@@ -26,6 +26,7 @@ import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PAnalysisManager;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import org.matsim.contrib.minibus.stats.operatorLogger.POperatorLogger;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -39,16 +40,10 @@ import org.matsim.core.controler.listener.StartupListener;
  */
 public final class PStatsModule extends AbstractModule {
 
-	private PConfigGroup pConfig;
-	private PtMode2LineSetter lineSetter;
-
-	public PStatsModule(PConfigGroup pConfig, PtMode2LineSetter lineSetter) {
-		this.pConfig = pConfig;
-		this.lineSetter = lineSetter;
-	}
-
 	@Override
 	public void install() {
+		PConfigGroup pConfig = ConfigUtils.addOrGetModule(this.getConfig(), PConfigGroup.class ) ;
+		
 		this.addControlerListenerBinding().to(PStatsOverview.class);
 		this.addControlerListenerBinding().toInstance(new POperatorLogger());
 		this.addControlerListenerBinding().toInstance(new GexfPStat(false, pConfig));
@@ -56,7 +51,7 @@ public final class PStatsModule extends AbstractModule {
 		this.addControlerListenerBinding().to(Line2GexfPStat.class);
 
 		if (pConfig.getWriteMetrics()) {
-			this.addControlerListenerBinding().toInstance(new PAnalysisManager(lineSetter, pConfig));
+			this.addControlerListenerBinding().toInstance(new PAnalysisManager(pConfig));
 		}
 
 		this.addControlerListenerBinding().to(ActivityLocationsParatransitUser.class);
