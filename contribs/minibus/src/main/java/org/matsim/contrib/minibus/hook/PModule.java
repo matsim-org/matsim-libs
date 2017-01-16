@@ -23,7 +23,7 @@
 package org.matsim.contrib.minibus.hook;
 
 import org.matsim.contrib.minibus.PConfigGroup;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.operator.Operators;
 import org.matsim.contrib.minibus.stats.PStatsModule;
@@ -33,41 +33,21 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouter;
+import org.matsim.pt.router.TransitRouter;
 
 public class PModule {
-	private AgentsStuckHandlerImpl agentsStuckHandler = null;
-	private PersonReRouteStuckFactory stuckFactory = null;
 	private PTransitRouterFactory pTransitRouterFactory = null;
-	private Class<? extends javax.inject.Provider<TripRouter>> tripRouterFactory = null;
-	private TicketMachineI ticketMachine;
+	private Class<? extends javax.inject.Provider<TripRouter>> tripRouterProvider = null;
 	
 	public void setPTransitRouterFactory(PTransitRouterFactory pTransitRouterFactory) {
 		this.pTransitRouterFactory = pTransitRouterFactory;
 	}
-	public void setStuckFactory(PersonReRouteStuckFactory stuckFactory) {
-		this.stuckFactory = stuckFactory;
-	}
 	public void setTripRouterFactory(Class<? extends javax.inject.Provider<TripRouter>> tripRouterFactory) {
-		this.tripRouterFactory = tripRouterFactory;
+		this.tripRouterProvider = tripRouterFactory;
 	}
 	public void configureControler(final Controler controler) {
 		final PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
 		pConfig.validate(controler.getConfig().planCalcScore().getMarginalUtilityOfMoney());
-		if ( this.ticketMachine==null ) {
-			this.ticketMachine = new TicketMachine(pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0 ) ;
-		}
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				this.bind(TicketMachineI.class).toInstance(ticketMachine);
-				this.bind(Operators.class).toInstance(new PBox(pConfig, ticketMachine ));
-				this.bindMobsim().toProvider(PQSimProvider.class) ;
-				this.addControlerListenerBinding().toInstance(new PControlerListener(controler, pTransitRouterFactory, stuckFactory, agentsStuckHandler));
-				this.bind(PtMode2LineSetter.class).to( BVGLines2PtModes.class ) ;
-				this.install( new PStatsModule() ) ;
-			}
-		});
-
 		if (pTransitRouterFactory == null) {
 			pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler(), pConfig.getPtRouter(), pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
 
@@ -77,14 +57,33 @@ public class PModule {
 			pTransitRouterFactory.createTransitRouterConfig(controler.getConfig());
 			pTransitRouterFactory.updateTransitSchedule(controler.getScenario().getTransitSchedule());
 		}
-		controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, this.pTransitRouterFactory));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toInstance( pTransitRouterFactory.get() ) ;
 
-		if (pConfig.getReRouteAgentsStuck()) {
-			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
-			if(stuckFactory == null) {
-				this.stuckFactory = new PersonReRouteStuckFactoryImpl();
+				AgentsStuckHandlerImpl agentsStuckHandler = null;
+				PersonReRouteStuckFactory stuckFactory = null;
+				if (pConfig.getReRouteAgentsStuck()) {
+					agentsStuckHandler = new AgentsStuckHandlerImpl();
+					if(stuckFactory == null) {
+						stuckFactory = new PersonReRouteStuckFactoryImpl();
+					}
+					bind(PersonReRouteStuckFactory.class).toInstance( stuckFactory );
+					bind(AgentsStuckHandlerImpl.class) ;
+				}
+				
+				addControlerListenerBinding().toInstance(new PControlerListener(controler, pTransitRouterFactory, stuckFactory, agentsStuckHandler));
+
+				bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
+				bind(Operators.class).to(PBox.class).asEagerSingleton();
+				bindMobsim().toProvider(PQSimProvider.class) ;
+				bind(PtMode2LineSetter.class).to( BVGLines2PtModes.class ) ;
+				install( new PStatsModule() ) ;
+				bind(TripRouter.class).toProvider(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterProvider, pTransitRouterFactory));
 			}
-		}
+		});
+
 
 	}
 }

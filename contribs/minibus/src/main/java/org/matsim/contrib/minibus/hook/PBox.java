@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.fare.StageContainerCreator;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.operator.*;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
@@ -45,6 +45,8 @@ import org.matsim.vehicles.Vehicle;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 /**
  * Black box for paratransit
@@ -80,7 +82,7 @@ public final class PBox implements Operators {
 	 * Constructor that allows to set the ticketMachine.  Deliberately in constructor and not as setter to keep the variable final.  Might be
 	 * replaced by a builder and/or guice at some later point in time.  But stay with "direct" injection for the time being.  kai, jan'17
 	 */
-	PBox(PConfigGroup pConfig, TicketMachineI ticketMachine) {
+	@Inject PBox(PConfigGroup pConfig, TicketMachineI ticketMachine) {
 		this.pConfig = pConfig;
 		this.ticketMachine = ticketMachine ;
 		this.scorePlansHandler = new PScorePlansHandler(this.ticketMachine);

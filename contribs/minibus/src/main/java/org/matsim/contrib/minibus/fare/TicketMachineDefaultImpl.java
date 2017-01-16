@@ -19,25 +19,26 @@
 
 package org.matsim.contrib.minibus.fare;
 
+import javax.inject.Inject;
+
+import org.matsim.contrib.minibus.PConfigGroup;
+
 /**
  * Calculates the fare for a given {@link StageContainer}.
  * 
  * @author aneumann
  *
  */
-public final class TicketMachine implements TicketMachineI {
+public final class TicketMachineDefaultImpl implements TicketMachineI {
 	
 	private final double earningsPerBoardingPassenger;
 	private final double earningsPerMeterAndPassenger;
 
-	public TicketMachine(double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger){
-		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
-		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
+	@Inject TicketMachineDefaultImpl(PConfigGroup pConfig ) {
+		this.earningsPerBoardingPassenger = pConfig.getEarningsPerBoardingPassenger() ;
+		this.earningsPerMeterAndPassenger = pConfig.getEarningsPerKilometerAndPassenger()/1000. ;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.minibus.fare.TicketMachineI#getFare(org.matsim.contrib.minibus.fare.StageContainer)
-	 */
 	@Override
 	public double getFare(StageContainer stageContainer) {
 		return this.earningsPerBoardingPassenger + this.earningsPerMeterAndPassenger * stageContainer.getDistanceTravelledInMeter();
