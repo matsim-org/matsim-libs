@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4urbansim.interpolation;
+package org.matsim.contrib.accessibility.interpolation;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.MathException;

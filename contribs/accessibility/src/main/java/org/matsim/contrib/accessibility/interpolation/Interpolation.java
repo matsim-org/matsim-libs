@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4urbansim.interpolation;
+package org.matsim.contrib.accessibility.interpolation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
