@@ -20,6 +20,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePlan;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
@@ -33,6 +34,12 @@ public class BasePlanImpl implements BasePlan {
 	private final List<PlanElement> planElements = new ArrayList<PlanElement>();
 	private Double score;
 	private Person person;
+		
+	private final Attributes attributes = new Attributes();
+	@Override
+	public final Attributes getAttributes() {
+		return this.attributes;
+	}
 
 	//Static methods
 	public static void createBasePlan(boolean fixedTypes, String[] types, BasePersonImpl newPerson, Plan plan, TripRouter tripRouter, ActivityFacilities facilities) {

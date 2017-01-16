@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Optimized data structure used in the location choice contribution. There, a huge amount of plans are created and
@@ -70,6 +71,12 @@ public class LCPlan implements Plan {
 	/*package*/ double[] travTimes;
 	/*package*/ String[] modes;
 	
+	private final Attributes attributes = new Attributes();
+	@Override
+	public final Attributes getAttributes() {
+		return this.attributes;
+	}
+
 	public LCPlan(Plan plan) {
 		copyFrom(plan, this);
 	}
