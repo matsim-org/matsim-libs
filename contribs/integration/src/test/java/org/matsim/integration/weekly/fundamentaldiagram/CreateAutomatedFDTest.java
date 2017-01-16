@@ -285,7 +285,7 @@ public class CreateAutomatedFDTest {
 		 */
 
 		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
-		String fileName = linkDynamics+"_"+trafficDynamics+"_"+".png";
+		String fileName = linkDynamics+"_"+trafficDynamics+".png";
 		
 		new File(outDir+ linkDynamics+"_"+trafficDynamics+".png").deleteOnExit();
 		
