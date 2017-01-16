@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -62,16 +63,18 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private final PVehiclesFactory pVehiclesFactory;
 	
 	private final AgentsStuckHandlerImpl agentsStuckHandler;
-	@Inject private Operators operators ;
+	private final Operators operators ;
 
     private final PersonReRouteStuckFactory stuckFactory;
 
-    PControlerListener(MatsimServices controler, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, AgentsStuckHandlerImpl agentsStuckHandler){
-        PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
+    @Inject PControlerListener(Config config, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, 
+		    AgentsStuckHandlerImpl agentsStuckHandler, Operators operators ){
+        PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.GROUP_NAME, PConfigGroup.class);
         this.pTransitRouterFactory = pTransitRouterFactory;
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
         this.agentsStuckHandler = agentsStuckHandler;
         this.stuckFactory = stuckFactory;
+        this.operators = operators ;
 	}
 	
 	@Override

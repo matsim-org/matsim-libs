@@ -60,20 +60,20 @@ public class PModule {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TransitRouter.class).toInstance( pTransitRouterFactory.get() ) ;
+				bind(PTransitRouterFactory.class).toInstance( pTransitRouterFactory ) ;
 
 				AgentsStuckHandlerImpl agentsStuckHandler = null;
 				PersonReRouteStuckFactory stuckFactory = null;
-				if (pConfig.getReRouteAgentsStuck()) {
+//				if (pConfig.getReRouteAgentsStuck()) {
 					agentsStuckHandler = new AgentsStuckHandlerImpl();
-					if(stuckFactory == null) {
+//					if(stuckFactory == null) {
 						stuckFactory = new PersonReRouteStuckFactoryImpl();
-					}
+//					}
 					bind(PersonReRouteStuckFactory.class).toInstance( stuckFactory );
 					bind(AgentsStuckHandlerImpl.class) ;
-				}
+//				}
 				
-				addControlerListenerBinding().toInstance(new PControlerListener(controler, pTransitRouterFactory, stuckFactory, agentsStuckHandler));
+				addControlerListenerBinding().to(PControlerListener.class) ;
 
 				bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
 				bind(Operators.class).to(PBox.class).asEagerSingleton();
