@@ -57,7 +57,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 	private static final String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
-	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil-mixedTraffic/";
+	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance4_600its/";
 	private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
 	public static void main(String[] args) {
@@ -101,6 +101,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
 		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
+
 
 		planCalcScoreConfigGroup.addModeParams(mpCar);
 		planCalcScoreConfigGroup.addModeParams(mpBike);
@@ -170,13 +171,13 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, 1.0,  EQUIL_MIXEDTRAFFIC, null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, 4.0,  EQUIL_MIXEDTRAFFIC, null);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL_MIXEDTRAFFIC);
 
 		// what would decide the convergence of the objective function
-		final int iterationsToConvergence = 100; //
+		final int iterationsToConvergence = 600; //
 		final int averagingIterations = 10;
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
 
