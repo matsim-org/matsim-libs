@@ -34,7 +34,7 @@ public final class TicketMachineDefaultImpl implements TicketMachineI {
 	private final double earningsPerBoardingPassenger;
 	private final double earningsPerMeterAndPassenger;
 
-	@Inject TicketMachineDefaultImpl(PConfigGroup pConfig ) {
+	@Inject public TicketMachineDefaultImpl(PConfigGroup pConfig ) {
 		this.earningsPerBoardingPassenger = pConfig.getEarningsPerBoardingPassenger() ;
 		this.earningsPerMeterAndPassenger = pConfig.getEarningsPerKilometerAndPassenger()/1000. ;
 	}
