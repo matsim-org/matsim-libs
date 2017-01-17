@@ -56,8 +56,8 @@ public class SpatialTemporalScoreAnalysis {
 		return scenario;
 	}
 	
-	//Calculate score of people with in the area of focus, in the considered time, using a given mode
-	public void calculateScore(String mode, Coord origin, double gridsize, double fromtime, double totime){ 
+	//Calculate score of people with in the area of focus, in the considered time, using a given mode and returns a tuple (number of relevant people, score)
+	public String calculateScore(String mode, Coord origin, double gridsize, double fromtime, double totime){ 
 		Set<Person> relevantpersons = getRelevantPersons(mode, origin, gridsize, fromtime, totime);
 //		Iterator<Id<Person>> iter = scenario.getPopulation().getPersons().keySet().iterator();
 //		while(iter.hasNext()){
@@ -68,6 +68,7 @@ public class SpatialTemporalScoreAnalysis {
 //		}
 		double score = getScoreOfRelevantPersons(relevantpersons);
 		System.out.println("The average score of relevant population is: " + score);
+		return relevantpersons.size() + "," + score;
 	}
 	
 	//return people with in the area of focus, in the considered time, using a given mode
