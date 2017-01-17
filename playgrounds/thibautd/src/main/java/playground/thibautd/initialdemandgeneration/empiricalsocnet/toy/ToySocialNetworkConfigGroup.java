@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.empiricalsocnet.toy;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -62,8 +63,8 @@ public class ToySocialNetworkConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Override
-	protected void checkConsistency() {
-		super.checkConsistency();
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
 		if ( median_distance_m > mean_distance_m ) throw new IllegalStateException( "median cannot be higher than mean for lognormal" );
 	}
 

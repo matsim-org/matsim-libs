@@ -17,29 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.fare;
+package org.matsim.contrib.minibus.stats.abtractPAnalysisModules;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import java.util.HashMap;
 
 /**
- * Calculates the fare for a given {@link StageContainer}.
+ * Some common methods for setting public transit modes for each public transit line.
+ * This information should come from the mode set in the schedule itself.
+ * As of now August 2012, it is not clear what the transport mode in the schedule is ment to be.
  * 
  * @author aneumann
  *
  */
-public final class TicketMachine implements TicketMachineI {
-	
-	private final double earningsPerBoardingPassenger;
-	private final double earningsPerMeterAndPassenger;
+public interface LineId2PtMode {
 
-	public TicketMachine(double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger){
-		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
-		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.minibus.fare.TicketMachineI#getFare(org.matsim.contrib.minibus.fare.StageContainer)
+	/**
+	 * 
+	 * @param transitSchedule Transit schedule with the lines
+	 * @param pIdentifier A String identifying paratransit lines
 	 */
-	@Override
-	public double getFare(StageContainer stageContainer) {
-		return this.earningsPerBoardingPassenger + this.earningsPerMeterAndPassenger * stageContainer.getDistanceTravelledInMeter();
-	}
+	void setPtModesForEachLine(TransitSchedule transitSchedule, String pIdentifier);
+	
+	/**
+	 * 
+	 * @return Returns one public transit mode for each line id
+	 */
+	HashMap<Id<TransitLine>, String> getLineId2ptModeMap();
+	
 }

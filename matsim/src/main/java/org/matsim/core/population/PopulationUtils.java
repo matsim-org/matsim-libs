@@ -367,6 +367,12 @@ public final class PopulationUtils {
 		public void setScore(Double score) {
 			throw new UnsupportedOperationException() ;
 		}
+
+		@Override
+		public Attributes getAttributes() {
+			// TODO yyyy should be made unmodifiable.  kai, jan'17
+			return delegate.getAttributes() ;
+		}
 	}
 
 	/**

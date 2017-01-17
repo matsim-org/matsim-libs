@@ -88,7 +88,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 				if (this.ptRouter.equalsIgnoreCase("raptor")) {
 					// nothing to do here
 				} else {
-					log.warn("Could not create speedy router, fall back to normal one.  This is so far not fatal.");
+					log.info("Could not create speedy router, fall back to normal one.  This is so far not fatal.");
 //					Gbl.assertNotNull(this.schedule);
 					Gbl.assertNotNull(this.transitRouterConfig);
 					this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.transitRouterConfig.getBeelineWalkConnectionDistance());
@@ -122,7 +122,9 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 			Constructor<?> ct = cls.getConstructor(new Class[] {TransitSchedule.class, TransitRouterConfig.class, String.class});
 			return (Provider<TransitRouter>) ct.newInstance(this.schedule, this.transitRouterConfig, this.ptEnabler);
 		} catch (ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			// I don't like output to stderr when the program execution is actually ok.  kai, jan'16
+			log.info(e.toString() );
 		}
         return null;
 	}

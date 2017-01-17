@@ -25,6 +25,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -1152,8 +1153,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 * currently set. Currently, this checks that for at least one activity type opening AND closing
 		 * times are defined. */
 		@Override
-		public void checkConsistency() {
-			super.checkConsistency();
+		public void checkConsistency(Config config) {
+			super.checkConsistency(config);
 			boolean hasOpeningAndClosingTime = false;
 			boolean hasOpeningTimeAndLatePenalty = false ;
 

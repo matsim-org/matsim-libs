@@ -24,14 +24,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.fare.StageContainerCreator;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.operator.*;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.schedule.PStopsFactory;
 import org.matsim.contrib.minibus.scoring.OperatorCostCollectorHandler;
-import org.matsim.contrib.minibus.scoring.ScoreContainer;
-import org.matsim.contrib.minibus.scoring.ScorePlansHandler;
+import org.matsim.contrib.minibus.scoring.PScoreContainer;
+import org.matsim.contrib.minibus.scoring.PScorePlansHandler;
 import org.matsim.contrib.minibus.scoring.StageContainer2AgentMoneyEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -46,13 +46,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  * Black box for paratransit
  * 
  * @author aneumann
  *
  */
-final class PBox implements Operators {
+public final class PBox implements Operators {
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PBox.class);
@@ -66,7 +68,7 @@ final class PBox implements Operators {
 	private TransitSchedule pStopsOnly;
 	private TransitSchedule pTransitSchedule;
 	
-	private final ScorePlansHandler scorePlansHandler;
+	private final PScorePlansHandler scorePlansHandler;
 	private final StageContainerCreator stageCollectorHandler;
 	private final OperatorCostCollectorHandler operatorCostCollectorHandler;
 	private final PStrategyManager strategyManager = new PStrategyManager();
@@ -80,10 +82,10 @@ final class PBox implements Operators {
 	 * Constructor that allows to set the ticketMachine.  Deliberately in constructor and not as setter to keep the variable final.  Might be
 	 * replaced by a builder and/or guice at some later point in time.  But stay with "direct" injection for the time being.  kai, jan'17
 	 */
-	PBox(PConfigGroup pConfig, TicketMachineI ticketMachine) {
+	@Inject PBox(PConfigGroup pConfig, TicketMachineI ticketMachine) {
 		this.pConfig = pConfig;
 		this.ticketMachine = ticketMachine ;
-		this.scorePlansHandler = new ScorePlansHandler(this.ticketMachine);
+		this.scorePlansHandler = new PScorePlansHandler(this.ticketMachine);
 		this.stageCollectorHandler = new StageContainerCreator(this.pConfig.getPIdentifier());
 		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0, this.pConfig.getCostPerHour() / 3600.0);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());
@@ -185,7 +187,7 @@ final class PBox implements Operators {
 			welfareAnalyzer.writeToFile(event);
 		}
 		
-		Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
+		Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
 		for (Operator operator : this.operators) {
 			operator.score(driverId2ScoreMap);
 		}

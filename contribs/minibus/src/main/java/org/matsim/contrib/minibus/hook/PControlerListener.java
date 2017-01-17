@@ -22,6 +22,8 @@ package org.matsim.contrib.minibus.hook;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
+import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -46,6 +48,8 @@ import org.matsim.vehicles.Vehicles;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 /**
  * Hook to register paratransit black box with MATSim
  * 
@@ -59,24 +63,26 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private final PVehiclesFactory pVehiclesFactory;
 	
 	private final AgentsStuckHandlerImpl agentsStuckHandler;
-	private final PBox pBox;
+	private final Operators operators ;
 
     private final PersonReRouteStuckFactory stuckFactory;
 
-    PControlerListener(MatsimServices controler, PBox pBox, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, AgentsStuckHandlerImpl agentsStuckHandler){
-        PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
+    @Inject PControlerListener(Config config, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, 
+		    AgentsStuckHandlerImpl agentsStuckHandler, Operators operators ){
+        PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.GROUP_NAME, PConfigGroup.class);
         this.pTransitRouterFactory = pTransitRouterFactory;
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
         this.agentsStuckHandler = agentsStuckHandler;
         this.stuckFactory = stuckFactory;
-		this.pBox = pBox;
+        this.operators = operators ;
 	}
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.pBox.notifyStartup(event);
-        addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
-		addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
+		PBox pBox = (PBox) operators ;
+		pBox.notifyStartup(event);
+        addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), pBox.getpTransitSchedule());
+		addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
 		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
 		this.pTransitRouterFactory.updateTransitSchedule(event.getServices().getScenario().getTransitSchedule());
@@ -88,15 +94,16 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+		PBox pBox = (PBox) operators ;
 		final MatsimServices controler = event.getServices();
 		if(event.getIteration() == controler.getConfig().controler().getFirstIteration()){
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
-			this.pBox.notifyIterationStarts(event);
+			pBox.notifyIterationStarts(event);
             removePreviousPTransitScheduleFromOriginalOne(event.getServices().getScenario().getTransitSchedule());
-			addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
+			addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), pBox.getpTransitSchedule());
 			removePreviousPVehiclesFromScenario(event.getServices().getScenario().getTransitVehicles());
-            addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
+            addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
 			this.pTransitRouterFactory.updateTransitSchedule(event.getServices().getScenario().getTransitSchedule());
 			
@@ -117,7 +124,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 
     @Override
 	public void notifyScoring(ScoringEvent event) {
-		this.pBox.notifyScoring(event);
+		PBox pBox = (PBox) operators ;
+		pBox.notifyScoring(event);
 	}
 
     private final Set<Id<TransitStopFacility>> currentExclusivePFacilityIDs = new HashSet<>();

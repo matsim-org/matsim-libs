@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.framework.scoring;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -100,13 +101,13 @@ public class GroupSizePreferencesConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Override
-	protected void checkConsistency() {
-		super.checkConsistency();
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
 		if ( maxPref < minPref ) throw new IllegalStateException( "max pref "+maxPref+" lower than min "+minPref+"!" );
 	}
 
-	public int getPersonPreference( final Person person ) {
-		checkConsistency();
+	public int getPersonPreference( final Person person, Config config ) {
+		checkConsistency(config);
 
 		final int personalSeed = seed + person.getId().toString().hashCode();
 		final Random random = new Random( personalSeed );

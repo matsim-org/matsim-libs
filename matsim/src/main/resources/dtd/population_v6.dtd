@@ -15,7 +15,7 @@
           name        CDATA #REQUIRED
           class       CDATA #REQUIRED>
 
-<!ELEMENT plan           (activity|leg)*>
+<!ELEMENT plan          (attributes?, (activity|leg)* )>
 <!ATTLIST plan
           score          CDATA    #IMPLIED
           type           CDATA    #IMPLIED

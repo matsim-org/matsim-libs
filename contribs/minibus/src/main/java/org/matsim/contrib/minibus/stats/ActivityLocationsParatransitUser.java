@@ -43,6 +43,8 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
+
 /**
  * Accumulates the number of activities right before and after a paratransit trip. Ignores pt interactions.
  * Accumulation is done with respect to given grid size. Grid nodes' coordinates are the weighted average 
@@ -61,7 +63,7 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 	private Set<String> actTypes = new TreeSet<>();
 	private HashMap<String, GridNode> gridNodeId2GridNode = new HashMap<>();
 
-	public ActivityLocationsParatransitUser(PConfigGroup pConfig) {
+	@Inject ActivityLocationsParatransitUser(PConfigGroup pConfig) {
 		this(pConfig.getPIdentifier(), pConfig.getGridSize());
 	}
 	

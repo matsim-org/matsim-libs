@@ -177,7 +177,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 				new GroupCompositionPenalizer(
 						groupSizeGroup.getActivityType(),
 						new GroupCompositionPenalizer.MinGroupSizeLinearUtilityOfTime(
-								groupSizeGroup.getPersonPreference(person),
+								groupSizeGroup.getPersonPreference(person, scenario.getConfig() ),
 								groupSizeGroup.getUtilityOfMissingContact_util_s())));
 
 
