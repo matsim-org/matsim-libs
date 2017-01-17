@@ -70,7 +70,6 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class CarPassingBusTest {
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils(); 
 	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private static final boolean isUsingOTFVis = false;
 	
