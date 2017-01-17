@@ -74,7 +74,7 @@ public class PatnaBikeTrackGenerator {
 
 			if(sf.getFeatureType() instanceof SimpleFeatureTypeImpl){
 
-				if( ((String)sf.getAttribute("type") ).equals("platform")) continue;
+				if( sf.getAttribute("type").equals("platform")) continue;
 
 				String osmId = (String)sf.getAttribute("osm_id") ;
 

@@ -152,7 +152,7 @@ public class CongestionTestExamples {
 		});
 		
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) {
-			events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario)sc));
+			events.addHandler(new CongestionHandlerImplV3(events, sc));
 			Logger.getLogger(CongestionTestExamples.class).warn("The analysis table is generated using events and thus there are some delays unaccounted in implV3.");
 		}
 		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));

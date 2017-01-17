@@ -130,7 +130,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
 		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 				vehicle,
-				Integer.parseInt(NetworkUtils.getType(((Link) link))),
+				Integer.parseInt(NetworkUtils.getType(link)),
 				link.getFreespeed(),
 				distance,
 				linkTravelTime

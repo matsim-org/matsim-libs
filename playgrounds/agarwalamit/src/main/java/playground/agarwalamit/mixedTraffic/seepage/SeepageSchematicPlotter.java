@@ -95,7 +95,7 @@ public class SeepageSchematicPlotter {
 		sc.getConfig().planCalcScore().addActivityParams(workAct);
 
 		sc.getConfig().qsim().setLinkWidthForVis((float)0);
-		((Network) sc.getNetwork()).setEffectiveLaneWidth(0.);	
+		sc.getNetwork().setEffectiveLaneWidth(0.);
 
 		Map<String, VehicleType> modesType = new HashMap<>();
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
@@ -207,7 +207,7 @@ public class SeepageSchematicPlotter {
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 
-			network = (Network) scenario.getNetwork();
+			network = scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(0.0, 0.0));
 			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord(0.0, 100.0));

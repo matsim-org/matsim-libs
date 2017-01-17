@@ -88,7 +88,7 @@ public class AgentPositionWriterOld {
 		if( IS_WRITING_TRANSIM_FILE ){
 			// not sure, if following three lines are required.
 			sc.getConfig().qsim().setLinkWidthForVis((float)0);
-			((Network)sc.getNetwork()).setEffectiveLaneWidth(0.);
+			sc.getNetwork().setEffectiveLaneWidth(0.);
 
 			sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
 			transimFile = apw.createAndReturnTransimSnapshotFile(sc, eventsFile);
