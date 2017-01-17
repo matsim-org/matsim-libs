@@ -123,7 +123,6 @@ public class FlowStorageSpillbackTest {
 
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
-			    System.err.println(event.toString());
 				linkLeaveEvents.add(event);
 			}			
 		});

@@ -246,13 +246,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	boolean doSimStep() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
-        for (QLaneI lane : this.laneQueues.values()) {
-            lane.initBeforeSimStep();
-        }
-		
 		boolean lanesActive = false;
 		boolean movedWaitToRoad = false;
 		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
+		    
+		    //TODO moveBufferToNextLane should be before waitToRoad and doSimStep!!!
+		    
 			this.moveWaitToRoad(now);
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
 			lanesActive = this.moveLanes();
@@ -288,6 +287,11 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			}
 			/* end of part A */
 		}
+		
+        for (QLaneI lane : this.laneQueues.values()) {
+            lane.initBeforeSimStep();
+        }
+        
 		for (QLaneI lane : this.laneQueues.values()) {
 			// (go through all lanes)
 		
