@@ -68,7 +68,7 @@ public class EmissionAnalysisControlerListener implements  ShutdownListener {
         Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionCosts();
 
         try (BufferedWriter writer = IOUtils.getBufferedWriter(iterationDir+controlerConfigGroup.getLastIteration()+".emissionsCostsMoneyUnits.txt")) {
-            if(this.emissionCostHandler.isFiltering()) { //TODO why only munich user group; personFilter interface can have the list of user groups.
+            if(this.emissionCostHandler.isFiltering()) {
                 writer.write("userGroup \t costsInMoneyUnits \n");
                 for ( String ug : userGrp2cost.keySet()) {
                     writer.write(ug+"\t");
