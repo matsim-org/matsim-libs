@@ -245,6 +245,11 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	@Override
 	boolean doSimStep() {
 		double now = context.getSimTimer().getTimeOfDay() ;
+		
+        for (QLaneI lane : this.laneQueues.values()) {
+            lane.initBeforeSimStep();
+        }
+		
 		boolean lanesActive = false;
 		boolean movedWaitToRoad = false;
 		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
