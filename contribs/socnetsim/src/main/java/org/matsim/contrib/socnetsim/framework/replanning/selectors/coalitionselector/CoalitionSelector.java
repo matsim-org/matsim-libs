@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,6 +38,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.ScoreWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalculator;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * Selects a combination of plans without "blocking coalition",
@@ -45,6 +47,8 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalcula
  * @author thibautd
  */
 public class CoalitionSelector implements GroupLevelPlanSelector {
+	private static final Logger log = Logger.getLogger( CoalitionSelector.class );
+	
 	private final ConflictSolver conflictSolver;
 	private final WeightCalculator weight;
 
@@ -73,6 +77,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan = new HashMap<JointPlan, Collection<PlanRecord>>();
 
 			// create agents
+			log.trace( "initialize pointing agents" );
 			for ( Person person : group.getPersons() ) {
 				final PointingAgent agent =
 					new PointingAgent(
@@ -92,14 +97,20 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			}
 
 			// iterate
+			log.trace( "start iterations" );
 			final GroupPlans groupPlans = new GroupPlans();
+			final Counter counter = new Counter( "do iteration # " );
 			while ( !agents.isEmpty() ) {
+				if ( log.isTraceEnabled() ) counter.incCounter();
 				doIteration(
 						jointPlans,
 						agents,
 						recordsPerJointPlan,
 						groupPlans );
 			}
+			if ( log.isTraceEnabled() )
+				log.trace( "did "+counter.getCounter()+
+						" iterations ("+(((double) counter.getCounter()) / group.getPersons().size())+" per person)" );
 
 			return groupPlans;
 		}
@@ -125,6 +136,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			final JointPlan pointedJointPlan = jointPlans.getJointPlan( pointedPlan );
 
 			if ( pointedJointPlan == null ) {
+				// agent points its individual plan
 				groupPlans.addIndividualPlan( pointedPlan );
 
 				final Id id = entry.getKey();
@@ -132,7 +144,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 				return;
 			}
 			else if ( areAllPlansPointed( recordsPerJointPlan.get( pointedJointPlan ) ) ) {
-
+				// found a dominating joint plan
 				groupPlans.addJointPlan( pointedJointPlan );
 
 				for ( Id id : pointedJointPlan.getIndividualPlans().keySet() ) {
