@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.router;
 
 import java.util.ArrayList;
 import java.util.Collection;

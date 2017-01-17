@@ -1,4 +1,4 @@
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.router;
 
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;

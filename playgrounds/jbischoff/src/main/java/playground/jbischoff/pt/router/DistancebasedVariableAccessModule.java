@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.router;
 
 import java.util.HashMap;
 import java.util.HashSet;

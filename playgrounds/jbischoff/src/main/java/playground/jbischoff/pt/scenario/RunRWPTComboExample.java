@@ -43,9 +43,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Binder;
 
 import playground.jbischoff.analysis.TripHistogramModule;
-import playground.jbischoff.pt.VariableAccessConfigGroup;
-import playground.jbischoff.pt.VariableAccessModeConfigGroup;
-import playground.jbischoff.pt.VariableAccessTransitRouterModule;
+import playground.jbischoff.pt.router.VariableAccessTransitRouterModule;
+import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
+import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
 
 /**
  * @author  jbischoff

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.router;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

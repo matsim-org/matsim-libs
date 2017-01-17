@@ -54,10 +54,10 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Names;
 
-import playground.jbischoff.pt.VariableAccessConfigGroup;
-import playground.jbischoff.pt.VariableAccessModeConfigGroup;
-import playground.jbischoff.pt.VariableAccessTransit;
-import playground.jbischoff.pt.VariableAccessTransitRouterImplFactory;
+import playground.jbischoff.pt.router.VariableAccessTransit;
+import playground.jbischoff.pt.router.VariableAccessTransitRouterImplFactory;
+import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
+import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
 import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModes;
 
 /**

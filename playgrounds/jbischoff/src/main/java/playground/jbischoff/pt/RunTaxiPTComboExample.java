@@ -43,6 +43,10 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.name.Names;
 
+import playground.jbischoff.pt.router.VariableAccessTransitRouterModule;
+import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
+import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
+
 
 /**
  * @author  jbischoff
