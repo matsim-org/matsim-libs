@@ -84,8 +84,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
         addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), pBox.getpTransitSchedule());
 		addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
-		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
-		this.pTransitRouterFactory.updateTransitSchedule();
+//		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
+//		this.pTransitRouterFactory.updateTransitSchedule();
 		
 		if(this.agentsStuckHandler != null){
 			event.getServices().getEvents().addHandler(this.agentsStuckHandler);
@@ -105,7 +105,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			removePreviousPVehiclesFromScenario(event.getServices().getScenario().getTransitVehicles());
             addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
-			this.pTransitRouterFactory.updateTransitSchedule();
+//			this.pTransitRouterFactory.updateTransitSchedule();
 			
 			if(this.agentsStuckHandler != null){
                 ParallelPersonAlgorithmRunner.run(controler.getScenario().getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {

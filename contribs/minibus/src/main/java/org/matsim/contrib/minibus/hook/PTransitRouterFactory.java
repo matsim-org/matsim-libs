@@ -23,10 +23,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.performance.raptor.Raptor;
 import org.matsim.contrib.minibus.performance.raptor.RaptorDisutility;
 import org.matsim.contrib.minibus.performance.raptor.TransitRouterQuadTree;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -39,7 +45,7 @@ import javax.inject.Provider;
  * @author aneumann
  *
  */
-class PTransitRouterFactory implements Provider<TransitRouter> {
+class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener, IterationStartsListener {
 	
 	private final static Logger log = Logger.getLogger(PTransitRouterFactory.class);
 	private TransitRouterConfig transitRouterConfig;
@@ -55,18 +61,21 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 	private RaptorDisutility raptorDisutility;
 	private TransitRouterQuadTree transitRouterQuadTree;
 	
-	public PTransitRouterFactory(String ptEnabler, String ptRouter, double costPerBoarding, double costPerMeterTraveled){
-		this.ptEnabler = ptEnabler;
-		this.ptRouter = ptRouter;
-		this.costPerBoarding = costPerBoarding;
-		this.costPerMeterTraveled = costPerMeterTraveled;
+	public PTransitRouterFactory(Config config){
+		PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class) ;
+		this.ptEnabler = pConfig.getPtEnabler() ;
+		this.ptRouter = pConfig.getPtRouter() ;
+		this.costPerBoarding = pConfig.getEarningsPerBoardingPassenger() ;
+		this.costPerMeterTraveled = pConfig.getEarningsPerKilometerAndPassenger() ;
+		
+		this.createTransitRouterConfig(config);
 	}
 
-	public void createTransitRouterConfig(Config config) {
+	private void createTransitRouterConfig(Config config) {
 		this.transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
 	
-	public void updateTransitSchedule() {
+	private void updateTransitSchedule() {
 		this.needToUpdateRouter = true;
 //		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
 		
@@ -127,5 +136,15 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 			log.info(e.toString() );
 		}
         return null;
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		this.updateTransitSchedule();
+	}
+
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		this.updateTransitSchedule();
 	}
 }
