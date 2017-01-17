@@ -281,8 +281,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		
         if( this.flowcap_accumulate.getTimeStep() < now //always true for slow update
                 && this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
-                && isNotOfferingVehicle() ){// should be: isBufferNotFull()
-			
+                /*&& isNotOfferingVehicle()*/ ){// consider: isBufferNotFull()
+
 				double flowCapSoFar = flowcap_accumulate.getValue();
 				double timeSteps = context.qsimConfig.isUsingFastCapacityUpdate() ?
 				        (now - flowcap_accumulate.getTimeStep()) : 1;
