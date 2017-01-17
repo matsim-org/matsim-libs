@@ -22,54 +22,39 @@
 
 package org.matsim.contrib.minibus.hook;
 
-import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.operator.Operators;
 import org.matsim.contrib.minibus.stats.PStatsModule;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.pt.router.TransitRouter;
 
-public final class PModule {
+public final class PModule extends AbstractModule {
 
-	public static void configureControler(final Controler controler) {
-		final PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
+	@Override public void install() {
+		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(this.getConfig());
+		bind(PTransitRouterFactory.class).toInstance( pTransitRouterFactory ) ;
+		bind(TransitRouter.class).toProvider(pTransitRouterFactory);
 
-		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(controler.getConfig());
+		// yyyy the following two should only be bound when pConfig.getReRouteAgentsStuck() is true.  But this
+		// does not work without problems (the binding needs to be optional).  kai, jan'17
+		bind(PersonReRouteStuckFactory.class).to( PersonReRouteStuckFactoryImpl.class );
+		bind(AgentsStuckHandlerImpl.class) ;
 
-		// For some unknown reason, the core starts failing when I start requesting a trip router out of an injected trip router in 
-		// ScoreStatsControlerListener.  Presumably, the manually constructed build procedure here conflicts with the (newer) standard guice
-		// procedure.  For the time being, the following two lines seem to fix it.  kai, nov'16
-//		pTransitRouterFactory.createTransitRouterConfig(controler.getConfig());
+		addControlerListenerBinding().to(PControlerListener.class) ;
+		addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override public void install() {
-				bind(PTransitRouterFactory.class).toInstance( pTransitRouterFactory ) ;
-		            bind(TransitRouter.class).toProvider(pTransitRouterFactory);
+		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
 
-				// yyyy the following two should only be bound when pConfig.getReRouteAgentsStuck() is true.  But this
-				// does not work without problems (the binding needs to be optional).  kai, jan'17
-				bind(PersonReRouteStuckFactory.class).to( PersonReRouteStuckFactoryImpl.class );
-				bind(AgentsStuckHandlerImpl.class) ;
+		bind(Operators.class).to(PBox.class).asEagerSingleton();
+		// (needs to be a singleton since it is a data container, and all clients should use the same data container. kai, jan'17)
 
-				addControlerListenerBinding().to(PControlerListener.class) ;
-		            addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;
+		bindMobsim().toProvider(PQSimProvider.class) ;
+		bind(LineId2PtMode.class).to( BVGLines2PtModes.class ) ;
 
-				bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
-
-				bind(Operators.class).to(PBox.class).asEagerSingleton();
-				// (needs to be a singleton since it is a data container, and all clients should use the same data container. kai, jan'17)
-				
-				bindMobsim().toProvider(PQSimProvider.class) ;
-				bind(LineId2PtMode.class).to( BVGLines2PtModes.class ) ;
-				
-				install( new PStatsModule() ) ;
-			}
-		});
-
+		install( new PStatsModule() ) ;
 	}
+
 }
