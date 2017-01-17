@@ -98,7 +98,7 @@ public class DistancebasedVariableAccessModule implements VariableAccessEgressTr
 	 * @see playground.jbischoff.pt.VariableAccessEgressTravelDisutility#getAccessEgressModeAndTraveltime(org.matsim.api.core.v01.population.Person, org.matsim.api.core.v01.Coord, org.matsim.api.core.v01.Coord)
 	 */
 	@Override
-	public Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord) {
+	public Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord, double time) {
 		double egressDistance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		String mode = getModeForDistance(egressDistance);
 		Leg leg = PopulationUtils.createLeg(mode);
@@ -113,6 +113,7 @@ public class DistancebasedVariableAccessModule implements VariableAccessEgressTr
 			double travelTime = distance / speed;
 			leg.setTravelTime(travelTime);
 			route.setDistance(distance);
+			leg.setDepartureTime(time);
 			
 						
 		} else {

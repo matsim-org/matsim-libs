@@ -98,7 +98,7 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 		VariableAccessModeConfigGroup taxi = new VariableAccessModeConfigGroup();
 		taxi.setDistance(20000);
 		taxi.setTeleported(false);
-		taxi.setMode("taxi");
+		taxi.setMode("car");
 		VariableAccessConfigGroup vacfg = new VariableAccessConfigGroup();
 		vacfg.setAccessModeGroup(taxi);
 		vacfg.setAccessModeGroup(walk);

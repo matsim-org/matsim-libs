@@ -42,7 +42,7 @@ public interface VariableAccessEgressTravelDisutility {
 	 * @param toCoord
 	 * @return
 	 */
-	Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord);
+	Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord, double time);
 	/**
 	 * 
 	 * @param mode
