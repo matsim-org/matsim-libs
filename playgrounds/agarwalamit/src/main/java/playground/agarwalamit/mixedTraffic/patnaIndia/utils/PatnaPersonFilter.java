@@ -19,10 +19,10 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.utils;
 
 import java.util.Arrays;
-
+import java.util.List;
+import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-
 import playground.agarwalamit.utils.PersonFilter;
 
 /**
@@ -69,7 +69,11 @@ public class PatnaPersonFilter implements PersonFilter{
 
 	@Override
 	public String getUserGroupAsStringFromPersonId(Id<Person> personId) {
-		PatnaUserGroup pug = PatnaPersonFilter.getUserGroup(personId);
-		return pug.toString();
+		return PatnaPersonFilter.getUserGroup(personId).toString();
+	}
+
+	@Override
+	public List<String> getUserGroupsAsStrings() {
+		return Arrays.stream(PatnaUserGroup.values()).map(Enum::toString).collect(Collectors.toList());
 	}
 }
