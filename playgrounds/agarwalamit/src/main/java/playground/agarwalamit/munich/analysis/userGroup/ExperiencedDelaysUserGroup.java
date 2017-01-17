@@ -24,14 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
@@ -70,8 +68,8 @@ public class ExperiencedDelaysUserGroup {
 	}
 
 	private void init(final String runCase){
-		this.userGroupToDelays  = new TreeMap<>();
 		this.time2linkIdDelays = new HashMap<>();
+		this.userGroupToDelays  = new TreeMap<>();
 		for (MunichUserGroup ug:MunichUserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
