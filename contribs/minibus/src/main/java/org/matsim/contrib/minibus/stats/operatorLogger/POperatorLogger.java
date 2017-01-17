@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.contrib.minibus.operator.POperators;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -68,7 +68,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 	
 	private BufferedWriter pOperatorLoggerWriter;
 
-	@Inject private Operators pBox;
+	@Inject private POperators pBox;
 	@Inject private PConfigGroup pConfig;
 
 	@Override

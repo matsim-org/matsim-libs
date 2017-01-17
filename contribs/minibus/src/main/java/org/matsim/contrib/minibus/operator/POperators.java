@@ -24,7 +24,7 @@ package org.matsim.contrib.minibus.operator;
 
 import java.util.List;
 
-public interface Operators {
+public interface POperators {
 
     public List<Operator> getOperators();
 

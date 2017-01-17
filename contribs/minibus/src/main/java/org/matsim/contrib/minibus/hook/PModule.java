@@ -22,12 +22,14 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
-import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.contrib.minibus.operator.POperators;
 import org.matsim.contrib.minibus.stats.PStatsModule;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouter;
 
@@ -35,26 +37,28 @@ public final class PModule extends AbstractModule {
 
 	@Override public void install() {
 		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(this.getConfig());
-		bind(PTransitRouterFactory.class).toInstance( pTransitRouterFactory ) ;
 		bind(TransitRouter.class).toProvider(pTransitRouterFactory);
-
-		// yyyy the following two should only be bound when pConfig.getReRouteAgentsStuck() is true.  But this
-		// does not work without problems (the binding needs to be optional).  kai, jan'17
-		bind(PersonReRouteStuckFactory.class).to( PersonReRouteStuckFactoryImpl.class );
-		bind(AgentsStuckHandlerImpl.class) ;
 
 		addControlerListenerBinding().to(PControlerListener.class) ;
 		addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;
+		// problem is that this factory gets updated (with a new transit schedule) before each iteration, and this needs to be done _before_ the
+		// notifyIterationStarts method of PControlerListener is called.  ???  kai, jan'16
 
 		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
 
-		bind(Operators.class).to(PBox.class).asEagerSingleton();
+		bind(POperators.class).to(PBox.class).asEagerSingleton();
 		// (needs to be a singleton since it is a data container, and all clients should use the same data container. kai, jan'17)
 
 		bindMobsim().toProvider(PQSimProvider.class) ;
 		bind(LineId2PtMode.class).to( BVGLines2PtModes.class ) ;
 
 		install( new PStatsModule() ) ;
+
+		if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getReRouteAgentsStuck() ) {
+			bind(PersonReRouteStuckFactory.class).to( PersonReRouteStuckFactoryImpl.class );
+			bind(AgentsStuckHandlerImpl.class) ;
+		}
+
 	}
 
 }
