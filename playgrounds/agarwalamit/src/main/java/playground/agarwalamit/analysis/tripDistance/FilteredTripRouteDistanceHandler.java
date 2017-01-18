@@ -50,7 +50,7 @@ public class FilteredTripRouteDistanceHandler implements PersonDepartureEventHan
     private static final Logger LOGGER = Logger.getLogger(FilteredTripRouteDistanceHandler.class);
     private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
 
-    private TripRouteDistanceHandler delegate;
+    private final TripRouteDistanceHandler delegate;
 
     private final PersonFilter pf ;
     private final String ug ;

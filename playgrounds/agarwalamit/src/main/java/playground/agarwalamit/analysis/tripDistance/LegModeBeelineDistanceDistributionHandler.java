@@ -41,10 +41,10 @@ public class LegModeBeelineDistanceDistributionHandler implements PersonDepartur
 
     private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2distances = new TreeMap<>();
 
-    private SortedMap<String, SortedMap<Double, Integer>> mode2DistClass2Count = new TreeMap<>();
-    private Map<Id<Person>,Coord> personId2DepartCoord = new HashMap<>();
-    private List<Double> distClasses;
-    private Network network;
+    private final SortedMap<String, SortedMap<Double, Integer>> mode2DistClass2Count = new TreeMap<>();
+    private final Map<Id<Person>,Coord> personId2DepartCoord = new HashMap<>();
+    private final List<Double> distClasses;
+    private final Network network;
 
     public LegModeBeelineDistanceDistributionHandler (final Network network) {
         Double [] dists = new Double[] {0., 2000., 4000., 6000., 8000., 10000.};

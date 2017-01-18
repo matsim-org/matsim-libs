@@ -148,7 +148,7 @@ public class PatnaPolicyControler {
 		String vehiclesFile = inputDir+"/output_vehicles.xml.gz"; // following is required to extract only vehicle types and not vehicle info. Amit Nov 2016
 		VehicleUtils.addVehiclesToScenarioFromVehicleFile(vehiclesFile, scenario);
 
-		if ( scenario.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
+		if (!scenario.getVehicles().getVehicles().isEmpty()) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
 				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 

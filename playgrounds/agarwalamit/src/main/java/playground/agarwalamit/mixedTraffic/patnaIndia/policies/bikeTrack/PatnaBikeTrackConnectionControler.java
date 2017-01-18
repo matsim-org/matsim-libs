@@ -218,7 +218,7 @@ public class PatnaBikeTrackConnectionControler {
 
 		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData
 		if ( scenario.getConfig().qsim().getVehiclesSource()==QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData  &&
-				scenario.getVehicles().getVehicles().size() != 0 ) {
+                !scenario.getVehicles().getVehicles().isEmpty()) {
 			throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
 					QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
 		}

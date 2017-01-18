@@ -206,7 +206,7 @@ public class PatnaNetworkFromTransCadDataGenerator {
 			network.getLinks().get(Id.createLinkId("1018010000-1017110000")).setToNode(n);
 			network.getLinks().get(Id.createLinkId("10171-10180")).setFromNode(n);
 			
-			if(n.getInLinks().size()==0 && n.getOutLinks().size()==0 ) network.removeNode(n.getId()); // make sure no link is connected and then remove
+			if(n.getInLinks().isEmpty() && n.getOutLinks().isEmpty()) network.removeNode(n.getId()); // make sure no link is connected and then remove
 		}
 		{ // a junction, small link  (6m) become a bottleneck
 			network.removeLink(Id.createLinkId("1674810000"));
@@ -220,7 +220,7 @@ public class PatnaNetworkFromTransCadDataGenerator {
 			network.getLinks().get(Id.createLinkId("1673810000-1675010000-16749-1675110000-1673610000-1675410000-16755-16761-16757-1676810000-16731")).setFromNode(n);
 			
 			n = network.getNodes().get(Id.createNodeId("14974"));
-			if(n.getInLinks().size()==0 && n.getOutLinks().size()==0 ) network.removeNode(n.getId()); // make sure no link is connected and then remove
+			if(n.getInLinks().isEmpty() && n.getOutLinks().isEmpty()) network.removeNode(n.getId()); // make sure no link is connected and then remove
 		}
 		{ // a small link  (3m) become a bottleneck
 			network.removeLink(Id.createLinkId("1878710000"));
@@ -231,7 +231,7 @@ public class PatnaNetworkFromTransCadDataGenerator {
 			network.getLinks().get(Id.createLinkId("1679010000")).setFromNode(n);
 			
 			n = network.getNodes().get(Id.createNodeId("16318"));
-			if(n.getInLinks().size()==0 && n.getOutLinks().size()==0 ) network.removeNode(n.getId()); // make sure no link is connected and then remove
+			if(n.getInLinks().isEmpty() && n.getOutLinks().isEmpty()) network.removeNode(n.getId()); // make sure no link is connected and then remove
 		}
 		{ // a small link  (6m) become a bottleneck
 			network.removeLink(Id.createLinkId("17461"));
@@ -242,7 +242,7 @@ public class PatnaNetworkFromTransCadDataGenerator {
 			network.getLinks().get(Id.createLinkId("17424-17501")).setFromNode(n);
 			
 			n = network.getNodes().get(Id.createNodeId("15468"));
-			if(n.getInLinks().size()==0 && n.getOutLinks().size()==0 ) network.removeNode(n.getId()); // make sure no link is connected and then remove
+			if(n.getInLinks().isEmpty() && n.getOutLinks().isEmpty()) network.removeNode(n.getId()); // make sure no link is connected and then remove
 		}
 	}
 
@@ -407,7 +407,7 @@ public class PatnaNetworkFromTransCadDataGenerator {
 		Collection<? extends Node> nodes = scenario.getNetwork().getNodes().values();
 		List<Id<Node>> nodes2Remove = new ArrayList<>();
 		for(Node n : nodes){
-			if(n.getInLinks().size() == 0 && n.getOutLinks().size() == 0) {
+			if(n.getInLinks().isEmpty() && n.getOutLinks().isEmpty()) {
 				nodes2Remove.add(n.getId());
 			}
 		}

@@ -109,7 +109,7 @@ public class TripAndPersonCounter implements PersonDepartureEventHandler, Person
 	}
 	
 	private void checkPersonNotArrived(){
-		if(this.departureList.size()>0){
+		if(!this.departureList.isEmpty()){
 			LOGGER.warn(this.departureList.size() +" persons are not arrived to activites. Reasons could be \n "
 					+ "1) Person is `StuckAndAbort' 2) Person is enroute at simulation end time.");
 		}
