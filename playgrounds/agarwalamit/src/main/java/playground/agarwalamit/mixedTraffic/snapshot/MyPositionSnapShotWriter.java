@@ -160,7 +160,8 @@ public class MyPositionSnapShotWriter implements SnapshotWriter {
 		} 
 		else if(agentPrevLink!=null && link2positions.containsKey(agentPrevLink) ) 
 		{ // if it was already on some link, then it is most likely to be at the end of the link
-			return new Tuple<>(agentPrevLink, link2positions.get(link2positions.size()));
+			throw new RuntimeException("A bug in the following commented link; fix it and then use it.");
+//			return new Tuple<>(agentPrevLink, link2positions.get(link2positions.size()));
 		} 
 		else 
 		{ // agent is never seen before, most likely departed thus should be at the end of the link

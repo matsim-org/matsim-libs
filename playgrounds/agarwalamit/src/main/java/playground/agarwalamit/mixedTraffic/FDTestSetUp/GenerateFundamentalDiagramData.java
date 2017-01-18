@@ -335,9 +335,7 @@ public class GenerateFundamentalDiagramData {
 		List<List<Integer>> pointsToRun = new ArrayList<>();
 		for (int i=0; i<numberOfPoints; i++){
 			Integer[] newPoint = new Integer[maxAgentDistribution.length];
-			for (int j=0; j<newPoint.length; j++){
-				newPoint[j] = iterationModule.getPoint()[j];
-			}
+			System.arraycopy(iterationModule.getPoint(), 0, newPoint, 0, newPoint.length);
 			pointsToRun.add(Arrays.asList(newPoint));
 			String point = arraytostring(iterationModule.getPoint());
 			LOG.info("Just added point "+point+" to the collection.");
