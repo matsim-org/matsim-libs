@@ -26,7 +26,7 @@ import java.util.SortedSet;
 * @author amit
 */
 
-public interface ModalShare {
+interface ModalShare {
 	
 	SortedSet<String> getUsedModes();
 	SortedMap<String, Integer> getModeToNumberOfLegs();

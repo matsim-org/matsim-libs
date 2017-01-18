@@ -39,7 +39,7 @@ public class ModalShareExample {
 		}
 	}
 
-	public void run(final String populationFile, final String outputFile){
+	private void run(final String populationFile, final String outputFile){
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(populationFile);
 		ModalShareFromPlans msg = new ModalShareFromPlans(sc.getPopulation());
 		msg.run();

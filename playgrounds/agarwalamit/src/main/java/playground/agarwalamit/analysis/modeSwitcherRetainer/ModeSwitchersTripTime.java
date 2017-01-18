@@ -59,14 +59,7 @@ public class ModeSwitchersTripTime {
 		}
 	}
 
-	private final Comparator<Tuple<String, String>> comparator = new Comparator<Tuple<String, String>>() {
-		@Override
-		public int compare(Tuple<String, String> o1, Tuple<String, String> o2) {
-			return o1.toString().compareTo(o2.toString());
-		}
-	};
-
-	private final SortedMap<Tuple<String, String>, ModeSwitcherInfoCollector> modeSwitchType2InfoCollector = new TreeMap<>(comparator);
+	private final SortedMap<Tuple<String, String>, ModeSwitcherInfoCollector> modeSwitchType2InfoCollector = new TreeMap<>((o1, o2) -> o1.toString().compareTo(o2.toString()));
 
 	public static void main(String[] args) {
 
