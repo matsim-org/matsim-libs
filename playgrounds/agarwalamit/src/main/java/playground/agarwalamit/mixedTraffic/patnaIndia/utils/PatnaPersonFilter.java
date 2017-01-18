@@ -36,28 +36,23 @@ public class PatnaPersonFilter implements PersonFilter{
     }
 	
 	public static boolean isPersonBelongsToUrban(Id<Person> personId){
-		if ( personId.toString().startsWith("slum") || personId.toString().startsWith("nonSlum") ) return true;
-		else return false;
+		return personId.toString().startsWith("slum") || personId.toString().startsWith("nonSlum");
 	}
 	
 	public static boolean isPersonBelongsToSlum(Id<Person> personId){
-		if ( personId.toString().startsWith("slum") ) return true;
-		else return false;
+		return personId.toString().startsWith("slum");
 	}
 	
 	public static boolean isPersonBelongsToNonSlum(Id<Person> personId){
-		if ( personId.toString().startsWith("nonsSum") ) return true;
-		else return false;
+		return personId.toString().startsWith("nonsSum");
 	}
 
 	public static boolean isPersonBelongsToCommuter(Id<Person> personId){
-		if( Arrays.asList( personId.toString().split("_") ).contains("E2I") ) return true;
-		else return false;
+		return Arrays.asList(personId.toString().split("_")).contains("E2I");
 	}
 	
 	public static boolean isPersonBelongsToThroughTraffic(Id<Person> personId){
-		if( Arrays.asList( personId.toString().split("_") ).contains("E2E") ) return true;
-		else return false;
+		return Arrays.asList(personId.toString().split("_")).contains("E2E");
 	}
 	
 	public static PatnaUserGroup getUserGroup(Id<Person> personId){

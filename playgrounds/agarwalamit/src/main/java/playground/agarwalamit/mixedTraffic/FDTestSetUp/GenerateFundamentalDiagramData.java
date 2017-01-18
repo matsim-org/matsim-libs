@@ -711,11 +711,8 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public boolean isWantingToArriveOnCurrentLink() {
-			if ( this.chooseNextLinkId()==null ) {
-				return true ;
-			} else {
-				return false ;
-			}
+			return this.chooseNextLinkId()==null ;
+
 		}
 
 		@Override

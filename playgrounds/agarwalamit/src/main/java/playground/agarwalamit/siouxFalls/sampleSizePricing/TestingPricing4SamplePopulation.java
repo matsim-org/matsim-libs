@@ -104,10 +104,7 @@ public class TestingPricing4SamplePopulation {
 			//			emissionModule.createLookupTables();
 			//			emissionModule.createEmissionHandler();
 
-			controler.getConfig().controler().setOverwriteFileSetting(
-					true ?
-							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 			controler.getConfig().controler().setCreateGraphs(true);
 			controler.getConfig().controler().setDumpDataAtEnd(false);
 
