@@ -224,7 +224,6 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
 //                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.bike, scenario.getConfig().planCalcScore()).createTravelDisutility(travelTime));
 
         final TripRouter tripRouter = routerFactory.build(this.scenario).get();
-        PlanAlgorithm router = new PlanRouter(tripRouter);
-        return router;
+        return new PlanRouter(tripRouter);
     }
 }
