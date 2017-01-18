@@ -42,7 +42,7 @@ public class ConflictSolverTestsFixture {
 	public final JointPlans jointPlans;
 	public final ReplanningGroup replanningGroup;
 	public final Set<Plan> expectedUnfeasiblePlans;
-	public final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan = new HashMap<JointPlan, Collection<PlanRecord>>();
+	public final CoalitionSelector.RecordsOfJointPlan recordsPerJointPlan;
 	public final Collection<PlanRecord> allRecords = new ArrayList<PlanRecord>();
 
 	public ConflictSolverTestsFixture(
@@ -51,7 +51,8 @@ public class ConflictSolverTestsFixture {
 			final Collection<? extends Plan> expectedUnfeasiblePlans) {
 		this.jointPlans = jointPlans;
 		this.replanningGroup = group;
-		this.expectedUnfeasiblePlans = new HashSet<Plan>( expectedUnfeasiblePlans );
+		this.expectedUnfeasiblePlans = new HashSet<>( expectedUnfeasiblePlans );
+		this.recordsPerJointPlan = new CoalitionSelector.RecordsOfJointPlan( jointPlans );
 
 		// create agents
 		for ( Person person : group.getPersons() ) {
@@ -63,12 +64,7 @@ public class ConflictSolverTestsFixture {
 
 			for ( PlanRecord r : agent.getRecords() ) {
 				allRecords.add( r );
-				final JointPlan jp = jointPlans.getJointPlan( r.getPlan() );
-				if ( jp != null ) {
-					MapUtils.getCollection(
-							jp,
-							recordsPerJointPlan ).add( r );
-				}
+				recordsPerJointPlan.addRecord( r );
 			}
 		}
 	}
