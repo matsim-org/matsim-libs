@@ -43,14 +43,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class CausedDelayUserGroup {
 
 	private final String outputDir;
-	private  double marginalUtlMoney;
-	private  double marginalUtlPerformingSec;
-	private  double marginalUtlTravelingCarSec;
-	private  double marginalUtlOfTravelTime ;
 	private  double vttsCar ;
 	private SortedMap<MunichUserGroup, Double> userGroupToDelays;
 	private Map<Id<Person>, Double> personId2CausingDelay;
-	private Scenario scenario;
 	private final MunichPersonFilter pf = new MunichPersonFilter();
 
 	public CausedDelayUserGroup(final String outputDir) {
@@ -127,12 +122,16 @@ public class CausedDelayUserGroup {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
 
-		this.scenario = LoadMyScenarios.loadScenarioFromOutputDir(outputDir+runCase);
+		Scenario scenario = LoadMyScenarios.loadScenarioFromOutputDir(outputDir + runCase);
 
-		this.marginalUtlMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		this.marginalUtlPerformingSec = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600;
-		this.marginalUtlTravelingCarSec = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600;
-		this.marginalUtlOfTravelTime = this.marginalUtlTravelingCarSec + this.marginalUtlPerformingSec;
-		this.vttsCar = this.marginalUtlOfTravelTime / this.marginalUtlMoney;
+		double marginalUtlMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		double marginalUtlPerformingSec = scenario.getConfig().planCalcScore().getPerforming_utils_hr() / 3600;
+		double marginalUtlTravelingCarSec = scenario.getConfig()
+				.planCalcScore()
+				.getModes()
+				.get(TransportMode.car)
+				.getMarginalUtilityOfTraveling() / 3600;
+		double marginalUtlOfTravelTime = marginalUtlTravelingCarSec + marginalUtlPerformingSec;
+		this.vttsCar = marginalUtlOfTravelTime / marginalUtlMoney;
 	}
 }

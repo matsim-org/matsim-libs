@@ -86,7 +86,6 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
 
 
     private boolean terminateSimulation = false;
-    private PlanAlgorithm router;
 
     public BikeConnectorControlerListener(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration, final int initialStabilizationIterations) {
         this.numberOfBikeConnectorsRequired = numberOfConnectorsRequired;
@@ -198,7 +197,7 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
     }
 
     private void reRoutePlan(final Id<Link> linkId) {
-        this.router = getRouter();
+        PlanAlgorithm router = getRouter();
         for (Person p : this.scenario.getPopulation().getPersons().values()) {
             for (Plan plan : p.getPlans()) {
                 boolean needsReRoute = false;
@@ -211,7 +210,7 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
                         }
                     }
                 }
-                if (needsReRoute) this.router.run(plan);
+                if (needsReRoute) router.run(plan);
             }
         }
     }
