@@ -190,7 +190,6 @@ public class TestingPricing4SamplePopulation {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
 		String inputEventsFile = outputDir+"/ITERS/it.500/500.events.xml.gz";
 		eventsReader.readFile(inputEventsFile);
-		double flowAndStorageDelays = congestionHandlerImplV3.getTotalInternalizedDelay()*VTTS_CAR; 
-		return flowAndStorageDelays;
+        return congestionHandlerImplV3.getTotalInternalizedDelay()*VTTS_CAR;
 	}
 }
