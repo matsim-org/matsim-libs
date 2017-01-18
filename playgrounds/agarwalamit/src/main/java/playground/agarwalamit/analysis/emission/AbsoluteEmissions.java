@@ -37,7 +37,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 public class AbsoluteEmissions {
 	private final String outputDir;
 
-	public AbsoluteEmissions(final String outputDir) {
+	private AbsoluteEmissions(final String outputDir) {
 		this.outputDir = outputDir;
 	}
 
@@ -47,7 +47,7 @@ public class AbsoluteEmissions {
 		new AbsoluteEmissions(clusterPathDesktop).runAndWrite(runCases);
 	}
 
-	public void runAndWrite(final String [] runCases){
+	private void runAndWrite(final String[] runCases){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteEmissions.txt");
 
 		SortedMap<String, SortedMap<String, Double>> emissions = new TreeMap<>();
@@ -81,7 +81,7 @@ public class AbsoluteEmissions {
 		}
 	}
 	
-	public double getEmissionCost(final SortedMap<String, Double> em){
+	private double getEmissionCost(final SortedMap<String, Double> em){
 		double cost = 0;
 		for (EmissionCostFactors ecf : EmissionCostFactors.values()){
 			cost += em.get(ecf.toString()) * ecf.getCostFactor();

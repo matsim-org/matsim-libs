@@ -37,7 +37,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class AbsoluteDelays  {
 	private final String outputDir;
 
-	public AbsoluteDelays(final String outputDir) {
+	private AbsoluteDelays(final String outputDir) {
 		this.outputDir = outputDir;
 	}
 
@@ -48,7 +48,7 @@ public class AbsoluteDelays  {
 		new AbsoluteDelays(clusterPathDesktop).runAndWrite(runCases);
 	}
 
-	public void runAndWrite(final String [] runCases){
+	private void runAndWrite(final String[] runCases){
 		BufferedWriter writer =IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteDelays.txt");
 
 		try {

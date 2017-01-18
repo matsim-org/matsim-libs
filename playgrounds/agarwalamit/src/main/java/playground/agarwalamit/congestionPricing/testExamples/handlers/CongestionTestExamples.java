@@ -37,7 +37,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.vsp.congestion.events.CongestionEvent;
