@@ -25,54 +25,41 @@ package org.matsim.contrib.minibus.hook;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
-import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.contrib.minibus.operator.POperators;
 import org.matsim.contrib.minibus.stats.PStatsModule;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.router.TripRouter;
+import org.matsim.pt.router.TransitRouter;
 
-public final class PModule {
+public final class PModule extends AbstractModule {
 
-	public static void configureControler(final Controler controler) {
-		final PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
+	@Override public void install() {
+		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(this.getConfig());
+		bind(TransitRouter.class).toProvider(pTransitRouterFactory);
 
-		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler(), pConfig.getPtRouter(), pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
+		addControlerListenerBinding().to(PControlerListener.class) ;
+		addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;
+		// Exchange of previous two lines will make the test fail.
+		// Problem is that this factory gets updated (with a new transit schedule) before each iteration, and this needs to be done _before_ the
+		// notifyIterationStarts method of PControlerListener is called.  ???  kai, jan'16
 
-		// For some unknown reason, the core starts failing when I start requesting a trip router out of an injected trip router in 
-		// ScoreStatsControlerListener.  Presumably, the manually constructed build procedure here conflicts with the (newer) standard guice
-		// procedure.  For the time being, the following two lines seem to fix it.  kai, nov'16
-		pTransitRouterFactory.createTransitRouterConfig(controler.getConfig());
-		pTransitRouterFactory.updateTransitSchedule(controler.getScenario().getTransitSchedule());
+		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override public void install() {
-				bind(PTransitRouterFactory.class).toInstance( pTransitRouterFactory ) ;
+		bind(POperators.class).to(PBox.class).asEagerSingleton();
+		// (needs to be a singleton since it is a data container, and all clients should use the same data container. kai, jan'17)
 
-				// yyyy the following two should only be bound when pConfig.getReRouteAgentsStuck() is true.  But this
-				// does not work without problems (the binding needs to be optional).  kai, jan'17
-				bind(PersonReRouteStuckFactory.class).to( PersonReRouteStuckFactoryImpl.class );
-				bind(AgentsStuckHandlerImpl.class) ;
+		bindMobsim().toProvider(PQSimProvider.class) ;
+		bind(LineId2PtMode.class).to( BVGLines2PtModes.class ) ;
 
-				addControlerListenerBinding().to(PControlerListener.class) ;
+		install( new PStatsModule() ) ;
 
-				bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
-
-				bind(Operators.class).to(PBox.class).asEagerSingleton();
-				// (needs to be a singleton since it is a data container, and all clients should use the same data container. kai, jan'17)
-				
-				bindMobsim().toProvider(PQSimProvider.class) ;
-				bind(LineId2PtMode.class).to( BVGLines2PtModes.class ) ;
-				
-				// yyyyyy my intuition is that it should (now) be possible to do the following in a less involved way (using more default material).
-				// kai, jan'17
-				bind(TripRouter.class).toProvider(new PTripRouterFactoryImpl(controler, pTransitRouterFactory)) ;
-
-				install( new PStatsModule() ) ;
-			}
-		});
+		if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getReRouteAgentsStuck() ) {
+			bind(PersonReRouteStuckFactory.class).to( PersonReRouteStuckFactoryImpl.class );
+			bind(AgentsStuckHandlerImpl.class) ;
+		}
 
 	}
+
 }

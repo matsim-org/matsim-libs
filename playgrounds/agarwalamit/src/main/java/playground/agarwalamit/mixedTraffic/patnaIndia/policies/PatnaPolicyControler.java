@@ -132,7 +132,7 @@ public class PatnaPolicyControler {
 		if ( addBikeTrack ) {
 			// remove the connectors on which freespeed is only 0.01 m/s
 			scenario.getNetwork().getLinks().values().stream().filter(
-					link -> link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX.toString()) && link.getFreespeed() == 0.01
+					link -> link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX) && link.getFreespeed() == 0.01
 			).collect(Collectors.toList()).forEach(link -> scenario.getNetwork().removeLink(link.getId()));
 		}
 

@@ -26,22 +26,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
-
 import playground.benjamin.utils.BkNumberUtils;
 
 /**
@@ -65,7 +61,7 @@ public class MyPositionSnapShotWriter implements SnapshotWriter {
 	
 		// first check if easting northing is free from any correction due to placement on 2d space
 		if (scenario.getConfig().qsim().getLinkWidthForVis() !=  0. || 
-				( (Network) scenario.getNetwork() ).getEffectiveLaneWidth() != 0.) 
+				scenario.getNetwork().getEffectiveLaneWidth() != 0.)
 		{
 			throw new RuntimeException("This snapshot writer is useful if plotting the positions of the vehicles in one-dimensitonal space."
 					+ "Either of link width for vis in qsim or effective lane width in the network is not zero.");
@@ -164,7 +160,8 @@ public class MyPositionSnapShotWriter implements SnapshotWriter {
 		} 
 		else if(agentPrevLink!=null && link2positions.containsKey(agentPrevLink) ) 
 		{ // if it was already on some link, then it is most likely to be at the end of the link
-			return new Tuple<>(agentPrevLink, link2positions.get(link2positions.size()));
+			throw new RuntimeException("A bug in the following commented link; fix it and then use it.");
+//			return new Tuple<>(agentPrevLink, link2positions.get(link2positions.size()));
 		} 
 		else 
 		{ // agent is never seen before, most likely departed thus should be at the end of the link

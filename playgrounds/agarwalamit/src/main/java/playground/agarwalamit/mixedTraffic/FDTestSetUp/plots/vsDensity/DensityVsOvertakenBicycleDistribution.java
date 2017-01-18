@@ -39,8 +39,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class DensityVsOvertakenBicycleDistribution extends AbstractAnalysisModule {
 
 	private final DensityVsPassingDistributionHandler dpd;
-	private final DensityVsFractionOfStoppedVehiclesHandler dfsv;
-	private final String eventFile;
+    private final String eventFile;
 	final BufferedWriter writer1;
 
 	public DensityVsOvertakenBicycleDistribution(String eventFile, String outputFolder) {
@@ -48,7 +47,7 @@ public class DensityVsOvertakenBicycleDistribution extends AbstractAnalysisModul
 		Id<Link> linkId = Id.create("1",Link.class);
 		writer1 = IOUtils.getBufferedWriter(outputFolder+"rDensityVsTotalOvertakenBicycleCount_2.txt");
 		this.dpd = new DensityVsPassingDistributionHandler(linkId, writer1);
-		this.dfsv = new DensityVsFractionOfStoppedVehiclesHandler(linkId, 1000);
+//        DensityVsFractionOfStoppedVehiclesHandler dfsv = new DensityVsFractionOfStoppedVehiclesHandler(linkId, 1000);
 		this.eventFile = eventFile;
 	}
 

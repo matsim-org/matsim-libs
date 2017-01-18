@@ -37,7 +37,7 @@ public final class ListUtils {
 	
 	public static double intMean(final List<Integer> intList){
 		if(intList.isEmpty()) return 0.;
-		return intList.stream().mapToInt(i -> i).average().getAsDouble();
+		return intList.stream().mapToInt(i -> i).average().orElse(0.);
 	}
 
 	public static double doubleSum(final List<Double> doubleList){
@@ -47,7 +47,7 @@ public final class ListUtils {
 
 	public static double doubleMean(final List<Double> doubleList){
 		if(doubleList.isEmpty()) return 0.;
-		return doubleList.stream().mapToDouble(i -> i).average().getAsDouble();
+		return doubleList.stream().mapToDouble(i -> i).average().orElse(0.0);
 	}
 
 	public static List<Double> scalerProduct(final List<Double> doubleList, final double scalerFactor){

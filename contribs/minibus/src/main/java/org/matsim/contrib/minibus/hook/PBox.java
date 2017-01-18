@@ -54,7 +54,7 @@ import javax.inject.Inject;
  * @author aneumann
  *
  */
-public final class PBox implements Operators {
+public final class PBox implements POperators {
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PBox.class);

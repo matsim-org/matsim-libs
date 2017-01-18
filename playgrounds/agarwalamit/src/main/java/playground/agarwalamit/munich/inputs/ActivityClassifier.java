@@ -47,7 +47,7 @@ import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
  * 
  * @author amit
  */
-public class ActivityClassifier {
+ class ActivityClassifier {
 
 	public ActivityClassifier(Scenario scenario) {
 		this.sc = scenario;

@@ -19,10 +19,7 @@
 package playground.agarwalamit.analysis.toll;
 
 import java.io.BufferedWriter;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -87,10 +84,12 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 		for(Double d : timeBin2PersonInfo.keySet()){
 			SortedMap<MunichUserGroup, Integer> usrGrp2Cnt = new TreeMap<>();
 			SortedMap<MunichUserGroup, Integer> usrGrp2Cnt2 = new TreeMap<>();
-			for(MunichUserGroup ug:MunichUserGroup.values()){
-				usrGrp2Cnt.put(ug, 0);
-				usrGrp2Cnt2.put(ug, 0);
-			}
+			Arrays.stream(MunichUserGroup.values()).forEach(
+					ug -> {
+						usrGrp2Cnt.put(ug, 0);
+						usrGrp2Cnt2.put(ug, 0);
+					}
+			);
 			this.userGroup2TollPayers.put(d, usrGrp2Cnt);
 			this.userGroup2TolledTrips.put(d, usrGrp2Cnt2);
 			this.timeBin2TolledLinks.put(d, 0);
@@ -99,10 +98,11 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 		//timeBin2UserGrp2TolledPerson
 		for(Double d : timeBin2PersonInfo.keySet()){
 			SortedMap<MunichUserGroup,Integer> usrGrp2Person = this.userGroup2TollPayers.get(d);
-			for(Id<Person> personId : timeBin2PersonInfo.get(d).keySet()){
-				if(timeBin2PersonInfo.get(d).get(personId)==0.) continue;
-				MunichUserGroup ug = this.pf.getMunichUserGroupFromPersonId(personId);
-				usrGrp2Person.put(ug, usrGrp2Person.get(ug)+1);
+			for (Id<Person> personId : timeBin2PersonInfo.get(d).keySet()) {
+				if (timeBin2PersonInfo.get(d).get(personId) != 0.) {
+					MunichUserGroup ug = this.pf.getMunichUserGroupFromPersonId(personId);
+					usrGrp2Person.put(ug, usrGrp2Person.get(ug) + 1);
+				}
 			}
 		}
 
@@ -120,10 +120,11 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 		//timeBin2TolledLinks
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkDelay = this.cda.getTimeBin2LinkId2Delay();
 		for(Double d : timeBin2LinkDelay.keySet()){
-			int cnt = 0;
-			for (Id<Link> linkId : timeBin2LinkDelay.get(d).keySet()){
-				if(timeBin2LinkDelay.get(d).get(linkId)!=0) cnt++;
-			}
+			int cnt = (int) timeBin2LinkDelay.get(d)
+					.keySet()
+					.stream()
+					.filter(linkId -> timeBin2LinkDelay.get(d).get(linkId) != 0)
+					.count();
 			this.timeBin2TolledLinks.put(d, cnt);
 		}
 	}

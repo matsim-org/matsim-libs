@@ -17,21 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.router;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
@@ -53,12 +61,13 @@ public class VariableAccessTransitRouterWrapper implements RoutingModule {
     private final RoutingModule walkRouter;
     private final TransitSchedule transitSchedule;
     private final Network network;
+    private final LeastCostPathCalculator routeAlgo;
 
 
     public VariableAccessTransitRouterWrapper(
             final TransitRouter router,
             final TransitSchedule transitSchedule,
-            Network network, final RoutingModule walkRouter) {
+            Network network, final RoutingModule walkRouter, final LeastCostPathCalculator routeAlgo) {
         if (router == null) {
             throw new NullPointerException("The router object is null, but is required later.");
         }
@@ -68,7 +77,11 @@ public class VariableAccessTransitRouterWrapper implements RoutingModule {
         if (walkRouter == null) {
             throw new NullPointerException("The walkRouter object is null, but is required later.");
         }
+        if (routeAlgo == null) {
+            throw new NullPointerException("The walkRouter object is null, but is required later.");
+        }
         this.walkRouter = walkRouter;
+        this.routeAlgo = routeAlgo ;
     }
 
     /**
@@ -110,6 +123,20 @@ public class VariableAccessTransitRouterWrapper implements RoutingModule {
 	    Coord nextCoord = null;
 	    int i = 0;
 	    for (Leg leg : baseTrip) {
+	    	if (leg.getMode().equals(TransportMode.car)){
+	    		Id<Link> startLinkId =  leg.getRoute().getStartLinkId();
+	    		Id<Link> endLinkId =  leg.getRoute().getEndLinkId();
+	    		NetworkRoute nr = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+	    		
+	    		Path path = routeAlgo.calcLeastCostPath(network.getLinks().get(startLinkId).getToNode(), network.getLinks().get(endLinkId).getFromNode(), departureTime, person, null);
+	    		nr.setLinkIds(startLinkId, NetworkUtils.getLinkIds(path.links), endLinkId);
+	    		nr.setTravelCost(path.travelCost);
+	    		nr.setTravelTime(path.travelTime);
+	    		
+	    		nr.setDistance(RouteUtils.calcDistance(nr, 1.0, 1.0, network));
+	    		leg.setRoute(nr);
+	    	}
+	    	
 		    if (i == 0) {
 			    // (access leg)
 			    Facility firstToFacility;

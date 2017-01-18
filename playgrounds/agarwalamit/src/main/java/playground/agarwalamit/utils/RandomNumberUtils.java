@@ -179,7 +179,7 @@ public class RandomNumberUtils {
 		}
 		
 		//Check if due to rounding any element is null
-		while(outArray.contains(null)) {
+		if (outArray.contains(null)) {
 			throw new RuntimeException("Some element in the list is null. Aborting ...");
 		}
 		

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.router.config;
 
 import java.util.Collection;
 

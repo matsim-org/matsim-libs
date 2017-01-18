@@ -100,7 +100,7 @@ public class CreateInputs {
 	}
 
 	private void createNetwork(){
-		Network network = (Network) scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("1:00:00"));
 		double x = -100.0;
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(x, 0.0));
@@ -112,13 +112,16 @@ public class CreateInputs {
 		final Node fromNode = node1;
 		final Node toNode = node2;
 
-		 link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("-1"), fromNode, toNode, (double) 1000, (double) 25, (double) 6000, (double) 1, null, (String) "22");
+		 link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("-1"), fromNode, toNode, (double) 1000, (double) 25, (double) 6000, (double) 1, null,
+				 "22");
 		final Node fromNode1 = node2;
 		final Node toNode1 = node3; 
-		 link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), fromNode1, toNode1, (double) 1000, (double) 25, (double) 100, (double) 1, null, (String) "22");
+		 link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), fromNode1, toNode1, (double) 1000, (double) 25, (double) 100, (double) 1, null,
+				 "22");
 		final Node fromNode2 = node3;
 		final Node toNode2 = node4;	
-		 link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), fromNode2, toNode2, (double) 1000, (double) 25, (double) 6000, (double) 1, null, (String) "22");
+		 link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), fromNode2, toNode2, (double) 1000, (double) 25, (double) 6000, (double) 1, null,
+				 "22");
 		 link1.setAllowedModes(allowedModes);link2.setAllowedModes(allowedModes);link3.setAllowedModes(allowedModes);
 		new NetworkWriter(network).write(outputDir+"/network.xml");
 	}

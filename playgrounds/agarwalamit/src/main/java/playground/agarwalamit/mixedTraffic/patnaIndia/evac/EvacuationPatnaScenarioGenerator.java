@@ -79,11 +79,8 @@ public class EvacuationPatnaScenarioGenerator {
 	private final String outNetworkFile = "evac_network.xml.gz";
 
 	private final String outPopFile = "patna_evac_plans_100Pct_filtered.xml.gz";
-	
-	private final String outConfigFile = "patna_evac_config.xml.gz";
 
-	private final String areaShapeFile = "area_epsg24345.shp";
-	private final Id<Link> safeLinkId = Id.createLinkId("safeLink_Patna");
+    private final Id<Link> safeLinkId = Id.createLinkId("safeLink_Patna");
 
 	private Scenario scenario;
 	private Geometry evavcuationArea;
@@ -168,14 +165,16 @@ public class EvacuationPatnaScenarioGenerator {
 			mrp.setBeelineDistanceFactor(1.5);
 			config.plansCalcRoute().addModeRoutingParams(mrp);
 		}
-		new ConfigWriter(config).write(dir+"/input/"+outConfigFile);
+        String outConfigFile = "patna_evac_config.xml.gz";
+        new ConfigWriter(config).write(dir+"/input/"+ outConfigFile);
 	}
 
 	private Scenario createEvacNetwork(){
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork( networkFile );
 		//read shape file and get area
 		ShapeFileReader reader = new ShapeFileReader();
-		Collection<SimpleFeature> features = reader.readFileAndInitialize(dir+"/input/"+areaShapeFile);
+        String areaShapeFile = "area_epsg24345.shp";
+        Collection<SimpleFeature> features = reader.readFileAndInitialize(dir+"/input/"+ areaShapeFile);
 		evavcuationArea = (Geometry) features.iterator().next().getDefaultGeometry();
 
 		// will create a network connecting with safe node.

@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.contrib.minibus.operator.POperators;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.stats.PStatsOverviewDataContainer.FIELDS;
 import org.matsim.core.controler.MatsimServices;
@@ -127,7 +127,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 
 	private double[][] history = null;
 	private int minIteration = 0;
-	@Inject private Operators operators;
+	@Inject private POperators operators;
 	@Inject private PConfigGroup pConfig;
 
 	private RecursiveStatsContainer statsContainer;

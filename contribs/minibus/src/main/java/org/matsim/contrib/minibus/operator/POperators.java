@@ -1,11 +1,11 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * TransitRouterModule.java
+ *  * Operators.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
- *  * copyright       : (C) 2015 by the members listed in the COPYING, *
+ *  * copyright       : (C) 2014 by the members listed in the COPYING, *
  *  *                   LICENSE and WARRANTY file.                            *
  *  * email           : info at matsim dot org                                *
  *  *                                                                         *
@@ -20,24 +20,12 @@
  *  * ***********************************************************************
  */
 
-package playground.jbischoff.pt;
+package org.matsim.contrib.minibus.operator;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.pt.router.TransitRouter;
+import java.util.List;
 
-import com.google.inject.name.Named;
-import com.google.inject.name.Names;
+public interface POperators {
 
-
-public class VariableAccessTransitRouterModule extends AbstractModule {
-
-    @Override
-    public void install() {
-        if (getConfig().transit().isUseTransit()) {
-        	addRoutingModuleBinding(TransportMode.pt).toProvider(VariableAccessTransit.class);
-            bind(TransitRouter.class).annotatedWith(Names.named("variableAccess")).toProvider(VariableAccessTransitRouterImplFactory.class);
-        }
-    }
+    public List<Operator> getOperators();
 
 }

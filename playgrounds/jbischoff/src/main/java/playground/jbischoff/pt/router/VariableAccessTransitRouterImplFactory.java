@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.router;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -38,6 +38,9 @@ import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import com.google.inject.name.Named;
+
+import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
+import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
 
 import java.util.HashSet;
 

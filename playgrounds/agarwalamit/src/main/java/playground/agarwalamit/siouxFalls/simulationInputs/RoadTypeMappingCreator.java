@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,7 +30,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -58,7 +56,7 @@ public class RoadTypeMappingCreator {
 		roadTypeAndHBEFARoadType.put("unclassified", new String [] {"9","URB/Access/50"});
 		roadTypeAndHBEFARoadType.put("residential", new String [] {"10","URB/Access/30"}); 
 
-		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("./input/baseCase/SiouxFalls_network_fromOSM.xml");
@@ -67,7 +65,7 @@ public class RoadTypeMappingCreator {
 		for (Link link : network.getLinks().values()) {
 			String linkIdentifier = link.getId().toString().split("___")[1];
 			if(roadTypeAndHBEFARoadType.containsKey(linkIdentifier)){
-				NetworkUtils.setType( ((Link) link), (String) roadTypeAndHBEFARoadType.get(linkIdentifier)[0]);
+				NetworkUtils.setType(link, roadTypeAndHBEFARoadType.get(linkIdentifier)[0]);
 			} else {
 				throw new RuntimeException("Road Category "+linkIdentifier+" is not defined.");
 			}

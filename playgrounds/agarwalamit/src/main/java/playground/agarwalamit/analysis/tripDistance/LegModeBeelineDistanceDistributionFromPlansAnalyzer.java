@@ -247,7 +247,7 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 		this.distanceClasses.add(endOfDistanceClass);
 
 		while(endOfDistanceClass <= longestDistance){
-			endOfDistanceClass = 100 * (Double) Math.pow(2, classCounter);
+			endOfDistanceClass = 100 * Math.pow(2, classCounter);
 			classCounter++;
 			this.distanceClasses.add(endOfDistanceClass);
 		}

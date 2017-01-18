@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.opdyts.equil;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import floetteroed.opdyts.DecisionVariableRandomizer;
@@ -42,7 +43,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,12 +58,14 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
-	private static int randomVariance = 2;
+	private static int randomVariance = 7;
 	private static int iterationsToConvergence = 400;
 
 	private static String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
 	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
 	private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
+
+	private static final boolean isPlansRelaxed = false;
 
 	public static void main(String[] args) {
 
@@ -79,7 +83,6 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
 
-		config.controler().setOutputDirectory(OUT_DIR);
 		config.plans().setInputFile("plans2000.xml.gz");
 
 		//== default config has limited inputs
@@ -126,20 +129,45 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		}
 
 		config.qsim().setUsingFastCapacityUpdate(true);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		//==
+
+		if(! isPlansRelaxed) {
+
+			config.controler().setOutputDirectory(OUT_DIR+"/relaxingPlans/");
+			config.controler().setLastIteration(50);
+			config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+
+			Scenario scenarioPlansRelaxor = ScenarioUtils.loadScenario(config);
+			// following is taken from KNBerlinControler.prepareScenario(...);
+			// modify equil plans:
+			double time = 6*3600. ;
+			for ( Person person : scenarioPlansRelaxor.getPopulation().getPersons().values() ) {
+				Plan plan = person.getSelectedPlan() ;
+				Activity activity = (Activity) plan.getPlanElements().get(0) ;
+				activity.setEndTime(time);
+				time++ ;
+			}
+
+			Controler controler = new Controler(scenarioPlansRelaxor);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new EquilDistanceDistribution(OpdytsScenario.EQUIL_MIXEDTRAFFIC)));
+				}
+			});
+			controler.run();
+
+			// set back settings for opdyts
+			File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
+			config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
+			config.controler().setOutputDirectory(OUT_DIR);
+			config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
+		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// following is taken from KNBerlinControler.prepareScenario(...);
-		// modify equil plans:
-		double time = 6*3600. ;
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			Plan plan = person.getSelectedPlan() ;
-			Activity activity = (Activity) plan.getPlanElements().get(0) ;
-			activity.setEndTime(time);
-			time++ ;
-		}
-		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		//****************************** mainly opdyts settings ******************************
 
 		// this is something like time bin generator
 		int startTime= 0;

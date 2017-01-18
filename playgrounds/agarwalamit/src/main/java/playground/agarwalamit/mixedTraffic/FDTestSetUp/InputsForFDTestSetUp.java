@@ -153,7 +153,7 @@ public class InputsForFDTestSetUp {
 
 		if(isTimeDependentNetwork) {
 			scenario.getConfig().network().setTimeVariantNetwork(true);
-			Network netImpl = (Network) scenario.getNetwork();
+			Network netImpl = scenario.getNetwork();
 			netImpl.getFactory().setLinkFactory( new VariableIntervalTimeVariantLinkFactory() );
 		}
 

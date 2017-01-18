@@ -63,8 +63,6 @@ public final class RunConfigurableMinibusExample {
 		
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
-
-		PModule builder = new PModule() ;
 		
 		if ( true ) {
 			throw new RuntimeException("the following is not possibly any more; just copy PModule and modify it to your needs.  kai, jan'17") ;
@@ -83,7 +81,8 @@ public final class RunConfigurableMinibusExample {
 //		}) ;
 		
 		
-		builder.configureControler(controler);
+		controler.addOverridingModule(new PModule()) ;
+
 
 		controler.run();
 	}		

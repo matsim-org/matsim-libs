@@ -19,10 +19,10 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.utils;
 
 import java.util.Arrays;
-
+import java.util.List;
+import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-
 import playground.agarwalamit.utils.PersonFilter;
 
 /**
@@ -36,28 +36,23 @@ public class PatnaPersonFilter implements PersonFilter{
     }
 	
 	public static boolean isPersonBelongsToUrban(Id<Person> personId){
-		if ( personId.toString().startsWith("slum") || personId.toString().startsWith("nonSlum") ) return true;
-		else return false;
+		return personId.toString().startsWith("slum") || personId.toString().startsWith("nonSlum");
 	}
 	
 	public static boolean isPersonBelongsToSlum(Id<Person> personId){
-		if ( personId.toString().startsWith("slum") ) return true;
-		else return false;
+		return personId.toString().startsWith("slum");
 	}
 	
 	public static boolean isPersonBelongsToNonSlum(Id<Person> personId){
-		if ( personId.toString().startsWith("nonsSum") ) return true;
-		else return false;
+		return personId.toString().startsWith("nonsSum");
 	}
 
 	public static boolean isPersonBelongsToCommuter(Id<Person> personId){
-		if( Arrays.asList( personId.toString().split("_") ).contains("E2I") ) return true;
-		else return false;
+		return Arrays.asList(personId.toString().split("_")).contains("E2I");
 	}
 	
 	public static boolean isPersonBelongsToThroughTraffic(Id<Person> personId){
-		if( Arrays.asList( personId.toString().split("_") ).contains("E2E") ) return true;
-		else return false;
+		return Arrays.asList(personId.toString().split("_")).contains("E2E");
 	}
 	
 	public static PatnaUserGroup getUserGroup(Id<Person> personId){
@@ -69,7 +64,11 @@ public class PatnaPersonFilter implements PersonFilter{
 
 	@Override
 	public String getUserGroupAsStringFromPersonId(Id<Person> personId) {
-		PatnaUserGroup pug = PatnaPersonFilter.getUserGroup(personId);
-		return pug.toString();
+		return PatnaPersonFilter.getUserGroup(personId).toString();
+	}
+
+	@Override
+	public List<String> getUserGroupsAsStrings() {
+		return Arrays.stream(PatnaUserGroup.values()).map(Enum::toString).collect(Collectors.toList());
 	}
 }

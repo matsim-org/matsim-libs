@@ -18,6 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.utils.networkProcessing;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,10 +38,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author amit
@@ -80,7 +79,7 @@ public class ShapeFileToNetworkDelhi {
 
 				if(!network.getNodes().containsKey((fromNodeId))){
 					final Id<Node> id = fromNodeId;
-					node1 = NetworkUtils.createAndAddNode(((Network) network), id, CT.transform(fromCoord));
+					node1 = NetworkUtils.createAndAddNode(network, id, CT.transform(fromCoord));
 				}else{
 					node1=network.getNodes().get((fromNodeId));
 				}
@@ -105,7 +104,7 @@ public class ShapeFileToNetworkDelhi {
 
 				if(!network.getNodes().containsKey((toNodeId))){
 					final Id<Node> id = toNodeId;
-					node2 = NetworkUtils.createAndAddNode(((Network) network), id, CT.transform(toCoord));
+					node2 = NetworkUtils.createAndAddNode(network, id, CT.transform(toCoord));
 				}else{
 					node2 = network.getNodes().get((toNodeId));
 				}
@@ -133,7 +132,7 @@ public class ShapeFileToNetworkDelhi {
 					final double freespeed = freeSpeed;
 					final double capacity1 = capacity;
 					final double numLanes = numberOfLanes;
-					NetworkUtils.createAndAddLink(((Network) network),id, fromNode, toNode, length, freespeed, capacity1, numLanes );
+					NetworkUtils.createAndAddLink(network,id, fromNode, toNode, length, freespeed, capacity1, numLanes );
 				}
 
 				if (!network.getLinks().containsKey(linkId2)) {
@@ -144,7 +143,7 @@ public class ShapeFileToNetworkDelhi {
 					final double freespeed = freeSpeed;
 					final double capacity1 = capacity;
 					final double numLanes = numberOfLanes;
-					NetworkUtils.createAndAddLink(((Network) network),id, fromNode, toNode, length, freespeed, capacity1, numLanes );
+					NetworkUtils.createAndAddLink(network,id, fromNode, toNode, length, freespeed, capacity1, numLanes );
 				}
 			}
 		}

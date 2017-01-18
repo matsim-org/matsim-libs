@@ -23,8 +23,8 @@ public class ParatransitWelfareExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		Controler controler = new Controler(scenario);
-		PModule hook = new PModule();
-		hook.configureControler(controler);
+		controler.addOverridingModule(new PModule()) ;
+
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

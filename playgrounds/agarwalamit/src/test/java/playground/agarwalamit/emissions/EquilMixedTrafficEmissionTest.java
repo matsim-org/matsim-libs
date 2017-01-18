@@ -75,6 +75,8 @@ public class EquilMixedTrafficEmissionTest {
 	public final MatsimTestUtils helper = new MatsimTestUtils();
 	private static final Logger logger = Logger.getLogger(EquilMixedTrafficEmissionTest.class);
 
+	private final String classOutputDir = "test/output/" + EquilMixedTrafficEmissionTest.class.getCanonicalName().replace('.', '/') + "/";
+
 	private final DecimalFormat df = new DecimalFormat("#.###");
 
 	private final boolean isConsideringCO2Costs ;
@@ -150,7 +152,7 @@ public class EquilMixedTrafficEmissionTest {
 		emissionSettings(sc);
 
 		Controler controler = new Controler(sc);
-		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
+		String outputDirectory = classOutputDir + helper.getMethodName() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
 		EmissionModule emissionModule = new EmissionModule(sc);

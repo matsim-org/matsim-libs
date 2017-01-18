@@ -31,7 +31,6 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.MapUtils;
 
 /**
@@ -68,16 +67,14 @@ public class EmissionAnalysisControlerListener implements  ShutdownListener {
 
         Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionCosts();
 
-        BufferedWriter writer = IOUtils.getBufferedWriter(iterationDir+controlerConfigGroup.getLastIteration()+".emissionsCostsMoneyUnits.txt");
-        try {
-            if(this.emissionCostHandler.isFiltering()) { //TODO why only munich user group; personFilter interface can have the list of user groups.
+        try (BufferedWriter writer = IOUtils.getBufferedWriter(iterationDir+controlerConfigGroup.getLastIteration()+".emissionsCostsMoneyUnits.txt")) {
+            if(this.emissionCostHandler.isFiltering()) {
                 writer.write("userGroup \t costsInMoneyUnits \n");
-                for ( MunichPersonFilter.MunichUserGroup munichUserGroup : MunichPersonFilter.MunichUserGroup.values()) {
-                    writer.write(munichUserGroup.toString()+"\t");
-                    writer.write(userGrp2cost.get(munichUserGroup.toString()) + "\n");
+                for ( String ug : userGrp2cost.keySet()) {
+                    writer.write(ug+"\t");
+                    writer.write(userGrp2cost.get(ug) + "\n");
                 }
             }
-
             writer.write( "allPersons \t" + MapUtils.doubleValueSum(userGrp2cost)+"\n");
             writer.close();
         } catch (IOException e) {

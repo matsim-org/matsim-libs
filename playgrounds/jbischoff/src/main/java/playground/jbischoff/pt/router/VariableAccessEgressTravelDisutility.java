@@ -20,59 +20,35 @@
 /**
  * 
  */
-package playground.jbischoff.pt;
+package playground.jbischoff.pt.router;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
+/**
+ *
+ */
+public interface VariableAccessEgressTravelDisutility {
 
-public class VariableAccessModeConfigGroup extends ReflectiveConfigGroup {
-
-	private static final String GROUPNAME = VariableAccessConfigGroup.MODEGROUPNAME;
-
-	private static final String MODEDISTANCE = "accessDistance_m";
-	private static final String MODE = "mode";
-	private static final String TELEPORTED = "isTeleported";
-
-	private double distance;
-	private String mode;
-	private boolean teleported;
-
-	public VariableAccessModeConfigGroup() {
-		super(GROUPNAME);
-	}
-
-	@StringGetter(MODEDISTANCE)
-	public double getDistance() {
-		return distance;
-	}
-
-	@StringSetter(MODEDISTANCE)
-	public void setDistance(double distance) {
-		this.distance = distance;
-	}
-
-	@StringGetter(MODE)
-	public String getMode() {
-		return mode;
-	}
-
-	@StringSetter(MODE)
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
-
-	@StringGetter(TELEPORTED)
-	public boolean isTeleported() {
-		return teleported;
-	}
-
-	@StringSetter(TELEPORTED)
-	public void setTeleported(boolean teleported) {
-		this.teleported = teleported;
-	}
-
+	/**
+	 * 
+	 * @param person
+	 * @param coord
+	 * @param toCoord
+	 * @return
+	 */
+	Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord, double time);
+	/**
+	 * 
+	 * @param mode
+	 * @return whether a mode is teleported. 
+	 * Non-teleported modes require an additional stage activity for the agent to get from street network to pt network
+	 */
+	boolean isTeleportedAccessEgressMode(String mode);
+	
 }

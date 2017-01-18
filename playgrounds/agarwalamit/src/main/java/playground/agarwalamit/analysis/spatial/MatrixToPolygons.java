@@ -73,9 +73,7 @@ public class MatrixToPolygons {
 		//get xs and ys
 		
 		String xCoords [] = new String [X_BINS];
-		for (int xIndex =1; xIndex < arrayToll[0].length;xIndex++){
-			xCoords[xIndex-1] = arrayToll[0][xIndex];
-		}
+		System.arraycopy(arrayToll[0], 1, xCoords, 0, arrayToll[0].length - 1);
 		String yCoords [] = new String [arrayToll.length-1];
  		for (int yIndex =1; yIndex < arrayToll.length;yIndex++){
 			yCoords[yIndex-1] = arrayToll[yIndex][0];

@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -88,7 +87,7 @@ public class AgentPositionWriterOld {
 		if( IS_WRITING_TRANSIM_FILE ){
 			// not sure, if following three lines are required.
 			sc.getConfig().qsim().setLinkWidthForVis((float)0);
-			((Network)sc.getNetwork()).setEffectiveLaneWidth(0.);
+			sc.getNetwork().setEffectiveLaneWidth(0.);
 
 			sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
 			transimFile = apw.createAndReturnTransimSnapshotFile(sc, eventsFile);
