@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsel
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -124,8 +125,14 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 		// If all participants of a joint plan point it, it is selected, as they
 		// represent a blocking coalition for other allocations of the remaining
 		// plans.
-		for ( Map.Entry<Id, PointingAgent> entry : agents.entrySet() ) {
-			final PointingAgent agent = entry.getValue();
+		boolean didSomething = false;
+		for( Iterator<PointingAgent> agentIterator = agents.values().iterator();
+			 agentIterator.hasNext(); ) {
+			final PointingAgent agent = agentIterator.next();
+			if ( agent.isOff() ) {
+				agentIterator.remove();
+				continue;
+			}
 
 			final Plan pointedPlan = agent.getPointedPlan();
 			final JointPlan pointedJointPlan = jointPlans.getJointPlan( pointedPlan );
@@ -134,9 +141,10 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 				// agent points its individual plan
 				groupPlans.addIndividualPlan( pointedPlan );
 
-				final Id id = entry.getKey();
+				final Id id = agent.getPointedPlan().getPerson().getId();
 				markJointPlansAsInfeasible( id , agents , recordsPerJointPlan , jointPlans );
-				return;
+				agentIterator.remove();
+				didSomething = true;
 			}
 			else if ( areAllPlansPointed( recordsPerJointPlan.getRecords( pointedJointPlan ) ) ) {
 				// found a dominating joint plan
@@ -145,12 +153,15 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 				for ( Id id : pointedJointPlan.getIndividualPlans().keySet() ) {
 					markJointPlansAsInfeasible( id , agents , recordsPerJointPlan , jointPlans );
 				}
-				return;
+				agentIterator.remove();
+				didSomething = true;
 			}
 		}
 
-		conflictSolver.attemptToSolveConflicts(
-				recordsPerJointPlan );
+		if ( !didSomething ) {
+			conflictSolver.attemptToSolveConflicts(
+					recordsPerJointPlan );
+		}
 	}
 
 	private static void markJointPlansAsInfeasible(
@@ -159,6 +170,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			final RecordsOfJointPlan recordsPerJointPlan,
 			final JointPlans jointPlans ) {
 		final PointingAgent agent = agents.get( id );
+		agent.switchOff();
 
 		for ( PlanRecord plan : agent.getRecords() ) {
 			final JointPlan jointPlan = jointPlans.getJointPlan( plan.getPlan() );
@@ -170,8 +182,6 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 				record.setInfeasible();
 			}
 		}
-
-		agents.remove( id );
 	}
 
 	private static boolean areAllPlansPointed(

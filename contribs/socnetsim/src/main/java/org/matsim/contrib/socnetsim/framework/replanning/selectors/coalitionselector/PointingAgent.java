@@ -30,6 +30,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalcula
 final class PointingAgent {
 	private final Id id;
 	private final PlanRecord[] records;
+	private boolean off = false;
 
 	private final MinHeap<PlanRecord> heap;
 
@@ -82,5 +83,13 @@ final class PointingAgent {
 		}
 
 		return heap.peek();
+	}
+
+	public boolean isOff() {
+		return off;
+	}
+
+	public void switchOff() {
+		this.off = true;
 	}
 }
