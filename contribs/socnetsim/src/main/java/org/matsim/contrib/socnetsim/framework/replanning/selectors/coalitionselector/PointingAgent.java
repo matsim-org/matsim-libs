@@ -39,7 +39,7 @@ final class PointingAgent {
 			final WeightCalculator weight) {
 		this.id = person.getId();
 		this.records = new PlanRecord[ person.getPlans().size() ];
-		this.heap = new BinaryMinHeap<PlanRecord>( records.length );
+		this.heap = new BinaryMinHeap<>( records.length );
 
 		int i = 0;
 		for ( Plan p : person.getPlans() ) {
@@ -69,6 +69,10 @@ final class PointingAgent {
 	}
 
 	public Plan getPointedPlan() {
+		return getPointedPlanRecord().getPlan();
+	}
+
+	public PlanRecord getPointedPlanRecord() {
 		while ( !heap.peek().isFeasible() ) {
 			heap.poll();
 			if ( heap.isEmpty() ) {
@@ -77,6 +81,6 @@ final class PointingAgent {
 			}
 		}
 
-		return heap.peek().getPlan();
+		return heap.peek();
 	}
 }
