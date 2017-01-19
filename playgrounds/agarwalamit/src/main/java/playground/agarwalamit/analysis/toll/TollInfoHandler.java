@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -83,9 +84,11 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 	 */
 	public SortedMap<Double,Double> getTimeBin2Toll(){
 		SortedMap<Double, Double> timebin2Toll = new TreeMap<>();
-		for (double d :this.timeBin2Person2Toll.keySet()){
-			timebin2Toll.put(d, MapUtils.doubleValueSum(timeBin2Person2Toll.get(d)));
-		}
+
+		timebin2Toll.putAll( this.timeBin2Person2Toll
+				.entrySet()
+				.stream()
+				.collect( Collectors.toMap( e -> e.getKey(), e -> MapUtils.doubleValueSum(e.getValue()) ) ) );
 		return timebin2Toll;
 	}
 }

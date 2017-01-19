@@ -51,12 +51,12 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 class CongestionPricingTestExample {
 
-	CongestionPricingTestExample (String congestionImpl){
+	private CongestionPricingTestExample(String congestionImpl){
 		this.isComparing = true;
 		this.congestionImpl = congestionImpl;
 	}
 
-	CongestionPricingTestExample () {
+	private CongestionPricingTestExample() {
 		this.isComparing = false;
 	}
 
@@ -84,7 +84,7 @@ class CongestionPricingTestExample {
 		new PricingTestAnalyser().run();
 	}
 
-	void run() {
+	private void run() {
 
 		if(!new File(outputDir+"/input/").exists()) {
 			new File(outputDir+"/input/").mkdirs();
@@ -137,13 +137,13 @@ class CongestionPricingTestExample {
 
 		config.qsim().setEndTime(9*3600.);
 
-		StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		reRoute.setWeight(0.10);
 		config.strategy().addStrategySettings(reRoute);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.7);
 
-		StrategySettings changeExpBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		StrategySettings changeExpBeta = new StrategySettings();
 		changeExpBeta.setStrategyName("ChangeExpBeta");
 		changeExpBeta.setWeight(0.9);
 		config.strategy().addStrategySettings(changeExpBeta);

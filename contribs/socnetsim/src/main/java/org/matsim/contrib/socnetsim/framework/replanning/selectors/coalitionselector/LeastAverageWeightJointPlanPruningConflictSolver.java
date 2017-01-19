@@ -32,7 +32,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolver implements Conflic
 
 	@Override
 	public void attemptToSolveConflicts(
-			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan) {
+			final CoalitionSelector.RecordsOfJointPlan recordsPerJointPlan) {
 		double minAvg = Double.POSITIVE_INFINITY;
 		Map.Entry<JointPlan , Collection<PlanRecord>> toMark = null;
 

@@ -87,9 +87,12 @@ public class SpatialInterpolation {
 	 */
 	public final void reset(){
 		this.cellWeights = new HashMap<>();
-		for(Point p :this.grid.getGrid().values()){
-			if ( isCellIncludedForInterpolation(p) ) this.cellWeights.put(p, 0.);
-		}
+
+		this.grid.getGrid().values()
+				 .stream()
+				 .filter(p->isCellIncludedForInterpolation(p))
+				 .forEach( p -> this.cellWeights.put(p,0.));
+
 		if (isFilteringCellForShape) SpatialDataInputs.LOG.warn(this.grid.getGrid().size() - this.cellWeights.size() + " cells are removed from bounding box.");
 	}
 
@@ -178,13 +181,9 @@ public class SpatialInterpolation {
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
 		Point actLocation = gf.createPoint(actCoordinate);
 
-		for(Point p: this.cellWeights.keySet()){
-			if(this.grid.getCellGeometry(p).covers(actLocation)){
-				double weightSoFar = this.cellWeights.get(p);
-				this.cellWeights.put(p, weightSoFar+1*countScaleFactor);
-				return;
-			} 
-		}
+		this.cellWeights.keySet().stream().filter(p -> this.grid.getCellGeometry(p).covers(actLocation)).forEach(p -> {
+			this.cellWeights.put(p, this.cellWeights.get(p) + 1 * countScaleFactor);
+		});
 	}
 
 	/**
@@ -304,18 +303,17 @@ public class SpatialInterpolation {
 
 	public boolean isInResearchArea(final Link link) {
 		Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
-		Point linkcentroidPoint = gf.createPoint(linkCentroid);
-		return boundingBoxPolygon.covers(linkcentroidPoint);
+		Point linkCentroidPoint = gf.createPoint(linkCentroid);
+		return boundingBoxPolygon.covers(linkCentroidPoint);
 	}
 	
 	private boolean isCellIncludedForInterpolation(final Point point){
-		boolean isInside = false;
 		if( this.isFilteringCellForShape ) {
 			for(Geometry g : geoms){
 				Geometry pointGeom =  gf.createPoint( new Coordinate( point.getCoordinate() ) );
-				if(g.contains(pointGeom)) isInside = true;
+				if(g.contains(pointGeom)) return true;
 			}
-		} else isInside = true;
-		return isInside;
+		} else return true;
+		return false;
 	}
 }

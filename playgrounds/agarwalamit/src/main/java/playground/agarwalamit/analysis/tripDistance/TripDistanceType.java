@@ -24,6 +24,6 @@ package playground.agarwalamit.analysis.tripDistance;
  */
 public enum TripDistanceType {
 
-    ROUTE_DISTANCE, BEELINE_DISTANCE;
+    ROUTE_DISTANCE, BEELINE_DISTANCE
 
 }

@@ -207,7 +207,7 @@ public class SubPopMunichControler {
 		controler.getConfig().controler().setCreateGraphs(true);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		if(internalizeEmission==false && internalizeBoth ==false){
+		if(!internalizeEmission && !internalizeBoth){
 			controler.addControlerListener(new EmissionControlerListener());
 		}
 

@@ -138,7 +138,7 @@ public class SiouxFallsControler {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		
-		if(Boolean.valueOf(args[0])==false && Boolean.valueOf(args[2])==false){
+		if(!internalizeEmission && !both){
 			controler.addControlerListener(new EmissionControlerListener());
 		}
 		controler.run();	

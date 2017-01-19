@@ -173,8 +173,7 @@ public class OuterCordonUtils {
 			throw new RuntimeException(extIntKey+" is not known. Possible options are -- "+extIntKeys.toString());
 		}
 		String key = countingStationKey+"_"+extIntKey;
-		double factor = OuterCordonDirectionalFactors.valueOf(key).getDirectionalFactor();
-		return factor;
+        return OuterCordonDirectionalFactors.valueOf(key).getDirectionalFactor();
 	}
 
 	/**

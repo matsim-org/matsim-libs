@@ -40,6 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -50,7 +51,7 @@ import org.matsim.core.utils.misc.Time;
 /**
  * @author amit
  */
-public class CreateInputs {
+class CreateInputs {
 
 	public CreateInputs() {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -69,10 +70,10 @@ public class CreateInputs {
 		config.qsim().setStorageCapFactor(1.0);
 		config.qsim().setMainModes(mainModes);
 
-		config.setParam("seepage", "isSeepageAllowed", "true");
-		config.setParam("seepage", "seepMode", SeepageControler.SEEP_MODE);
-		config.setParam("seepage","isSeepModeStorageFree", SeepageControler.IS_SEEP_MODE_STORAGE_FREEE);
-		
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.SeepageQ.name());
+		config.qsim().setSeepModes(Arrays.asList(SeepageControler.SEEP_MODE));
+		config.qsim().setSeepModeStorageFree(SeepageControler.IS_SEEP_MODE_STORAGE_FREE);
+
 		config.qsim().setStuckTime(50*3600);
 		config.qsim().setEndTime(18*3600);
 //		config.controler().setOutputDirectory(outputDir);

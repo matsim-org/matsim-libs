@@ -42,9 +42,8 @@ public class CongestionCostCollector implements CongestionEventHandler {
 	private final Map<Id<Person>, Double> causingPerson2Cost = new HashMap<>();
 
 	public CongestionCostCollector(MutableScenario scenario) {
-		MutableScenario scenario1 = scenario;
-		this.vttsCar = (scenario1.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - scenario1
-				.getConfig().planCalcScore().getPerforming_utils_hr()) / scenario1.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+        this.vttsCar = (scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - scenario
+				.getConfig().planCalcScore().getPerforming_utils_hr()) / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
 		LOG.info("VTTS_car: " + vttsCar);
 	}

@@ -43,9 +43,9 @@ public class UrbanConfigGenerator {
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setMainModes(PatnaUtils.URBAN_MAIN_MODES);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		
-		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
-		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
+
+		config.timeAllocationMutator().setAffectingDuration(false);
+		config.timeAllocationMutator().setMutationRange(7200.0);
 
 		StrategySettings expChangeBeta = new StrategySettings();
 		expChangeBeta.setStrategyName("ChangeExpBeta");

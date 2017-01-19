@@ -41,9 +41,12 @@ public final class PModule extends AbstractModule {
 
 		addControlerListenerBinding().to(PControlerListener.class) ;
 		addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;
-		// Exchange of previous two lines will make the test fail.
-		// Problem is that this factory gets updated (with a new transit schedule) before each iteration, and this needs to be done _before_ the
-		// notifyIterationStarts method of PControlerListener is called.  ???  kai, jan'16
+		// (needs to be injected _after_ PControlerListener, so that it is executed _before_ PControlerListener.
+		// yyyy injecting the TransitRouterFactory besides the TransitRouter is a fix to re-configure the factory in every iteration.
+		// A more general solution suggested by MZ would be to define an iteration scope.  Then the factory could be forced
+		// to reconstruct itself in every iteration, thus pulling new information (in this case the updated transit schedule)
+		// by itself.  Is on the "list", has not been done yet, will be done eventually, until then this remains the way it is.
+		// kai, jan'17)
 
 		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
 

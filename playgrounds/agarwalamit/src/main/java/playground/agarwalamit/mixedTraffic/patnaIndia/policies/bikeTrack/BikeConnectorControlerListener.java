@@ -60,7 +60,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
  * Created by amit on 24/11/2016.
  */
 
-public class BikeConnectorControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+class BikeConnectorControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
     private static final Logger LOG = Logger.getLogger(PatnaBikeTrackConnectionControler.class);
     private static final List<String> allowedModes = Arrays.asList(TransportMode.bike);
@@ -224,7 +224,6 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
 //                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.bike, scenario.getConfig().planCalcScore()).createTravelDisutility(travelTime));
 
         final TripRouter tripRouter = routerFactory.build(this.scenario).get();
-        PlanAlgorithm router = new PlanRouter(tripRouter);
-        return router;
+        return new PlanRouter(tripRouter);
     }
 }

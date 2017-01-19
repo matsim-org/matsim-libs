@@ -32,7 +32,7 @@ public class LeastPointedPlanPruningConflictSolver implements ConflictSolver {
 
 	@Override
 	public void attemptToSolveConflicts(
-			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan) {
+			final CoalitionSelector.RecordsOfJointPlan recordsPerJointPlan) {
 		int minPoint = Integer.MAX_VALUE;
 		Map.Entry<JointPlan , Collection<PlanRecord>> toMark = null;
 		for ( final Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {

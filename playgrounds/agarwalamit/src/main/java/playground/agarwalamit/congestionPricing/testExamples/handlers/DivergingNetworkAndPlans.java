@@ -59,16 +59,16 @@ import org.matsim.core.scenario.ScenarioUtils;
  *<p>				  o----5----o
  */
  class DivergingNetworkAndPlans {
-	final Scenario scenario;
-	final Config config;
-	final Network network;
-	final Population population;
-	Link link0;
-	Link link1;
-	Link link2;
-	Link link3;
-	Link link4;
-	Link link5;
+	private final Scenario scenario;
+	private final Config config;
+	private final Network network;
+	private final Population population;
+	private Link link0;
+	private Link link1;
+	private Link link2;
+	private Link link3;
+	private Link link4;
+	private Link link5;
 
 	 DivergingNetworkAndPlans(){
 		config=ConfigUtils.createConfig();

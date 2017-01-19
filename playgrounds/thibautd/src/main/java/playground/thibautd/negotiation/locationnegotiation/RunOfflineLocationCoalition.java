@@ -19,6 +19,8 @@
 package playground.thibautd.negotiation.locationnegotiation;
 
 import com.google.inject.Key;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.core.config.Config;
@@ -51,6 +53,8 @@ public class RunOfflineLocationCoalition {
 						new LocationAlternativesConfigGroup(),
 						new NegotiatorConfigGroup(),
 						new OfflineCoalitionConfigGroup() );
+
+		Logger.getLogger( CoalitionSelector.class ).setLevel( Level.TRACE );
 
 		try ( AutoCloseable out = MoreIOUtils.initOut( config ) ;
 			  AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose();

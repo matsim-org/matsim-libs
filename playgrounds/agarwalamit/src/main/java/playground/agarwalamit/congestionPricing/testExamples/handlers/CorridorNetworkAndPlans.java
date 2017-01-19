@@ -52,15 +52,15 @@ public class CorridorNetworkAndPlans {
 	 *<p>  o--0---o---1---o---2---o---3---o
 	 *<p>				  
 	 */
-    final Scenario scenario;
-	final Config config;
-	final Network network;
-	final Population population;
+    private final Scenario scenario;
+	private final Config config;
+	private final Network network;
+	private final Population population;
 	
-	Link link0;
-	Link link1;
-	Link link2;
-	Link link3;
+	private Link link0;
+	private Link link1;
+	private Link link2;
+	private Link link3;
 
 	public CorridorNetworkAndPlans(){
 		config=ConfigUtils.createConfig();

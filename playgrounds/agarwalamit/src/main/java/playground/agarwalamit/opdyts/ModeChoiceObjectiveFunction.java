@@ -49,7 +49,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     @SuppressWarnings("unused")
     private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
 
-    private MainModeIdentifier mainModeIdentifier ;
+    private final MainModeIdentifier mainModeIdentifier ;
     private final DistanceDistribution distriInfo ;
 
     @Inject

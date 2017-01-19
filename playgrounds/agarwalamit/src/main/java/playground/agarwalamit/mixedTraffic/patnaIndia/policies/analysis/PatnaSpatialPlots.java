@@ -54,15 +54,15 @@ public class PatnaSpatialPlots {
     private static final double countScaleFactor = 1.0 / PatnaUtils.SAMPLE_SIZE;
 
     private static final double gridSize = 100;
-    private static double smoothingRadius = 100;
+    private static final double smoothingRadius = 100;
 
     private static final boolean isWritingGGPLOTData = true;
     private static final int noOfBins = 1;
 
-    private static double xMin=304200.00;
-    private static double xMax=326700.00;
-    private static double yMin=2828000.00;
-    private static double yMax=2838500.00;
+    private static final double xMin=304200.00;
+    private static final double xMax=326700.00;
+    private static final double yMin=2828000.00;
+    private static final double yMax=2838500.00;
 
     private static final boolean isComparing = false;
 

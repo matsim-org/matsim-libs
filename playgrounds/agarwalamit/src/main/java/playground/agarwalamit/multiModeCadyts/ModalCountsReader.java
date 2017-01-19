@@ -50,7 +50,7 @@ public class ModalCountsReader {
 
 			while (row != null) {
 				row = bufferedReader.readLine();
-				if (row != null && row != "") {
+				if (row != null && !row.equals("")) {
 					String[] values = StringUtils.explode(row, '\t');
 					Id<Link> id = Id.create(values[0], Link.class);
 					String mode = values[1];
