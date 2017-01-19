@@ -29,12 +29,14 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.router.Dijkstra;
 
+import playground.jbischoff.drt.scheduler.tasks.DrtStayTask;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import playground.jbischoff.utils.JbUtils;
@@ -80,6 +82,9 @@ public class SimpleDispatchCreator implements RequestDispatcher {
 		ArrayList<TaxibusRequest> bestPickupOrder = null;
 		ArrayList<TaxibusRequest> bestDropoffOrder = null;
 		double bestDistance = Double.MAX_VALUE;
+		DrtStayTask ct = (DrtStayTask) veh.getSchedule().getCurrentTask();
+
+		Link departurelink = ct.getLink();
 		for (int i = 0 ; i< context.clusteringRounds;i++){
 			double distance = 0;
 
@@ -91,7 +96,7 @@ public class SimpleDispatchCreator implements RequestDispatcher {
 			currentDropoffOrder.addAll(commonRequests);
 			Collections.shuffle(currentDropoffOrder);
 			
-			Coord lastCoord = veh.getStartLink().getCoord();
+			Coord lastCoord = departurelink.getCoord();
 			for (TaxibusRequest r : currentPickupOrder){
 				distance += DistanceUtils.calculateDistance(r.getFromLink().getCoord(),lastCoord);
 				lastCoord = r.getFromLink().getCoord();
@@ -111,7 +116,7 @@ public class SimpleDispatchCreator implements RequestDispatcher {
 		}
 		Iterator<TaxibusRequest> it = bestPickupOrder.iterator();
 		TaxibusRequest lastPU = it.next();
-		VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(veh.getStartLink(), lastPU.getFromLink(), context.timer.getTimeOfDay(), router, context.travelTime);
+		VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(departurelink, lastPU.getFromLink(), context.timer.getTimeOfDay(), router, context.travelTime);
 		TaxibusDispatch dispatch = new TaxibusDispatch(veh, lastPU, path);
 		while (it.hasNext()){
 			TaxibusRequest currentPU = it.next();
@@ -128,7 +133,9 @@ public class SimpleDispatchCreator implements RequestDispatcher {
 			dispatch.addPath(VrpPaths.calcAndCreatePath(lastDO.getToLink(), currentDO.getToLink(), currentDO.getT0(), router, context.travelTime));
 			lastDO = currentDO;
 		}
+		if (context.returnToDepot){
 		dispatch.addPath(VrpPaths.calcAndCreatePath(lastDO.getToLink(), veh.getStartLink(), lastDO.getT0(), router, context.travelTime));
+		}
 		return dispatch;
 	}
 
@@ -139,18 +146,20 @@ public class SimpleDispatchCreator implements RequestDispatcher {
 	private Vehicle findClosestIdleVehicle(Coord coord) {
 		double bestDistance = Double.MAX_VALUE;
 		Vehicle bestVehicle = null;
-		for (Vehicle veh : this.context.vrpData.getVehicles().values()){
-			if (context.scheduler.isIdle(veh)){
-				double distance = DistanceUtils.calculateSquaredDistance(veh.getStartLink().getCoord(),coord);
-				if (distance<bestDistance){
-					bestDistance=distance;
+		for (Vehicle veh : this.context.vrpData.getVehicles().values()) {
+			if (context.scheduler.isIdle(veh)) {
+				DrtStayTask ct = (DrtStayTask) veh.getSchedule().getCurrentTask();
+				Coord startCoord = ct.getLink().getCoord();
+				double distance = DistanceUtils.calculateSquaredDistance(startCoord, coord);
+				if (distance < bestDistance) {
+					bestDistance = distance;
 					bestVehicle = veh;
 				}
-				
+
 			}
-	
-			}
-		
+
+		}
+
 		return bestVehicle;
 	}
 

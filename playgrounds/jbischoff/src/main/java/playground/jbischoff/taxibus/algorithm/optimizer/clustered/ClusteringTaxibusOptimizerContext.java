@@ -30,7 +30,7 @@ public class ClusteringTaxibusOptimizerContext
     public final int clusteringRounds;
     public final int routingRounds;
     public final double minOccupancy;
-    
+    public final boolean returnToDepot;
 
     public ClusteringTaxibusOptimizerContext(VrpData vrpData, Scenario scenario, MobsimTimer timer,
             TravelTime travelTime, TravelDisutility travelDisutility, TaxibusScheduler scheduler,
@@ -38,6 +38,7 @@ public class ClusteringTaxibusOptimizerContext
     {
         this.vrpData = vrpData;
         this.scenario = scenario;
+        this.returnToDepot = tbcg.isReturnToDepot();
         this.timer = timer;
         this.travelTime = travelTime;
         this.travelDisutility = travelDisutility;
