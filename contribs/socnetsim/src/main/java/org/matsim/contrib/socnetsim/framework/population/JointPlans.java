@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 
@@ -139,6 +142,31 @@ public class JointPlans implements MatsimToplevelContainer {
 
 	public void addJointPlans(final Iterable<JointPlan> jointPlans) {
 		for (JointPlan jp : jointPlans) addJointPlan( jp );
+	}
+
+	public Collection<JointPlan> getJointPlansOfPerson( final Person person ) {
+		final Collection<JointPlan> jps = new ArrayList<>( person.getPlans().size() );
+		for ( Plan p : person.getPlans() ) {
+			final JointPlan jp = getJointPlan( p );
+			if ( jp != null ) jps.add( jp );
+		}
+		return jps;
+	}
+
+	public Collection<JointPlan> getJointPlansOfSameComposition( final JointPlan jointPlan ) {
+		final Person person = jointPlan.getIndividualPlans().values().iterator().next().getPerson();
+
+		final Collection<JointPlan> jps = new ArrayList<>( person.getPlans().size() );
+		for ( Plan p : person.getPlans() ) {
+			final JointPlan jp = getJointPlan( p );
+
+			if ( jp != null &&
+					jp.getIndividualPlans().keySet().equals(
+							jointPlan.getIndividualPlans().keySet() ) ) {
+				jps.add( jp );
+			}
+		}
+		return jps;
 	}
 
 	@Override

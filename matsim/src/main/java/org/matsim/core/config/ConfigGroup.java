@@ -86,11 +86,17 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	/** Check if the set values go well together. This method is usually called after reading the
 	 * configuration from a file. If an inconsistency is found, a warning or error should be issued
 	 * and (optionally) a RuntimeException being thrown.
+	 * @param config TODO
 	 */
-	protected void checkConsistency() {
+	protected void checkConsistency(Config config) {
+		// (I added Config as a parameter, since there are many occasions where the validity of a ConfigGroup can only be checked when other
+		// material is known.  Could put all of this in the "global" config consistency checker, but if it conceptually belongs into the
+		// ConfigGroup, I think it is easier to have it more local.  Wasn't a big problem, since this method is _only_ called from the global config
+		// itself, which obviously can just pass on a "this" pointer.  kai, jan'17)
+		
 		// default: just call this method on parameter sets
 		for ( Collection<? extends ConfigGroup> sets : getParameterSets().values() ) {
-			for ( ConfigGroup set : sets ) set.checkConsistency();
+			for ( ConfigGroup set : sets ) set.checkConsistency(config);
 		}
 	}
 	@Deprecated // please try to use the "typed" access structures.  kai, nov'16

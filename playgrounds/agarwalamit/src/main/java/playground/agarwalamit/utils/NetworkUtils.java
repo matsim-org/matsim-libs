@@ -19,8 +19,8 @@
 
 package playground.agarwalamit.utils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
@@ -32,10 +32,11 @@ import org.matsim.api.core.v01.network.Node;
 public class NetworkUtils {
 
     public static void removeIsolatedNodes(final Network network ){
-        List<Node> nodes2remove = new ArrayList<>();
-        for(Node n: network.getNodes().values()) {
-            if( n.getInLinks().size() == 0 && n.getOutLinks().size() == 0) nodes2remove.add(n);
-        }
+        List<Node> nodes2remove = network.getNodes()
+                                         .values()
+                                         .stream()
+                                         .filter(n -> n.getInLinks().isEmpty() && n.getOutLinks().isEmpty())
+                                         .collect(Collectors.toList());
 
         for(Node n : nodes2remove) {network.removeNode(n.getId());}
     }

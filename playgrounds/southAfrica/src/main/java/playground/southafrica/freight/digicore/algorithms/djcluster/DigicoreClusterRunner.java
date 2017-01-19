@@ -417,7 +417,8 @@ public class DigicoreClusterRunner {
 		Counter counter = new Counter("   Vehicles completed: ");
 
 		/* Set up the output infrastructure:
-		 * Create a new map with an empty list for each zone. These will be passed to threads later. */
+		 * Create a new map with an empty list for each zone. These will be 
+		 * passed to threads later. */
 		zoneMap = new HashMap<Id<MyZone>, List<Coord>>();
 		for(MyZone mz : zoneList){
 			zoneMap.put(mz.getId(), new ArrayList<Coord>());

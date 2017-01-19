@@ -61,8 +61,10 @@ public class Main {
 	 * ============================================================
 	 */
 
-	private static AverageTravelTime avgTravelTimes = null;
+	// private static AverageTravelTime avgTravelTimes = null;
 
+	private static AverageTravelTimeAcrossRuns avgTTsAcrossRuns = null;
+	
 	private static void runDemandModel(final Scenario scenario, final int outerIt) {
 
 		if (outerIt == 1) {
@@ -73,13 +75,12 @@ public class Main {
 		if (outerIt == 1) {
 			carTravelTime = new FreeSpeedTravelTime();
 		} else {
-			if (avgTravelTimes == null) {
+			if (avgTTsAcrossRuns == null) {
 				assert (outerIt != 2);
-				avgTravelTimes = new AverageTravelTime(scenario, ttAvgIts);
-			} else {
-				avgTravelTimes.addData(scenario, ttAvgIts);
+				avgTTsAcrossRuns = new AverageTravelTimeAcrossRuns(Integer.MAX_VALUE);
 			}
-			carTravelTime = avgTravelTimes;
+			avgTTsAcrossRuns.addData(scenario);
+			carTravelTime = avgTTsAcrossRuns;
 		}
 
 		final com.google.inject.Injector injector = org.matsim.core.controler.Injector

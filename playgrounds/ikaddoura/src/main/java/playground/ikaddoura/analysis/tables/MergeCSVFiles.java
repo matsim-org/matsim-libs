@@ -54,8 +54,7 @@ public class MergeCSVFiles {
 	
 	private static final Logger log = Logger.getLogger(MergeCSVFiles.class);
 	
-	private static final String directory = "/Users/ihab/Desktop/ils4i/kaddoura/bln-dz-time/output_route_time/";
-//	private static final String directory = "/Users/ihab/Documents/workspace/runs-svn/berlin-dz-time/output/flowCapFactor0.02/";
+	private static final String directory = "/Users/ihab/Desktop/ils4i/kaddoura/cn_sensitivity/output/";
 	private static final String fileName = "aggregated_info_car";
 	private static final String separator = ";";
 	
@@ -145,7 +144,7 @@ public class MergeCSVFiles {
 	}
 	
 	private static List<File> collectAllFilesInDirectory(File file, List<File> fileList) {
-				
+		log.info("File: " + file);
 		File[] files = file.listFiles();
 		
 		if (files != null) {

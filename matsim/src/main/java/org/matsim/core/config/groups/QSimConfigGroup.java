@@ -20,16 +20,15 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
 
 public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
@@ -53,7 +52,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
 	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
 
-	public static enum TrafficDynamics { queue, withHoles } ;
+	public static enum TrafficDynamics { queue, withHoles,
+		KWM //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
+	} ;
 	
 	public static enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime } ;
 	public static enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime } ;
@@ -452,8 +453,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(LINK_DYNAMICS)
-	public void setLinkDynamics( String str ) {
-		this.linkDynamics = LinkDynamics.valueOf( str ) ;
+	public void setLinkDynamics(LinkDynamics linkDynamics) {
+		this.linkDynamics = linkDynamics ;
 	}
 
 	@StringGetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)
@@ -542,14 +543,5 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
 		// yyyyyy this should better become a threshold number!  kai, aug'16
 		return this.usingTravelTimeCheckInTeleportation = val ;
-	}
-	// ---
-	public static enum InflowConstraint { none, maxflowFromFdiag } ;
-	private InflowConstraint inflowConstraint = InflowConstraint.none ;
-	public InflowConstraint getInflowConstraint() {
-		return this.inflowConstraint ;
-	}
-	public void setInflowConstraint( InflowConstraint inflowConstraint ) {
-		this.inflowConstraint = inflowConstraint ;
 	}
 }

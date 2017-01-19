@@ -23,9 +23,10 @@ package playground.agarwalamit.opdyts;
 /**
  * Created by amit on 05/10/16.
  */
+@SuppressWarnings("DefaultFileTemplate")
 public enum RandomizedUtilityParametersChoser {
 
     ONLY_ASC,
     ALL_EXCEPT_ASC,
-    ALL;
+    ALL
 }

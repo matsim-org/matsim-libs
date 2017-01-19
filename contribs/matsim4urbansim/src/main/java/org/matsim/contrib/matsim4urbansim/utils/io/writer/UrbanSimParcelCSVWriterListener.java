@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.matsim4urbansim.interpolation.Interpolation;
+import org.matsim.contrib.accessibility.interpolation.Interpolation;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacilitiesImpl;

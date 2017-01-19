@@ -19,6 +19,15 @@
 
 package org.matsim.contrib.minibus.stats.abtractPAnalysisModules;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
@@ -34,13 +43,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Plugs in all analysis.
  * 
@@ -54,17 +56,11 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	private final List<PAnalysisModule> pAnalyzesList = new LinkedList<>();
 	private final HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<>();
 	private boolean firstIteration = true;
-	private final PtMode2LineSetter lineSetter;
+	@Inject private LineId2PtMode lineSetter;
 
-	public PAnalysisManager(PConfigGroup pConfig, PtMode2LineSetter lineSetter){
+	public PAnalysisManager(PConfigGroup pConfig){
 		log.info("enabled");
 		this.pIdentifier = pConfig.getPIdentifier();
-		if (lineSetter == null) {
-			this.lineSetter = new BVGLines2PtModes();
-			log.info("using default PtMode2LineSetter " +  this.lineSetter.getClass().getSimpleName());
-		} else {
-			this.lineSetter = lineSetter;
-		}
 	}
 	@Override
 	public void notifyStartup(StartupEvent event) {

@@ -62,7 +62,7 @@ class MergingNetworkAndPlans {
 	MergingNetworkAndPlans(){
 		config=ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.loadScenario(config);
-		network =  (Network) this.scenario.getNetwork();
+		network = this.scenario.getNetwork();
 		population = this.scenario.getPopulation();
 	}
 
@@ -76,20 +76,25 @@ class MergingNetworkAndPlans {
 		final Node fromNode = node1;
 		final Node toNode = node2;
 
-		link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+		link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 100.0, 20.0, (double) 3600, (double) 1, null,
+                "7");
 		final Node fromNode1 = node2;
 		final Node toNode1 = node3;
-		link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 100.0, 110.0, (double) 360, (double) 1, null, (String) "7");
+		link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 100.0, 110.0, (double) 360, (double) 1, null,
+                "7");
 		final Node fromNode2 = node3;
 		final Node toNode2 = node4;
-		link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 5.0, 6.0, (double) 900, (double) 1, null, (String) "7");
+		link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("3")), fromNode2, toNode2, 5.0, 6.0, (double) 900, (double) 1, null,
+                "7");
 		final Node fromNode3 = node4;
 		final Node toNode3 = node5;
-		link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+		link4 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("4")), fromNode3, toNode3, 100.0, 20.0, (double) 3600, (double) 1, null,
+                "7");
 		final Node fromNode4 = node1;
 		final Node toNode4 = node3;
 
-		link5 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("5")), fromNode4, toNode4, 100.0, 20.0, (double) 3600, (double) 1, null, (String) "7");
+		link5 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("5")), fromNode4, toNode4, 100.0, 20.0, (double) 3600, (double) 1, null,
+                "7");
 	}
 
 	void createPopulation(){

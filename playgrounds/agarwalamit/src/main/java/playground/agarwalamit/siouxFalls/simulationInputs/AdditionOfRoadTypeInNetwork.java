@@ -20,7 +20,6 @@ package playground.agarwalamit.siouxFalls.simulationInputs;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -28,7 +27,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 /**
@@ -42,7 +40,7 @@ public class AdditionOfRoadTypeInNetwork {
 	private static BufferedWriter writer;
 	
 	public static void main(String[] args) {
-		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("./input/output_network.xml.gz");
 		writer = IOUtils.getBufferedWriter("./input/baseCase/roadTypeMapping.txt");
@@ -51,9 +49,9 @@ public class AdditionOfRoadTypeInNetwork {
 			
 				double speedInMPS = link.getFreespeed();
 				if (speedInMPS == 25.0) {
-					NetworkUtils.setType( ((Link) link), (String) "01");
+					NetworkUtils.setType(link, "01");
 				} else if (speedInMPS == 13.9) {
-					NetworkUtils.setType( ((Link) link), (String) "02");
+					NetworkUtils.setType(link, "02");
 				} else {
 					throw new RuntimeException(
 							"Define road type in roadTypeMapping file for this category."

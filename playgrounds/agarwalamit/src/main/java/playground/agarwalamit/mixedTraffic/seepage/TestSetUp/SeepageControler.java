@@ -48,7 +48,7 @@ public class SeepageControler {
 	 public static final String OUTPUT_DIR = "../../../repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
 	 static final List<String> MAIN_MODES = Arrays.asList(TransportMode.car,TransportMode.bike);
 	 static final String SEEP_MODE = "bike";
-	 static final String IS_SEEP_MODE_STORAGE_FREEE="false";
+	 static final boolean IS_SEEP_MODE_STORAGE_FREE = false;
 	 
 	private void run (){
 		CreateInputs inputs = new CreateInputs();

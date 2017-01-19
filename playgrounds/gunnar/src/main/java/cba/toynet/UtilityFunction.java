@@ -34,11 +34,14 @@ class UtilityFunction {
 
 		this.scenario = scenario;
 
-		this.tourSeq2ASC.put(TourSequence.Type.work_car, 103.5);
-		this.tourSeq2ASC.put(TourSequence.Type.work_car_other1_car, 0.0);
-		this.tourSeq2ASC.put(TourSequence.Type.work_car_other1_pt, 0.0);
-		this.tourSeq2ASC.put(TourSequence.Type.work_car_other2_car, 0.0);
-		this.tourSeq2ASC.put(TourSequence.Type.work_pt, 103.5);
+		final double singleTourASC = 103.5;
+		final double carASC = 1.0;
+		
+		this.tourSeq2ASC.put(TourSequence.Type.work_car, singleTourASC + carASC);
+		this.tourSeq2ASC.put(TourSequence.Type.work_car_other1_car, 0.0 + carASC);
+		this.tourSeq2ASC.put(TourSequence.Type.work_car_other1_pt, 0.0 + carASC);
+		this.tourSeq2ASC.put(TourSequence.Type.work_car_other2_car, 0.0 + carASC);
+		this.tourSeq2ASC.put(TourSequence.Type.work_pt, singleTourASC);
 		this.tourSeq2ASC.put(TourSequence.Type.work_pt_other1_car, 0.0);
 		this.tourSeq2ASC.put(TourSequence.Type.work_pt_other1_pt, 0.0);
 		this.tourSeq2ASC.put(TourSequence.Type.work_pt_other2_car, 0.0);

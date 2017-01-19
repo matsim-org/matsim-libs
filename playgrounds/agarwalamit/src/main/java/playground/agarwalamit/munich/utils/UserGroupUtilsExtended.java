@@ -114,7 +114,7 @@ public class UserGroupUtilsExtended {
 	}
 
 	public double calculateMedian(List<Double> inputList){
-		if(inputList.size()==0){
+		if(inputList.isEmpty()){
 			return 0.;
 		} else {
 			Collections.sort(inputList);

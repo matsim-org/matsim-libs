@@ -277,10 +277,12 @@ public final class MergeNoiseCSVFile {
 
 			log.info("Reading " + label + "...");
 
-			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
+			double totalValueSum = 0.;
 
+			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 				log.info("Reading time bin: " + time);
 
+				double valueSumTimeBin = 0.;
 				String fileName = workingDirectory + label + "_" + Double.toString(time) + ".csv";
 
 				try ( BufferedReader br = IOUtils.getBufferedReader(fileName) ) {
@@ -305,7 +307,8 @@ public final class MergeNoiseCSVFile {
 							if (column == 0) {
 								rp = Id.create(columns[column], ReceiverPoint.class);
 							} else if (column == 1) {
-								value = Double.valueOf(columns[column]); 
+								value = Double.valueOf(columns[column]);
+								valueSumTimeBin+=value;
 							} else {
 								// throw new RuntimeException("More than two columns. Aborting...");
 							}
@@ -315,9 +318,13 @@ public final class MergeNoiseCSVFile {
 						lineCounter++;
 						time2rp2value.put(time, rp2value);
 					}
+					log.info("sum of all values in this time bin: " + valueSumTimeBin);
 				} catch (NumberFormatException | IOException e) {
 					e.printStackTrace();
 				}
+				
+				totalValueSum+=valueSumTimeBin;
+				log.info("total sum of all values: " + totalValueSum);
 			}
 
 			this.label2time2rp2value.put(label, time2rp2value);

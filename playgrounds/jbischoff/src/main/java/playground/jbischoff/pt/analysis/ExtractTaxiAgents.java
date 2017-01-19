@@ -62,6 +62,6 @@ public static void main(String[] args) {
 		}
 	});
 	new MatsimEventsReader(events).readFile("D:/runs-svn/intermodal/5000_routeDevel/5000_routeDevel.output_events.xml.gz");
-	JbUtils.collection2Text(taxicustomers, "D:/runs-svn/intermodal/5000_routeDevel/taxicustomers.txt");
+	JbUtils.collection2Text(taxicustomers, "D:/runs-svn/intermodal/5000_routeDevel/taxicustomers.txt", null);
 }
 }

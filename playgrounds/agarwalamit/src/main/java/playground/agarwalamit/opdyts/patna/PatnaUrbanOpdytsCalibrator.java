@@ -54,7 +54,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class PatnaUrbanOpdytsCalibrator {
 
-	private static final OpdytsScenarios PATNA_1_PCT = OpdytsScenarios.PATNA_1Pct;
+	private static final OpdytsScenario PATNA_1_PCT = OpdytsScenario.PATNA_1Pct;
 	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 
@@ -107,7 +107,8 @@ public class PatnaUrbanOpdytsCalibrator {
 //		modes2consider.add("pt");
 //		modes2consider.add("walk");
 
-		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,PATNA_1_PCT);
+		DistanceDistribution referenceStudyDistri = new PatnaCMPDistanceDistribution(PATNA_1_PCT);
+		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, modes2consider);
@@ -133,7 +134,7 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(PATNA_1_PCT); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(referenceStudyDistri); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.

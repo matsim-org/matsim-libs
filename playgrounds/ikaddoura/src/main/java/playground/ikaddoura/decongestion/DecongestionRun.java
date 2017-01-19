@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,8 +63,8 @@ public class DecongestionRun {
 			log.info("output directory: "+ outputBaseDirectory);
 
 		} else {
-			configFile = "../../../runs-svn/decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/decongestion/output/";
+			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
+			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output_convergence_1000.output_plans/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -74,13 +75,32 @@ public class DecongestionRun {
 	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setMsa(true);
+		decongestionSettings.setTOLL_BLEND_FACTOR(0.);
+		decongestionSettings.setKd(0.);
+		decongestionSettings.setKi(0.);
+		decongestionSettings.setKp(0.025);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
+		
 		Config config = ConfigUtils.loadConfig(configFile);
 
+		double weight = Double.NEGATIVE_INFINITY;
+		for (StrategySettings settings : config.strategy().getStrategySettings()) {
+			if (settings.getStrategyName().equals("TimeAllocationMutator")) {
+				weight = settings.getWeight();
+			}
+		}
+		
 		String outputDirectory = outputBaseDirectory +
-				"total" + config.controler().getLastIteration() + "it" + 
+				"total" + config.controler().getLastIteration() + "it" +
+				"_plans" + config.strategy().getMaxAgentPlanMemorySize() +
+				"_ScoreMSA" + config.planCalcScore().getFractionOfIterationsToStartScoreMSA() +
 				"_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() +
 				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() +
-				"_timeMutation" + config.timeAllocationMutator().getMutationRange() +
+				"_timeMutationWeight" + weight +
+				"_timeMutationRange" + config.timeAllocationMutator().getMutationRange() +
 				"_" + decongestionSettings.getTOLLING_APPROACH();
 		
 		if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.NoPricing.toString())) {
@@ -103,7 +123,9 @@ public class DecongestionRun {
 				outputDirectory = outputDirectory +
 						"_Kp" + decongestionSettings.getKp() +
 						"_Ki" + decongestionSettings.getKi() +
-						"_Kd" + decongestionSettings.getKd();
+						"_Kd" + decongestionSettings.getKd() +
+						"_tollMSA" + decongestionSettings.isMsa() + 
+						"_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR();
 			}
 		}
 			

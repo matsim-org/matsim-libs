@@ -92,7 +92,6 @@ class EquilTestSetUp {
 		strategySettings.setWeight(1);
 		scg.addStrategySettings(strategySettings);
 
-		// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = config.vspExperimental() ;
 		vcg.setWritingOutputEvents(false) ;
 

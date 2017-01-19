@@ -173,8 +173,7 @@ public class OuterCordonUtils {
 			throw new RuntimeException(extIntKey+" is not known. Possible options are -- "+extIntKeys.toString());
 		}
 		String key = countingStationKey+"_"+extIntKey;
-		double factor = OuterCordonDirectionalFactors.valueOf(key).getDirectionalFactor();
-		return factor;
+        return OuterCordonDirectionalFactors.valueOf(key).getDirectionalFactor();
 	}
 
 	/**
@@ -190,7 +189,7 @@ public class OuterCordonUtils {
 	public static List<Id<Link>> getExternalToInternalCountStationLinkIds(final PatnaNetworkType pnt){
 		List<Id<Link>> links = new ArrayList<>();
 		for(Entry<String,String> e : new OuterCordonLinks(pnt).getCountingStationToLink().entrySet()){
-			if(e.getKey().toString().split("_")[1].equals("X2P")) links.add( Id.createLinkId(e.getValue()) ) ;
+			if(e.getKey().split("_")[1].equals("X2P")) links.add( Id.createLinkId(e.getValue()) ) ;
 		}
 		return links;
 	}
@@ -198,7 +197,7 @@ public class OuterCordonUtils {
 	public static List<Id<Link>> getInternalToExternalCountStationLinkIds(final PatnaNetworkType pnt){
 		List<Id<Link>> links = new ArrayList<>();
 		for(Entry<String,String> e : new OuterCordonLinks(pnt).getCountingStationToLink().entrySet()){
-			if(e.getKey().toString().split("_")[1].equals("P2X")) links.add( Id.createLinkId(e.getValue()) ) ;
+			if(e.getKey().split("_")[1].equals("P2X")) links.add( Id.createLinkId(e.getValue()) ) ;
 		}
 		return links;
 	}

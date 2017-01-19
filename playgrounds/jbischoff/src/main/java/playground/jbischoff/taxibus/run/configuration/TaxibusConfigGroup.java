@@ -32,6 +32,7 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	private static final String SERVICE_AREA_1_RADIUS = "serviceArea_1_Radius_m";
 	private static final String SERVICE_AREA_2_RADIUS = "serviceArea_2_Radius_m";
 	
+	private static final String RETURN_TO_DEPOT = "ReturnToDepot";
 	
 
 	//SharedTaxi
@@ -58,6 +59,7 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	private String serviceAreaCentroid_2 = null;
 	private double serviceArea_2_Radius_m = 20000;
 	private double serviceArea_1_Radius_m = 20000;
+	private boolean returnToDepot = false;
 	//SharedTaxi
 	private double detourFactor = 1.2;
 
@@ -95,9 +97,9 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 		map.put(SERVICE_AREA_2_CENTROID_LINK, "[Clustered] Link Id that sets taxibus service area 2 centroid. Service areas may overlap");
 		map.put(SERVICE_AREA_1_RADIUS, "[Clustered] Radius (in meters) around service area 1 where taxibus trips are possible");
 		map.put(SERVICE_AREA_2_RADIUS, "[Clustered] Radius (in meters) around service area 2 where taxibus trips are possible");
-		
+		map.put(RETURN_TO_DEPOT, "[clustered] Determines whether the bus returns to its depot (=startLink) after each ride");
 		map.put(DESTINATIONID, "[StateBased] Common destination link id for statebased optimizer");
-
+		
 		return map;
 	}
 
@@ -105,6 +107,23 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 		return taxiIdentifier;
 	}
 
+	
+	/**
+	 * @return the returnToDepot
+	 */
+	@StringGetter(RETURN_TO_DEPOT)
+	public boolean isReturnToDepot() {
+		return returnToDepot;
+	}
+
+	/**
+	 * @param returnToDepot the returnToDepot to set
+	 */
+	@StringSetter(RETURN_TO_DEPOT)
+	public void setReturnToDepot(boolean returnToDepot) {
+		this.returnToDepot = returnToDepot;
+	}
+	
 	/**
 	 * @return the destinationLinkId
 	 */

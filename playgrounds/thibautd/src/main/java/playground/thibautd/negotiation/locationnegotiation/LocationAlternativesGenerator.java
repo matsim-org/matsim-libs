@@ -96,12 +96,13 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 							Collections.singleton( alter ) ,
 							locations.getHomeLocation( ego ),
 							LocationProposition.Type.visit ) );
-			propositions.add(
-					LocationProposition.create(
-							ego ,
-							Collections.singleton( alter ) ,
-							locations.getHomeLocation( alter ),
-							LocationProposition.Type.visit ) );
+			// this will come from alter
+			//propositions.add(
+			//		LocationProposition.create(
+			//				ego ,
+			//				Collections.singleton( alter ) ,
+			//				locations.getHomeLocation( alter ),
+			//				LocationProposition.Type.visit ) );
 		}
 
 		// alone at home

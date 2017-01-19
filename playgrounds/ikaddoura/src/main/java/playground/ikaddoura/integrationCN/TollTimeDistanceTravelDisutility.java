@@ -143,7 +143,7 @@ public class TollTimeDistanceTravelDisutility implements TravelDisutility {
 
 		}
 						
-		double expectedLinkNoiseTollDistuility = this.marginalUtilityOfMoney * linkExpectedNoiseToll;			
+		double expectedLinkNoiseTollDistuility = this.noiseContext.getNoiseParams().getNoiseTollFactor() * this.marginalUtilityOfMoney * linkExpectedNoiseToll;			
 		
 		double linkExpectedTollDisutility = expectedLinkCongestionTollDisutility + expectedLinkNoiseTollDistuility;
 		return linkExpectedTollDisutility;

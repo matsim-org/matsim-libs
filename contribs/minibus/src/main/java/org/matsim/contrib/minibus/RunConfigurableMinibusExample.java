@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.fare.StageContainer;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.hook.PModule;
 import org.matsim.core.config.Config;
@@ -63,24 +63,26 @@ public final class RunConfigurableMinibusExample {
 		
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
+		
+		if ( true ) {
+			throw new RuntimeException("the following is not possibly any more; just copy PModule and modify it to your needs.  kai, jan'17") ;
+		}
+//		builder.setTicketMachine(new TicketMachineI() {
+//			TicketMachineI delegate = new TicketMachine(pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0 ) ;
+//			@Override public double getFare(StageContainer stageContainer) {
+//				double fare = delegate.getFare(stageContainer) ;
+//				if ( subsidizedStops.contains( stageContainer.getStopEntered() ) ) {
+//					fare+=1. ; 
+//					// this would increase the fare for the subsidized stops ...
+//					// ... but I fear that this also means that the passengers have to pay this.  kai, jan'17
+//				}
+//				return fare ;
+//			}
+//		}) ;
+		
+		
+		controler.addOverridingModule(new PModule()) ;
 
-		PModule builder = new PModule() ;
-		
-		builder.setTicketMachine(new TicketMachineI() {
-			TicketMachineI delegate = new TicketMachine(pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0 ) ;
-			@Override public double getFare(StageContainer stageContainer) {
-				double fare = delegate.getFare(stageContainer) ;
-				if ( subsidizedStops.contains( stageContainer.getStopEntered() ) ) {
-					fare+=1. ; 
-					// this would increase the fare for the subsidized stops ...
-					// ... but I fear that this also means that the passengers have to pay this.  kai, jan'17
-				}
-				return fare ;
-			}
-		}) ;
-		
-		
-		builder.configureControler(controler);
 
 		controler.run();
 	}		

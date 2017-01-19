@@ -71,7 +71,8 @@ public class MatsimNetwork2Shape {
         	Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
         	Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
         	SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(((Link)link)), link.getCapacity(), link.getFreespeed()}, null);
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), NetworkUtils.getType(
+                            link), link.getCapacity(), link.getFreespeed()}, null);
 			features.add(ft);
         }
        new File("./clusterOutput/networkShape/").mkdir();

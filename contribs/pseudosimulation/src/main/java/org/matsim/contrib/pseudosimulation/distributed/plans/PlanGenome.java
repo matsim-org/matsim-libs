@@ -10,7 +10,7 @@ import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponen
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.utils.misc.Time;
-
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.ScoreComponentType;
 
 import java.util.ArrayList;
@@ -34,6 +34,13 @@ public class PlanGenome implements Plan {
     private Person person = null;
     private String type = null;
     private Customizable customizableDelegate;
+    
+	private final Attributes attributes = new Attributes();
+	@Override
+	public final Attributes getAttributes() {
+		return this.attributes;
+	}
+
     public PlanGenome() {
         System.out.print("");
     }

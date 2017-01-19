@@ -68,7 +68,7 @@ public class EvacPatnaControler {
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outDir);
 
-		config.qsim().setLinkDynamics(linkDynamics.name());
+		config.qsim().setLinkDynamics(linkDynamics);
 		config.qsim().setSeepModeStorageFree(isSeepModeStorageFree);
 		Collection<String> seepModes = Arrays.asList("bike");
 		config.qsim().setSeepModes(seepModes );

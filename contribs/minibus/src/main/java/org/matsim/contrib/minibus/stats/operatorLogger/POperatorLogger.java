@@ -24,12 +24,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.contrib.minibus.operator.POperators;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -66,13 +68,8 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 	
 	private BufferedWriter pOperatorLoggerWriter;
 
-	private final Operators pBox;
-	private final PConfigGroup pConfig;
-
-	public POperatorLogger(Operators pBox, PConfigGroup pConfig) throws UncheckedIOException {
-		this.pBox = pBox;
-		this.pConfig = pConfig;
-	}
+	@Inject private POperators pBox;
+	@Inject private PConfigGroup pConfig;
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {

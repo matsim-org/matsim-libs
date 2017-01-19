@@ -23,83 +23,46 @@
 package org.matsim.contrib.minibus.hook;
 
 import org.matsim.contrib.minibus.PConfigGroup;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
+import org.matsim.contrib.minibus.operator.POperators;
 import org.matsim.contrib.minibus.stats.PStatsModule;
-import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
+import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
+import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.router.TripRouter;
+import org.matsim.pt.router.TransitRouter;
 
-import com.google.inject.Provider;
+public final class PModule extends AbstractModule {
 
-public class PModule {
-	private AgentsStuckHandlerImpl agentsStuckHandler = null;
-	private PersonReRouteStuckFactory stuckFactory = null;
-	private PtMode2LineSetter lineSetter = null;
-	private PTransitRouterFactory pTransitRouterFactory = null;
-	private Class<? extends javax.inject.Provider<TripRouter>> tripRouterFactory = null;
-	private TicketMachineI ticketMachine;
-	
-	public void setLineSetter(PtMode2LineSetter lineSetter) {
-		this.lineSetter = lineSetter;
-	}
-	public void setPTransitRouterFactory(PTransitRouterFactory pTransitRouterFactory) {
-		this.pTransitRouterFactory = pTransitRouterFactory;
-	}
-	public void setStuckFactory(PersonReRouteStuckFactory stuckFactory) {
-		this.stuckFactory = stuckFactory;
-	}
-	public void setTripRouterFactory(Class<? extends javax.inject.Provider<TripRouter>> tripRouterFactory) {
-		this.tripRouterFactory = tripRouterFactory;
-	}
-	public final void setTicketMachine( TicketMachineI ticketMachine ) {
-		this.ticketMachine = ticketMachine;
-	}
-	public void configureControler(final Controler controler) {
-		PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
-		pConfig.validate(controler.getConfig().planCalcScore().getMarginalUtilityOfMoney());
-		if ( this.ticketMachine==null ) {
-			this.ticketMachine = new TicketMachine(pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0 ) ;
-		}
-		PBox pBox = new PBox(pConfig, this.ticketMachine );
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new PQSimFactory().createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
-			}
-		});
+	@Override public void install() {
+		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(this.getConfig());
+		bind(TransitRouter.class).toProvider(pTransitRouterFactory);
 
-		if (pTransitRouterFactory == null) {
-			pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler(), pConfig.getPtRouter(), pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
+		addControlerListenerBinding().to(PControlerListener.class) ;
+		addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;
+		// (needs to be injected _after_ PControlerListener, so that it is executed _before_ PControlerListener.
+		// yyyy injecting the TransitRouterFactory besides the TransitRouter is a fix to re-configure the factory in every iteration.
+		// A more general solution suggested by MZ would be to define an iteration scope.  Then the factory could be forced
+		// to reconstruct itself in every iteration, thus pulling new information (in this case the updated transit schedule)
+		// by itself.  Is on the "list", has not been done yet, will be done eventually, until then this remains the way it is.
+		// kai, jan'17)
 
-			// For some unknown reason, the core starts failing when I start requesting a trip router out of an injected trip router in 
-			// ScoreStatsControlerListener.  Presumably, the manually constructed build procedure here conflicts with the (newer) standard guice
-			// procedure.  For the time being, the following two lines seem to fix it.  kai, nov'16
-			pTransitRouterFactory.createTransitRouterConfig(controler.getConfig());
-			pTransitRouterFactory.updateTransitSchedule(controler.getScenario().getTransitSchedule());
-		}
-		controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, this.pTransitRouterFactory));
+		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
 
-		if (pConfig.getReRouteAgentsStuck()) {
-			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
-			if(stuckFactory == null) {
-				this.stuckFactory = new PersonReRouteStuckFactoryImpl();
-			}
+		bind(POperators.class).to(PBox.class).asEagerSingleton();
+		// (needs to be a singleton since it is a data container, and all clients should use the same data container. kai, jan'17)
+
+		bindMobsim().toProvider(PQSimProvider.class) ;
+		bind(LineId2PtMode.class).to( BVGLines2PtModes.class ) ;
+
+		install( new PStatsModule() ) ;
+
+		if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getReRouteAgentsStuck() ) {
+			bind(PersonReRouteStuckFactory.class).to( PersonReRouteStuckFactoryImpl.class );
+			bind(AgentsStuckHandlerImpl.class) ;
 		}
 
-		PStatsModule.configureControler(controler, pConfig, pBox, lineSetter);
-
-		PControlerListener pHook = new PControlerListener(controler, pBox, pTransitRouterFactory, stuckFactory, agentsStuckHandler);
-		controler.addControlerListener(pHook);
-
-
 	}
+
 }

@@ -56,8 +56,8 @@ public class MinibusControler {
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		
-		PModule builder = new PModule() ;
-		builder.configureControler(controler);
+		controler.addOverridingModule(new PModule()) ;
+
 
 		controler.run();
 		

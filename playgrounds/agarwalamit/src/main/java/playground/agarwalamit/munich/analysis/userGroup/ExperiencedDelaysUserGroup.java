@@ -24,14 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
@@ -43,10 +41,6 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class ExperiencedDelaysUserGroup {
 
-	private  double marginalUtlMoney;
-	private  double marginalUtlPerformingSec;
-	private  double marginalUtlTravelingCarSec;
-	private  double marginalUtlOfTravelTime ;
 	private  double vttsCar ;
 
 	public ExperiencedDelaysUserGroup(String outputDir) {
@@ -70,8 +64,8 @@ public class ExperiencedDelaysUserGroup {
 	}
 
 	private void init(final String runCase){
-		this.userGroupToDelays  = new TreeMap<>();
 		this.time2linkIdDelays = new HashMap<>();
+		this.userGroupToDelays  = new TreeMap<>();
 		for (MunichUserGroup ug:MunichUserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
@@ -80,11 +74,15 @@ public class ExperiencedDelaysUserGroup {
 		
 		this.lastIteration = scenario.getConfig().controler().getLastIteration();
 
-		this.marginalUtlMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		this.marginalUtlPerformingSec = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600;
-		this.marginalUtlTravelingCarSec = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600;
-		this.marginalUtlOfTravelTime = this.marginalUtlTravelingCarSec + this.marginalUtlPerformingSec;
-		this.vttsCar = this.marginalUtlOfTravelTime / this.marginalUtlMoney;
+		double marginalUtlMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		double marginalUtlPerformingSec = scenario.getConfig().planCalcScore().getPerforming_utils_hr() / 3600;
+		double marginalUtlTravelingCarSec = scenario.getConfig()
+				.planCalcScore()
+				.getModes()
+				.get(TransportMode.car)
+				.getMarginalUtilityOfTraveling() / 3600;
+		double marginalUtlOfTravelTime = marginalUtlTravelingCarSec + marginalUtlPerformingSec;
+		this.vttsCar = marginalUtlOfTravelTime / marginalUtlMoney;
 	}
 
 	public void run(final String [] runCases){

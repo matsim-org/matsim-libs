@@ -222,7 +222,7 @@ public class Config implements MatsimExtensionPoint {
 	 */
 	public void checkConsistency() {
 		for (ConfigGroup m : this.modules.values()) {
-			m.checkConsistency();
+			m.checkConsistency(this);
 		}
 		for (ConfigConsistencyChecker c : this.consistencyCheckers) {
 			c.checkConsistency(this);

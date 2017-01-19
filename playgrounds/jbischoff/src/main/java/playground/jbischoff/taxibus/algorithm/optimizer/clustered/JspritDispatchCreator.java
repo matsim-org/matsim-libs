@@ -22,9 +22,7 @@
  */
 package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,11 +30,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -44,22 +40,22 @@ import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.router.Dijkstra;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
-import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.core.util.Solutions;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
+
+import playground.jbischoff.drt.scheduler.tasks.DrtStayTask;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import playground.jbischoff.utils.JbUtils;
@@ -111,12 +107,17 @@ public class JspritDispatchCreator implements RequestDispatcher {
 		VehicleTypeImpl.Builder vehicleTypeBuilder = VehicleTypeImpl.Builder.newInstance("vehicleType")
 				.addCapacityDimension(0, commonRequests.size());
 		VehicleType vehicleType = vehicleTypeBuilder.build();
-		Coord startCoord = veh.getStartLink().getCoord();
+		
+		DrtStayTask ct = (DrtStayTask) veh.getSchedule().getCurrentTask();
+		
+		Coord startCoord = ct.getLink().getCoord();
 		String vId = veh.getId().toString();
 		Builder vehicleBuilder = VehicleImpl.Builder.newInstance(vId);
 		vehicleBuilder.setStartLocation(Location.newInstance(startCoord.getX(), startCoord.getY()));
 		vehicleBuilder.setType(vehicleType);
+		vehicleBuilder.setReturnToDepot(false);
 		VehicleImpl vehicle = vehicleBuilder.build();
+		
 		vrpBuilder.addVehicle(vehicle);
 
 		for (TaxibusRequest req : commonRequests) {
@@ -146,7 +147,7 @@ public class JspritDispatchCreator implements RequestDispatcher {
 		TourActivity lastAct = it.next();
 		Link lastDestination = context.scenario.getNetwork().getLinks()
 				.get(Id.createLinkId(lastAct.getLocation().getId()));
-		VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(veh.getStartLink(), lastDestination,
+		VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(ct.getLink(), lastDestination,
 				context.timer.getTimeOfDay(), router, context.travelTime);
 		TaxibusDispatch dispatch = new TaxibusDispatch(veh, path);
 		double d = context.timer.getTimeOfDay();
@@ -160,8 +161,9 @@ public class JspritDispatchCreator implements RequestDispatcher {
 			lastAct = current;
 			lastDestination = currentDestination;
 		}
+		if (context.returnToDepot){
 		dispatch.addPath(VrpPaths.calcAndCreatePath(lastDestination, veh.getStartLink(), d+60, router, context.travelTime));
-
+		}
 		dispatch.addRequests(commonRequests);
 
 		return dispatch;
@@ -176,7 +178,9 @@ public class JspritDispatchCreator implements RequestDispatcher {
 		Vehicle bestVehicle = null;
 		for (Vehicle veh : this.context.vrpData.getVehicles().values()) {
 			if (context.scheduler.isIdle(veh)) {
-				double distance = DistanceUtils.calculateSquaredDistance(veh.getStartLink().getCoord(), coord);
+				DrtStayTask ct = (DrtStayTask) veh.getSchedule().getCurrentTask();
+				Coord startCoord = ct.getLink().getCoord();
+				double distance = DistanceUtils.calculateSquaredDistance(startCoord, coord);
 				if (distance < bestDistance) {
 					bestDistance = distance;
 					bestVehicle = veh;

@@ -31,18 +31,16 @@ import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
  */
 public final class MergeNoiseDataFilesIK {
 	
-	private static final double startTime = 4. * 3600.;
+	private static final double startTime = 1. * 3600.;
 	private static final double timeBinSize = 3600.;
-	private static final double endTime = 24. * 3600.;
+	private static final double endTime = 30. * 3600.;
 
-	private static final String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/";
+	private static final String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn3/ITERS/it.100/damages_receiverPoint/";
 
-	private static final String[] workingDirectories = { "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/immissions/"
-			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/consideredAgentUnits/"
-			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/damages_receiverPoint/"};
-	private static final String[] labels = { "immission" , "consideredAgentUnits" , "damages_receiverPoint" };
+	private static final String[] workingDirectories = { "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn3/ITERS/it.100/damages_receiverPoint/"};
+	private static final String[] labels = { "damages_receiverPoint" };
 
-	private static final String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/receiverPoints/receiverPoints.csv";
+	private static final String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn3/receiverPoints/receiverPoints.csv";
 	private static final String separator = ";";
 
 	private static final OutputFormat outputFormat = OutputFormat.xyt ;

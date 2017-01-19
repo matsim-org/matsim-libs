@@ -63,7 +63,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	public NoiseCalculationOnline(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) noiseContext.getScenario().getConfig().getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) noiseContext.getScenario().getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 		
 		if (noiseParameters.isInternalizeNoiseDamages()) {
 			log.warn("Internalizing noise damages. This requires that the default travel disutility is replaced by a travel distuility which accounts for noise tolls.");
@@ -79,7 +79,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		NoiseContext noiseContext = new NoiseContext(controler.getScenario());
 		this.noiseContext = noiseContext;
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getConfig().getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 		
 		if (noiseParameters.isInternalizeNoiseDamages()) {
 			
@@ -116,7 +116,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		}
 			
 		if (this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
-			this.pricing = new NoisePricingHandler(event.getServices().getEvents());
+			this.pricing = new NoisePricingHandler(event.getServices().getEvents(), noiseContext.getNoiseParams().getNoiseTollFactor());
 			event.getServices().getEvents().addHandler(this.pricing);
 		}		
 	}

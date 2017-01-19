@@ -46,6 +46,8 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 	private double K_i = Double.NaN;
 	private double K_d = Double.NaN;
 	
+	private int tollUpdateCounter = 0;
+	
 	public DecongestionTollingPID(DecongestionInfo congestionInfo) {
 		this.congestionInfo = congestionInfo;
 		K_p = congestionInfo.getDecongestionConfigGroup().getKp();
@@ -54,7 +56,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 	}
 
 	@Override
-	public void updateTolls(int iteration) {
+	public void updateTolls() {
 	
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
 			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
@@ -109,8 +111,8 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 
 				double blendFactor = Double.NEGATIVE_INFINITY;
 				if (this.congestionInfo.getDecongestionConfigGroup().isMsa()) {
-					if (iteration > 0) {
-						blendFactor = 1.0 / (double) iteration;
+					if (this.tollUpdateCounter > 0) {
+						blendFactor = 1.0 / (double) this.tollUpdateCounter;
 					} else {
 						blendFactor = 1.0;
 					}
@@ -137,10 +139,11 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 //					log.warn("delta delay: " + deltaDelay);		
 //					log.warn("toll: " + smoothedToll);
 //				}
-			}
+			}	
 		}
 		
 		log.info("Updating tolls completed.");
+		this.tollUpdateCounter++;
 		
 		// store the current link information for the next toll computation
 		

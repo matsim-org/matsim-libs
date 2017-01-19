@@ -57,7 +57,7 @@ public class DigicoreChainExtractor implements Runnable {
 	private final String crs;
 	private CoordinateTransformation ct;
 	private DigicoreVehicle vehicle;
-	
+
 	private final Logger log = Logger.getLogger(DigicoreChainExtractor.class);
 	private Counter threadCounter;
 
@@ -69,7 +69,8 @@ public class DigicoreChainExtractor implements Runnable {
 
 		DigicoreChain chain = new DigicoreChain();
 		DigicoreActivity activity = null;
-		
+
+		int invalidGps = 0;
 		List<String[]> activityBuffer = null;
 		List<String[]> tripBuffer = null;
 		List<String[]> previousTripBuffer = null;
@@ -81,141 +82,150 @@ public class DigicoreChainExtractor implements Runnable {
 				String line = br.readLine();
 				while((line = br.readLine()) != null){
 					String [] sa = line.split(",");
-					if(this.ignitionOn.contains( sa[4] )){
-						move = true;
-					} else if(this.ignitionOff.contains( sa[4] )){
-						move = false;
-					} else{
-						log.warn("Could not identify status " + sa[4] + " for vehicle " + name);
-					}
-					
-					/* Initialise the (correct) buffer. */
-					if(firstRecord){
-						if(move){
-							tripBuffer = new ArrayList<>();
-						} else{
-							activityBuffer = new ArrayList<>();
-						}
-						firstRecord = false;
-					}
-					
-					/* Process the record. */
-					if(move){
-						if(activityBuffer == null && tripBuffer != null){
-							/* Vehicle is still moving. */
-							tripBuffer.add(sa);
-						} else if(activityBuffer != null && tripBuffer == null){
-							/* Vehicle has started moving. Finish activity. */
-							activityBuffer.add(sa);
-							
-							/* Check if activity duration exceeds threshold. */
-							long duration = (Long.parseLong(activityBuffer.get(activityBuffer.size()-1)[1]) - 
-									Long.parseLong(activityBuffer.get(0)[1]));
-							if(duration >= this.thresholdActivityDuration){
-								/* It qualifies as an activity. */
-								
-								if(duration >= this.thresholdMinorMajor){
-									activity = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-								} else{
-									activity = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
-								}
-								
-								/* Calculate activity centroid */
-								double xSum = 0;
-								double ySum = 0;
-								for(String[] saa : activityBuffer){
-									xSum += Double.parseDouble(saa[2]);
-									ySum += Double.parseDouble(saa[3]);
-								}
-								Coord cOriginal = new Coord(xSum / (double) activityBuffer.size(), ySum / (double) activityBuffer.size());
-								Coord cFinal = ct.transform(cOriginal);
-								activity.setCoord(cFinal);
-								
-								/* Set start- and end time. */
-								activity.setStartTime(Double.parseDouble(activityBuffer.get(0)[1]));
-								activity.setEndTime(Double.parseDouble(activityBuffer.get(activityBuffer.size()-1)[1]));
-								
-								/* 
-								 * Add the activity to the chain. 
-								 */
-								boolean major = activity.getType().equalsIgnoreCase("major");
-								if(major){
-									/* End current chain and start a new chain. */
-									chain.add(activity);
-									chain = cleanChain(chain);
-									if(chain.isComplete()){
-										/* This is a complete chain, add it to the vehicle. */
-										vehicle.getChains().add(chain);
-									} else{
-										/* Drop the current chain. */
-									}
-									chain = new DigicoreChain();
-									chain.add(activity);
-								} else{
-									/* Just add the minor activity to the current chain. */
-									chain.add(activity);
-								}
-								
-								activityBuffer = null;
-								/* Start new trip buffer. */
-								tripBuffer = new ArrayList<>();
-								tripBuffer.add(sa);
-							} else{
-								/* It is not considered an activity. Re-instate 
-								 * the previous (partial) trip.*/
-								tripBuffer = previousTripBuffer;
-								if(tripBuffer == null){
-									tripBuffer = new ArrayList<>();
-								}
-								
-								/* Now also remove the previous trace that was
-								 * (possibly) already added to the activity chain. */
-								if(chain.size() > 0){
-									if(chain.get(chain.size()-1) instanceof DigicoreTrace){
-										chain.remove(chain.size()-1);
-									}
-								}
-								
-								/* TODO Check if the next line is indeed correct...
-								 * Is it accurate to add the (failed) activity 
-								 * records to the trip as well? Jan'17 JWJ */
-								
-								// FIXME Remove after debugging.
-								if(tripBuffer == null || activityBuffer == null){
-									log.error("Null");
-								}
-								
-								tripBuffer.addAll(activityBuffer);
-								activityBuffer = null;
-							}
-						} else{
-							log.error("The buffer combination is problematic:");
-							log.error("  Is line buffer null?: " + (activityBuffer == null));
-							log.error("  Is trip buffer null?: " + (tripBuffer == null));
-							throw new IllegalStateException("Buffer states seem wrong.");
-						}
-					} else {
-						if(activityBuffer == null && tripBuffer != null){
-							/* Vehicle has just stopped. Finish trip.*/
-							DigicoreTrace trace = convertBufferToTrace(tripBuffer, this.crs);
-							chain.add(trace);
-							previousTripBuffer = tripBuffer;
-							tripBuffer = null;
-							
-							/* Start activity. */
-							activityBuffer = new ArrayList<String[]>();
-							activityBuffer.add(sa);
 
-						} else if(activityBuffer != null && tripBuffer == null){
-							/* Vehicle is still stationary. */
-							activityBuffer.add(sa);
-							
+					/* Check if the coordinate is within bounds... ignore record 
+					 * if not. */
+					double x = Double.parseDouble(sa[2]);
+					double y = Double.parseDouble(sa[3]);
+					if(validSACoord(x, y)){
+						if(this.ignitionOn.contains( sa[4] )){
+							move = true;
+						} else if(this.ignitionOff.contains( sa[4] )){
+							move = false;
 						} else{
-							log.error("The buffer combination is problematic:");
-							log.error("  Is line buffer null?: " + (activityBuffer == null));
-							log.error("  Is trip buffer null?: " + (tripBuffer == null));
-							throw new IllegalStateException("Buffer states seem wrong.");
+							log.warn("Could not identify status " + sa[4] + " for vehicle " + name);
 						}
+
+						/* Initialise the (correct) buffer. */
+						if(firstRecord){
+							if(move){
+								tripBuffer = new ArrayList<>();
+							} else{
+								activityBuffer = new ArrayList<>();
+							}
+							firstRecord = false;
+						}
+
+						/* Process the record. */
+						if(move){
+							if(activityBuffer == null && tripBuffer != null){
+								/* Vehicle is still moving. */
+								tripBuffer.add(sa);
+							} else if(activityBuffer != null && tripBuffer == null){
+								/* Vehicle has started moving. Finish activity. */
+								activityBuffer.add(sa);
+
+								/* Check if activity duration exceeds threshold. */
+								long duration = (Long.parseLong(activityBuffer.get(activityBuffer.size()-1)[1]) - 
+										Long.parseLong(activityBuffer.get(0)[1]));
+								if(duration >= this.thresholdActivityDuration){
+									/* It qualifies as an activity. */
+
+									if(duration >= this.thresholdMinorMajor){
+										activity = new DigicoreActivity("major", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
+									} else{
+										activity = new DigicoreActivity("minor", TimeZone.getTimeZone("GMT+2"), new Locale("en", "za"));
+									}
+
+									/* Calculate activity centroid */
+									double xSum = 0;
+									double ySum = 0;
+									for(String[] saa : activityBuffer){
+										xSum += Double.parseDouble(saa[2]);
+										ySum += Double.parseDouble(saa[3]);
+									}
+									Coord cOriginal = new Coord(xSum / (double) activityBuffer.size(), ySum / (double) activityBuffer.size());
+									Coord cFinal = ct.transform(cOriginal);
+									activity.setCoord(cFinal);
+
+									/* Set start- and end time. */
+									activity.setStartTime(Double.parseDouble(activityBuffer.get(0)[1]));
+									activity.setEndTime(Double.parseDouble(activityBuffer.get(activityBuffer.size()-1)[1]));
+
+									/* 
+									 * Add the activity to the chain. 
+									 */
+									boolean major = activity.getType().equalsIgnoreCase("major");
+									if(major){
+										/* End current chain and start a new chain. */
+										chain.add(activity);
+										chain = cleanChain(chain);
+										if(chain.isComplete()){
+											/* This is a complete chain, add it to the vehicle. */
+											vehicle.getChains().add(chain);
+										} else{
+											/* Drop the current chain. */
+										}
+										chain = new DigicoreChain();
+										chain.add(activity);
+									} else{
+										/* Just add the minor activity to the current chain. */
+										chain.add(activity);
+									}
+
+									activityBuffer = null;
+									/* Start new trip buffer. */
+									tripBuffer = new ArrayList<>();
+									tripBuffer.add(sa);
+								} else{
+									/* It is not considered an activity. Re-instate 
+									 * the previous (partial) trip.*/
+									tripBuffer = previousTripBuffer;
+									if(tripBuffer == null){
+										tripBuffer = new ArrayList<>();
+									}
+
+									/* Now also remove the previous trace that was
+									 * (possibly) already added to the activity chain. */
+									if(chain.size() > 0){
+										if(chain.get(chain.size()-1) instanceof DigicoreTrace){
+											chain.remove(chain.size()-1);
+										}
+									}
+
+									/* TODO Check if the next line is indeed correct...
+									 * Is it accurate to add the (failed) activity 
+									 * records to the trip as well? Jan'17 JWJ */
+
+									// FIXME Remove after debugging.
+									if(tripBuffer == null || activityBuffer == null){
+										log.error("Null");
+									}
+
+									tripBuffer.addAll(activityBuffer);
+									activityBuffer = null;
+								}
+							} else{
+								log.error("The buffer combination is problematic:");
+								log.error("  Is line buffer null?: " + (activityBuffer == null));
+								log.error("  Is trip buffer null?: " + (tripBuffer == null));
+								throw new IllegalStateException("Buffer states seem wrong.");
+							}
+						} else {
+							if(activityBuffer == null && tripBuffer != null){
+								/* Vehicle has just stopped. Finish trip.*/
+								DigicoreTrace trace = convertBufferToTrace(tripBuffer, this.crs);
+								chain.add(trace);
+								previousTripBuffer = tripBuffer;
+								tripBuffer = null;
+
+								/* Start activity. */
+								activityBuffer = new ArrayList<String[]>();
+								activityBuffer.add(sa);
+
+							} else if(activityBuffer != null && tripBuffer == null){
+								/* Vehicle is still stationary. */
+								activityBuffer.add(sa);
+
+							} else{
+								log.error("The buffer combination is problematic:");
+								log.error("  Is line buffer null?: " + (activityBuffer == null));
+								log.error("  Is trip buffer null?: " + (tripBuffer == null));
+								throw new IllegalStateException("Buffer states seem wrong.");
+							}
+						}
+					} else{
+						invalidGps++;
 					}
 				}
 			} finally {
@@ -229,7 +239,10 @@ public class DigicoreChainExtractor implements Runnable {
 			e.printStackTrace();
 			log.error("Vehicle with NullPointerException: " + vehicle.getId().toString());
 		}
-				
+
+		if(invalidGps > 0){
+			log.warn("Vehicle " + name + " has " + invalidGps + " records with invalid GPS positions.");
+		}
 		/* Write the vehicle to file if it has at least one chain. This is 
 		 * currently (Nov'16) writing version 2 vehicles. When using the
 		 * TurnkeyExtractor these files will be removed anyway. */
@@ -240,6 +253,17 @@ public class DigicoreChainExtractor implements Runnable {
 		threadCounter.incCounter();
 	}
 	
+	private boolean validSACoord(double x, double y){
+		boolean valid = false;
+		
+		if(x >= 0.0 && x <= 45.0 && y >= -36.0 && y <= 0.0){
+			valid = true;
+		} else{
+			log.warn("Out-of-bounds coordinate");
+		}
+		return valid;
+	}
+
 	/**
 	 * Converts a given buffer of records into a GPS trace.
 	 * @param buffer
@@ -252,15 +276,15 @@ public class DigicoreChainExtractor implements Runnable {
 			long time = Long.parseLong(sa[1]);
 			double lon = Double.parseDouble(sa[2]);
 			double lat = Double.parseDouble(sa[3]);
-			
+
 			Coord c = this.ct.transform(CoordUtils.createCoord(lon, lat));
-			
+
 			DigicorePosition dp = new DigicorePosition(time, c.getX(), c.getY());
 			dt.add(dp);
 		}
 		return dt;
 	}
-	
+
 	/**
 	 * TODO Currently returns exactly the same chain. No cleaning or merging
 	 * of activities that are close to one another.
@@ -270,8 +294,8 @@ public class DigicoreChainExtractor implements Runnable {
 	private DigicoreChain cleanChain(DigicoreChain chain){
 		return chain;
 	}
-	
-	
+
+
 	/**
 	 * Default coordinate reference systems, both origin and destination, is 
 	 * assumed to be `WGS84'.
@@ -300,7 +324,7 @@ public class DigicoreChainExtractor implements Runnable {
 			this.ct = TransformationFactory.getCoordinateTransformation("WGS84", crs);
 		}
 	}
-		
+
 	public DigicoreVehicle getVehicle(){
 		return this.vehicle;
 	}

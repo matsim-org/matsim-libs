@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -36,10 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 /**
@@ -67,10 +64,10 @@ public class LinkVolumeHandler implements LinkLeaveEventHandler, VehicleEntersTr
 			Vehicles vehs = VehicleUtils.createVehiclesContainer();
 			VehicleReaderV1 vr = new VehicleReaderV1(vehs);
 			vr.readFile(VehiclesFile);
-			
-			for(VehicleType vt : vehs.getVehicleTypes().values()){
-				mode2pcu.put(vt.getId().toString(), vt.getPcuEquivalents());
-			}
+
+			vehs.getVehicleTypes().values().forEach(
+					vehicleType -> mode2pcu.put(vehicleType.getId().toString(), vehicleType.getPcuEquivalents())
+			);
 		}
 	}
 	

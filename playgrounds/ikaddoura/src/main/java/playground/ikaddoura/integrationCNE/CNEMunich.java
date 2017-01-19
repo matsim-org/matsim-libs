@@ -89,7 +89,7 @@ public class CNEMunich {
 	private static CongestionTollingApproach congestionTollingApproach;
 	private static double kP;
 
-	private static boolean modeChoice = true;
+	private static boolean modeChoice = false;
 	
 	public static void main(String[] args) throws IOException {
 				
@@ -134,9 +134,9 @@ public class CNEMunich {
 			
 		} else {
 
-			if (modeChoice) configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
-			else configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
-//			configFile = "../../../shared-svn/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";.xml
+//			if (modeChoice) configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
+//			else configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
+			configFile = "../../../shared-svn/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
 
 		}
 
@@ -261,6 +261,8 @@ public class CNEMunich {
 		tunnelLinkIDs.add(Id.create("595877742", Link.class));
 		tunnelLinkIDs.add(Id.create("595870463-586909531-594897602", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
+		
+		noiseParameters.setWriteOutputIteration(config.controler().getLastIteration() - config.controler().getFirstIteration());
 		
 		// CNE Integration
 		

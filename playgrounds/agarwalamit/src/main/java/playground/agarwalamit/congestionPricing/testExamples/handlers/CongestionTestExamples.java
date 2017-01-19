@@ -37,7 +37,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.vsp.congestion.events.CongestionEvent;
@@ -152,7 +151,7 @@ public class CongestionTestExamples {
 		});
 		
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) {
-			events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario)sc));
+			events.addHandler(new CongestionHandlerImplV3(events, sc));
 			Logger.getLogger(CongestionTestExamples.class).warn("The analysis table is generated using events and thus there are some delays unaccounted in implV3.");
 		}
 		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));

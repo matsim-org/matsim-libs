@@ -30,6 +30,7 @@ import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,6 +148,12 @@ public class RoutingUtils {
 		@Override
 		public Double getScore() {
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 	}
 }

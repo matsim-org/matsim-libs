@@ -137,7 +137,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 					&& iterationCounter > this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT() * totalNumberOfIterations) {
 				
 				log.info("+++ Iteration " + event.getIteration() + ". Update tolls per link and time bin.");
-				tollComputation.updateTolls(event.getIteration());
+				tollComputation.updateTolls();
 			}
 		}
 		

@@ -40,13 +40,13 @@ public class PatnaVehiclesGenerator {
 	private final Scenario scenario ;
 	private static double pcu_2w = Double.NaN;
 
-	public static void addVehiclesToScenarioFromVehicleFile(final String vehiclesFile, final Scenario scenario){
-		Vehicles vehs = VehicleUtils.createVehiclesContainer();
-		new VehicleReaderV1(vehs).readFile(vehiclesFile);
-		for(VehicleType vt : vehs.getVehicleTypes().values()) {
-			scenario.getVehicles().addVehicleType(vt);
-		}
-	}
+//	public static void addVehiclesToScenarioFromVehicleFile(final String vehiclesFile, final Scenario scenario){
+//		Vehicles vehs = VehicleUtils.createVehiclesContainer();
+//		new VehicleReaderV1(vehs).readFile(vehiclesFile);
+//		for(VehicleType vt : vehs.getVehicleTypes().values()) {
+//			scenario.getVehicles().addVehicleType(vt);
+//		}
+//	}
 
 	/**
 	 * @param plansFile is required to get vehicles for each agent type in population.

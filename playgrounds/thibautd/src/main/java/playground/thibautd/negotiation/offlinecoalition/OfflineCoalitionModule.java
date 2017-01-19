@@ -24,6 +24,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.ProportionBasedConflictSolver;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.gbl.MatsimRandom;
 import playground.thibautd.negotiation.framework.Proposition;
@@ -49,6 +50,7 @@ public class OfflineCoalitionModule extends AbstractModule {
 		return new CoalitionSelector(
 				new LogitWeight(
 						MatsimRandom.getLocalInstance(),
-						conf.getLogitScale() ) );
+						conf.getLogitScale() ),
+				new ProportionBasedConflictSolver() );
 	}
 }

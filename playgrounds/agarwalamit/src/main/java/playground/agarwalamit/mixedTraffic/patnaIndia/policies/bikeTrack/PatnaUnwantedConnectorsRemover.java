@@ -40,7 +40,7 @@ public class PatnaUnwantedConnectorsRemover {
 
     void processNetworkForRemoval (final Network network){
         List<Link> links2remove = network.getLinks().values().stream().filter(
-                link -> link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX.toString()) && link.getFreespeed()==0.01
+                link -> link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX) && link.getFreespeed()==0.01
         ).collect(Collectors.toList());
         links2remove.stream().forEach(link -> network.removeLink(link.getId()));
     }

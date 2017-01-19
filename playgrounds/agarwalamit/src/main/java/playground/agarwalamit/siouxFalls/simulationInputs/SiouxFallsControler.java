@@ -113,7 +113,8 @@ public class SiouxFallsControler {
 					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario)controler.getScenario()) ));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV3(controler.getEvents(),
+                    controler.getScenario()) ));
 		}
 		
 		if(both) {
@@ -137,7 +138,7 @@ public class SiouxFallsControler {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		
-		if(Boolean.valueOf(args[0])==false && Boolean.valueOf(args[2])==false){
+		if(!internalizeEmission && !both){
 			controler.addControlerListener(new EmissionControlerListener());
 		}
 		controler.run();	

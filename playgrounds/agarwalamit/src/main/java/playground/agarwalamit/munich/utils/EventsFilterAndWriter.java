@@ -73,7 +73,7 @@ public class EventsFilterAndWriter {
 		Scenario sc = LoadMyScenarios.loadScenarioFromOutputDir(outputFilesDir);
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader  reader = new MatsimEventsReader(events);
-		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, sc));
 		events.addHandler(new MarginalCongestionPricingHandler(events, (MutableScenario) sc));
 		EventWriterXML ewxml = new EventWriterXML(eventsDir+"/1500.events_congestionAndMoneyEvent.xml.gz");
 		events.addHandler(ewxml);
