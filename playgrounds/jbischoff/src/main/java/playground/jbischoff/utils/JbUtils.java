@@ -97,9 +97,16 @@ public class JbUtils {
 	}
 	
 	public static <T> void collection2Text(Collection<T> c, String filename){
+		collection2Text(c, filename, null);
+	}
+
+	public static <T> void collection2Text(Collection<T> c, String filename, String header){
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
-
+			if (header!=null){
+				bw.write(header);
+				bw.newLine();
+			}
 			for (Iterator<T> iterator = c.iterator(); iterator.hasNext();) {
 				
 				bw.write(iterator.next().toString());
