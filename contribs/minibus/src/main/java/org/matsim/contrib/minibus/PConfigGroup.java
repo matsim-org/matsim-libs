@@ -618,6 +618,9 @@ public final class PConfigGroup extends ConfigGroup{
 		return this.operationMode;
 	}
 	
+	public void setWelfareMaximization( boolean val ) {
+		this.welfareMaximization = val ;
+	}
 	public boolean getWelfareMaximization() {
 		return this.welfareMaximization;
 	}
