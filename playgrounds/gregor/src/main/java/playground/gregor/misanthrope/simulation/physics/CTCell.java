@@ -31,7 +31,7 @@ public abstract class CTCell {
 	private final List<CTCellFace> faces = new ArrayList<>();
 	//	private final HashSet<CTPed> peds = new HashSet<>();
 //	private final Map<Double,LinkedList<CTPed>> pop = new ArrayMap<>();//TODO is this faster than HashMap?
-	private final List<CTCell> neighbors = new ArrayList<>();
+	private final Set<CTCell> neighbors = new HashSet<>();
 	protected CTPed next = null;
 	protected double nextCellJumpTime;
 	protected CTEvent currentEvent = null;
@@ -60,6 +60,10 @@ public abstract class CTCell {
 //		pop.put(-Math.PI/6., new LinkedList<CTPed>());
 	}
 
+	public CTEvent getCurrentEvent() {
+		return currentEvent;
+	}
+
 	public CTNetwork getNet() {
 		return net;
 	}
@@ -76,9 +80,10 @@ public abstract class CTCell {
 	public void addFace(CTCellFace face) {
 		faces.add(face);
 		getNeighbors().add(face.nb);
+//		face.nb.addNeighbor(this);
 	}
 
-	public List<CTCell> getNeighbors() {
+	public Set<CTCell> getNeighbors() {
 		return neighbors;
 	}
 
@@ -141,6 +146,9 @@ public abstract class CTCell {
 
 	public void jumpAndUpdateNeighbors(double now) {
 
+		if (next == null) {
+			log.error("next is null");
+		}
 		CTCell nb = next.getNextCellAndJump(now);
 		next = null;
 		this.nextCellJumpTime = Double.NaN;

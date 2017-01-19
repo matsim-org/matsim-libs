@@ -95,7 +95,11 @@ public class CTLinkCell extends CTCell {
 
 //		if (this.l)
 
-
+		double x = CTLink.WIDTH / 0.1;
+		minJumpTime = Math.min(minJumpTime, x);
+//		if (minJumpTime > 1000) {
+//			log.info(minJumpTime);
+//		}
 
 		this.nextCellJumpTime = now + minJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);

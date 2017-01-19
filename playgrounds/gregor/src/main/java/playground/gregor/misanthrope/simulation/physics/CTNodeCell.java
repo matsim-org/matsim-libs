@@ -76,6 +76,8 @@ public class CTNodeCell extends CTCell {
 			return;
 		}
 		this.next = nextJumper;
+		double x = CTLink.WIDTH / 0.1;
+		minJumpTime = Math.min(minJumpTime, x);
 
 		this.nextCellJumpTime = now + minJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);

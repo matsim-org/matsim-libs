@@ -123,7 +123,7 @@ public class ConfluentRunner {
         c.travelTimeCalculator().setTraveltimeBinSize(24 * 3600);
 
         c.controler().setCreateGraphs(!HEADLESS);
-        c.controler().setDumpDataAtEnd(verbose);
+        c.controler().setDumpDataAtEnd(true);
         c.controler().setWriteEventsInterval(verbose ? 1 : 0);
         c.controler().setWritePlansInterval(verbose ? 1 : 0);
 

@@ -43,7 +43,7 @@ public class CTEventsPaulPriorityQueue {
     private double dT = 0.1;
     private double tLast = 0;
 
-    public void add(final CTEvent e) {
+    public synchronized void add(final CTEvent e) {
         final double execTime = e.getExecTime();
         double diff = execTime - tLast;
         if (diff < dT) {

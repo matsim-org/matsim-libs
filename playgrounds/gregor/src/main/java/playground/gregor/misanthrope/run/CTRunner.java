@@ -20,10 +20,12 @@
 package playground.gregor.misanthrope.run;
 
 import com.google.inject.Provider;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,6 +36,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.misanthrope.router.CTRoutingModule;
 import playground.gregor.misanthrope.simulation.CTMobsimFactory;
@@ -41,120 +44,145 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebu
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
 
+
 public class CTRunner implements IterationStartsListener {
+
+    private static final Logger log = Logger.getLogger(CTRunner.class);
 
     public static boolean DEBUG = false;
 
-	private MatsimServices controller;
-	private QSimDensityDrawer qSimDrawer;
+    private MatsimServices controller;
+    private QSimDensityDrawer qSimDrawer;
 
-	public static void main(String[] args) {
-		if (args.length != 2) {
-			printUsage();
-			System.exit(-1);
-		}
-		String qsimConf = args[0];
+    public static void main(String[] args) {
+        if (args.length != 2) {
+            printUsage();
+            System.exit(-1);
+        }
+        String qsimConf = args[0];
 
-		boolean vis = Boolean.parseBoolean(args[1]);
-		DEBUG = vis;
+        boolean vis = Boolean.parseBoolean(args[1]);
+        DEBUG = vis;
 
-		Config c = ConfigUtils.loadConfig(qsimConf);
+        Config c = ConfigUtils.loadConfig(qsimConf);
 
-		c.controler().setWriteEventsInterval(1);
-		c.controler().setMobsim("ctsim");
-		final Scenario sc = ScenarioUtils.loadScenario(c);
+        c.controler().setWriteEventsInterval(1);
+        c.controler().setMobsim("ctsim");
+        final Scenario sc = ScenarioUtils.loadScenario(c);
 
-        for (Person p : sc.getPopulation().getPersons().values()) {
-            for (Plan plan : p.getPlans()) {
-                Leg leg = (Leg) plan.getPlanElements().get(1);
+
+//        sc.getPopulation().getPersons().entrySet().removeIf(p -> MatsimRandom.getRandom().nextDouble() < );
+
+        sc.getPopulation().getPersons().values().parallelStream().flatMap(p -> p.getPlans().stream()).forEach(pl -> {
+            Activity a0 = (Activity) pl.getPlanElements().get(0);
+
+            Leg leg = (Leg) pl.getPlanElements().get(1);
+
+
+            Id<Link> frst = a0.getLinkId();
+            Link frstL = sc.getNetwork().getLinks().get(frst);
+            if (((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().size() == 0) {
                 leg.setRoute(null);
                 leg.setMode("walkct");
+                a0.setType("pre-evac");
+                Activity a1 = (Activity) pl.getPlanElements().get(2);
+                a1.setType("post-evac");
+                log.warn("route length is 0");
+                return;
             }
-        }
+            Id<Link> scnd = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().get(0);
+            Link scndL = sc.getNetwork().getLinks().get(scnd);
+
+            if (frstL.getFromNode() == scndL.getToNode()) { //U-turn
+                a0.setLinkId(scnd);
+            }
+
+            leg.setRoute(null);
+            leg.setMode("walkct");
+            a0.setType("pre-evac");
+            Activity a1 = (Activity) pl.getPlanElements().get(2);
+            a1.setType("post-evac");
+        });
 
 
-		final Controler controller = new Controler(sc);
-		if (vis) {
+        final Controler controller = new Controler(sc);
+        if (vis) {
 //			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
 //			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
 //
 //
 //			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
-			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
-			InfoBox iBox = new InfoBox(dbg, sc);
-			dbg.addAdditionalDrawer(iBox);
-			//		dbg.addAdditionalDrawer(new Branding());
+            EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+            InfoBox iBox = new InfoBox(dbg, sc);
+            dbg.addAdditionalDrawer(iBox);
+            //		dbg.addAdditionalDrawer(new Branding());
 //			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 //			dbg.addAdditionalDrawer(qDbg);
 
-			EventsManager em = controller.getEvents();
+            EventsManager em = controller.getEvents();
 //			em.addHandler(qDbg);
-			em.addHandler(dbg);
-		}
+            em.addHandler(dbg);
+        }
 
 
+        controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 
-		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        controller.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addRoutingModuleBinding("walkct").toProvider(CTRoutingModule.class);
+            }
+        });
 
 
-		controller.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addRoutingModuleBinding("walkct").toProvider(CTRoutingModule.class);
-			}
-		});
+        final CTMobsimFactory factory = new CTMobsimFactory();
 
 
+        controller.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                if (getConfig().controler().getMobsim().equals("ctsim")) {
+                    bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+                        @Override
+                        public Mobsim get() {
+                            return factory.createMobsim(controller.getScenario(), controller.getEvents());
+                        }
+                    });
+                }
+            }
+        });
 
-		final CTMobsimFactory factory = new CTMobsimFactory();
-
-
-		controller.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				if (getConfig().controler().getMobsim().equals("ctsim")) {
-					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return factory.createMobsim(controller.getScenario(), controller.getEvents());
-						}
-					});
-				}
-			}
-		});
-
-		controller.run();
-	}
+        controller.run();
+    }
 
 
-	protected static void printUsage() {
-		System.out.println();
-		System.out.println("CTRunner");
+    protected static void printUsage() {
+        System.out.println();
+        System.out.println("CTRunner");
         System.out.println("Controller for misanthrope (pedestrian) simulations.");
         System.out.println();
-		System.out.println("usage : CARunner config");
-		System.out.println();
-		System.out.println("config:   A MATSim config file.");
-		System.out.println("visualize:   one of {true,false}.");
-		System.out.println();
-		System.out.println("---------------------");
-		System.out.println("2015, matsim.org");
-		System.out.println();
-	}
+        System.out.println("usage : CARunner config");
+        System.out.println();
+        System.out.println("config:   A MATSim config file.");
+        System.out.println("visualize:   one of {true,false}.");
+        System.out.println();
+        System.out.println("---------------------");
+        System.out.println("2015, matsim.org");
+        System.out.println();
+    }
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()) % 5 == 0 || event.getIteration() > 0) {
-			// this.factory.debug(this.visDebugger);
-			this.controller.getEvents().addHandler(this.qSimDrawer);
-			this.controller.getConfig().controler().setCreateGraphs(true);
-		}
-		else {
-			// this.factory.debug(null);
-			this.controller.getEvents().removeHandler(this.qSimDrawer);
-			this.controller.getConfig().controler().setCreateGraphs(false);
-		}
-		// this.visDebugger.setIteration(event.getIteration());
-	}
+    @Override
+    public void notifyIterationStarts(IterationStartsEvent event) {
+        if ((event.getIteration()) % 5 == 0 || event.getIteration() > 0) {
+            // this.factory.debug(this.visDebugger);
+            this.controller.getEvents().addHandler(this.qSimDrawer);
+            this.controller.getConfig().controler().setCreateGraphs(true);
+        } else {
+            // this.factory.debug(null);
+            this.controller.getEvents().removeHandler(this.qSimDrawer);
+            this.controller.getConfig().controler().setCreateGraphs(false);
+        }
+        // this.visDebugger.setIteration(event.getIteration());
+    }
 }

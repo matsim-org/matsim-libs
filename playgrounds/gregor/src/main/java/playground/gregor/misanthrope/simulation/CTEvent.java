@@ -31,7 +31,6 @@ public class CTEvent implements Comparable<CTEvent> {
 
     private boolean valid = true;
 
-
     public CTEvent(CTCell cell, double execTime) {
         this.cell = cell;
         this.execTime = execTime;

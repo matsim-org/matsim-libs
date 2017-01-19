@@ -186,6 +186,7 @@ public class CTLink implements CTNetworkEntity {
 						double dir = getAngle(cell.getX(), cell.getY(), (ge.x1 + ge.x2) / 2, (ge.y1 + ge.y2) / 2, cell.getX() + dy, cell.getY() - dx);
 						CTCellFace face = new CTCellFace(ge.x1, ge.y1, ge.x2, ge.y2, neighbor, dir);
 						cell.addFace(face);
+
 					}
 				}
 			}
@@ -212,19 +213,21 @@ public class CTLink implements CTNetworkEntity {
 
 
 		//create pseudo cells
-        this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, WIDTH / 2, area);// * width);
+        this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, WIDTH * 2, area);// * width);
         double dir = Math.PI / 2.;
 		for (CTCell ctCell : dsJumpOns) {
 			CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
 			this.dsJumpOn.addFace(face);
-			ctCell.addNeighbor(this.dsJumpOn);
+            this.dsJumpOn.addNeighbor(ctCell);
+            ctCell.addNeighbor(this.dsJumpOn);
 		}
-        this.usJumpOn = new CTLinkCell(0, 0, this.network, this, WIDTH / 2, area);// * width);
+        this.usJumpOn = new CTLinkCell(0, 0, this.network, this, WIDTH * 2, area);// * width);
         dir = -Math.PI / 2.;
 		for (CTCell ctCell : usJumpOns) {
 			CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
 			this.usJumpOn.addFace(face);
-			ctCell.addNeighbor(this.usJumpOn);
+            this.usJumpOn.addNeighbor(ctCell);
+            ctCell.addNeighbor(this.usJumpOn);
 		}
 
 		//append cells
