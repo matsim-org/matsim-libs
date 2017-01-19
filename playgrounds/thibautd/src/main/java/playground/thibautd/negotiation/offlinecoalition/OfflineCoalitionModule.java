@@ -20,8 +20,8 @@ package playground.thibautd.negotiation.offlinecoalition;
 
 import com.google.inject.Key;
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.ProportionBasedConflictSolver;
@@ -46,11 +46,13 @@ public class OfflineCoalitionModule extends AbstractModule {
 	}
 
 	@Provides
-	public CoalitionSelector createSelector( final OfflineCoalitionConfigGroup conf ) {
+	public CoalitionSelector createSelector(
+			final SocialNetwork socialNetwork,
+			final OfflineCoalitionConfigGroup conf ) {
 		return new CoalitionSelector(
 				new LogitWeight(
 						MatsimRandom.getLocalInstance(),
 						conf.getLogitScale() ),
-				new ProportionBasedConflictSolver() );
+				new ProportionBasedConflictSolver( socialNetwork ) );
 	}
 }

@@ -18,20 +18,34 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author thibautd
  */
 public class ProportionBasedConflictSolver implements CoalitionSelector.ConflictSolver {
+	private static final Logger log = Logger.getLogger( ProportionBasedConflictSolver.class );
+	private final SocialNetwork socialNetwork;
+
+	public ProportionBasedConflictSolver( final SocialNetwork socialNetwork ) {
+		this.socialNetwork = socialNetwork;
+	}
 
 	@Override
 	public void attemptToSolveConflicts(
 			final CoalitionSelector.RecordsOfJointPlan recordsPerJointPlan) {
 		double maxProportion = Double.NEGATIVE_INFINITY;
-		Collection<PlanRecord> mostPointed = null;
+
+		final Collection<Collection<PlanRecord>> currentToRemove = new ArrayList<>();
 
 		for ( final Collection<PlanRecord> records : recordsPerJointPlan.values() ) {
 			int nPoint = 0;
@@ -42,28 +56,61 @@ public class ProportionBasedConflictSolver implements CoalitionSelector.Conflict
 			assert nPoint < records.size();
 			final double proportion = nPoint / ((double) records.size());
 
-			if ( proportion > maxProportion ) {
+			if ( proportion > maxProportion + 1E-9 ) {
+				currentToRemove.clear();
 				maxProportion = proportion;
-				mostPointed = records;
 			}
-			if ( nPoint == recordsPerJointPlan.getMaxJointPlanSize() -1 ) break;
+			if ( proportion >= maxProportion - 1E-9 ) {
+				currentToRemove.add( records );
+				break;
+			}
 		}
 
-		if ( mostPointed == null ) {
-			throw new RuntimeException( "could not find least pointed joint plan in "+recordsPerJointPlan );
-		}
+		final TabuList tabu = new TabuList();
+		int c = 0;
+		for ( final Collection<PlanRecord> records : currentToRemove ) {
+			if ( tabu.addAndCheckTabu( records ) ) continue;
+			c++;
+			for ( final PlanRecord r : records ) {
+				if ( r.isPointed() ) continue;
+				// for each agent in the joint plan that does not point to the joint plan,
+				// we remove the pointed joint plan.
+				final Plan pointed = r.getAgent().getPointedPlan();
+				for ( PlanRecord inPointed : recordsPerJointPlan.getRecords( pointed ) ) {
+					inPointed.setInfeasible();
+				}
 
-		for ( final PlanRecord r : mostPointed ) {
-			if ( r.isPointed() ) continue;
-			// for each agent in the joint plan that does not point to the joint plan,
-			// we remove the pointed joint plan.
-			final Plan pointed = r.getAgent().getPointedPlan();
-			for ( PlanRecord inPointed : recordsPerJointPlan.getRecords( pointed ) ) {
-				inPointed.setInfeasible();
+				final Collection<PlanRecord> removed = recordsPerJointPlan.removeJointPlan( pointed );
+				assert removed != null;
+			}
+		}
+		if ( log.isTraceEnabled() ) log.trace( "Handled "+c+" of "+currentToRemove.size()+" possibly conflicting joint plans" );
+	}
+
+	private class TabuList {
+		final Set<Id<Person>> tabuAgents = new HashSet<>();
+
+		public boolean addAndCheckTabu( final Iterable<PlanRecord> records ) {
+			boolean tabu = areAltersTabu( records );
+
+			for ( PlanRecord r :records ) {
+				tabu = !tabuAgents.add( r.getPlan().getPerson().getId() ) || tabu;
 			}
 
-			final Collection<PlanRecord> removed = recordsPerJointPlan.removeJointPlan( pointed );
-			assert removed != null;
+			return tabu;
+		}
+
+		// this is done for improving the number of pruned possible conflicts for very big groups.
+		private boolean areAltersTabu( final Iterable<PlanRecord> records ) {
+			for ( PlanRecord r :records ) {
+				final Set<Id<Person>> alters = socialNetwork.getAlters( r.getPlan().getPerson().getId() );
+				for ( Id<Person> alter : alters ) {
+					if ( tabuAgents.contains( alter ) ) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 	}
 }

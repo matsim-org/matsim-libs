@@ -23,6 +23,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.ProportionBasedConflictSolver;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
@@ -55,6 +56,7 @@ public class RunOfflineLocationCoalition {
 						new OfflineCoalitionConfigGroup() );
 
 		Logger.getLogger( CoalitionSelector.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( ProportionBasedConflictSolver.class ).setLevel( Level.TRACE );
 
 		try ( AutoCloseable out = MoreIOUtils.initOut( config ) ;
 			  AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose();
