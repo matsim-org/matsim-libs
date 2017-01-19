@@ -96,8 +96,17 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			log.trace( "start iterations" );
 			final GroupPlans groupPlans = new GroupPlans();
 			final Counter counter = new Counter( "do iteration # " );
+			int nextSize = 1;
+			final int maxSize = agents.size();
 			while ( !agents.isEmpty() ) {
-				if ( log.isTraceEnabled() ) counter.incCounter();
+				if ( log.isTraceEnabled() ) {
+					counter.incCounter();
+					final int nAllocated = groupPlans.getAllIndividualPlans().size();
+					if ( nAllocated > nextSize ) {
+						log.trace( nAllocated+" / "+maxSize+" allocated plans" );
+						nextSize *= 2;
+					}
+				}
 				doIteration(
 						jointPlans,
 						agents,
