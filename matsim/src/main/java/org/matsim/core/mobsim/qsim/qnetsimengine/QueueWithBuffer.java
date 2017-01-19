@@ -263,12 +263,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
     private void updateFastFlowAccumulation(){
         double now = context.getSimTimer().getTimeOfDay() ;
         
-        if (!this.thisTimeStepGreen) {
-            //AFAIK signals + fastCapUpdate are incompatibile
-            //TODO add a check to config validation (signals)
-            throw new RuntimeException();
-        }
-        
         if( this.flowcap_accumulate.getTimeStep() < now
                 && this.flowcap_accumulate.getValue() <= 0.
                 && isNotOfferingVehicle() ){
