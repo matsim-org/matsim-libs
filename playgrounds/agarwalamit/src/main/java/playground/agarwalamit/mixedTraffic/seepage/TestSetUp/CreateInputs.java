@@ -51,7 +51,7 @@ import org.matsim.core.utils.misc.Time;
 /**
  * @author amit
  */
-public class CreateInputs {
+class CreateInputs {
 
 	public CreateInputs() {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

@@ -40,7 +40,7 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  * @author amit
  * Density vs number of bicycles overtaken by cars on link id"1" in test network.
  */
-public class DensityVsPassingDistributionHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+class DensityVsPassingDistributionHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private final Map<Id<Person>, String> personId2LegMode;
 	private final Map<Double, Double> density2TotalOvertakenBicycles;

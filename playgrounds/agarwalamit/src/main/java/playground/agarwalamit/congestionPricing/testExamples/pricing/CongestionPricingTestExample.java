@@ -51,12 +51,12 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 class CongestionPricingTestExample {
 
-	CongestionPricingTestExample (String congestionImpl){
+	private CongestionPricingTestExample(String congestionImpl){
 		this.isComparing = true;
 		this.congestionImpl = congestionImpl;
 	}
 
-	CongestionPricingTestExample () {
+	private CongestionPricingTestExample() {
 		this.isComparing = false;
 	}
 
@@ -84,7 +84,7 @@ class CongestionPricingTestExample {
 		new PricingTestAnalyser().run();
 	}
 
-	void run() {
+	private void run() {
 
 		if(!new File(outputDir+"/input/").exists()) {
 			new File(outputDir+"/input/").mkdirs();

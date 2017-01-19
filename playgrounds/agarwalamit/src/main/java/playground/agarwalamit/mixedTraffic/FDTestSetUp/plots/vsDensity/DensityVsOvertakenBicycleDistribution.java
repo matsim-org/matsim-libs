@@ -40,9 +40,9 @@ public class DensityVsOvertakenBicycleDistribution extends AbstractAnalysisModul
 
 	private final DensityVsPassingDistributionHandler dpd;
     private final String eventFile;
-	final BufferedWriter writer1;
+	private final BufferedWriter writer1;
 
-	public DensityVsOvertakenBicycleDistribution(String eventFile, String outputFolder) {
+	private DensityVsOvertakenBicycleDistribution(String eventFile, String outputFolder) {
 		super(DensityVsOvertakenBicycleDistribution.class.getSimpleName());
 		Id<Link> linkId = Id.create("1",Link.class);
 		writer1 = IOUtils.getBufferedWriter(outputFolder+"rDensityVsTotalOvertakenBicycleCount_2.txt");
