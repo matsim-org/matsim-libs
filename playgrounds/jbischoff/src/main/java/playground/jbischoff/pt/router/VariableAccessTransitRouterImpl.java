@@ -144,7 +144,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 		double directWalkCost = getAccessEgressDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 
-		if (directWalkCost < pathCost) {
+		if (directWalkCost * config.getDirectWalkFactor() < pathCost) {
 			return this.createDirectAccessEgressModeLegList(null, fromFacility.getCoord(), toFacility.getCoord(), departureTime);
 		}
 		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
@@ -321,9 +321,13 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 		if (transitLegCnt == 0) {
 			// it seems, the agent only walked
 			legs.clear();
-			leg = getAccessEgressLeg(person, accessStop.getCoord(), toCoord, time);
+			try{
+			leg = getAccessEgressLeg(person, fromCoord, toCoord, time);
 
 			legs.add(leg);
+			} catch (NullPointerException e){
+				throw new RuntimeException(" npe: person"+ person + fromCoord + toCoord + time);
+			}
 		}
 		return legs;
 	}

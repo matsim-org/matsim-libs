@@ -61,6 +61,7 @@ import playground.jbischoff.pt.router.VariableAccessTransitRouterImplFactory;
 import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
 import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
 import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModes;
+import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModesModule;
 
 /**
  * @author  jbischoff
@@ -86,11 +87,6 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		// special, second transit schedule for our special pt mode, i.e. only
-		// railway lines
-		String scrappedScheduleFile = config.transit().getTransitScheduleFileURL(config.getContext()).getFile().split(".xml")[0]+"_va.xml"; 
-		new TransitScheduleReader(scenario2).readFile(scrappedScheduleFile);
-		final TransitSchedule schedule = scenario2.getTransitSchedule();
 
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		walk.setDistance(1000);
@@ -117,35 +113,7 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 
 		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
 		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
-		controler.addOverridingModule(new AbstractModule() {
-
-			@Override
-			public void install() {
-				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
-
-				bind(TransitSchedule.class).annotatedWith(Names.named("variableAccess")).toInstance(schedule);
-				addRoutingModuleBinding("avpt").toProvider(VariableAccessTransit.class);
-
-				bind(TransitRouter.class).annotatedWith(Names.named("variableAccess")).toProvider(VariableAccessTransitRouterImplFactory.class);
-				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.toString())
-						.toProvider(new Provider<PlanStrategy>() {
-							@Inject
-							Provider<TripRouter> tripRouterProvider;
-
-							@Override
-							public PlanStrategy get() {
-								final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-								builder.addStrategyModule(
-										new TripsToLegsModule(tripRouterProvider, scenario.getConfig().global()));
-								builder.addStrategyModule(new ChangeSingleLegModeWithPredefinedFromModes(
-										scenario.getConfig().global(), scenario.getConfig().changeMode()));
-								return builder.build();
-							}
-						});
-
-			}
-		});
-
+		controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
 		controler.run();
 
 	}

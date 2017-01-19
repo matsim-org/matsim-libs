@@ -22,12 +22,18 @@
 
 package playground.jbischoff.pt.router;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+
+import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
 
 
 public class VariableAccessTransitRouterModule extends AbstractModule {
@@ -35,7 +41,16 @@ public class VariableAccessTransitRouterModule extends AbstractModule {
     @Override
     public void install() {
         if (getConfig().transit().isUseTransit()) {
-        	addRoutingModuleBinding(TransportMode.pt).toProvider(VariableAccessTransit.class);
+        	VariableAccessConfigGroup vaconfig = (VariableAccessConfigGroup) getConfig().getModules().get(VariableAccessConfigGroup.GROUPNAME);
+        	addRoutingModuleBinding(vaconfig.getMode()).toProvider(VariableAccessTransit.class);
+        	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        	String scheduleFile = getConfig().transit().getTransitScheduleFileURL(getConfig().getContext()).getFile();
+        	if (vaconfig.getTransitScheduleFile()!=null){
+        		scheduleFile = vaconfig.getTransitScheduleFileURL(getConfig().getContext()).getFile();
+        	}
+        	
+        	new TransitScheduleReader(scenario2).readFile(scheduleFile);
+			bind(TransitSchedule.class).annotatedWith(Names.named("variableAccess")).toInstance(scenario2.getTransitSchedule());
             bind(TransitRouter.class).annotatedWith(Names.named("variableAccess")).toProvider(VariableAccessTransitRouterImplFactory.class);
         }
     }

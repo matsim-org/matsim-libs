@@ -34,19 +34,20 @@ import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.run.TaxiQSimProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.inject.name.Names;
 
 import playground.jbischoff.pt.router.VariableAccessTransitRouterModule;
 import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
 import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
-
 
 /**
  * @author  jbischoff
@@ -56,21 +57,23 @@ import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
  *
  */
 public class RunTaxiPTComboExample {
-public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/example/config.xml", new TaxiConfigGroup());
+	public static void main(String[] args) {
+		Config config = ConfigUtils.loadConfig(
+				"C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/example/config.xml",
+				new TaxiConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
+
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		walk.setDistance(1000);
 		walk.setTeleported(true);
 		walk.setMode("walk");
-		
-		
+
 		VariableAccessModeConfigGroup bike = new VariableAccessModeConfigGroup();
 		bike.setDistance(1100);
 		bike.setTeleported(true);
 		bike.setMode("bike");
-		
-		
+
 		VariableAccessModeConfigGroup taxi = new VariableAccessModeConfigGroup();
 		taxi.setDistance(20000);
 		taxi.setTeleported(false);
@@ -79,48 +82,32 @@ public static void main(String[] args) {
 		vacfg.setAccessModeGroup(taxi);
 		vacfg.setAccessModeGroup(bike);
 		vacfg.setAccessModeGroup(walk);
-		
+
 		config.addModule(vacfg);
 		config.transitRouter().setSearchRadius(15000);
 		config.transitRouter().setExtensionRadius(0);
+
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		OTFVisConfigGroup otfvis = new OTFVisConfigGroup();
+		otfvis.setDrawNonMovingItems(true);
+		config.addModule(otfvis);
+
+		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		config.checkConsistency();
 		
-	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-       config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-       config.checkConsistency();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		TaxiData taxiData = new TaxiData();
+		new VehicleReader(scenario.getNetwork(), taxiData)
+				.readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new TaxiModule(taxiData));
+		double expAveragingAlpha = 0.05;// from the AV flow paper
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
+		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+		controler.addOverridingModule(new VariableAccessTransitRouterModule());
+		// controler.addOverridingModule(new TripHistogramModule());
+		controler.addOverridingModule(new OTFVisLiveModule());
+		controler.run();
 
-       
-       Scenario scenario = ScenarioUtils.loadScenario(config);
-       Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-      
-       // special, second transit schedule for our special pt mode, i.e. only railway lines
-       new TransitScheduleReader(scenario2).readFile(config.transit().getTransitScheduleFileURL(config.getContext()).getFile());
-     final TransitSchedule schedule = scenario2.getTransitSchedule(); 
-
-      
-      	TaxiData taxiData = new TaxiData();
-       new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
-       Controler controler = new Controler(scenario);
-       controler.addOverridingModule(new TaxiModule(taxiData));
-       double expAveragingAlpha = 0.05;//from the AV flow paper 
-       controler.addOverridingModule(
-               VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-       controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
-       controler.addOverridingModule(new VariableAccessTransitRouterModule());
-//       controler.addOverridingModule(new TripHistogramModule());
-       controler.addOverridingModule(new OTFVisLiveModule());
-       
-       controler.addOverridingModule(new AbstractModule() {
-		
-		
-		@Override
-		public void install() {
-			bind(TransitSchedule.class).annotatedWith(Names.named("variableAccess")).toInstance(schedule);
-			
-		}
-	});
-
-       controler.run();
-
-
-}
+	}
 }

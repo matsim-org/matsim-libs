@@ -22,10 +22,12 @@
  */
 package playground.jbischoff.pt.router;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -36,12 +38,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -51,20 +53,22 @@ import org.matsim.core.utils.geometry.CoordUtils;
 /**
  *
  */
-public class DistancebasedVariableAccessModule implements VariableAccessEgressTravelDisutility {
+public class FlexibleDistanceBasedVariableAccessModule implements VariableAccessEgressTravelDisutility {
 
 	
 	private Map<String,Boolean> teleportedModes = new HashMap<>();
-	private Map<Integer,String> distanceMode = new TreeMap<>();
+	private Map<String,Integer> distanceMode = new TreeMap<>();
 	private Map<String, LeastCostPathCalculator> lcpPerNonTeleportedMode = new HashMap<>();
 	
 	private final Network carnetwork;
 	private final Config config;
 	
+	private boolean checkCarAvail = true;
+	private final Random rand = MatsimRandom.getRandom();
 	/**
 	 * 
 	 */
-	public DistancebasedVariableAccessModule(Network carnetwork, Config config) {
+	public FlexibleDistanceBasedVariableAccessModule(Network carnetwork, Config config) {
 		this.config = config;
 		this.carnetwork = carnetwork;
 	}
@@ -75,22 +79,21 @@ public class DistancebasedVariableAccessModule implements VariableAccessEgressTr
 	 * @param isTeleported defines whether this is a teleported mode
 	 * @param lcp for non teleported modes, some travel time assumption is required
 	 */
-	public void registerMode(String mode, int maximumAccessDistance, boolean isTeleported, LeastCostPathCalculator lcp){
-		if (this.distanceMode.containsKey(maximumAccessDistance)){
-			throw new RuntimeException("Maximum distance of "+maximumAccessDistance+" is already registered to mode "+distanceMode.get(maximumAccessDistance)+" and cannot be re-registered to mode: "+mode);
+	public void registerMode(String mode, int maximumAccessDistance, boolean isTeleported){
+		if (this.distanceMode.containsKey(mode)){
+			throw new RuntimeException("mode "+mode+"is already registered. Check your config four double entries..");
 		}
 		if (isTeleported){
 			teleportedModes.put(mode, true);
-			distanceMode.put(maximumAccessDistance, mode);
-		} else {
+			distanceMode.put(mode, maximumAccessDistance);
+		}
+		else {
 			teleportedModes.put(mode, false);
-			distanceMode.put(maximumAccessDistance,mode);
-			if (lcp!= null){
-			lcpPerNonTeleportedMode.put(mode, lcp);}
-			else {throw new NullPointerException("LCP cannot be null for non-teleported mode");
-			}
+			distanceMode.put(mode, maximumAccessDistance);
+			
 			
 		}
+		
 	}
 	
 	
@@ -100,7 +103,8 @@ public class DistancebasedVariableAccessModule implements VariableAccessEgressTr
 	@Override
 	public Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord, double time) {
 		double egressDistance = CoordUtils.calcEuclideanDistance(coord, toCoord);
-		String mode = getModeForDistance(egressDistance);
+		
+		String mode = getModeForDistance(egressDistance, person);
 		Leg leg = PopulationUtils.createLeg(mode);
 		Link startLink = NetworkUtils.getNearestLink(carnetwork, coord);
 		Link endLink = NetworkUtils.getNearestLink(carnetwork, toCoord);
@@ -134,15 +138,40 @@ public class DistancebasedVariableAccessModule implements VariableAccessEgressTr
 	 * @param egressDistance
 	 * @return
 	 */
-	private String getModeForDistance(double egressDistance) {
-		for (Entry<Integer, String> e : this.distanceMode.entrySet()){
-			if (e.getKey()>=egressDistance){
-//				System.out.println("Mode" + e.getValue()+" "+egressDistance);
-				return e.getValue();
+	private String getModeForDistance(double egressDistance, Person p) {
+		if (distanceMode.containsKey(TransportMode.walk))
+		if (egressDistance<distanceMode.get(TransportMode.walk)) return TransportMode.walk;
+		//TODO: MAke Config switch
+		List<String> possibleModes = new ArrayList<>();
+		for (Entry<String,Integer> e : this.distanceMode.entrySet()){
+			if (e.getValue()>=egressDistance){
+				if (e.getKey().equals(TransportMode.car)){
+					if ((checkCarAvail)&&(p!=null)&&(p.getCustomAttributes()!=null)){
+						
+						String carA  = PersonUtils.getCarAvail(p);
+						if (carA!=null){
+						if (carA.equals("always")||carA.equals("sometimes")){
+							possibleModes.add(e.getKey());
+						
+						}
+						}
+						else {				
+							possibleModes.add(e.getKey());
+						}
+					}
+					else {
+						possibleModes.add(e.getKey());
+					}
+				}
+				else {
+					possibleModes.add(e.getKey());
+				}
 			}
 		}
-		throw new RuntimeException(egressDistance + " m is not covered by any egress / access mode.");
-		
+		if (possibleModes.size()<1){
+			throw new RuntimeException("Egress distance "+egressDistance+ " is not covered by any mode.");
+		}
+		return possibleModes.get(rand.nextInt(possibleModes.size()));
 	}
 
 

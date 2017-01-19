@@ -31,7 +31,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class VariableAccessModeConfigGroup extends ReflectiveConfigGroup {
 
-	private static final String GROUPNAME = VariableAccessConfigGroup.MODEGROUPNAME;
+	public static final String GROUPNAME = VariableAccessConfigGroup.MODEGROUPNAME;
 
 	private static final String MODEDISTANCE = "accessDistance_m";
 	private static final String MODE = "mode";
