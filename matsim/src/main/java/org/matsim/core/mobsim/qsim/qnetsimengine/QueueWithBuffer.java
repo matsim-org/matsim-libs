@@ -258,7 +258,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
         if(context.qsimConfig.isUsingFastCapacityUpdate() ){
-            updateFlowAccumulation();
+            updateFastFlowAccumulation();
         }
         
 		return usedBufferStorageCapacity < bufferStorageCapacity
@@ -266,41 +266,45 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 
-	private void updateFlowAccumulation(){
-		double now = context.getSimTimer().getTimeOfDay() ;
-		
-		if (!this.thisTimeStepGreen) {
-		    if (context.qsimConfig.isUsingFastCapacityUpdate()) {
-		        //AFAIK signals + fastCapUpdate are incompatibile
-	            //TODO add a check to config validation (signals)
-	            throw new RuntimeException();
-		    }
-		    
-		    return;
-		}
-		
+    private void updateFastFlowAccumulation(){
+        double now = context.getSimTimer().getTimeOfDay() ;
+        
+        if (!this.thisTimeStepGreen) {
+            //AFAIK signals + fastCapUpdate are incompatibile
+            //TODO add a check to config validation (signals)
+            throw new RuntimeException();
+        }
+        
         if( this.flowcap_accumulate.getTimeStep() < now //always true for slow update
                 && this.flowcap_accumulate.getValue() <= 0. // < flowCapacityPerTimeStep
                 && isNotOfferingVehicle() ){// consider: isBufferNotFull()
 
-				double flowCapSoFar = flowcap_accumulate.getValue();
-				double timeSteps = context.qsimConfig.isUsingFastCapacityUpdate() ?
-				        (now - flowcap_accumulate.getTimeStep()) : 1;
-				double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
-				double newFlowCap = flowCapSoFar + accumulateFlowCap;
-				
-				newFlowCap = Math.min(newFlowCap, flowCapacityPerTimeStep);
-				
-				flowcap_accumulate.setValue(newFlowCap);
-				flowcap_accumulate.setTimeStep( now );
-		}
-	}
+                double flowCapSoFar = flowcap_accumulate.getValue();
+                double timeSteps = now - flowcap_accumulate.getTimeStep();
+                double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
+                double newFlowCap = flowCapSoFar + accumulateFlowCap;
+                
+                newFlowCap = Math.min(newFlowCap, flowCapacityPerTimeStep);
+                
+                flowcap_accumulate.setValue(newFlowCap);
+                flowcap_accumulate.setTimeStep( now );
+        }
+    }
 
+    
+    private void updateSlowFlowAccumulation(){
+        if (this.thisTimeStepGreen
+                && this.flowcap_accumulate.getValue() <= 0. // < flowCapacityPerTimeStep
+                && isNotOfferingVehicle() ){// consider: isBufferNotFull()
+                flowcap_accumulate.setValue(flowcap_accumulate.getValue() + flowCapacityPerTimeStep);
+        }
+    }
 
-	//replacement for updateRemainingFlowCapacity()
+    
+
 	final void initBeforeSimStep() {
 		if(!context.qsimConfig.isUsingFastCapacityUpdate() ){
-		      updateFlowAccumulation();
+		    updateSlowFlowAccumulation();
 		}
 	}
 
@@ -386,9 +390,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	final boolean doSimStep( ) {
-	    //XXX this if-clause is the remaining part from updateRemainingFlowCapacity()
-	    //used to be called at this moment in time, though I would move it to initBeforeSimStep()
-	    //to make things clearer
        if ( context.qsimConfig.getInflowConstraint()!=InflowConstraint.none ) {
             this.accumulatedInflowCap += this.maxFlowFromFdiag ;
             if ( this.accumulatedInflowCap > Math.ceil( this.maxFlowFromFdiag ) ) {
