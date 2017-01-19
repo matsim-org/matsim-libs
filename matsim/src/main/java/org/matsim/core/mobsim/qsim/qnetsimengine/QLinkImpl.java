@@ -107,8 +107,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	boolean doSimStep() {
-//		((QueueWithBuffer)qlane).updateRemainingFlowCapacity(); 
-		
 		double now = context.getSimTimer().getTimeOfDay() ;
 		qlane.initBeforeSimStep();
 		

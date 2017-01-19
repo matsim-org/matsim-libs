@@ -249,9 +249,13 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		boolean lanesActive = false;
 		boolean movedWaitToRoad = false;
 		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
-		    
-		    //TODO moveBufferToNextLane should be before waitToRoad and doSimStep!!!
-		    
+		    //TODO
+		    //Because moveBufferToNextLane() (called from moveLanes()) is kind of "moveInternalNodes()",
+		    //it should be executed before moveWaitToRoad() to keep the sequence fully consistent.
+		    //The sequence is broken only if isInsertingWaitingVehiclesBeforeDrivingVehicles==true.
+		    //Currently, the buffer of the accepting lane gets emptied after moveWaitToRoad(),
+		    //which gives preference to already driving vehicles 
+		    //michalm, jan'17
 			this.moveWaitToRoad(now);
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
 			lanesActive = this.moveLanes();
@@ -269,8 +273,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		boolean activeLane = false;
 		for (QLaneI lane : this.laneQueues.values()) {
 			// (go through all lanes)
-			
-//			((QueueWithBuffer) lane).updateRemainingFlowCapacity();
 			
 			/* part A */
 			if (!this.toNodeLaneQueues.contains(lane)) {

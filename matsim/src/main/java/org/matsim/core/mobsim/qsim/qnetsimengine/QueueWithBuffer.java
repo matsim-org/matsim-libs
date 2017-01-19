@@ -275,9 +275,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
             throw new RuntimeException();
         }
         
-        if( this.flowcap_accumulate.getTimeStep() < now //always true for slow update
-                && this.flowcap_accumulate.getValue() <= 0. // < flowCapacityPerTimeStep
-                && isNotOfferingVehicle() ){// consider: isBufferNotFull()
+        if( this.flowcap_accumulate.getTimeStep() < now
+                && this.flowcap_accumulate.getValue() <= 0.
+                && isNotOfferingVehicle() ){
 
                 double flowCapSoFar = flowcap_accumulate.getValue();
                 double timeSteps = now - flowcap_accumulate.getTimeStep();
@@ -294,8 +294,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
     
     private void updateSlowFlowAccumulation(){
         if (this.thisTimeStepGreen
-                && this.flowcap_accumulate.getValue() <= 0. // < flowCapacityPerTimeStep
-                && isNotOfferingVehicle() ){// consider: isBufferNotFull()
+                && this.flowcap_accumulate.getValue() <= 0.
+                && isNotOfferingVehicle() ){
                 flowcap_accumulate.setValue(flowcap_accumulate.getValue() + flowCapacityPerTimeStep);
         }
     }
@@ -519,8 +519,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	 final boolean isActive() {
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
-				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) || ( !this.holes.isEmpty() ) ;
+			return (!this.vehQueue.isEmpty())
+			        || (!this.isNotOfferingVehicle())
+			        || ( !this.holes.isEmpty() ) ;
 		} else {
              return (this.flowcap_accumulate.getValue() <= 0.) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
@@ -578,11 +579,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private void recalcTimeVariantAttributes() {
 		calculateFlowCapacity();
 		calculateStorageCapacity();
-		
-		//I would reset the value in both cases
-//		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
-//		}
+		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 	}
 	
 	@Override
