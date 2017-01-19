@@ -453,8 +453,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(LINK_DYNAMICS)
-	public void setLinkDynamics( String str ) {
-		this.linkDynamics = LinkDynamics.valueOf( str ) ;
+	public void setLinkDynamics(LinkDynamics linkDynamics) {
+		this.linkDynamics = linkDynamics ;
 	}
 
 	@StringGetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)

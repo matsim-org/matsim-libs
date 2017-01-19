@@ -245,7 +245,7 @@ public class OuterCordonCadytsControler {
 		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setMainModes(PatnaUtils.EXT_MAIN_MODES);
-		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
+		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setEndTime(36*3600);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);

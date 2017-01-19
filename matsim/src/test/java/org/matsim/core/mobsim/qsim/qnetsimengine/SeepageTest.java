@@ -186,7 +186,7 @@ public class SeepageTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
-			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.name());
+			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ);
 			
 			config.qsim().setSeepModes(Arrays.asList(TransportMode.walk) );
 			config.qsim().setSeepModeStorageFree(false);

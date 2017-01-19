@@ -117,7 +117,7 @@ public class VehicleSourceTest {
 		config.qsim().setStorageCapFactor(1.0);
 		config.qsim().setMainModes(Arrays.asList(transportModes));
 		//config.plansCalcRoute().setNetworkModes(Arrays.asList(transportModes));
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
 		config.qsim().setVehiclesSource(this.vehicleSource);
 		config.qsim().setUsePersonIdForMissingVehicleId(this.isUsingPersonIdForMissionVehicleId);

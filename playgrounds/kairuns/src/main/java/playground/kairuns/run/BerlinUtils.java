@@ -345,7 +345,7 @@ final class BerlinUtils {
 
 	static void createMultimodalParameters(Config config) {
 		config.qsim().setVehiclesSource(VehiclesSource.modeVehicleTypesFromVehiclesData);
-		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name()); // I think this is ok even when not needed.
+		config.qsim().setLinkDynamics(LinkDynamics.PassingQ); // I think this is ok even when not needed.
 
 		// network modes for router:
 		Collection<String> networkModes = new ArrayList<>() ;

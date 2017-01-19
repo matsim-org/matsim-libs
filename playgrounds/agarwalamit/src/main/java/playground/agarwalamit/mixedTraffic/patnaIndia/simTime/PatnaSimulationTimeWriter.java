@@ -139,7 +139,7 @@ public class PatnaSimulationTimeWriter {
 		config.network().setInputFile(inputFilesDir+"/network.xml.gz");
 		config.counts().setInputFile(inputFilesDir+"counts/countsCarMotorbikeBike.xml");
 
-		config.qsim().setLinkDynamics(ld.toString());
+		config.qsim().setLinkDynamics(ld);
 		config.qsim().setTrafficDynamics(td);
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 

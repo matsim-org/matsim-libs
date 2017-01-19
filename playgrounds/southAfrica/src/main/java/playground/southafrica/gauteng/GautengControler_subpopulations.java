@@ -140,7 +140,7 @@ public class GautengControler_subpopulations {
 			throw new RuntimeException("I doubt that the jdqsim honors _main modes_.  Either check, or do not use. Aborting. kai, jan'14") ;
 		}
 
-		config.qsim().setLinkDynamics( LinkDynamics.PassingQ.toString() );
+		config.qsim().setLinkDynamics( LinkDynamics.PassingQ );
 		// yy is the mobsim really assigning the vehicles from the vehicles file?  (In fact I think it is. kai, sep'14)
 
 		GautengUtils.assignSubpopulationStrategies(config);

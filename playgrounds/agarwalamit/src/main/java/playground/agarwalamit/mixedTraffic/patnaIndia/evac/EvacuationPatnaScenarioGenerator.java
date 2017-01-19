@@ -120,7 +120,7 @@ public class EvacuationPatnaScenarioGenerator {
 		config.qsim().setSnapshotPeriod(5*60);
 		config.qsim().setEndTime(30*3600);
 		config.qsim().setStuckTime(100000);
-		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
+		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setMainModes(PatnaUtils.URBAN_MAIN_MODES);
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
 

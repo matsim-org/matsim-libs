@@ -176,7 +176,7 @@ public class VehVsLinkSpeedTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList("car","bike"));
-			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
+			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
 			network = (Network) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));

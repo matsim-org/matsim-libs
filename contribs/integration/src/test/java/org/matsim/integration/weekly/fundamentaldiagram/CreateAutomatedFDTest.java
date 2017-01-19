@@ -149,7 +149,7 @@ public class CreateAutomatedFDTest {
 		final Config config = ConfigUtils.createConfig();
 		config.qsim().setMainModes(Arrays.asList(travelModes));
 		config.qsim().setEndTime(14*3600);
-		config.qsim().setLinkDynamics(linkDynamics.name());
+		config.qsim().setLinkDynamics(linkDynamics);
 
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
 			config.qsim().setSeepModes(Arrays.asList("bike"));

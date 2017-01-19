@@ -155,7 +155,7 @@ public class ConfigCreator {
 		qsim.setEndTime(Time.UNDEFINED_TIME);
 		qsim.setFlowCapFactor(Global.getN()/Global.N);
 		qsim.setInsertingWaitingVehiclesBeforeDrivingVehicles(false);
-		qsim.setLinkDynamics(LinkDynamics.FIFO.name());
+		qsim.setLinkDynamics(LinkDynamics.FIFO);
 		qsim.setLinkWidthForVis(30L);
 		Set<String> mainModes = new HashSet<>();
 		mainModes.add(TransportMode.car);
