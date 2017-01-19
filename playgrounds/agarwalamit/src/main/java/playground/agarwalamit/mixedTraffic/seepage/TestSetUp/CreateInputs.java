@@ -70,7 +70,7 @@ class CreateInputs {
 		config.qsim().setStorageCapFactor(1.0);
 		config.qsim().setMainModes(mainModes);
 
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.SeepageQ.name());
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.SeepageQ);
 		config.qsim().setSeepModes(Arrays.asList(SeepageControler.SEEP_MODE));
 		config.qsim().setSeepModeStorageFree(SeepageControler.IS_SEEP_MODE_STORAGE_FREE);
 
