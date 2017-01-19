@@ -182,21 +182,18 @@ public class MultiModalControlerListenerTest {
 		Assert.assertEquals(8, linkModeChecker.linkLeftCount);
 	}
 
-	@Ignore("takes too long - temporarily skipped")
 	@Test
 	public void testBerlinScenario_singleThreaded() {
 		log.info("Run test single threaded...");
 		runBerlinScenario(1);
 	}
 
-    @Ignore("takes too long - temporarily skipped")
 	@Test
 	public void testBerlinScenario_multiThreaded_2() {
 		log.info("Run test multi threaded with 2 threads...");
 		runBerlinScenario(2);
 	}
 
-    @Ignore("takes too long - temporarily skipped")
 	@Test
 	public void testBerlinScenario_multiThreaded_4() {
 		log.info("Run test multi threaded with 4 threads...");
