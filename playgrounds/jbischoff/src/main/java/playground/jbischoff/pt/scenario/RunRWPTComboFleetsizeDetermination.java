@@ -67,7 +67,7 @@ public static void main(String[] args) {
 		config.controler().setOutputDirectory(outPutDir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModule("taxi");
+		TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
 		tcg.setTaxisFile(taxisFile);
 		
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
@@ -94,6 +94,7 @@ public static void main(String[] args) {
 		config.transitRouter().setExtensionRadius(0);
 		
 	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+	   taxiCfg.setChangeStartLinkToLastLinkInSchedule(true);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
 
