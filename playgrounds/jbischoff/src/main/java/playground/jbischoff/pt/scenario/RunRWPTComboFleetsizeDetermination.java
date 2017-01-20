@@ -85,6 +85,7 @@ public static void main(String[] args) {
 		taxi.setDistance(200000);
 		taxi.setTeleported(false);
 		taxi.setMode("taxi");
+		
 		VariableAccessConfigGroup vacfg = new VariableAccessConfigGroup();
 		vacfg.setAccessModeGroup(taxi);
 		vacfg.setAccessModeGroup(walk);
@@ -94,6 +95,7 @@ public static void main(String[] args) {
 		config.transitRouter().setExtensionRadius(0);
 		
 	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+	   taxiCfg.setBreakSimulationIfNotAllRequestsServed(false);
 	   taxiCfg.setChangeStartLinkToLastLinkInSchedule(true);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
