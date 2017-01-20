@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class LinkDemandAnalysisMain {
 	
 //	private static String OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";
-	private static String OUTPUT_BASE_DIR = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/cordonToll_0/";
+	private static String OUTPUT_BASE_DIR = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/cordonToll_3/";
 	
 	public static void main(String[] args) {
 		LinkDemandAnalysisMain anaMain = new LinkDemandAnalysisMain();
