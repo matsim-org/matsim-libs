@@ -37,6 +37,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -67,9 +69,8 @@ import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
+
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizer;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**

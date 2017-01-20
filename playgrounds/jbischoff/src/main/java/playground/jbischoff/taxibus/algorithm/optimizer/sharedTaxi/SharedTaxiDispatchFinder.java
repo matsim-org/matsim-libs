@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -39,9 +41,7 @@ import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusScheduler;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 

@@ -29,11 +29,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.av.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 
 /**
  * @author  jbischoff

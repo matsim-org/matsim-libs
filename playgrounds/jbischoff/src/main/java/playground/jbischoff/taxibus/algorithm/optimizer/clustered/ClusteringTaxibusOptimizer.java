@@ -31,6 +31,8 @@ import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -39,9 +41,7 @@ import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizer;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**

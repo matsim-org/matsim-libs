@@ -17,10 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.drt.scheduler.tasks;
+package org.matsim.contrib.av.drt.tasks;
 import java.util.Set;
 
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+
 
 
 

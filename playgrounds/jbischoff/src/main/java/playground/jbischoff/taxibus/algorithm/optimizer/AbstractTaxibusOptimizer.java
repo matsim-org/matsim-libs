@@ -22,6 +22,9 @@ package playground.jbischoff.taxibus.algorithm.optimizer;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
+import org.matsim.contrib.av.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -29,10 +32,6 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask.DrtTaskType;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 
 
 public abstract class AbstractTaxibusOptimizer

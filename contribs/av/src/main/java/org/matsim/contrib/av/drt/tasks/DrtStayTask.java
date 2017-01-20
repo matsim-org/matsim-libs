@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.drt.scheduler.tasks;
+package org.matsim.contrib.av.drt.tasks;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
-/**
- * @author  jbischoff
- *	Task for driving w/o pax
- */
-public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
 
-	public DrtDriveTask(VrpPathWithTravelData path) {
-		super(path);
-		// TODO Auto-generated constructor stub
-	}
 
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		
-		return DrtTaskType.DRIVE_EMPTY;
-	}
+public class DrtStayTask
+    extends StayTaskImpl
+    implements DrtTask
+{
+    public DrtStayTask(double beginTime, double endTime, Link link)
+    {
+        super(beginTime, endTime, link);
+    }
+
+
+    @Override
+    public DrtTaskType getDrtTaskType()
+    {
+        return DrtTaskType.STAY;
+    }
+
 
     @Override
     protected String commonToString()
     {
         return "[" + getDrtTaskType().name() + "]" + super.commonToString();
     }
-
-
 }

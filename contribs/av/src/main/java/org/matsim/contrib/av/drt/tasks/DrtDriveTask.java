@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.drt.scheduler.tasks;
+package org.matsim.contrib.av.drt.tasks;
 
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
+/**
+ * @author  jbischoff
+ *	Task for driving w/o pax
+ */
+public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
 
-public interface DrtTask
-    extends Task
-{
-    static enum DrtTaskType
+	public DrtDriveTask(VrpPathWithTravelData path) {
+		super(path);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public DrtTaskType getDrtTaskType() {
+		
+		return DrtTaskType.DRIVE_EMPTY;
+	}
+
+    @Override
+    protected String commonToString()
     {
-    	        DRIVE_EMPTY, // drive empty might be needed later.
-        STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
-        PICKUP, DRIVE_WITH_PASSENGER, DROPOFF;//serving n customers (TaxibusTaskWithRequests)
+        return "[" + getDrtTaskType().name() + "]" + super.commonToString();
     }
 
 
-    DrtTaskType getDrtTaskType();
 }

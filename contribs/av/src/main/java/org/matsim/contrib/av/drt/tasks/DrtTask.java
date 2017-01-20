@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,68 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.drt.scheduler.tasks;
+package org.matsim.contrib.av.drt.tasks;
 
-import java.util.Set;
-
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
+import org.matsim.contrib.dvrp.schedule.*;
 
 
-/**
- * @author  jbischoff
- *
- */
-public class DrtDriveWithPassengerTask extends DriveTaskImpl implements DrtTaskWithRequests {
-	
-	private Set<TaxibusRequest> requests;
-	
-	public DrtDriveWithPassengerTask(Set<TaxibusRequest> requests, VrpPathWithTravelData path) {
-		super(path);
-		this.requests = requests;
-		for (TaxibusRequest req: this.requests){
-			req.addDriveWithPassengerTask(this);
-		}
-		}
-
-	
-
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		
-		return DrtTaskType.DRIVE_WITH_PASSENGER;
-	}
-	
-	
-
-	@Override
-	public Set<TaxibusRequest> getRequests() {
-		return requests;
-	}
-	
-
-	
-
-	@Override
-	public void removeFromRequest(TaxibusRequest request) {
-		
-		request.addDriveWithPassengerTask(null);
-		this.requests.remove(request);
-
-	}
-
-	@Override
-	public void removeFromAllRequests() {
-		for (TaxibusRequest request : this.requests){
-			request.addDriveWithPassengerTask(null);
-			
-		}
-		this.requests.clear();
-	}
+public interface DrtTask
+    extends Task
+{
+    static enum DrtTaskType
+    {
+    	        DRIVE_EMPTY, // drive empty might be needed later.
+        STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
+        PICKUP, DRIVE_WITH_PASSENGER, DROPOFF;//serving n customers (TaxibusTaskWithRequests)
+    }
 
 
-	
-
+    DrtTaskType getDrtTaskType();
 }

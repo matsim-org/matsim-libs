@@ -28,12 +28,11 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.TaxibusRequest.TaxibusRequestStatus;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest.TaxibusRequestStatus;
 
 
 public class TaxibusDispatch 

@@ -24,15 +24,15 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
+import org.matsim.contrib.av.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.util.Schedules2GIS;
 
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask.DrtTaskType;
 import playground.jbischoff.taxibus.algorithm.optimizer.AbstractTaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**

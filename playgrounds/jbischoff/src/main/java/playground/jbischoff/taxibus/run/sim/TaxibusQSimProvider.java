@@ -22,6 +22,7 @@ package playground.jbischoff.taxibus.run.sim;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.av.drt.DrtActionCreator;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -35,7 +36,6 @@ import com.beust.jcommander.internal.Nullable;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 
-import playground.jbischoff.drt.scheduler.DrtActionCreator;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.optimizer.clustered.ClusteringTaxibusOptimizer;

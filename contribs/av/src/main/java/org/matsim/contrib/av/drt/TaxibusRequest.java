@@ -17,22 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.algorithm.passenger;
+package org.matsim.contrib.av.drt;
 
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.av.drt.tasks.DrtDriveWithPassengerTask;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
+import org.matsim.contrib.av.drt.tasks.DrtTaskWithRequests;
+import org.matsim.contrib.av.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.RequestImpl;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-
-import playground.jbischoff.drt.scheduler.tasks.DrtDriveWithPassengerTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtTaskWithRequests;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask.DrtTaskType;
 
 /**
  * @author  jbischoff

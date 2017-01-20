@@ -25,9 +25,8 @@ package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.contrib.av.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.data.Request;
-
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 
 /**
  * @author  jbischoff

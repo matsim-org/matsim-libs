@@ -17,8 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.drt.scheduler;
+package org.matsim.contrib.av.drt;
 
+import org.matsim.contrib.av.drt.tasks.DrtDropoffTask;
+import org.matsim.contrib.av.drt.tasks.DrtPickupTask;
+import org.matsim.contrib.av.drt.tasks.DrtStayTask;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
@@ -28,11 +32,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.DynAction;
-
-import playground.jbischoff.drt.scheduler.tasks.DrtDropoffTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtPickupTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtStayTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
 
 
 

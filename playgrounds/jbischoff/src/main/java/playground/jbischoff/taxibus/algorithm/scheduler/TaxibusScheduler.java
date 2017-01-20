@@ -24,6 +24,15 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.tasks.DrtDriveTask;
+import org.matsim.contrib.av.drt.tasks.DrtDriveWithPassengerTask;
+import org.matsim.contrib.av.drt.tasks.DrtDropoffTask;
+import org.matsim.contrib.av.drt.tasks.DrtPickupTask;
+import org.matsim.contrib.av.drt.tasks.DrtStayTask;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
+import org.matsim.contrib.av.drt.tasks.DrtTaskWithRequests;
+import org.matsim.contrib.av.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -32,15 +41,6 @@ import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import playground.jbischoff.drt.scheduler.tasks.DrtDriveTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtDriveWithPassengerTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtDropoffTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtPickupTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtStayTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtTaskWithRequests;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask.DrtTaskType;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 public class TaxibusScheduler {

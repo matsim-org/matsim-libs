@@ -17,27 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.drt.scheduler.tasks;
+package org.matsim.contrib.av.drt.tasks;
 
-import org.matsim.api.core.v01.network.Link;
+import java.util.HashSet;
+
+import org.matsim.contrib.av.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
 
 
-public class DrtStayTask
+public class DrtPickupTask
     extends StayTaskImpl
-    implements DrtTask
+    implements DrtTaskWithRequests
 {
-    public DrtStayTask(double beginTime, double endTime, Link link)
-    {
-        super(beginTime, endTime, link);
-    }
+    private final TaxibusRequest request;
 
+
+    public DrtPickupTask(double beginTime, double endTime, TaxibusRequest request)
+    {
+        super(beginTime, endTime, request.getFromLink());
+
+        this.request = request;
+        request.setPickupTask(this);
+    }
 
     @Override
     public DrtTaskType getDrtTaskType()
     {
-        return DrtTaskType.STAY;
+        return DrtTaskType.PICKUP;
+    }
+
+
+    public TaxibusRequest getRequest()
+    {
+        return request;
     }
 
 
@@ -46,4 +59,27 @@ public class DrtStayTask
     {
         return "[" + getDrtTaskType().name() + "]" + super.commonToString();
     }
+
+
+	@Override
+	public HashSet<TaxibusRequest> getRequests() {
+		HashSet<TaxibusRequest> t = new HashSet<>();
+		t.add(request);
+		return t;
+	}
+
+
+	@Override
+	public void removeFromRequest(TaxibusRequest request) {
+		if (request!=this.request) {
+			throw new IllegalStateException();
+		}
+		request.setPickupTask(null);
+		
+	}
+	
+	@Override
+	public void removeFromAllRequests() {
+		removeFromRequest(this.request);
+	}
 }

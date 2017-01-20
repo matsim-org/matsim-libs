@@ -5,6 +5,12 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.tasks.DrtDriveTask;
+import org.matsim.contrib.av.drt.tasks.DrtDriveWithPassengerTask;
+import org.matsim.contrib.av.drt.tasks.DrtPickupTask;
+import org.matsim.contrib.av.drt.tasks.DrtStayTask;
+import org.matsim.contrib.av.drt.tasks.DrtTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -13,14 +19,8 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
-import playground.jbischoff.drt.scheduler.tasks.DrtDriveTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtDriveWithPassengerTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtPickupTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtStayTask;
-import playground.jbischoff.drt.scheduler.tasks.DrtTask;
 import playground.jbischoff.taxibus.algorithm.optimizer.AbstractTaxibusOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateSpace;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
