@@ -1,4 +1,4 @@
-package playground.jbischoff.pt.router;
+package org.matsim.contrib.av.intermodal.router;
 
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;

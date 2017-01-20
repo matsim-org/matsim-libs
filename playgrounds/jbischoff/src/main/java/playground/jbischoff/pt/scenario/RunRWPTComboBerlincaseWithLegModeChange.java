@@ -26,6 +26,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.av.intermodal.router.VariableAccessTransit;
+import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterImplFactory;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
@@ -56,10 +60,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.name.Names;
 
-import playground.jbischoff.pt.router.VariableAccessTransit;
-import playground.jbischoff.pt.router.VariableAccessTransitRouterImplFactory;
-import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
-import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
 import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModes;
 import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModesModule;
 

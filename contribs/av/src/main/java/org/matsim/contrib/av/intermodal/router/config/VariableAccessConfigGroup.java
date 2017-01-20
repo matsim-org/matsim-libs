@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.pt.router.config;
+package org.matsim.contrib.av.intermodal.router.config;
 
 import java.net.URL;
 import java.util.Collection;

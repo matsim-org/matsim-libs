@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
+
+<vehicles>
+	<vehicle id="taxi_one" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi_2" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi3" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi4" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi5" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi6" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi7" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi8" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi9" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi0" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi00" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi01" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi02" start_link="4445" t_0="0" t_1="93600" />
+	<vehicle id="taxi03" start_link="4445" t_0="0" t_1="93600" />
+
+</vehicles>

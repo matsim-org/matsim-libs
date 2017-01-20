@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.pt.router;
+package org.matsim.contrib.av.intermodal.router;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -23,6 +23,9 @@
 package playground.jbischoff.pt.scenario;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -43,9 +46,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import com.google.inject.Binder;
 
 import playground.jbischoff.analysis.TripHistogramModule;
-import playground.jbischoff.pt.router.VariableAccessTransitRouterModule;
-import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
-import playground.jbischoff.pt.router.config.VariableAccessModeConfigGroup;
 
 /**
  * @author  jbischoff

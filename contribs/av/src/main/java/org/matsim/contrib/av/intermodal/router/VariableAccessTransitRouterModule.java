@@ -20,10 +20,11 @@
  *  * ***********************************************************************
  */
 
-package playground.jbischoff.pt.router;
+package org.matsim.contrib.av.intermodal.router;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -32,8 +33,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.name.Names;
-
-import playground.jbischoff.pt.router.config.VariableAccessConfigGroup;
 
 
 public class VariableAccessTransitRouterModule extends AbstractModule {
