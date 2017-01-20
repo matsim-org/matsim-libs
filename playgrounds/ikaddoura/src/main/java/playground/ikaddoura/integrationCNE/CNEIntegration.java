@@ -98,6 +98,7 @@ public class CNEIntegration {
 	
 	private CongestionTollingApproach congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 	private double kP = 0.;
+	private boolean computeExpectedAirPollutionCosts = false;
 
 	private PersonFilter personFilter = null;
 
@@ -393,39 +394,74 @@ public class CNEIntegration {
 				final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
 				
 				if (useTripAndAgentSpecificVTTSForRouting) {
-					final VttsCNETimeDistanceTravelDisutilityFactory factory = new VttsCNETimeDistanceTravelDisutilityFactory(
-							new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
-							emissionModule, emissionCostModule,
-							noiseContext,
-							congestionTollHandlerQBP,
-							controler.getConfig().planCalcScore()
-						);
-					factory.setSigma(sigma);
-					factory.setHotspotLinks(null);
 					
-					controler.addOverridingModule(new AbstractModule(){
-						@Override
-						public void install() {
-							this.bindCarTravelDisutilityFactory().toInstance( factory );
-						}
-					}); 
+					if (computeExpectedAirPollutionCosts) {
+						final VttsCNETimeDistanceTravelDisutilityFactory factory = new VttsCNETimeDistanceTravelDisutilityFactory(
+								new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
+								emissionModule, emissionCostModule,
+								noiseContext,
+								congestionTollHandlerQBP,
+								controler.getConfig().planCalcScore()
+							);
+						factory.setSigma(sigma);
+						factory.setHotspotLinks(null);
+						
+						controler.addOverridingModule(new AbstractModule(){
+							@Override
+							public void install() {
+								this.bindCarTravelDisutilityFactory().toInstance( factory );
+							}
+						}); 
+					} else {
+						final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
+								new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
+								noiseContext,
+								congestionTollHandlerQBP, controler.getConfig().planCalcScore()
+							);
+						factory.setSigma(sigma);
+						
+						controler.addOverridingModule(new AbstractModule(){
+							@Override
+							public void install() {
+								this.bindCarTravelDisutilityFactory().toInstance( factory );
+							}
+						});
+					}
+					
 				} else {
-					final CNETimeDistanceTravelDisutilityFactory factory = new CNETimeDistanceTravelDisutilityFactory(
-							new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-							emissionModule, emissionCostModule,
-							noiseContext,
-							congestionTollHandlerQBP,
-							controler.getConfig().planCalcScore()
-						);
-					factory.setSigma(sigma);
-					factory.setHotspotLinks(hotSpotLinks);
 					
-					controler.addOverridingModule(new AbstractModule(){
-						@Override
-						public void install() {
-							this.bindCarTravelDisutilityFactory().toInstance( factory );
-						}
-					}); 				
+					if (computeExpectedAirPollutionCosts) {
+						final CNETimeDistanceTravelDisutilityFactory factory = new CNETimeDistanceTravelDisutilityFactory(
+								new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+								emissionModule, emissionCostModule,
+								noiseContext,
+								congestionTollHandlerQBP,
+								controler.getConfig().planCalcScore()
+							);
+						factory.setSigma(sigma);
+						factory.setHotspotLinks(hotSpotLinks);
+						
+						controler.addOverridingModule(new AbstractModule(){
+							@Override
+							public void install() {
+								this.bindCarTravelDisutilityFactory().toInstance( factory );
+							}
+						});
+					} else {
+						final TollTimeDistanceTravelDisutilityFactory factory = new TollTimeDistanceTravelDisutilityFactory(
+								new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+								noiseContext,
+								congestionTollHandlerQBP, controler.getConfig().planCalcScore()
+							);
+						factory.setSigma(sigma);
+						
+						controler.addOverridingModule(new AbstractModule(){
+							@Override
+							public void install() {
+								this.bindCarTravelDisutilityFactory().toInstance( factory );
+							}
+						});
+					} 				
 				}
 				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));						
 
@@ -650,5 +686,9 @@ public class CNEIntegration {
 
 	public void setPersonFilter(PersonFilter personFilter) {
 		this.personFilter = personFilter;
+	}
+
+	public void setComputeExpectedAirPollutionCosts(boolean computeExpectedAirPollutionCosts) {
+		this.computeExpectedAirPollutionCosts = computeExpectedAirPollutionCosts;
 	}
 }

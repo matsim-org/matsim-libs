@@ -58,7 +58,6 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
-import playground.agarwalamit.utils.FileUtils;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -90,6 +89,8 @@ public class CNEMunich {
 	private static double kP;
 
 	private static boolean modeChoice = false;
+	
+	private static boolean computeExpectedAirPollutionCosts = false;
 	
 	public static void main(String[] args) throws IOException {
 				
@@ -129,8 +130,11 @@ public class CNEMunich {
 			kP = Double.parseDouble(args[7]);
 			log.info("kP: " + kP);
 
-			if(args.length > 8) modeChoice = Boolean.valueOf(args[8]);
+			modeChoice = Boolean.valueOf(args[8]);
 			log.info("Mode choice for Munich scenario is "+ modeChoice);
+			
+			computeExpectedAirPollutionCosts = Boolean.valueOf(args[9]);
+			log.info("computeExpectedAirPollutionCosts: " + computeExpectedAirPollutionCosts);
 			
 		} else {
 
@@ -274,6 +278,7 @@ public class CNEMunich {
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
 		cne.setPersonFilter(new MunichPersonFilter());
+		cne.setComputeExpectedAirPollutionCosts(computeExpectedAirPollutionCosts);
 		controler = cne.prepareControler();
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
