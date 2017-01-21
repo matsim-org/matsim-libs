@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -169,7 +170,8 @@ public class FlexibleDistanceBasedVariableAccessModule implements VariableAccess
 			}
 		}
 		if (possibleModes.size()<1){
-			throw new RuntimeException("Egress distance "+egressDistance+ " is not covered by any mode.");
+			Logger.getLogger(getClass()).warn("Egress distance "+egressDistance+ " is not covered by any available mode mode for person "+p.getId()+". Assuming walk.");
+			return (TransportMode.walk);
 		}
 		return possibleModes.get(rand.nextInt(possibleModes.size()));
 	}
