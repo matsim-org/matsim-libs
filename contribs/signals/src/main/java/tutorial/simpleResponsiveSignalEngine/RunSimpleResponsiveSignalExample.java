@@ -261,6 +261,7 @@ public class RunSimpleResponsiveSignalExample {
 		config.travelTimeCalculator().setMaxTime(3600 * 5);
 		config.qsim().setStartTime(0);
 		config.qsim().setEndTime(3600 * 5);
+        config.qsim().setUsingFastCapacityUpdate(false);
 		
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalConfigGroup.setUseSignalSystems(true);

@@ -643,6 +643,7 @@ public class DefaultPlanbasedSignalSystemControllerTest {
 			config.controler().setLastIteration(0);
 			
 			config.qsim().setStartTime(simStart_h*3600);
+	        config.qsim().setUsingFastCapacityUpdate(false);
 		
 			// able or enable signals and lanes
 			SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
