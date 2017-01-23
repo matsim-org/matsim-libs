@@ -134,15 +134,17 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 		HashSet<Set<TaxibusRequest>> dispatchSet = new HashSet<>();
 		for (Set<TaxibusRequest> dueRequests : prefilteredDueRequests){
 			HashSet<Set<TaxibusRequest>> bestSet = new HashSet<>();
+			HashSet<Request> bestSetLeftOvers = new HashSet<>();
 			double bestDispatchScore = Double.MAX_VALUE;
 		for (int i = 0; i < context.clusteringRounds;i++){
 			HashSet<Set<TaxibusRequest>> currentSet = new HashSet<>();
+			
 			List<Request> allOpenRequests = new ArrayList<>();
 			allOpenRequests.addAll(dueRequests);
 			Collections.shuffle(allOpenRequests, r);
 			int vehiclesOnDispatch = (int) Math.min(context.vehiclesAtSameTime,Math.max(1, allOpenRequests.size()/context.minOccupancy));
 //			Logger.getLogger(getClass()).info("vehicles on dispatch "+ vehiclesOnDispatch+" requests "+ allOpenRequests);
-			int occupancy = (allOpenRequests.size()/vehiclesOnDispatch);
+			int occupancy = Math.min((allOpenRequests.size()/vehiclesOnDispatch),context.capacity);
 			for (int c = 0 ; c<vehiclesOnDispatch;c++){
 				Set<TaxibusRequest> currentBus = new HashSet<>();
 				for ( int o = 0; o<occupancy;o++){
@@ -156,7 +158,12 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			
 			for (Set<TaxibusRequest> bus: currentSet){
 				if (!allOpenRequests.isEmpty()){
+					if (bus.size()<context.capacity){
 					bus.add((TaxibusRequest) allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
+					}
+					else {
+						continue;
+					}
 				}
 			}
 			//scoreSet
@@ -164,9 +171,14 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			if (score<bestDispatchScore){
 				bestDispatchScore=score;
 				bestSet=currentSet;
+				bestSetLeftOvers.clear();
+				bestSetLeftOvers.addAll(allOpenRequests);
 			}
 		}
 		dispatchSet.addAll(bestSet);
+		for (Request r: bestSetLeftOvers){
+			unplannedRequests.add((TaxibusRequest) r);
+		}
 		}
 		
 		
