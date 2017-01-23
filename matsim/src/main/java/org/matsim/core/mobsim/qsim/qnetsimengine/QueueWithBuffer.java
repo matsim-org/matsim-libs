@@ -264,7 +264,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
         double now = context.getSimTimer().getTimeOfDay() ;
         
         if( this.flowcap_accumulate.getTimeStep() < now
-                && this.flowcap_accumulate.getValue() <= 0.
+                && this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
                 && isNotOfferingVehicle() ){
 
             double accumulateFlowCap = (now - flowcap_accumulate.getTimeStep())
