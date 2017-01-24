@@ -107,19 +107,19 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static class FlowcapAccumulate {
 		private double timeStep = 0.;//Double.NEGATIVE_INFINITY ;
 		private double value = 0. ;
-		double getTimeStep(){
+		private double getTimeStep(){
 			return this.timeStep;
 		}
-		void setTimeStep(double now) {
+		private void setTimeStep(double now) {
 			this.timeStep = now;
 		}
-		double getValue() {
+		private double getValue() {
 			return value;
 		}
-		void setValue(double value ) {
+		private void setValue(double value ) {
 			this.value = value;
 		}
-		void addValue(double value1, double now) {
+		private void addValue(double value1, double now) {
 			this.value += value1;
 			this.timeStep = now ;
 		}
@@ -264,27 +264,29 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
         double now = context.getSimTimer().getTimeOfDay() ;
         
         if( this.flowcap_accumulate.getTimeStep() < now
-                && this.flowcap_accumulate.getValue() <= 0.
+                && this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
                 && isNotOfferingVehicle() ){
 
-                double flowCapSoFar = flowcap_accumulate.getValue();
-                double timeSteps = now - flowcap_accumulate.getTimeStep();
-                double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
-                double newFlowCap = flowCapSoFar + accumulateFlowCap;
-                
-                newFlowCap = Math.min(newFlowCap, flowCapacityPerTimeStep);
-                
-                flowcap_accumulate.setValue(newFlowCap);
-                flowcap_accumulate.setTimeStep( now );
+            double accumulateFlowCap = (now - flowcap_accumulate.getTimeStep())
+                    * flowCapacityPerTimeStep;
+            double newFlowCap = Math.min(flowcap_accumulate.getValue() + accumulateFlowCap,
+                    flowCapacityPerTimeStep);
+
+            flowcap_accumulate.setValue(newFlowCap);
+            flowcap_accumulate.setTimeStep(now);
         }
     }
 
     
     private void updateSlowFlowAccumulation(){
         if (this.thisTimeStepGreen
-                && this.flowcap_accumulate.getValue() <= 0.
+                && this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
                 && isNotOfferingVehicle() ){
-                flowcap_accumulate.setValue(flowcap_accumulate.getValue() + flowCapacityPerTimeStep);
+
+            double newFlowCap = Math.min(flowcap_accumulate.getValue() + flowCapacityPerTimeStep,
+                    flowCapacityPerTimeStep);
+
+            flowcap_accumulate.setValue(newFlowCap);
         }
     }
 
@@ -511,7 +513,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			        || (!this.isNotOfferingVehicle())
 			        || ( !this.holes.isEmpty() ) ;
 		} else {
-             return (this.flowcap_accumulate.getValue() <= 0.) // still accumulating, thus active
+             return (this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
 					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active
 					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
