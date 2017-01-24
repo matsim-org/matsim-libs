@@ -380,10 +380,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	final boolean doSimStep( ) {
         if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
-            this.accumulatedInflowCap += this.maxFlowFromFdiag ;
-            if ( this.accumulatedInflowCap > Math.ceil( this.maxFlowFromFdiag ) ) {
-                this.accumulatedInflowCap = Math.ceil( this.maxFlowFromFdiag ) ;
-            }
+            this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowFromFdiag, maxFlowFromFdiag);
         }
 
         if(context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue) this.processArrivalOfHoles( ) ;
@@ -555,7 +552,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			return true ;
 		}
 		
-		return this.accumulatedInflowCap >= 1. ; // can maximally be 1.
+		return this.accumulatedInflowCap > 0;
 		
 	}
 
@@ -718,7 +715,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
 		}
         if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
-			this.accumulatedInflowCap -= veh.getSizeInEquivalents() ;
+			this.accumulatedInflowCap -= veh.getFlowCapacityConsumptionInEquivalents() ;
 		}
 	}
 
