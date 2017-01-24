@@ -53,6 +53,7 @@ public class TestTravelTimesAndDistances {
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// (otherwise the numbers change; the simulation may still be correct. kai, feb'16)  
+		config.qsim().setUsingFastCapacityUpdate(false);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);

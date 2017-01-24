@@ -107,7 +107,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 	private final static String FAST_CAPACITY_UPDATE = "usingFastCapacityUpdate";
-	private boolean usingFastCapacityUpdate = false ;
+	private boolean usingFastCapacityUpdate = true ;
 	// ---
 	private static final String VEHICLES_SOURCE = "vehiclesSource";
 	public enum VehiclesSource { defaultVehicle, modeVehicleTypesFromVehiclesData, fromVehiclesData} ;
@@ -237,9 +237,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
 		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
 				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
-		map.put(FAST_CAPACITY_UPDATE, "normally, the qsim accumulates fractional flows up to one flow unit in every time step.  If this switch is set to true, "
-				+ "flows are updated only if an agent wants to enter the link or an agent is added to buffer."
-				+ "Will probably become the default eventually.") ;
+		map.put(FAST_CAPACITY_UPDATE, "If false, the qsim accumulates fractional flows up to one flow unit in every time step.  If true, "
+				+ "flows are updated only if an agent wants to enter the link or an agent is added to buffer. "
+				+ "Default is true.") ;
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
 		{	
 			StringBuilder stb = new StringBuilder() ;

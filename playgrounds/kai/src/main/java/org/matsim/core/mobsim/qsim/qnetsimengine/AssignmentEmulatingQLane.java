@@ -509,4 +509,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	@Override
+	void initBeforeSimStep() {
+	}
 }

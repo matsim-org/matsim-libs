@@ -71,13 +71,13 @@ public class EquilTest extends MatsimTestCase {
 
 		String referenceFileName ;
 		
-		if(this.isUsingFastCapacityUpdate) {
+//		if(this.isUsingFastCapacityUpdate) {
 			System.out.println(helper.getInputDirectory());
 			referenceFileName = helper.getInputDirectory() + "events_fastCapacityUpdate.xml.gz";
-		} else {
-			System.out.println(helper.getInputDirectory());
-			referenceFileName = helper.getInputDirectory() + "events.xml.gz";
-		}
+//		} else {
+//			System.out.println(helper.getInputDirectory());
+//			referenceFileName = helper.getInputDirectory() + "events.xml.gz";
+//		}
 		
 		String eventsFileName = getOutputDirectory() + "events.xml.gz";
 

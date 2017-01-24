@@ -252,7 +252,11 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
-
+		
+		@Override
+		void initBeforeSimStep() {
+		    // TODO Auto-generated method stub
+		}
 	}
 
 

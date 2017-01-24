@@ -54,6 +54,7 @@ public class InvertedNetworkRoutingSignalsFixture extends InvertedNetworkRouting
 			boolean doCreateLanes, boolean doCreateSignals) {
 		super(doCreateModes, doCreateLanes, doCreateSignals);
 		if (doCreateSignals){
+		    scenario.getConfig().qsim().setUsingFastCapacityUpdate(false);
 			ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 			createSignals();
 		}
