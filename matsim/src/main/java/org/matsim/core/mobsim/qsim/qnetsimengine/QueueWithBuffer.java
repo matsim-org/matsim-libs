@@ -268,7 +268,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
                 && isNotOfferingVehicle() ){
 
                 double flowCapSoFar = flowcap_accumulate.getValue();
-                double timeSteps = now - flowcap_accumulate.getTimeStep();
+                double timeSteps = (now - flowcap_accumulate.getTimeStep()) / context.qsimConfig.getTimeStepSize();
                 double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
                 double newFlowCap = flowCapSoFar + accumulateFlowCap;
                 
