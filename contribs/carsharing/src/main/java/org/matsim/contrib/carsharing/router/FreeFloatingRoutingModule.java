@@ -25,7 +25,7 @@ public class FreeFloatingRoutingModule implements RoutingModule {
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 						
 		final Leg leg1 = PopulationUtils.createLeg("freefloating");
-		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+		CarsharingRoute route1 = new CarsharingRoute(fromFacility.getLinkId(), toFacility.getLinkId());
 		leg1.setRoute(route1);
 		trip.add( leg1 );	
 						

@@ -177,8 +177,8 @@ public class RunCarsharingTest {
 					} else if ( "egress_walk_tw".equals(legMode) ) {
 						Assert.assertEquals( 4, nOfModeLegs ) ;
 					}
-					else if ( "access_walk_ow".equals(legMode) ) {
-						Assert.assertEquals( 0, nOfModeLegs ) ;
+					else if ( "access_walk_tw".equals(legMode) ) {
+						Assert.assertEquals( 4, nOfModeLegs ) ;
 					}
 				}
 			}

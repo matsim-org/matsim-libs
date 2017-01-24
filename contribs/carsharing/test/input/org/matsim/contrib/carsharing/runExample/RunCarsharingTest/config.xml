@@ -34,7 +34,7 @@
 			<param name="endTime" value="00:00:00"   />
 			<param name="flowCapacityFactor" value="1"   />
 			<param name="storageCapacityFactor" value="10.0"   />
-			<param name="mainMode" value="car,oneway,freefloating,twoway,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
+			<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
 		</module>
 
     <module name="Carsharing" >
