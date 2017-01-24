@@ -73,20 +73,26 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		final Double timeBinSize = 3600.;
 		final int noOfTimeBins = 30;
 
-		String networkFile = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/output_run5_muc_cne_QBPV3/output_network.xml.gz";
-		String emissinoEvenetsFile = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/output_run5_muc_cne_QBPV3/ITERS/it.1500/1500.emission.events.xml.gz";
+		String dir = "";
+		String [] cases = {"output_run0_muc_bc", "output_run0b_muc_bc","output_run1_muc_e", "output_run1b_muc_e"};
 
-		GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt, gt );
-		ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule);
+		for(String str : cases) {
+			int lastInt = 1010;
+			String emissionEventsFile = dir + str + "ITERS/it." + lastInt + "/" + lastInt + ".emission.events.xml.gz";
+			String networkFile = dir+str+"/output_network.xml.gz";
 
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(handler);
-		EmissionEventsReader reader = new EmissionEventsReader(events);
-		reader.readFile(emissinoEvenetsFile);
+			GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+			ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+			EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt, gt );
+			ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule);
 
-		handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
+			EventsManager events = EventsUtils.createEventsManager();
+			events.addHandler(handler);
+			EmissionEventsReader reader = new EmissionEventsReader(events);
+			reader.readFile(emissionEventsFile);
+
+			handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
+		}
 	}
 
 	@Override
