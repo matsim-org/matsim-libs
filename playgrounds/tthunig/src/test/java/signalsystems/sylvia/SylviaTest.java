@@ -399,6 +399,8 @@ public class SylviaTest {
 		
 		config.qsim().setStartTime(0);
 		config.qsim().setEndTime(3*3600);
+		
+		config.qsim().setUsingFastCapacityUpdate(false);
 	
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 	
