@@ -56,6 +56,11 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		this(emissionCostModule, null);
 	}
 
+	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule, final PersonFilter pf) {
+		this.emissionCostModule = emissionCostModule;
+		this.pf = pf;
+	}
+
 	public static void main (String args []) {
 
 		// munich CNE specific data
@@ -81,14 +86,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		EmissionEventsReader reader = new EmissionEventsReader(events);
 		reader.readFile(emissinoEvenetsFile);
 
-		for (Map.Entry<String, Double> e : handler.getUserGroup2TotalEmissionCosts().entrySet()) {
-			System.out.println(e.getKey()+"\t"+e.getValue());
-		}
-	}
-
-	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule, final PersonFilter pf) {
-		this.emissionCostModule = emissionCostModule;
-		this.pf = pf;
+		handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
 	}
 
 	@Override
