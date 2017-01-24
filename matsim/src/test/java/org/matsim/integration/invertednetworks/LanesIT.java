@@ -65,10 +65,10 @@ public class LanesIT {
 		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		config.plans().setInputFile("population.xml");
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output");
-		final int lastIteration = 50;
-		config.controler().setWriteEventsInterval(lastIteration);
-		config.controler().setWritePlansInterval(lastIteration);
-		config.controler().setLastIteration(lastIteration);
+//		final int lastIteration = 50;
+//		config.controler().setWriteEventsInterval(lastIteration);
+//		config.controler().setWritePlansInterval(lastIteration);
+//		config.controler().setLastIteration(lastIteration);
 		// ---
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setCreateGraphs(false);
@@ -147,10 +147,14 @@ public class LanesIT {
 //			Assert.assertTrue("", (49.0 < percent36 && percent36 < 51.0));
 			
 			// shifting the error margins so that 50 iterations are enough. kai, feb'16
-			Assert.assertTrue("", (17.4 < percent34 && percent34 < 17.5));
-			Assert.assertTrue("", (34.5 < percent35 && percent35 < 34.6));
-			Assert.assertTrue("", (47.9 < percent36 && percent36 < 48.0));
+//			Assert.assertTrue("", (17.4 < percent34 && percent34 < 17.5));
+//			Assert.assertTrue("", (34.5 < percent35 && percent35 < 34.6));
+//			Assert.assertTrue("", (47.9 < percent36 && percent36 < 48.0));
 
+			//back to 100 iterations. michalm, jan'17
+            Assert.assertTrue("", (17.2 < percent34 && percent34 < 17.3));
+            Assert.assertTrue("", (33.6 < percent35 && percent35 < 33.7));
+            Assert.assertTrue("", (49.1 < percent36 && percent36 < 49.2));
 		}
 	}
 
