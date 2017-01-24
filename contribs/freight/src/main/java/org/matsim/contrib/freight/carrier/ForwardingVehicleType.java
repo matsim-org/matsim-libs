@@ -81,5 +81,9 @@ public class ForwardingVehicleType implements VehicleType{
 	@Override
 	public void setPcuEquivalents(double pcuEquivalents) { vType.setPcuEquivalents(pcuEquivalents); }
 	
+    @Override
+    public double getFlowEfficiencyFactor() { return vType.getFlowEfficiencyFactor(); } 
 
+    @Override
+    public void setFlowEfficiencyFactor(double flowEfficiencyFactor) { vType.setFlowEfficiencyFactor(flowEfficiencyFactor); }
 }
