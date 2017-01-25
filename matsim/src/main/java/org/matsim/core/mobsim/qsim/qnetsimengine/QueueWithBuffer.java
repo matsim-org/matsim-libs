@@ -260,15 +260,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
         double now = context.getSimTimer().getTimeOfDay() ;
         
         if( this.flowcap_accumulate.getTimeStep() < now
-                && this.flowcap_accumulate.getValue() <= 0.
+                && this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
                 && isNotOfferingVehicle() ){
 
-                double flowCapSoFar = flowcap_accumulate.getValue();
                 double timeSteps = (now - flowcap_accumulate.getTimeStep()) / context.qsimConfig.getTimeStepSize();
                 double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
-                double newFlowCap = flowCapSoFar + accumulateFlowCap;
-                
-                newFlowCap = Math.min(newFlowCap, flowCapacityPerTimeStep);
+                double newFlowCap = Math.min(flowcap_accumulate.getValue() + accumulateFlowCap,
+                        flowCapacityPerTimeStep);
                 
                 flowcap_accumulate.setValue(newFlowCap);
                 flowcap_accumulate.setTimeStep( now );
@@ -278,9 +276,11 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
     
     private void updateSlowFlowAccumulation(){
         if (this.thisTimeStepGreen
-                && this.flowcap_accumulate.getValue() <= 0.
+                && this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
                 && isNotOfferingVehicle() ){
-                flowcap_accumulate.setValue(flowcap_accumulate.getValue() + flowCapacityPerTimeStep);
+            double newFlowCap = Math.min(flowcap_accumulate.getValue() + flowCapacityPerTimeStep,
+                    flowCapacityPerTimeStep);
+            flowcap_accumulate.setValue(newFlowCap);
         }
     }
 
@@ -509,7 +509,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			        || (!this.isNotOfferingVehicle()) //TODO do we need this condition???
 			        || ( !this.holes.isEmpty() ) ;
 		} else {
-             return (this.flowcap_accumulate.getValue() <= 0.) // still accumulating, thus active
+             return (this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
 					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active //TODO do we need this condition???
 					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
