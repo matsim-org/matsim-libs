@@ -286,6 +286,16 @@ public class CreateAutomatedFDTest {
 
 		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
 		String fileName = linkDynamics+"_"+trafficDynamics+".png";
+
+		{ // need to go away
+			String file2del = outDir+linkDynamics+"_"+trafficDynamics+"_maxflowFromFdiag.png";
+			new File(file2del).deleteOnExit();
+		}
+
+		{ // need to go away
+			String file2del = outDir+linkDynamics+"_"+trafficDynamics+"_none.png";
+			new File(file2del).deleteOnExit();
+		}
 		
 		String outFile ;
 		//ZZ_TODO : what if, there exists some different directory (or files with old filename) => changing method name will keep collecting the old data.
