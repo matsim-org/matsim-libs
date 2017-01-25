@@ -20,7 +20,10 @@
 
 package playground.vsp.airPollution.exposure;
 
+import java.util.Map;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
@@ -56,9 +59,9 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	private Double timeBinSize; // = 60.*60.;
 
-//	private int noOfXCells; // = 160;
-//
-//	private int noOfYCells; // = 120;
+	private int noOfXCells; // = 160;
+
+	private int noOfYCells; // = 120;
 
 // TODO remove parameter
 //	static double xMin = 4452550.25;
@@ -68,27 +71,25 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	
 	private int noOfTimeBins; // = 30;
 	
-//	private Map<Id<Link>, Integer> links2xCells;
-//	private Map<Id<Link>, Integer> links2yCells;
+	private Map<Id<Link>, Integer> links2xCells;
+	private Map<Id<Link>, Integer> links2yCells;
 	
 	private IntervalHandler intervalHandler;
 
 	private ResponsibilityGridTools responsibilityGridTools;
-	private final GridTools gridTools;
 	
 
 
 	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, GridTools gridTools) {
 		this.noOfTimeBins = rgt.getNoOfTimeBins();
 		this.timeBinSize = rgt.getTimeBinSize();
-		this.gridTools = gridTools;
-//		this.noOfXCells = rgt.getNoOfXCells();
-//		this.noOfYCells = rgt.getNoOfYCells();
+		this.noOfXCells = rgt.getNoOfXCells();
+		this.noOfYCells = rgt.getNoOfYCells();
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
 		this.responsibilityGridTools = rgt;
-//		this.links2xCells = gridTools.getLink2XBins();
-//		this.links2yCells = gridTools.getLink2YBins();
+		this.links2xCells = gridTools.getLink2XBins();
+		this.links2yCells = gridTools.getLink2YBins();
 	}
 
 	@Override
@@ -102,7 +103,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 //		responsibilityGridTools.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
 
 		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
-		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, this.gridTools);
+		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, noOfXCells, noOfYCells, links2xCells, links2yCells);
 		eventsManager.addHandler(intervalHandler);
 		
 		firstIt = controler.getConfig().controler().getFirstIteration();

@@ -54,25 +54,25 @@ public class GridTools {
 	private void mapLinks2Xcells() {
 		this.link2xbin = new HashMap<>();
 		for(Id<Link> linkId: this.links.keySet()){
-			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells));
+			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX()));
 		}
 	}
 
 	private void mapLinks2Ycells() {
 		this.link2ybin = new HashMap<Id<Link>, Integer>();
 		for(Id<Link> linkId: this.links.keySet()){
-			link2ybin.put(linkId, mapYCoordToBin(this.links.get(linkId).getCoord().getY(), noOfYCells));
+			link2ybin.put(linkId, mapYCoordToBin(this.links.get(linkId).getCoord().getY()));
 		}
 	}
 	
-	private Integer mapXCoordToBin(double xCoord, Integer noOfXCells) {
+	private Integer mapXCoordToBin(double xCoord) {
 
 		if (xCoord <= xMin  || xCoord >= xMax) return null; // xCorrd is not in area of interest
 		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXCells); // gives the relative position along the x-range
 		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
 	
-	private Integer mapYCoordToBin(double yCoord, Integer noOfYCells) {
+	private Integer mapYCoordToBin(double yCoord) {
 
 		if (yCoord <= yMin  || yCoord >= yMax) return null; // xCorrd is not in area of interest
 		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * noOfYCells); // gives the relative position along the x-range

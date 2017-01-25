@@ -64,7 +64,7 @@ public class IntervalHandlerTest {
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 //		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
 //		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-		IntervalHandler intHandler = new IntervalHandler( timeBinSize, sc.getConfig().qsim().getEndTime(), gt);
+		IntervalHandler intHandler = new IntervalHandler( timeBinSize, sc.getConfig().qsim().getEndTime(), gt.getNoOfXCells(), gt.getNoOfYCells(), gt.getLink2XBins(), gt.getLink2YBins());
 		events.addHandler(intHandler);
 
 		Controler controler = new Controler(sc);
@@ -119,7 +119,7 @@ public class IntervalHandlerTest {
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 //		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
 //		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-		IntervalHandler intHandler = new IntervalHandler( timeBinSize, sc.getConfig().qsim().getEndTime(), gt);
+		IntervalHandler intHandler = new IntervalHandler( timeBinSize, sc.getConfig().qsim().getEndTime(), gt.getNoOfXCells(), gt.getNoOfYCells(), gt.getLink2XBins(), gt.getLink2YBins());
 		events.addHandler(intHandler);
 
 		Controler controler = new Controler(sc);
