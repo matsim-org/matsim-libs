@@ -22,7 +22,7 @@
  */
 package playground.jbischoff.pt.scenario;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
@@ -42,6 +42,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.*;
 
 /**
  * @author  jbischoff
@@ -103,9 +104,12 @@ public static void main(String[] args) {
        TaxiData taxiData = new TaxiData();
        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
-       controler.addOverridingModule(new TaxiModule(taxiData));
-       double expAveragingAlpha = 0.05;//from the AV flow paper 
 
+       VehicleType avVehType = new VehicleTypeImpl(Id.create("avVehicleType", VehicleType.class));
+       avVehType.setFlowEfficiencyFactor(2);
+       controler.addOverridingModule(new TaxiModule(taxiData, avVehType));
+
+       double expAveragingAlpha = 0.05;//from the AV flow paper 
        controler.addOverridingModule(
                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
