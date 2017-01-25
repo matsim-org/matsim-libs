@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.wobscenario.analysis;
+package playground.jbischoff.wobscenario.plans;
 
 import java.util.ArrayList;
 import java.util.List;
