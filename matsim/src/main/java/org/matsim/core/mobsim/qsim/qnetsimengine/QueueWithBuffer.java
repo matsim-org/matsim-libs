@@ -107,19 +107,19 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static class FlowcapAccumulate {
 		private double timeStep = 0.;//Double.NEGATIVE_INFINITY ;
 		private double value = 0. ;
-		double getTimeStep(){
+		private double getTimeStep(){
 			return this.timeStep;
 		}
-		void setTimeStep(double now) {
+		private void setTimeStep(double now) {
 			this.timeStep = now;
 		}
-		double getValue() {
+		private double getValue() {
 			return value;
 		}
-		void setValue(double value ) {
+		private void setValue(double value ) {
 			this.value = value;
 		}
-		void addValue(double value1, double now) {
+		private void addValue(double value1, double now) {
 			this.value += value1;
 			this.timeStep = now ;
 		}
@@ -311,7 +311,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private void calculateStorageCapacity() {
 		// yyyyyy the following is not adjusted for time-dependence!! kai, apr'16
-	    // XXX it is recalculated upon NetworkChangeEvent, so what other kind of time-dependence????? 
 		
 		// first guess at storageCapacity:
 		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
@@ -506,12 +505,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 final boolean isActive() {
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
 			return (!this.vehQueue.isEmpty())
-			        || (!this.isNotOfferingVehicle()) //TODO do we need this condition???
 			        || ( !this.holes.isEmpty() ) ;
 		} else {
              return (this.flowcap_accumulate.getValue() <= 0.) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
-					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active //TODO do we need this condition???
 					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
 		}
 	}
