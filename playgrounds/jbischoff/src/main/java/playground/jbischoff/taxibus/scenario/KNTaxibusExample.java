@@ -32,8 +32,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
-import playground.jbischoff.taxibus.scenario.analysis.quick.TaxiBusTravelTimesAnalyzer;
-import playground.jbischoff.taxibus.scenario.analysis.quick.TraveltimeAndDistanceEventHandler;
 
 /**
  * @author jbischoff
@@ -69,21 +67,11 @@ public class KNTaxibusExample {
 
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-
-		final TaxiBusTravelTimesAnalyzer taxibusTravelTimesAnalyzer = new TaxiBusTravelTimesAnalyzer();
-		final TraveltimeAndDistanceEventHandler ttEventHandler = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override public void install() {
-				addEventHandlerBinding().toInstance(taxibusTravelTimesAnalyzer);
-				addEventHandlerBinding().toInstance(ttEventHandler);
-			}
-		});
 		controler.addOverridingModule( new OTFVisLiveModule() );
 		
 		controler.run();
 
-		taxibusTravelTimesAnalyzer.printOutput();
-		ttEventHandler.printOutput();
+	
 	}
 
 	

@@ -17,50 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.jbischoff.pt.scenario;
+package playground.jbischoff.wobscenario.trains;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.vehicles.VehicleWriterV1;
 
-import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModesModule;
 
 /**
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public class RunRWPTComboBVGBasecase {
-public static void main(String[] args) {
-	
-		if (args.length!=1){
-			throw new RuntimeException("Wrong arguments");
-		}
-		String configfile = args[0];
+public class CreateTransitVehicles {
+
+	public static void main(String[] args) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/braunschweig/bs-network.xml");
+		TransitScheduleReader reader = new TransitScheduleReader(scenario);
+		reader.readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/braunschweig/bs-scheduleNetwork.xml");
 		
-		Config config = ConfigUtils.loadConfig(configfile, new VariableAccessConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.global().setNumberOfThreads(8);
-		config.controler().setRunId("r02_t8");
-		config.controler().setOutputDirectory("/net/ils4/jbischoff/bvg/output/"+config.controler().getRunId()+"/");
-		config.controler().setLastIteration(0);
-		final  Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new VariableAccessTransitRouterModule());
-		controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
+		new CreateVehiclesForSchedule(scenario.getTransitSchedule(),scenario.getTransitVehicles()).run();;
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/transitvehicles.xml");
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/bs-scheduleNetwork.xml");
+	}
+	
 
-		controler.run();
-
-
-}
 }
