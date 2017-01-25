@@ -26,13 +26,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.analysis.emission.EmissionCostHandler;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 import playground.agarwalamit.utils.PersonFilter;
@@ -77,7 +81,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		final Double timeBinSize = 3600.;
 		final int noOfTimeBins = 30;
 
-		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/cne/munich/output/";
+		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/cne/munich/output_c6241ca98ab/";
 		String [] cases = {"output_run0_muc_bc", "output_run0b_muc_bc"
 				,"output_run1_muc_e", "output_run1b_muc_e"
 		};
@@ -85,7 +89,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		int [] its = {1000, 1010};
 
 		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/airPolluationExposureCosts.txt")) {
-			writer.write("case \t itNr \t \t costsInEur \n");
+			writer.write("case \t itNr \t \t costsInEur \t tollValuesEUR \n");
 
 		for(String str : cases) {
 				for(int itr : its) {
@@ -99,7 +103,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 			GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 			ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 			EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt);
-			ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule);
+			ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, new MunichPersonFilter());
 
 			EventsManager events = EventsUtils.createEventsManager();
 			events.addHandler(handler);
@@ -107,7 +111,30 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 			reader.readFile(emissionEventsFile);
 
 			handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
-					writer.write(str+"\t"+itr+"\t"+handler.getUserGroup2TotalEmissionCosts().get("AllPersons")+"\n");
+					writer.write(str+"\t"+itr+"\t"+MapUtils.doubleValueSum(handler.getUserGroup2TotalEmissionCosts())+"\t");
+
+					String eventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".events.xml.gz";
+
+					final Map<Id<Person>, Double> person2toll = new HashMap<>();
+
+					EventsManager eventsManager = EventsUtils.createEventsManager();
+					eventsManager.addHandler(new PersonMoneyEventHandler() {
+						@Override
+						public void handleEvent(PersonMoneyEvent event) {
+							if(person2toll.containsKey(event.getPersonId())) {
+								person2toll.put(event.getPersonId(), person2toll.get(event.getPersonId()) + event.getAmount());
+							} else {
+								person2toll.put(event.getPersonId(), event.getAmount());
+							}
+						}
+
+						@Override
+						public void reset(int iteration) {
+
+						}
+					});
+					new MatsimEventsReader(eventsManager).readFile(eventsFile);
+					writer.write(MapUtils.doubleValueSum(person2toll)+"\n");
 				}
 			}
 			writer.close();
