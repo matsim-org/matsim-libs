@@ -133,11 +133,11 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 * Move as many waiting cars to the link as it is possible
 	 */
 	private void moveWaitToRoad() {
-		while (qlane.isAcceptingFromWait() ) {
-			QVehicle veh = this.getWaitingList().poll();
-			if (veh == null) {
+		while (!getWaitingList().isEmpty()) {
+			if (!qlane.isAcceptingFromWait()) {
 				return;
 			}
+            QVehicle veh = this.getWaitingList().poll();
 			
 			double now = context.getSimTimer().getTimeOfDay() ;
 			context.getEventsManager().processEvent(
