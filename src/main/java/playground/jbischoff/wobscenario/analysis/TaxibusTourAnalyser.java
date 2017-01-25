@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.analysis.quick;
+package playground.jbischoff.wobscenario.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -47,7 +47,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-import playground.jbischoff.taxibus.scenario.analysis.JbUtils;
+import playground.jbischoff.utils.JbUtils;
 
 
 /**

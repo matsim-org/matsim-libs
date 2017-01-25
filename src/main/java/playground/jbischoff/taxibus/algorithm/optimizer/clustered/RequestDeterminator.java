@@ -17,25 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.analysis.quick;
+/**
+ * 
+ */
+package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
+import java.util.List;
+import java.util.Set;
 
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.dvrp.data.Request;
 
 /**
  * @author  jbischoff
  *
  */
-public class RunManyAnalyses {
+/**
+ *
+ */
+public interface RequestDeterminator {
 
-	public static void main(String[] args) {
+	boolean isRequestServable(Request request);
 
-		String[] runs = {"vw079	"};
-		for (int i = 0; i<runs.length;i++){
-			String[] file = {"D:/runs-svn/vw_rufbus/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
-//			String[] file = {"D:/runs-svn/vw_rufbus/delievery/20160121/runs/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
-			TravelTimeStatistics.main(file);
-		}
-		
-	}
-
+	/**
+	 * @param requests
+	 * @return
+	 */
+	List<Set<TaxibusRequest>> prefilterRequests(Set<TaxibusRequest> requests);
+	
 }

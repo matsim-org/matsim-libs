@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.analysis.quick;
+package playground.jbischoff.wobscenario.analysis;
 
 import java.io.File;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ public class TravelTimeStatistics   {
 
 	public static void main(String[] args) {
 
-		String run = "run108";
+		String run = "run110";
 //		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String inputFile = folder + run + ".output_events.xml.gz";

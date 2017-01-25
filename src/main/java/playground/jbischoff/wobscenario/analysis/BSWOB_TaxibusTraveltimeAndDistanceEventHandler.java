@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.analysis.quick;
+package playground.jbischoff.wobscenario.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

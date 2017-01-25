@@ -25,8 +25,8 @@
 			<url>http://oss.jfrog.org/libs-snapshot</url>
 		</repository>
 		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
 
@@ -34,8 +34,8 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
- 			<version>0.9.0-SNAPSHOT</version>
-		
+			<version>0.9.0-SNAPSHOT</version>
+
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -43,34 +43,41 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-		
-	<!-- the following dependencies show how to use MATSim contributions. 
-	For a list of available contribs, see http://matsim.org/extensions -->
-		
+
+		<!-- the following dependencies show how to use MATSim contributions. For 
+			a list of available contribs, see http://matsim.org/extensions -->
+
 
 		<dependency>
- 			<groupId>org.matsim.contrib</groupId>
- 			<artifactId>otfvis</artifactId>
- 			<version>0.9.0-SNAPSHOT</version>
- 		</dependency>
- 		
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>otfvis</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
+
 		<!-- An example on how to add a contribution using the 0.9.0-SNAPSHOT -->
 		<dependency>
- 			<groupId>org.matsim.contrib</groupId>
- 			<artifactId>av</artifactId>
- 			<version>0.9.0-SNAPSHOT</version>
- 		</dependency>
- 	
-<!-- 		<dependency>
-			<groupId>com.github.msmobility</groupId>
-			<artifactId>silo</artifactId>
-			<version>master-SNAPSHOT</version>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>av</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
- -->
+
+		<!-- <dependency> <groupId>com.github.msmobility</groupId> <artifactId>silo</artifactId> 
+			<version>master-SNAPSHOT</version> </dependency> -->
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.graphhopper</groupId>
+			<artifactId>jsprit-core</artifactId>
+			<version>1.7-RC1</version>
 		</dependency>
 	</dependencies>
 
@@ -97,12 +104,12 @@
 				</configuration>
 			</plugin>
 			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-eclipse-plugin</artifactId>
-			  <configuration>
-			    <downloadSources>true</downloadSources>
-			    <downloadJavadocs>true</downloadJavadocs>
-			  </configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
