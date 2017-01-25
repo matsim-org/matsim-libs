@@ -18,6 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.emission.experienced;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.analysis.emission.EmissionCostHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -73,13 +77,24 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		final Double timeBinSize = 3600.;
 		final int noOfTimeBins = 30;
 
-		String dir = "";
-		String [] cases = {"output_run0_muc_bc", "output_run0b_muc_bc","output_run1_muc_e", "output_run1b_muc_e"};
+		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/cne/munich/output/";
+		String [] cases = {"output_run0_muc_bc", "output_run0b_muc_bc"
+				,"output_run1_muc_e", "output_run1b_muc_e"
+		};
+
+		int [] its = {1000, 1010};
+
+		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/airPolluationExposureCosts.txt")) {
+			writer.write("case \t itNr \t \t costsInEur \n");
 
 		for(String str : cases) {
-			int lastInt = 1010;
-			String emissionEventsFile = dir + str + "ITERS/it." + lastInt + "/" + lastInt + ".emission.events.xml.gz";
+				for(int itr : its) {
+					String emissionEventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".emission.events.xml.gz";
 			String networkFile = dir+str+"/output_network.xml.gz";
+
+					if(! new File(emissionEventsFile).exists()) {
+						continue;
+					}
 
 			GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 			ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
@@ -92,6 +107,12 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 			reader.readFile(emissionEventsFile);
 
 			handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
+					writer.write(str+"\t"+itr+"\t"+handler.getUserGroup2TotalEmissionCosts().get("AllPersons")+"\n");
+				}
+			}
+			writer.close();
+		} catch(IOException e) {
+			throw new RuntimeException("Data is not written.");
 		}
 	}
 
