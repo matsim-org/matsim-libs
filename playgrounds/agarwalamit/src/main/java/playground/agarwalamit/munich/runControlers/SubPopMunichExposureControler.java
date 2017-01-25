@@ -152,7 +152,7 @@ public class SubPopMunichExposureControler {
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		

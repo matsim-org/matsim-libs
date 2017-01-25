@@ -254,7 +254,7 @@ public class TestExposurePricing {
 //		links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
 		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0,	false, rgt, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0,	false, rgt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {

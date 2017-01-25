@@ -83,7 +83,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 
 			GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 			ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-			EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt, gt );
+			EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt);
 			ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule);
 
 			EventsManager events = EventsUtils.createEventsManager();

@@ -225,7 +225,7 @@ public class CNEIntegration {
 			emissionModule.createLookupTables();
 			emissionModule.createEmissionHandler();
 			
-			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools, this.gridTools);
+			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools);
 		}
 						
 		// ########################## Pricing setup ##########################

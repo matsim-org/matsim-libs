@@ -95,7 +95,7 @@ public class RunExposureInternalizationMunich {
 		
 		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor),	
-				Boolean.parseBoolean(considerCO2Costs), rgt, gt);
+				Boolean.parseBoolean(considerCO2Costs), rgt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
