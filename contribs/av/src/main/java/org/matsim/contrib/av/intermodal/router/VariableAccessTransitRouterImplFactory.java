@@ -48,6 +48,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 /**
+ * yyyyyy cld u pls add a short description what this is meant to do?  kai, jan'17
+ * 
  * @author jbischoff
  */
 @Singleton
