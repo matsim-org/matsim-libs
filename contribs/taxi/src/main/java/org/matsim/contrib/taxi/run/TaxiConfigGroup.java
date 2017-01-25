@@ -101,8 +101,9 @@ public class TaxiConfigGroup
                         + " starts the next day at the link where it stopped operating the day before");
         map.put(TAXIS_FILE, "An XML file specifying the taxi fleet."
                 + " The file format according to dvrp_vehicles_v1.dtd");
-        map.put(TIME_PROFILES, "If true, time profiles of vehicle statuses (i.e. current task type)"
-                + " and the number of unplanned requests");
+        map.put(TIME_PROFILES, "If true, writes time profiles of vehicle statuses (i.e. current task type)"
+                + " and the number of unplanned requests are written to a text file"
+                + " (taxi_status_time_profiles) and saved as plots");
         map.put(DETAILED_STATS,
                 "If true, detailed hourly taxi stats are dumped after each" + " iteration.");
         map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED,
