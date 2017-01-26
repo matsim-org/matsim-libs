@@ -47,7 +47,9 @@ public final class DefaultSignalModelFactory implements SignalModelFactory {
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (DefaultPlanbasedSignalSystemController.IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Created SignalController: " + DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			return new DefaultPlanbasedSignalSystemController(signalSystem);
+			DefaultPlanbasedSignalSystemController signalControl = new DefaultPlanbasedSignalSystemController();
+			signalControl.setSignalSystem(signalSystem);
+			return signalControl;
 		}
 		//TODO improve error message and consider creation by class name
 		throw new IllegalArgumentException("Controller " + controllerIdentifier + " not known.");

@@ -41,4 +41,6 @@ public interface SignalController {
 
 	public void simulationInitialized(double simStartTimeSeconds);
 	
+	public void setSignalSystem(SignalSystem signalSystem);
+	
 }

@@ -47,10 +47,6 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 	private SignalPlan activePlan = null;
 	private double nextActivePlanCheckTime;
 	
-	public DefaultPlanbasedSignalSystemController(SignalSystem system) {
-		super(system) ;
-	}
-	
 	@Override
 	public void updateState(double timeSeconds) {
 		if (nextActivePlanCheckTime <= timeSeconds){
