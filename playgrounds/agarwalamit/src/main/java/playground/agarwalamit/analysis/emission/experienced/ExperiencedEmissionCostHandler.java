@@ -59,7 +59,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 	private final Map<Id<Vehicle>, Double> vehicleId2ColdEmissCosts = new HashMap<>();
 	private final Map<Id<Vehicle>, Double> vehicleId2WarmEmissCosts = new HashMap<>();
 
-	private final PersonFilter pf  ; // TODO : what if no person filter is available..?
+	private final PersonFilter pf  ;
 
 	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule) {
 		this(emissionCostModule, null);

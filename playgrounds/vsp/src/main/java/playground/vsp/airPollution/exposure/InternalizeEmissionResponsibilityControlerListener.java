@@ -20,6 +20,7 @@
 
 package playground.vsp.airPollution.exposure;
 
+import java.io.File;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,7 +37,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
-
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author benjamin
@@ -45,43 +46,28 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 public class InternalizeEmissionResponsibilityControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionResponsibilityControlerListener.class);
 
-	MatsimServices controler;
-	EmissionModule emissionModule;
-	EmissionResponsibilityCostModule emissionCostModule;
-	String emissionEventOutputFile;
-	EventWriterXML emissionEventWriter;
-	EmissionResponsibilityInternalizationHandler emissionInternalizationHandler;
-	
-	int iteration;
-	int firstIt;
-	int lastIt;
+	private final Map<Id<Link>, Integer> links2xCells;
+	private final Map<Id<Link>, Integer> links2yCells;
+	private final Double timeBinSize;
 
+	private final EmissionModule emissionModule;
+	private final EmissionResponsibilityCostModule emissionCostModule;
+	private final ResponsibilityGridTools responsibilityGridTools;
 
-	private Double timeBinSize; // = 60.*60.;
-
-	private int noOfXCells; // = 160;
-
-	private int noOfYCells; // = 120;
-
-// TODO remove parameter
-//	static double xMin = 4452550.25;
-//	static double xMax = 4479483.33;
-//	static double yMin = 5324955.00;
-//	static double yMax = 5345696.81;
-	
-	private int noOfTimeBins; // = 30;
-	
-	private Map<Id<Link>, Integer> links2xCells;
-	private Map<Id<Link>, Integer> links2yCells;
-	
+	private MatsimServices controler;
+	private EmissionResponsibilityInternalizationHandler emissionInternalizationHandler;
 	private IntervalHandler intervalHandler;
 
-	private ResponsibilityGridTools responsibilityGridTools;
-	
+	private String emissionEventOutputFile;
+	private EventWriterXML emissionEventWriter;
 
+	private int firstIt;
+	private int lastIt;
+
+	private final int noOfXCells;
+	private final int noOfYCells;
 
 	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, GridTools gridTools) {
-		this.noOfTimeBins = rgt.getNoOfTimeBins();
 		this.timeBinSize = rgt.getTimeBinSize();
 		this.noOfXCells = rgt.getNoOfXCells();
 		this.noOfYCells = rgt.getNoOfYCells();
@@ -100,8 +86,6 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());			
 		
-//		responsibilityGridTools.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-
 		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
 		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, noOfXCells, noOfYCells, links2xCells, links2yCells);
 		eventsManager.addHandler(intervalHandler);
@@ -112,7 +96,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		iteration = event.getIteration();
+		int iteration = event.getIteration();
 
 		logger.info("creating new emission internalization handler...");
 		emissionInternalizationHandler = new EmissionResponsibilityInternalizationHandler(controler, emissionCostModule);
@@ -126,12 +110,11 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 			logger.info("adding emission events writer to emission events stream...");
 			emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 		}
-		
-
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		int iteration = event.getIteration();
 
 		logger.info("removing emission internalization module from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
@@ -152,6 +135,21 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+
+		boolean isWritingOutputEvents = event.getServices().getConfig().vspExperimental().isWritingOutputEvents();
+		if( isWritingOutputEvents) {
+			dumpOutputEvents();
+		}
 	}
 
+	private void dumpOutputEvents() {
+		try {
+			File toFile = new File(	controler.getControlerIO().getOutputFilename("output_emission.events.xml.gz"));
+			File fromFile = new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controler().getLastIteration(), "emission.events.xml.gz"));
+			IOUtils.copyFile(fromFile, toFile);
+		} catch ( Exception ee ) {
+			Logger.getLogger(this.getClass()).error("writing output emissions events did not work; probably parameters were such that no events were "
+					+ "generated in the final iteration") ;
+		}
+	}
 }
