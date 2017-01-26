@@ -43,7 +43,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.agarwalamit.analysis.emission.EmissionAnalysisControlerListener;
+import playground.agarwalamit.analysis.emission.AirPollutionExposureAnalysisControlerListener;
 import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionCostHandler;
 import playground.agarwalamit.utils.PersonFilter;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
@@ -650,7 +650,7 @@ public class CNEIntegration {
 			if (!airPollutionPricing) {
 				controler.addControlerListener(new EmissionControlerListener());
 			}
-			controler.addControlerListener(new EmissionAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule, personFilter) ));
+			controler.addControlerListener(new AirPollutionExposureAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule, personFilter) ));
 		}
 		
 		return controler;

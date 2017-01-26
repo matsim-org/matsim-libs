@@ -23,26 +23,56 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
+import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionCostHandler;
 import playground.agarwalamit.utils.MapUtils;
+import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.IntervalHandler;
+import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 /**
  * Created by amit on 01/12/2016.
  */
 
-public class EmissionAnalysisControlerListener implements  ShutdownListener {
+public class AirPollutionExposureAnalysisControlerListener implements  ShutdownListener {
 
-    private static final Logger LOG = Logger.getLogger(EmissionAnalysisControlerListener.class);
+    private static final Logger LOG = Logger.getLogger(AirPollutionExposureAnalysisControlerListener.class);
 
-    public EmissionAnalysisControlerListener(final EmissionCostHandler emissionCostHandler) {
+    @Inject
+    private OutputDirectoryHierarchy controlerIO;
+
+    @Inject
+    private ControlerConfigGroup controlerConfigGroup;
+
+    @Inject
+    private QSimConfigGroup qSimConfigGroup;
+
+    @Inject
+    private GridTools gridTools;
+
+    @Inject
+    private ResponsibilityGridTools responsibilityGridTools;
+
+    private final Double timeBinSize ;
+
+    public AirPollutionExposureAnalysisControlerListener(final ExperiencedEmissionCostHandler emissionCostHandler) {
+        this(emissionCostHandler,3600.);
+    }
+
+    public AirPollutionExposureAnalysisControlerListener(final ExperiencedEmissionCostHandler emissionCostHandler, final double timeBinSize) {
         this.emissionCostHandler = emissionCostHandler;
+        this.timeBinSize = timeBinSize;
     }
 
     private final EmissionCostHandler emissionCostHandler;
@@ -50,24 +80,36 @@ public class EmissionAnalysisControlerListener implements  ShutdownListener {
     @Override
     public void notifyShutdown(ShutdownEvent event) {
 
-        ControlerConfigGroup controlerConfigGroup = event.getServices().getConfig().controler();
-        String iterationDir = controlerConfigGroup.getOutputDirectory()+"/ITERS/it."+controlerConfigGroup.getLastIteration()+"/";
+        int lastIt = controlerConfigGroup.getLastIteration();
+        String eventsFile = controlerIO.getIterationFilename(lastIt, "events.xml.gz");
 
-        String emissionEventsFile = iterationDir+controlerConfigGroup.getLastIteration()+".emission.events.xml.gz";
+        IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, qSimConfigGroup.getEndTime(), gridTools);
+        {
+            intervalHandler.reset(0);
+            EventsManager eventsManager = EventsUtils.createEventsManager();
+            eventsManager.addHandler(intervalHandler);
+            new MatsimEventsReader(eventsManager).readFile(eventsFile);
+        }
+
+        responsibilityGridTools.resetAndcaluculateRelativeDurationFactors(intervalHandler.getDuration());
+
+        String emissionEventsFile = controlerIO.getIterationFilename(lastIt, "emission.events.xml.gz");
         if (! new File(emissionEventsFile).exists()) {
             LOG.error("The emission events file for last iteration does not exists.");
             return;
         }
 
         this.emissionCostHandler.reset(0); // resetting everything.
-        EventsManager events = EventsUtils.createEventsManager();
-        events.addHandler(this.emissionCostHandler);
-        EmissionEventsReader reader = new EmissionEventsReader(events);
-        reader.readFile(emissionEventsFile);
+
+        {
+            EventsManager events = EventsUtils.createEventsManager();
+            events.addHandler(this.emissionCostHandler);
+            EmissionEventsReader reader = new EmissionEventsReader(events);
+            reader.readFile(emissionEventsFile);
+        }
 
         Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionCosts();
-
-        try (BufferedWriter writer = IOUtils.getBufferedWriter(iterationDir+controlerConfigGroup.getLastIteration()+".emissionsCostsMoneyUnits.txt")) {
+        try (BufferedWriter writer = IOUtils.getBufferedWriter(controlerIO.getIterationFilename(lastIt,"emissionsCostsMoneyUnits.txt")) ) {
             if(this.emissionCostHandler.isFiltering()) {
                 writer.write("userGroup \t costsInMoneyUnits \n");
                 for ( String ug : userGrp2cost.keySet()) {

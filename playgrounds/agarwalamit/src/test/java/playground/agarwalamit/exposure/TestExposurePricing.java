@@ -53,6 +53,8 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import playground.agarwalamit.analysis.emission.AirPollutionExposureAnalysisControlerListener;
+import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionCostHandler;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -173,11 +175,13 @@ public class TestExposurePricing {
 
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
+				addControlerListenerBinding().toInstance(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+				addControlerListenerBinding().toInstance(new AirPollutionExposureAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule), timeBinSize));
 			}
 		});
-
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 
 		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyEventHandler);
@@ -238,11 +242,13 @@ public class TestExposurePricing {
 
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
+				addControlerListenerBinding().toInstance(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+				addControlerListenerBinding().toInstance(new AirPollutionExposureAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule), timeBinSize));
 			}
 		});
-
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 
 		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyEventHandler);
