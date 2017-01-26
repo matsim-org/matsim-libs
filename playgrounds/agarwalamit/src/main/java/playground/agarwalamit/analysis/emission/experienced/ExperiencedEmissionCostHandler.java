@@ -114,7 +114,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 					}
 
 					GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-					IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, noOfXCells, noOfYCells, gt.getLink2XBins(), gt.getLink2YBins());
+					IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gt);
 
 					final Map<Id<Person>, Double> person2toll = new HashMap<>();
 					EventsManager eventsManager = EventsUtils.createEventsManager();

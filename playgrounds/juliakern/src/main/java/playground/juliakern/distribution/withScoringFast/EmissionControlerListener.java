@@ -155,7 +155,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		timeBinSize = simulationEndTime/noOfTimeBins;
 		
 		logger.info("timebinsize----------------" + timeBinSize);
-		intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXCells, noOfYCells, links2xcells, links2ycells);
+		intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, gt);
 		
 		eventsManager.addHandler(intervalHandler);
 		intervalHandler.reset(0);

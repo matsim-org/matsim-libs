@@ -21,10 +21,7 @@
 package playground.vsp.airPollution.exposure;
 
 import java.io.File;
-import java.util.Map;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
@@ -46,10 +43,8 @@ import org.matsim.core.utils.io.IOUtils;
 public class InternalizeEmissionResponsibilityControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionResponsibilityControlerListener.class);
 
-	private final Map<Id<Link>, Integer> links2xCells;
-	private final Map<Id<Link>, Integer> links2yCells;
 	private final Double timeBinSize;
-
+	private final GridTools gridTools;
 	private final EmissionModule emissionModule;
 	private final EmissionResponsibilityCostModule emissionCostModule;
 	private final ResponsibilityGridTools responsibilityGridTools;
@@ -74,8 +69,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
 		this.responsibilityGridTools = rgt;
-		this.links2xCells = gridTools.getLink2XBins();
-		this.links2yCells = gridTools.getLink2YBins();
+		this.gridTools = gridTools;
 	}
 
 	@Override
@@ -87,7 +81,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());			
 		
 		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
-		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, noOfXCells, noOfYCells, links2xCells, links2yCells);
+		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gridTools);
 		eventsManager.addHandler(intervalHandler);
 		
 		firstIt = controler.getConfig().controler().getFirstIteration();
