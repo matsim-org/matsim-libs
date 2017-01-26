@@ -1,0 +1,19 @@
+Case;VehCat;Year;TrafficScenario;Component;RoadCat;TrafficSit;Gradient;IDSubsegment;Subsegment;Technology;SizeClasse;EmConcept;KM;%OfSubsegment;V;V_0%;V_100%;EFA;EFA_0%;EFA_100%;V_weighted;V_weighted_0%;V_weighted_100%;EFA_weighted;EFA_weighted_0%;EFA_weighted_100%
+2005HotDetailed[3.1];pass. car;2010;;FC;;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;77.12;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;FC;;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;145.9;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;HC;;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;0.08;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;HC;;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;0.25;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;CO;;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;1.07;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;CO;;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;1.32;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;NO2;;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;0.01;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;NO2;;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;0.02;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;NOx;;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;0.36;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;NOx;;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;0.47;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;CO2(total);;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;241.78;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;CO2(total);;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;457.41;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;PM;;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;0.0050300001;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;PM;;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;0.00339;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;NMHC;;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;0.07;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;NMHC;;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;0.22;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;SO2;;RUR/Trunk/100/Freeflow;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;97.8;;;0.001233964;;;;;;;;
+2005HotDetailed[3.1];pass. car;2010;;SO2;;RUR/Trunk/100/St+Go;0%;111313;PC petrol >=2L PreEuro 3WCat 1987-90;petrol (4S);>=2L;PC-P-Euro-0;50000;1;15.97;;;0.0023344469;;;;;;;;

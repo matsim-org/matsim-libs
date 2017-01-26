@@ -23,11 +23,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
 public class ResponsibilityGridTools {
+
+	private static final Logger LOGGER = org.apache.log4j.Logger.getLogger(ResponsibilityGridTools.class);
 
 	private final Double dist0factor = 0.216;
 	private final Double dist1factor = 0.132;
@@ -67,7 +70,7 @@ public class ResponsibilityGridTools {
 	public Double getFactorForLink(Id<Link> linkId, double time) {
 
 		if (! isDurationsStored) {
-			throw new RuntimeException("It looks, you have not stored activity durations. Store them using "+ IntervalHandler.class.getSimpleName()
+			LOGGER.warn("Make sure, you have stored activity durations by using "+ IntervalHandler.class.getSimpleName()
 					+" along with normal events and pass it to the "+ResponsibilityGridTools.class.getSimpleName());
 		}
 
