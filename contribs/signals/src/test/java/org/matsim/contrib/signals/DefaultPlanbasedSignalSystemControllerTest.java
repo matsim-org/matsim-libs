@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -505,8 +504,7 @@ public class DefaultPlanbasedSignalSystemControllerTest {
 			
 			Controler controler = new Controler(scenario);
 			// add missing modules
-			SignalsModule signalsModule = new SignalsModule();
-			controler.addOverridingModule(signalsModule);
+			controler.addOverridingModule(new SignalsModule());
 			
 			// add signal analysis tool
 			final SignalEventAnalyzer signalAnalyzer = new SignalEventAnalyzer();
