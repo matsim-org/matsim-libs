@@ -505,10 +505,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 final boolean isActive() {
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
 			return (!this.vehQueue.isEmpty())
+                    || (!this.isNotOfferingVehicle() && context.qsimConfig.isUseLanes()) // if lanes, the buffer needs to be active in order to move vehicles over an internal node
 			        || ( !this.holes.isEmpty() ) ;
 		} else {
              return (this.flowcap_accumulate.getValue() <= 0.) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
+                    || (!this.isNotOfferingVehicle() && context.qsimConfig.isUseLanes()) // if lanes, the buffer needs to be active in order to move vehicles over an internal node
 					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
 		}
 	}
