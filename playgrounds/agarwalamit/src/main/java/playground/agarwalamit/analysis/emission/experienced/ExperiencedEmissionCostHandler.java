@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -61,10 +62,12 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 
 	private final PersonFilter pf  ;
 
+	@Inject
 	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule) {
 		this(emissionCostModule, null);
 	}
 
+//	@Inject
 	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule, final PersonFilter pf) {
 		this.emissionCostModule = emissionCostModule;
 		this.pf = pf;
@@ -90,7 +93,8 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		final int noOfTimeBins = 30;
 
 		String dir = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/";
-		String [] cases = {"output_run0_muc_bc","output_run0b_muc_bc"
+		String [] cases = {
+				"output_run0_muc_bc","output_run0b_muc_bc"
 				, "output_run1_muc_c_QBPV3","output_run1b_muc_c_QBPV3"
 				,"output_run2_muc_c_QBPV9","output_run2b_muc_c_QBPV9"
 				,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
@@ -113,11 +117,11 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 					String configFile = dir+str+"/output_config.xml.gz";
 					String eventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".events.xml.gz";
 
-					double simulationEndtime = LoadMyScenarios.getSimulationEndTime(configFile);
-
-					if(! new File(emissionEventsFile).exists() || ! new File(networkFile).exists() || ! new File(configFile).exists() ) {
+					if(! new File(emissionEventsFile).exists() || ! new File(networkFile).exists() || ! new File(configFile).exists() || ! new File(eventsFile).exists() ) {
 						continue;
 					}
+
+					double simulationEndtime = LoadMyScenarios.getSimulationEndTime(configFile);
 
 					GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 					IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gt);

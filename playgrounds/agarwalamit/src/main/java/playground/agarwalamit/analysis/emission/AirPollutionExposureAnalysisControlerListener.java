@@ -64,18 +64,19 @@ public class AirPollutionExposureAnalysisControlerListener implements  ShutdownL
     @Inject
     private ResponsibilityGridTools responsibilityGridTools;
 
+    @Inject
+    private ExperiencedEmissionCostHandler emissionCostHandler;
+
     private final Double timeBinSize ;
 
-    public AirPollutionExposureAnalysisControlerListener(final ExperiencedEmissionCostHandler emissionCostHandler) {
-        this(emissionCostHandler,3600.);
+
+    public AirPollutionExposureAnalysisControlerListener() {
+        this(3600.);
     }
 
-    public AirPollutionExposureAnalysisControlerListener(final ExperiencedEmissionCostHandler emissionCostHandler, final double timeBinSize) {
-        this.emissionCostHandler = emissionCostHandler;
+    public AirPollutionExposureAnalysisControlerListener(final double timeBinSize) {
         this.timeBinSize = timeBinSize;
     }
-
-    private final EmissionCostHandler emissionCostHandler;
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {

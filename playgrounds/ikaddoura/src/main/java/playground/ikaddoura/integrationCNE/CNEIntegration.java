@@ -681,8 +681,9 @@ public class CNEIntegration {
 				public void install() {
 					bind(GridTools.class).toInstance(gridTools);
 					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
-					addControlerListenerBinding().toInstance(new AirPollutionExposureAnalysisControlerListener(new ExperiencedEmissionCostHandler(
-							finalEmissionCostModule1, personFilter) ));
+					addEventHandlerBinding().to(ExperiencedEmissionCostHandler.class).asEagerSingleton();
+					bind(PersonFilter.class).toInstance(personFilter);
+					addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 				}
 			});
 		}
