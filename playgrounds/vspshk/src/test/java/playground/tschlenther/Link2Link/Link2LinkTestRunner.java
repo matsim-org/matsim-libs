@@ -126,6 +126,7 @@ public class Link2LinkTestRunner {
 
 	private Map<Integer, int[]> runAndGetResults (RunSettings runSettings, TSAnalyzeLink2Link handler) {
 		Config config = defineConfig(runSettings);
+		config.qsim().setUsingFastCapacityUpdate(false);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		Controler controler = new Controler(scenario);
