@@ -26,7 +26,6 @@ import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
-import org.matsim.contrib.signals.controler.SignalControlerListener;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -47,7 +46,10 @@ import playground.dgrether.signalsystems.sylvia.model.SylviaSignalModelFactory;
  * and without signals.
  * 
  * @author tthunig
+ * 
+ * @deprecated use CombinedSignalsModule (so far in playground tthunig) instead if possible (dependencies). theresa, jan'17
  */
+@Deprecated
 public class SylviaSignalsModule extends AbstractModule {
 
 	private boolean alwaysSameMobsimSeed = false;

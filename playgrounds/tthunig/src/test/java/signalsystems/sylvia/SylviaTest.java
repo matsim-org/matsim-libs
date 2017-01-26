@@ -75,6 +75,7 @@ import analysis.signals.TtSignalAnalysisTool;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
+import signals.CombinedSignalsModule;
 
 /**
  * Test sylvia logic at an intersection with four incoming links and one signal each.
@@ -180,7 +181,8 @@ public class SylviaTest {
 
 		Controler controler = new Controler(scenario);
 		// add missing modules
-		SylviaSignalsModule signalsModule = new SylviaSignalsModule();
+//		SylviaSignalsModule signalsModule = new SylviaSignalsModule();
+		CombinedSignalsModule signalsModule = new CombinedSignalsModule();
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
 		// this is only needed because the default is to small (1.5)
 		sylviaConfig.setSignalGroupMaxGreenScale(100);

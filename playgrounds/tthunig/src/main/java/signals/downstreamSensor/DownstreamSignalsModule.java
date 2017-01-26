@@ -36,14 +36,18 @@ import com.google.inject.Provides;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
+import signals.CombinedSignalsModule;
 
 /**
  * Add this module to the controler if you want to simulate downstream signals, i.e.
  * signals that switch to red if the downstream link is full
  * 
+ * @deprecated use {@link CombinedSignalsModule} instead
+ * 
  * @author tthunig
  *
  */
+@Deprecated
 public class DownstreamSignalsModule extends AbstractModule{
 
 	@Override

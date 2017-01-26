@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
+import signals.CombinedSignalsModule;
 import signals.laemmer.model.LaemmerSignalsModule;
 
 
@@ -44,7 +45,8 @@ public class SingleCrossingLaemmerMain {
 		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast, false);
 		
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new LaemmerSignalsModule());
+//		controler.addOverridingModule(new LaemmerSignalsModule());
+		controler.addOverridingModule(new CombinedSignalsModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 

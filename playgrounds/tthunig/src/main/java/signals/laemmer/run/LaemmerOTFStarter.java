@@ -34,6 +34,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.utils.DgOTFVisUtils;
+import signals.CombinedSignalsModule;
 import signals.laemmer.model.LaemmerSignalsModule;
 
 /**
@@ -60,7 +61,8 @@ public class LaemmerOTFStarter {
 				install(new ScenarioByInstanceModule(scenario));
 				
 				// signal specific module
-				install(new LaemmerSignalsModule());
+//				install(new LaemmerSignalsModule());
+				install(new CombinedSignalsModule());
 			}
 		});
 

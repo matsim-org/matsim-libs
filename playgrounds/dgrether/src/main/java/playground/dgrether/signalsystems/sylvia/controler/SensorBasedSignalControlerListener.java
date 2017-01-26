@@ -35,18 +35,22 @@ import playground.dgrether.signalsystems.LinkSensorManager;
 
 
 /**
+ * also works without sensor-based signals, i.e. plan-based signals and also without signals at all.
+ * 
  * @author dgrether, tthunig
  */
 public class SensorBasedSignalControlerListener implements SignalControlerListener, IterationStartsListener,
 		ShutdownListener {
 
-	@Inject SignalSystemsManager signalManager;
-	@Inject LinkSensorManager sensorManager;
+	@Inject(optional = true) SignalSystemsManager signalManager = null;
+	@Inject(optional = true) LinkSensorManager sensorManager = null;
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		this.signalManager.resetModel(event.getIteration());
-		this.sensorManager.reset(event.getIteration());
+		if (this.signalManager != null) 
+			this.signalManager.resetModel(event.getIteration());
+		if (this.sensorManager != null)
+			this.sensorManager.reset(event.getIteration());
 	}
 
 	@Override

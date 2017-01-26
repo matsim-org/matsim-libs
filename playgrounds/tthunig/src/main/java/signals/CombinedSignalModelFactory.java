@@ -32,18 +32,26 @@ import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
+import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
+import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalPlan;
 import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import signals.downstreamSensor.DownstreamSignalController;
+import signals.laemmer.model.LaemmerSignalController;
 
 /**
+ * combined signal model factory that works for all provided signal controller, so far: planbased, sylvia, downstream, laemmer, gershenson
+ * 
  * @author tthunig
  *
  */
@@ -53,22 +61,17 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 
-	private Map<String, Object> signalControllerBuilder = new HashMap<>();
+	private Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
 
-	@Inject(optional = true) LinkSensorManager sensorManager = null;
-	@Inject(optional = true) DgSylviaConfig sylviaConfig = null;
-	@Inject	Scenario scenario;
-
-	public CombinedSignalModelFactory() {
-		// prepare signal controller builder
-		if (sensorManager != null) {
-			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-			if (sylviaConfig != null) {
-				signalControllerBuilder.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.Builder(sylviaConfig, sensorManager, signalsData));
-			}
-			Network network = scenario.getNetwork();
-			signalControllerBuilder.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.Builder(sensorManager, signalsData, network));
-		}
+	@Inject
+	public CombinedSignalModelFactory(Scenario scenario, DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager) {
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		Network network = scenario.getNetwork();
+		// prepare signal controller provider
+		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, signalsData));
+		signalControlProvider.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network));
+		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(sensorManager, signalsData, network));
+		signalControlProvider.put(DgRoederGershensonSignalController.IDENTIFIER, new DgRoederGershensonSignalController.SignalControlProvider(sensorManager, scenario));
 	}
 
 	@Override
@@ -78,17 +81,22 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (signalControllerBuilder.containsKey(controllerIdentifier)) {
+		if (signalControlProvider.containsKey(controllerIdentifier)) {
 			log.info("Creating " + controllerIdentifier);
-			// TODO
-//			return signalControllerBuilder.get(controllerIdentifier).build(signalSystem);
+			SignalController signalControl = signalControlProvider.get(controllerIdentifier).get();
+			signalControl.setSignalSystem(signalSystem);
+			return signalControl;
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}
 
 	@Override
 	public SignalPlan createSignalPlan(SignalPlanData planData) {
-		return this.delegate.createSignalPlan(planData);
+		DatabasedSignalPlan plan = (DatabasedSignalPlan) this.delegate.createSignalPlan(planData);
+		if (planData.getId().toString().startsWith(DgSylviaPreprocessData.SYLVIA_PREFIX)) {
+			return new DgSylviaSignalPlan(plan);
+		}
+		return plan;
 	}
 
 }

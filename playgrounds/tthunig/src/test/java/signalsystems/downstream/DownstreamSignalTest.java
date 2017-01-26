@@ -70,8 +70,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import analysis.signals.TtSignalAnalysisTool;
+import signals.CombinedSignalsModule;
 import signals.downstreamSensor.DownstreamSignalController;
-import signals.downstreamSensor.DownstreamSignalsModule;
 
 /**
  * @author tthunig
@@ -159,7 +159,6 @@ public class DownstreamSignalTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// add missing scenario elements
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
 		switch (scenarioType) {
@@ -184,7 +183,7 @@ public class DownstreamSignalTest {
 
 		Controler controler = new Controler(scenario);
 		// add signal module
-		controler.addOverridingModule(new DownstreamSignalsModule());
+		controler.addOverridingModule(new CombinedSignalsModule());
 
 		// add signal analysis tool
 		TtSignalAnalysisTool signalAnalyzer = new TtSignalAnalysisTool();

@@ -66,6 +66,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import analysis.signals.TtSignalAnalysisTool;
 import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController;
 import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalsModule;
+import signals.CombinedSignalsModule;
 
 /**
  * Test gershenson logic at an intersection with four incoming links and one signal each. No lanes are used.
@@ -172,7 +173,8 @@ public class GershensonTest {
 		createScenarioElements(scenario, noPersons);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DgRoederGershensonSignalsModule());
+		controler.addOverridingModule(new CombinedSignalsModule());
+//		controler.addOverridingModule(new DgRoederGershensonSignalsModule());
 
 		// add signal analysis tool
 		TtSignalAnalysisTool signalAnalyzer = new TtSignalAnalysisTool();

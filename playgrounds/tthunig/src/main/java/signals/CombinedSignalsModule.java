@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package playground.dgrether.signalsystems.roedergershenson;
+package signals;
 
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
@@ -30,46 +30,70 @@ import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Provides;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
 
 /**
- * @author tthunig
+ * Add this module if you want to simulate fixed-time signals, sylvia, laemmer, gershenson or the downstream signals or different control schemes together at different intersections (i.e. systems) in
+ * your scenario. It also works without signals.
  * 
- * @deprecated use CombinedSignalsModule (so far in playground tthunig) instead if possible (dependencies). theresa, jan'17
+ * @author tthunig
  *
  */
-@Deprecated
-public class DgRoederGershensonSignalsModule extends AbstractModule{
-
+public class CombinedSignalsModule extends AbstractModule {
+	
+	private boolean alwaysSameMobsimSeed = false;
+	private DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+	
 	@Override
 	public void install() {
+		if (alwaysSameMobsimSeed) {
+			MobsimInitializedListener randomSeedResetter = new MobsimInitializedListener() {
+				@Override
+				public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+					// make sure it is same random seed every time
+					MatsimRandom.reset(0);
+				}
+			};
+			this.addMobsimListenerBinding().toInstance(randomSeedResetter);
+		}
+	
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-			// signal specific bindings
-			bind(SignalModelFactory.class).to(DgRoederGershensonSignalModelFactory.class);
-			
-			// bindings for sensor based signals
-			bind(LinkSensorManager.class);
+			bind(DgSylviaConfig.class).toInstance(sylviaConfig);
+			bind(SignalModelFactory.class).to(CombinedSignalModelFactory.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
-            
+			bind(LinkSensorManager.class);
+			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
-            addMobsimListenerBinding().to(QSimSignalEngine.class);
-            
-            // bind tool to write information about signal states for via
+			addMobsimListenerBinding().to(QSimSignalEngine.class);
+
+			// bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
 			/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
-        }
+		}
+	}
+
+	@Provides
+	SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, SignalSystemsModelBuilder modelBuilder) {
+		SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
+		signalSystemsManager.resetModel(replanningContext.getIteration());
+		return signalSystemsManager;
 	}
 	
-	@Provides SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, SignalSystemsModelBuilder modelBuilder) {	
-		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		signalManager.resetModel(replanningContext.getIteration());		
-		return signalManager;
-    }
-	
+	public void setAlwaysSameMobsimSeed(boolean alwaysSameMobsimSeed) {
+		this.alwaysSameMobsimSeed = alwaysSameMobsimSeed;
+	}
+
+	public void setSylviaConfig(DgSylviaConfig sylviaConfig) {
+		this.sylviaConfig = sylviaConfig;
+	}
 }

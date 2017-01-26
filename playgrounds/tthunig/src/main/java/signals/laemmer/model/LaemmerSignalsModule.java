@@ -36,13 +36,16 @@ import com.google.inject.Provides;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
+import signals.CombinedSignalsModule;
 
 /**
  * Add this module to the controler if you want to control signals by the LaemmerSignalController
  * 
  * @author tthunig
  *
+ * @deprecated use {@link CombinedSignalsModule} instead. theresa, jan'17
  */
+@Deprecated
 public class LaemmerSignalsModule extends AbstractModule{
 
 	@Override
