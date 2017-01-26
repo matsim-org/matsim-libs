@@ -59,13 +59,8 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	private int firstIt;
 	private int lastIt;
 
-	private final int noOfXCells;
-	private final int noOfYCells;
-
 	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, GridTools gridTools) {
 		this.timeBinSize = rgt.getTimeBinSize();
-		this.noOfXCells = rgt.getNoOfXCells();
-		this.noOfYCells = rgt.getNoOfYCells();
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
 		this.responsibilityGridTools = rgt;
