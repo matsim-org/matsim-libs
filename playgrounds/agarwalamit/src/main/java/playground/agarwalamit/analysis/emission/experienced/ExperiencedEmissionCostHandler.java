@@ -42,6 +42,7 @@ import playground.agarwalamit.utils.MapUtils;
 import playground.agarwalamit.utils.PersonFilter;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.GridTools;
+import playground.vsp.airPollution.exposure.IntervalHandler;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
 /**
@@ -78,15 +79,23 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		final double xMax = 4479550.;
 		final double yMin = 5324955.;
 		final double yMax = 5345755.;
+//		final Integer noOfXCells = 160;
+//		final Integer noOfYCells = 120;
+//		final double xMin = 4452550.25;
+//		final double xMax = 4479483.33;
+//		final double yMin = 5324955.00;
+//		final double yMax = 5345696.81;
+
 		final Double timeBinSize = 3600.;
 		final int noOfTimeBins = 30;
 
-		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/cne/munich/output_c6241ca98ab/";
-		String [] cases = {"output_run0_muc_bc", "output_run0b_muc_bc"
-				,"output_run1_muc_e", "output_run1b_muc_e"
+		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/munich/";
+		String [] cases = {"output"
+				, "output_woCO2"
+//				,"output_run1_muc_e", "output_run1b_muc_e"
 		};
 
-		int [] its = {1000, 1010};
+		int [] its = {1000, 1005};
 
 		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/airPolluationExposureCosts.txt")) {
 			writer.write("case \t itNr \t \t costsInEur \t tollValuesEUR \n");
@@ -94,30 +103,22 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		for(String str : cases) {
 				for(int itr : its) {
 					String emissionEventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".emission.events.xml.gz";
-			String networkFile = dir+str+"/output_network.xml.gz";
+					String networkFile = dir+str+"/output_network.xml.gz";
+					String configFile = dir+str+"/output_config.xml.gz";
+					String eventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".events.xml.gz";
 
-					if(! new File(emissionEventsFile).exists()) {
+					double simulationEndtime = LoadMyScenarios.getSimulationEndTime(configFile);
+
+					if(! new File(emissionEventsFile).exists() || ! new File(networkFile).exists()) {
 						continue;
 					}
 
-			GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-			ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-			EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt);
-			ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, new MunichPersonFilter());
-
-			EventsManager events = EventsUtils.createEventsManager();
-			events.addHandler(handler);
-			EmissionEventsReader reader = new EmissionEventsReader(events);
-			reader.readFile(emissionEventsFile);
-
-			handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
-					writer.write(str+"\t"+itr+"\t"+MapUtils.doubleValueSum(handler.getUserGroup2TotalEmissionCosts())+"\t");
-
-					String eventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".events.xml.gz";
+					GridTools gt = new GridTools(LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+					IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, noOfXCells, noOfYCells, gt.getLink2XBins(), gt.getLink2YBins());
 
 					final Map<Id<Person>, Double> person2toll = new HashMap<>();
-
 					EventsManager eventsManager = EventsUtils.createEventsManager();
+					eventsManager.addHandler(intervalHandler);
 					eventsManager.addHandler(new PersonMoneyEventHandler() {
 						@Override
 						public void handleEvent(PersonMoneyEvent event) {
@@ -127,13 +128,27 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 								person2toll.put(event.getPersonId(), event.getAmount());
 							}
 						}
-
 						@Override
 						public void reset(int iteration) {
 
 						}
 					});
 					new MatsimEventsReader(eventsManager).readFile(eventsFile);
+
+					ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+					rgt.resetAndcaluculateRelativeDurationFactors(intervalHandler.getDuration());
+
+					EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, str.endsWith("woCO2") ? false : true, rgt);
+					ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, new MunichPersonFilter());
+
+					EventsManager events = EventsUtils.createEventsManager();
+					events.addHandler(handler);
+					EmissionEventsReader reader = new EmissionEventsReader(events);
+					reader.readFile(emissionEventsFile);
+
+					handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
+					writer.write(str+"\t"+itr+"\t"+MapUtils.doubleValueSum(handler.getUserGroup2TotalEmissionCosts())+"\t");
+
 					writer.write(MapUtils.doubleValueSum(person2toll)+"\n");
 				}
 			}
