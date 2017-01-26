@@ -32,7 +32,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import com.google.inject.Inject;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController.Builder;
+import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController.SignalControlProvider;
 
 
 /**
@@ -45,11 +45,11 @@ public final class DgRoederGershensonSignalModelFactory implements SignalModelFa
 	
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 	
-	private Builder builder;
+	private SignalControlProvider provider;
 	
 	@Inject 
 	public DgRoederGershensonSignalModelFactory(Scenario scenario, LinkSensorManager sensorManager) {
-		builder = new DgRoederGershensonSignalController.Builder(sensorManager, scenario);
+		provider = new DgRoederGershensonSignalController.SignalControlProvider(sensorManager, scenario);
 	}
 	
 	@Override
@@ -61,7 +61,9 @@ public final class DgRoederGershensonSignalModelFactory implements SignalModelFa
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (DgRoederGershensonSignalController.IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Created controller: " + DgRoederGershensonSignalController.IDENTIFIER);
-			return builder.build(signalSystem);
+			SignalController signalControl = this.provider.get();
+			signalControl.setSignalSystem(signalSystem);
+			return signalControl;
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}

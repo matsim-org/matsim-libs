@@ -34,7 +34,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import com.google.inject.Inject;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
-import signals.laemmer.model.LaemmerSignalController.Builder;
+import signals.laemmer.model.LaemmerSignalController.SignalControlProvider;
 
 
 /**
@@ -48,13 +48,13 @@ public final class LaemmerSignalModelFactory implements SignalModelFactory {
 	
 	private DefaultSignalModelFactory delegate = new DefaultSignalModelFactory();
 
-	private Builder builder;
+	private SignalControlProvider provider;
 	
 	@Inject
 	public LaemmerSignalModelFactory(LinkSensorManager sensorManager, Scenario scenario) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
-		this.builder = new LaemmerSignalController.Builder(sensorManager, signalsData, network);
+		this.provider = new LaemmerSignalController.SignalControlProvider(sensorManager, signalsData, network);
 	}
 
 	@Override
@@ -66,7 +66,9 @@ public final class LaemmerSignalModelFactory implements SignalModelFactory {
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (LaemmerSignalController.IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Creating " + LaemmerSignalController.IDENTIFIER);
-			return builder.build(signalSystem) ;
+			SignalController signalControl = this.provider.get();
+			signalControl.setSignalSystem(signalSystem);
+			return signalControl;
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}

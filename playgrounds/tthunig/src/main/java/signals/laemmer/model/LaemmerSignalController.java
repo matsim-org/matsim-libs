@@ -27,8 +27,9 @@ import org.matsim.contrib.signals.model.AbstractSignalController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.lanes.data.Lane;
+
+import com.google.inject.Provider;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
 
@@ -44,19 +45,20 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 	
 	public static final String IDENTIFIER = "LaemmerSignalControl";
 	
-	public final static class Builder {
+	public final static class SignalControlProvider implements Provider<SignalController> {
 		private final LinkSensorManager sensorManager;
 		private final SignalsData signalsData;
 		private final Network network;
 
-		public Builder(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+		public SignalControlProvider(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
 			this.sensorManager = sensorManager;
 			this.signalsData = signalsData;
 			this.network = network;
 		}
-
-		public LaemmerSignalController build(SignalSystem signalSystem) {
-			return new LaemmerSignalController(sensorManager, signalsData, network, signalSystem);
+		
+		@Override
+		public SignalController get() {
+			return new LaemmerSignalController(sensorManager, signalsData, network);
 		}
 	}	
 	
@@ -65,8 +67,7 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 	private Network network;
 
 	
-	private LaemmerSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network, SignalSystem system){
-		super(system) ;
+	private LaemmerSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network){
 		this.sensorManager = sensorManager;
 		this.signalsData = signalsData;
 		this.network = network;

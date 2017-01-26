@@ -41,6 +41,8 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
+import com.google.inject.Provider;
+
 import playground.dgrether.signalsystems.LinkSensorManager;
 
 /**
@@ -53,19 +55,20 @@ public class DownstreamSignalController implements SignalController {
 
 	public final static String IDENTIFIER = "DownstreamSignalControl";
 
-	public final static class Builder {
+	public final static class SignalControlProvider implements Provider<SignalController> {
 		private final LinkSensorManager sensorManager;
 		private final SignalsData signalsData;
 		private final Network network;
 
-		public Builder(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+		public SignalControlProvider(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
 			this.sensorManager = sensorManager;
 			this.signalsData = signalsData;
 			this.network = network;
 		}
 
-		public DownstreamSignalController build(SignalSystem signalSystem) {
-			return new DownstreamSignalController(sensorManager, signalsData, network, signalSystem);
+		@Override
+		public DownstreamSignalController get() {
+			return new DownstreamSignalController(sensorManager, signalsData, network);
 		}
 	}
 
@@ -73,7 +76,7 @@ public class DownstreamSignalController implements SignalController {
 	private SignalsData signalsData;
 	private Network network;
 
-	private final SignalSystem system;
+	private SignalSystem system;
 	private Node systemNode;
 	private Map<Id<Signal>, Set<Id<Link>>> signal2DownstreamLinkMap = new HashMap<>();
 	private SignalPlan signalPlan;
@@ -82,11 +85,10 @@ public class DownstreamSignalController implements SignalController {
 	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
 
-	private DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network, SignalSystem signalSystem) {
+	private DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
 		this.sensorManager = sensorManager;
 		this.signalsData = signalsData;
 		this.network = network;
-		this.system = signalSystem;
 		init();
 	}
 
@@ -216,6 +218,11 @@ public class DownstreamSignalController implements SignalController {
 				this.signal2DownstreamLinkMap.get(sd.getId()).addAll(systemNode.getOutLinks().keySet());
 			}
 		}
+	}
+
+	@Override
+	public void setSignalSystem(SignalSystem signalSystem) {
+		this.system = signalSystem;
 	}
 
 }

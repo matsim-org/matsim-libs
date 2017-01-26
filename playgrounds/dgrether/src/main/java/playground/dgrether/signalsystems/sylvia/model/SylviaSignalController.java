@@ -37,9 +37,10 @@ import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
-import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.Lane;
+
+import com.google.inject.Provider;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
@@ -59,17 +60,20 @@ public class SylviaSignalController extends AbstractSignalController implements 
 
 	private static int sylviaPlanDumpCount = 0;
 	
-	public final static class Builder {
+	public final static class SignalControlProvider implements Provider<SignalController>{
 		private DgSylviaConfig sylviaConfig;
 		private LinkSensorManager sensorManager;
 		private SignalsData signalsData;
-		public Builder(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData) {
+		
+		public SignalControlProvider(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData) {
 			this.sylviaConfig = sylviaConfig;
 			this.sensorManager = sensorManager;
 			this.signalsData = signalsData;
 		}
-		public SylviaSignalController build(SignalSystem signalSystem){
-			return new SylviaSignalController(sylviaConfig, sensorManager, signalsData, signalSystem);
+		
+		@Override
+		public SylviaSignalController get() {
+			return new SylviaSignalController(sylviaConfig, sensorManager, signalsData);
 		}
 	}
 	
@@ -88,8 +92,7 @@ public class SylviaSignalController extends AbstractSignalController implements 
 	private LinkSensorManager sensorManager;
 	private SignalsData signalsData;
 
-	private SylviaSignalController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData, SignalSystem signalSystem) {
-		super(signalSystem) ;
+	private SylviaSignalController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData) {
 		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
 		this.signalsData = signalsData;
@@ -447,7 +450,5 @@ public class SylviaSignalController extends AbstractSignalController implements 
 				}
 			}
 		}
-	}
-	
-	
+	}	
 }

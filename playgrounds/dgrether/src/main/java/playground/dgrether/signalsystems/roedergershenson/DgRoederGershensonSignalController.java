@@ -40,6 +40,8 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.LanesToLinkAssignment;
 
+import com.google.inject.Provider;
+
 import playground.dgrether.signalsystems.LinkSensorManager;
 
 
@@ -51,17 +53,18 @@ public class DgRoederGershensonSignalController implements SignalController {
 	
 	public final static String IDENTIFIER = "gretherRoederGershensonSignalControl";
 	
-	public final static class Builder {
+	public final static class SignalControlProvider implements Provider<SignalController> {
 		private final LinkSensorManager sensorManager;
 		private final Scenario scenario;
 
-		public Builder(LinkSensorManager sensorManager, Scenario scenario) {
+		public SignalControlProvider(LinkSensorManager sensorManager, Scenario scenario) {
 			this.sensorManager = sensorManager;
 			this.scenario = scenario;
 		}
 
-		public DgRoederGershensonSignalController build(SignalSystem signalSystem) {
-			return new DgRoederGershensonSignalController(scenario, sensorManager, signalSystem);
+		@Override
+		public SignalController get() {
+			return new DgRoederGershensonSignalController(scenario, sensorManager);
 		}
 	}
 	
@@ -90,7 +93,7 @@ public class DgRoederGershensonSignalController implements SignalController {
 
 	private static final Logger log = Logger.getLogger(DgRoederGershensonSignalController.class);
 	
-	private final SignalSystem system;
+	private SignalSystem system;
 
 	protected int tGreenMin =  0; // time in seconds
 	protected int minCarsTime = 0; //
@@ -117,13 +120,9 @@ public class DgRoederGershensonSignalController implements SignalController {
 
 	private Map<Id<SignalGroup>, SignalGroupMetadata> signalGroupIdMetadataMap;
 	
-	private DgRoederGershensonSignalController(Scenario scenario, LinkSensorManager sensorManager, SignalSystem system ) {
+	private DgRoederGershensonSignalController(Scenario scenario, LinkSensorManager sensorManager) {
 		this.scenario = scenario;
 		this.sensorManager = sensorManager;
-		this.system = system ;
-		
-		initSignalGroupMetadata();
-		registerAndInitializeSensorManager();
 	}
 
 	private void registerAndInitializeSensorManager() {
@@ -346,6 +345,16 @@ public class DgRoederGershensonSignalController implements SignalController {
 	@Override
 	public void reset(Integer iterationNumber) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void setSignalSystem(SignalSystem signalSystem) {
+		this.system = signalSystem ;		
+		
+		/* start initialization process. 
+		 * can not be started earlier in the constructor because the signal system ID is needed. theresa, jan'17 */
+		initSignalGroupMetadata();
+		registerAndInitializeSensorManager();
 	}
 
 }

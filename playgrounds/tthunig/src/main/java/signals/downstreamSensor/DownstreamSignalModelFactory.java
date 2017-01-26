@@ -29,7 +29,6 @@ import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -37,7 +36,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import com.google.inject.Inject;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
-import signals.downstreamSensor.DownstreamSignalController.Builder;
+import signals.downstreamSensor.DownstreamSignalController.SignalControlProvider;
 
 /**
  * @author tthunig
@@ -49,13 +48,13 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 	
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 	
-	private Builder builder;
+	private SignalControlProvider provider;
 
 	@Inject 
 	public DownstreamSignalModelFactory(LinkSensorManager sensorManager, Scenario scenario) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
-		this.builder = new DownstreamSignalController.Builder(sensorManager, signalsData, network) ;
+		this.provider = new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network) ;
 	}
 	
 	@Override
@@ -67,7 +66,9 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (DownstreamSignalController.IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Creating " + DownstreamSignalController.IDENTIFIER);
-			return builder.build(signalSystem) ;
+			SignalController signalControl = this.provider.get();
+			signalControl.setSignalSystem(signalSystem);
+			return signalControl;
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier, signalSystem);
 	}
