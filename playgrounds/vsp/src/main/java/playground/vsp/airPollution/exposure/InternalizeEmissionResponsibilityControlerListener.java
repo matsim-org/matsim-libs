@@ -21,6 +21,7 @@
 package playground.vsp.airPollution.exposure;
 
 import java.io.File;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,12 +45,15 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionResponsibilityControlerListener.class);
 
 	private final Double timeBinSize;
+
 	private final GridTools gridTools;
 	private final EmissionModule emissionModule;
 	private final EmissionResponsibilityCostModule emissionCostModule;
 	private final ResponsibilityGridTools responsibilityGridTools;
 
+	@Inject
 	private MatsimServices controler;
+
 	private EmissionResponsibilityInternalizationHandler emissionInternalizationHandler;
 	private IntervalHandler intervalHandler;
 
@@ -59,7 +63,8 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	private int firstIt;
 	private int lastIt;
 
-	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, GridTools gridTools) {
+	@Inject
+	private InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, GridTools gridTools) {
 		this.timeBinSize = rgt.getTimeBinSize();
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
@@ -69,8 +74,6 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getServices();
-
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());			

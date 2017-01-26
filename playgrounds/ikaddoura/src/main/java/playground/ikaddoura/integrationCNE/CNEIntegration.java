@@ -385,7 +385,20 @@ public class CNEIntegration {
 					}
 				});
 			}
-			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
+
+			final EmissionModule finalEmissionModule = emissionModule;
+			final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(GridTools.class).toInstance(gridTools);
+					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
+					bind(EmissionModule.class).toInstance(finalEmissionModule);
+					bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
+					bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+				}
+			});
+//			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
 
 		} else if (congestionPricing && noisePricing && airPollutionPricing) {
 			// congestion + noise + airPollution pricing
@@ -563,7 +576,19 @@ public class CNEIntegration {
 			}
 				
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
+			final EmissionModule finalEmissionModule = emissionModule;
+			final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(GridTools.class).toInstance(gridTools);
+					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
+					bind(EmissionModule.class).toInstance(finalEmissionModule);
+					bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
+					bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+				}
+			});
+//			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
 			
 		} else if (congestionPricing && noisePricing && airPollutionPricing == false) {
 			// congestion + noise pricing

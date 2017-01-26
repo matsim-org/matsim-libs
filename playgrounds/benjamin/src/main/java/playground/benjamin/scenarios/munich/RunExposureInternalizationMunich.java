@@ -101,10 +101,15 @@ public class RunExposureInternalizationMunich {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.addOverridingModule(new OTFVisFileWriterModule());

@@ -160,11 +160,16 @@ public class SubPopMunichExposureControler {
 			
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
 		
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		
 		// additional things to get the networkRoute for ride mode. For this, ride mode must be assigned in networkModes of the config file.

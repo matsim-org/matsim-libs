@@ -174,11 +174,16 @@ public class TestExposurePricing {
 
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
 
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 
 		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyEventHandler);
@@ -239,11 +244,16 @@ public class TestExposurePricing {
 
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
 
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 
 		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyEventHandler);

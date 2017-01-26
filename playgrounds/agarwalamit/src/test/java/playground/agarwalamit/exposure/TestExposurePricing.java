@@ -177,8 +177,11 @@ public class TestExposurePricing {
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
 				bindCarTravelDisutilityFactory().toInstance(emfac);
-				addControlerListenerBinding().toInstance(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//				addControlerListenerBinding().toInstance(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 				addControlerListenerBinding().toInstance(new AirPollutionExposureAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule), timeBinSize));
 			}
 		});
@@ -244,8 +247,12 @@ public class TestExposurePricing {
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+
 				bindCarTravelDisutilityFactory().toInstance(emfac);
-				addControlerListenerBinding().toInstance(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//				addControlerListenerBinding().toInstance(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 				addControlerListenerBinding().toInstance(new AirPollutionExposureAnalysisControlerListener(new ExperiencedEmissionCostHandler(emissionCostModule), timeBinSize));
 			}
 		});
