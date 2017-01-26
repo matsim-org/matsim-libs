@@ -20,31 +20,22 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.LaneEnterEvent;
-import org.matsim.core.api.experimental.events.LaneLeaveEvent;
+import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.config.groups.QSimConfigGroup.*;
+import org.matsim.core.gbl.*;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
-import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.Lane;
@@ -107,19 +98,19 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static class FlowcapAccumulate {
 		private double timeStep = 0.;//Double.NEGATIVE_INFINITY ;
 		private double value = 0. ;
-		double getTimeStep(){
+		private double getTimeStep(){
 			return this.timeStep;
 		}
-		void setTimeStep(double now) {
+		private void setTimeStep(double now) {
 			this.timeStep = now;
 		}
-		double getValue() {
+		private double getValue() {
 			return value;
 		}
-		void setValue(double value ) {
+		private void setValue(double value ) {
 			this.value = value;
 		}
-		void addValue(double value1, double now) {
+		private void addValue(double value1, double now) {
 			this.value += value1;
 			this.timeStep = now ;
 		}
@@ -244,10 +235,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	 final boolean isAcceptingFromWait() {
-		return this.hasFlowCapacityLeftAndBufferSpace() ;
+		return this.hasFlowCapacityLeft() ;
 	}
 
-	private boolean hasFlowCapacityLeftAndBufferSpace() {
+	private boolean hasFlowCapacityLeft() {
         if(context.qsimConfig.isUsingFastCapacityUpdate() ){
             updateFastFlowAccumulation();
         }
@@ -311,7 +302,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private void calculateStorageCapacity() {
 		// yyyyyy the following is not adjusted for time-dependence!! kai, apr'16
-	    // XXX it is recalculated upon NetworkChangeEvent, so what other kind of time-dependence????? 
 		
 		// first guess at storageCapacity:
 		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
@@ -374,7 +364,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	
 	private double getBufferStorageCapacity()
 	{
-	    return flowCapacityPerTimeStep;//this assumes that vehicles have the flowEfficiency of 1.0 
+	    return flowCapacityPerTimeStep;//this assumes that vehicles have the flowEfficiencyFactor of 1.0 
 	}
 
 	@Override
@@ -437,7 +427,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			}
 			
 			/* is there still room left in the buffer? */
-			if (!hasFlowCapacityLeftAndBufferSpace() ) {
+			if (!hasFlowCapacityLeft() ) {
 				return;
 			}
 
@@ -506,12 +496,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 final boolean isActive() {
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
 			return (!this.vehQueue.isEmpty())
-			        || (!this.isNotOfferingVehicle()) //TODO do we need this condition???
+                    || (!this.isNotOfferingVehicle() && context.qsimConfig.isUseLanes()) // if lanes, the buffer needs to be active in order to move vehicles over an internal node
 			        || ( !this.holes.isEmpty() ) ;
 		} else {
              return (this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
-					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active //TODO do we need this condition???
+                    || (!this.isNotOfferingVehicle() && context.qsimConfig.isUseLanes()) // if lanes, the buffer needs to be active in order to move vehicles over an internal node
 					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
 		}
 	}
