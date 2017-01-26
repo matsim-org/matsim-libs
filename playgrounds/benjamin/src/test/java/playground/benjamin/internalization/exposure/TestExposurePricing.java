@@ -164,9 +164,6 @@ public class TestExposurePricing {
 		emissionModule.createEmissionHandler();
 
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
@@ -227,9 +224,6 @@ public class TestExposurePricing {
 		emissionModule.createEmissionHandler();
 
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);

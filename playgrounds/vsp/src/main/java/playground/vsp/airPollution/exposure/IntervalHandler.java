@@ -16,14 +16,14 @@ import org.matsim.api.core.v01.population.Person;
 
 public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
 
-	SortedMap<Double, Double[][]> duration = new TreeMap<Double, Double[][]>();
-	Map<Id<Link>,Integer> link2xbins;
-	Map<Id<Link>,Integer> link2ybins;
-	private Double timeBinSize;
-	private Double simulationEndTime;
-	private int noOfxCells;
-	private int noOfyCells;
-	private Set<Id<Person>> recognisedPersons;
+	private final SortedMap<Double, Double[][]> duration = new TreeMap<>();
+	private final Map<Id<Link>,Integer> link2xbins;
+	private final Map<Id<Link>,Integer> link2ybins;
+	private final  Double timeBinSize;
+	private final  Double simulationEndTime;
+	private final  int noOfxCells;
+	private final  int noOfyCells;
+	private final  Set<Id<Person>> recognisedPersons = new HashSet<>();
 
 
 	public IntervalHandler(Double timeBinSize, Double simulationEndTime, GridTools gridTools){
@@ -33,13 +33,12 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		this.noOfyCells = gridTools.getNoOfYCells();
 		this.link2xbins = gridTools.getLink2XBins();
 		this.link2ybins = gridTools.getLink2YBins();
-		recognisedPersons = new HashSet<Id<Person>>();
 		this.reset(0);
 	}
 
 	@Override
 	public void reset(int iteration) {
-		recognisedPersons = new HashSet<Id<Person>>();
+		recognisedPersons.clear();
 		for(int i=0; i<simulationEndTime/timeBinSize+1; i++){
 			duration.put(i*timeBinSize, new Double[noOfxCells][noOfyCells]);
 			for(int j=0; j< noOfxCells; j++){
@@ -49,7 +48,6 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 			}
 		}
 	}
-
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
@@ -71,7 +69,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 				double updatedDuration = prevDuration - timeBinSize + timeWithinCurrentInterval;
 				duration.get(currentTimeBin)[xCell][yCell] = updatedDuration;
 				
-//				if (prevDuration>timeBinSize) { // this looks completely illogical because prevDuration is sum of actDurations in that time bin for all persons amit Oct'15
+//				if (prevDuration>timeBinSize) { // this does not looks correct because prevDuration is sum of actDurations in that time bin for all persons amit Oct'15
 //					prevDuration = prevDuration - timeWithinCurrentInterval;
 //					duration.get(currentTimeBin)[xCell][yCell] = prevDuration;
 //				}
@@ -138,5 +136,4 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 	public SortedMap<Double, Double[][]> getDuration() {
 		return duration;
 	}
-
 }
