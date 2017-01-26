@@ -21,7 +21,6 @@ package playground.jbischoff.taxibus.run.sim;
 
 import java.util.Collection;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.drt.DrtActionCreator;
 import org.matsim.contrib.dvrp.data.VrpData;
@@ -33,6 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.router.util.*;
 
+import com.beust.jcommander.internal.Nullable;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 
