@@ -89,15 +89,21 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		final Double timeBinSize = 3600.;
 		final int noOfTimeBins = 30;
 
-		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/munich/";
-		String [] cases = {"output"
-				, "output_woCO2"
-//				,"output_run1_muc_e", "output_run1b_muc_e"
+		String dir = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/";
+		String [] cases = {"output_run0_muc_bc","output_run0b_muc_bc"
+				, "output_run1_muc_c_QBPV3","output_run1b_muc_c_QBPV3"
+				,"output_run2_muc_c_QBPV9","output_run2b_muc_c_QBPV9"
+				,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
+				,"output_run4_muc_cne_DecongestionPID","output_run4b_muc_cne_DecongestionPID"
+				,"output_run5_muc_cne_QBPV3","output_run5b_muc_cne_QBPV3"
+				,"output_run6_muc_cne_QBPV9","output_run6b_muc_cne_QBPV9"
+				,"output_run7_muc_n","output_run7b_muc_n"
+				,"output_run8_muc_e","output_run8b_muc_e"
 		};
 
-		int [] its = {1000, 1005};
+		int [] its = {1000, 1500};
 
-		try(BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/airPolluationExposureCosts.txt")) {
+		try(BufferedWriter writer = IOUtils.getBufferedWriter("/Users/amit/Documents/cluster/ils4/agarwal/munich/airPolluationExposureCosts_cne.txt")) {
 			writer.write("case \t itNr \t \t costsInEur \t tollValuesEUR \n");
 
 		for(String str : cases) {
@@ -109,7 +115,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 
 					double simulationEndtime = LoadMyScenarios.getSimulationEndTime(configFile);
 
-					if(! new File(emissionEventsFile).exists() || ! new File(networkFile).exists()) {
+					if(! new File(emissionEventsFile).exists() || ! new File(networkFile).exists() || ! new File(configFile).exists() ) {
 						continue;
 					}
 
@@ -138,7 +144,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 					ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 					rgt.resetAndcaluculateRelativeDurationFactors(intervalHandler.getDuration());
 
-					EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, str.endsWith("woCO2") ? false : true, rgt);
+					EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt);
 					ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, new MunichPersonFilter());
 
 					EventsManager events = EventsUtils.createEventsManager();
