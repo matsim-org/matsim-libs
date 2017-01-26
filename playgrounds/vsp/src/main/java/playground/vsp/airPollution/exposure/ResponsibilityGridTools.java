@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -24,6 +23,13 @@ public class ResponsibilityGridTools {
 	private Map<Id<Link>, Integer> links2yCells;
 	private int noOfXCells;
 	private int noOfYCells;
+
+
+	/* TODO : adding this switch to inform the user to use first interval handler with normal events file
+	 * and provide activity durations and then estiamtes the air pollution exposure costs. This switch should go away after
+	 * https://matsim.atlassian.net/browse/MATSIM-634
+	 */
+	private boolean isDurationsStored = false;
 	
 	public ResponsibilityGridTools(Double timeBinSize, int noOfTimeBins,
 			GridTools gridTools) {
@@ -31,6 +37,12 @@ public class ResponsibilityGridTools {
 	}
 	
 	public Double getFactorForLink(Id<Link> linkId, double time) {
+
+		if (! isDurationsStored) {
+			throw new RuntimeException("It looks, you have not stored activity durations. Store them using "+ IntervalHandler.class.getSimpleName()
+					+" along with normal events and pass it to the "+ResponsibilityGridTools.class.getSimpleName());
+		}
+
 		Double currentTimeBin = getTimeBin(time);
 		
 		if(timebin2link2factor!=null){
@@ -44,7 +56,7 @@ public class ResponsibilityGridTools {
 	}
  
 	public void resetAndcaluculateRelativeDurationFactors(SortedMap<Double, Double[][]> duration) {
-		
+		isDurationsStored = true;
 		timebin2link2factor = new HashMap<Double, Map<Id<Link>, Double>>();
 		
 		// each time bin - generate new map
