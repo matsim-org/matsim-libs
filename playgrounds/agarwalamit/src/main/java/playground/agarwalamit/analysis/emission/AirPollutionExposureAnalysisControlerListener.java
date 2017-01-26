@@ -67,19 +67,13 @@ public class AirPollutionExposureAnalysisControlerListener implements  ShutdownL
     @Inject
     private ExperiencedEmissionCostHandler emissionCostHandler;
 
-    private Double timeBinSize = 3600.;
-
-    public AirPollutionExposureAnalysisControlerListener(final double timeBinSize) {
-        this.timeBinSize = timeBinSize;
-    }
-
     @Override
     public void notifyShutdown(ShutdownEvent event) {
 
         int lastIt = controlerConfigGroup.getLastIteration();
         String eventsFile = controlerIO.getIterationFilename(lastIt, "events.xml.gz");
 
-        IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, qSimConfigGroup.getEndTime(), gridTools);
+        IntervalHandler intervalHandler = new IntervalHandler(responsibilityGridTools.getTimeBinSize(), qSimConfigGroup.getEndTime(), gridTools);
         {
             intervalHandler.reset(0);
             EventsManager eventsManager = EventsUtils.createEventsManager();

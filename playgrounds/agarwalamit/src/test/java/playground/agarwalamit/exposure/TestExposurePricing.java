@@ -182,9 +182,9 @@ public class TestExposurePricing {
 				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
 
 				bindCarTravelDisutilityFactory().toInstance(emfac);
-				bind(ExperiencedEmissionCostHandler.class).asEagerSingleton();
+				bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(emissionCostModule));
 //				addEventHandlerBinding().to(ExperiencedEmissionCostHandler.class).asEagerSingleton();
-				addControlerListenerBinding().toInstance(new AirPollutionExposureAnalysisControlerListener(timeBinSize));
+				addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 			}
 		});
 
@@ -255,9 +255,9 @@ public class TestExposurePricing {
 
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 
-				bind(ExperiencedEmissionCostHandler.class).asEagerSingleton();
+				bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(emissionCostModule));
 				addEventHandlerBinding().to(ExperiencedEmissionCostHandler.class).asEagerSingleton();
-				addControlerListenerBinding().toInstance(new AirPollutionExposureAnalysisControlerListener( timeBinSize));
+				addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 			}
 		});
 
