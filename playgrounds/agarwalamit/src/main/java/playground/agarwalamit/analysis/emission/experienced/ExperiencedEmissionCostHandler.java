@@ -93,6 +93,9 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		final int noOfTimeBins = 30;
 
 		String dir = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/";
+		String outFile = "/Users/amit/Documents/cluster/ils4/agarwal/munich/airPolluationExposureCosts_cne.txt";
+
+		//		String outFile = dir+"/airPolluationExposureCosts_cne.txt";
 		String [] cases = {
 				"output_run0_muc_bc","output_run0b_muc_bc"
 				, "output_run1_muc_c_QBPV3","output_run1b_muc_c_QBPV3"
@@ -107,8 +110,8 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 
 		int [] its = {1000, 1500};
 
-		try(BufferedWriter writer = IOUtils.getBufferedWriter("/Users/amit/Documents/cluster/ils4/agarwal/munich/airPolluationExposureCosts_cne.txt")) {
-			writer.write("case \t itNr \t \t costsInEur \t tollValuesEUR \n");
+		try(BufferedWriter writer = IOUtils.getBufferedWriter(outFile)) {
+			writer.write("case \t itNr \t costsInEur \t tollValuesEUR \n");
 
 		for(String str : cases) {
 				for(int itr : its) {

@@ -675,14 +675,13 @@ public class CNEIntegration {
 			if (!airPollutionPricing) {
 				controler.addControlerListener(new EmissionControlerListener());
 			}
-			EmissionResponsibilityCostModule finalEmissionCostModule1 = emissionCostModule;
+			EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bind(GridTools.class).toInstance(gridTools);
 					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
-					addEventHandlerBinding().to(ExperiencedEmissionCostHandler.class).asEagerSingleton();
-					bind(PersonFilter.class).toInstance(personFilter);
+					addEventHandlerBinding().toInstance(new ExperiencedEmissionCostHandler(finalEmissionCostModule, personFilter));
 					addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 				}
 			});

@@ -67,12 +67,7 @@ public class AirPollutionExposureAnalysisControlerListener implements  ShutdownL
     @Inject
     private ExperiencedEmissionCostHandler emissionCostHandler;
 
-    private final Double timeBinSize ;
-
-
-    public AirPollutionExposureAnalysisControlerListener() {
-        this(3600.);
-    }
+    private Double timeBinSize = 3600.;
 
     public AirPollutionExposureAnalysisControlerListener(final double timeBinSize) {
         this.timeBinSize = timeBinSize;
