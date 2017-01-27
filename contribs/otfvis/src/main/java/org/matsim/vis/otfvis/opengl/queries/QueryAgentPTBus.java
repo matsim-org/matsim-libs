@@ -22,7 +22,7 @@ package org.matsim.vis.otfvis.opengl.queries;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 import com.jogamp.opengl.GL;
@@ -182,11 +182,14 @@ public class QueryAgentPTBus extends AbstractQuery {
 		this.net = simulationView.getNetwork();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
-		for(Id<Person> planId : simulationView.getPlans().keySet()) {
-			if(planId.toString().startsWith(prefix, 0)) allIds.add(planId.toString());
+		Map<Id<Person>, Plan> plans = simulationView.getPlans();
+		for(Id<Person> planId : plans.keySet()) {
+			if(planId.toString().startsWith(prefix, 0)) {
+			    allIds.add(planId.toString());
+			}
 		}
 		if (allIds.size()==0) return;
-		Plan plan = simulationView.getPlans().get(Id.create(allIds.get(0), Person.class));
+		Plan plan = plans.get(Id.create(allIds.get(0), Person.class));
 		this.result.vertex = buildRoute(plan);
 	}
 
