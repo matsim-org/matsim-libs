@@ -35,8 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
@@ -140,9 +138,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		} else {
 			log.error("No plan found for id " + this.agentId);
 		}
-		MobsimAgent mobsimAgent = simulationView.getAgents().get(this.agentId);
-		if (mobsimAgent != null && mobsimAgent.getState() == MobsimAgent.State.ACTIVITY && mobsimAgent instanceof PlanAgent ) {
-			Activity act = (Activity) ((PlanAgent) mobsimAgent).getCurrentPlanElement();
+		
+		Activity act = simulationView.getCurrentActivity(agentId);
+		if (act != null) {
 			Coord c2 = getCoord(act);
 			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
 				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
