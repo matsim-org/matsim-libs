@@ -24,8 +24,8 @@ import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.util.otfvis.OTFVisLiveModuleWithVrpAgentVisualisation;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -82,7 +82,7 @@ public class RunRobotaxiExample {
 		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
 		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
+			controler.addOverridingModule(new OTFVisLiveModuleWithVrpAgentVisualisation());
 		}
 
 		return controler;

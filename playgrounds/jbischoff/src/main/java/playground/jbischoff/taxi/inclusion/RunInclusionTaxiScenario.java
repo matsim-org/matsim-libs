@@ -22,8 +22,8 @@ package playground.jbischoff.taxi.inclusion;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.util.otfvis.OTFVisLiveModuleWithVrpAgentVisualisation;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -84,7 +84,7 @@ public class RunInclusionTaxiScenario
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         if (otfvis) {
-            controler.addOverridingModule(new OTFVisLiveModule());
+            controler.addOverridingModule(new OTFVisLiveModuleWithVrpAgentVisualisation());
         }
 
         return controler;

@@ -20,11 +20,10 @@
 package playground.jbischoff.taxibus.scenario;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.dvrp.util.otfvis.OTFVisLiveModuleWithVrpAgentVisualisation;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -67,7 +66,7 @@ public class KNTaxibusExample {
 
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.addOverridingModule( new OTFVisLiveModule() );
+		controler.addOverridingModule( new OTFVisLiveModuleWithVrpAgentVisualisation() );
 		
 		controler.run();
 

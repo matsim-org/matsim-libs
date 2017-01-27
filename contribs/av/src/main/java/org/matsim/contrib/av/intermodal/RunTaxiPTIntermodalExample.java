@@ -28,10 +28,9 @@ import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.util.otfvis.OTFVisLiveModuleWithVrpAgentVisualisation;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerFactory;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModule;
@@ -39,7 +38,6 @@ import org.matsim.contrib.taxi.run.TaxiQSimProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -120,7 +118,7 @@ public class RunTaxiPTIntermodalExample {
 		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
+			controler.addOverridingModule(new OTFVisLiveModuleWithVrpAgentVisualisation());
 		}
 		// ---
 		controler.run();
