@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.removers;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.framework.controller.listeners.GroupReplanningListenner;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
@@ -45,6 +48,12 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 	private final Random random;
 	private final int maxPlansPerComposition;
 	private final int maxPlansPerAgent;
+
+	@Inject
+	public LexicographicForCompositionExtraPlanRemover(
+			final GroupReplanningConfigGroup config ) {
+		this( config.getMaxPlansPerComposition() , config.getMaxPlansPerAgent() );
+	}
 
 	public LexicographicForCompositionExtraPlanRemover(
 			final int maxPlansPerComposition,
@@ -96,27 +105,31 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		// at all).
 		// randomize order to avoid the existence of "dictators" (agent for which their
 		// worst plan is always removed, whatever the ranking of the others is)
-		final List<Person> persons = new ArrayList<Person>( group.getPersons() );
+		final List<Person> persons = new ArrayList<>( group.getPersons() );
 		Collections.shuffle( persons , random );
-		for ( Person person : persons ) {
-			if ( person.getPlans().size() > maxPlansPerAgent ) {
-				assert person.getPlans().size() == maxPlansPerAgent + 1;
-				final Plan toRemove = getWorstNonUniquelyIndividualPlan( person.getPlans() , jointPlans );
-				final JointPlan jpToRemove = jointPlans.getJointPlan( toRemove );
+		boolean loop = false;
+		do {
+			for ( Person person : persons ) {
+				if ( person.getPlans().size() > maxPlansPerAgent ) {
+					final Plan toRemove = getWorstNonUniquelyIndividualPlan( person.getPlans(), jointPlans );
+					final JointPlan jpToRemove = jointPlans.getJointPlan( toRemove );
 
-				if ( jpToRemove != null ) {
-					for ( Plan p : jpToRemove.getIndividualPlans().values() ) {
-						p.getPerson().removePlan(p);
+					if ( jpToRemove != null ) {
+						for ( Plan p : jpToRemove.getIndividualPlans().values() ) {
+							p.getPerson().removePlan( p );
+						}
+						jointPlans.removeJointPlan( jpToRemove );
 					}
-					jointPlans.removeJointPlan( jpToRemove );
-				}
-				else {
-					person.removePlan(toRemove);
-				}
+					else {
+						person.removePlan( toRemove );
+					}
 
-				somethingDone = true;
+					somethingDone = true;
+				}
+				// continue looping if still too many plans
+				loop = loop || person.getPlans().size() > maxPlansPerAgent;
 			}
-		}
+		} while ( loop );
 
 		return somethingDone;
 	}

@@ -22,6 +22,8 @@ import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.util.Types;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
+import org.matsim.contrib.socnetsim.framework.replanning.removers.LexicographicForCompositionExtraPlanRemover;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.ProportionBasedConflictSolver;
@@ -43,6 +45,7 @@ public class OfflineCoalitionModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind( Key.get( Types.newParameterizedType( CoalitionChoiceIterator.class , propositionClass ) ) );
+		bind( ExtraPlanRemover.class ).to( LexicographicForCompositionExtraPlanRemover.class );
 	}
 
 	@Provides
