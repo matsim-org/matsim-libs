@@ -77,7 +77,7 @@ public abstract class CTCell {
 		return this.alpha;
 	}
 
-	public void addFace(CTCellFace face) {
+	public synchronized void addFace(CTCellFace face) {
 		faces.add(face);
 		getNeighbors().add(face.nb);
 //		face.nb.addNeighbor(this);
@@ -87,7 +87,7 @@ public abstract class CTCell {
 		return neighbors;
 	}
 
-	public void addNeighbor(CTCell nb) {
+	public synchronized void addNeighbor(CTCell nb) {
 		this.getNeighbors().add(nb);
 	}
 

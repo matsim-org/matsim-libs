@@ -61,7 +61,8 @@ public class CTLink implements CTNetworkEntity {
 	@Override
 	public void init() {
 
-		//this requires a planar coordinate system
+
+        //this requires a planar coordinate system
 		double dx = (this.dsLink.getToNode().getCoord().getX() - this.dsLink.getFromNode().getCoord().getX()); // this.dsLink.getLength();
 		double dy = (this.dsLink.getToNode().getCoord().getY() - this.dsLink.getFromNode().getCoord().getY()); // this.dsLink.getLength();
 		double projLength = Math.sqrt(dx * dx + dy * dy);
@@ -241,15 +242,10 @@ public class CTLink implements CTNetworkEntity {
 		}
 
 		//append cells
+        if (CTRunner.DEBUG) {
+            debugBound(bounds);
+        }
 
-		if (CTRunner.DEBUG) {
-			debugBound(bounds);
-			for (CTCell c : this.cells) {
-				c.debug(this.em);
-				TextEvent textEvent = new TextEvent(0, c.id + "", c.getX(), c.getY());
-				this.em.processEvent(textEvent);
-			}
-		}
 
 //		if (CTRunner.DEBUG) {
 //			for (CTCell c : dsJumpOns) {
@@ -266,6 +262,16 @@ public class CTLink implements CTNetworkEntity {
 //		}
 	}
 
+    public void debug() {
+        if (CTRunner.DEBUG) {
+
+            for (CTCell c : this.cells) {
+                c.debug(this.em);
+                TextEvent textEvent = new TextEvent(0, c.id + "", c.getX(), c.getY());
+                this.em.processEvent(textEvent);
+            }
+        }
+    }
 
 	private double getAngle(double frX, double frY, double toX1, double toY1, double toX2, double toY2) {
 

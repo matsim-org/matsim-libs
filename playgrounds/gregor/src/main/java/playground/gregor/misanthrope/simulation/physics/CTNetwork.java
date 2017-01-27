@@ -84,12 +84,15 @@ public class CTNetwork {
         this.network.getLinks().values().stream().filter(l -> links.get(l.getId()) == null).forEach(l -> {
             Link rev = getRevLink(l);
             CTLink ct = new CTLink(l, rev, em, this, this.nodes.get(l.getFromNode().getId()), this.nodes.get(l.getToNode().getId()));
-            ct.init();
             links.put(l.getId(), ct);
             if (rev != null) {
                 links.put(rev.getId(), ct);
             }
         });
+
+        this.links.values().parallelStream().forEach(CTLink::init);
+        this.links.values().forEach(CTLink::debug);
+
         this.nodes.values().parallelStream().forEach(CTNode::init);
         log.info("verifying network");
         checkNetwork();
