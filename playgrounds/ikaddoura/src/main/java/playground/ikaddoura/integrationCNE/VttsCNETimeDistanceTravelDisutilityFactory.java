@@ -20,6 +20,7 @@
 package playground.ikaddoura.integrationCNE;
 
 import java.util.Set;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -46,17 +47,15 @@ public final class VttsCNETimeDistanceTravelDisutilityFactory implements TravelD
 	private double sigma = 0. ;
 	private Set<Id<Link>> hotspotLinks = null;
 	private VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
-	private final EmissionModule emissionModule;
-	private final EmissionResponsibilityCostModule emissionCostModule;
+	@Inject private EmissionModule emissionModule;
+	@Inject private EmissionResponsibilityCostModule emissionCostModule;
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 	public VttsCNETimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory,
-													  EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
+													  NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
-		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
 		this.noiseContext = noiseContext;
 		this.tollHandler = tollHandler;
 		this.cnScoringGroup = cnScoringGroup;

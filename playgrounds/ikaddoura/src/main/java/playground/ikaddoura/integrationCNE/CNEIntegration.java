@@ -227,6 +227,10 @@ public class CNEIntegration {
 			
 			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools);
 		}
+
+		// final is required if binding. Amit Jan 17
+		final EmissionModule finalEmissionModule = emissionModule;
+		final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
 						
 		// ########################## Pricing setup ##########################
 				
@@ -372,10 +376,7 @@ public class CNEIntegration {
 					throw new RuntimeException("The following travel disutility doesn't allow for randomness. Aborting...");
 				}
 				EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
-						new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-						emissionModule,
-						emissionCostModule,
-						controler.getConfig().planCalcScore()
+						new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore())
 				);
 				controler.addOverridingModule(new AbstractModule() {
 
@@ -386,8 +387,6 @@ public class CNEIntegration {
 				});
 			}
 
-			final EmissionModule finalEmissionModule = emissionModule;
-			final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -398,7 +397,6 @@ public class CNEIntegration {
 					bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
 				}
 			});
-//			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
 
 		} else if (congestionPricing && noisePricing && airPollutionPricing) {
 			// congestion + noise + airPollution pricing
@@ -411,17 +409,18 @@ public class CNEIntegration {
 					if (computeExpectedAirPollutionCosts) {
 						final VttsCNETimeDistanceTravelDisutilityFactory factory = new VttsCNETimeDistanceTravelDisutilityFactory(
 								new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
-								emissionModule, emissionCostModule,
 								noiseContext,
 								congestionTollHandlerQBP,
 								controler.getConfig().planCalcScore()
 							);
 						factory.setSigma(sigma);
 						factory.setHotspotLinks(null);
-						
+
 						controler.addOverridingModule(new AbstractModule(){
 							@Override
 							public void install() {
+								bind(EmissionModule.class).toInstance(finalEmissionModule);
+								bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
 								this.bindCarTravelDisutilityFactory().toInstance( factory );
 							}
 						}); 
@@ -432,7 +431,7 @@ public class CNEIntegration {
 								congestionTollHandlerQBP, controler.getConfig().planCalcScore()
 							);
 						factory.setSigma(sigma);
-						
+
 						controler.addOverridingModule(new AbstractModule(){
 							@Override
 							public void install() {
@@ -446,7 +445,6 @@ public class CNEIntegration {
 					if (computeExpectedAirPollutionCosts) {
 						final CNETimeDistanceTravelDisutilityFactory factory = new CNETimeDistanceTravelDisutilityFactory(
 								new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-								emissionModule, emissionCostModule,
 								noiseContext,
 								congestionTollHandlerQBP,
 								controler.getConfig().planCalcScore()
@@ -457,6 +455,8 @@ public class CNEIntegration {
 						controler.addOverridingModule(new AbstractModule(){
 							@Override
 							public void install() {
+								bind(EmissionModule.class).toInstance(finalEmissionModule);
+								bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
 								this.bindCarTravelDisutilityFactory().toInstance( factory );
 							}
 						});
@@ -484,34 +484,36 @@ public class CNEIntegration {
 				if (useTripAndAgentSpecificVTTSForRouting) {
 					final VttsCNETimeDistanceTravelDisutilityFactory factory = new VttsCNETimeDistanceTravelDisutilityFactory(
 							new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()),
-							emissionModule, emissionCostModule,
 							noiseContext,
 							congestionTollHandlerQBP,
 							controler.getConfig().planCalcScore()
 						);
 					factory.setSigma(sigma);
 					factory.setHotspotLinks(null);
-					
+
 					controler.addOverridingModule(new AbstractModule(){
 						@Override
 						public void install() {
+							bind(EmissionModule.class).toInstance(finalEmissionModule);
+							bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
 							this.bindCarTravelDisutilityFactory().toInstance( factory );
 						}
-					}); 
+					});
 				} else {
 					final CNETimeDistanceTravelDisutilityFactory factory = new CNETimeDistanceTravelDisutilityFactory(
 							new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-							emissionModule, emissionCostModule,
 							noiseContext,
 							congestionTollHandlerQBP,
 							controler.getConfig().planCalcScore()
 						);
 					factory.setSigma(sigma);
 					factory.setHotspotLinks(hotSpotLinks);
-					
+
 					controler.addOverridingModule(new AbstractModule(){
 						@Override
 						public void install() {
+							bind(EmissionModule.class).toInstance(finalEmissionModule);
+							bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
 							this.bindCarTravelDisutilityFactory().toInstance( factory );
 						}
 					}); 				
@@ -556,8 +558,6 @@ public class CNEIntegration {
 					// toll-adjusted routing
 					final CbNETimeDistanceTravelDisutilityFactory travelDisutilityFactory = new CbNETimeDistanceTravelDisutilityFactory(
 							new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-							emissionModule,
-							emissionCostModule,
 							noiseContext,
 							decongestionInfo,
 							controler.getConfig().planCalcScore());
@@ -566,9 +566,11 @@ public class CNEIntegration {
 					controler.addOverridingModule(new AbstractModule(){
 						@Override
 						public void install() {
+							bind(EmissionModule.class).toInstance(finalEmissionModule);
+							bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
 							this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
 						}
-					});						
+					});
 				}
 
 			} else {
@@ -576,8 +578,6 @@ public class CNEIntegration {
 			}
 				
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-			final EmissionModule finalEmissionModule = emissionModule;
-			final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -588,8 +588,7 @@ public class CNEIntegration {
 					bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
 				}
 			});
-//			controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, this.responsibilityGridTools, this.gridTools));
-			
+
 		} else if (congestionPricing && noisePricing && airPollutionPricing == false) {
 			// congestion + noise pricing
 			
@@ -675,7 +674,6 @@ public class CNEIntegration {
 			if (!airPollutionPricing) {
 				controler.addControlerListener(new EmissionControlerListener());
 			}
-			EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {

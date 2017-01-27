@@ -20,6 +20,7 @@
 package playground.ikaddoura.integrationCNE;
 
 import java.util.Set;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -44,18 +45,16 @@ public final class CNETimeDistanceTravelDisutilityFactory implements TravelDisut
 
 	private double sigma = 0. ;
 	private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
-	private final EmissionModule emissionModule;
-	private final EmissionResponsibilityCostModule emissionCostModule;
+	@Inject private EmissionModule emissionModule;
+	@Inject private EmissionResponsibilityCostModule emissionCostModule;
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private Set<Id<Link>> hotspotLinks = null;
 
-	public CNETimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, 
-			EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public CNETimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory,
+												  NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
 		this.noiseContext = noiseContext;
 		this.tollHandler = tollHandler;
 		this.cnScoringGroup = cnScoringGroup;
