@@ -15,6 +15,7 @@ import playground.gregor.sim2d_v4.events.debug.TextEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
@@ -28,7 +29,7 @@ public class CTNetwork {
     private final CTNetsimEngine engine;
     private final int cores = Runtime.getRuntime().availableProcessors();
     private Map<Id<Link>, CTLink> links = new HashMap<>();
-    private Map<Id<Node>, CTNode> nodes = new HashMap<>();
+    private Map<Id<Node>, CTNode> nodes = new ConcurrentHashMap<>();
     private Network network;
     private EventsManager em;
 
@@ -62,19 +63,9 @@ public class CTNetwork {
             this.em.processEvent(e9);
         }
 
-//		log.info("initializing network; using " + this.cores + " threads.");
-//		List<Worker> workers = new ArrayList<>();
-//		List<Thread> threads = new ArrayList<>();
-//		for (int i = 0; i < this.cores; i++) {
-//			Worker w = new Worker();
-//			workers.add(w);
-//			Thread t = new Thread(w);
-//			t.start();
-//			threads.add(t);
-//		}
 
         log.info("creating and initializing links and nodes");
-        for (Node n : this.network.getNodes().values()) {
+        this.network.getNodes().values().parallelStream().forEach(n -> {
             double mxCap = 0;
             for (Link l : n.getInLinks().values()) {
                 if (l.getCapacity() > mxCap) {
@@ -86,54 +77,20 @@ public class CTNetwork {
                     mxCap = l.getCapacity();
                 }
             }
-
             mxCap = Math.min(mxCap, 133);
-
             CTNode ct = new CTNode(n.getId(), n, this, mxCap / 1.33);
             this.nodes.put(n.getId(), ct);
-        }
-
-//		int cnt = 0;
-        for (Link l : this.network.getLinks().values()) {
-
-
-            if (links.get(l.getId()) != null) {
-                continue;
-            }
+        });
+        this.network.getLinks().values().stream().filter(l -> links.get(l.getId()) == null).forEach(l -> {
             Link rev = getRevLink(l);
             CTLink ct = new CTLink(l, rev, em, this, this.nodes.get(l.getFromNode().getId()), this.nodes.get(l.getToNode().getId()));
-//			workers.get(cnt++ % this.cores).add(ct);
             ct.init();
             links.put(l.getId(), ct);
             if (rev != null) {
                 links.put(rev.getId(), ct);
             }
-
-        }
-
-        for (CTNode ctNode : this.nodes.values()) {
-            ctNode.init();
-//            if (cnt++ % 10 == 0) {
-//       				log.info(cnt);
-//       			}
-//			workers.get(cnt++ % this.cores).add(ctNode);
-
-        }
-//		for (Worker w : workers) {
-//			w.add(new CTNetworkEntity() {
-//				@Override
-//				public void init() {
-//				}
-//			});
-//		}
-//		for (Thread t : threads) {
-//			try {
-//				t.join();
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//
-//		}
+        });
+        this.nodes.values().parallelStream().forEach(CTNode::init);
         log.info("verifying network");
         checkNetwork();
         log.info("done.");
