@@ -21,33 +21,55 @@ package org.matsim.contrib.dvrp.util.otfvis;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
+import com.google.inject.Inject;
 
+
+/**
+ * The class is designed for inheritance. Overrride createLeg() and createActivity() to obtain
+ * different visualisation of VRP schedules/vehicles
+ * 
+ * @author michalm
+ */
 public class VrpAgentQueryHelper
     implements NonPlanAgentQueryHelper
 {
-    private static final double SIM_BEGIN_TIME = 0;
-
-    private final PopulationFactory populFactory;
+    protected final PopulationFactory populFactory;
 
 
+    @Inject
     public VrpAgentQueryHelper(PopulationFactory populFactory)
     {
         this.populFactory = populFactory;
+    }
+
+
+    @Override
+    public Activity getCurrentActivity(MobsimAgent mobsimAgent)
+    {
+        Vehicle vehicle = getVehicle(mobsimAgent);
+        Schedule<?> schedule = vehicle.getSchedule();
+
+        if (schedule.getStatus() == ScheduleStatus.STARTED) {
+            Task currentTask = schedule.getCurrentTask();
+            if (currentTask.getType() == TaskType.STAY) {
+                return createActivity((StayTask)currentTask);
+            }
+        }
+
+        return null;
     }
 
 
@@ -58,35 +80,29 @@ public class VrpAgentQueryHelper
     }
 
 
-    @Override
-    public Activity getCurrentActivity(MobsimAgent mobsimAgent)
+    private List<PlanElement> initPlanElements(Vehicle vehicle)
     {
-        Vehicle vehicle = getVehicle(mobsimAgent);
+        List<PlanElement> planElements = new ArrayList<>();
         Schedule<?> schedule = vehicle.getSchedule();
 
-        switch (schedule.getStatus()) {
-            case UNPLANNED:
-                return createActivity("Unplanned", vehicle.getStartLink().getId(), SIM_BEGIN_TIME,
-                        vehicle.getT1());
+        if (schedule.getStatus() == ScheduleStatus.STARTED) {
+            for (Task t : schedule.getTasks()) {
+                switch (t.getType()) {
+                    case DRIVE:
+                        planElements.add(createLeg((DriveTask)t));
+                        break;
 
-            case PLANNED:
-                return createActivity("Before schedule", vehicle.getStartLink().getId(),
-                        SIM_BEGIN_TIME, schedule.getBeginTime());
+                    case STAY:
+                        planElements.add(createActivity((StayTask)t));
+                        break;
 
-            case STARTED:
-                Task currentTask = schedule.getCurrentTask();
-                if (currentTask.getType() == TaskType.STAY) {
-                    StayTask st = (StayTask)currentTask;
-                    return createActivity(st.getType().name(), st.getLink().getId(),
-                            st.getBeginTime(), st.getEndTime());
+                    default:
+                        throw new IllegalStateException();
                 }
-                return null;
-
-            case COMPLETED: //at that time, should be removed from simulation
-            default:
+            }
         }
 
-        throw new IllegalStateException();
+        return planElements;
     }
 
 
@@ -96,74 +112,33 @@ public class VrpAgentQueryHelper
     }
 
 
-    private List<PlanElement> initPlanElements(Vehicle vehicle)
+    protected Leg createLeg(DriveTask task)
     {
-        List<PlanElement> planElements = new ArrayList<>();
-        Schedule<?> schedule = vehicle.getSchedule();
-        Id<Link> startLinkId = vehicle.getStartLink().getId();
-
-        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {// vehicle stays on startLink until t1
-            planElements
-                    .add(createActivity("Unplanned", startLinkId, SIM_BEGIN_TIME, vehicle.getT1()));
-            return planElements;
-        }
-
-        planElements.add(createActivity("Before schedule", startLinkId, SIM_BEGIN_TIME,
-                schedule.getBeginTime()));
-
-        for (Task t : schedule.getTasks()) {
-            switch (t.getType()) {
-                case DRIVE:
-                    planElements.add(createLeg((DriveTask)t));
-                    break;
-
-                case STAY:
-                    StayTask st = (StayTask)t;
-                    planElements.add(createActivity(st.getType().name(), st.getLink().getId(),
-                            st.getBeginTime(), st.getEndTime()));
-                    break;
-
-                default:
-                    throw new IllegalStateException();
-            }
-        }
-
-        planElements.add(
-                createActivity("After schedule", Schedules.getLastLinkInSchedule(schedule).getId(),
-                        schedule.getEndTime(), Double.POSITIVE_INFINITY));
-
-        return planElements;
-    }
-
-
-    private Leg createLeg(DriveTask task)
-    {
-        VrpPath path = task.getPath();
         Leg leg = populFactory.createLeg(TransportMode.car);
-        NetworkRoute route = VrpPaths.createNetworkRoute(path, populFactory.getRouteFactories());
-        leg.setRoute(route);
+        leg.setRoute(VrpPaths.createNetworkRoute(task.getPath(), populFactory.getRouteFactories()));
         return leg;
     }
 
 
-    private Activity createActivity(String actType, Id<Link> linkId, double startTime,
-            double endTime)
+    protected Activity createActivity(StayTask task)
     {
-        Activity act = populFactory.createActivityFromLinkId(actType, linkId);
-        act.setStartTime(startTime);
-        act.setEndTime(endTime);
+        Activity act = populFactory.createActivityFromLinkId("s", task.getLink().getId());
+        act.setStartTime(task.getBeginTime());
+        act.setEndTime(task.getEndTime());
         return act;
     }
 
 
-    private class VrpSchedulePlan
+    private final class VrpSchedulePlan
         implements Plan
     {
         private final Vehicle vehicle;
-        private List<PlanElement> unmodifiablePlanElements;//lazily initialised
+
+        //lazily initialised - we do not visualise plans of all VRP vehicles
+        private List<PlanElement> unmodifiablePlanElements;
 
 
-        public VrpSchedulePlan(Vehicle vehicle)
+        private VrpSchedulePlan(Vehicle vehicle)
         {
             this.vehicle = vehicle;
         }

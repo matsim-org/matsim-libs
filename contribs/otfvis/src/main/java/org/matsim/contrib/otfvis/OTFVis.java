@@ -47,6 +47,7 @@ import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.snapshotwriters.*;
 
@@ -158,7 +159,12 @@ public class OTFVis {
 	}
 
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
-		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim);
+        return startServerAndRegisterWithQSim(config, scenario, events, qSim, null);
+    }
+	
+    public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim,
+            NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
+		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim, nonPlanAgentQueryHelper);
 
 		if (config.transit().isUseTransit()) {
 

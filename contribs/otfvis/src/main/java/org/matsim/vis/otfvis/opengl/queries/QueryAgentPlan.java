@@ -189,12 +189,16 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private void buildRoute(Plan plan, Id<Person> agentId, Network net, Level level) {
+		    List<PlanElement> planElements = plan.getPlanElements();
+		    if (planElements.isEmpty()) {
+		        return;//non-plan agents may do not have a meaningful plan to be shown
+		    }
 			Color carColor = Color.ORANGE;
 			Color actColor = Color.BLUE;
 			Color ptColor = Color.YELLOW;
 			Color walkColor = Color.MAGENTA;
 			Color otherColor = Color.PINK;
-			for (PlanElement planElement : plan.getPlanElements()) {
+			for (PlanElement planElement : planElements) {
 				if (planElement instanceof Activity) {
 					Activity act = (Activity) planElement;
 					Coord coord = act.getCoord();
@@ -255,7 +259,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						}
 					}
 				}
-			} 
+			}
+			
 			this.vert = Buffers.newDirectFloatBuffer(vertex.size()*2);
 			this.vert.rewind();
 			for (Coord coord : this.vertex) {
