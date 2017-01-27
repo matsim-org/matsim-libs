@@ -54,13 +54,14 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.gregor.misanthrope.router.CTRoutingModule;
 import playground.gregor.misanthrope.simulation.CTMobsimFactory;
 import playground.gregor.misanthrope.simulation.physics.CTCell;
-import playground.gregor.misanthrope.simulation.physics.CTLink;
 import playground.gregor.utils.Variance;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
 
 /**
  * Created by laemmel on 15/10/15.
@@ -380,8 +381,8 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		double var2 = ttObserver2.ttVariance.getVar();
 
 
-		double cellHeight = 3. * CTLink.WIDTH / 4.;
-		double nrCells = (int) (80. / cellHeight);
+        double cellHeight = 3. * WIDTH / 4.;
+        double nrCells = (int) (80. / cellHeight);
 		double realLength = cellHeight * nrCells;
 		double expctdTT = realLength / CTCell.V_0 - 0.5;
 		// yy I reduced the expctdTT by 0.5 since that seems to be closer to the outcome. Travis generates other results

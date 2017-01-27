@@ -21,10 +21,12 @@ import playground.gregor.sim2d_v4.events.debug.TextEvent;
 
 import java.util.*;
 
+import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
+
 public class CTLink implements CTNetworkEntity {
 
 
-	public static final double WIDTH = 3;
+
 	private static final Logger log = Logger.getLogger(CTLink.class);
 	private static final double EPSILON = 0.00001;
 	private static double LENGTH;
@@ -71,7 +73,8 @@ public class CTLink implements CTNetworkEntity {
 		dx /= projLength;
 		dy /= projLength;
 		double length = this.dsLink.getLength();
-		if (length < LENGTH) {
+//        double length = projLength;
+        if (length < LENGTH) {
 			if (LENGTH_WRN_CNT++ < 10) {
 				log.warn("Length of link: " + this.dsLink.getId() + " is too small. Increasing it from: " + length + " to: " + LENGTH);
 				if (LENGTH_WRN_CNT == 10) {
@@ -89,7 +92,9 @@ public class CTLink implements CTNetworkEntity {
 
 
 		double width = this.dsLink.getCapacity() / 1.33;
-		if (width < WIDTH) {
+
+
+        if (width < WIDTH) {
 			if (WIDTH_WRN_CNT++ < 10) {
 				log.warn("Width of link: " + this.dsLink.getId() + " is too small. Increasing it from: " + width + " to: " + WIDTH);
 				if (WIDTH_WRN_CNT == 10) {
@@ -98,6 +103,11 @@ public class CTLink implements CTNetworkEntity {
 			}
 			width = WIDTH;
 		}
+
+//		log.warn("Paper version!");
+//        int multipl = (int)(width/WIDTH + 0.5);
+//		width *= multipl;
+
 
 		if (this.dsLink.getId().toString().contains("el")) {
 			length = LENGTH;

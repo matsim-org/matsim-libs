@@ -21,9 +21,7 @@ package playground.gregor.misanthrope.run;
 
 import com.google.inject.Provider;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,7 +34,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.misanthrope.router.CTRoutingModule;
 import playground.gregor.misanthrope.simulation.CTMobsimFactory;
@@ -46,18 +43,20 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer
 
 
 public class CTRunner implements IterationStartsListener {
-
     private static final Logger log = Logger.getLogger(CTRunner.class);
-
+    public static double WIDTH = 3;
     public static boolean DEBUG = false;
 
     private MatsimServices controller;
     private QSimDensityDrawer qSimDrawer;
 
     public static void main(String[] args) {
-        if (args.length != 2) {
+        if (args.length < 2) {
             printUsage();
             System.exit(-1);
+        }
+        if (args.length >= 3) {
+            WIDTH = Double.parseDouble(args[2]);
         }
         String qsimConf = args[0];
 
@@ -77,25 +76,25 @@ public class CTRunner implements IterationStartsListener {
             Activity a0 = (Activity) pl.getPlanElements().get(0);
 
             Leg leg = (Leg) pl.getPlanElements().get(1);
-
-
-            Id<Link> frst = a0.getLinkId();
-            Link frstL = sc.getNetwork().getLinks().get(frst);
-            if (((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().size() == 0) {
-                leg.setRoute(null);
-                leg.setMode("walkct");
-                a0.setType("pre-evac");
-                Activity a1 = (Activity) pl.getPlanElements().get(2);
-                a1.setType("post-evac");
-                log.warn("route length is 0");
-                return;
-            }
-            Id<Link> scnd = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().get(0);
-            Link scndL = sc.getNetwork().getLinks().get(scnd);
-
-            if (frstL.getFromNode() == scndL.getToNode()) { //U-turn
-                a0.setLinkId(scnd);
-            }
+//
+//
+//            Id<Link> frst = a0.getLinkId();
+//            Link frstL = sc.getNetwork().getLinks().get(frst);
+//            if (((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().size() == 0) {
+//                leg.setRoute(null);
+//                leg.setMode("walkct");
+//                a0.setType("pre-evac");
+//                Activity a1 = (Activity) pl.getPlanElements().get(2);
+//                a1.setType("post-evac");
+//                log.warn("route length is 0");
+//                return;
+//            }
+//            Id<Link> scnd = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().get(0);
+//            Link scndL = sc.getNetwork().getLinks().get(scnd);
+//
+//            if (frstL.getFromNode() == scndL.getToNode()) { //U-turn
+//                a0.setLinkId(scnd);
+//            }
 
             leg.setRoute(null);
             leg.setMode("walkct");
@@ -140,8 +139,10 @@ public class CTRunner implements IterationStartsListener {
 
 
         controller.addOverridingModule(new AbstractModule() {
+
             @Override
             public void install() {
+                addControlerListenerBinding().to(UTurnCleaner.class);
                 if (getConfig().controler().getMobsim().equals("ctsim")) {
                     bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
                         @Override
@@ -162,13 +163,13 @@ public class CTRunner implements IterationStartsListener {
         System.out.println("CTRunner");
         System.out.println("Controller for misanthrope (pedestrian) simulations.");
         System.out.println();
-        System.out.println("usage : CARunner config");
+        System.out.println("usage : CARunner config visualize");
         System.out.println();
         System.out.println("config:   A MATSim config file.");
         System.out.println("visualize:   one of {true,false}.");
         System.out.println();
         System.out.println("---------------------");
-        System.out.println("2015, matsim.org");
+        System.out.println("2015-2017, matsim.org");
         System.out.println();
     }
 

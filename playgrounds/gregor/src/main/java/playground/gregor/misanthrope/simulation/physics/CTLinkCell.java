@@ -20,6 +20,7 @@ package playground.gregor.misanthrope.simulation.physics;
  * *********************************************************************** */
 
 import org.matsim.core.gbl.MatsimRandom;
+import playground.gregor.misanthrope.run.CTRunner;
 import playground.gregor.misanthrope.simulation.CTEvent;
 
 import java.util.*;
@@ -95,8 +96,8 @@ public class CTLinkCell extends CTCell {
 
 //		if (this.l)
 
-		double x = CTLink.WIDTH / 0.1;
-		minJumpTime = Math.min(minJumpTime, x);
+        double x = CTRunner.WIDTH / 0.1;
+        minJumpTime = Math.min(minJumpTime, x);
 //		if (minJumpTime > 1000) {
 //			log.info(minJumpTime);
 //		}

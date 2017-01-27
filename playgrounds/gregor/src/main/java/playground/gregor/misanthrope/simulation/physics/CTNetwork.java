@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
+
 public class CTNetwork {
 
     private static final Logger log = Logger.getLogger(CTNetwork.class);
@@ -39,24 +41,24 @@ public class CTNetwork {
 
     private void init() {
         if (CTRunner.DEBUG) {
-            TextEvent e1 = new TextEvent(0, "alpha: " + CTLink.WIDTH / 2, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3);
+            TextEvent e1 = new TextEvent(0, "alpha: " + WIDTH / 2, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3);
 
             this.em.processEvent(e1);
-            TextEvent e2 = new TextEvent(0, "rho_m: " + CTCell.RHO_M, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 2);
+            TextEvent e2 = new TextEvent(0, "rho_m: " + CTCell.RHO_M, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 2);
             this.em.processEvent(e2);
-            TextEvent e3 = new TextEvent(0, "v_0: " + CTCell.V_0, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 4);
+            TextEvent e3 = new TextEvent(0, "v_0: " + CTCell.V_0, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 4);
             this.em.processEvent(e3);
-            TextEvent e4 = new TextEvent(0, "gamma: " + CTCell.GAMMA, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 6);
+            TextEvent e4 = new TextEvent(0, "gamma: " + CTCell.GAMMA, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 6);
             this.em.processEvent(e4);
-            TextEvent e5 = new TextEvent(0, "p_0: " + CTCell.P0, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 8);
+            TextEvent e5 = new TextEvent(0, "p_0: " + CTCell.P0, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 8);
             this.em.processEvent(e5);
-            TextEvent e6 = new TextEvent(0, "#left -> right: " + Debugger3.AGENTS_LR, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 10);
+            TextEvent e6 = new TextEvent(0, "#left -> right: " + Debugger3.AGENTS_LR, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 10);
             this.em.processEvent(e6);
-            TextEvent e7 = new TextEvent(0, "#right -> left: " + Debugger3.AGENTS_RL, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 12);
+            TextEvent e7 = new TextEvent(0, "#right -> left: " + Debugger3.AGENTS_RL, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 12);
             this.em.processEvent(e7);
-            TextEvent e8 = new TextEvent(0, "inflow [1/s]: left -> right: " + 1 / Debugger3.INV_INFLOW, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 14);
+            TextEvent e8 = new TextEvent(0, "inflow [1/s]: left -> right: " + 1 / Debugger3.INV_INFLOW, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 14);
             this.em.processEvent(e8);
-            TextEvent e9 = new TextEvent(0, "inflow [1/s]: right -> left: " + 1 / Debugger3.INV_INFLOW, 10 + CTLink.WIDTH, -Debugger3.WIDTH / 2 - 3 - 16);
+            TextEvent e9 = new TextEvent(0, "inflow [1/s]: right -> left: " + 1 / Debugger3.INV_INFLOW, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 16);
             this.em.processEvent(e9);
         }
 
@@ -252,8 +254,8 @@ public class CTNetwork {
 
     private void drawCell(CTCell cell, double time, double dx, double dy) {
         for (CTPed ped : cell.getPeds()) {
-            double oX = (5 - (ped.hashCode() % 10)) / (20. / CTLink.WIDTH);
-            double oY = (5 - ((23 * ped.hashCode()) % 10)) / (20. / CTLink.WIDTH);
+            double oX = (5 - (ped.hashCode() % 10)) / (20. / WIDTH);
+            double oY = (5 - ((23 * ped.hashCode()) % 10)) / (20. / WIDTH);
 
             double x = cell.getX() + oX / 2.;
             double y = cell.getY() + oY / 2.;
