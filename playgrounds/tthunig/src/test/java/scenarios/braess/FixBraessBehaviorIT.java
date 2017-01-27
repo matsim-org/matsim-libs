@@ -68,28 +68,24 @@ public final class FixBraessBehaviorIT{
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
-	@Test
+    @Test
 	public void testBraessWoPricing() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 24, 1920, 21, 3805298);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 26, 1919, 15, 3786517);
 	}
 
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
-	@Test
+    @Test
 	public void testV3() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 457, 1135, 408, 3113939);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 516, 980, 504, 2965973);
 	}
 
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
 	public void testV8() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V8, 572, 974, 454, 2992020);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V8, 684, 767, 549, 2748042);
 	}
 	
-    @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
 	public void testV9() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 603, 863, 534, 2825507);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 677, 718, 605, 2691619);
 	}
 	
 	private void fixRouteDistributionAndTT(RunBraessSimulation.PricingType pricingType, int expectedNOAgentsOnUpperRoute,
@@ -144,17 +140,20 @@ public final class FixBraessBehaviorIT{
 			
 		controler.run();		
 		
-		// test route distribution
+		// get route distribution
 		int agentsOnUpperRoute = handler.getRouteUsers()[0];
 		int agentsOnMiddleRoute = handler.getRouteUsers()[1];
 		int agentsOnLowerRoute = handler.getRouteUsers()[2];
 		log.info("Route distribution: " + agentsOnUpperRoute + ", " + agentsOnMiddleRoute + ", " + agentsOnLowerRoute);
+		
+		// get total travel time
+		double totalTT = handler.getTotalTT();
+		log.info("Total travel time: " + totalTT);
+		
+		// test both
 		Assert.assertEquals("The number of agents on the upper route has changed to previous MATSim behavior.", expectedNOAgentsOnUpperRoute, agentsOnUpperRoute);
 		Assert.assertEquals("The number of agents on the middle route has changed to previous MATSim behavior.", expectedNOAgentsOnMiddleRoute, agentsOnMiddleRoute);
 		Assert.assertEquals("The number of agents on the lower route has changed to previous MATSim behavior.", expectedNOAgentsOnLowerRoute, agentsOnLowerRoute);
-		
-		// test total travel time
-		double totalTT = handler.getTotalTT();
 		Assert.assertEquals("The total travel time has changed to previous MATSim behavior.", expectedTotalTT, totalTT, MatsimTestUtils.EPSILON);
 	}
 	
