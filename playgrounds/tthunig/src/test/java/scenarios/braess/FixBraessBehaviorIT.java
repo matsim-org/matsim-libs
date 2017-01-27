@@ -57,8 +57,6 @@ import scenarios.illustrative.braess.run.RunBraessSimulation.PricingType;
  * Test to fix the route distribution and travel times in Braess's scenario.
  * If it fails something has changed to previous MATSim behavior.
  * 
- * Currently, congestion version V4 throws a runtime exception and is therefore set to ignore (see comment below).
- * 
  * @author tthunig
  *
  */
@@ -81,17 +79,6 @@ public final class FixBraessBehaviorIT{
 	public void testV3() {
 		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 457, 1135, 408, 3113939);
 	}
-	
-	/* V4 throws a runtime exception: 
-	 * "time=28915.0; 13.799999999999999 sec delay is not internalized. Aborting..."
-	 * Amit, please fix this and remove the @Ignore. 
-	 * Theresa & Ihab oct'2015 */
-	@Test
-	@Ignore
-	public void testV4() {
-		Assert.fail("Not yet tested.");
-//		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V4, , , , );
-	}
 
     @Ignore("Due to bugfixes in slow flowCap accumulation in QueueWithBuffer")//by michalm
 	@Test
@@ -103,13 +90,6 @@ public final class FixBraessBehaviorIT{
 	@Test
 	public void testV9() {
 		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 603, 863, 534, 2825507);
-	}
-	
-	@Test
-	@Ignore
-	public void testFlowbased() {
-		Assert.fail("Not yet implemented.");
-//		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.FLOWBASED, , , , );
 	}
 	
 	private void fixRouteDistributionAndTT(RunBraessSimulation.PricingType pricingType, int expectedNOAgentsOnUpperRoute,
@@ -201,7 +181,7 @@ public final class FixBraessBehaviorIT{
 		config.strategy().setMaxAgentPlanMemorySize(3);
 
 		config.qsim().setStuckTime(3600 * 0.5);
-
+		
 		// set end time to 12 am (4 hours after simulation start) to
 		// shorten simulation run time
 		config.qsim().setEndTime(3600 * 10);
