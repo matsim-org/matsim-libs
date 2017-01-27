@@ -90,13 +90,13 @@ public class CoalitionChoiceIterator<P extends Proposition> {
 			}
 			// cleanup after each person. Could also wait a bit,
 			// but waiting for the end results in OOME pretty easily
-			//extraPlanRemover.removePlansInGroup( jointPlans , group );
+			extraPlanRemover.removePlansInGroup( jointPlans , group );
 		}
 		agentCounter.printCounter();
 		counter.printCounter();
-		log.info( "run plan remover" );
-		extraPlanRemover.removePlansInGroup( jointPlans , group );
-		log.info( "run plan remover: DONE" );
+		//log.info( "run plan remover" );
+		//extraPlanRemover.removePlansInGroup( jointPlans , group );
+		//log.info( "run plan remover: DONE" );
 	}
 
 	public GroupPlans doIteration() {

@@ -76,8 +76,9 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 			final PlansPerComposition plansPerComposition = getPlansPerComposition( jointPlans , person );
 
 			// too many individual plans?
-			if ( plansPerComposition.getIndividualPlans().size() > maxPlansPerComposition ) {
-				assert plansPerComposition.getIndividualPlans().size() == maxPlansPerComposition + 1;
+			int rem = 0;
+			while ( plansPerComposition.getIndividualPlans().size() - rem > maxPlansPerComposition ) {
+				rem++;
 				person.removePlan(
 						identifyWorst(
 								plansPerComposition.getIndividualPlans()));
@@ -85,8 +86,9 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 			}
 
 			for ( Collection<JointPlan> structure : plansPerComposition.getJointPlansGroupedPerStructure() ) {
-				if ( structure.size() > maxPlansPerComposition ) {
-					assert structure.size() == maxPlansPerComposition + 1;
+				rem = 0;
+				while ( structure.size() - rem > maxPlansPerComposition ) {
+					rem++;
 					final JointPlan toRemove = identifyWorst( maxRank , structure );
 
 					for ( Plan p : toRemove.getIndividualPlans().values() ) {
@@ -108,7 +110,8 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		final List<Person> persons = new ArrayList<>( group.getPersons() );
 		Collections.shuffle( persons , random );
 		boolean loop = false;
-		do {
+		while ( loop ) {
+			loop = false;
 			for ( Person person : persons ) {
 				if ( person.getPlans().size() > maxPlansPerAgent ) {
 					final Plan toRemove = getWorstNonUniquelyIndividualPlan( person.getPlans(), jointPlans );
@@ -129,7 +132,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 				// continue looping if still too many plans
 				loop = loop || person.getPlans().size() > maxPlansPerAgent;
 			}
-		} while ( loop );
+		}
 
 		return somethingDone;
 	}
