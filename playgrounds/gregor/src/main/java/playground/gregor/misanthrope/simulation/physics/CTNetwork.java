@@ -6,12 +6,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import playground.gregor.misanthrope.debug.Debugger3;
+import org.matsim.core.gbl.Gbl;
 import playground.gregor.misanthrope.run.CTRunner;
 import playground.gregor.misanthrope.simulation.CTEvent;
 import playground.gregor.misanthrope.simulation.CTEventsPaulPriorityQueue;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
-import playground.gregor.sim2d_v4.events.debug.TextEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +22,8 @@ import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
 public class CTNetwork {
 
     private static final Logger log = Logger.getLogger(CTNetwork.class);
+
+    private static int WIDTH_WRN_CNT = 0;
 
     private final CTEventsPaulPriorityQueue events = new CTEventsPaulPriorityQueue();
     //	private final PriorityQueue<CTEvent> events = new PriorityQueue<>();
@@ -41,30 +42,46 @@ public class CTNetwork {
     }
 
     private void init() {
-        if (CTRunner.DEBUG) {
-            TextEvent e1 = new TextEvent(0, "alpha: " + WIDTH / 2, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3);
-
-            this.em.processEvent(e1);
-            TextEvent e2 = new TextEvent(0, "rho_m: " + CTCell.RHO_M, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 2);
-            this.em.processEvent(e2);
-            TextEvent e3 = new TextEvent(0, "v_0: " + CTCell.V_0, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 4);
-            this.em.processEvent(e3);
-            TextEvent e4 = new TextEvent(0, "gamma: " + CTCell.GAMMA, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 6);
-            this.em.processEvent(e4);
-            TextEvent e5 = new TextEvent(0, "p_0: " + CTCell.P0, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 8);
-            this.em.processEvent(e5);
-            TextEvent e6 = new TextEvent(0, "#left -> right: " + Debugger3.AGENTS_LR, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 10);
-            this.em.processEvent(e6);
-            TextEvent e7 = new TextEvent(0, "#right -> left: " + Debugger3.AGENTS_RL, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 12);
-            this.em.processEvent(e7);
-            TextEvent e8 = new TextEvent(0, "inflow [1/s]: left -> right: " + 1 / Debugger3.INV_INFLOW, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 14);
-            this.em.processEvent(e8);
-            TextEvent e9 = new TextEvent(0, "inflow [1/s]: right -> left: " + 1 / Debugger3.INV_INFLOW, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 16);
-            this.em.processEvent(e9);
-        }
+//        if (CTRunner.DEBUG) {
+//            TextEvent e1 = new TextEvent(0, "alpha: " + WIDTH / 2, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3);
+//
+//            this.em.processEvent(e1);
+//            TextEvent e2 = new TextEvent(0, "rho_m: " + CTCell.RHO_M, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 2);
+//            this.em.processEvent(e2);
+//            TextEvent e3 = new TextEvent(0, "v_0: " + CTCell.V_0, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 4);
+//            this.em.processEvent(e3);
+//            TextEvent e4 = new TextEvent(0, "gamma: " + CTCell.GAMMA, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 6);
+//            this.em.processEvent(e4);
+//            TextEvent e5 = new TextEvent(0, "p_0: " + CTCell.P0, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 8);
+//            this.em.processEvent(e5);
+//            TextEvent e6 = new TextEvent(0, "#left -> right: " + Debugger3.AGENTS_LR, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 10);
+//            this.em.processEvent(e6);
+//            TextEvent e7 = new TextEvent(0, "#right -> left: " + Debugger3.AGENTS_RL, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 12);
+//            this.em.processEvent(e7);
+//            TextEvent e8 = new TextEvent(0, "inflow [1/s]: left -> right: " + 1 / Debugger3.INV_INFLOW, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 14);
+//            this.em.processEvent(e8);
+//            TextEvent e9 = new TextEvent(0, "inflow [1/s]: right -> left: " + 1 / Debugger3.INV_INFLOW, 10 + WIDTH, -Debugger3.WIDTH / 2 - 3 - 16);
+//            this.em.processEvent(e9);
+//        }
 
 
         log.info("creating and initializing links and nodes");
+        this.network.getLinks().values().forEach(l -> {
+
+            double width = l.getCapacity() / 1.33;
+            if (width < 2 * WIDTH) {
+                if (WIDTH_WRN_CNT++ < 10) {
+                    log.warn("Width of link: " + l.getId() + " is too small. Increasing it from: " + width + " to: " + WIDTH);
+                    if (WIDTH_WRN_CNT == 10) {
+                        log.warn(Gbl.FUTURE_SUPPRESSED);
+                    }
+                }
+                width = 2 * WIDTH;
+
+            }
+            width = WIDTH * ((int) (width / WIDTH) + 1);
+            l.setCapacity(width * 1.33);
+        });
         this.network.getNodes().values().parallelStream().forEach(n -> {
             double mxCap = 0;
             for (Link l : n.getInLinks().values()) {
@@ -90,13 +107,19 @@ public class CTNetwork {
             }
         });
 
-        this.links.values().parallelStream().forEach(CTLink::init);
+        this.links.values().stream().forEach(CTLink::init);
         this.links.values().forEach(CTLink::debug);
-
         this.nodes.values().parallelStream().forEach(CTNode::init);
+
         log.info("verifying network");
         checkNetwork();
         log.info("done.");
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
     }
 
     private Link getRevLink(Link l) {

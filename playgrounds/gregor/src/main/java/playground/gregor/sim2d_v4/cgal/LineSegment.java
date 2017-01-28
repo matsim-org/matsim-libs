@@ -85,6 +85,19 @@ public class LineSegment {
         return s;
     }
 
+    public LineSegment getInverse() {
+        LineSegment s = new LineSegment();
+        s.x0 = x1;
+        s.y0 = y1;
+        s.x1 = x0;
+        s.y1 = y0;
+        s.dx = -dx;
+        s.dy = -dy;
+        s.length = length;
+        s.width = width;
+        return s;
+    }
+
     public boolean equalInverse(LineSegment other) {
         return Math.abs(this.x0 - other.x1) < CGAL.EPSILON && Math.abs(this.x1 - other.x0) < CGAL.EPSILON && Math.abs(this.y0 - other.y1) < CGAL.EPSILON && Math.abs(this.y1 - other.y0) < CGAL.EPSILON;
     }

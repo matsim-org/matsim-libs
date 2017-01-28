@@ -24,7 +24,7 @@ public class Debugger1 {
 
         String netFile = "/Users/laemmel/scenarios/misanthrope/paper/network.xml";
 
-        CTRunner.WIDTH = 3;
+        CTRunner.WIDTH = 2;
         CTRunner.DEBUG = true;
 
         Config c = ConfigUtils.createConfig();
@@ -40,7 +40,7 @@ public class Debugger1 {
 
             EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
             InfoBox iBox = new InfoBox(dbg, sc);
-            dbg.addAdditionalDrawer(iBox);
+//            dbg.addAdditionalDrawer(iBox);
             //		dbg.addAdditionalDrawer(new Branding());
 //			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 //			dbg.addAdditionalDrawer(qDbg);

@@ -25,7 +25,8 @@ import org.matsim.api.core.v01.Scenario;
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.events.CASimAgentConstructEventHandler;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
-import playground.gregor.sim2d_v4.events.*;
+import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v4.events.XYVxVyEventsHandler;
 import playground.gregor.sim2d_v4.events.debug.*;
 
 import java.util.ArrayList;
@@ -38,25 +39,20 @@ public class EventBasedVisDebuggerEngine implements
 		 LineEventHandler, ForceReDrawEventHandler,
         RectEventHandler, CircleEventHandler, TextEventHandler {
 
-	double time;
 	private final EventsBasedVisDebugger vis;
-
 	private final Map<Id, CircleProperty> circleProperties = new HashMap<Id, CircleProperty>();
 	private final CircleProperty defaultCp = new CircleProperty();
-
 	private final Scenario sc;
-
-	private long lastUpdate = -1;
 	private final double dT;
 	private final Control keyControl;
-
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
-	private int nrAgents;
+	double time;
+	FrameSaver fs = null;
+	private long lastUpdate = -1;
 //
 //	 FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/nyc/",
 //	 "png", 20);
-
-	FrameSaver fs = null;
+private int nrAgents;
 
 	public EventBasedVisDebuggerEngine(Scenario sc) {
 		this.sc = sc;
@@ -190,8 +186,8 @@ public class EventBasedVisDebuggerEngine implements
 
     @Override
     public void handleEvent(TextEvent event) {
-        this.vis.addTextStatic(event.getX(), event.getY(), event.getText(), 10);
-    }
+		this.vis.addTextStatic(event.getX(), event.getY(), event.getText(), 50);
+	}
 
 
 	@Override
@@ -230,18 +226,6 @@ public class EventBasedVisDebuggerEngine implements
 			}
 		}
 		this.nrAgents = 0;
-	}
-
-
-
-	private static final class CircleProperty {
-		boolean fill = true;
-		float rr;
-		int r, g, b, a, minScale = 0;
-	}
-
-	private static final class LineProperty {
-		int r, g, b, a, minScale = 0;
 	}
 
 	@Override
@@ -290,7 +274,6 @@ public class EventBasedVisDebuggerEngine implements
 		this.circleProperties.put(a.getId(), cp);
 
 	}
-	
 
 	@Override
 	public void handleEvent(LineEvent e) {
@@ -339,6 +322,16 @@ public class EventBasedVisDebuggerEngine implements
 
 	public int getNrAgents() {
 		return this.nrAgents;
+	}
+
+	private static final class CircleProperty {
+		boolean fill = true;
+		float rr;
+		int r, g, b, a, minScale = 0;
+	}
+
+	private static final class LineProperty {
+		int r, g, b, a, minScale = 0;
 	}
 
 
