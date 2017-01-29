@@ -153,7 +153,9 @@ class LinkToLinkRoutingModule
             }
 
             List<Node> nodes = new ArrayList<>(invLinkCount);
-            nodes.add(links.get(0).getFromNode());
+//            nodes.add(links.get(0).getFromNode());
+            /* use the first link of the inverted path instead of the first node of the just created link list. also works for invLinkCount 1. theresa, jan'17 */
+            nodes.add(network.getNodes().get(Id.create(invPath.links.get(0).getId(), Node.class)));
             for (Link l : links) {
                 nodes.add(l.getToNode());
             }
