@@ -10,13 +10,13 @@ import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import javax.inject.Inject;
 
 @Singleton
-public class RenaultTransitRouterProvider implements Provider<TransitRouter> {
+public class IleDeFranceTransitRouterProvider implements Provider<TransitRouter> {
     private final TransitRouterConfig config;
     private final TransitRouterNetwork routerNetwork;
     private final PreparedTransitSchedule preparedTransitSchedule;
 
     @Inject
-    RenaultTransitRouterProvider(final TransitSchedule schedule, final Config config) {
+    IleDeFranceTransitRouterProvider(final TransitSchedule schedule, final Config config) {
         this(schedule, new TransitRouterConfig(
                 config.planCalcScore(),
                 config.plansCalcRoute(),
@@ -24,7 +24,7 @@ public class RenaultTransitRouterProvider implements Provider<TransitRouter> {
                 config.vspExperimental()));
     }
 
-    public RenaultTransitRouterProvider(final TransitSchedule schedule, final TransitRouterConfig config) {
+    public IleDeFranceTransitRouterProvider(final TransitSchedule schedule, final TransitRouterConfig config) {
         this.config = config;
 
         this.routerNetwork = new TransitRouterNetwork();

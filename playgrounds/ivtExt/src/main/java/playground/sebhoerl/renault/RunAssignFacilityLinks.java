@@ -110,6 +110,6 @@ public class RunAssignFacilityLinks {
             }
         }
 
-        new FacilitiesWriter(facilities).write(args[2]);
+        new FacilitiesWriter(facilities).writeV1(args[2]);
     }
 }
