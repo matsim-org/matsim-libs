@@ -255,8 +255,7 @@ public class TestExposurePricing {
 
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 
-				bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(emissionCostModule,null));
-				addEventHandlerBinding().to(ExperiencedEmissionCostHandler.class).asEagerSingleton();
+				bind(ExperiencedEmissionCostHandler.class);
 				addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 			}
 		});
