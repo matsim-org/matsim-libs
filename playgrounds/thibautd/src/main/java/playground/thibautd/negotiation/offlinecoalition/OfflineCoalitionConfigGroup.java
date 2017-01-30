@@ -28,6 +28,7 @@ public class OfflineCoalitionConfigGroup extends ReflectiveConfigGroup {
 
 	private double logitScale = 1;
 	private int iterations = 10;
+	private int removalPeriod = 500;
 
 	public OfflineCoalitionConfigGroup() {
 		super( GROUP_NAME );
@@ -51,5 +52,15 @@ public class OfflineCoalitionConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("iterations")
 	public void setIterations( final int iterations ) {
 		this.iterations = iterations;
+	}
+
+	@StringGetter("removalPeriod")
+	public int getRemovalPeriod() {
+		return removalPeriod;
+	}
+
+	@StringSetter("removalPeriod")
+	public void setRemovalPeriod( final int removalPeriod ) {
+		this.removalPeriod = removalPeriod;
 	}
 }

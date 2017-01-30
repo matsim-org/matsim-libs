@@ -73,6 +73,8 @@ public class CoalitionChoiceIterator<P extends Proposition> {
 				.map( NegotiationAgent::getId )
 				.map( population.getPersons()::get )
 				.forEach( group::addPerson );
+
+		int i = 0;
 		for ( NegotiationAgent<P> agent : agents.getAllAgents() ) {
 			agentCounter.incCounter();
 			for ( P proposition : alternativesGenerator.generateAlternatives( agent ) ) {
@@ -93,15 +95,17 @@ public class CoalitionChoiceIterator<P extends Proposition> {
 									proposition ) );
 				}
 			}
-			// cleanup after each person. Could also wait a bit,
-			// but waiting for the end results in OOME pretty easily
-			extraPlanRemover.removePlansInGroup( jointPlans , group );
+			if ( ++i % configGroup.getRemovalPeriod() == 0 ) {
+				log.info( "Run plan remover..." );
+				extraPlanRemover.removePlansInGroup( jointPlans , group );
+				log.info( "Run plan remover... DONE" );
+			}
 		}
 		agentCounter.printCounter();
 		counter.printCounter();
-		//log.info( "run plan remover" );
-		//extraPlanRemover.removePlansInGroup( jointPlans , group );
-		//log.info( "run plan remover: DONE" );
+		log.info( "Run plan remover..." );
+		extraPlanRemover.removePlansInGroup( jointPlans , group );
+		log.info( "Run plan remover... DONE" );
 	}
 
 	public GroupPlans doIteration() {

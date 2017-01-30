@@ -43,7 +43,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 public class JointPlans implements MatsimToplevelContainer {
 	public static final String ELEMENT_NAME = "jointPlans";
 
-	private final Map<Plan, JointPlan> planToJointPlan = new ConcurrentHashMap<Plan, JointPlan>();
+	private final Map<Plan, JointPlan> planToJointPlan = new ConcurrentHashMap<>();
 
 	private final JointPlanFactory factory = new JointPlanFactory();
 
@@ -80,7 +80,7 @@ public class JointPlans implements MatsimToplevelContainer {
 				// keep in Map no matter what, as the joint plan may be uncached in the plan.
 				// This results in slower removes... Only get is optimized by the cache
 				final Object removed = planToJointPlan.remove( indivPlan );
-				if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan );
+				if (removed != jointPlan) throw new PlanLinkException( removed+" differs from "+indivPlan+" for "+jointPlan );
 			}
 		}
 	}

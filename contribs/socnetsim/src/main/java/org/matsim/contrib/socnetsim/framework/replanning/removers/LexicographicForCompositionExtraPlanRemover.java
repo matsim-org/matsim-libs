@@ -108,6 +108,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 						p.getPerson().removePlan(p);
 					}
 					jointPlans.removeJointPlan( toRemove );
+					structure.remove( toRemove );
 					somethingDone = true;
 				}
 				if ( log.isTraceEnabled() && rem > 0 ) log.trace( "removed "+rem+" joint plans for structure of size "+size );
@@ -132,7 +133,6 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 					if ( log.isTraceEnabled() ) log.trace( "person "+person.getId()+" has "+(person.getPlans().size() - maxPlansPerAgent)+" excedentary plans" );
 					final Plan toRemove = getWorstNonUniquelyIndividualPlan( person.getPlans(), jointPlans );
 
-					if ( toRemove == null ) continue;
 					rem++;
 					final JointPlan jpToRemove = jointPlans.getJointPlan( toRemove );
 
@@ -182,12 +182,6 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 
 		// if there is only one individual plan, do not consider it "worse"
 		// assert nIndividualPlans > 0; // this assertion only makes sense if all persons have at least 1 individual plan
-		if ( nIndividualPlans == 0 ) {
-			// In a well behaved run, this should not happen.
-			// If it happens (for instance because we iteratively construct joint plans, cleaning along the way),
-			// we do not do anything
-			return null;
-		}
 		return ( nIndividualPlans == 1 && worstIsIndividual ) ? secondWorst : worst;
 	}
 
