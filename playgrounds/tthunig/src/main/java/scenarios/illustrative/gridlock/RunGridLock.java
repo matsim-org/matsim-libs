@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,10 +42,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -80,65 +81,73 @@ import org.matsim.lanes.data.LanesToLinkAssignment;
 import analysis.signals.TtSignalAnalysisListener;
 import analysis.signals.TtSignalAnalysisTool;
 import analysis.signals.TtSignalAnalysisWriter;
+import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
+import signals.CombinedSignalsModule;
 import signals.downstreamSensor.DownstreamSignalController;
-import signals.downstreamSensor.DownstreamSignalsModule;
 
 /**
  * @author tthunig
  *
  */
 public class RunGridLock {
+
+	private static final Logger log = Logger.getLogger(RunGridLock.class);
 	
-	// TODO add SYLVIA
-	private enum SignalType { PLANBASED, DOWNSTREAM};
-	private static final SignalType SIGNALTYPE = SignalType.PLANBASED;
+	private enum SignalType { NONE, PLANBASED, DOWNSTREAM, SYLVIA};
+	private static final SignalType SIGNALTYPE = SignalType.DOWNSTREAM;
 	
-	// TODO try around which effect number of lanes has (1800 or 3600 needed here?)
-	private static final double middleLinkCap = 1800;
+	private static final double MIDDLE_LINK_CAP = 1800;
+	
+	private static final int DEMAND_START_TIME_OFFSET  = 0; // choose 0 if both streams should start at the same time
+	private enum DemandIntensity { CONSTANT, INCREASING, PERIODIC};
+	private static final DemandIntensity DEMAND_INTENSITY  = DemandIntensity.INCREASING;
 
 	public static void main(String[] args) {
 		Config config = defineConfig();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		// add missing scenario elements
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		
-		createGridLockNetworkAndLanes(scenario.getNetwork(), scenario.getLanes(), middleLinkCap);
+		createGridLockNetworkAndLanes(scenario.getNetwork(), scenario.getLanes());
 		createTwoStreamPopulation(scenario.getPopulation(), Id.createLinkId("0_1"), Id.createLinkId("2_1"), Id.createLinkId("5_4"), Id.createLinkId("3_4"), true);
-		createGridlockSignals(scenario);
+		if (!SIGNALTYPE.equals(SignalType.NONE)){
+			createGridlockSignals(scenario);
+		}
 		
 		Controler controler = new Controler(scenario);
-		// add signal module (also works for planbased signals)
-		controler.addOverridingModule(new DownstreamSignalsModule());
+		if (!SIGNALTYPE.equals(SignalType.NONE)) {
+			// add signal module
+			controler.addOverridingModule(new CombinedSignalsModule());
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				// TODO add agent analysis: number of cars on link per time, departed agents, arrived agents, 
-				
-				// bind tool to analyze signals
-				this.bind(TtSignalAnalysisTool.class).asEagerSingleton();
-				this.addEventHandlerBinding().to(TtSignalAnalysisTool.class);
-				this.addControlerListenerBinding().to(TtSignalAnalysisTool.class);
-				this.bind(TtSignalAnalysisWriter.class);
-				this.addControlerListenerBinding().to(TtSignalAnalysisListener.class);
-			}
-		});
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					// TODO add agent analysis: number of cars on link per time, departed agents, arrived agents,
+
+					// bind tool to analyze signals
+					this.bind(TtSignalAnalysisTool.class).asEagerSingleton();
+					this.addEventHandlerBinding().to(TtSignalAnalysisTool.class);
+					this.addControlerListenerBinding().to(TtSignalAnalysisTool.class);
+					this.bind(TtSignalAnalysisWriter.class);
+					this.addControlerListenerBinding().to(TtSignalAnalysisListener.class);
+				}
+			});
+		}
 
 		controler.run();
 	}
 	
 	private static Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory("../../../runs-svn/gridlock/twoStream/"+SIGNALTYPE+middleLinkCap+"/");
+		config.controler().setOutputDirectory("../../../runs-svn/gridlock/twoStream/"+SIGNALTYPE+MIDDLE_LINK_CAP+"_demand"+DEMAND_INTENSITY+"_offset"+(int)DEMAND_START_TIME_OFFSET+"/");
 
 		// set number of iterations
 		config.controler().setLastIteration(0);
 
 		// able or enable signals and lanes
-		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalConfigGroup.setUseSignalSystems(true);
+		if (!SIGNALTYPE.equals(SignalType.NONE)) {
+			SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+			signalConfigGroup.setUseSignalSystems(true);
+		}
 		config.qsim().setUseLanes(true);
 
 		// // set brain exp beta
@@ -177,11 +186,12 @@ public class RunGridLock {
 		// choose maximal number of plans per agent. 0 means unlimited
 		config.strategy().setMaxAgentPlanMemorySize(1);
 
+		// TODO use lower values?
 		config.qsim().setStuckTime(3600);
 		config.qsim().setRemoveStuckVehicles(false);
 
 		config.qsim().setStartTime(0);
-		config.qsim().setEndTime(6 * 3600);
+		config.qsim().setEndTime(24 * 3600);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -202,7 +212,7 @@ public class RunGridLock {
 		return config;
 	}
 
-	private static void createGridLockNetworkAndLanes(Network net, Lanes lanes, double bottleneckCap) {
+	private static void createGridLockNetworkAndLanes(Network net, Lanes lanes) {
 		NetworkFactory netFac = net.getFactory();
 
 		net.addNode(netFac.createNode(Id.createNodeId(0), new Coord(-3000, 0)));
@@ -224,33 +234,35 @@ public class RunGridLock {
 			net.addLink(link);
 		}
 		// create bottleneck at link 2_3 and 3_2
-		net.getLinks().get(Id.createLinkId("2_3")).setCapacity(bottleneckCap);
-		net.getLinks().get(Id.createLinkId("3_2")).setCapacity(bottleneckCap);
+		net.getLinks().get(Id.createLinkId("2_3")).setCapacity(MIDDLE_LINK_CAP);
+		net.getLinks().get(Id.createLinkId("3_2")).setCapacity(MIDDLE_LINK_CAP);
 
 		LanesFactory lanesFac = lanes.getFactory();
 
 		// create link assignment of link 2_3
 		LanesToLinkAssignment linkAssignment2_3 = lanesFac.createLanesToLinkAssignment(Id.createLinkId("2_3"));
-		LanesUtils.createAndAddLane(linkAssignment2_3, lanesFac, Id.create("2_3.ol", Lane.class), bottleneckCap, 1000, 0, 2, null,
+		LanesUtils.createAndAddLane(linkAssignment2_3, lanesFac, Id.create("2_3.ol", Lane.class), MIDDLE_LINK_CAP, 1000, 0, 2, null,
 				Arrays.asList(Id.create("2_3.l", Lane.class), Id.create("2_3.s", Lane.class)));
-		LanesUtils.createAndAddLane(linkAssignment2_3, lanesFac, Id.create("2_3.l", Lane.class), bottleneckCap, 500, 1, 1, Collections.singletonList(Id.createLinkId("3_2")), null);
-		LanesUtils.createAndAddLane(linkAssignment2_3, lanesFac, Id.create("2_3.s", Lane.class), bottleneckCap, 500, 0, 1, Collections.singletonList(Id.createLinkId("3_4")), null);
+		LanesUtils.createAndAddLane(linkAssignment2_3, lanesFac, Id.create("2_3.l", Lane.class), MIDDLE_LINK_CAP, 500, 1, 1, Collections.singletonList(Id.createLinkId("3_2")), null);
+		LanesUtils.createAndAddLane(linkAssignment2_3, lanesFac, Id.create("2_3.s", Lane.class), MIDDLE_LINK_CAP, 500, 0, 1, Collections.singletonList(Id.createLinkId("3_4")), null);
 		lanes.addLanesToLinkAssignment(linkAssignment2_3);
 
 		// create link assignment of link 3_2
 		LanesToLinkAssignment linkAssignment3_2 = lanesFac.createLanesToLinkAssignment(Id.createLinkId("3_2"));
-		LanesUtils.createAndAddLane(linkAssignment3_2, lanesFac, Id.create("3_2.ol", Lane.class), bottleneckCap, 1000, 0, 2, null,
+		LanesUtils.createAndAddLane(linkAssignment3_2, lanesFac, Id.create("3_2.ol", Lane.class), MIDDLE_LINK_CAP, 1000, 0, 2, null,
 				Arrays.asList(Id.create("3_2.l", Lane.class), Id.create("3_2.s", Lane.class)));
-		LanesUtils.createAndAddLane(linkAssignment3_2, lanesFac, Id.create("3_2.l", Lane.class), bottleneckCap, 500, 1, 1, Collections.singletonList(Id.createLinkId("2_3")), null);
-		LanesUtils.createAndAddLane(linkAssignment3_2, lanesFac, Id.create("3_2.s", Lane.class), bottleneckCap, 500, 0, 1, Collections.singletonList(Id.createLinkId("2_1")), null);
+		LanesUtils.createAndAddLane(linkAssignment3_2, lanesFac, Id.create("3_2.l", Lane.class), MIDDLE_LINK_CAP, 500, 1, 1, Collections.singletonList(Id.createLinkId("2_3")), null);
+		LanesUtils.createAndAddLane(linkAssignment3_2, lanesFac, Id.create("3_2.s", Lane.class), MIDDLE_LINK_CAP, 500, 0, 1, Collections.singletonList(Id.createLinkId("2_1")), null);
 		lanes.addLanesToLinkAssignment(linkAssignment3_2);
 	}
 	
-	private static void createSingleStreamPopulation(Population pop, Id<Link> fromLinkId, Id<Link> toLinkId, boolean initRoutes) {
+	private static void createSingleStreamPopulation(Population pop, Id<Link> fromLinkId, Id<Link> toLinkId, boolean initRoutes, int startTime) {
 		PopulationFactory fac = pop.getFactory();
-
-		for (int i = 0; i < 3600; i++) {
-			// create a person
+		
+		int simTime = 3600;
+		int currentActEnd = startTime;
+		for (int i = 0; currentActEnd < startTime + simTime; i++) {
+			// create a person (the i-th person)
 			Person person = fac.createPerson(Id.createPersonId(fromLinkId + "-" + toLinkId + "-" + i));
 			pop.addPerson(person);
 
@@ -260,8 +272,25 @@ public class RunGridLock {
 
 			// create a start activity at the from link
 			Activity startAct = fac.createActivityFromLinkId("dummy", fromLinkId);
-			// distribute agents uniformly during one hour.
-			startAct.setEndTime(i);
+			if (DEMAND_INTENSITY.equals(DemandIntensity.CONSTANT)){
+				// distribute agents uniformly during one hour.
+				currentActEnd++;
+			} else if (DEMAND_INTENSITY.equals(DemandIntensity.INCREASING)) {
+				if (currentActEnd < simTime/5){
+					currentActEnd += 5;
+				} else if (currentActEnd < (simTime/5)*2){
+					currentActEnd += 4;
+				} else if (currentActEnd < (simTime/5)*3){
+					currentActEnd += 3;
+				} else if (currentActEnd < (simTime/5)*4){
+					currentActEnd += 2;
+				} else {
+					currentActEnd += 1;
+				}
+			} else {
+				throw new UnsupportedOperationException("The choosen demand intensity " + DEMAND_INTENSITY + " is not yet supported.");
+			}
+			startAct.setEndTime(currentActEnd);
 			plan.addActivity(startAct);
 
 			// create a dummy leg
@@ -289,11 +318,14 @@ public class RunGridLock {
 	}
 
 	private static void createTwoStreamPopulation(Population pop, Id<Link> fromLinkId1, Id<Link> toLinkId1, Id<Link> fromLinkId2, Id<Link> toLinkId2, boolean initRoutes) {
-		createSingleStreamPopulation(pop, fromLinkId1, toLinkId1, initRoutes);
-		createSingleStreamPopulation(pop, fromLinkId2, toLinkId2, initRoutes);
+		createSingleStreamPopulation(pop, fromLinkId1, toLinkId1, initRoutes, 0);
+		createSingleStreamPopulation(pop, fromLinkId2, toLinkId2, initRoutes, DEMAND_START_TIME_OFFSET);
 	}
 	
 	private static void createGridlockSignals(Scenario scenario) {
+		// add missing signals scenario element
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
+		
 		createUTurnNoTurnSystem(scenario, Id.createNodeId(2), Id.createLinkId("1_2"), Id.createLinkId("2_3"), Id.createLinkId("3_2"), Id.createLinkId("2_1"));
 		createUTurnNoTurnSystem(scenario, Id.createNodeId(3), Id.createLinkId("4_3"), Id.createLinkId("3_2"), Id.createLinkId("2_3"), Id.createLinkId("3_4"));
 	}
@@ -306,6 +338,9 @@ public class RunGridLock {
 		SignalControlData signalControl = signalsData.getSignalControlData();
 		SignalControlDataFactory conFac = new SignalControlDataFactoryImpl();
 
+		// create a temporary, empty signal control object needed for sylvia
+		SignalControlData tmpSignalControl = new SignalControlDataImpl();
+		
 		// create signal system
 		Id<SignalSystem> signalSystemId = Id.create("SignalSystem" + systemNodeId, SignalSystem.class);
 		SignalSystemData signalSystem = sysFac.createSignalSystemData(signalSystemId);
@@ -330,27 +365,42 @@ public class RunGridLock {
 		// create a group for all signals each (one element groups)
 		SignalUtils.createAndAddSignalGroups4Signals(signalGroups, signalSystem);
 
-		// create the signal control - almost all day green
+		// create the signal control
 		SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
-		switch (SIGNALTYPE){
-		case DOWNSTREAM:
-			signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
-			break;
-		case PLANBASED:
-			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			break;
-		default:
-			break;
-		}
-
 		// create a plan for the signal system (with defined cycle time and offset 0)
 		SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));
 		signalSystemControl.addSignalPlanData(signalPlan);
 		// specify signal group settings for the single element signal groups
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 59));
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 0, 59));
-		signalControl.addSignalSystemControllerData(signalSystemControl);
+		switch (SIGNALTYPE){
+		case DOWNSTREAM:
+			signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+			log.info("Create almost all day green base plan for downstream signal controller");
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 59));
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 0, 59));
+			signalControl.addSignalSystemControllerData(signalSystemControl);
+			break;
+		case PLANBASED:
+			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			log.info("Create alternating signal phases for conflicting streams");
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+			signalControl.addSignalSystemControllerData(signalSystemControl);
+			break;
+		case SYLVIA:
+			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			log.warn("outgoing signal time shortend to combine signal phases for sylvia. keep in mind while comparing planbased and sylvia!");
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 30, 59));
+			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+			tmpSignalControl.addSignalSystemControllerData(signalSystemControl);
+			// create the sylvia signal control by shorten the temporary signal control
+			DgSylviaPreprocessData.convertSignalControlData(tmpSignalControl, signalControl);
+			break;
+		default:
+			break;
+		}
 	}
 	
 }
