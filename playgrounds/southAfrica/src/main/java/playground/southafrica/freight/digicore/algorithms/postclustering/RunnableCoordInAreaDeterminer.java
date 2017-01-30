@@ -1,4 +1,4 @@
-package playground.southafrica.freight.digicore.analysis.postClustering;
+package playground.southafrica.freight.digicore.algorithms.postclustering;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

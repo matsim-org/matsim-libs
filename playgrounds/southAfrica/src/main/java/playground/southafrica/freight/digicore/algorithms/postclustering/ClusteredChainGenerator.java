@@ -1,4 +1,4 @@
-package playground.southafrica.freight.digicore.analysis.postClustering;
+package playground.southafrica.freight.digicore.algorithms.postclustering;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +32,13 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
+/**
+ * This class was used with individual xml files. It is now superceded by using
+ * a single vehicles container. Instead us {@link FacilityToActivityLinker}.
+ *
+ * @author jwjoubert
+ */
+@Deprecated
 public class ClusteredChainGenerator {
 	private static Logger log = Logger.getLogger(ClusteredChainGenerator.class);
 	private static long reconstructDuration;

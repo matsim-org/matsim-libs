@@ -1,4 +1,4 @@
-package playground.southafrica.freight.digicore.analysis.postClustering;
+package playground.southafrica.freight.digicore.algorithms.postclustering;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,6 +14,11 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreFacility;
@@ -21,12 +26,13 @@ import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
-
+/**
+ * Only keep it here for backward compatibility. Some time in future, if this
+ * is no longer used, we can remove/delete it.
+ *
+ * @author jwjoubert
+ */
+@Deprecated
 public class RunnableChainReconstructor implements Runnable {
 	private Logger log = Logger.getLogger(RunnableChainReconstructor.class);
 	private File vehicleFile;
@@ -134,5 +140,7 @@ public class RunnableChainReconstructor implements Runnable {
 			e.printStackTrace();
 		}
 		threadCounter.incCounter();
-	}	
+	}
+
+
 }
