@@ -1,6 +1,5 @@
 package playground.southafrica.freight.digicore.algorithms.postclustering;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +38,8 @@ import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
 import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
-public class FacilityToActivityLinker {
-	private static Logger log = Logger.getLogger(FacilityToActivityLinker.class);
+public class FacilityToActivityAssigner {
+	private static Logger log = Logger.getLogger(FacilityToActivityAssigner.class);
 	private static long reconstructDuration;
 	private static long treeBuildDuration;
 	private static long writeToFileDuration;
@@ -79,7 +78,7 @@ public class FacilityToActivityLinker {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Header.printHeader(FacilityToActivityLinker.class.toString(), args);
+		Header.printHeader(FacilityToActivityAssigner.class.toString(), args);
 		long startTime = System.currentTimeMillis();
 
 		String inputVehicles = args[0];
@@ -112,7 +111,7 @@ public class FacilityToActivityLinker {
 		oar.putAttributeConverter(Polygon.class, new HullConverter());
 		oar.readFile(inputFacilityAttributeFile);
 
-		FacilityToActivityLinker ccg = new FacilityToActivityLinker();
+		FacilityToActivityAssigner ccg = new FacilityToActivityAssigner();
 
 		/* Build facility QuadTree. */
 		QuadTree<DigicoreFacility> facilityTree = ccg.buildFacilityQuadTree(inputFacilityFile, inputFacilityAttributeFile);
@@ -248,7 +247,7 @@ public class FacilityToActivityLinker {
 	}
 
 	/* Default constructor */
-	public FacilityToActivityLinker() {
+	public FacilityToActivityAssigner() {
 
 	}
 
