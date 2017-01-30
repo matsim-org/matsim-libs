@@ -20,19 +20,27 @@
 package org.matsim.contrib.socnetsim.framework.replanning.removers;
 
 import com.google.inject.Inject;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.socnetsim.framework.controller.listeners.GroupReplanningListenner;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.collections.MapUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Considers the "maximum plans per agent" is actually a "maximum plans per
@@ -45,6 +53,7 @@ import java.util.*;
  * @author thibautd
  */
 public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRemover {
+	private static final Logger log = Logger.getLogger( LexicographicForCompositionExtraPlanRemover.class );
 	private final Random random;
 	private final int maxPlansPerComposition;
 	private final int maxPlansPerAgent;
@@ -68,6 +77,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 	public boolean removePlansInGroup(
 			final JointPlans jointPlans,
 			final ReplanningGroup group) {
+		if ( log.isTraceEnabled() ) log.trace( "remove plans in group of size "+group.getPersons().size() );
 		boolean somethingDone = false;
 
 		// check condition per composition
@@ -84,12 +94,15 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 								plansPerComposition.getIndividualPlans()));
 				somethingDone = true;
 			}
+			if ( log.isTraceEnabled() && rem > 0 ) log.trace( "removed "+rem+" individual plans for person "+person.getId() );
 
 			for ( Collection<JointPlan> structure : plansPerComposition.getJointPlansGroupedPerStructure() ) {
 				rem = 0;
+				int size = 0;
 				while ( structure.size() - rem > maxPlansPerComposition ) {
 					rem++;
 					final JointPlan toRemove = identifyWorst( maxRank , structure );
+					size = toRemove.getIndividualPlans().size();
 
 					for ( Plan p : toRemove.getIndividualPlans().values() ) {
 						p.getPerson().removePlan(p);
@@ -97,6 +110,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 					jointPlans.removeJointPlan( toRemove );
 					somethingDone = true;
 				}
+				if ( log.isTraceEnabled() && rem > 0 ) log.trace( "removed "+rem+" joint plans for structure of size "+size );
 			}
 		}
 
@@ -110,10 +124,13 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		final List<Person> persons = new ArrayList<>( group.getPersons() );
 		Collections.shuffle( persons , random );
 		boolean loop = true;
+		int rem = 0;
 		while ( loop ) {
 			loop = false;
 			for ( Person person : persons ) {
 				if ( person.getPlans().size() > maxPlansPerAgent ) {
+					if ( log.isTraceEnabled() ) log.trace( "person "+person.getId()+" has "+(person.getPlans().size() - maxPlansPerAgent)+" excedentary plans" );
+					rem++;
 					final Plan toRemove = getWorstNonUniquelyIndividualPlan( person.getPlans(), jointPlans );
 					final JointPlan jpToRemove = jointPlans.getJointPlan( toRemove );
 
@@ -133,6 +150,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 				loop = loop || person.getPlans().size() > maxPlansPerAgent;
 			}
 		}
+		if ( log.isTraceEnabled() && rem > 0 ) log.trace( "removed "+rem+" excedentary plans" );
 
 		return somethingDone;
 	}
@@ -148,12 +166,12 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		for ( Plan plan : plans ) {
 			final JointPlan jp = jointPlans.getJointPlan( plan );
 
-			if ( jp == null ) nIndividualPlans++;
+			if ( isIndividual( jp ) ) nIndividualPlans++;
 
 			if ( worst == null || plan.getScore() < worst.getScore() ) {
 				secondWorst = worst;
 				worst = plan;
-				worstIsIndividual = jp == null;
+				worstIsIndividual = isIndividual( jp );
 			}
 			else if ( secondWorst == null || plan.getScore() < secondWorst.getScore() ) {
 				secondWorst = plan;
@@ -161,8 +179,12 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		}
 
 		// if there is only one individual plan, do not consider it "worse"
-		assert nIndividualPlans > 0;
+		assert nIndividualPlans > 0; // this assertion only makes sense if all persons have at least 1 individual plan
 		return ( nIndividualPlans == 1 && worstIsIndividual ) ? secondWorst : worst;
+	}
+
+	private static boolean isIndividual( final JointPlan jp ) {
+		return jp == null || jp.getIndividualPlans().size() == 1;
 	}
 
 	private static int maxRank(final ReplanningGroup group) {
@@ -178,7 +200,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 	private static JointPlan identifyWorst(
 			final int maxRank,
 			final Collection<JointPlan> jointPlans) {
-		final Collection<ValuedJointPlan> coll = new ArrayList<ValuedJointPlan>();
+		final Collection<ValuedJointPlan> coll = new ArrayList<>();
 		for ( JointPlan jp : jointPlans ) {
 			coll.add(
 					new ValuedJointPlan(

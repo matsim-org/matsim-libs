@@ -78,7 +78,12 @@ public class CoalitionChoiceIterator<P extends Proposition> {
 			for ( P proposition : alternativesGenerator.generateAlternatives( agent ) ) {
 				counter.incCounter();
 				final JointPlan jp = jointPlanCreator.apply( proposition );
-				if ( jp.getIndividualPlans().size() > 1 ) jointPlans.addJointPlan( jp );
+				if ( jp.getIndividualPlans().size() > 1 ) {
+					jointPlans.addJointPlan( jp );
+				}
+				else if ( jointPlans.contains( jp ) ){
+					jointPlans.removeJointPlan( jp );
+				}
 
 				for ( Plan p : jp.getIndividualPlans().values() ) {
 					p.setScore(
