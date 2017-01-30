@@ -50,7 +50,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.southafrica.freight.digicore.algorithms.concaveHull.ConcaveHull;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.ClusterActivity;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.DigicoreCluster;
-import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
+import playground.southafrica.freight.digicore.algorithms.postclustering.ClusteredChainGenerator;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 import playground.southafrica.freight.digicore.io.DigicoreVehiclesReader;
