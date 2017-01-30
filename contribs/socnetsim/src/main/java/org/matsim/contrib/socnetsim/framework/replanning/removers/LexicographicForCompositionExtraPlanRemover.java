@@ -109,7 +109,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		// worst plan is always removed, whatever the ranking of the others is)
 		final List<Person> persons = new ArrayList<>( group.getPersons() );
 		Collections.shuffle( persons , random );
-		boolean loop = false;
+		boolean loop = true;
 		while ( loop ) {
 			loop = false;
 			for ( Person person : persons ) {

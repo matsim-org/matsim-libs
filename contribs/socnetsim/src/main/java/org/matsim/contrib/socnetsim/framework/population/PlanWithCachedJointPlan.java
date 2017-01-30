@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -184,6 +185,14 @@ public final class PlanWithCachedJointPlan implements Plan {
 	public final void copyFrom( Plan in) {
 		// yy we really need a more systematic way for plans copying.  kai, nov15
 		PopulationUtils.copyFromTo(in, delegate);
+	}
+
+	@Override
+	public String toString() {
+		return "PlanWithCachedJointPlan{" +
+				"delegate=" + delegate +
+				", jointPlans=" + Arrays.toString( jointPlans ) +
+				'}';
 	}
 }
 
