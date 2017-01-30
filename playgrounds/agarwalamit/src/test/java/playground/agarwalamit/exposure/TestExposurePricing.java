@@ -55,6 +55,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.agarwalamit.analysis.emission.AirPollutionExposureAnalysisControlerListener;
 import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionCostHandler;
+import playground.agarwalamit.munich.utils.MunichPersonFilter;
+import playground.agarwalamit.utils.PersonFilter;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -179,11 +181,12 @@ public class TestExposurePricing {
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
 				bind(EmissionModule.class).toInstance(emissionModule);
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
-				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 
 				bindCarTravelDisutilityFactory().toInstance(emfac);
-				bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(emissionCostModule));
-//				addEventHandlerBinding().to(ExperiencedEmissionCostHandler.class).asEagerSingleton();
+				bind(ExperiencedEmissionCostHandler.class);
+				bind(PersonFilter.class).to(MunichPersonFilter.class);
+//				bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(emissionCostModule,null));
 				addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 			}
 		});
@@ -248,11 +251,11 @@ public class TestExposurePricing {
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
 				bind(EmissionModule.class).toInstance(emissionModule);
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
-				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 
-				bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(emissionCostModule));
+				bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(emissionCostModule,null));
 				addEventHandlerBinding().to(ExperiencedEmissionCostHandler.class).asEagerSingleton();
 				addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 			}
@@ -262,6 +265,8 @@ public class TestExposurePricing {
 		controler.getEvents().addHandler(personMoneyEventHandler);
 
 		controler.run();
+
+		Assert.assertTrue("Money events are not thrown,check if emission costs are internlized.", personMoneyEventHandler.events.size()>0);
 
 		if (noOfTimeBins == 1) {
 			/*

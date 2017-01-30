@@ -394,7 +394,7 @@ public class CNEIntegration {
 					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
 					bind(EmissionModule.class).toInstance(finalEmissionModule);
 					bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
-					bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+					addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				}
 			});
 
@@ -585,7 +585,7 @@ public class CNEIntegration {
 					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
 					bind(EmissionModule.class).toInstance(finalEmissionModule);
 					bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
-					bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+					addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				}
 			});
 
@@ -680,7 +680,7 @@ public class CNEIntegration {
 					bind(GridTools.class).toInstance(gridTools);
 					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
 					bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(finalEmissionCostModule, personFilter));
-					addControlerListenerBinding().toInstance(new AirPollutionExposureAnalysisControlerListener());
+					addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 				}
 			});
 		}
