@@ -42,7 +42,7 @@ import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
  * @author ikaddoura
  *
  */
-public class CNETest {
+public class CNETestIT {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

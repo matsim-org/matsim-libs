@@ -45,7 +45,7 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
  *
  */
 
-public class DecongestionPricingTest {
+public class DecongestionPricingTestIT {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
