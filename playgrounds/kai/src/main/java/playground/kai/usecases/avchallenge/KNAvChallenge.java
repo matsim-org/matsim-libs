@@ -42,7 +42,7 @@ public class KNAvChallenge {
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override public void install() {
-				this.bind( VrpOptimizer.class ).toInstance( new MyVrpOptimizer() ) ;
+				this.bind( VrpOptimizer.class ).toInstance( new KNVrpOptimizer() ) ;
 			}
 		}) ;
 		

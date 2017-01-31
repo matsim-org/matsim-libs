@@ -18,13 +18,13 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author nagel
  *
  */
-class MyVrpOptimizer implements VrpOptimizer {
+class KNVrpOptimizer implements VrpOptimizer {
 	
 	@Inject MobsimTimer timer ;
 	
 	private Queue<Request> requests = new LinkedList<>() ;
 
-	MyVrpOptimizer() {
+	KNVrpOptimizer() {
 	}
 
 	@Override
