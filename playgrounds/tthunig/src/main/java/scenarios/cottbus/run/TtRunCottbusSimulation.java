@@ -29,11 +29,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
 import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
@@ -65,6 +68,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
+import signals.CombinedSignalsModule;
+import signals.downstreamSensor.DownstreamSignalController;
 
 /**
  * Class to run a cottbus simulation.
@@ -96,7 +101,7 @@ public class TtRunCottbusSimulation {
 	
 	private final static SignalType SIGNAL_TYPE = SignalType.MS;
 	public enum SignalType {
-		NONE, MS, MS_RANDOM_OFFSETS, BTU_OPT
+		NONE, MS, MS_RANDOM_OFFSETS, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN
 	}
 	
 	// defines which kind of pricing should be used
@@ -109,13 +114,13 @@ public class TtRunCottbusSimulation {
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private static final double SIGMA = 0.0;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/cottbus/createNewBC/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/cottbus/createGridLock/";
 	private static final String INPUT_BASE_DIR = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
 	private static final String BTU_BASE_DIR = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
 	
 	private static final boolean WRITE_INITIAL_FILES = true;
-	private static final boolean USE_COUNTS = true;
-	private static final double SCALING_FACTOR = 0.7;
+	private static final boolean USE_COUNTS = false;
+	private static final double SCALING_FACTOR = 0.5;
 	
 	public static void main(String[] args) {
 		if (!SCENARIO_TYPE.equals(ScenarioType.BaseCase) && !NETWORK_TYPE.equals(NetworkType.V1)){
@@ -194,12 +199,15 @@ public class TtRunCottbusSimulation {
 				signalConfigGroup.setSignalGroupsFile(INPUT_BASE_DIR + "signal_groups_no_13.xml");
 				switch (SIGNAL_TYPE) {
 				case MS:
+				case DOWNSTREAM_MS:
+				case DOWNSTREAM_ALLGREEN: // will be changed to all day green later
 					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13.xml");
 					break;
 				case MS_RANDOM_OFFSETS:
 					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13_random_offsets.xml");
 					break;
 				case BTU_OPT:
+				case DOWNSTREAM_BTUOPT:
 					signalConfigGroup.setSignalControlFile(BTU_BASE_DIR + "btu/signal_control_opt.xml");
 					break;
 				}
@@ -361,6 +369,34 @@ public class TtRunCottbusSimulation {
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		}
+
+		// adapt signal controller for downstream signal control
+		switch (SIGNAL_TYPE) {
+		case DOWNSTREAM_BTUOPT:
+		case DOWNSTREAM_MS:
+			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+			SignalControlData signalControl = signalsData.getSignalControlData();
+			for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()) {
+				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+			}
+			break;
+		case DOWNSTREAM_ALLGREEN:
+			signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+			signalControl = signalsData.getSignalControlData();
+			for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()) {
+				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+				// change to all day green
+				for (SignalPlanData planData : controllerData.getSignalPlanData().values()) {
+					for (SignalGroupSettingsData groupSetting : planData.getSignalGroupSettingsDataByGroupId().values()) {
+						groupSetting.setOnset(0);
+						groupSetting.setDropping(planData.getCycleTime());
+					}
+				}
+			}
+			break;
+		default:
+			break;
+		}
 		
 		if (WRITE_INITIAL_FILES) 
 			writeInitFiles(scenario);
@@ -376,7 +412,8 @@ public class TtRunCottbusSimulation {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			controler.addOverridingModule(new SignalsModule());
+//			controler.addOverridingModule(new SignalsModule());
+			controler.addOverridingModule(new CombinedSignalsModule());
 		}
 		
 		// add the module for link to link routing if enabled
@@ -562,6 +599,15 @@ public class TtRunCottbusSimulation {
 				break;
 			case MS_RANDOM_OFFSETS:
 				runName += "_rdmOff";
+				break;
+			case DOWNSTREAM_MS:
+				runName += "_dwnBC";
+				break;
+			case DOWNSTREAM_ALLGREEN:
+				runName += "_dwnGreen";
+				break;
+			case DOWNSTREAM_BTUOPT:
+				runName += "_dwnOPT";
 				break;
 			default:
 				runName += "_" + SIGNAL_TYPE;

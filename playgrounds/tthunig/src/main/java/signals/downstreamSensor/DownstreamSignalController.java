@@ -103,7 +103,7 @@ public class DownstreamSignalController implements SignalController {
 			// maximum number such that free speed travel time can be reached (when vehicles are distributed uniformly over time)
 			int maxNoCarsForFreeSpeedTT = (int) Math.ceil((link.getLength() / link.getFreespeed()) * (link.getCapacity() / 3600));
 			linkMaxNoCarsForFreeSpeed.put(link.getId(), maxNoCarsForFreeSpeedTT);
-			log.info("setting max number of cars for free speed travel time to " + maxNoCarsForFreeSpeedTT);
+//			log.info("setting max number of cars for free speed travel time to " + maxNoCarsForFreeSpeedTT);
 		}
 	}
 
