@@ -21,14 +21,19 @@ package utils;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import analysis.TtAnalyzedGeneralResultsWriter;
+import analysis.TtGeneralAnalysis;
+import analysis.TtListenerToBindGeneralAnalysis;
+import signals.CombinedSignalsModule;
 
 
 /**
@@ -58,13 +63,25 @@ public class TtBasicController {
         
 		// add the signals module if signal systems are used
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			controler.addOverridingModule(new SignalsModule());
+//			controler.addOverridingModule(new SignalsModule());
+			controler.addOverridingModule(new CombinedSignalsModule());
 		}
 				
 		// add the module for link to link routing if enabled
 		if (config.controler().isLinkToLinkRoutingEnabled()){
 			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
+		
+		// add analysis tools
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				this.bind(TtGeneralAnalysis.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(TtGeneralAnalysis.class);
+				this.bind(TtAnalyzedGeneralResultsWriter.class);
+				this.addControlerListenerBinding().to(TtListenerToBindGeneralAnalysis.class);
+			}
+		});
 		
 		controler.run();
 	}
