@@ -58,7 +58,9 @@ public class TaxiModule
         addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
         bind(TaxiData.class).toInstance(taxiData);
         bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
+
         bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
+        // yyyy: Why is this a factory?  See comment in TaxiOptimizerFactory.  kai, jan'2017
 
         addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
         addControlerListenerBinding().to(TaxiStatsDumper.class);
