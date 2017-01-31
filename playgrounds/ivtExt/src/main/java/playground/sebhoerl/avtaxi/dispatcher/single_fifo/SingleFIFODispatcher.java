@@ -61,6 +61,7 @@ public class SingleFIFODispatcher implements AVDispatcher {
 
     private void reoptimize(double now) {
         while (availableVehicles.size() > 0 && pendingRequests.size() > 0) {
+            System.out.println("single FIFO heuristic is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + "  availableVehicles.size()" + availableVehicles.size());
             AVVehicle vehicle = availableVehicles.poll();
             AVRequest request = pendingRequests.poll();
             appender.schedule(request, vehicle, now);

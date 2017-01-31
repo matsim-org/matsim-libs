@@ -3,6 +3,7 @@ package playground.sebhoerl.avtaxi.framework;
 import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
+import junit.framework.Test;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -19,6 +20,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.opengis.filter.capability.Operator;
+import playground.clruch.dispatcher.LazyDispatcher;
+import playground.clruch.dispatcher.TestDispatcher;
 import playground.sebhoerl.avtaxi.config.*;
 import playground.sebhoerl.avtaxi.data.*;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -82,10 +85,16 @@ public class AVModule extends AbstractModule {
         bind(SingleFIFODispatcher.Factory.class);
         bind(SingleHeuristicDispatcher.Factory.class);
         bind(MultiODHeuristic.Factory.class);
+        bind(TestDispatcher.Factory.class);
+        bind(LazyDispatcher.Factory.class);
+
+        // TODO: Also change identifiers of other dispatchers to class internal
 
         AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), TestDispatcher.IDENTIFIER).to(TestDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LazyDispatcher.IDENTIFIER).to(LazyDispatcher.Factory.class);
     }
 
     private void configureGeneratorStrategies() {
