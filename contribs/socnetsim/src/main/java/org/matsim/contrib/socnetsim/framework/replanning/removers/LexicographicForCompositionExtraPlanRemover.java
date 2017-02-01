@@ -84,6 +84,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 		// check condition per composition
 		final int maxRank = maxRank( group );
 		for ( Person person : group.getPersons() ) {
+			if ( person.getPlans().size() <= maxPlansPerAgent ) continue;
 			final PlansPerComposition plansPerComposition = getPlansPerComposition( jointPlans , person );
 
 			// too many individual plans?
@@ -312,7 +313,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 	}
 
 	private static class PlansPerComposition {
-		private final Collection<Plan> individualPlans = new ArrayList<Plan>();
+		private final Collection<Plan> individualPlans = new ArrayList<>();
 		private final Map< Set<Id<Person>> , Collection<JointPlan> > jointPlans = new LinkedHashMap< >();
 
 		public void addPlan( final Plan p ) {

@@ -28,18 +28,16 @@ import org.matsim.contrib.socnetsim.framework.replanning.removers.LexicographicF
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.stream.Collector;
 
 /**
  * @author thibautd
  */
 public class RunLexicographicRemoverForProfiling {
-	private static final int POP_SIZE = 1000;
-	private static final int N_PLANS = 10;
+	private static final int POP_SIZE = 10000;
+	private static final int N_PLANS = 20;
 	private static final int N_JOINT_PLANS = POP_SIZE * 10;
 
 	private static final Random random = new Random( 123 );
