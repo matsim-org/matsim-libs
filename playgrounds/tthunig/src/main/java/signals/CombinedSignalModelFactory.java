@@ -36,6 +36,7 @@ import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -64,12 +65,12 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 	private Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
 
 	@Inject
-	public CombinedSignalModelFactory(Scenario scenario, DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager) {
+	public CombinedSignalModelFactory(Scenario scenario, DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, JDEQSimConfigGroup jdeQSim) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
 		// prepare signal controller provider
 		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, signalsData));
-		signalControlProvider.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network));
+		signalControlProvider.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network, jdeQSim));
 		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(sensorManager, signalsData, network));
 		signalControlProvider.put(DgRoederGershensonSignalController.IDENTIFIER, new DgRoederGershensonSignalController.SignalControlProvider(sensorManager, scenario));
 	}
@@ -82,7 +83,7 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (signalControlProvider.containsKey(controllerIdentifier)) {
-			log.info("Creating " + controllerIdentifier);
+//			log.info("Creating " + controllerIdentifier);
 			SignalController signalControl = signalControlProvider.get(controllerIdentifier).get();
 			signalControl.setSignalSystem(signalSystem);
 			return signalControl;

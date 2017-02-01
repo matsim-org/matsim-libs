@@ -32,16 +32,20 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 
 import com.google.inject.Inject;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
+import signals.CombinedSignalModelFactory;
 import signals.downstreamSensor.DownstreamSignalController.SignalControlProvider;
 
 /**
  * @author tthunig
  *
+ * @deprecated use {@link CombinedSignalModelFactory} instead
  */
+@Deprecated
 public class DownstreamSignalModelFactory implements SignalModelFactory{
 
 	private static final Logger log = Logger.getLogger(DownstreamSignalModelFactory.class);
@@ -51,10 +55,10 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 	private SignalControlProvider provider;
 
 	@Inject 
-	public DownstreamSignalModelFactory(LinkSensorManager sensorManager, Scenario scenario) {
+	public DownstreamSignalModelFactory(LinkSensorManager sensorManager, Scenario scenario, JDEQSimConfigGroup jdeQSim) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
-		this.provider = new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network) ;
+		this.provider = new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network, jdeQSim) ;
 	}
 	
 	@Override

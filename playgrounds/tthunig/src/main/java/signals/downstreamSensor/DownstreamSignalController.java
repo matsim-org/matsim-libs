@@ -40,6 +40,7 @@ import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 
 import com.google.inject.Provider;
 
@@ -59,22 +60,30 @@ public class DownstreamSignalController implements SignalController {
 		private final LinkSensorManager sensorManager;
 		private final SignalsData signalsData;
 		private final Network network;
+		private final JDEQSimConfigGroup jdeQSim;
 
-		public SignalControlProvider(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+		public SignalControlProvider(LinkSensorManager sensorManager, SignalsData signalsData, Network network, JDEQSimConfigGroup jdeQSim) {
 			this.sensorManager = sensorManager;
 			this.signalsData = signalsData;
 			this.network = network;
+			this.jdeQSim = jdeQSim;
 		}
 
 		@Override
 		public DownstreamSignalController get() {
-			return new DownstreamSignalController(sensorManager, signalsData, network);
+			return new DownstreamSignalController(sensorManager, signalsData, network, jdeQSim);
 		}
 	}
 
-	private LinkSensorManager sensorManager;
-	private SignalsData signalsData;
-	private Network network;
+	/* the controller will allow a delay of at most this factor times the free speed travel time */
+	private static final double DELAY_FACTOR = 2;
+	/* the controller will allow a link occupation of at most this factor time the maximum number of vehicles regarding to the storage capacity */
+	private static final double STORAGE_FACTOR = 0.75;
+	
+	private final LinkSensorManager sensorManager;
+	private final SignalsData signalsData;
+	private final Network network;
+	private final JDEQSimConfigGroup jdeQSim;
 
 	private SignalSystem system;
 	private Node systemNode;
@@ -85,10 +94,11 @@ public class DownstreamSignalController implements SignalController {
 	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
 
-	private DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+	private DownstreamSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network, JDEQSimConfigGroup jdeQSim) {
 		this.sensorManager = sensorManager;
 		this.signalsData = signalsData;
 		this.network = network;
+		this.jdeQSim = jdeQSim;
 		init();
 	}
 
@@ -97,11 +107,11 @@ public class DownstreamSignalController implements SignalController {
 		linkMaxNoCarsForStorage = new HashMap<>();
 		linkMaxNoCarsForFreeSpeed = new HashMap<>();
 		for (Link link : network.getLinks().values()) {
-			// maximum number = half of storage capacity
-			linkMaxNoCarsForStorage.put(link.getId(), (int) (link.getLength() / 15));
+			// maximum number = storage capacity * factor
+			linkMaxNoCarsForStorage.put(link.getId(), (int) ((link.getLength() / jdeQSim.getCarSize()) * STORAGE_FACTOR));
 
-			// maximum number such that free speed travel time can be reached (when vehicles are distributed uniformly over time)
-			int maxNoCarsForFreeSpeedTT = (int) Math.ceil((link.getLength() / link.getFreespeed()) * (link.getCapacity() / 3600));
+			// maximum number such that (free speed travel time * factor) can be reached (when vehicles are distributed uniformly over time)
+			int maxNoCarsForFreeSpeedTT = (int) Math.ceil((link.getLength() / link.getFreespeed()) * DELAY_FACTOR * (link.getCapacity() / 3600));
 			linkMaxNoCarsForFreeSpeed.put(link.getId(), maxNoCarsForFreeSpeedTT);
 //			log.info("setting max number of cars for free speed travel time to " + maxNoCarsForFreeSpeedTT);
 		}
@@ -179,9 +189,8 @@ public class DownstreamSignalController implements SignalController {
 	private boolean allDownstreamLinksEmpty(Id<SignalGroup> signalGroupId) {
 		for (Id<Signal> signalId : this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(this.system.getId()).get(signalGroupId).getSignalIds()) {
 			for (Id<Link> downstreamLinkId : signal2DownstreamLinkMap.get(signalId)) {
-				// TODO test other parameters
-				// if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCars.get(downstreamLinkId)) {
-				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCarsForFreeSpeed.get(downstreamLinkId)) {
+				// stop green if one of the numbers is exceeded
+				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > Math.min(linkMaxNoCarsForStorage.get(downstreamLinkId), linkMaxNoCarsForFreeSpeed.get(downstreamLinkId))) {
 					return false;
 				}
 			}
