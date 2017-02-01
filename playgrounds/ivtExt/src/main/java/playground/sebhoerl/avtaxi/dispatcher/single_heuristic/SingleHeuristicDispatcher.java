@@ -31,7 +31,7 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class SingleHeuristicDispatcher extends AbstractDispatcher {
-    private boolean reoptimize = true; // TODO probably obsolete
+//    private boolean reoptimize = true; // always true
 
     final private Id<AVOperator> operatorId;
     final private EventsManager eventsManager;
@@ -45,11 +45,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     final private Map<AVVehicle, Link> vehicleLinks = new HashMap<>();
     final private Map<AVRequest, Link> requestLinks = new HashMap<>();
 
-    public enum HeuristicMode {
-        OVERSUPPLY, UNDERSUPPLY
-    }
-
-    private HeuristicMode mode = HeuristicMode.OVERSUPPLY;
+    private SimpleDispatcherHeuristicMode mode = SimpleDispatcherHeuristicMode.OVERSUPPLY;
 
     public SingleHeuristicDispatcher(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, SingleRideAppender appender) {
 	super(appender);
@@ -65,6 +61,13 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     @Override
     public void onRequestSubmitted(AVRequest request) {
         addRequest(request, request.getFromLink());
+    }
+    
+    private void addRequest(AVRequest request, Link link) { // function only called from one place
+        pendingRequests.add(request);
+        pendingRequestsTree.put(link.getCoord().getX(), link.getCoord().getY(), request);
+        requestLinks.put(request, link);
+//        reoptimize = true;
     }
 
     @Override
@@ -97,7 +100,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
             appender.schedule(request, vehicle, now);
         }
 
-        HeuristicMode updatedMode = availableVehicles.size() > 0 ? HeuristicMode.OVERSUPPLY : HeuristicMode.UNDERSUPPLY;
+        SimpleDispatcherHeuristicMode updatedMode = availableVehicles.size() > 0 ? SimpleDispatcherHeuristicMode.OVERSUPPLY : SimpleDispatcherHeuristicMode.UNDERSUPPLY;
         if (!updatedMode.equals(mode)) {
             mode = updatedMode;
             eventsManager.processEvent(new ModeChangeEvent(mode, operatorId, now));
@@ -107,14 +110,8 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     @Override
     public void onNextTimestep(double now) {
         appender.update();
-        if (reoptimize) reoptimize(now);
-    }
-
-    private void addRequest(AVRequest request, Link link) {
-        pendingRequests.add(request);
-        pendingRequestsTree.put(link.getCoord().getX(), link.getCoord().getY(), request);
-        requestLinks.put(request, link);
-        reoptimize = true;
+//        if (reoptimize) 
+            reoptimize(now);
     }
 
     private AVRequest findRequest() {
@@ -145,7 +142,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         availableVehicles.add(vehicle);
         availableVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), vehicle);
         vehicleLinks.put(vehicle, link);
-        reoptimize = true;
+//        reoptimize = true;
     }
 
     private void removeVehicle(AVVehicle vehicle) {

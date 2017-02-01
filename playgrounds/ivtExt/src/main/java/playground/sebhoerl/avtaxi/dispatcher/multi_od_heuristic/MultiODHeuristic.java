@@ -19,7 +19,7 @@ import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregatedRequest;
 import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregationEvent;
 import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.ModeChangeEvent;
-import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
+import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SimpleDispatcherHeuristicMode;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
@@ -28,7 +28,7 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 import java.util.*;
 
 public class MultiODHeuristic implements AVDispatcher {
-    private boolean reoptimize = true;
+//    private boolean reoptimize = true; // TODO this is never set to false
 
     final private Id<AVOperator> operatorId;
     final private EventsManager eventsManager;
@@ -45,7 +45,7 @@ public class MultiODHeuristic implements AVDispatcher {
 
     final private Map<AVVehicle, AggregatedRequest> vehicle2Request = new HashMap<>();
 
-    private SingleHeuristicDispatcher.HeuristicMode mode = SingleHeuristicDispatcher.HeuristicMode.OVERSUPPLY;
+    private SimpleDispatcherHeuristicMode mode = SimpleDispatcherHeuristicMode.OVERSUPPLY;
 
     final private AggregateRideAppender appender;
     final private TravelTimeEstimator estimator;
@@ -116,10 +116,10 @@ public class MultiODHeuristic implements AVDispatcher {
             shareHistogram.put(count, shareHistogram.get(count) + 1);
         }
 
-        SingleHeuristicDispatcher.HeuristicMode updatedMode =
+        SimpleDispatcherHeuristicMode updatedMode =
                 availableVehicles.size() > 0 ?
-                        SingleHeuristicDispatcher.HeuristicMode.OVERSUPPLY :
-                        SingleHeuristicDispatcher.HeuristicMode.UNDERSUPPLY;
+                        SimpleDispatcherHeuristicMode.OVERSUPPLY :
+                        SimpleDispatcherHeuristicMode.UNDERSUPPLY;
 
         if (!updatedMode.equals(mode)) {
             mode = updatedMode;
@@ -130,7 +130,8 @@ public class MultiODHeuristic implements AVDispatcher {
     @Override
     public void onNextTimestep(double now) {
         this.now = now;
-        if (reoptimize) reoptimize(now);
+//        if (reoptimize) // always true
+            reoptimize(now);
     }
 
     private void addRequest(AVRequest request, Link link) {
@@ -194,7 +195,7 @@ public class MultiODHeuristic implements AVDispatcher {
         availableVehicles.add(vehicle);
         availableVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), vehicle);
         vehicleLinks.put(vehicle, link);
-        reoptimize = true;
+//        reoptimize = true; // always true
     }
 
     private void removeVehicle(AVVehicle vehicle) {
