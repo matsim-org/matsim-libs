@@ -30,7 +30,7 @@ public interface AVDispatcher {
      * 
      * @param vehicle
      */
-    void addVehicle(AVVehicle vehicle); // TODO rename to registerVehicle...(?)
+    void registerVehicle(AVVehicle vehicle);
 
     interface AVDispatcherFactory {
         AVDispatcher createDispatcher(AVDispatcherConfig config);

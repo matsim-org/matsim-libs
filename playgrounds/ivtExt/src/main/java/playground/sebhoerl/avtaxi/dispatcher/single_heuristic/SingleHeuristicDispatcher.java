@@ -70,7 +70,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     @Override
     public void onNextTaskStarted(AVTask task) {
         if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
-            addVehicle((AVVehicle) task.getSchedule().getVehicle(), ((AVStayTask) task).getLink());
+            private_addVehicle((AVVehicle) task.getSchedule().getVehicle(), ((AVStayTask) task).getLink());
         }
     }
 
@@ -92,7 +92,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
             }
 
             removeRequest(request);
-            removeVehicle(vehicle);
+            private_removeVehicle(vehicle);
 
             appender.schedule(request, vehicle, now);
         }
@@ -129,18 +129,19 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     }
 
     @Override
-    public void addVehicle(AVVehicle vehicle) {
+    public void registerVehicle(AVVehicle vehicle) {
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
-        addVehicle(vehicle, vehicle.getStartLink());
+        private_addVehicle(vehicle, vehicle.getStartLink());
     }
 
-    private void addVehicle(AVVehicle vehicle, Link link) {
+    private void private_addVehicle(AVVehicle vehicle, Link link) {
         availableVehicles.add(vehicle);
+        // FIXME the coordinates of the car in the tree are never updated (only removed)
         availableVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), vehicle);
         vehicleLinks.put(vehicle, link);
     }
 
-    private void removeVehicle(AVVehicle vehicle) {
+    private void private_removeVehicle(AVVehicle vehicle) {
         availableVehicles.remove(vehicle);
         Coord coord = vehicleLinks.remove(vehicle).getCoord();
         availableVehiclesTree.remove(coord.getX(), coord.getY(), vehicle);

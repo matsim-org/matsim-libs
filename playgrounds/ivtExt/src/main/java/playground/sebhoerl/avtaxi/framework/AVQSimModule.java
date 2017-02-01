@@ -97,7 +97,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
             AVDispatcher dispatcher = factory.createDispatcher(dc);
 
             for (AVVehicle vehicle : vehicles.get(oc.getId())) {
-                dispatcher.addVehicle(vehicle);
+                dispatcher.registerVehicle(vehicle);
                 vehicle.setDispatcher(dispatcher);
             }
 

@@ -44,7 +44,7 @@ public class TestDispatcher extends AbstractDispatcher {
     }
 
     @Override
-    public void addVehicle(AVVehicle vehicle) {
+    public void registerVehicle(AVVehicle vehicle) {
         availableVehicles.add(vehicle);
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
