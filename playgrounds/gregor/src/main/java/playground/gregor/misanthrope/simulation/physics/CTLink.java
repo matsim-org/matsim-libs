@@ -48,6 +48,8 @@ public class CTLink implements CTNetworkEntity {
     private EventsManager em;
     private CTLinkCell dsJumpOn;
     private CTLinkCell usJumpOn;
+    private Set<CTCell> dsJumpOns;
+    private Set<CTCell> usJumpOns;
 
     public CTLink(Link l, Link rev, EventsManager em, CTNetwork ctNetwork, CTNode from, CTNode to) {
         this.dsLink = l;
@@ -62,8 +64,20 @@ public class CTLink implements CTNetworkEntity {
     @Override
     public void init() {
 
-
         LineSegment ls = LineSegment.createFromLink(this.dsLink);
+
+        //wrong! el nodes/links need special params ...
+        if (this.dsLink.getId().toString().contains("el")) {
+//            length = LENGTH;
+//            width = 100;
+            log.warn("evacuation link needs to have unlimited flow cap! this is not implemented yet");
+            ls.x1 = ls.x0 += 10 * ls.dx;
+            ls.y1 = ls.y0 += 10 * ls.dy;
+            ls.length = 10;
+            ls.width = 50;
+        }
+
+
 
         pruneEnds(ls);
 
@@ -85,15 +99,10 @@ public class CTLink implements CTNetworkEntity {
         if (Math.abs(ls.dy) < EPSILON) { //fixes a numerical issue
             ls.dy = 0;
         }
-        double width = this.dsLink.getCapacity() / 1.33;
+        double width = ls.width;
 
 
-        //wrong! el nodes/links need special params ...
-        if (this.dsLink.getId().toString().contains("el")) {
-//            length = LENGTH;
-//            width = 100;
-            log.warn("evacuation link needs to have unlimited flow cap! this is not implemented yet");
-        }
+
 
 
         Coordinate[] bounds = new Coordinate[5];
@@ -150,6 +159,7 @@ public class CTLink implements CTNetworkEntity {
                 qt.put(cell.getX(), cell.getY(), cell);
                 for (GraphEdge ge : pt.edges) {
 //					debugGe(ge);
+                    cell.addGe(ge);
                     ProtoCell protoNeighbor = pt.nb.get(ge);
                     Geometry nCh = geoMap.get(protoNeighbor);
                     CTCell neighbor = null;
@@ -181,9 +191,9 @@ public class CTLink implements CTNetworkEntity {
 
 
         //identify cells
-        Set<CTCell> dsJumpOns = new HashSet<>();
-        Set<CTCell> usJumpOns = new HashSet<>();
-        for (double incr = 0; incr <= width; incr += WIDTH / 2.) {
+        this.dsJumpOns = new HashSet<>();
+        this.usJumpOns = new HashSet<>();
+        for (double incr = 0; incr <= width; incr += WIDTH / 8.) {
             double dsX = bounds[1].x + ls.dy * incr - WIDTH * ls.dx / 2.;
             double dsY = bounds[1].y - ls.dx * incr - WIDTH * ls.dy / 2.;
             double usX = bounds[0].x + ls.dy * incr + WIDTH * ls.dx / 2.;
@@ -217,10 +227,11 @@ public class CTLink implements CTNetworkEntity {
             ctCell.addNeighbor(this.usJumpOn);
         }
 
-        //append cells
-        if (CTRunner.DEBUG) {
-            debugBound(bounds);
-        }
+//        //append cells
+//        if (CTRunner.DEBUG) {
+//            debugBound(ls);
+//
+//        }
 
 
 //		if (CTRunner.DEBUG) {
@@ -241,29 +252,23 @@ public class CTLink implements CTNetworkEntity {
     private void pruneEnds(LineSegment ls) {
         List<LineSegment> usAdjacent = this.usNode.getNode().getOutLinks().values().stream().filter(l -> l != this.dsLink).map(LineSegment::createFromLink).collect(Collectors.toList());
         if (usAdjacent.size() > 0) {
-            double amount = getPruneAmmountUs(ls, usAdjacent);
-            if (amount > 0) {
-                ls.x0 = ls.x0 + ls.dx * amount;
-                ls.y0 = ls.y0 + ls.dy * amount;
-                ls.length -= amount;
-            }
+            prune(ls, usAdjacent);
+
         }
         List<LineSegment> dsAdjacent = this.dsNode.getNode().getInLinks().values().stream().filter(l -> l != this.dsLink).map(LineSegment::createFromLink).map(LineSegment::getInverse).collect(Collectors.toList());
         if (dsAdjacent.size() > 0) {
-            double amount = getPruneAmmountUs(ls.getInverse(), dsAdjacent);
-            if (amount > 0) {
-                ls.x1 = ls.x1 - ls.dx * amount;
-                ls.y1 = ls.y1 - ls.dy * amount;
-                ls.length -= amount;
-            }
+            LineSegment tmp = ls.getInverse();
+            prune(tmp, dsAdjacent);
+
+            ls.x1 = tmp.x0;
+            ls.y1 = tmp.y0;
+            ls.length = tmp.length;
         }
     }
 
-    private double getPruneAmmountUs(LineSegment ls, List<LineSegment> usAdjacent) {
-
+    private void prune(LineSegment ls, List<LineSegment> usAdjacent) {
         usAdjacent.add(ls);
         TreeMap<Double, LineSegment> sorted = usAdjacent.stream().collect(Collectors.toMap(LineSegment::getPseudoAngle, Function.identity(), (e1, e2) -> e1, TreeMap::new));
-
 
         LineSegment nb1, nb2;
 
@@ -277,46 +282,28 @@ public class CTLink implements CTNetworkEntity {
             nb1 = sorted.lowerEntry(ls.getPseudoAngle()).getValue();
             nb2 = sorted.higherEntry(ls.getPseudoAngle()).getValue();
         }
-
-        double amount1 = pruneUpStream(ls, nb1);
-        double amount2 = pruneUpStream(ls, nb2);
-
-        double amount = amount1 > amount2 ? amount1 : amount2;
-
-        return amount;
-//        System.out.println("Wow");
-
+        CGAL.pruneIntersectingLineSegments(ls, nb1);
+        CGAL.pruneIntersectingLineSegments(ls, nb2);
     }
 
-    private double pruneUpStream(LineSegment ls, LineSegment n) {
-
-        LineSegment ls1 = LineSegment.createFromCoords(ls.x0 + ls.dy * ls.width / 2, ls.y0 - ls.dx * ls.width / 2, ls.x1 + ls.dy * ls.width / 2, ls.y1 - ls.dx * ls.width / 2);
-        LineSegment ls2 = LineSegment.createFromCoords(ls.x0 - ls.dy * ls.width / 2, ls.y0 + ls.dx * ls.width / 2, ls.x1 - ls.dy * ls.width / 2, ls.y1 + ls.dx * ls.width / 2);
-
-        LineSegment n1 = LineSegment.createFromCoords(n.x0 + n.dy * n.width / 2, n.y0 - n.dx * n.width / 2, n.x1 + n.dy * n.width / 2, n.y1 - n.dx * n.width / 2);
-        LineSegment n2 = LineSegment.createFromCoords(n.x0 - n.dy * n.width / 2, n.y0 + n.dx * n.width / 2, n.x1 - n.dy * n.width / 2, n.y1 + n.dx * n.width / 2);
-
-        double coeff1 = CGAL.intersectCoeff(ls1, n1);
-        double coeff2 = CGAL.intersectCoeff(ls1, n2);
-        double coeff3 = CGAL.intersectCoeff(ls2, n1);
-        double coeff4 = CGAL.intersectCoeff(ls2, n2);
-
-        return Math.max(Math.max(coeff1, coeff2), Math.max(coeff3, coeff4));
-
-    }
-
-//    private LineSegment createLS() {
-//
-//    }
 
     public void debug() {
         if (CTRunner.DEBUG) {
 
             for (CTCell c : this.cells) {
-                c.debug(this.em);
+//                c.debug(this.em);
                 TextEvent textEvent = new TextEvent(0, c.id + "", c.getX(), c.getY());
                 this.em.processEvent(textEvent);
+
+                if (dsJumpOns.contains(c) || usJumpOns.contains(c)) {
+                    c.debugFill(em, 0, 136, 43, 255);
+                } else {
+                    c.debugFill(em, 230, 242, 255, 255);
+                }
+
+
             }
+
         }
     }
 
@@ -416,11 +403,49 @@ public class CTLink implements CTNetworkEntity {
         return cells;
     }
 
-    private void debugBound(Coordinate[] bounds) {
+    private void debugBound(LineSegment ls) {
         if (!CTRunner.DEBUG) {
             return;
         }
 
+
+//
+//        {
+//            LineSegment s = new LineSegment();
+//            s.x0 = ls.x0 + ls.dy * ls.width / 2;
+//            s.y0 = ls.y0 - ls.dx * ls.width / 2;
+//            s.x1 = ls.x1 + ls.dy * ls.width / 2;
+//            s.y1 = ls.y1 - ls.dx * ls.width / 2;
+//            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
+//            em.processEvent(le);
+//        }
+//        {
+//            LineSegment s = new LineSegment();
+//            s.x0 = ls.x0 - ls.dy * ls.width / 2;
+//            s.y0 = ls.y0 + ls.dx * ls.width / 2;
+//            s.x1 = ls.x1 - ls.dy * ls.width / 2;
+//            s.y1 = ls.y1 + ls.dx * ls.width / 2;
+//            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
+//            em.processEvent(le);
+//        }
+//        {
+//            LineSegment s = new LineSegment();
+//            s.x0 = ls.x0 + ls.dy * ls.width / 2;
+//            s.y0 = ls.y0 - ls.dx * ls.width / 2;
+//            s.x1 = ls.x0 - ls.dy * ls.width / 2;
+//            s.y1 = ls.y0 + ls.dx * ls.width / 2;
+//            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
+//            em.processEvent(le);
+//        }
+//        {
+//            LineSegment s = new LineSegment();
+//            s.x0 = ls.x1 + ls.dy * ls.width / 2;
+//            s.y0 = ls.y1 - ls.dx * ls.width / 2;
+//            s.x1 = ls.x1 - ls.dy * ls.width / 2;
+//            s.y1 = ls.y1 + ls.dx * ls.width / 2;
+//            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
+//            em.processEvent(le);
+//        }
         GeometryFactory geofac = new GeometryFactory();
 
 

@@ -44,7 +44,7 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer
 
 public class CTRunner implements IterationStartsListener {
     private static final Logger log = Logger.getLogger(CTRunner.class);
-    public static double WIDTH = 3;
+    public static double WIDTH = 4;
     public static boolean DEBUG = false;
 
     private MatsimServices controller;
@@ -142,7 +142,7 @@ public class CTRunner implements IterationStartsListener {
 
             @Override
             public void install() {
-                addControlerListenerBinding().to(UTurnCleaner.class);
+//                addControlerListenerBinding().to(UTurnCleaner.class);
                 if (getConfig().controler().getMobsim().equals("ctsim")) {
                     bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
                         @Override

@@ -1,10 +1,10 @@
-/* *********************************************************************** *
+package playground.gregor.sim2d_v4.events.debug;/* *********************************************************************** *
  * project: org.matsim.*
- * LineEventHandler.java
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,12 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.events.debug;
-
 import org.matsim.core.events.handler.EventHandler;
 
-public interface LineEventHandler extends EventHandler {
+public interface PolygonEventHandler extends EventHandler {
 
-    void handleEvent(LineEvent e);
-
+    void handleEvent(PolygonEvent e);
 }

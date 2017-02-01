@@ -79,7 +79,7 @@ public class CTNetwork {
                 width = 2 * WIDTH;
 
             }
-            width = WIDTH * ((int) (width / WIDTH) + 1);
+            width = WIDTH * ((int) (0.5 + width / WIDTH));
             l.setCapacity(width * 1.33);
         });
         this.network.getNodes().values().parallelStream().forEach(n -> {
