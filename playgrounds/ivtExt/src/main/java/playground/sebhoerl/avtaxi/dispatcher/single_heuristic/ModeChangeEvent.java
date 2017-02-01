@@ -1,11 +1,11 @@
 package playground.sebhoerl.avtaxi.dispatcher.single_heuristic;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.opengis.filter.capability.Operator;
-import playground.sebhoerl.avtaxi.data.AVOperator;
 
-import java.util.Map;
+import playground.sebhoerl.avtaxi.data.AVOperator;
 
 public class ModeChangeEvent extends Event {
     final private SimpleDispatcherHeuristicMode mode;

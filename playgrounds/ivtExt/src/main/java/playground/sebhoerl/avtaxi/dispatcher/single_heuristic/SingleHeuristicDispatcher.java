@@ -31,15 +31,14 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class SingleHeuristicDispatcher extends AbstractDispatcher {
-//    private boolean reoptimize = true; // always true
-
     final private Id<AVOperator> operatorId;
-    final private EventsManager eventsManager;
 
     final private List<AVVehicle> availableVehicles = new LinkedList<>();
     final private List<AVRequest> pendingRequests = new LinkedList<>();
 
+    /** data structure to find closest vehicles */
     final private QuadTree<AVVehicle> availableVehiclesTree;
+    /** data structure to find closest requests/customers */
     final private QuadTree<AVRequest> pendingRequestsTree;
 
     final private Map<AVVehicle, Link> vehicleLinks = new HashMap<>();
@@ -48,9 +47,8 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     private SimpleDispatcherHeuristicMode mode = SimpleDispatcherHeuristicMode.OVERSUPPLY;
 
     public SingleHeuristicDispatcher(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, SingleRideAppender appender) {
-	super(appender);
+	super(eventsManager, appender);
         this.operatorId = operatorId;
-        this.eventsManager = eventsManager;
 
         double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx, miny, maxx, maxy
 
@@ -67,7 +65,6 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         pendingRequests.add(request);
         pendingRequestsTree.put(link.getCoord().getX(), link.getCoord().getY(), request);
         requestLinks.put(request, link);
-//        reoptimize = true;
     }
 
     @Override
@@ -110,8 +107,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     @Override
     public void onNextTimestep(double now) {
         appender.update();
-//        if (reoptimize) 
-            reoptimize(now);
+        reoptimize(now);
     }
 
     private AVRequest findRequest() {
@@ -142,7 +138,6 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         availableVehicles.add(vehicle);
         availableVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), vehicle);
         vehicleLinks.put(vehicle, link);
-//        reoptimize = true;
     }
 
     private void removeVehicle(AVVehicle vehicle) {

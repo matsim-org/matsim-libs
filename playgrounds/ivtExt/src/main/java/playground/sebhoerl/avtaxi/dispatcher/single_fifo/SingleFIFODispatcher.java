@@ -24,13 +24,10 @@ public class SingleFIFODispatcher extends AbstractDispatcher {
     final private Queue<AVVehicle> availableVehicles = new LinkedList<>();
     final private Queue<AVRequest> pendingRequests = new LinkedList<>();
 
-    final private EventsManager eventsManager;
-
     private boolean reoptimize = false;
 
     public SingleFIFODispatcher(EventsManager eventsManager, SingleRideAppender appender) {
-	super(appender);
-        this.eventsManager = eventsManager;
+	super(eventsManager, appender);
     }
 
     @Override

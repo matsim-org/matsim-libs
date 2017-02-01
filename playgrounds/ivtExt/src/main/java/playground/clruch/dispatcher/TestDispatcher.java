@@ -19,17 +19,15 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class TestDispatcher extends AbstractDispatcher {
+    public static final String IDENTIFIER = "TestDispatcher";
+    
     final private Queue<AVVehicle> availableVehicles = new LinkedList<>();
     final private Queue<AVRequest> pendingRequests = new LinkedList<>();
-    public static final String IDENTIFIER = "TestDispatcher";
-
-    final private EventsManager eventsManager;
 
     private boolean reoptimize = false;
 
     public TestDispatcher(EventsManager eventsManager, SingleRideAppender appender) {
-        super(appender);
-        this.eventsManager = eventsManager;
+        super(eventsManager, appender);
     }
 
     @Override

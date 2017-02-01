@@ -34,18 +34,16 @@ import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LazyDispatcher extends AbstractDispatcher {
+    public static final String IDENTIFIER = "LazyDispatcher";
+    
     final private Queue<AVVehicle> availableVehicles = new LinkedList<>();
     final private Queue<AVRequest> pendingRequests = new LinkedList<>();
     private Link[] destLinks = null;
-    public static final String IDENTIFIER = "LazyDispatcher";
-
-    final private EventsManager eventsManager;
 
     private boolean reoptimize = false;
 
     public LazyDispatcher(EventsManager eventsManager, SingleRideAppender appender, Link[] sendAVtoLink) {
-        super(appender);
-        this.eventsManager = eventsManager;
+        super(eventsManager, appender);
         this.destLinks = sendAVtoLink;
     }
 
