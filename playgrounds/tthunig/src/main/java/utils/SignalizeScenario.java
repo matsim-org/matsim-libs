@@ -54,6 +54,8 @@ import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesFactory;
 import org.matsim.lanes.data.LanesToLinkAssignment;
 
+import com.amazonaws.services.kms.model.UnsupportedOperationException;
+
 /**
  * This class converts a scenario without signals into a scenario with signals at all intersections.
  * The user may choose between (1) a simpler approach without lanes, where only one signal is created for every link
@@ -64,13 +66,20 @@ import org.matsim.lanes.data.LanesToLinkAssignment;
 public class SignalizeScenario {
 
 	/**
+	 * call method with same name with signal control identifier DefaultPlanbasedSignalSystemController
+	 */
+	public static void createSignalsForAllLinks(Scenario scenario){
+		createSignalsForAllLinks(scenario, DefaultPlanbasedSignalSystemController.IDENTIFIER);
+	}
+	
+	/**
 	 * Creates a signal system at every intersection which contains a signal on every link. 
 	 * No lanes are used, i.e. from every signal one can reach all outgoing links.
 	 * The signal information is saved in the given Scenario.
 	 * 
 	 * @param scenario a scenario which contains a network, but no signal or lane information
 	 */
-	public static void createSignalsForAllLinks(Scenario scenario){
+	public static void createSignalsForAllLinks(Scenario scenario, String signalControlIdentifier){
 		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -79,7 +88,14 @@ public class SignalizeScenario {
 	
 		createSystemAtEveryNode(scenario, false);
 		createGroupForEverySignal(scenario);
-		createControlForEveryGroup(scenario);
+		createControlForEveryGroup(scenario, signalControlIdentifier);
+	}
+	
+	/**
+	 * call method with same name with signal control identifier DefaultPlanbasedSignalSystemController
+	 */
+	public static void createSignalsAndLanesForAllTurnings(Scenario scenario){
+		createSignalsAndLanesForAllTurnings(scenario, DefaultPlanbasedSignalSystemController.IDENTIFIER);
 	}
 
 	/**
@@ -89,8 +105,9 @@ public class SignalizeScenario {
 	 * The lane and signal information is saved in the given Scenario.
 	 * 
 	 * @param scenario a scenario which contains a network, but no signal oder lane information
+	 * @param signalControlIdentifier 
 	 */
-	public static void createSignalsAndLanesForAllTurnings(Scenario scenario){
+	public static void createSignalsAndLanesForAllTurnings(Scenario scenario, String signalControlIdentifier){
 		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), 
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -101,13 +118,17 @@ public class SignalizeScenario {
 		createLanesForEveryInLinkOutLinkPair(scenario);
 		createSystemAtEveryNode(scenario, true);
 		createGroupForEverySignal(scenario);
-		createControlForEveryGroup(scenario);
+		createControlForEveryGroup(scenario, signalControlIdentifier);
 	}
 
 	private static void createLanesForEveryInLinkOutLinkPair(Scenario scenario) {
 		Lanes lanes = scenario.getLanes();
 		LanesFactory fac = lanes.getFactory();
 
+		if (!lanes.getLanesToLinkAssignments().isEmpty()){
+			throw new UnsupportedOperationException("Creating lanes and signals at all intersections is only supported for scenarios that do not contain lanes yet.");
+		}
+		
 		for (Link inLink : scenario.getNetwork().getLinks().values()){
 			// Create lanes for every link with outgoing links
 			if ((inLink.getToNode().getOutLinks() != null) && (!inLink.getToNode().getOutLinks().isEmpty())){
@@ -117,7 +138,7 @@ public class SignalizeScenario {
 				for (Link outLink : inLink.getToNode().getOutLinks().values()) {
 					// TODO decide for suitable capacity, lane length and alignment. use dg utils or lane v1 to v2 converter logik?
 					double laneCap = inLink.getCapacity();
-					double laneStart_mFromLinkEnd = 50;
+					double laneStart_mFromLinkEnd = inLink.getLength()/2;
 					int alignment = 0;
 					Id<Lane> laneId = Id.create(inLink.getId() + "." + outLink.getId(), Lane.class);
 					LanesUtils.createAndAddLane(linkLanes, fac, laneId, laneCap, laneStart_mFromLinkEnd, alignment, 1, Collections.singletonList(outLink.getId()), null);
@@ -139,6 +160,10 @@ public class SignalizeScenario {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
 	
+		if (!signalsData.getSignalSystemsData().getSignalSystemData().isEmpty()){
+			throw new UnsupportedOperationException("Creating signals at all intersections is only supported for scenarios that do not contain signals yet.");
+		}
+		
 		for (Node node : scenario.getNetwork().getNodes().values()){
 			// Create system for every node with outgoing and ingoing links
 			if ((node.getOutLinks() != null) && (!node.getOutLinks().isEmpty())
@@ -178,8 +203,9 @@ public class SignalizeScenario {
 	 * Create an all day green signal control for every signal group.
 	 * 
 	 * @param scenario
+	 * @param signalControlIdentifier 
 	 */
-	private static void createControlForEveryGroup(Scenario scenario) {
+	private static void createControlForEveryGroup(Scenario scenario, String signalControlIdentifier) {
 		int CYCLE_TIME = 90;
 		
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
@@ -195,7 +221,7 @@ public class SignalizeScenario {
 			// create a default plan for the signal system (with defined cycle time and offset 0)
 			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
 			signalSystemControl.addSignalPlanData(signalPlan);
-			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			signalSystemControl.setControllerIdentifier(signalControlIdentifier);
 			// add the signalSystemControl to the signalControl
 			signalControl.addSignalSystemControllerData(signalSystemControl);
 
