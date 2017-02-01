@@ -21,7 +21,6 @@ import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
@@ -129,8 +128,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     }
 
     @Override
-    public void registerVehicle(AVVehicle vehicle) {
-        eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
+    public void protected_registerVehicle(AVVehicle vehicle) {
         private_addVehicle(vehicle, vehicle.getStartLink());
     }
 

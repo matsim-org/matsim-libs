@@ -22,7 +22,6 @@ import com.google.inject.name.Named;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
@@ -61,9 +60,8 @@ public class LazyDispatcher extends AbstractDispatcher {
     }
 
     @Override
-    public void registerVehicle(AVVehicle vehicle) {
+    public void protected_registerVehicle(AVVehicle vehicle) {
         availableVehicles.add(vehicle);
-        eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
     private void reoptimize(double now) {
@@ -166,10 +164,6 @@ public class LazyDispatcher extends AbstractDispatcher {
             Link sendAVtoLink1 = playground.clruch.RunAVScenario.NETWORKINSTANCE.getLinks().get(l1);
             Link sendAVtoLink2 = playground.clruch.RunAVScenario.NETWORKINSTANCE.getLinks().get(l2);
             Link[] sendAVtoLinks = new Link[]{sendAVtoLink1, sendAVtoLink2};
-            //sendAVtoLinks[0] = sendAVtoLink1;
-            //sendAVtoLinks[1] = sendAVtoLink2;
-
-
             // put the link into the lazy dispatcher
             return new LazyDispatcher(eventsManager, new SingleRideAppender(config, router, travelTime), sendAVtoLinks);
         }
