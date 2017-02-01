@@ -205,6 +205,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 						toLinkIdDownstreamQueues);
 				for (ModelLane toLane : lane.getToLanes()) {
 					Set<Id<Link>> toLinks = laneIdToLinksMap.get(toLane.getLaneData().getId());
+					if (toLinks == null){ 
+						// nothing to do here
+						break;
+					}
 					if (!laneIdToLinksMap.containsKey(laneId)) {
 						laneIdToLinksMap.put(laneId, new HashSet<Id<Link>>());
 					}
