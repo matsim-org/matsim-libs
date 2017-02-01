@@ -23,10 +23,16 @@ public class AVVehicle extends VehicleImpl {
     public AVOperator getOperator() {
         return operator;
     }
-    public AVDispatcher getDispatcher() { return dispatcher; }
+
+    public AVDispatcher getDispatcher() {
+        return dispatcher;
+    }
 
     public void setOpeartor(AVOperator operator) {
         this.operator = operator;
     }
-    public void setDispatcher(AVDispatcher dispatcher) { this.dispatcher = dispatcher; }
+
+    public void setDispatcher(AVDispatcher dispatcher) {
+        this.dispatcher = dispatcher;
+    }
 }
