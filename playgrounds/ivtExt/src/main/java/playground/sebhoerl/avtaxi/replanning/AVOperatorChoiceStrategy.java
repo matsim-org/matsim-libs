@@ -16,32 +16,37 @@ import java.util.Map;
 
 @Singleton
 public class AVOperatorChoiceStrategy implements PlanStrategy {
-    @Inject private Map<Id<AVOperator>, AVOperator> operators;
+    @Inject
+    private Map<Id<AVOperator>, AVOperator> operators;
 
     @Override
     public void run(HasPlansAndId<Plan, Person> person) {
-        for (PlanElement element : person.getSelectedPlan().getPlanElements()) {
-            if (element instanceof Leg && ((Leg) element).getMode().equals(AVModule.AV_MODE)) {
-                AVRoute route = (AVRoute) ((Leg) element).getRoute();
-                route.setOperatorId(chooseRandomOperator());
-            }
-        }
+	for (PlanElement element : person.getSelectedPlan().getPlanElements()) {
+	    if (element instanceof Leg && ((Leg) element).getMode().equals(AVModule.AV_MODE)) {
+		AVRoute route = (AVRoute) ((Leg) element).getRoute();
+		route.setOperatorId(chooseRandomOperator());
+	    }
+	}
     }
 
     @Override
-    public void init(ReplanningContext replanningContext) {}
+    public void init(ReplanningContext replanningContext) {
+	// TODO jan intentionally empty?
+    }
 
     @Override
-    public void finish() {}
+    public void finish() {
+	// TODO jan intentionally empty?
+    }
 
     public Id<AVOperator> chooseRandomOperator() {
-        int draw = MatsimRandom.getRandom().nextInt(operators.size());
-        Iterator<Id<AVOperator>> iterator = operators.keySet().iterator();
+	int draw = MatsimRandom.getRandom().nextInt(operators.size());
+	Iterator<Id<AVOperator>> iterator = operators.keySet().iterator();
 
-        for (int i = 0; i < draw; i++) {
-            iterator.next();
-        }
+	for (int i = 0; i < draw; i++) {
+	    iterator.next();
+	}
 
-        return iterator.next();
+	return iterator.next();
     }
 }
