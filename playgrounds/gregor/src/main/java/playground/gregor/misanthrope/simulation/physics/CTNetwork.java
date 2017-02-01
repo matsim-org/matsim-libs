@@ -15,7 +15,6 @@ import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
 
@@ -26,9 +25,7 @@ public class CTNetwork {
     private static int WIDTH_WRN_CNT = 0;
 
     private final CTEventsPaulPriorityQueue events = new CTEventsPaulPriorityQueue();
-    //	private final PriorityQueue<CTEvent> events = new PriorityQueue<>();
     private final CTNetsimEngine engine;
-    private final int cores = Runtime.getRuntime().availableProcessors();
     private Map<Id<Link>, CTLink> links = new HashMap<>();
     private Map<Id<Node>, CTNode> nodes = new ConcurrentHashMap<>();
     private Network network;
@@ -107,18 +104,13 @@ public class CTNetwork {
             }
         });
 
-        this.links.values().stream().forEach(CTLink::init);
+        this.links.values().parallelStream().forEach(CTLink::init);
         this.links.values().forEach(CTLink::debug);
         this.nodes.values().parallelStream().forEach(CTNode::init);
 
         log.info("verifying network");
         checkNetwork();
         log.info("done.");
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
 
     }
 
@@ -172,17 +164,7 @@ public class CTNetwork {
         if (CTRunner.DEBUG) {
             draw(time);
         }
-//
-//        if (((int) time) % 60 == 0) {
-//            this.nodes.values().parallelStream().forEach(n -> {
-//                if (n.getCTCell().getN() > 0 && (n.getCTCell().getCurrentEvent() == null || n.getCTCell().getCurrentEvent().isInvalid()))
-//                    n.getCTCell().updateIntendedCellJumpTimeAndChooseNextJumper(time);
-//            });
-//            this.links.values().parallelStream().flatMap(l -> l.getCells().stream()).forEach(c -> {
-//                if (c.getN() > 0 && (c.getCurrentEvent() == null || c.getCurrentEvent().isInvalid()))
-//                    c.updateIntendedCellJumpTimeAndChooseNextJumper(time);
-//            });
-//        }
+
 
         while (this.events.peek() != null && events.peek().getExecTime() < time + 1) {
             CTEvent e = events.poll();
@@ -200,9 +182,7 @@ public class CTNetwork {
     private void draw(double time) {
         for (CTLink link : getLinks().values()) {
             Link ll = link.getDsLink();
-//			if (!accept(ll)){
-//			    continue;
-//            }
+
             double dx = ll.getToNode().getCoord().getX() - ll.getFromNode().getCoord().getX();
             double dy = ll.getToNode().getCoord().getY() - ll.getFromNode().getCoord().getY();
             dx /= ll.getLength();
@@ -212,9 +192,6 @@ public class CTNetwork {
             }
         }
 
-//		for (CTNode n : this.nodes.values())  {
-//		    drawCell(n.getCTCell(),time,0,0);
-//        }
     }
 
     private boolean accept(Link ll) {
@@ -228,11 +205,7 @@ public class CTNetwork {
         }
 
         return false;
-//        for (Link l : ll.getToNode().getOutLinks().values() ) {
-//        	        if (l.getId().toString().contains("el")) {
-//        	            return true;
-//                    }
-//                }
+
     }
 
     private void drawCell(CTCell cell, double time, double dx, double dy) {
@@ -275,53 +248,9 @@ public class CTNetwork {
         this.events.add(e);
     }
 
-    CTNode getCTNode(Id<Node> id) {
-        return this.nodes.get(id);
-    }
-
-
     public void afterSim() {
 
-//                    this.nodes.values().parallelStream().forEach(n -> {
-//                        if (n.getCTCell().getN() > 0)
-//                            log.error("still " + n.getCTCell().getN() + " peds in cell");
-//                    });
-//                    this.links.values().parallelStream().flatMap(l -> l.getCells().stream()).forEach(c -> {
-//                        if (c.getN() > 0)
-//                            log.error("still " + c.getN() + " peds in cell");
-//                    });
+
     }
-
-    private final class Worker implements Runnable {
-
-        private LinkedBlockingQueue<CTNetworkEntity> q = new LinkedBlockingQueue<>();
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    CTNetworkEntity e = q.take();
-                    if (e instanceof CTLink) {
-                        e.init();
-                    } else {
-                        if (e instanceof CTNode) {
-                            e.init();
-                            ((CTNode) e).getCTCell().debug(em);
-                        } else {
-                            break;
-                        }
-                    }
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
-
-        }
-
-        public void add(CTNetworkEntity e) {
-            q.offer(e);
-        }
-    }
-
 
 }

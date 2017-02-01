@@ -32,11 +32,9 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import playground.gregor.casim.simulation.physics.CANetworkFactory;
 
 public class CTMobsimFactory implements MobsimFactory {
 
-//	private CANetworkFactory fac = new CAMultiLaneNetworkFactory();
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -69,19 +67,11 @@ public class CTMobsimFactory implements MobsimFactory {
 		else {
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
-//		if (sc.getConfig().network().isTimeVariantNetwork()) {
-//			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
-//		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(
 				sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}
 
-	public void setCANetworkFactory(CANetworkFactory caNetworkFactory) {
-//		this.fac = caNetworkFactory;
-		throw new RuntimeException("obsolete method");
-
-	}
 
 }

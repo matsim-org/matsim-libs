@@ -204,12 +204,12 @@ public class CTNodeCell extends CTCell {
             width = WIDTH;
         }
 		double area = width * width;
-		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1
-				&& ((CTNode) this.getParent()).getNode().getInLinks().size() == 1
-				&& ((CTNode) this.getParent()).getNode().getOutLinks().values().iterator().next().getToNode()
-				== ((CTNode) this.getParent()).getNode().getInLinks().values().iterator().next().getFromNode()) {
-			area = width * mxLength;
-		}
+//		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1
+//				&& ((CTNode) this.getParent()).getNode().getInLinks().size() == 1
+//				&& ((CTNode) this.getParent()).getNode().getOutLinks().values().iterator().next().getToNode()
+//				== ((CTNode) this.getParent()).getNode().getInLinks().values().iterator().next().getFromNode()) {
+//			area = width * mxLength;
+//		}
 
 
 		setArea(area);

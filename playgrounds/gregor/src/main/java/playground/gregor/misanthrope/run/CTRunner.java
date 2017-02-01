@@ -70,32 +70,9 @@ public class CTRunner implements IterationStartsListener {
         final Scenario sc = ScenarioUtils.loadScenario(c);
 
 
-//        sc.getPopulation().getPersons().entrySet().removeIf(p -> MatsimRandom.getRandom().nextDouble() < );
-
         sc.getPopulation().getPersons().values().parallelStream().flatMap(p -> p.getPlans().stream()).forEach(pl -> {
             Activity a0 = (Activity) pl.getPlanElements().get(0);
-
             Leg leg = (Leg) pl.getPlanElements().get(1);
-//
-//
-//            Id<Link> frst = a0.getLinkId();
-//            Link frstL = sc.getNetwork().getLinks().get(frst);
-//            if (((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().size() == 0) {
-//                leg.setRoute(null);
-//                leg.setMode("walkct");
-//                a0.setType("pre-evac");
-//                Activity a1 = (Activity) pl.getPlanElements().get(2);
-//                a1.setType("post-evac");
-//                log.warn("route length is 0");
-//                return;
-//            }
-//            Id<Link> scnd = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().get(0);
-//            Link scndL = sc.getNetwork().getLinks().get(scnd);
-//
-//            if (frstL.getFromNode() == scndL.getToNode()) { //U-turn
-//                a0.setLinkId(scnd);
-//            }
-
             leg.setRoute(null);
             leg.setMode("walkct");
             a0.setType("pre-evac");

@@ -67,10 +67,6 @@ public abstract class CTCell {
 //		pop.put(-Math.PI/6., new LinkedList<CTPed>());
     }
 
-    public CTEvent getCurrentEvent() {
-        return currentEvent;
-    }
-
     public CTNetwork getNet() {
         return net;
     }
@@ -118,18 +114,13 @@ public abstract class CTCell {
         }
     }
 
-//	protected double getFHHi(CTPed ped, CTCellFace face) {
-//		return 1 + Math.cos(ped.getDesiredDir() - face.h_i);
-//	}
 
     private void debug(CTCellFace f, EventsManager em) {
 
         if (!CTRunner.DEBUG) {
             return;
         }
-//		if (MatsimRandom.getRandom().nextDouble() > 0.1 ){
-//			return;
-//		}
+
 
         {
             LineSegment s = new LineSegment();
@@ -184,15 +175,9 @@ public abstract class CTCell {
     public abstract void updateIntendedCellJumpTimeAndChooseNextJumper(double now);
 
     protected double chooseNextCellAndReturnJ(CTPed ped) {
-//		boolean debug = false;
-//		DebugInfo i = new DebugInfo();
-//		if (ped.getDriver().getId().toString().equals("4")) {
-//			debug = true;
-//		}
 
 
         CTCell bestNB = null;
-//		CTCellFace bestFace = null;
         double maxFJ = 0;
         double maxJ = Double.NaN;
         for (CTCellFace face : this.getFaces()) {
@@ -201,9 +186,7 @@ public abstract class CTCell {
             double f = getFHHi(ped, face);
             double j = this.getJ(face.nb, ped);
             double fJ = f * j;
-//			i.addDirInfo(fDir,f,j,fJ);
             if (fJ > maxFJ) {
-//				bestFace = face;
                 maxJ = j;
                 maxFJ = fJ;
                 bestNB = face.nb;
@@ -213,16 +196,8 @@ public abstract class CTCell {
         if (bestNB == null) {
             return Double.NaN;
         }
-//		if (Math.abs(bestFace.h_i-ped.getDesiredDir())>0.1) {
-//			log.info("lane switch" + ped.getDesiredDir() + "  " + bestFace.h_i);
-//			log.info("lane switch" + ped.getDesiredDir() + "  " + bestFace.h_i);
-//		}
         ped.setTentativeNextCell(bestNB);
 
-//		if (debug) {
-//			System.out.print(i);
-//			System.out.println();
-//		}
         return maxJ;
     }
 
@@ -235,7 +210,6 @@ public abstract class CTCell {
     }
 
     private double getDelta(CTPed ped) { //demand function
-//		return Math.min(Q, V_0 * Math.max(this.getRho(), 1 / (Math.sqrt(3)*width*width)));
         double coeff = getDirCoeff(ped);
         return Math.min(coeff * Q, V_0 * this.getRho());
     }
@@ -245,8 +219,6 @@ public abstract class CTCell {
     }
 
     public void setRho(double rho) {
-//		double myRho = this.n/this.N*RHO_M;
-//		log.info("diff rho-myRho:" + (rho-myRho));
         this.rho = rho;
     }
 
@@ -277,51 +249,4 @@ public abstract class CTCell {
         this.ge.add(e);
     }
 
-    private static final class DebugInfo {
-        Map<Integer, DirInfo> dirs = new HashMap<>();
-
-        public void addDirInfo(double dir, double f, double j, double jf) {
-            DirInfo i = new DirInfo();
-            i.dir = dir;
-            i.f = f;
-            i.j = j;
-            i.jf = jf;
-            this.dirs.put((int) (100 * dir), i);
-        }
-
-        @Override
-        public String toString() {
-            StringBuffer buf = new StringBuffer();
-            buf.append("dir\tf\tj\tjf\n");
-            {
-                DirInfo i = this.dirs.get((int) (100 * Math.PI / 6));
-                if (i != null) {
-
-                    buf.append("pi/6\t" + i.f + "\t" + i.j + "\t" + i.jf + "\n");
-                }
-            }
-            {
-                DirInfo i = this.dirs.get((int) (100 * Math.PI / 2));
-                if (i != null) {
-
-                    buf.append("pi/2\t" + i.f + "\t" + i.j + "\t" + i.jf + "\n");
-                }
-            }
-            {
-                DirInfo i = this.dirs.get((int) (100 * 5 * Math.PI / 6));
-                if (i != null) {
-
-                    buf.append("5 pi/6\t" + i.f + "\t" + i.j + "\t" + i.jf + "\n");
-                }
-            }
-            return buf.toString();
-        }
-    }
-
-    private static final class DirInfo {
-        double dir;
-        double f;
-        double j;
-        double jf;
-    }
 }

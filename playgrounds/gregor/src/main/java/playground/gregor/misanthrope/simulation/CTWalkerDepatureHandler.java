@@ -59,9 +59,7 @@ public class CTWalkerDepatureHandler implements DepartureHandler {
 		CTLink link = this.engine.getCTNetwork().getLinks().get(linkId);
 		Id<Vehicle> vehicleId = agent.getPlannedVehicleId();
 
-//		CTVehicle veh = new CTVehicle(vehicleId, agent, link);
 		link.letAgentDepart(agent, link, now);
-//		agent.notifyMoveOverNode();
 
 
 	}
