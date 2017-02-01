@@ -1,15 +1,10 @@
 package playground.sebhoerl.avtaxi.config;
 
-import org.apache.log4j.chainsaw.Main;
-import org.matsim.api.core.v01.Id;
+import java.util.Stack;
+
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import playground.sebhoerl.avtaxi.data.AVOperator;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
 
 public class AVConfigReader extends MatsimXmlParser {
     final private AVConfig config;
@@ -26,7 +21,7 @@ public class AVConfigReader extends MatsimXmlParser {
         MAIN, OPERATOR, TIMING, DISPATCHER, GENERATOR, PRICING
     }
 
-    private Stack<State> state = new Stack<State>();
+    private Stack<State> state = new Stack<>();
     private Stack<ConfigGroup> configs = new Stack<>();
 
     private AVOperatorConfig operatorConfig;
