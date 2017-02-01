@@ -392,7 +392,7 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		
 		log.warn("expected travel time=" + expctdTT + "; avg travel time=" + tt2);
 
-		assertEquals("wrong avg travel time;", expctdTT, tt2, 1.0);
+        assertEquals("wrong avg travel time;", expctdTT, tt2, 2.0);
 
 	}
 
