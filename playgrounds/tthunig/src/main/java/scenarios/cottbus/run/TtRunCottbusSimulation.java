@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -39,6 +38,7 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
+import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
 import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
@@ -73,6 +73,7 @@ import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 import signals.CombinedSignalsModule;
 import signals.downstreamSensor.DownstreamSignalController;
+import utils.SignalizeScenario;
 
 /**
  * Class to run a cottbus simulation.
@@ -84,13 +85,9 @@ public class TtRunCottbusSimulation {
 
 	private static final Logger LOG = Logger.getLogger(TtRunCottbusSimulation.class);
 	
-	private final static ScenarioType SCENARIO_TYPE = ScenarioType.BaseCase;
-	public enum ScenarioType {
-		BaseCase, BaseCaseContinued_MatsimRoutes, BaseCaseContinued_BtuRoutes
-	}
-	
 	private final static NetworkType NETWORK_TYPE = NetworkType.V1;
 	public enum NetworkType {
+		BTU_NET, // "network small simplified" in BTU_BASE_DIR
 		V1, // network of the public-svn scenario from 2016-03-18 (same as from DG)
 		V2, // add missing highway part, add missing links, correct directions, add missing signal
 		V21, // add missing lanes
@@ -98,13 +95,15 @@ public class TtRunCottbusSimulation {
 	}
 	private final static PopulationType POP_TYPE = PopulationType.WoMines;
 	public enum PopulationType {
+		BTU_POP_MATSIM_ROUTES,
+		BTU_POP_BTU_ROUTES,
 		WMines, // with mines as working places. causes an oversized number of working places in the south west of Cottbus.
 		WoMines // without mines as working places
 	}
 	
-	private final static SignalType SIGNAL_TYPE = SignalType.DOWNSTREAM_MS;
+	private final static SignalType SIGNAL_TYPE = SignalType.ALL_NODES_DOWNSTREAM;
 	public enum SignalType {
-		NONE, MS, MS_RANDOM_OFFSETS, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN
+		NONE, MS, MS_RANDOM_OFFSETS, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN, ALL_NODES_ALL_GREEN, ALL_NODES_DOWNSTREAM
 	}
 	
 	// defines which kind of pricing should be used
@@ -121,21 +120,16 @@ public class TtRunCottbusSimulation {
 	private static final String INPUT_BASE_DIR = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
 	private static final String BTU_BASE_DIR = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
 	
-	private static final boolean WRITE_INITIAL_FILES = true;
+	private static final boolean WRITE_INITIAL_FILES = false;
 	private static final boolean USE_COUNTS = false;
-	private static final double SCALING_FACTOR = 0.6;
+	private static final double SCALING_FACTOR = .7;
 	
-	public static void main(String[] args) {
-		if (!SCENARIO_TYPE.equals(ScenarioType.BaseCase) && !NETWORK_TYPE.equals(NetworkType.V1)){
-			throw new UnsupportedOperationException("base case continued scenario types are not yet combinable with the new network versions.");
-		}
-		
+	public static void main(String[] args) {		
 		Config config = defineConfig();
-		config.qsim().setEndTime(24.*3600.);
+		config.qsim().setEndTime(36.*3600.);
 		
 		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class ) ;
 		otfvisConfig.setDrawTime(true);
-		
 		
 		Scenario scenario = prepareScenario( config );
 		Controler controler = prepareController( scenario );
@@ -148,89 +142,114 @@ public class TtRunCottbusSimulation {
 	private static Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
 
-		if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
-			switch (NETWORK_TYPE){
-			case V1:
-				config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml.gz");
-				config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
-				break;
-			case V2:
-				config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_v2.xml");
-				config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
-				break;
-			case V21:
-				config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_v2.xml");
-				config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes_v2.1.xml");
-				break;
-			case V3:
-				config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_v3.xml");
-				config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes_v3.xml");
-				break;
-			}
-			switch (POP_TYPE){
-			case WMines:
-				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/commuter_population_wgs84_utm33n_car_only.xml.gz");
-				break;
-			case WoMines:
-//				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
-				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/output_plans_cap0.7_100it_MS.xml.gz");
-				break;
-			}
-//			// pt scenario
-//			config.network().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/network_improved.xml");
-//			config.plans().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/plans_scale1.4false.xml");
-		} else { // BaseCaseContinued
+		switch (NETWORK_TYPE) {
+		case BTU_NET:
 			config.network().setInputFile(BTU_BASE_DIR + "network_small_simplified.xml.gz");
 			config.network().setLaneDefinitionsFile(BTU_BASE_DIR + "lanes_network_small.xml.gz");
-			if (SCENARIO_TYPE.equals(ScenarioType.BaseCaseContinued_MatsimRoutes))
-				config.plans().setInputFile(BTU_BASE_DIR + "trip_plans_from_morning_peak_ks_commodities_minFlow50.0.xml");
-			else // BtuRoutes	
-				config.plans().setInputFile(BTU_BASE_DIR + "routeComparison/2015-03-10_sameEndTimes_ksOptRouteChoice_paths.xml");
+			break;
+		case V1:
+			config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml.gz");
+			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
+			break;
+		case V2:
+			config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_v2.xml");
+			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
+			break;
+		case V21:
+			config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_v2.xml");
+			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes_v2.1.xml");
+			break;
+		case V3:
+			config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_v3.xml");
+			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes_v3.xml");
+			break;
+		}
+		if (SIGNAL_TYPE.toString().startsWith("ALL_NODES")){
+			config.network().setLaneDefinitionsFile(null);
 		}
 		
-		// set number of iterations
-		if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
-			config.controler().setLastIteration(100);
-		} else { // BaseCaseContinued
-			config.controler().setFirstIteration(1000);
-			config.controler().setLastIteration(1400);
+		switch (POP_TYPE) {
+		case BTU_POP_MATSIM_ROUTES:
+			config.plans().setInputFile(BTU_BASE_DIR + "trip_plans_from_morning_peak_ks_commodities_minFlow50.0.xml");
+			break;
+		case BTU_POP_BTU_ROUTES:
+			config.plans().setInputFile(BTU_BASE_DIR + "routeComparison/2015-03-10_sameEndTimes_ksOptRouteChoice_paths.xml");
+			break;
+		case WMines:
+			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/commuter_population_wgs84_utm33n_car_only.xml.gz");
+			break;
+		case WoMines:
+			if (NETWORK_TYPE.equals(NetworkType.V1)){
+//				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
+				// use routes from a 100th iteration as initial plans
+				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_100it_MS_cap0.7.xml.gz");
+			} else {
+				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
+			}
+			break;
 		}
+		// // pt scenario
+		// config.network().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/network_improved.xml");
+		// config.plans().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/plans_scale1.4false.xml");
+
+		// set number of iterations
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(0);
 
 		// able or enable signals and lanes
-		config.qsim().setUseLanes( true );
-		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalConfigGroup.setUseSignalSystems(SIGNAL_TYPE.equals(SignalType.NONE) ? false : true);
+		config.qsim().setUseLanes(SIGNAL_TYPE.toString().startsWith("ALL_NODES") ? false : true);
 		// set signal files
-		if (!SIGNAL_TYPE.equals(SignalType.NONE)) {
-			if (NETWORK_TYPE.equals(NetworkType.V1)){
-				if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
-					signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13.xml");
-				} else { // BaseCaseContinued, i.e. smaller network
-					signalConfigGroup.setSignalSystemFile(BTU_BASE_DIR + "output_signal_systems_v2.0.xml.gz");
-				}
+		if (!SIGNAL_TYPE.equals(SignalType.NONE) && !SIGNAL_TYPE.toString().startsWith("ALL_NODES")) {
+			SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+			signalConfigGroup.setUseSignalSystems(true);
+			// set signal systems
+			switch (NETWORK_TYPE) {
+			case V1:
+				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13.xml");
+				break;
+			case BTU_NET:
+//				signalConfigGroup.setSignalSystemFile(BTU_BASE_DIR + "output_signal_systems_v2.0.xml.gz"); // gives SAXParseException: Content is not allowed in prolog
+				signalConfigGroup.setSignalSystemFile(BTU_BASE_DIR + "signal_systems_no_13_btuNet.xml");
+				break;
+			case V2:
+				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_v2.xml");
+				break;
+			default:
+				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_v2.1.xml");
+				break;
+			}
+			// set signal group
+			if (NETWORK_TYPE.equals(NetworkType.V1) || NETWORK_TYPE.equals(NetworkType.BTU_NET)) {
 				signalConfigGroup.setSignalGroupsFile(INPUT_BASE_DIR + "signal_groups_no_13.xml");
-				switch (SIGNAL_TYPE) {
-				case MS:
-				case DOWNSTREAM_MS:
-				case DOWNSTREAM_ALLGREEN: // will be changed to all day green later
-					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13.xml");
-					break;
-				case MS_RANDOM_OFFSETS:
-					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13_random_offsets.xml");
-					break;
-				case BTU_OPT:
-				case DOWNSTREAM_BTUOPT:
-					signalConfigGroup.setSignalControlFile(BTU_BASE_DIR + "btu/signal_control_opt.xml");
-					break;
-				}
-			} else { // network != V1
+			} else {
 				signalConfigGroup.setSignalGroupsFile(INPUT_BASE_DIR + "signal_groups_no_13_v2.xml");
-				signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13_v2.xml");
-				if (NETWORK_TYPE.equals(NetworkType.V2)){
-					signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_v2.xml");
-				} else { // network != V1 and network != V2
-					signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_v2.1.xml");
+			}
+			// set signal control
+			switch (SIGNAL_TYPE) {
+			case MS:
+			case DOWNSTREAM_MS:
+			case DOWNSTREAM_ALLGREEN: // will be changed to all day green later
+				if (NETWORK_TYPE.equals(NetworkType.V1) || NETWORK_TYPE.equals(NetworkType.BTU_NET)) {
+					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13.xml");
+				} else {
+					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13_v2.xml");
 				}
+				break;
+			case MS_RANDOM_OFFSETS:
+				if (NETWORK_TYPE.equals(NetworkType.V1) || NETWORK_TYPE.equals(NetworkType.BTU_NET)) {
+					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13_random_offsets.xml");
+				} else {
+					throw new UnsupportedOperationException("It is not yet supported to combine " + SIGNAL_TYPE + " and " + NETWORK_TYPE);
+				}
+				break;
+			case BTU_OPT:
+			case DOWNSTREAM_BTUOPT:
+				if (NETWORK_TYPE.equals(NetworkType.V1) || NETWORK_TYPE.equals(NetworkType.BTU_NET)) {
+					signalConfigGroup.setSignalControlFile(BTU_BASE_DIR + "btu/signal_control_opt.xml");
+				} else {
+					throw new UnsupportedOperationException("It is not yet supported to combine " + SIGNAL_TYPE + " and " + NETWORK_TYPE);
+				}
+				break;
 			}
 		}
 		
@@ -255,11 +274,12 @@ public class TtRunCottbusSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-			if (SCENARIO_TYPE.equals(ScenarioType.BaseCaseContinued_BtuRoutes))
+			if (POP_TYPE.equals(PopulationType.BTU_POP_BTU_ROUTES))
 				strat.setWeight(0.0); // no ReRoute, fix route choice set
-			else // MatsimRoutes or BaseCase
+			else
 				strat.setWeight(0.1);
-			strat.setDisableAfter(config.controler().getLastIteration() - 50);
+			strat.setDisableAfter(config.controler().getLastIteration() - config.controler().getFirstIteration() > 200 ? 
+					config.controler().getLastIteration() - 100 : config.controler().getLastIteration() - 50);
 			config.strategy().addStrategySettings(strat);
 		}
 		{
@@ -293,7 +313,7 @@ public class TtRunCottbusSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		if (SCENARIO_TYPE.equals(ScenarioType.BaseCaseContinued_BtuRoutes))
+		if (POP_TYPE.equals(PopulationType.BTU_POP_BTU_ROUTES))
 			config.strategy().setMaxAgentPlanMemorySize(0); //unlimited because ReRoute is switched off anyway
 		else 
 			config.strategy().setMaxAgentPlanMemorySize( 5 );
@@ -301,12 +321,11 @@ public class TtRunCottbusSimulation {
 		config.qsim().setStuckTime( 3600 );
 		config.qsim().setRemoveStuckVehicles(false);
 		
-		if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
-			config.qsim().setStorageCapFactor( SCALING_FACTOR );
-			config.qsim().setFlowCapFactor( SCALING_FACTOR );
-		} else { // BaseCaseContinued
-			// use default: 1.0 (i.e. as it is in the BTU network)
+		if (NETWORK_TYPE.equals(NetworkType.BTU_NET)){
+			LOG.warn("Keep in mind that the btu network has already be scaled");
 		}
+		config.qsim().setStorageCapFactor( SCALING_FACTOR );
+		config.qsim().setFlowCapFactor( SCALING_FACTOR );
 		
 		config.qsim().setStartTime(3600 * 5); 
 
@@ -354,9 +373,9 @@ public class TtRunCottbusSimulation {
 		
 		// add counts module
 		if (USE_COUNTS) {
-			if (!SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
-				throw new UnsupportedOperationException("In this scenario, counts can only be used together with ScenarioType.BaseCase"
-						+ " because they are not available for the simplified network of other scenario types.");
+			if (!NETWORK_TYPE.equals(NetworkType.V1)){
+				throw new UnsupportedOperationException("In this scenario, counts can only be used together with NetworkType.V1"
+						+ " because they are not available for other simplified networks.");
 			}
 //			config.counts().setCountsFileName(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted.xml");
 			config.counts().setInputFile(INPUT_BASE_DIR + "CottbusCounts/counts_matsim/counts_final_shifted_v2.xml");
@@ -382,29 +401,34 @@ public class TtRunCottbusSimulation {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		}
 
-		// adapt signal controller for downstream signal control
+		// adoptions for some signal types necessary:
 		switch (SIGNAL_TYPE) {
 		case DOWNSTREAM_BTUOPT:
 		case DOWNSTREAM_MS:
+		case DOWNSTREAM_ALLGREEN:
+			// adapt signal controller for downstream signal control
 			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			SignalControlData signalControl = signalsData.getSignalControlData();
 			for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()) {
 				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
-			}
-			break;
-		case DOWNSTREAM_ALLGREEN:
-			signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-			signalControl = signalsData.getSignalControlData();
-			for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()) {
-				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
-				// change to all day green
-				for (SignalPlanData planData : controllerData.getSignalPlanData().values()) {
-					for (SignalGroupSettingsData groupSetting : planData.getSignalGroupSettingsDataByGroupId().values()) {
-						groupSetting.setOnset(0);
-						groupSetting.setDropping(planData.getCycleTime());
+				if (SIGNAL_TYPE.equals(SignalType.DOWNSTREAM_ALLGREEN)){
+					// change to all day green
+					for (SignalPlanData planData : controllerData.getSignalPlanData().values()) {
+						for (SignalGroupSettingsData groupSetting : planData.getSignalGroupSettingsDataByGroupId().values()) {
+							groupSetting.setOnset(0);
+							groupSetting.setDropping(planData.getCycleTime());
+						}
 					}
 				}
 			}
+			break;
+		case ALL_NODES_ALL_GREEN:
+			// signalize all intersections with an all day green signal plan, create lanes for all intersections
+			SignalizeScenario.createSignalsAndLanesForAllTurnings(scenario, DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			break;
+		case ALL_NODES_DOWNSTREAM:
+			// signalize all intersections, use downstream signal controller, create lanes for all intersections
+			SignalizeScenario.createSignalsAndLanesForAllTurnings(scenario, DownstreamSignalController.IDENTIFIER);
 			break;
 		default:
 			break;
@@ -424,7 +448,6 @@ public class TtRunCottbusSimulation {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
-//			controler.addOverridingModule(new SignalsModule());
 			controler.addOverridingModule(new CombinedSignalsModule());
 		}
 		
@@ -540,18 +563,6 @@ public class TtRunCottbusSimulation {
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		
 		String runName = date;
-		
-		switch (SCENARIO_TYPE){
-		case BaseCase:
-			runName += "_BC";
-			break;
-		case BaseCaseContinued_MatsimRoutes:
-			runName += "_BCCont_freeRouteChoice";
-			break;
-		case BaseCaseContinued_BtuRoutes:
-			runName += "_BCCont_btuRoutes";
-			break;
-		}
 
 		runName += "_" + config.controler().getLastIteration() + "it";
 		
