@@ -1,30 +1,31 @@
 package playground.clruch.dispatcher;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
+import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.framework.RunAVScenario;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
@@ -32,14 +33,7 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
-public class LazyDispatcher implements AVDispatcher {
-    final private SingleRideAppender appender;
+public class LazyDispatcher extends AbstractDispatcher {
     final private Queue<AVVehicle> availableVehicles = new LinkedList<>();
     final private Queue<AVRequest> pendingRequests = new LinkedList<>();
     private Link[] destLinks = null;
@@ -50,7 +44,7 @@ public class LazyDispatcher implements AVDispatcher {
     private boolean reoptimize = false;
 
     public LazyDispatcher(EventsManager eventsManager, SingleRideAppender appender, Link[] sendAVtoLink) {
-        this.appender = appender;
+        super(appender);
         this.eventsManager = eventsManager;
         this.destLinks = sendAVtoLink;
     }

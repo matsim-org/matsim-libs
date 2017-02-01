@@ -1,7 +1,10 @@
 package playground.sebhoerl.avtaxi.dispatcher.single_heuristic;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -10,23 +13,26 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
+import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.*;
+import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-import java.util.*;
+public class SingleHeuristicDispatcher extends AbstractDispatcher {
+    private boolean reoptimize = true; // TODO probably obsolete
 
-public class SingleHeuristicDispatcher implements AVDispatcher {
-    private boolean reoptimize = true;
-
-    final private SingleRideAppender appender;
     final private Id<AVOperator> operatorId;
     final private EventsManager eventsManager;
 
@@ -46,7 +52,7 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
     private HeuristicMode mode = HeuristicMode.OVERSUPPLY;
 
     public SingleHeuristicDispatcher(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, SingleRideAppender appender) {
-        this.appender = appender;
+	super(appender);
         this.operatorId = operatorId;
         this.eventsManager = eventsManager;
 

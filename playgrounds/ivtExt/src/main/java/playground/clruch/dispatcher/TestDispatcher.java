@@ -8,6 +8,7 @@ import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
+import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -17,8 +18,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class TestDispatcher implements AVDispatcher {
-    final private SingleRideAppender appender;
+public class TestDispatcher extends AbstractDispatcher {
     final private Queue<AVVehicle> availableVehicles = new LinkedList<>();
     final private Queue<AVRequest> pendingRequests = new LinkedList<>();
     public static final String IDENTIFIER = "TestDispatcher";
@@ -28,7 +28,7 @@ public class TestDispatcher implements AVDispatcher {
     private boolean reoptimize = false;
 
     public TestDispatcher(EventsManager eventsManager, SingleRideAppender appender) {
-        this.appender = appender;
+        super(appender);
         this.eventsManager = eventsManager;
     }
 
