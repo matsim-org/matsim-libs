@@ -127,7 +127,7 @@ public class DigicoreFileSplitter {
 	 */
 	public static void main( String[] args){
 		if(args.length != 9){
-			throw new RuntimeException("Must provide 9 field arguments: filename, startLine, outputfolder and the field locations for VehId, Time, Long, Lat, Status and Speed.");
+			throw new RuntimeException("Must provide 9 field arguments: filename, outputfolder, startLine and the field locations for VehId, Time, Long, Lat, Status and Speed.");
 		}
 		
 		log.info("=================================================================");

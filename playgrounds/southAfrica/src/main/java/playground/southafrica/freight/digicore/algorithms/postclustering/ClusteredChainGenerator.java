@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * This class was used with individual xml files. It is now superceded by using
- * a single vehicles container. Instead us {@link FacilityToActivityAssigner}.
+ * a single vehicles container. Instead use {@link FacilityToActivityAssigner}.
  *
  * @author jwjoubert
  */
