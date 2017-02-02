@@ -23,7 +23,6 @@ import org.matsim.vehicles.Vehicle;
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.controler.listener.FFListener;
 import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModule;
-import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
 import playground.wrashid.freefloating.qsim.FreeFloatingQsimFactory;
 import playground.wrashid.parkingChoice.config.ParkingChoiceConfigGroup;
 
@@ -42,8 +41,7 @@ public static void main(final String[] args) throws IOException {
     	ParkingChoiceConfigGroup configGroupP = new ParkingChoiceConfigGroup();
     	config.addModule(configGroupP);
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-		OneWayCarsharingRDConfigGroup configGroupOW = new OneWayCarsharingRDConfigGroup();
-    	config.addModule(configGroupOW);
+		
 		
 		final Controler controler = new Controler( sc );
 					
