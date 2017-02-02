@@ -72,14 +72,14 @@ public class Schedules
 
     public static Task getNextToLastTask(Schedule schedule)
     {
-        List<Task> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         return tasks.get(tasks.size() - 2);
     }
 
 
     public static Task getLastTask(Schedule schedule)
     {
-        List<Task> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         return tasks.get(tasks.size() - 1);
     }
 
@@ -128,7 +128,7 @@ public class Schedules
 
     public static  Link getLastLinkInSchedule(Schedule schedule)
     {
-        List<Task> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         return tasks.isEmpty() ? //
                 schedule.getVehicle().getStartLink() : //
                 Tasks.getEndLink(tasks.get(tasks.size() - 1));
@@ -150,7 +150,7 @@ public class Schedules
 
 
     public static Iterable<? extends Task> createTaskFilterIter(Schedule schedule,
-            Predicate<Task> taskPredicate)
+            Predicate<? super Task> taskPredicate)
     {
         return Iterables.filter(schedule.getTasks(), taskPredicate);
     }

@@ -50,7 +50,7 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
         Task currentTask = schedule.getCurrentTask();
         currentTask.setEndTime(now);
 
-        List<Task> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         int index = currentTask.getTaskIdx() + 1;
         AVTask nextTask = null;
 

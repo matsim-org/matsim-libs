@@ -110,11 +110,11 @@ public class ScheduleReconstructionTest
     }
 
 
-    private void compareTasks(List<Task> originalTasks, List<Task> reconstructedTasks)
+    private void compareTasks(List<? extends Task> originalTasks, List<? extends Task> reconstructedTasks)
     {
         Assert.assertEquals(originalTasks.size(), reconstructedTasks.size());
 
-        Iterator<Task> rIter = reconstructedTasks.iterator();
+        Iterator<? extends Task> rIter = reconstructedTasks.iterator();
         for (Task o : originalTasks) {
             Task r = rIter.next();
 

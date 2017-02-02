@@ -418,7 +418,7 @@ public class TaxibusScheduler {
 
 		currentTask.setEndTime(newTaskEndTime);
 
-		List<Task> tasks = schedule.getTasks();
+		List<? extends Task> tasks = schedule.getTasks();
 		int startIdx = currentTask.getTaskIdx() + 1;
 		double t = newTaskEndTime;
 
@@ -504,7 +504,7 @@ public class TaxibusScheduler {
 
 	public Set<TaxibusRequest> getCurrentlyPlannedRequests(Schedule schedule) {
 		Set<TaxibusRequest> plannedRequests = new HashSet<>();
-		List<Task> tasks = schedule.getTasks();
+		List<? extends Task> tasks = schedule.getTasks();
 
 		for (int i = schedule.getTaskCount() - 1; i > schedule.getCurrentTask().getTaskIdx(); i--) {
 			Task task = tasks.get(i);

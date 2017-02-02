@@ -408,13 +408,13 @@ public class TaxiScheduler
 
         currentTask.setEndTime(newEndTime);
 
-        List<Task> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         int startIdx = currentTask.getTaskIdx() + 1;
         double newBeginTime = newEndTime;
 
         for (int i = startIdx; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
-            double calcEndTime = calcNewEndTime((TaxiTask)task, newBeginTime);
+            TaxiTask task = (TaxiTask)tasks.get(i);
+            double calcEndTime = calcNewEndTime(task, newBeginTime);
 
             if (calcEndTime == Time.UNDEFINED_TIME) {
                 schedule.removeTask(task);
@@ -569,11 +569,11 @@ public class TaxiScheduler
 
     protected void removePlannedTasks(Schedule schedule, int newLastTaskIdx)
     {
-        List<Task> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
-            Task task = tasks.get(i);
+            TaxiTask task = (TaxiTask)tasks.get(i);
             schedule.removeTask(task);
-            taskRemovedFromSchedule(schedule, (TaxiTask)task);
+            taskRemovedFromSchedule(schedule, task);
         }
     }
 

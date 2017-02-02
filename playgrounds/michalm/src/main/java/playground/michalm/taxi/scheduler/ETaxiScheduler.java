@@ -143,7 +143,7 @@ public class ETaxiScheduler
     @Override
     protected void removePlannedTasks(Schedule schedule, int newLastTaskIdx)
     {
-        List<Task> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
 
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
             Task task = tasks.get(i);

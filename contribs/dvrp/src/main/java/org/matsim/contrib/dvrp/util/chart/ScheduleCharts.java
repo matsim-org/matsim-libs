@@ -192,9 +192,7 @@ public class ScheduleCharts
                 continue;
             }
 
-            List<Task> tasks = schedule.getTasks();
-
-            for (Task t : tasks) {
+            for (Task t : schedule.getTasks()) {
                 String description = descriptionCreator.create(t);
 
                 TimePeriod duration = new SimpleTimePeriod(//

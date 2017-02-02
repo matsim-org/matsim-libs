@@ -35,9 +35,9 @@ public interface Schedule
     Vehicle getVehicle();
 
 
-    List<Task> getTasks();// unmodifiableList
+    List<? extends Task> getTasks();// unmodifiableList
 
-    
+
     int getTaskCount();
 
 

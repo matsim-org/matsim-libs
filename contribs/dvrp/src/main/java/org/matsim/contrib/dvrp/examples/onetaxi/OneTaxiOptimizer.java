@@ -148,7 +148,7 @@ public class OneTaxiOptimizer
 
         currentTask.setEndTime(now);
 
-        List<Task> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         int nextTaskIdx = currentTask.getTaskIdx() + 1;
 
         //all except the last task (waiting)

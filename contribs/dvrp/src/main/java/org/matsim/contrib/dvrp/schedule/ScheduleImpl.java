@@ -33,8 +33,8 @@ public class ScheduleImpl
     private final Vehicle vehicle;
 
     private final List<AbstractTask> tasks = new ArrayList<>();
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    private final List<Task> unmodifiableTasks = (List<Task>)Collections.unmodifiableList((List)tasks);
+    private final List<? extends Task> unmodifiableTasks = (List<? extends Task>)Collections
+            .unmodifiableList(tasks);
 
     private ScheduleStatus status = ScheduleStatus.UNPLANNED;
     private AbstractTask currentTask = null;
@@ -54,7 +54,7 @@ public class ScheduleImpl
 
 
     @Override
-    public List<Task> getTasks()
+    public List<? extends Task> getTasks()
     {
         return unmodifiableTasks;
     }
@@ -123,7 +123,9 @@ public class ScheduleImpl
             }
 
             if (Tasks.getEndLink(previousTask) != beginLink) {
-            	Logger.getLogger(getClass()).error("Last task End link: "+Tasks.getEndLink(previousTask).getId()+ " ; next Task start link: "+ beginLink.getId());
+                Logger.getLogger(getClass())
+                        .error("Last task End link: " + Tasks.getEndLink(previousTask).getId()
+                                + " ; next Task start link: " + beginLink.getId());
                 throw new IllegalArgumentException();
             }
         }
