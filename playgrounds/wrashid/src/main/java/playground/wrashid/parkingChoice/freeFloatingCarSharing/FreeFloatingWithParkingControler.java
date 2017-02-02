@@ -121,12 +121,7 @@ public static void main(final String[] args) throws IOException {
 				}
 			});
 		}
-		controler.addOverridingModule( new AbstractModule() {
-			@Override
-			public void install() {
-				this.addPlanStrategyBinding("RandomTripToCarsharingStrategy").to( playground.balac.allcsmodestest.replanning.RandomTripToCarsharingStrategy.class ) ;
-			}
-		});
+		
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
