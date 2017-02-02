@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
 import org.matsim.core.population.PersonUtils;
-import playground.balac.carsharing.data.FlexTransPersonImpl;
 
 public class MembershipModel {
 	
