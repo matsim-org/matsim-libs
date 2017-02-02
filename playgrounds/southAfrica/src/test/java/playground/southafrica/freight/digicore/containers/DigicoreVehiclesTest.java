@@ -34,7 +34,7 @@ public class DigicoreVehiclesTest {
 		assertNull("Description should be NULL", dv.getDescription());
 		String descr = "Test";
 		dv.setDescription(descr);
-		assertTrue("Wrong descripotion", descr.equalsIgnoreCase(dv.getDescription()));
+		assertTrue("Wrong description", descr.equalsIgnoreCase(dv.getDescription()));
 	}
 
 	@Test
