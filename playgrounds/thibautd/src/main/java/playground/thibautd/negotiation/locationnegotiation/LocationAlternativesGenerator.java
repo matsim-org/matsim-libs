@@ -23,6 +23,7 @@ import com.google.inject.Singleton;
 import org.apache.commons.math3.util.Combinations;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
@@ -185,14 +186,14 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		return StreamSupport.stream( getGroups( alters ).spliterator() , false );
 	}
 
-	private static class AltersGroupIterator implements Iterator<Collection<Person>> {
+	private class AltersGroupIterator implements Iterator<Collection<Person>> {
 		private final Person[] alters;
 
 		private Iterator<int[]> combinations = null;
 		private final int maxSize;
 		private int currSize = 0;
 
-		private int[] currentCombination;
+		private List<Person> currentCombination;
 
 		private AltersGroupIterator( final Collection<Person> alters , final int maxSize ) {
 			this.alters = alters.toArray( new Person[ alters.size() ] );
@@ -201,18 +202,33 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 		}
 
 		private void nextCombinations() {
-			if ( combinations == null || !combinations.hasNext() ) {
-				currSize++;
-				if ( currSize > maxSize ) {
-					combinations = null;
-					currentCombination = null;
-					return;
+			do {
+				if ( combinations == null || !combinations.hasNext() ) {
+					currSize++;
+					if ( currSize > maxSize ) {
+						combinations = null;
+						currentCombination = null;
+						return;
+					}
+
+					combinations = new Combinations( alters.length, currSize ).iterator();
 				}
 
-				combinations = new Combinations( alters.length, currSize ).iterator();
+				this.currentCombination = new ArrayList<>( currSize );
+				for ( int i : combinations.next() ) currentCombination.add( alters[ i ] );
+			} while ( !isClique() );
+		}
+
+		private boolean isClique() {
+			for ( int i = 0; i < currentCombination.size(); i++ ) {
+				final Id<Person> ego = currentCombination.get( i ).getId();
+				for ( int j = i + 1; j < currentCombination.size(); j++ ) {
+					final Id<Person> alter = currentCombination.get( j ).getId();
+					if ( !socialNetwork.getAlters( ego ).contains( alter ) ) return false;
+				}
 			}
 
-			this.currentCombination = combinations.next();
+			return true;
 		}
 
 		@Override
@@ -222,12 +238,9 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 
 		@Override
 		public Collection<Person> next() {
-			final Collection<Person> comb = new ArrayList<>( currSize );
-
-			for ( int i : currentCombination ) comb.add( alters[ i ] );
+			final Collection<Person> val = currentCombination;
 			nextCombinations();
-
-			return comb;
+			return val;
 		}
 	}
 
