@@ -176,11 +176,17 @@ public class SignalizeScenario {
 				for (Id<Link> linkId : node.getInLinks().keySet()) {
 					if (useLanes) {
 						// go through all ingoing lanes
-						for (Id<Lane> laneId : scenario.getLanes().getLanesToLinkAssignments().get(linkId).getLanes().keySet()) {
-							SignalData signal = fac.createSignalData(Id.create("signal" + linkId + "." + laneId, Signal.class));
-							signalSystem.addSignalData(signal);
-							signal.setLinkId(linkId);
-							signal.addLaneId(laneId);
+						for (Lane lane : scenario.getLanes().getLanesToLinkAssignments().get(linkId).getLanes().values()) {
+							// do not create signals for original lanes
+							if (!lane.getId().toString().endsWith(".ol")) {
+								SignalData signal = fac.createSignalData(Id.create("signal" + linkId + "." + lane.getId(), Signal.class));
+								signalSystem.addSignalData(signal);
+								signal.setLinkId(linkId);
+								signal.addLaneId(lane.getId());
+								for (Id<Link> toLinkId : lane.getToLinkIds()) {
+									signal.addTurningMoveRestriction(toLinkId);
+								}
+							}
 						}
 					} else { // i.e. no lanes
 						SignalData signal = fac.createSignalData(Id.create("signal" + linkId, Signal.class));
@@ -232,7 +238,7 @@ public class SignalizeScenario {
 				 * problem: corresponding directions cannot be found easily
 				 * currently used: all day green: */
 				int onset = 0;
-				int dropping = CYCLE_TIME;
+				int dropping = CYCLE_TIME-1;
 				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroup.getId(), onset, dropping));
 			}
 		}
