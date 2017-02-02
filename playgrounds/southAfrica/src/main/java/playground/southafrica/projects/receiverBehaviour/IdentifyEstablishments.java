@@ -18,7 +18,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
+import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v2;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
 import playground.southafrica.utilities.Header;
@@ -41,11 +41,12 @@ public class IdentifyEstablishments {
 		String networkFile = args[0];
 		String rFile = args[1];
 		
-		DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
+		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
 		nr.readFile(networkFile);
 
 		/* Set up the three shopping area locations. */
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
+//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", TransformationFactory.HARTEBEESTHOEK94_LO29);
 		final double y2 = -25.774736;
 		Coord waterkloof = ct.transform(new Coord(28.240537, y2));
 		final double y1 = -25.770383;
@@ -71,7 +72,7 @@ public class IdentifyEstablishments {
 		
 		LOG.info("Writing nodes to file...");
 		BufferedWriter bw = IOUtils.getBufferedWriter(rFile);
-		CoordinateTransformation ctBack = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
+		CoordinateTransformation ctBack = TransformationFactory.getCoordinateTransformation(TransformationFactory.HARTEBEESTHOEK94_LO29, "WGS84");
 		try{
 			bw.write("id,x,y,long,lat");
 			bw.newLine();
