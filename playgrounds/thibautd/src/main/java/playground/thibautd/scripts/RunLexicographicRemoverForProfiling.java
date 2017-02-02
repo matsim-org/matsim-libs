@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -27,6 +28,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
 import org.matsim.contrib.socnetsim.framework.replanning.removers.LexicographicForCompositionExtraPlanRemover;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Counter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,11 +38,13 @@ import java.util.Random;
  * @author thibautd
  */
 public class RunLexicographicRemoverForProfiling {
+	private static final Logger log = Logger.getLogger( RunLexicographicRemoverForProfiling.class );
 	private static final int POP_SIZE = 10000;
 	private static final int N_PLANS = 20;
-	private static final int N_JOINT_PLANS = POP_SIZE * 10;
+	private static final int N_JOINT_PLANS = POP_SIZE * 20;
 
 	private static final Random random = new Random( 123 );
+	private static final Counter planCounter = new Counter( "create plan # " );
 
 	public static void main( final String... args ) {
 		while ( true ) {
@@ -54,6 +58,7 @@ public class RunLexicographicRemoverForProfiling {
 				sc.getPopulation().addPerson( p );
 
 				for ( int j=0; j < N_PLANS; j++ ) {
+					planCounter.incCounter();
 					createPlan( sc, p );
 				}
 			}
@@ -72,6 +77,8 @@ public class RunLexicographicRemoverForProfiling {
 					addJointPlan( jointPlans, plan1, plan2, plan3 );
 				}
 			}
+			planCounter.printCounter();
+			log.info( (planCounter.getCounter() / (double) POP_SIZE)+" plans per person" );
 
 			new LexicographicForCompositionExtraPlanRemover( 3 , 10 ).removePlansInGroup(
 					jointPlans,
@@ -92,6 +99,7 @@ public class RunLexicographicRemoverForProfiling {
 	}
 
 	private static Plan createPlan( final Scenario sc, final Person p ) {
+		planCounter.incCounter();
 		final Plan plan = sc.getPopulation().getFactory().createPlan();
 		plan.setScore( random.nextDouble() );
 		p.addPlan( plan );
