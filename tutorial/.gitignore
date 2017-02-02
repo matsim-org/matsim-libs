@@ -1,2 +1,4 @@
 test/output
 /.classpath
+/output
+/pop.xml.gz

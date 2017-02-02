@@ -91,9 +91,12 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			// I think that the above comment is a todo, not a description of the code status. kai, feb'15
 			
 			StringBuilder sels = new StringBuilder() ;
-			for ( DefaultSelector sel : DefaultSelector.values() ) {
-				sels.append( sel.toString() + " " ) ;
-			}
+			sels.append( DefaultSelector.SelectRandom ) ;
+			sels.append( DefaultSelector.BestScore ) ;
+			sels.append( DefaultSelector.KeepLastSelected ) ;
+			sels.append( DefaultSelector.ChangeExpBeta ) ;
+			sels.append( DefaultSelector.SelectExpBeta ) ;
+			sels.append( DefaultSelector.SelectPathSizeLogit ) ;
 			
 			StringBuilder strats = new StringBuilder() ;
 			for ( DefaultStrategy strat : DefaultStrategy.values() ) {

@@ -18,7 +18,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author nagel
  *
  */
-public class KNAvChallenge {
+class KNAvChallenge {
 
 	/**
 	 * @param args

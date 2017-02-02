@@ -12,6 +12,8 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.tracker.TaskTracker;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -33,12 +35,54 @@ class KNVrpOptimizer implements VrpOptimizer {
 	}
 
 	@Override
-	public void nextTask(Schedule<? extends Task> schedule) {
+	public void nextTask(Schedule<? extends Task> schedule1) {
+		@SuppressWarnings("unchecked")
+		Schedule<Task> schedule = (Schedule<Task>) schedule1 ;
+
 		schedule.getTasks().clear(); 
 		
 		Request rr = requests.poll() ;
-		if ( rr==null ) {
-//			schedule.addTask( new Task(){} ) ; // yyyyyy this is not allowed because of the <? extends Task>.  Deliberately?  kai, jan'17
+		if ( rr==null ) { 
+			// no request in queue, schedule 
+			schedule.addTask( new TaxiTask(){
+				@Override public TaskType getType() {
+					return TaskType.STAY ;
+				}
+				@Override public TaskStatus getStatus() {
+					return TaskStatus.STARTED ;
+				}
+				@Override public double getBeginTime() {
+					return timer.getTimeOfDay() ;
+				}
+				@Override public double getEndTime() {
+					return Double.POSITIVE_INFINITY ;
+				}
+				@Override public Schedule<? extends Task> getSchedule() {
+					return schedule ;
+				}
+				@Override public int getTaskIdx() {
+					return 0;
+				}
+				@Override public void setBeginTime(double beginTime) {
+					throw new RuntimeException("when is this called?") ;
+				}
+				@Override public void setEndTime(double endTime) {
+					throw new RuntimeException("when is this called?") ;
+				}
+				@Override public TaskTracker getTaskTracker() {
+					throw new RuntimeException("what is this?" ) ;
+				}
+
+				@Override
+				public void initTaskTracker(TaskTracker taskTracker) {
+					throw new RuntimeException("what is this?" ) ;
+				}
+				@Override
+				public TaxiTaskType getTaxiTaskType() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+			} ) ;
 			return ;
 		}
 	}

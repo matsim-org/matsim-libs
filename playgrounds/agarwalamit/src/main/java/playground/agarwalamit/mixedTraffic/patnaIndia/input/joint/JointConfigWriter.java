@@ -98,7 +98,7 @@ public class JointConfigWriter {
 
 		{//urban
 			StrategySettings expChangeBeta = new StrategySettings();
-			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			expChangeBeta.setSubpopulation(PatnaUserGroup.urban.name());
 			expChangeBeta.setWeight(0.7);
 			config.strategy().addStrategySettings(expChangeBeta);
@@ -129,7 +129,7 @@ public class JointConfigWriter {
 
 		{//commuters
 			StrategySettings expChangeBeta = new StrategySettings();
-			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			expChangeBeta.setSubpopulation(PatnaUserGroup.commuter.name());
 			expChangeBeta.setWeight(0.85);
 			config.strategy().addStrategySettings(expChangeBeta);
@@ -143,7 +143,7 @@ public class JointConfigWriter {
 
 		{//through
 			StrategySettings expChangeBeta = new StrategySettings();
-			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			expChangeBeta.setSubpopulation(PatnaUserGroup.through.name());
 			expChangeBeta.setWeight(0.85);
 			config.strategy().addStrategySettings(expChangeBeta);
