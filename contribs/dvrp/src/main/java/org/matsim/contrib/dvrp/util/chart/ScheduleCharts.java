@@ -45,8 +45,8 @@ public class ScheduleCharts
     }
 
 
-    public static <T extends Task> JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles,
-            DescriptionCreator<T> descriptionCreator, PaintSelector<T> paintSelector)
+    public static JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles,
+            DescriptionCreator descriptionCreator, PaintSelector paintSelector)
     {
         // data
         TaskSeriesCollection dataset = createScheduleDataset(vehicles, descriptionCreator);
@@ -72,7 +72,7 @@ public class ScheduleCharts
         plot.setRangeAxis(new DateAxis("Time", TimeZone.getTimeZone("GMT"), Locale.getDefault()));
 
         // Renderer
-        XYBarRenderer xyBarRenderer = new ChartTaskRenderer<T>(dataset, paintSelector);
+        XYBarRenderer xyBarRenderer = new ChartTaskRenderer(dataset, paintSelector);
         xyBarRenderer.setUseYInterval(true);
         plot.setRenderer(xyBarRenderer);
 
@@ -81,13 +81,13 @@ public class ScheduleCharts
 
 
     @SuppressWarnings("serial")
-    private static class ChartTask<T extends Task>
+    private static class ChartTask
         extends org.jfree.data.gantt.Task
     {
-        private T vrpTask;
+        private Task vrpTask;
 
 
-        private ChartTask(String description, TimePeriod duration, T vrpTask)
+        private ChartTask(String description, TimePeriod duration, Task vrpTask)
         {
             super(description, duration);
             this.vrpTask = vrpTask;
@@ -96,14 +96,14 @@ public class ScheduleCharts
 
 
     @SuppressWarnings("serial")
-    private static class ChartTaskRenderer<T extends Task>
+    private static class ChartTaskRenderer
         extends XYBarRenderer
     {
         private final TaskSeriesCollection tsc;
-        private final PaintSelector<T> paintSelector;
+        private final PaintSelector paintSelector;
 
 
-        public ChartTaskRenderer(final TaskSeriesCollection tsc, PaintSelector<T> paintSelector)
+        public ChartTaskRenderer(final TaskSeriesCollection tsc, PaintSelector paintSelector)
         {
             this.tsc = tsc;
             this.paintSelector = paintSelector;
@@ -128,26 +128,25 @@ public class ScheduleCharts
         }
 
 
-        private ChartTask<T> getTask(int series, int item)
+        private ChartTask getTask(int series, int item)
         {
-            @SuppressWarnings("unchecked")
-            ChartTask<T> chartTask = (ChartTask<T>)tsc.getSeries(series).get(item);
+            ChartTask chartTask = (ChartTask)tsc.getSeries(series).get(item);
             return chartTask;
         }
 
     }
 
 
-    public static interface PaintSelector<T extends Task>
+    public static interface PaintSelector
     {
-        Paint select(T task);
+        Paint select(Task task);
     }
 
 
     private static final Color WAIT_COLOR = new Color(0, 200, 0);
     private static final Color DRIVE_COLOR = new Color(200, 0, 0);
 
-    public static final PaintSelector<Task> BASIC_PAINT_SELECTOR = new PaintSelector<Task>() {
+    public static final PaintSelector BASIC_PAINT_SELECTOR = new PaintSelector() {
         public Paint select(Task task)
         {
             switch (task.getType()) {
@@ -164,13 +163,13 @@ public class ScheduleCharts
     };
 
 
-    public static interface DescriptionCreator<T extends Task>
+    public static interface DescriptionCreator
     {
-        String create(T task);
+        String create(Task task);
     }
 
 
-    public static final DescriptionCreator<Task> BASIC_DESCRIPTION_CREATOR = new DescriptionCreator<Task>() {
+    public static final DescriptionCreator BASIC_DESCRIPTION_CREATOR = new DescriptionCreator() {
         public String create(Task task)
         {
             return task.getType().name();
@@ -178,14 +177,13 @@ public class ScheduleCharts
     };
 
 
-    private static <T extends Task> TaskSeriesCollection createScheduleDataset(
-            Collection<? extends Vehicle> vehicles, DescriptionCreator<T> descriptionCreator)
+    private static TaskSeriesCollection createScheduleDataset(
+            Collection<? extends Vehicle> vehicles, DescriptionCreator descriptionCreator)
     {
         TaskSeriesCollection collection = new TaskSeriesCollection();
 
         for (Vehicle v : vehicles) {
-            @SuppressWarnings("unchecked")
-            Schedule<T> schedule = (Schedule<T>)v.getSchedule();
+            Schedule schedule = v.getSchedule();
 
             final TaskSeries scheduleTaskSeries = new TaskSeries(v.getId().toString());
 
@@ -194,16 +192,16 @@ public class ScheduleCharts
                 continue;
             }
 
-            List<T> tasks = schedule.getTasks();
+            List<Task> tasks = schedule.getTasks();
 
-            for (T t : tasks) {
+            for (Task t : tasks) {
                 String description = descriptionCreator.create(t);
 
                 TimePeriod duration = new SimpleTimePeriod(//
                         new Date((int)Math.floor(t.getBeginTime() * 1000)), //
                         new Date((int)Math.ceil(t.getEndTime() * 1000)));
 
-                scheduleTaskSeries.add(new ChartTask<T>(description, duration, t));
+                scheduleTaskSeries.add(new ChartTask(description, duration, t));
             }
 
             collection.add(scheduleTaskSeries);

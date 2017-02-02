@@ -161,7 +161,7 @@ public class AssignmentETaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Schedule schedule)
     {
         if (schedule.getStatus() == ScheduleStatus.STARTED) {
             if (schedule.getCurrentTask() instanceof ETaxiChargingTask) {

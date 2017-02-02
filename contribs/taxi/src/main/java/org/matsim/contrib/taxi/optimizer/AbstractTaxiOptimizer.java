@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -70,8 +70,7 @@ public abstract class AbstractTaxiOptimizer
             //perhaps by checking if there are any unplanned requests??
             if (doUnscheduleAwaitingRequests) {
                 for (Vehicle v : optimContext.taxiData.getVehicles().values()) {
-                    optimContext.scheduler
-                            .updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
+                    optimContext.scheduler.updateTimeline(v.getSchedule());
                 }
             }
 
@@ -119,15 +118,14 @@ public abstract class AbstractTaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Schedule schedule)
     {
-        Schedule<TaxiTask> taxiSchedule = TaxiSchedules.asTaxiSchedule(schedule);
-        optimContext.scheduler.updateBeforeNextTask(taxiSchedule);
+        optimContext.scheduler.updateBeforeNextTask(schedule);
 
-        TaxiTask newCurrentTask = taxiSchedule.nextTask();
+        Task newCurrentTask = schedule.nextTask();
 
         if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-            requiresReoptimization = doReoptimizeAfterNextTask(newCurrentTask);
+            requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
         }
     }
 
@@ -141,8 +139,7 @@ public abstract class AbstractTaxiOptimizer
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {
-        optimContext.scheduler
-                .updateTimeline(TaxiSchedules.asTaxiSchedule(driveTask.getSchedule()));
+        optimContext.scheduler.updateTimeline(driveTask.getSchedule());
 
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}

@@ -47,13 +47,12 @@ public class OneTaxiOptimizer
     private final LeastCostPathCalculator router;
 
     private final Vehicle vehicle;//we have only one vehicle
-    private final Schedule<AbstractTask> schedule;// the vehicle's schedule
+    private final Schedule schedule;// the vehicle's schedule
 
     public static final double PICKUP_DURATION = 120;
     public static final double DROPOFF_DURATION = 60;
 
 
-    @SuppressWarnings("unchecked")
     public OneTaxiOptimizer(Scenario scenario, VrpData vrpData, MobsimTimer timer)
     {
         this.timer = timer;
@@ -63,9 +62,9 @@ public class OneTaxiOptimizer
                 travelTime);
 
         vrpData.clearRequestsAndResetSchedules();//necessary if we run more than 1 iteration
-        
+
         vehicle = vrpData.getVehicles().values().iterator().next();
-        schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
+        schedule = vehicle.getSchedule();
         schedule.addTask(
                 new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(), "wait"));
     }
@@ -121,7 +120,7 @@ public class OneTaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Schedule schedule)
     {
         shiftTimings();
         schedule.nextTask();
@@ -149,7 +148,7 @@ public class OneTaxiOptimizer
 
         currentTask.setEndTime(now);
 
-        List<AbstractTask> tasks = schedule.getTasks();
+        List<Task> tasks = schedule.getTasks();
         int nextTaskIdx = currentTask.getTaskIdx() + 1;
 
         //all except the last task (waiting)

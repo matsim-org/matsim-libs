@@ -29,15 +29,15 @@ import com.google.common.collect.Iterables;
 
 public class TaxiSchedules
 {
-    public static final Predicate<TaxiTask> IS_PICKUP = new Predicate<TaxiTask>() {
-        public boolean apply(TaxiTask t)
+    public static final Predicate<Task> IS_PICKUP = new Predicate<Task>() {
+        public boolean apply(Task t)
         {
-            return t.getTaxiTaskType() == TaxiTaskType.PICKUP;
+            return ((TaxiTask)t).getTaxiTaskType() == TaxiTaskType.PICKUP;
         };
     };
 
-    public static final Function<TaxiTask, TaxiRequest> TAXI_TASK_TO_REQUEST = new Function<TaxiTask, TaxiRequest>() {
-        public TaxiRequest apply(TaxiTask t)
+    public static final Function<Task, TaxiRequest> TAXI_TASK_TO_REQUEST = new Function<Task, TaxiRequest>() {
+        public TaxiRequest apply(Task t)
         {
             if (t instanceof TaxiTaskWithRequest) {
                 return ((TaxiTaskWithRequest)t).getRequest();
@@ -49,28 +49,9 @@ public class TaxiSchedules
     };
 
 
-    @SuppressWarnings("unchecked")
-    public static Schedule<TaxiTask> asTaxiSchedule(Schedule<? extends Task> schedule)
+    public static Iterable<TaxiRequest> getTaxiRequests(Schedule schedule)
     {
-        return (Schedule<TaxiTask>)schedule;
-    }
-
-
-    public static Iterable<TaxiRequest> getTaxiRequests(Schedule<TaxiTask> schedule)
-    {
-        Iterable<TaxiTask> pickupTasks = Iterables.filter(schedule.getTasks(), IS_PICKUP);
+        Iterable<Task> pickupTasks = Iterables.filter(schedule.getTasks(), IS_PICKUP);
         return Iterables.transform(pickupTasks, TAXI_TASK_TO_REQUEST);
-    }
-
-
-    public static TaxiTask getNextTaxiTask(TaxiTask task)
-    {
-        return asTaxiSchedule(task.getSchedule()).getTasks().get(task.getTaskIdx() + 1);
-    }
-
-
-    public static TaxiTask getPreviousTaxiTask(TaxiTask task)
-    {
-        return asTaxiSchedule(task.getSchedule()).getTasks().get(task.getTaskIdx() - 1);
     }
 }

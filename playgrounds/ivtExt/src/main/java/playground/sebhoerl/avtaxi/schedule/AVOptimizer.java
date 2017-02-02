@@ -41,7 +41,7 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
     }
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule) {
+    public void nextTask(Schedule schedule) {
         if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
             schedule.nextTask();
             return;
@@ -50,19 +50,19 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
         Task currentTask = schedule.getCurrentTask();
         currentTask.setEndTime(now);
 
-        List<AVTask> tasks = ((Schedule<AVTask>) schedule).getTasks();
+        List<Task> tasks = schedule.getTasks();
         int index = currentTask.getTaskIdx() + 1;
         AVTask nextTask = null;
 
         if (index < tasks.size()) {
-            nextTask = tasks.get(index);
+            nextTask = (AVTask)tasks.get(index);
         }
 
         double startTime = now;
 
         AVTask indexTask;
         while (index < tasks.size()) {
-            indexTask = tasks.get(index);
+            indexTask = (AVTask)tasks.get(index);
 
             if (indexTask.getAVTaskType() == AVTask.AVTaskType.STAY) {
                 if (indexTask.getEndTime() < startTime) indexTask.setEndTime(startTime);

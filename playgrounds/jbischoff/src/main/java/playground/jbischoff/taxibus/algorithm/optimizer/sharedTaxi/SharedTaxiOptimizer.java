@@ -71,7 +71,7 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 		Set<Vehicle> idleVehicles = new HashSet<>();
 		Set<Vehicle> busyVehicles = new HashSet<>();
 		for (Vehicle veh : this.optimContext.vrpData.getVehicles().values()){
-			Schedule<DrtTask> schedule = (Schedule<DrtTask>)veh.getSchedule();
+			Schedule schedule = veh.getSchedule();
 			if (optimContext.scheduler.isIdle(veh)){
 				// empty vehicle = no customer onboard so far, we are adding those requests to a Set and let the ordinary 
 				// BestDispatchFinder do the job
@@ -79,9 +79,9 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 			}
 			else if (optimContext.scheduler.isStarted(veh)){
 				// busy vehicle = we are currently picking someone up, maximum of passengers for this optimizer = 2;
-				DrtTaskType  type =  schedule.getCurrentTask().getDrtTaskType();
+				DrtTaskType  type =  ((DrtTask)schedule.getCurrentTask()).getDrtTaskType();
 //				Logger.getLogger(getClass()).info(veh.getId() + " "+ type);
-				if (schedule.getCurrentTask().getDrtTaskType().equals(DrtTaskType.DRIVE_EMPTY)){
+				if (type.equals(DrtTaskType.DRIVE_EMPTY)){
 					
 					Set<TaxibusRequest> currentRequests = optimContext.scheduler.getCurrentlyPlannedRequests(schedule);
 					if (currentRequests.size()<2){
@@ -96,7 +96,7 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 		if (bestPath!=null){
 		if (busyVehicles.contains(bestPath.vehicle)){
 			//Shared ride: We need to get rid of the previous planned objects in schedule. In our case we know it must be 3 (Stay,Drive,Dropoff)
-			Schedule<DrtTask> schedule = (Schedule<DrtTask>) bestPath.vehicle.getSchedule();
+			Schedule schedule = bestPath.vehicle.getSchedule();
 			int oldcount = schedule.getTaskCount() ;
 			for (int ix = oldcount ;ix>schedule.getCurrentTask().getTaskIdx()+2; ix--){
 				schedule.removeLastTask();

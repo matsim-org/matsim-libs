@@ -33,7 +33,7 @@ import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
 public class ScheduleBuilder
 {
-    private Schedule<TaxiTask> schedule;
+    private Schedule schedule;
     private TaxiRequest currentRequest = null;
 
 
@@ -42,7 +42,7 @@ public class ScheduleBuilder
         Vehicle vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0,
                 Double.NaN);
         taxiData.addVehicle(vehicle);
-        schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
+        schedule = vehicle.getSchedule();
     }
 
 

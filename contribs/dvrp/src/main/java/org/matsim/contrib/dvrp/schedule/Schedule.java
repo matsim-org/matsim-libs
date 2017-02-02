@@ -24,7 +24,7 @@ import java.util.List;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 
-public interface Schedule<T extends Task>
+public interface Schedule
 {
     public enum ScheduleStatus
     {
@@ -35,13 +35,13 @@ public interface Schedule<T extends Task>
     Vehicle getVehicle();
 
 
-    List<T> getTasks();// unmodifiableList
+    List<Task> getTasks();// unmodifiableList
 
-
+    
     int getTaskCount();
 
 
-    T getCurrentTask();
+    Task getCurrentTask();
 
 
     ScheduleStatus getStatus();
@@ -55,17 +55,17 @@ public interface Schedule<T extends Task>
 
     // schedule modification functionality:
 
-    void addTask(T task);
+    void addTask(Task task);
 
 
-    void addTask(int taskIdx, T task);
+    void addTask(int taskIdx, Task task);
 
 
     void removeLastTask();
 
 
-    void removeTask(T task);
+    void removeTask(Task task);
 
 
-    T nextTask();//this one seems synchronous (will be executed when switching between DynActions)
+    Task nextTask();//this one seems synchronous (will be executed when switching between DynActions)
 }

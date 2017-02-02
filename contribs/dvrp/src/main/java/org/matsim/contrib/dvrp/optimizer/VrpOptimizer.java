@@ -32,5 +32,5 @@ public interface VrpOptimizer
     void requestSubmitted(Request request);
 
 
-    void nextTask(Schedule<? extends Task> schedule);
+    void nextTask(Schedule schedule);
 }

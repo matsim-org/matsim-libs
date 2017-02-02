@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.data;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 
 
@@ -32,8 +32,8 @@ public interface Vehicle
     extends Identifiable<Vehicle>
 {
     Link getStartLink();
-    
-    
+
+
     void setStartLink(Link link);
 
 
@@ -50,7 +50,7 @@ public interface Vehicle
     void setT1(double t1);
 
 
-    Schedule<? extends Task> getSchedule();
+    Schedule getSchedule();
 
 
     VrpAgentLogic getAgentLogic();

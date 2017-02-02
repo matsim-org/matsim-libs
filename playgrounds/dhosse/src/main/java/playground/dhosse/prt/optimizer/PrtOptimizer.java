@@ -56,16 +56,13 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	}
 
 	@Override
-	public void nextTask(Schedule<? extends Task> schedule) {
+	public void nextTask(Schedule schedule) {
 		
-		@SuppressWarnings("unchecked")
-		Schedule<TaxiTask> prtSchedule = (Schedule<TaxiTask>)schedule;
-
-        this.scheduler.updateBeforeNextTask(prtSchedule);
-        TaxiTask newCurrentTask = prtSchedule.nextTask();
+        this.scheduler.updateBeforeNextTask(schedule);
+        Task newCurrentTask = schedule.nextTask();
 
         if (newCurrentTask != null // schedule != COMPLETED
-                && newCurrentTask.getTaxiTaskType() == TaxiTask.TaxiTaskType.STAY) {
+                && ((TaxiTask)newCurrentTask).getTaxiTaskType() == TaxiTask.TaxiTaskType.STAY) {
             requiresReoptimization = true;
         }
 
@@ -74,7 +71,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	@Override
 	public void nextLinkEntered(DriveTask driveTask)
 	{
-		scheduler.updateTimeline(TaxiSchedules.asTaxiSchedule(driveTask.getSchedule()));
+		scheduler.updateTimeline(driveTask.getSchedule());
 	}
 	
 	protected void scheduleUnplannedRequests()

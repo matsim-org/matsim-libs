@@ -35,10 +35,7 @@ class KNVrpOptimizer implements VrpOptimizer {
 	}
 
 	@Override
-	public void nextTask(Schedule<? extends Task> schedule1) {
-		@SuppressWarnings("unchecked")
-		Schedule<Task> schedule = (Schedule<Task>) schedule1 ;
-
+	public void nextTask(Schedule schedule) {
 		schedule.getTasks().clear(); 
 		
 		Request rr = requests.poll() ;
@@ -57,7 +54,7 @@ class KNVrpOptimizer implements VrpOptimizer {
 				@Override public double getEndTime() {
 					return Double.POSITIVE_INFINITY ;
 				}
-				@Override public Schedule<? extends Task> getSchedule() {
+				@Override public Schedule getSchedule() {
 					return schedule ;
 				}
 				@Override public int getTaskIdx() {

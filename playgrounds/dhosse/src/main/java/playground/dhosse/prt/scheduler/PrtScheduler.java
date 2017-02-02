@@ -41,10 +41,10 @@ public class PrtScheduler
             throw new IllegalStateException();
         }
 
-        Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
+        Schedule bestSched = best.vehicle.getSchedule();
 
         if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
-            TaxiTask lastTask = Schedules.getLastTask(bestSched);// only WAIT
+            TaxiTask lastTask = (TaxiTask)Schedules.getLastTask(bestSched);// only WAIT
 
             if (lastTask.getTaxiTaskType().equals(TaxiTask.TaxiTaskType.PICKUP)) {
                 appendRequestToExistingScheduleTasks(best, requests);
@@ -97,9 +97,9 @@ public class PrtScheduler
             List<BestDispatchFinder.Dispatch<TaxiRequest>> requests)
     {
 
-        Schedule<TaxiTask> sched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
+        Schedule sched = best.vehicle.getSchedule();
 
-        for (TaxiTask task : sched.getTasks()) {
+        for (Task task : sched.getTasks()) {
 
             if (task instanceof NPersonsPickupStayTask) {
                 for (BestDispatchFinder.Dispatch<TaxiRequest> vrp : requests) {
@@ -117,7 +117,7 @@ public class PrtScheduler
 
 
     @Override
-    protected void appendOccupiedDriveAndDropoff(Schedule<TaxiTask> schedule)
+    protected void appendOccupiedDriveAndDropoff(Schedule schedule)
     {
         NPersonsPickupStayTask pickupStayTask = (NPersonsPickupStayTask)Schedules
                 .getLastTask(schedule);
@@ -139,7 +139,7 @@ public class PrtScheduler
 
 
     @Override
-    protected void appendTasksAfterDropoff(Schedule<TaxiTask> schedule)
+    protected void appendTasksAfterDropoff(Schedule schedule)
     {
         NPersonsDropoffStayTask dropoffStayTask = (NPersonsDropoffStayTask)Schedules
                 .getLastTask(schedule);
@@ -155,8 +155,7 @@ public class PrtScheduler
 
     protected void scheduleRankReturn(Vehicle veh, double time, boolean charge, boolean home)
     {
-        @SuppressWarnings("unchecked")
-        Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
+        Schedule sched = (Schedule)veh.getSchedule();
         TaxiStayTask last = (TaxiStayTask)Schedules.getLastTask(veh.getSchedule());
         if (last.getStatus() != TaskStatus.STARTED)
             throw new IllegalStateException();

@@ -32,7 +32,7 @@ final class MyTaxiOptimizerFactory implements TaxiOptimizerFactory {
 				
 				// TODO Auto-generated method stub
 			}
-			@Override public void nextTask(Schedule<? extends Task> schedule) {
+			@Override public void nextTask(Schedule schedule) {
 				// what is this?  Presumably, a "schedule", which is attached to a single "taxi", here asks to be extended?? kai, jan'17
 				
 				// TODO Auto-generated method stub

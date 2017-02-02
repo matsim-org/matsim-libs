@@ -26,7 +26,7 @@ public abstract class AbstractTask
     implements Task
 {
     // ==== BEGIN: fields managed by ScheduleImpl
-    Schedule<? extends AbstractTask> schedule;
+    Schedule schedule;
     int taskIdx;
 
     TaskStatus status;
@@ -64,7 +64,7 @@ public abstract class AbstractTask
 
 
     @Override
-    public final Schedule<? extends AbstractTask> getSchedule()
+    public final Schedule getSchedule()
     {
         return schedule;
     }

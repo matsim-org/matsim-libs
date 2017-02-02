@@ -20,11 +20,10 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
@@ -60,9 +59,8 @@ public class TaxiTimeProfiles
 
                 for (Vehicle veh : taxiData.getVehicles().values()) {
                     if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-                        Schedule<TaxiTask> schedule = TaxiSchedules
-                                .asTaxiSchedule(veh.getSchedule());
-                        counter.increment(schedule.getCurrentTask().getTaxiTaskType());
+                        TaxiTask currentTask = (TaxiTask)veh.getSchedule().getCurrentTask();
+                        counter.increment(currentTask.getTaxiTaskType());
                     }
                 }
 

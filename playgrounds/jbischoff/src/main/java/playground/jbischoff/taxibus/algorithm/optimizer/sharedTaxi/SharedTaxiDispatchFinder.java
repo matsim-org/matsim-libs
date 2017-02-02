@@ -135,7 +135,7 @@ public class SharedTaxiDispatchFinder {
 		TaxibusDispatch bestSharedPath = null;
 		for (Vehicle veh : busyVehicles){
 			
-			Schedule<DrtTask> schedule = (Schedule<DrtTask>) veh.getSchedule();
+			Schedule schedule = veh.getSchedule();
 			Set<TaxibusRequest> currentRequests = scheduler.getCurrentlyPlannedRequests(schedule);
 			if (currentRequests.size()>1){
 				throw new IllegalStateException("Not supported by this optimizer");

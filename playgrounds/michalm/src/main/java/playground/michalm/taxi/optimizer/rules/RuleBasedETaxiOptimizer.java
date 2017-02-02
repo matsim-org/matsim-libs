@@ -82,7 +82,7 @@ public class RuleBasedETaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Schedule schedule)
     {
         super.nextTask(schedule);
 

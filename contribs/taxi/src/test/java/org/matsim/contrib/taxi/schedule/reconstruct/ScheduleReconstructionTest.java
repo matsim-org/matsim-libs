@@ -23,14 +23,14 @@ import java.util.*;
 
 import org.junit.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -95,8 +95,8 @@ public class ScheduleReconstructionTest
             Assert.assertEquals(o.getT0(), r.getT0(), 0);
             Assert.assertEquals(o.getT1(), r.getT1(), 0);
 
-            Schedule<TaxiTask> oSchedule = TaxiSchedules.asTaxiSchedule(o.getSchedule());
-            Schedule<TaxiTask> rSchedule = TaxiSchedules.asTaxiSchedule(r.getSchedule());
+            Schedule oSchedule = o.getSchedule();
+            Schedule rSchedule = r.getSchedule();
 
             Assert.assertEquals(oSchedule.getBeginTime(), rSchedule.getBeginTime(), 0);
             Assert.assertEquals(oSchedule.getEndTime(), rSchedule.getEndTime(), 0);
@@ -110,19 +110,19 @@ public class ScheduleReconstructionTest
     }
 
 
-    private void compareTasks(List<TaxiTask> originalTasks, List<TaxiTask> reconstructedTasks)
+    private void compareTasks(List<Task> originalTasks, List<Task> reconstructedTasks)
     {
         Assert.assertEquals(originalTasks.size(), reconstructedTasks.size());
 
-        Iterator<TaxiTask> rIter = reconstructedTasks.iterator();
-        for (TaxiTask o : originalTasks) {
-            TaxiTask r = rIter.next();
+        Iterator<Task> rIter = reconstructedTasks.iterator();
+        for (Task o : originalTasks) {
+            Task r = rIter.next();
 
             Assert.assertEquals(o.getBeginTime(), r.getBeginTime(), 0);
             Assert.assertEquals(o.getEndTime(), r.getEndTime(), 0);
             Assert.assertEquals(o.getTaskIdx(), r.getTaskIdx());
             Assert.assertEquals(o.getType(), r.getType());
-            Assert.assertEquals(o.getTaxiTaskType(), r.getTaxiTaskType());
+            Assert.assertEquals( ((TaxiTask)o).getTaxiTaskType(), ((TaxiTask)r).getTaxiTaskType());
 
             Assert.assertEquals(TaskStatus.PERFORMED, o.getStatus());
             Assert.assertEquals(TaskStatus.PLANNED, r.getStatus());

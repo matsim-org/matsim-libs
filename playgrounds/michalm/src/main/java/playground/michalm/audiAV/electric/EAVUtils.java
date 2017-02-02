@@ -57,13 +57,12 @@ public class EAVUtils
 
     private static boolean isServingCustomer(ElectricVehicle ev)
     {
-        Schedule<TaxiTask> schedule = TaxiSchedules
-                .asTaxiSchedule( ((Ev)ev).getEvrpVehicle().getSchedule());
+        Schedule schedule = ((Ev)ev).getEvrpVehicle().getSchedule();
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
 
-        switch (schedule.getCurrentTask().getTaxiTaskType()) {
+        switch (((TaxiTask)schedule.getCurrentTask()).getTaxiTaskType()) {
             case PICKUP:
             case OCCUPIED_DRIVE:
             case DROPOFF:

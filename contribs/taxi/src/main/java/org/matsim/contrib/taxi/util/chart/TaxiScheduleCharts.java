@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.*;
 import org.matsim.contrib.taxi.schedule.*;
@@ -19,25 +20,25 @@ public class TaxiScheduleCharts
     }
 
 
-    public static final DescriptionCreator<TaxiTask> TAXI_DESCRIPTION_CREATOR = new DescriptionCreator<TaxiTask>() {
+    public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = new DescriptionCreator() {
         @Override
-        public String create(TaxiTask task)
+        public String create(Task task)
         {
-            return task.getTaxiTaskType().name();
+            return ((TaxiTask)task).getTaxiTaskType().name();
         }
     };
 
-    public static final DescriptionCreator<TaxiTask> TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = new DescriptionCreator<TaxiTask>() {
+    public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = new DescriptionCreator() {
         @Override
-        public String create(TaxiTask task)
+        public String create(Task task)
         {
             if (task instanceof TaxiTaskWithRequest) {
                 TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-                return task.getTaxiTaskType().name() + "_"
+                return taskWithReq.getTaxiTaskType().name() + "_"
                         + taskWithReq.getRequest().getPassenger().getId();
             }
 
-            return task.getTaxiTaskType().name();
+            return ((TaxiTask)task).getTaxiTaskType().name();
         }
     };
 
@@ -47,10 +48,10 @@ public class TaxiScheduleCharts
     private static final Color EMPTY_DRIVE_COLOR = new Color(100, 0, 0);
     private static final Color STAY_COLOR = new Color(0, 0, 100);
 
-    public static final PaintSelector<TaxiTask> TAXI_PAINT_SELECTOR = new PaintSelector<TaxiTask>() {
-        public Paint select(TaxiTask task)
+    public static final PaintSelector TAXI_PAINT_SELECTOR = new PaintSelector() {
+        public Paint select(Task task)
         {
-            switch (task.getTaxiTaskType()) {
+            switch ( ((TaxiTask)task).getTaxiTaskType()) {
                 case PICKUP:
                 case DROPOFF:
                     return PICKUP_DROPOFF_COLOR;

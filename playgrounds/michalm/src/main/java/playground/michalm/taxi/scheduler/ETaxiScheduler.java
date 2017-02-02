@@ -69,7 +69,7 @@ public class ETaxiScheduler
     public void scheduleCharging(EvrpVehicle vehicle, Charger charger,
             VrpPathWithTravelData vrpPath)
     {
-        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
+        Schedule schedule = vehicle.getSchedule();
         divertOrAppendDrive(schedule, vrpPath);
 
         ETaxiChargingLogic logic = (ETaxiChargingLogic)charger.getLogic();
@@ -106,12 +106,12 @@ public class ETaxiScheduler
     // Drives-to-chargers can be diverted if diversion is on.
     // Otherwise, we do not remove stays-at-chargers from schedules.
     @Override
-    protected Integer countUnremovablePlannedTasks(Schedule<TaxiTask> schedule)
+    protected Integer countUnremovablePlannedTasks(Schedule schedule)
     {
-        TaxiTask currentTask = schedule.getCurrentTask();
-        switch (currentTask.getTaxiTaskType()) {
+        Task currentTask = schedule.getCurrentTask();
+        switch (((TaxiTask)currentTask).getTaxiTaskType()) {
             case EMPTY_DRIVE:
-                TaxiTask nextTask = TaxiSchedules.getNextTaxiTask(currentTask);
+                Task nextTask = Schedules.getNextTask(schedule);
                 if (! (nextTask instanceof ETaxiChargingTask)) {
                     return super.countUnremovablePlannedTasks(schedule);
                 }
@@ -141,26 +141,26 @@ public class ETaxiScheduler
     //
     // Maybe for a more complex algos we would like to interrupt charging tasks as well.
     @Override
-    protected void removePlannedTasks(Schedule<TaxiTask> schedule, int newLastTaskIdx)
+    protected void removePlannedTasks(Schedule schedule, int newLastTaskIdx)
     {
-        List<TaxiTask> tasks = schedule.getTasks();
+        List<Task> tasks = schedule.getTasks();
 
         for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
-            TaxiTask task = tasks.get(i);
+            Task task = tasks.get(i);
 
             if (!chargingTasksRemovalMode && task instanceof ETaxiChargingTask) {
                 break;//cannot remove -> stop removing
             }
 
             schedule.removeTask(task);
-            taskRemovedFromSchedule(schedule, task);
+            taskRemovedFromSchedule(schedule, (TaxiTask)task);
         }
 
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return;
         }
 
-        TaxiTask lastTask = Schedules.getLastTask(schedule);
+        Task lastTask = Schedules.getLastTask(schedule);
         if (lastTask instanceof ETaxiChargingTask) {
             //we must append 'wait' because both 'charge' and 'wait' are 'STAY' tasks,
             //so the standard TaxiScheduler cannot distinguish them and would treat 'charge' as 'wait'
@@ -175,7 +175,7 @@ public class ETaxiScheduler
 
 
     @Override
-    protected void taskRemovedFromSchedule(Schedule<TaxiTask> schedule, TaxiTask task)
+    protected void taskRemovedFromSchedule(Schedule schedule, TaxiTask task)
     {
         if (task instanceof ETaxiChargingTask) {
             ((ETaxiChargingTask)task).removeFromChargerLogic();

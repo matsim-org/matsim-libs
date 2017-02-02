@@ -46,7 +46,7 @@ public class RouteCharts
         CoordDataset lData = new CoordDataset();
         int i = 0;
         for (Vehicle v : vehicles) {
-            Schedule<?> schedule = v.getSchedule();
+            Schedule schedule = v.getSchedule();
             lData.addSeries(Integer.toString(i++),
                     ScheduleCoordSources.createCoordSource(schedule));
         }
@@ -89,7 +89,7 @@ public class RouteCharts
         CoordDataset nData = new CoordDataset();
 
         for (int i = 0; i < vehicles.size(); i++) {
-            Schedule<?> schedule = vehicles.get(i).getSchedule();
+            Schedule schedule = vehicles.get(i).getSchedule();
             Map<TaskStatus, CoordSource> vsByStatus = createLinkSourceByStatus(schedule);
             nData.addSeries(i + "-PR", vsByStatus.get(TaskStatus.PERFORMED));
             nData.addSeries(i + "-ST", vsByStatus.get(TaskStatus.STARTED));
@@ -149,8 +149,7 @@ public class RouteCharts
     }
 
 
-    private static Map<TaskStatus, CoordSource> createLinkSourceByStatus(
-            Schedule<? extends Task> schedule)
+    private static Map<TaskStatus, CoordSource> createLinkSourceByStatus(Schedule schedule)
     {
         Iterable<DriveTask> tasks = Schedules.createDriveTaskIter(schedule);
 

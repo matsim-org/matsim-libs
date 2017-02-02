@@ -22,7 +22,7 @@ package playground.michalm.taxi.utli.stats;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculators;
@@ -69,12 +69,12 @@ public class ETaxiStatsCalculator
 
     private void updateEStatsForVehicle(Vehicle vehicle)
     {
-        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return;// do not evaluate - the vehicle is unused
         }
 
-        for (TaxiTask t : schedule.getTasks()) {
+        for (Task t : schedule.getTasks()) {
             if (t instanceof ETaxiChargingTask) {
                 ETaxiChargingTask chargingTask = (ETaxiChargingTask)t;
 
