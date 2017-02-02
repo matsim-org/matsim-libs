@@ -83,7 +83,7 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (signalControlProvider.containsKey(controllerIdentifier)) {
-//			log.info("Creating " + controllerIdentifier);
+			log.info("Creating " + controllerIdentifier);
 			SignalController signalControl = signalControlProvider.get(controllerIdentifier).get();
 			signalControl.setSignalSystem(signalSystem);
 			return signalControl;
