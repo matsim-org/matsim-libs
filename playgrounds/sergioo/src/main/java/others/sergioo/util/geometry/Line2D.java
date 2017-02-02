@@ -57,6 +57,21 @@ public class Line2D {
 		else
 			this.pF = new Point2D(pI.getX(),0);
 	}
+	public Line2D(Point2D pI, Point2D pF, double thickness) {
+		super();
+		this.pI = pI;
+		this.pF = pF;
+		this.thickness = thickness;
+	}
+	public Line2D(Point2D pI, double slope, double thickness) {
+		super();
+		this.pI = pI;
+		if(!Double.isInfinite(slope))
+			this.pF = new Point2D(0,pI.getY()-slope*pI.getX());
+		else
+			this.pF = new Point2D(pI.getX(),0);
+		this.thickness = thickness;
+	}
 	public Point2D getPI() {
 		return pI;
 	}

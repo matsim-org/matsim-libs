@@ -20,10 +20,7 @@ package playground.agarwalamit.analysis.emission;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.matsim.core.utils.io.IOUtils;
 
@@ -37,22 +34,22 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 public class AbsoluteEmissions {
 	private final String outputDir;
 
-	public AbsoluteEmissions(final String outputDir) {
+	private AbsoluteEmissions(final String outputDir) {
 		this.outputDir = outputDir;
 	}
 
 	public static void main(String[] args) {
-		String clusterPathDesktop = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-		String [] runCases =  {"baseCaseCtd","ei","ci","eci","ei_10"};
+		String clusterPathDesktop = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/";
+		String [] runCases =  {"output_run0_muc_bc","output_run0b_muc_bc","output_run8_muc_e","output_run8b_muc_e"};
 		new AbsoluteEmissions(clusterPathDesktop).runAndWrite(runCases);
 	}
 
-	public void runAndWrite(final String [] runCases){
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteEmissions.txt");
+	private void runAndWrite(final String[] runCases){
+		BufferedWriter writer = IOUtils.getBufferedWriter("/Users/amit/Desktop/analysis/absoluteEmissions.txt");
 
 		SortedMap<String, SortedMap<String, Double>> emissions = new TreeMap<>();
 		SortedMap<String, Double> emissionCost = new TreeMap<>();
-		Set<String> pollutants = new HashSet<>();
+		Set<String> pollutants = new TreeSet<>();
 
 		for(String runCase:runCases){
 			SortedMap<String, Double> em = calculateTotalEmissions(runCase);
@@ -65,7 +62,7 @@ public class AbsoluteEmissions {
 			for(String runCase:pollutants){
 				writer.write(runCase+"\t");
 			}
-			writer.write("emissionCost");
+//			writer.write("emissionCost");
 			writer.newLine();
 
 			for(String runCase:emissions.keySet()){
@@ -73,7 +70,8 @@ public class AbsoluteEmissions {
 				for(String pollutant : pollutants){
 					writer.write(emissions.get(runCase).get(pollutant)+"\t");
 				}
-				writer.write(emissionCost.get(runCase)+"\n");
+//				writer.write(emissionCost.get(runCase));
+				writer.newLine();
 			}
 			writer.close();
 		} catch (IOException e1) {
@@ -81,11 +79,10 @@ public class AbsoluteEmissions {
 		}
 	}
 	
-	public double getEmissionCost(final SortedMap<String, Double> em){
-		double cost = 0;
-		for (EmissionCostFactors ecf : EmissionCostFactors.values()){
-			cost += em.get(ecf.toString()) * ecf.getCostFactor();
-		}
+	private double getEmissionCost(final SortedMap<String, Double> em){
+		double cost = Arrays.stream(EmissionCostFactors.values())
+							.mapToDouble(ecf -> em.get(ecf.toString()) * ecf.getCostFactor())
+							.sum();
 		return cost;
 	}
 	

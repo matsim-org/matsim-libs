@@ -51,13 +51,16 @@ final class OperatorCostContainer {
 		this.expensesPerMeter = expensesPerMeter;
 		this.expensesPerSecond = expensesPerSecond;
 	}
+	
+	// yyyy my intuition is that this class should be very much reduced, just returning "cost", and handling arbitrary events, and figure
+	// out the rest internally.  That would make it much more flexible with respect to replacement.  kai, jan'17
 
-	public void handleTransitDriverStarts(TransitDriverStartsEvent transitDriverStartsE) {
-		this.transitDriverStartsE = transitDriverStartsE;
+	public void handleTransitDriverStarts(TransitDriverStartsEvent transitDriverStartsE1) {
+		this.transitDriverStartsE = transitDriverStartsE1;
 	}
 
-	public void addDistanceTravelled(double meterTravelled){
-		this.meterTravelled  += meterTravelled;
+	public void addDistanceTravelled(double meterTravelled1){
+		this.meterTravelled  += meterTravelled1;
 	}
 	
 	/**

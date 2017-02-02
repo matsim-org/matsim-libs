@@ -40,7 +40,7 @@ public class Main {
 	 * ============================================================
 	 */
 
-	static final int outerIts = 5;
+	static final int outerIts = 10;
 	static final int popSize = 1000;
 	static final double replanProba = 1.0;
 	static final String expectationFilePrefix = "./output/cba/toynet/expectation-before-it";
@@ -61,8 +61,10 @@ public class Main {
 	 * ============================================================
 	 */
 
-	private static AverageTravelTime avgTravelTimes = null;
+	// private static AverageTravelTime avgTravelTimes = null;
 
+	private static AverageTravelTimeAcrossRuns avgTTsAcrossRuns = null;
+	
 	private static void runDemandModel(final Scenario scenario, final int outerIt) {
 
 		if (outerIt == 1) {
@@ -73,13 +75,12 @@ public class Main {
 		if (outerIt == 1) {
 			carTravelTime = new FreeSpeedTravelTime();
 		} else {
-			if (avgTravelTimes == null) {
+			if (avgTTsAcrossRuns == null) {
 				assert (outerIt != 2);
-				avgTravelTimes = new AverageTravelTime(scenario, ttAvgIts);
-			} else {
-				avgTravelTimes.addData(scenario, ttAvgIts);
+				avgTTsAcrossRuns = new AverageTravelTimeAcrossRuns(Integer.MAX_VALUE);
 			}
-			carTravelTime = avgTravelTimes;
+			avgTTsAcrossRuns.addData(scenario);
+			carTravelTime = avgTTsAcrossRuns;
 		}
 
 		final com.google.inject.Injector injector = org.matsim.core.controler.Injector

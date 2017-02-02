@@ -38,9 +38,11 @@ public class NoisePricingHandler implements NoiseEventCausedHandler {
 
 	private final EventsManager events;
 	private double amountSum = 0.;
+	private double noiseTollFactor;
 
-	public NoisePricingHandler(EventsManager eventsManager) {
+	public NoisePricingHandler(EventsManager eventsManager, double noiseTollFactor) {
 		this.events = eventsManager;
+		this.noiseTollFactor = noiseTollFactor;
 	}
 
 	@Override
@@ -52,7 +54,7 @@ public class NoisePricingHandler implements NoiseEventCausedHandler {
 	public void handleEvent(NoiseEventCaused event) {
 		
 		// negative amount since from here the amount is interpreted as costs
-		double amount = event.getAmount() * (-1);
+		double amount = this.noiseTollFactor * event.getAmount() * (-1);
 		this.amountSum = this.amountSum + amount;
 		
 		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);

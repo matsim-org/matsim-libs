@@ -114,6 +114,8 @@ public class WelfareAnalyzer {
 						}
 						
 						this.personId2usedPPlanIds.get(person.getId()).add(planId);
+						// yyyy this will in the end give the welfare benefit to the pplan that was _planned_ to be used. 
+						// Not necessarily to the one that _was_ actually used. kai, jan'17
 
 					}
 				}

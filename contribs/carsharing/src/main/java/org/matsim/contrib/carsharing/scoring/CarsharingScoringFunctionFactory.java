@@ -43,7 +43,7 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	    new CarsharingLegScoringFunction( params.getScoringParameters( person ),
 	    								 this.scenario.getConfig(),
 	    								 this.scenario.getNetwork(), this.demandHandler, this.costsCalculatorContainer, 
-	    								 this.carsharingSupplyContainer, person.getId()));
+	    								 this.carsharingSupplyContainer, person));
 		scoringFunctionSum.addScoringFunction(
 				new CharyparNagelLegScoring(
 						params.getScoringParameters( person ),

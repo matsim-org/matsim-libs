@@ -56,8 +56,8 @@ public class SpatialTemporalScoreAnalysis {
 		return scenario;
 	}
 	
-	//Calculate score of people with in the area of focus, in the considered time, using a given mode
-	public void calculateScore(String mode, Coord origin, double gridsize, double fromtime, double totime){ 
+	//Calculate score of people with in the area of focus, in the considered time, using a given mode and returns a tuple (number of relevant people, score)
+	public String calculateScore(String mode, Coord origin, double gridsize, double fromtime, double totime){ 
 		Set<Person> relevantpersons = getRelevantPersons(mode, origin, gridsize, fromtime, totime);
 //		Iterator<Id<Person>> iter = scenario.getPopulation().getPersons().keySet().iterator();
 //		while(iter.hasNext()){
@@ -68,6 +68,7 @@ public class SpatialTemporalScoreAnalysis {
 //		}
 		double score = getScoreOfRelevantPersons(relevantpersons);
 		System.out.println("The average score of relevant population is: " + score);
+		return relevantpersons.size() + "," + score;
 	}
 	
 	//return people with in the area of focus, in the considered time, using a given mode
@@ -95,10 +96,19 @@ public class SpatialTemporalScoreAnalysis {
 	}
 	
 	public static void main(String[] args){
-		//Mode can be "car", "pt" or "both"
-		SpatialTemporalScoreAnalysis stsanalyser = new SpatialTemporalScoreAnalysis("C:\\Jayanth\\FarstaCentrum\\configFarstaCentrumEmployed10pcMax.xml", "C:\\Jayanth\\FarstaCentrum\\employedmax\\1000.plans.xml.gz", 
+		/*
+		  Mode can be "car", "pt" or "both"
+		  If changing scenario, change plans file, events file and cordinates where to check score (if needed); you will need to re-instantiate the stsanalyser object.
+		  Scenario is changed when you need to switch from Max PT to Min PT, or you want to change population i.e. employed to unemployed or unemployed to mixed etc., 
+		  or you want to increase population elsewhere i,e. check for population increase in Arstafaltet instead of Alvsjo. If you change PT measure, also change config file accordingly
+		  between Max and Min accordingly.  
+		  If only checking score at a different time or place or for different mode but within existing scenario, you won't need to re-instantiate the stsanalyser object,
+		  just call the calculateScore() function with changed coordinates, mode and/or starting and end time.
+		  Default scenario is Farsta Centrum, Max PT measure, Employed Population, PT mode, Morning Peak Hour (06:00 to 09:00)
+		 */
+		SpatialTemporalScoreAnalysis stsanalyser = new SpatialTemporalScoreAnalysis("C:\\Jayanth\\FarstaCentrum\\configFarstaCentrumMax.xml", "C:\\Jayanth\\FarstaCentrum\\employedmax\\1000.plans.xml.gz", 
 				"C:\\Jayanth\\FarstaCentrum\\employedmax\\1000.events.xml.gz");
-		stsanalyser.calculateScore("both", new Coord(676397, 6571273), 1000000,  0, 110000);//28800, 36000
+		stsanalyser.calculateScore("pt", new Coord(676397, 6571273), 1000,  21600, 32400);//06:00 to 09:00, Morning Peak
 	}
 
 }

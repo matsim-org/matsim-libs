@@ -158,15 +158,15 @@ public class SeepageTest {
 		int walkTravelTime = travelTime1.get(Id.createLinkId("2")).intValue(); 
 		int carTravelTime = travelTime2.get(Id.createLinkId("2")).intValue();
 
-		if(this.isUsingFastCapacityUpdate) {
+//		if(this.isUsingFastCapacityUpdate) {
 			Assert.assertEquals("Wrong car travel time", 115, carTravelTime);
 			Assert.assertEquals("Wrong walk travel time.", 1009, walkTravelTime);
 			Assert.assertEquals("Seepage is not implemented", 894, walkTravelTime-carTravelTime);
-		} else {
-			Assert.assertEquals("Wrong car travel time", 116, carTravelTime);
-			Assert.assertEquals("Wrong walk travel time.", 1010, walkTravelTime);
-			Assert.assertEquals("Seepage is not implemented", 894, walkTravelTime-carTravelTime);
-		}
+//		} else {
+//			Assert.assertEquals("Wrong car travel time", 116, carTravelTime);
+//			Assert.assertEquals("Wrong walk travel time.", 1010, walkTravelTime);
+//			Assert.assertEquals("Seepage is not implemented", 894, walkTravelTime-carTravelTime);
+//		}
 	}
 
 	private static final class SimpleNetwork{
@@ -186,7 +186,7 @@ public class SeepageTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
-			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.name());
+			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ);
 			
 			config.qsim().setSeepModes(Arrays.asList(TransportMode.walk) );
 			config.qsim().setSeepModeStorageFree(false);

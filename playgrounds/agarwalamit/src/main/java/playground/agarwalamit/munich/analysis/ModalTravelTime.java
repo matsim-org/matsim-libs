@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.analysis;
 
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 
 /**
  * @author amit

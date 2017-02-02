@@ -150,7 +150,7 @@ ShutdownListener {
 		}
 		
 		try {
-			this.modeOut.write( event.getIteration() ) ;
+			this.modeOut.write( String.valueOf(event.getIteration()) ) ;
 			for ( String mode : modes ) {
 				Double cnt = this.modeCnt.get(mode) ;
 				double share = 0. ;
@@ -163,6 +163,7 @@ ShutdownListener {
 				Map<Integer, Double> modeHistory = this.modeHistories.get(mode) ;
 				if ( modeHistory == null ) {
 					modeHistory = new TreeMap<>() ;
+					this.modeHistories.put(mode, modeHistory) ;
 				}
 				modeHistory.put( event.getIteration(), share ) ;
 				
@@ -175,7 +176,7 @@ ShutdownListener {
 
 
 		// yyyy the following does not work!!
-		if (this.createPNG && event.getIteration() != this.minIteration) {
+		if (this.createPNG && event.getIteration() > this.minIteration) {
 			// create chart when data of more than one iteration is available.
 			XYLineChart chart = new XYLineChart("Mode Statistics", "iteration", "mode");
 			for ( Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet() ) {

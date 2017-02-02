@@ -144,6 +144,9 @@ import java.util.Stack;
 					case PERSON:
 						currAttributes = currperson.getAttributes();
 						break;
+					case PLAN:
+						currAttributes = currplan.getAttributes();
+						break;
 					case ACT:
 						currAttributes = curract.getAttributes();
 						break;

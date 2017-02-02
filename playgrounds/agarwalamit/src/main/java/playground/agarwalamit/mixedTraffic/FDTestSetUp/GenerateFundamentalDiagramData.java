@@ -25,12 +25,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -38,7 +33,6 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -67,7 +61,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.utils.FileUtils;
 
@@ -259,7 +252,7 @@ public class GenerateFundamentalDiagramData {
 		}
 		
 		//set up number of Points to run.
-		double cellSizePerPCU = ((Network) scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = scenario.getNetwork().getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 		double sumOfPCUInEachStep = 0;
 	
@@ -300,7 +293,7 @@ public class GenerateFundamentalDiagramData {
 		this.startingPoint = new Integer[] {1,1};
 
 		maxAgentDistribution = new Integer [travelModes.length];
-		double cellSizePerPCU = ((Network) this.scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = this.scenario.getNetwork().getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
 		for(int ii=0;ii<maxAgentDistribution.length;ii++){
@@ -342,9 +335,7 @@ public class GenerateFundamentalDiagramData {
 		List<List<Integer>> pointsToRun = new ArrayList<>();
 		for (int i=0; i<numberOfPoints; i++){
 			Integer[] newPoint = new Integer[maxAgentDistribution.length];
-			for (int j=0; j<newPoint.length; j++){
-				newPoint[j] = iterationModule.getPoint()[j];
-			}
+			System.arraycopy(iterationModule.getPoint(), 0, newPoint, 0, newPoint.length);
 			pointsToRun.add(Arrays.asList(newPoint));
 			String point = arraytostring(iterationModule.getPoint());
 			LOG.info("Just added point "+point+" to the collection.");
@@ -431,7 +422,7 @@ public class GenerateFundamentalDiagramData {
 		if(!globalFlowDynamicsUpdator.isPermanent()) stableState=false;
 
 		// sometimes higher density points are also executed (stuck time), to exclude them density check.
-		double cellSizePerPCU = ((Network) scenario.getNetwork()).getEffectiveCellSize();
+		double cellSizePerPCU = scenario.getNetwork().getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 
 		if(stableState){
@@ -720,11 +711,8 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public boolean isWantingToArriveOnCurrentLink() {
-			if ( this.chooseNextLinkId()==null ) {
-				return true ;
-			} else {
-				return false ;
-			}
+			return this.chooseNextLinkId()==null ;
+
 		}
 
 		@Override

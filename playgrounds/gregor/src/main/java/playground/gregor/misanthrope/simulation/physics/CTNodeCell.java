@@ -32,6 +32,8 @@ import playground.gregor.misanthrope.simulation.CTEvent;
 
 import java.util.*;
 
+import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
+
 /**
  * Created by laemmel on 12/10/15.
  */
@@ -76,6 +78,8 @@ public class CTNodeCell extends CTCell {
 			return;
 		}
 		this.next = nextJumper;
+        double x = WIDTH / 0.1;
+        minJumpTime = Math.min(minJumpTime, x);
 
 		this.nextCellJumpTime = now + minJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);
@@ -90,12 +94,12 @@ public class CTNodeCell extends CTCell {
 			Link usLink = ((CTLink) nbp).getUsLink();
 			Link dsLink = ((CTLink) nbp).getDsLink();
 			if (usLink != null && ped.getNextLinkId() == usLink.getId()) {
-				return 2 * this.width / CTLink.WIDTH;
-			}
+                return 2 * this.width / WIDTH;
+            }
 			else {
 				if (ped.getNextLinkId() == dsLink.getId()) {
-					return 2 * this.width / CTLink.WIDTH;
-				}
+                    return 2 * this.width / WIDTH;
+                }
 			}
 		}
 		return 0;
@@ -193,17 +197,19 @@ public class CTNodeCell extends CTCell {
 			}
 		}
 
+		maxCap = Math.min(maxCap, 26.6);
+
 		double width = (maxCap / 1.33);
-		if (width < CTLink.WIDTH) {
-			width = CTLink.WIDTH;
-		}
+        if (width < WIDTH) {
+            width = WIDTH;
+        }
 		double area = width * width;
-		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1
-				&& ((CTNode) this.getParent()).getNode().getInLinks().size() == 1
-				&& ((CTNode) this.getParent()).getNode().getOutLinks().values().iterator().next().getToNode()
-				== ((CTNode) this.getParent()).getNode().getInLinks().values().iterator().next().getFromNode()) {
-			area = width * mxLength;
-		}
+//		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1
+//				&& ((CTNode) this.getParent()).getNode().getInLinks().size() == 1
+//				&& ((CTNode) this.getParent()).getNode().getOutLinks().values().iterator().next().getToNode()
+//				== ((CTNode) this.getParent()).getNode().getInLinks().values().iterator().next().getFromNode()) {
+//			area = width * mxLength;
+//		}
 
 
 		setArea(area);

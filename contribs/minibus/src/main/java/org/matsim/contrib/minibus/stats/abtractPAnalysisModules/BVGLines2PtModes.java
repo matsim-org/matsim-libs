@@ -35,7 +35,7 @@ import java.util.Map.Entry;
  * @author aneumann
  *
  */
-public final class BVGLines2PtModes implements PtMode2LineSetter{
+public final class BVGLines2PtModes implements LineId2PtMode{
 	
 	private final static Logger log = Logger.getLogger(BVGLines2PtModes.class);
 	
@@ -52,6 +52,7 @@ public final class BVGLines2PtModes implements PtMode2LineSetter{
 		log.info("using BVG naming sheme to tag lines");
 	}
 	
+	@Override
 	public void setPtModesForEachLine(TransitSchedule transitSchedule, String pIdentifier){
 		this.lineId2ptMode = new HashMap<>();
 		this.pIdentifier = pIdentifier;
@@ -97,6 +98,7 @@ public final class BVGLines2PtModes implements PtMode2LineSetter{
 		return types;
 	}
 	
+	@Override
 	public HashMap<Id<TransitLine>, String> getLineId2ptModeMap(){
 		return this.lineId2ptMode;
 	}

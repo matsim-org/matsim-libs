@@ -77,6 +77,8 @@ public class CNEBerlin {
 	private static CongestionTollingApproach congestionTollingApproach;
 	private static double kP;
 	
+	private static boolean computeExpectedAirPollutionCosts = false;
+	
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
@@ -115,6 +117,9 @@ public class CNEBerlin {
 			kP = Double.parseDouble(args[7]);
 			log.info("kP: " + kP);
 			
+			computeExpectedAirPollutionCosts = Boolean.valueOf(args[8]);
+			log.info("computeExpectedAirPollutionCosts: " + computeExpectedAirPollutionCosts);
+			
 		} else {
 			
 			outputDirectory = null;
@@ -128,6 +133,8 @@ public class CNEBerlin {
 			
 			congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 			kP = 2 * ( 10 / 3600. );
+			
+			computeExpectedAirPollutionCosts = false;
 		}
 				
 		CNEBerlin cnControler = new CNEBerlin();
@@ -230,6 +237,7 @@ public class CNEBerlin {
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
+		cne.setComputeExpectedAirPollutionCosts(computeExpectedAirPollutionCosts);
 		controler = cne.prepareControler();
 				
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

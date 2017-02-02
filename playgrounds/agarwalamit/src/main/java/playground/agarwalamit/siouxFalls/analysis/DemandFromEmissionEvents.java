@@ -42,13 +42,10 @@ public class DemandFromEmissionEvents {
 	private final Logger logger = Logger.getLogger(DemandFromEmissionEvents.class);
 
 	private final String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
-	private final int noOfTimeBins = 30;
-	private double simulationEndTime;
-	private final String configFile ="/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
+    private double simulationEndTime;
 
-	private final String [] runNumber =  {"baseCaseCtd","ei"};
-	private final String netFile1 = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
-	private Network network;
+    private final String [] runNumber =  {"baseCaseCtd","ei"};
+    private Network network;
 
 	public static void main(String[] args) {
 		new DemandFromEmissionEvents().writeDemandData();
@@ -56,9 +53,11 @@ public class DemandFromEmissionEvents {
 
 	private void writeDemandData(){
 
-		this.network = LoadMyScenarios.loadScenarioFromNetwork(this.netFile1).getNetwork();
+        String netFile1 = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
+        this.network = LoadMyScenarios.loadScenarioFromNetwork(netFile1).getNetwork();
 
-		this.simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
+        String configFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
+        this.simulationEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
 
 		Map<Double, Map<Id<Link>, Double>> demandBAU = filterLinks(processEmissionsAndReturnDemand(runNumber[0])); 
 		//		Map<Double, Map<Id, Double>> demandPolicy = filterLinks(processEmissionsAndReturnDemand(runNumber[1]));
@@ -140,7 +139,9 @@ public class DemandFromEmissionEvents {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 
-		EmissionsPerLinkWarmEventHandler warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, this.noOfTimeBins);
+        int noOfTimeBins = 30;
+        EmissionsPerLinkWarmEventHandler warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime,
+                noOfTimeBins);
 		eventsManager.addHandler(warmHandler);
 		emissionReader.readFile(emissionFileBAU);
 		return warmHandler.getTime2linkIdLeaveCount();

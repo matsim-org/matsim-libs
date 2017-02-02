@@ -25,6 +25,7 @@ package org.matsim.contrib.matrixbasedptrouter;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -93,7 +94,7 @@ public final class MatrixBasedPtRouterConfigGroup extends ReflectiveConfigGroup 
 	}
 
 	@Override
-	protected void checkConsistency() {
+	protected void checkConsistency(Config config) {
 		boolean problem = false ;
 		if( isUsingPtStops() ) {
 			log.info(MatrixBasedPtRouterConfigGroup.USING_PT_STOPS + " switch is set to true. Trying to find pt stops file ...");

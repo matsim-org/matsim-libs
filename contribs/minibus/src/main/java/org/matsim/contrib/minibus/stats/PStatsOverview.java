@@ -19,11 +19,20 @@
 
 package org.matsim.contrib.minibus.stats;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.List;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
 import org.matsim.contrib.minibus.operator.Operator;
-import org.matsim.contrib.minibus.operator.Operators;
+import org.matsim.contrib.minibus.operator.POperators;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.stats.PStatsOverviewDataContainer.FIELDS;
 import org.matsim.core.controler.MatsimServices;
@@ -36,13 +45,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Calculates at the end of each iteration the following statistics:
@@ -125,19 +127,18 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 
 	private double[][] history = null;
 	private int minIteration = 0;
-	private final Operators pBox;
-	private final PConfigGroup pConfig;
+	@Inject private POperators operators;
+	@Inject private PConfigGroup pConfig;
 
 	private RecursiveStatsContainer statsContainer;
 	private RecursiveStatsApproxContainer statsApproxContainer;
 
-	public PStatsOverview(Operators pBox, PConfigGroup pConfig) throws UncheckedIOException {
-		this.pBox = pBox;
-		this.pConfig = pConfig;
+	public PStatsOverview() {
 	}
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
+		
 		MatsimServices controler = event.getServices();
 		
 		if(this.pConfig.getWriteStatsInterval() > 0){
@@ -183,7 +184,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRoute.ordinal(), 0.0);
 			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRouteOfInBusiness.ordinal(), 0.0);
 
-			for (Operator operator : this.pBox.getOperators()) {
+			for (Operator operator : this.operators.getOperators()) {
 				List<PPlan> plans = operator.getAllPlans();
 				
 				double operatorRoutes = 0.0;

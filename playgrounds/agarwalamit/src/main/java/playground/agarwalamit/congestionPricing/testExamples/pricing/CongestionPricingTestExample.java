@@ -19,7 +19,6 @@
 package playground.agarwalamit.congestionPricing.testExamples.pricing;
 
 import java.io.File;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,13 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -45,9 +38,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -60,12 +51,12 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 class CongestionPricingTestExample {
 
-	CongestionPricingTestExample (String congestionImpl){
+	private CongestionPricingTestExample(String congestionImpl){
 		this.isComparing = true;
 		this.congestionImpl = congestionImpl;
 	}
 
-	CongestionPricingTestExample () {
+	private CongestionPricingTestExample() {
 		this.isComparing = false;
 	}
 
@@ -93,7 +84,7 @@ class CongestionPricingTestExample {
 		new PricingTestAnalyser().run();
 	}
 
-	void run() {
+	private void run() {
 
 		if(!new File(outputDir+"/input/").exists()) {
 			new File(outputDir+"/input/").mkdirs();
@@ -117,7 +108,8 @@ class CongestionPricingTestExample {
 
 			switch (congestionImpl) {
 			case "implV3":
-				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(),  (MutableScenario)sc)));	
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(),
+                        sc)));
 				break;
 			case "implV4":
 				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(),  sc)));
@@ -145,13 +137,13 @@ class CongestionPricingTestExample {
 
 		config.qsim().setEndTime(9*3600.);
 
-		StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		reRoute.setWeight(0.10);
 		config.strategy().addStrategySettings(reRoute);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.7);
 
-		StrategySettings changeExpBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		StrategySettings changeExpBeta = new StrategySettings();
 		changeExpBeta.setStrategyName("ChangeExpBeta");
 		changeExpBeta.setWeight(0.9);
 		config.strategy().addStrategySettings(changeExpBeta);
@@ -222,7 +214,7 @@ class CongestionPricingTestExample {
 	 */
 	private void createTolledNetwork (){
 
-		Network network = (Network) sc.getNetwork();
+		Network network = sc.getNetwork();
 
 		// nodes between o-d1 (all horizonal links)
 		double x = -100;

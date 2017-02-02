@@ -38,7 +38,7 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 /**
  * @author amit
  */
-public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private final Id<Link> linkId ;
 	private final Map<Double, Double> densityVsFractionOfStoppedVehicles;

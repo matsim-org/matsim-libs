@@ -118,5 +118,25 @@
 			<artifactId>gunnar</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>emissions</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>minibus</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>playground</groupId>
+			<artifactId>ivtExt</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>av</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

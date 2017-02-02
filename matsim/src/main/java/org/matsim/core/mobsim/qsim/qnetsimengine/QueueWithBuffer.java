@@ -19,38 +19,23 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.LaneEnterEvent;
-import org.matsim.core.api.experimental.events.LaneLeaveEvent;
+import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
-import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.config.groups.QSimConfigGroup.*;
+import org.matsim.core.gbl.*;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
-import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.Lane;
@@ -103,12 +88,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 
 	/**
-	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
-	 * buffer. This value is updated each time step by a call to
-	 * {@link #updateRemainingFlowCapacity()} (double)}.
-	 */
-	private double remainingflowCap = 0.0 ;
-	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
 	 * <p></p>
@@ -119,19 +98,19 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static class FlowcapAccumulate {
 		private double timeStep = 0.;//Double.NEGATIVE_INFINITY ;
 		private double value = 0. ;
-		double getTimeStep(){
+		private double getTimeStep(){
 			return this.timeStep;
 		}
-		void setTimeStep(double now) {
+		private void setTimeStep(double now) {
 			this.timeStep = now;
 		}
-		double getValue() {
+		private double getValue() {
 			return value;
 		}
-		void setValue(double value ) {
+		private void setValue(double value ) {
 			this.value = value;
 		}
-		void addValue(double value1, double now) {
+		private void addValue(double value1, double now) {
 			this.value += value1;
 			this.timeStep = now ;
 		}
@@ -144,13 +123,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 */
 	private boolean thisTimeStepGreen = true ;
 	private double inverseFlowCapacityPerTimeStep;
-	private double flowCapacityPerTimeStepFractionalPart;
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
 	private double flowCapacityPerTimeStep;
-	private int bufferStorageCapacity;
-	private double usedBufferStorageCapacity = 0.0 ;
 	private double remainingHolesStorageCapacity = 0.0 ;
 
 	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
@@ -187,8 +163,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final LinkSpeedCalculator linkSpeedCalculator;
 	private final NetsimEngineContext context;
 
-	private double lastUpdate = Double.NEGATIVE_INFINITY ;
-	
 	private double maxFlowFromFdiag = Double.POSITIVE_INFINITY ;
 
 	private double accumulatedInflowCap = 1. ;
@@ -215,15 +189,11 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
 		
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+        if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue ) {
 			remainingHolesStorageCapacity = this.storageCapacity;
 		}
 
-		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
-		} else {
-			flowcap_accumulate.setValue((flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0) );
-		}
+		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 		
 		if ( context.qsimConfig.getTimeStepSize() < 1. ) {
 			throw new RuntimeException("yyyy This will produce weird results because in at least one place "
@@ -245,28 +215,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
-		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			updateFlowAccumulation();
-			if (flowcap_accumulate.getValue() > 0.0  ) {
-				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now);
-			} else {
-				throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
-			}
+	    if (flowcap_accumulate.getValue() > 0.0  ) {
+			flowcap_accumulate.addValue(-veh.getFlowCapacityConsumptionInEquivalents(), now);
 		} else {
-			if (remainingflowCap >= 1.0  ) {
-				remainingflowCap -= veh.getSizeInEquivalents();
-			}
-			else if (flowcap_accumulate.getValue() >= 1.0) {
-				flowcap_accumulate.setValue(flowcap_accumulate.getValue() - veh.getSizeInEquivalents() );
-			}
-			else {
-				throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
-			}
+			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
 		}
-
 		
 		buffer.add(veh);
-		usedBufferStorageCapacity = usedBufferStorageCapacity + veh.getSizeInEquivalents();
 		if (buffer.size() == 1) {
 			bufferLastMovedTime = now;
 			// (if there is one vehicle in the buffer now, there were zero vehicles in the buffer before.  in consequence,
@@ -280,62 +235,51 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	 final boolean isAcceptingFromWait() {
-		return this.hasFlowCapacityLeftAndBufferSpace() ;
+		return this.hasFlowCapacityLeft() ;
 	}
 
-	private boolean hasFlowCapacityLeftAndBufferSpace() {
-		// yyyyyy really not so pretty that we have updateFlowAccumulation in fastCapUp and updateRemainingFlowCap in normalCapUp.
-		// In particular since the last one was a bit confused in the code before.  Need to clean up.  kai, mar'16
-		
-		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			updateFlowAccumulation(); 
-			return (
-					usedBufferStorageCapacity < bufferStorageCapacity
-					&&
-					((flowcap_accumulate.getValue() > 0.0) )
-					);
-		} else {
-			this.updateRemainingFlowCapacity();
-			return (
-					usedBufferStorageCapacity < bufferStorageCapacity
-					&&
-					((remainingflowCap >= 1.0) || this.flowcap_accumulate.getValue() >=1.0)
-					);
-		}
+	private boolean hasFlowCapacityLeft() {
+        if(context.qsimConfig.isUsingFastCapacityUpdate() ){
+            updateFastFlowAccumulation();
+        }
+        
+		return flowcap_accumulate.getValue() > 0.0;
 	}
 
-	private void updateFlowAccumulation(){
-		double now = context.getSimTimer().getTimeOfDay() ;
-		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0. && isNotOfferingVehicle() ){
-			
-				double flowCapSoFar = flowcap_accumulate.getValue();
-				double accumulateFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
-				double newFlowCap = flowCapSoFar + accumulateFlowCap;
-				
-				newFlowCap = Math.min(newFlowCap, flowCapacityPerTimeStep);
-				
-				flowcap_accumulate.setValue(newFlowCap);
-				flowcap_accumulate.setTimeStep( now );
-		}
-	}
 
-	private final void updateRemainingFlowCapacity() {
-		double now = context.getSimTimer().getTimeOfDay() ;
-		if ( this.lastUpdate==now ) {
-			return ;
-		}
-		this.lastUpdate = now ;
+    private void updateFastFlowAccumulation(){
+        double now = context.getSimTimer().getTimeOfDay() ;
+        
+        if( this.flowcap_accumulate.getTimeStep() < now
+                && this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
+                && isNotOfferingVehicle() ){
+
+                double timeSteps = (now - flowcap_accumulate.getTimeStep()) / context.qsimConfig.getTimeStepSize();
+                double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
+                double newFlowCap = Math.min(flowcap_accumulate.getValue() + accumulateFlowCap,
+                        flowCapacityPerTimeStep);
+                
+                flowcap_accumulate.setValue(newFlowCap);
+                flowcap_accumulate.setTimeStep( now );
+        }
+    }
+
+    
+    private void updateSlowFlowAccumulation(){
+        if (this.thisTimeStepGreen
+                && this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
+                && isNotOfferingVehicle() ){
+            double newFlowCap = Math.min(flowcap_accumulate.getValue() + flowCapacityPerTimeStep,
+                    flowCapacityPerTimeStep);
+            flowcap_accumulate.setValue(newFlowCap);
+        }
+    }
+
+    
+
+	final void initBeforeSimStep() {
 		if(!context.qsimConfig.isUsingFastCapacityUpdate() ){
-			remainingflowCap = flowCapacityPerTimeStep;
-			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
-				flowcap_accumulate.addValue( flowCapacityPerTimeStepFractionalPart, now);
-			}
-		}
-		if ( context.qsimConfig.getInflowConstraint()!=InflowConstraint.none ) {
-			this.accumulatedInflowCap += this.maxFlowFromFdiag ;
-			if ( this.accumulatedInflowCap > Math.ceil( this.maxFlowFromFdiag ) ) {
-				this.accumulatedInflowCap = Math.ceil( this.maxFlowFromFdiag ) ;
-			}
+		    updateSlowFlowAccumulation();
 		}
 	}
 
@@ -344,9 +288,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
-		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
 		
-		if ( context.qsimConfig.getInflowConstraint()==InflowConstraint.maxflowFromFdiag ) {
+        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
 			// uncongested branch: q = vmax * rho
 			// congested branch: q = vhole * (rhojam - rho)
 			// equal: rho * (vmax + vhole) = vhole * rhojam
@@ -360,13 +303,11 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private void calculateStorageCapacity() {
 		// yyyyyy the following is not adjusted for time-dependence!! kai, apr'16
 		
-		bufferStorageCapacity = (int) Math.ceil(flowCapacityPerTimeStep);
-
 		// first guess at storageCapacity:
 		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
-		storageCapacity = Math.max(storageCapacity, bufferStorageCapacity);
+		storageCapacity = Math.max(storageCapacity, getBufferStorageCapacity());
 
 		/*
 		 * If speed on link is relatively slow, then we need MORE cells than the
@@ -401,7 +342,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		 * 
 		 */
 		
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+        if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue ) {
 //			final double minStorCapForHoles = 2. * flowCapacityPerTimeStep * context.getSimTimer().getSimTimestepSize();
 			final double freeSpeed = qLink.getLink().getFreespeed() ;
 			final double holeSpeed = HOLE_SPEED_KM_H/3.6;
@@ -419,11 +360,20 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			}
 		}
 	}
+	
+	
+	private double getBufferStorageCapacity()
+	{
+	    return flowCapacityPerTimeStep;//this assumes that vehicles have the flowEfficiencyFactor of 1.0 
+	}
 
 	@Override
 	final boolean doSimStep( ) {
-		this.updateRemainingFlowCapacity();
-		if(context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) this.processArrivalOfHoles( ) ;
+        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
+            this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowFromFdiag, maxFlowFromFdiag);
+        }
+
+        if(context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue) this.processArrivalOfHoles( ) ;
 		this.moveQueueToBuffer();
 		return true ;
 	}
@@ -477,7 +427,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			}
 			
 			/* is there still room left in the buffer? */
-			if (!hasFlowCapacityLeftAndBufferSpace() ) {
+			if (!hasFlowCapacityLeft() ) {
 				return;
 			}
 
@@ -508,7 +458,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
 		}
 
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+        if ( context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue ) {
 			QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
 			double ttimeOfHoles = length*3600./HOLE_SPEED_KM_H/1000. ;
 			
@@ -534,7 +484,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private void letVehicleArrive(QVehicle veh) {
-		double now = context.getSimTimer().getTimeOfDay() ;
 		qLink.addParkedVehicle(veh);
 		qLink.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh);
@@ -546,12 +495,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	 final boolean isActive() {
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
-				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) || ( !this.holes.isEmpty() ) ;
+			return (!this.vehQueue.isEmpty())
+                    || (!this.isNotOfferingVehicle() && context.qsimConfig.isUseLanes()) // if lanes, the buffer needs to be active in order to move vehicles over an internal node
+			        || ( !this.holes.isEmpty() ) ;
 		} else {
-			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
+             return (this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
-					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active
+                    || (!this.isNotOfferingVehicle() && context.qsimConfig.isUseLanes()) // if lanes, the buffer needs to be active in order to move vehicles over an internal node
 					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
 		}
 	}
@@ -573,18 +523,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 final boolean isAcceptingFromUpstream() {
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
 		
-		if ( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) 
-				&& context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
+        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.queue )  {
 			return storageOk ;
 		}
-		// (continue only if HOLES and/or inflow constraing)
+		// (continue only if HOLES and/or inflow constraint)
 
-		if( ! (context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles)
-				&& !storageOk) { // irrespective of inflow constrain, storageOk must be respected; amit Aug 2016
-			return storageOk;
-		}
-		
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles   
+        if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue
 				&& remainingHolesStorageCapacity <= 0. ) { 
 			// check the holes storage capacity if using holes only (amit, Aug 2016)
 			return false ;
@@ -594,21 +538,18 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// * reduced by entering vehicles
 		// * increased by holes arriving at upstream end of link
 		
-		if ( context.qsimConfig.getInflowConstraint()==InflowConstraint.none ) {
+        if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.KWM ) {
 			return true ;
 		}
 		
-		return this.accumulatedInflowCap >= 1. ; // can maximally be 1.
+		return this.accumulatedInflowCap > 0;
 		
 	}
 
 	private void recalcTimeVariantAttributes() {
 		calculateFlowCapacity();
 		calculateStorageCapacity();
-		
-		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
-		}
+		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 	}
 	
 	@Override
@@ -648,7 +589,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		QVehicle veh = removeFirstVehicle();
 		if (this.context.qsimConfig.isUseLanes() ) {
-			if (  this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0) ) {
+			if (  hasMoreThanOneLane() ) {
 				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
 			}
 		}
@@ -658,7 +599,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final QVehicle removeFirstVehicle(){
 		double now = context.getSimTimer().getTimeOfDay() ;
 		QVehicle veh = buffer.poll();
-		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ) {
 			flowcap_accumulate.setTimeStep(now - 1);
@@ -719,7 +659,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			context.getAgentCounter().decLiving();
 		}
 		buffer.clear();
-		usedBufferStorageCapacity = 0;
 		
 		holes.clear();
 		this.remainingHolesStorageCapacity = this.storageCapacity;
@@ -730,7 +669,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 
 		if (this.context.qsimConfig.isUseLanes() ) {
-			if (  this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0) ) {
+			if (  hasMoreThanOneLane() ) {
 				this.context.getEventsManager().processEvent(new LaneEnterEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
 			}
 		}
@@ -762,12 +701,20 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		veh.setCurrentLink(qLink.getLink());
 		vehQueue.add(veh);
 
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+        if ( context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue ) {
 			remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
 		}
-		if ( context.qsimConfig.getInflowConstraint()!=InflowConstraint.none ) {
-			this.accumulatedInflowCap -= veh.getSizeInEquivalents() ;
+        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
+			this.accumulatedInflowCap -= veh.getFlowCapacityConsumptionInEquivalents() ;
 		}
+	}
+
+	private boolean hasMoreThanOneLane() {
+		return this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0);
+		// this works independent from sorting since if there is only one lane, then it has to be the one to be returned by
+		// getOfferingQLanes().get(0), and it is also the same as the accepting QLane.  If, however, "lanes" is used,
+		// there are at least two lanes in sequence, so the accepting lane is never the same as any of the offering lanes, and
+		// this will always return false independent from sorting.  kai/theresa, dec'16
 	}
 
 	 @Override
@@ -876,7 +823,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 						now, 
 						getAllVehicles(), 
 						length, 
-						storageCapacity + bufferStorageCapacity, 
+						storageCapacity + getBufferStorageCapacity(), 
 						this.upstreamCoord,
 						this.downstreamCoord,
 						inverseFlowCapacityPerTimeStep, 

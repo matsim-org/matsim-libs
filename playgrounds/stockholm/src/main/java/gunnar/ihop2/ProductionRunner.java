@@ -2,7 +2,6 @@ package gunnar.ihop2;
 
 import java.io.IOException;
 
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -142,10 +141,13 @@ public class ProductionRunner {
 			}
 
 			final Controler controler = new Controler(config);
-			if (useLanes) {
-				controler
-						.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-			}
+
+			//LinkToLinkRouting is added automatically when config.controler.linkToLinkRoutingEnabled == true
+	        //michalm, jan'17
+//			if (useLanes) {
+//				controler
+//						.addOverridingModule(new LinkToLinkRoutingGuiceModule());
+//			}
 			if (useRoadPricing) {
 				controler
 						.setModules(new ControlerDefaultsWithRoadPricingModule());

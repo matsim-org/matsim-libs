@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scenario.CustomizableUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /* deliberately package */  final class PlanImpl implements Plan {
 
@@ -47,6 +48,13 @@ import org.matsim.core.scenario.CustomizableUtils;
 
 	private Customizable customizableDelegate;
 	
+	private final Attributes attributes = new Attributes();
+	
+	@Override
+	public final Attributes getAttributes() {
+		return this.attributes;
+	}
+
 	/* package */ PlanImpl() {}
 
 //	@Override

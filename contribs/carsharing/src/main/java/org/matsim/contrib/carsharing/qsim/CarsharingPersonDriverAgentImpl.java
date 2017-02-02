@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
+import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -41,13 +42,17 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private final TransitAgentImpl transitAgentDelegate;
 	private final PlanBasedDriverAgentImpl driverAgentDelegate;
 
+	private final Scenario scenario;
+	private final Plan originalPlan;
+	private int carsharingTrips = 0;
 	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, CarsharingManagerInterface carsharingManager) {
-		Scenario scenario = simulation.getScenario() ;
+		this.scenario = simulation.getScenario() ;
 		this.carsharingManager = carsharingManager;
 		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;
 		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate ) ;
 		this.driverAgentDelegate = new PlanBasedDriverAgentImpl( this.basicAgentDelegate ) ;
-		
+		this.originalPlan = this.scenario.getPopulation().getPersons().get(this.basicAgentDelegate.getId()).getSelectedPlan();
+
 		if ( scenario.getConfig().qsim().getNumberOfThreads() != 1 ) {
 			throw new RuntimeException("does not work with multiple qsim threads (will use same instance of router)") ; 
 		}
@@ -58,18 +63,31 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
 
-		Plan plan = this.getModifiablePlan() ; 
 		PlanElement pe = this.getNextPlanElement();
-		int nextElementIndex = plan.getPlanElements().indexOf(pe);
+		int nextElementIndex = this.getCurrentPlan().getPlanElements().indexOf(pe);
 		Leg legToBerouted = (Leg)pe;
 		if (carsharingLeg(pe)) {
+			int countCSLegs = 0;
+			List<PlanElement> newTrip = null;
+			for (PlanElement pe2 : originalPlan.getPlanElements()) {
+				if (pe2 instanceof Leg && carsharingLeg(pe2))
+					countCSLegs++;
+				if (countCSLegs > this.carsharingTrips) {
+					newTrip = carsharingManager.reserveAndrouteCarsharingTrip(this.getCurrentPlan(), legToBerouted.getMode(), 
+							(Leg)(pe2), now);
+					carsharingTrips++;
+					break;
+				}
+			}
 			
-			List<PlanElement> newTrip = carsharingManager.reserveAndrouteCarsharingTrip(plan, legToBerouted.getMode(), 
-					legToBerouted, now);
 			if (newTrip == null) {
 				this.setStateToAbort(now);
 			}
 			else {
+				
+				Plan plan = this.getModifiablePlan() ; 
+				pe = this.getNextPlanElement();
+
 				List<PlanElement> planElements = plan.getPlanElements();
 
 				planElements.remove(pe);

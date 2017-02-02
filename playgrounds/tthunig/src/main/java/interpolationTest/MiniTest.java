@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
-import org.matsim.contrib.matsim4urbansim.interpolation.Interpolation;
+import org.matsim.contrib.accessibility.interpolation.Interpolation;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

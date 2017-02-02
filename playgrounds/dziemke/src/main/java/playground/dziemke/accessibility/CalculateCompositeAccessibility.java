@@ -48,8 +48,7 @@ public class CalculateCompositeAccessibility {
 
 	
 	public static void main(String[] args) {
-		String directoryRoot = "../../../shared-svn/projects/maxess/data/nmb/output/17neuRestrictedFile/";
-//		String[] activityTypes = {"s", "l", "t", "e"};
+		String directoryRoot = "../../../shared-svn/projects/maxess/data/nmb/output/17compRestricted500/";
 		String[] activityTypes = {FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION};
 
 		setHeader(directoryRoot, activityTypes);

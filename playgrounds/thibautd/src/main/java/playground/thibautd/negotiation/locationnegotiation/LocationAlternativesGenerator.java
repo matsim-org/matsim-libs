@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -50,8 +49,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 	private final LocationHelper locations;
 	private final LocationAlternativesConfigGroup configGroup;
 	private final VPTree<Coord,ActivityFacility> facilities;
-
-	private final Random random = MatsimRandom.getLocalInstance();
+	private final RandomSeedHelper seeds;
 
 	@Inject
 	public LocationAlternativesGenerator(
@@ -59,11 +57,13 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 			final Population population,
 			final ActivityFacilities facilities,
 			final LocationHelper locations,
-			final LocationAlternativesConfigGroup configGroup ) {
+			final LocationAlternativesConfigGroup configGroup,
+			final RandomSeedHelper seeds ) {
 		this.socialNetwork = socialNetwork;
 		this.population = population;
 		this.locations = locations;
 		this.configGroup = configGroup;
+		this.seeds = seeds;
 
 		this.facilities =
 				new VPTree<>(
@@ -87,7 +87,7 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 				new ArrayList<>(
 						2 * alters.size() + // visits
 								1 + // alone at home
-								configGroup.getnOutOfHomeAlternatives() * alters.size() ); // out of home
+								configGroup.getnOutOfHomeAlternatives() * (alters.size() + 1) ); // out of home
 		// visits
 		for ( Person alter : alters ) {
 			propositions.add(
@@ -96,12 +96,13 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 							Collections.singleton( alter ) ,
 							locations.getHomeLocation( ego ),
 							LocationProposition.Type.visit ) );
-			propositions.add(
-					LocationProposition.create(
-							ego ,
-							Collections.singleton( alter ) ,
-							locations.getHomeLocation( alter ),
-							LocationProposition.Type.visit ) );
+			// this will come from alter
+			//propositions.add(
+			//		LocationProposition.create(
+			//				ego ,
+			//				Collections.singleton( alter ) ,
+			//				locations.getHomeLocation( alter ),
+			//				LocationProposition.Type.visit ) );
 		}
 
 		// alone at home
@@ -127,24 +128,44 @@ public class LocationAlternativesGenerator implements AlternativesGenerator<Loca
 						home,
 						configGroup.getMaxOutOfHomeRadius_km() * 1000 );
 
-		// no need to be too smart (e.g. only select a few of the best facilities):
-		// being smart requires a lot of utility computations here, plus in the negotiator.
-		// being dumb but returning more options leads to those options only being evaluated
-		// once.
+		// always select the same "awareness set"
+		// assumes the VP tree returns elements in ball in deterministic order (it should)
 		final List<ActivityFacility> subsample = RandomUtils.sublist_withSideEffect(
-				random,
+				new Random( seeds.getSeed( ego )),
 				(List<ActivityFacility>) close,
+				//new ArrayList<>( close ),
 				configGroup.getnOutOfHomeAlternatives() );
 
-		return subsample.stream()
+		//alters.forEach( alter -> subsample.addAll(
+		//		RandomUtils.sublist_withSideEffect(
+		//				new Random( seeds.getSeed( alter )),
+		//				new ArrayList<>( close ),
+		//				configGroup.getnOutOfHomeAlternatives() ) ) );
+
+		final List<LocationProposition> propositions = new ArrayList<>();
+		// with friends
+		subsample.stream()
 				.flatMap( facility ->
-						alters.stream().map( alter ->
-								LocationProposition.create(
-										ego,
-										Collections.singleton( alter ),
-										facility,
-										LocationProposition.Type.outOfHome ) ) )
-				.collect( Collectors.toList() );
+						alters.stream()
+								.map( alter ->
+										LocationProposition.create(
+												ego,
+												Collections.singleton( alter ),
+												facility,
+												LocationProposition.Type.outOfHome ) ) )
+				.forEach( propositions::add );
+
+		// alone
+		subsample.stream()
+				.map( facility ->
+						LocationProposition.create(
+								ego,
+								Collections.emptyList(),
+								facility,
+								LocationProposition.Type.outOfHome ) )
+				.forEach( propositions::add );
+
+		return propositions;
 	}
 
 }

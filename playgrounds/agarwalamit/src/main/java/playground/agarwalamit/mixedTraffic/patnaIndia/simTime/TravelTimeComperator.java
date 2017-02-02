@@ -25,7 +25,7 @@ import java.util.SortedMap;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.utils.FileUtils;
 
 /**

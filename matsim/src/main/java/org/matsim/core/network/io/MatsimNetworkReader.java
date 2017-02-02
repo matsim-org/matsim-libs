@@ -23,11 +23,9 @@ package org.matsim.core.network.io;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;

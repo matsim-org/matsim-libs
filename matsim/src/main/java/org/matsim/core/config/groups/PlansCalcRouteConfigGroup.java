@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
@@ -108,7 +109,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 
 		@Override
-		public void checkConsistency() {
+		public void checkConsistency(Config config) {
 			if ( mode == null ) throw new RuntimeException( "mode for parameter set "+this+" is null!" );
 
 			if ( teleportedModeSpeed == null && teleportedModeFreespeedFactor == null ) {

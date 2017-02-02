@@ -91,6 +91,8 @@ public class TravelTimeFourWaysTest {
 	public void testTrafficLightIntersection4arms() {
 		Scenario scenario = this.createTestScenario();
 		scenario.getConfig().plans().setInputFile("plans.xml.gz");
+	    scenario.getConfig().qsim().setUsingFastCapacityUpdate(false);
+
 		
 		ScenarioUtils.loadScenario(scenario);
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;

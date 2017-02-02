@@ -25,9 +25,9 @@ import processing.core.PApplet;
  */
 
 public class DancingRobot extends PApplet {
-	int armAngle = 0;
-	int angleChange = 5;
-	final int ANGLE_LIMIT = 135;
+	private int armAngle = 0;
+	private int angleChange = 5;
+	private final int ANGLE_LIMIT = 135;
 
 	public static void main(String[] args) {
 		PApplet.main(new String [] {"--present","playground.agarwalamit.templates.DancingRobot"});
@@ -58,7 +58,7 @@ public class DancingRobot extends PApplet {
 		smooth();
 //		frameRate(30); // using this throws NPE
 	}
-	void drawRobot()
+	private void drawRobot()
 	{
 		noStroke();
 		fill(38, 38, 200);
@@ -74,7 +74,7 @@ public class DancingRobot extends PApplet {
 		ellipse(47, 12, 12, 12);  // right eye
 	}
 
-	void drawLeftArm()
+	private void drawLeftArm()
 	{
 		pushMatrix();
 		translate(12, 32);
@@ -83,7 +83,7 @@ public class DancingRobot extends PApplet {
 		popMatrix();
 	}
 
-	void drawRightArm()
+	private void drawRightArm()
 	{
 		pushMatrix();
 		translate(66, 32);

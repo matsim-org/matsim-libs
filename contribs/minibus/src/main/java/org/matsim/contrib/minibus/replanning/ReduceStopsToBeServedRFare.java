@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.fare.StageContainer;
 import org.matsim.contrib.minibus.fare.StageContainerHandler;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
@@ -54,7 +54,7 @@ public final class ReduceStopsToBeServedRFare extends AbstractPStrategyModule im
 	private final double sigmaScale;
 	private final boolean useFareAsWeight;
 
-	private TicketMachine ticketMachine;
+	private TicketMachineI ticketMachine;
 	private LinkedHashMap<Id<TransitRoute>, LinkedHashMap<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>>> route2StartStop2EndStop2WeightMap = new LinkedHashMap<>();
 	
 	public ReduceStopsToBeServedRFare(ArrayList<String> parameter) {
@@ -200,7 +200,7 @@ public final class ReduceStopsToBeServedRFare extends AbstractPStrategyModule im
 		this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId).put(endStopId, oldWeight + additionalWeight);
 	}
 
-	public void setTicketMachine(TicketMachine ticketMachine) {
+	public void setTicketMachine(TicketMachineI ticketMachine) {
 		this.ticketMachine = ticketMachine;
 	}
 }

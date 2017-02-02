@@ -7,7 +7,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -217,7 +216,9 @@ public class TransmodelerMATSim {
 				"Starting Assignment ...");
 
 		final Controler controler = new Controler(matsimConfig);
-		controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+        //LinkToLinkRouting is added automatically when config.controler.linkToLinkRoutingEnabled == true
+		//michalm, jan'17
+		//controler.addOverridingModule(new LinkToLinkRoutingGuiceModule());
 
 		if (MOBSIM.transmodeler.equals(mobsim)) {
 

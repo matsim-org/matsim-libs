@@ -98,5 +98,7 @@ abstract class QLaneI implements Identifiable<Lane> {
 	 * the one with the smallest load.
 	 */
 	abstract double getLoadIndicator() ;
+	
+	abstract void initBeforeSimStep();
 
 }

@@ -19,11 +19,9 @@
 package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
 import java.util.Arrays;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -65,7 +63,7 @@ public class ShockwaveExperiment {
 
 		if (! isUsingOTFVis ) { //necessary to avoid placement on link/lane (2-D) if using the data to plot only one-D space.
 			sc.getConfig().qsim().setLinkWidthForVis((float)0);
-			((Network) sc.getNetwork()).setEffectiveLaneWidth(0.);		
+			sc.getNetwork().setEffectiveLaneWidth(0.);
 		}
 
 		ScenarioUtils.loadScenario(sc);
@@ -77,15 +75,13 @@ public class ShockwaveExperiment {
 			NetworkChangeEvent event = new NetworkChangeEvent(35.*60.) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 0.0)); 
 			event.addLink(desiredLink);
-			final NetworkChangeEvent event1 = event;
-			NetworkUtils.addNetworkChangeEvent(((Network)sc.getNetwork()),event1);
+            NetworkUtils.addNetworkChangeEvent(sc.getNetwork(), event);
 		}
 		{
 			NetworkChangeEvent event = new NetworkChangeEvent(35.*60.+60*5) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, flowCapBefore/3600.)); // value should be in pcu/s
 			event.addLink(desiredLink);
-			final NetworkChangeEvent event1 = event;
-			NetworkUtils.addNetworkChangeEvent(((Network)sc.getNetwork()),event1);
+            NetworkUtils.addNetworkChangeEvent(sc.getNetwork(), event);
 		}
 		generateFDData.run();
 	}

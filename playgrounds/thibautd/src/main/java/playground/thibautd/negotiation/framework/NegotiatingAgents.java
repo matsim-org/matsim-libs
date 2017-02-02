@@ -30,6 +30,7 @@ import playground.ivt.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -47,6 +48,7 @@ public class NegotiatingAgents<P extends Proposition> implements Iterable<Negoti
 	private final Map<Id<Person>, NegotiationAgent<P>> agents = new HashMap<>();
 
 	private final List<NegotiationAgent<P>> agentList;
+	private int currentIndex = -1;
 
 	private final Random random = MatsimRandom.getLocalInstance();
 
@@ -79,11 +81,16 @@ public class NegotiatingAgents<P extends Proposition> implements Iterable<Negoti
 	}
 
 	public NegotiationAgent<P> getRandomAgent() {
-		// get a random sublist and get the agent with the minimum best utility from it.
-		// avoids loosing too much time re-considering "lucky" agents
-		//final List<NegotiationAgent<P>> choiceSet = RandomUtils.sublist_withSideEffect( random , agentList , 100 );
-		//return choiceSet.stream().min( (a1, a2) -> Double.compare( a1.getBestUtility() , a2.getBestUtility() ) ).get();
-		return agentList.get( random.nextInt( agentList.size() ) );
+		// repeat sampling without replacement as often as necessary.
+		// ensures "fairness" in the number of times each agent is called, not only on average
+		currentIndex++;
+		currentIndex %= agentList.size();
+		if ( currentIndex == 0 ) Collections.shuffle( agentList , random );
+		return agentList.get( currentIndex );
+	}
+
+	public Collection<NegotiationAgent<P>> getAllAgents() {
+		return agentList;
 	}
 
 	public NegotiationAgent<P> get( final Id<Person> id ) {

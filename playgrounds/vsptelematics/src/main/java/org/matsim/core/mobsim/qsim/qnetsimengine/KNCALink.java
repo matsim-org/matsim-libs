@@ -410,6 +410,10 @@ public class KNCALink {
 			@Override double getLoadIndicator() {
 				return 0.5 ;
 			}
+
+            @Override
+            void initBeforeSimStep() {
+            }
 		}
 		@Inject private EventsManager events ;
 		@Inject private Scenario scenario ; // yyyyyy I would like to get rid of this. kai, mar'16

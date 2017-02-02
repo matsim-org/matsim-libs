@@ -59,25 +59,23 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 			final NegotiationAgent<LocationProposition> agent,
 			final LocationProposition proposition ) {
 		if ( proposition == null ) return Double.NEGATIVE_INFINITY;
-		return proposition.getOrUpdateUtility( () -> {
-			final Person ego = population.getPersons().get( agent.getId() );
-			final Collection<Person> alters = proposition.getGroup();
+		final Person ego = population.getPersons().get( agent.getId() );
+		final Collection<Person> alters = proposition.getGroup();
 
-			final ActivityFacility location = proposition.getFacility();
+		final ActivityFacility location = proposition.getFacility();
 
-			final double sumOfAlterUtils =
-					alters.stream()
-							.filter( a -> !a.getId().equals( agent.getId() ) )
-							.mapToDouble( a -> seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact() )
-							.sum();
+		final double sumOfAlterUtils =
+				alters.stream()
+						.filter( a -> !a.getId().equals( agent.getId() ) )
+						.mapToDouble( a -> configGroup.getFixedUtilContact() + seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact() )
+						.sum();
 
-			final double utilLocation =
-					seeds.getGaussianErrorTerm( ego, asAttr( location ) ) * configGroup.getSigmaFacility();
+		final double utilLocation =
+				seeds.getGaussianErrorTerm( ego, asAttr( location ) ) * configGroup.getSigmaFacility();
 
-			final double utilTravelTime = getTravelTime( ego, location ) * configGroup.getBetaTime();
+		final double utilTravelTime = getTravelDistance( ego, location ) * configGroup.getBetaDistance();
 
-			return sumOfAlterUtils + utilLocation + utilTravelTime;
-		} );
+		return sumOfAlterUtils + utilLocation + utilTravelTime;
 	}
 
 	// TODO: make facilities actually implement attributable!
@@ -88,7 +86,7 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 		return () -> (Attributes) facility.getCustomAttributes().get( "attributes" );
 	}
 
-	private double getTravelTime( final Person ego, final ActivityFacility location ) {
+	private double getTravelDistance( final Person ego, final ActivityFacility location ) {
 		switch ( configGroup.getTravelTimeType() ) {
 			case crowFly:
 				final Coord homeCoord = locations.getHomeLocation( ego ).getCoord();

@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.fare.StageContainer;
 import org.matsim.contrib.minibus.fare.StageContainerHandler;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
@@ -54,7 +54,7 @@ public final class ReduceTimeServedRFare extends AbstractPStrategyModule impleme
 	private final boolean allowForSplitting;
 	
 	private LinkedHashMap<Id<TransitRoute>,LinkedHashMap<Integer,LinkedHashMap<Integer,Double>>> route2StartTimeSlot2EndTimeSlot2WeightMap = new LinkedHashMap<>();
-	private TicketMachine ticketMachine;
+	private TicketMachineI ticketMachine;
 
 
 	public ReduceTimeServedRFare(ArrayList<String> parameter) {
@@ -265,7 +265,7 @@ public final class ReduceTimeServedRFare extends AbstractPStrategyModule impleme
 		this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId).get(startTimeSlot).put(endTimeSlot, oldWeight + additionalWeight);
 	}
 
-	public void setTicketMachine(TicketMachine ticketMachine) {
+	public void setTicketMachine(TicketMachineI ticketMachine) {
 		this.ticketMachine = ticketMachine;
 	}
 

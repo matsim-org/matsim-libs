@@ -22,11 +22,13 @@ import java.io.BufferedWriter;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.PersonFilter;
 
 /**
@@ -57,14 +59,7 @@ public class ModeSwitchersTripTime {
 		}
 	}
 
-	private final Comparator<Tuple<String, String>> comparator = new Comparator<Tuple<String, String>>() {
-		@Override
-		public int compare(Tuple<String, String> o1, Tuple<String, String> o2) {
-			return o1.toString().compareTo(o2.toString());
-		}
-	};
-
-	private final SortedMap<Tuple<String, String>, ModeSwitcherInfoCollector> modeSwitchType2InfoCollector = new TreeMap<>(comparator);
+	private final SortedMap<Tuple<String, String>, ModeSwitcherInfoCollector> modeSwitchType2InfoCollector = new TreeMap<>((o1, o2) -> o1.toString().compareTo(o2.toString()));
 
 	public static void main(String[] args) {
 
@@ -73,12 +68,17 @@ public class ModeSwitchersTripTime {
 
 		for(String runNr : runCases){
 			ModeSwitchersTripTime mstt = new ModeSwitchersTripTime();
-			mstt.processEventsFiles(dir+runNr, 1000, 1500);
+			Scenario scenario = LoadMyScenarios.loadScenarioFromNetworkAndConfig(dir+"/output_network.xml.gz", dir+"output_config.xml.gz");
+			scenario.getConfig().controler().setOutputDirectory(dir);
+			mstt.processEventsFiles(scenario);
 			mstt.writeResults(dir+runNr+"/analysis/");
 		}
 	}
 
-	public void processEventsFiles (final String eventsDir, final int firstIteration, final int lastIteration){
+	public void processEventsFiles (final Scenario scenario){
+		String eventsDir = scenario.getConfig().controler().getOutputDirectory();
+		int firstIteration = scenario.getConfig().controler().getFirstIteration();
+		int lastIteration = scenario.getConfig().controler().getLastIteration();
 		// data from event files
 		String eventsFileFirstIt = eventsDir+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
 		String eventsFileLastIt = eventsDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
@@ -161,7 +161,7 @@ public class ModeSwitchersTripTime {
 	}
 
 	public void writeResults(final String outputFolder){
-		String outFile = outputFolder+"/modeSwitchersTripTimes.txt";
+		String outFile = outputFolder+"modeSwitchersTripTimes.txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
 			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripTimesForFirstIterationInHr \t totalTripTimesForLastIterationInHr \n");

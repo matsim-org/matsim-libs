@@ -163,7 +163,7 @@ public class CNETollTimeDistanceTravelDisutility implements TravelDisutility {
 
 		}
 						
-		double expectedLinkNoiseTollDistuility = this.marginalUtilityOfMoney * linkExpectedNoiseToll;			
+		double expectedLinkNoiseTollDistuility = this.noiseContext.getNoiseParams().getNoiseTollFactor() * this.marginalUtilityOfMoney * linkExpectedNoiseToll;			
 		
 		// exhaust emission toll disutility
 		

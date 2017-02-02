@@ -20,6 +20,7 @@
 package playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -27,12 +28,11 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.av.drt.TaxibusRequest.TaxibusRequestStatus;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest.TaxibusRequestStatus;
 
 
 public class TaxibusDispatch 
@@ -57,6 +57,22 @@ public class TaxibusDispatch
         
     }
     
+    public TaxibusDispatch(Vehicle vehicle, VrpPathWithTravelData path)
+    {
+    	this.requests = new LinkedHashSet<>();
+    	this.path = new ArrayList<>();
+        this.vehicle = vehicle;
+        this.path.add(path);
+        this.earliestNextDeparture =  path.getArrivalTime();
+        
+        
+    }
+    public void addRequests(Collection<TaxibusRequest> requests){
+    	this.requests.addAll(requests);
+    }
+    public void addRequest(TaxibusRequest request){
+    	this.requests.add(request);
+    }
     
     public void addRequestAndPath(TaxibusRequest request, VrpPathWithTravelData path){
     	this.requests.add(request);

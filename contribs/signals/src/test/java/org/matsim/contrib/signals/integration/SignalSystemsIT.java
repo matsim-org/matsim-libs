@@ -21,15 +21,10 @@ package org.matsim.contrib.signals.integration;
 
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controler.SignalsModule;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
+import org.matsim.contrib.signals.data.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -67,6 +62,7 @@ public class SignalSystemsIT {
 		
 		config.qsim().setStartTime(1.5*3600);
 		config.qsim().setEndTime(5.5*3600);
+		config.qsim().setUsingFastCapacityUpdate(false);
 		
 		config.controler().setLastIteration(10);
 		
@@ -79,7 +75,7 @@ public class SignalSystemsIT {
 
 		Controler c = new Controler(scenario);
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+		
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		
 //		c.addOverridingModule( new AbstractModule(){
@@ -109,8 +105,8 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
 
-			new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it0.xml.gz");
-			new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it0.xml.gz");
+//			new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it0.xml.gz");
+//			new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it0.xml.gz");
 
 			Assert.assertTrue("different population files after iteration 0 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));
@@ -131,8 +127,8 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 			
-			new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
-			new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
+//			new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
+//			new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
 
 			Assert.assertTrue("different population files after iteration 10 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));
@@ -160,13 +156,13 @@ public class SignalSystemsIT {
 
 		config.qsim().setStartTime(1.5*3600);
 		config.qsim().setEndTime(5*3600);
+        config.qsim().setUsingFastCapacityUpdate(false);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
 		Controler c = new Controler(scenario);
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.getConfig().controler().setCreateGraphs(false);
 		c.getConfig().controler().setDumpDataAtEnd(false);
@@ -188,6 +184,9 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
 
+//            new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it0.xml.gz");
+//            new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it0.xml.gz");
+
 			Assert.assertTrue("different population files after iteration 0 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));
 		}
@@ -206,6 +205,9 @@ public class SignalSystemsIT {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 
+//            new org.matsim.api.core.v01.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
+//            new org.matsim.api.core.v01.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
+			
 			Assert.assertTrue("different population files after iteration 10 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));
 		}

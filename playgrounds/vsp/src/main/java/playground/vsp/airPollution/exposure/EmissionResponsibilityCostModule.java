@@ -31,6 +31,9 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 
 
 /**
+ * This class estimates the air pollution exposure costs of all pollutants except CO2
+ * and flat costs of CO2 if considering CO2 costs at all.
+ *
  * @author benjamin
  *
  */
@@ -38,31 +41,28 @@ public class EmissionResponsibilityCostModule {
 	private static final Logger logger = Logger.getLogger(EmissionResponsibilityCostModule.class);
 	
 	private final double emissionCostMultiplicationFactor;
-	private boolean considerCO2Costs = false;
-	
-	private ResponsibilityGridTools responsibilityGridTools;
+	private final ResponsibilityGridTools responsibilityGridTools;
+	private final boolean considerCO2Costs ;
 
-	
-	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt, GridTools gridTools) {
+
+	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt) {
 		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostMultiplicationFactor);
-		
-		if(considerCO2Costs){
-			this.considerCO2Costs = true;
+
+		this.considerCO2Costs = considerCO2Costs;
+		if(this.considerCO2Costs){
 			logger.info("CO2 emission costs will be calculated... ");
+			logger.warn("The first iteration will include only flat CO2 emission costs because, " +
+					"the relative densities from activity durations are estimated after first iteration.");
 		} else {
 			logger.info("CO2 emission costs will NOT be calculated... ");
 		}
 		
 		this.responsibilityGridTools = rgt;
-		
 	}
 	
-	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, ResponsibilityGridTools rgt, GridTools gridTools) {
-		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
-		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostMultiplicationFactor);
-		logger.info("CO2 emission costs will NOT be calculated... ");
-		this.responsibilityGridTools = rgt;
+	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, ResponsibilityGridTools rgt) {
+		this(emissionCostMultiplicationFactor, false, rgt);
 	}
 
 	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions, Id<Link> linkId, double time) {
@@ -74,14 +74,8 @@ public class EmissionResponsibilityCostModule {
 				warmEmissionCosts += warmEmissions.get(wp) * costFactor ;
 			}
 		}
-		//following log statment increases size of the logFile thus commented. amit, Oct'15
-//		logger.info("warm emission costs" + warmEmissionCosts);
-		// relative density = person minutes of resp. cell and time bin / average person minutes of all cells from this time bin
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);
-		//following log statment increases size of the logFile thus commented. amit, Oct'15
-//		logger.info("relative density" + relativeDensity 
-//				+ " on link " + linkId.toString() 
-//				+ "resulting costs " + (this.emissionCostFactor*warmEmissionCosts*relativeDensity));
+
 		if(this.considerCO2Costs) {
 			WarmPollutant co2Total = WarmPollutant.CO2_TOTAL;
 			return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity
@@ -100,9 +94,6 @@ public class EmissionResponsibilityCostModule {
 		}
 		// relative density = person minutes of resp. cell and time bin / average person minutes of all cells from this time bin
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);
-		//following log statment increases size of the logFile thus commented. amit, Oct'15
-//		logger.info("cold emission costs " + coldEmissionCosts);
 		return this.emissionCostMultiplicationFactor * coldEmissionCosts * relativeDensity;
 	}
-
 }

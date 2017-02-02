@@ -69,6 +69,10 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 
 		@Override
 	    public void reset(int iteration){
+			this.numberOfTrips = 0;
+			this.totalWaitingTime = 0.0;
+			this.personsTaxiCallTime = new HashMap<Id<Person>, Double>();
+			initializeZoneMaps();
 	    }
 	    
 	    @Override

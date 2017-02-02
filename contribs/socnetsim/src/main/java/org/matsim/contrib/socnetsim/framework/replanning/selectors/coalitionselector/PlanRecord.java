@@ -48,6 +48,10 @@ final class PlanRecord implements HasIndex {
 		return plan;
 	}
 
+	public boolean isPointed() {
+		return plan == agent.getPointedPlan();
+	}
+
 	public double getWeight() {
 		return weight;
 	}

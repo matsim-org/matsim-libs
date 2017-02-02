@@ -47,12 +47,30 @@ public class DigicoreVehicleCollator {
 	private final static Logger LOG = Logger.getLogger(DigicoreVehicleCollator.class);
 
 	/**
-	 * @param args
+	 * A class to collate multiple {@link DigicoreVehicle} XML-files into a 
+	 * single {@link DigicoreVehicles} container.
+	 * 
+	 * @param args the following arguments are required, and in the following 
+	 * 		  order:
+	 * 		<ol>
+	 * 			<li><code>inputFolder</code> containing the <code>xml/</code>
+	 * 				folder, which has the {@link DigicoreVehicle} files, as well 
+	 * 				as the <code>Vehicles/</code> folder, which contains the 
+	 * 				original GPS records for each individual vehicle.
+	 * 			<li><code>outputFile</code> to which the {@link DigicoreVehicles}
+	 * 				container will be written. This needs to have an <code>.xml</code>
+	 * 				or <code>.xml.gz</code> extension.
+	 * 			<li><code>CRS</code> the Coordinate Reference System (CRS) used
+	 * 				by/in the individual {@link DigicoreVehicle} files.
+	 * 			<li><code>descr</code> describing the container contents.
+	 * 		<ol> 
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(DigicoreVehicleCollator.class.toGenericString(), args);
 		
 		String inputFolder = args[0];
+		inputFolder += inputFolder.endsWith("/") ? "" : "/";
+		
 		String outputFile = args[1];
 		String CRS = args[2];
 		String descr = args[3];
@@ -68,10 +86,14 @@ public class DigicoreVehicleCollator {
 			}
 		}
 		
-		collate(inputFolder, outputFile, CRS, descr);
+		String xmlFolder = inputFolder + "xml/";
+		String vehiclesfolder = inputFolder + "Vehicles/";
+		
+		collate(xmlFolder, outputFile, CRS, descr);
 		
 		if(deleteOriginal){
-			FileUtils.delete(new File(inputFolder));
+			FileUtils.delete(new File(xmlFolder));
+			FileUtils.delete(new File(vehiclesfolder));
 		}
 		
 		Header.printFooter();

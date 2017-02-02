@@ -40,6 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
@@ -72,8 +73,8 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	}
 
 	public static void main(String[] args) {
-		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
-		String [] runCases = {"bau","ei","ci","eci"};
+		String outputDir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/";/*"./output/run2/";*/
+		String [] runCases = {"ExI"};
 		new UserBenefitsAndTotalWelfarePerUserGroup(outputDir, false).runAndWrite(runCases);
 	}
 

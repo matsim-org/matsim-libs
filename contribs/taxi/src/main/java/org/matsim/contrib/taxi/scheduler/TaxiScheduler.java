@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -67,6 +68,12 @@ public class TaxiScheduler
 
         router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility,
                 travelTime, params.AStarEuclideanOverdoFactor, fastRouterFactory);
+
+        if (TaxiConfigGroup.get(scenario.getConfig()).isChangeStartLinkToLastLinkInSchedule()) {
+            for (Vehicle veh : taxiData.getVehicles().values()) {
+                Vehicles.changeStartLinkToLastLinkInSchedule(veh);
+            }
+        }
 
         taxiData.clearRequestsAndResetSchedules();
 
@@ -283,7 +290,8 @@ public class TaxiScheduler
     /**
      * If diversion is enabled, this method must be called after scheduling in order to make sure
      * that no vehicle is moving aimlessly.
-     * <p></p>
+     * <p>
+     * </p>
      * The reason: the destination/goal had been removed before scheduling (e.g. by calling the
      * {@link #removeAwaitingRequestsFromAllSchedules()} method)
      */

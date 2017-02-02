@@ -204,10 +204,10 @@ public class Debugger3 {
 		net1.addNode(n1_9);
 		net1.addNode(n1_10);
 		Link l1_0 = fac1.createLink(Id.createLinkId("l1_0"), n1_0, n1_1);
-		Link l1_8 = fac1.createLink(Id.createLinkId("l1_8"), n1_1, n1_9);
+		Link l1_8 = fac1.createLink(Id.createLinkId("e1_8"), n1_1, n1_9);
 		Link l1_9 = fac1.createLink(Id.createLinkId("l1_9"), n1_9, n1_10);
 		Link l1_0r = fac1.createLink(Id.createLinkId("l1_0r"), n1_1, n1_0);
-		Link l1_8r = fac1.createLink(Id.createLinkId("l1_8r"), n1_9, n1_1);
+		Link l1_8r = fac1.createLink(Id.createLinkId("1_8r"), n1_9, n1_1);
 		Link l1_9r = fac1.createLink(Id.createLinkId("l1_9r"), n1_10, n1_9);
 		net1.addLink(l1_0);
 		net1.addLink(l1_8);

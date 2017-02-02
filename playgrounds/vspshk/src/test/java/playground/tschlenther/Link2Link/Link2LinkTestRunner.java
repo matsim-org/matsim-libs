@@ -18,7 +18,6 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -127,6 +126,7 @@ public class Link2LinkTestRunner {
 
 	private Map<Integer, int[]> runAndGetResults (RunSettings runSettings, TSAnalyzeLink2Link handler) {
 		Config config = defineConfig(runSettings);
+		config.qsim().setUsingFastCapacityUpdate(false);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		Controler controler = new Controler(scenario);
@@ -137,10 +137,6 @@ public class Link2LinkTestRunner {
 			controler.addOverridingModule(new SignalsModule());
 		}
 
-		if (config.controler().isLinkToLinkRoutingEnabled()) {
-			// add the module for link to link routing if enabled
-			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		}
 		new Link2LinkTestNetworkCreator(scenario, runSettings.isUseLanes(), runSettings.isUseSignals()).createNetwork();
 		this.createPersons(scenario);
 

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -103,7 +104,7 @@ public class RunCoord3D {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		/* Set the queue type. */
-		config.qsim().setLinkDynamics("PassingQ");
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		
 		/* Set input/output files and paths. */
 		config.plans().setInputFile(path + "population.xml.gz");

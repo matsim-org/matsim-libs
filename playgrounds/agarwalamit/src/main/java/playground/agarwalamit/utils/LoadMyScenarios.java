@@ -48,8 +48,7 @@ public final class LoadMyScenarios {
 		config.plans().setInputPersonAttributeFile(null);
 		config.vehicles().setVehiclesFile(null);
 		config.network().setInputFile(networkFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+        return ScenarioUtils.loadScenario(config);
 	}
 	
 	/**
@@ -90,8 +89,7 @@ public final class LoadMyScenarios {
 		config.addCoreModules();
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+        return ScenarioUtils.loadScenario(config);
 	}
 	
 	/**
@@ -106,8 +104,7 @@ public final class LoadMyScenarios {
 		config.plans().setInputFile(null);
 		config.plans().setInputPersonAttributeFile(null);
 		config.vehicles().setVehiclesFile(null);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+        return ScenarioUtils.loadScenario(config);
 	}
 	
 	
@@ -129,8 +126,7 @@ public final class LoadMyScenarios {
 		Config config = new Config();
 		config.addCoreModules();
 		config.network().setInputFile(networkFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+        return ScenarioUtils.loadScenario(config);
 	}
 	
 	/**
@@ -140,8 +136,7 @@ public final class LoadMyScenarios {
 		Config config = new Config();
 		config.addCoreModules();
 		config.plans().setInputFile(plansFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+        return ScenarioUtils.loadScenario(config);
 	}
 	
 	/**
@@ -155,8 +150,7 @@ public final class LoadMyScenarios {
 		config.plans().setInputFile(plansFile);
 		config.plans().setInputPersonAttributeFile(null);
 		config.network().setInputFile(null);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
+        return ScenarioUtils.loadScenario(config);
 	}
 	
 	/**

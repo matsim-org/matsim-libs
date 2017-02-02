@@ -44,9 +44,11 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
 import com.google.inject.Inject;
 import com.vividsolutions.jts.geom.Envelope;
@@ -69,6 +71,8 @@ public final class AccessibilityModule extends AbstractModule {
 	private boolean pushing2Geoserver;
 
 	private String crs;
+	
+	private String measuringPointsFile = null;
 
 	
 	/**
@@ -109,7 +113,8 @@ public final class AccessibilityModule extends AbstractModule {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
 				double cellSize_m = acg.getCellSizeCellBasedAccessibility();
 				if (cellSize_m <= 0) {
-					throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
+//					throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
+					LOG.error("Cell Size needs to be assigned a value greater than zero.");
 				}
 				crs = acg.getOutputCrs() ;
 				
@@ -127,6 +132,14 @@ public final class AccessibilityModule extends AbstractModule {
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
+				} else if(acg.getAreaOfAccessibilityComputation().equals(AreaOfAccesssibilityComputation.fromFile)){
+					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
+					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
+					Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+					new FacilitiesReaderMatsimV1(measuringPointsSc).readFile(measuringPointsFile);
+					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, activityType);
+					LOG.info("Using measuring points from file: " + measuringPointsFile);
 				} else {
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m) ;

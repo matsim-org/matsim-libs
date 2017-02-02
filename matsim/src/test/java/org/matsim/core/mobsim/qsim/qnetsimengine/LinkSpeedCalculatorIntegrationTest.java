@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -115,8 +116,6 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Fixture f = new Fixture();
 
 		final Scenario scenario = f.scenario ;
-		final Config config = scenario.getConfig() ;
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		Collection<AbstractModule> defaultsModules = new ArrayList<>() ;
 		defaultsModules.add( new ScenarioByInstanceModule( scenario ) ) ;
@@ -126,41 +125,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		AbstractModule overrides = new AbstractModule() {
 			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(5.0) ;
 			@Override public void install() {
-				bind(QNetworkFactory.class).toInstance( new QNetworkFactory(){
-					@Inject QSimConfigGroup qsimConfig ;
-					@Inject EventsManager events ;
-					@Inject Network network ;
-					private AgentCounter agentCounter;
-					private NetsimInternalInterface netsimEngine;
-					private MobsimTimer mobsimTimer;
-					private NetsimEngineContext context;
-					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine1) {
-						this.agentCounter = agentCounter1 ;
-						this.mobsimTimer = mobsimTimer1 ;
-						this.netsimEngine = netsimEngine1 ;
-
-						double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
-
-						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
-
-						this.context = new NetsimEngineContext( events, effectiveCellSize,
-								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
-						
-					}
-					@Override QNode createNetsimNode(Node node) {
-						QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
-						return builder.build( node ) ;
-					}
-					@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
-						QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
-						laneBuilder.setLinkSpeedCalculator(linkSpeedCalculator);
-
-						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
-						builder.setLaneFactory(laneBuilder);
-
-						return builder.build(link, queueNode) ;
+				bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
+					@Inject private EventsManager events ;
+					@Override public QNetworkFactory get() {
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
+						factory.setLinkSpeedCalculator(linkSpeedCalculator); 
+						return factory ;
 					}
 				} ) ;
 			}
@@ -209,40 +179,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 		AbstractModule overrides = new AbstractModule() {
 			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(20.0) ;
 			@Override public void install() {
-				bind(QNetworkFactory.class).toInstance( new QNetworkFactory(){
-					@Inject private QSimConfigGroup qsimConfig ;
+				bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
 					@Inject private EventsManager events ;
-					@Inject private Network network ;
-					private AgentCounter agentCounter;
-					private MobsimTimer mobsimTimer;
-					private NetsimInternalInterface netsimEngine;
-					private NetsimEngineContext context;
-					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine1) {
-						this.agentCounter = agentCounter1 ;
-						this.mobsimTimer = mobsimTimer1 ;
-						this.netsimEngine = netsimEngine1 ;
-
-						double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
-
-						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
-
-						this.context = new NetsimEngineContext( events, effectiveCellSize,
-								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
-					}
-					@Override QNode createNetsimNode(Node node) {
-						QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
-						return builder.build( node ) ;
-					}
-					@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
-						QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
-						laneBuilder.setLinkSpeedCalculator(linkSpeedCalculator);
-
-						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
-						builder.setLaneFactory(laneBuilder);
-
-						return builder.build(link, queueNode) ;
+					@Override public QNetworkFactory get() {
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
+						factory.setLinkSpeedCalculator(linkSpeedCalculator); 
+						return factory ;
 					}
 				} ) ;
 			}

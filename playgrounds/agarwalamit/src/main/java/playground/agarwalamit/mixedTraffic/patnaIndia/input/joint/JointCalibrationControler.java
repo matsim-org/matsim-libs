@@ -51,12 +51,12 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
 import playground.agarwalamit.analysis.StatsWriter;
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
@@ -109,7 +109,7 @@ public class JointCalibrationControler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData
-		if ( sc.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
+		if (!sc.getVehicles().getVehicles().isEmpty()) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
 				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
 		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 

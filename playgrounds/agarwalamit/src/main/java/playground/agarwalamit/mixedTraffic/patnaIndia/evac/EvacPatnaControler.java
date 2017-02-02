@@ -31,10 +31,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -68,7 +68,7 @@ public class EvacPatnaControler {
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(outDir);
 
-		config.qsim().setLinkDynamics(linkDynamics.name());
+		config.qsim().setLinkDynamics(linkDynamics);
 		config.qsim().setSeepModeStorageFree(isSeepModeStorageFree);
 		Collection<String> seepModes = Arrays.asList("bike");
 		config.qsim().setSeepModes(seepModes );

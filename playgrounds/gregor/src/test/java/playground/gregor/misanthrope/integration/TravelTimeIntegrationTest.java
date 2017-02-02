@@ -53,13 +53,15 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestCase;
 import playground.gregor.misanthrope.router.CTRoutingModule;
 import playground.gregor.misanthrope.simulation.CTMobsimFactory;
-import playground.gregor.misanthrope.simulation.physics.CTLink;
+import playground.gregor.misanthrope.simulation.physics.CTCell;
 import playground.gregor.utils.Variance;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
 
 /**
  * Created by laemmel on 15/10/15.
@@ -379,10 +381,10 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		double var2 = ttObserver2.ttVariance.getVar();
 
 
-		double cellHeight = 3. * CTLink.WIDTH / 4.;
-		double nrCells = (int) (80. / cellHeight);
+        double cellHeight = 3. * WIDTH / 4.;
+        double nrCells = (int) (80. / cellHeight);
 		double realLength = cellHeight * nrCells;
-		double expctdTT = realLength / 1.5 - 0.5;
+		double expctdTT = realLength / CTCell.V_0 - 0.5;
 		// yy I reduced the expctdTT by 0.5 since that seems to be closer to the outcome. Travis generates other results
 		// than my local laptop so there seems to be something non-deterministic and/or machine-dependent.  kai, sep'16
 		// I just set the number of threads to one.  Leads to a different result.  So possibly the multi-threading made
@@ -390,7 +392,7 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		
 		log.warn("expected travel time=" + expctdTT + "; avg travel time=" + tt2);
 
-		assertEquals("wrong avg travel time;", expctdTT, tt2, 1.0);
+        assertEquals("wrong avg travel time;", expctdTT, tt2, 2.0);
 
 	}
 

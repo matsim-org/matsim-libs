@@ -29,9 +29,11 @@ import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.router.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.replanning.ReplanningContext;
 
 public class SignalsModule extends AbstractModule {
@@ -45,6 +47,16 @@ public class SignalsModule extends AbstractModule {
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
             addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
             addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
+
+            if (getConfig().controler().isLinkToLinkRoutingEnabled()){
+                //use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
+                //michalm, jan'17
+                bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
+            }
+            
+            if (getConfig().qsim().isUsingFastCapacityUpdate()) {
+                throw new RuntimeException("Fast flow capacity update does not support signals");
+            }
         }
     }
 

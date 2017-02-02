@@ -29,9 +29,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.legMode.tripDistance.LegModeBeelineDistanceDistributionHandler;
-import playground.agarwalamit.analysis.legMode.tripDistance.LegModeRouteDistanceDistributionHandler;
-import playground.agarwalamit.analysis.legMode.tripDistance.TripDistanceType;
+import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceHandler;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceType;
 import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.PersonFilter;
@@ -67,14 +67,7 @@ public class ModeSwitchersTripDistance {
 		}
 	}
 
-	private final Comparator<Tuple<String, String>> comparator = new Comparator<Tuple<String, String>>() {
-		@Override
-		public int compare(Tuple<String, String> o1, Tuple<String, String> o2) {
-			return o1.toString().compareTo(o2.toString());
-		}
-	};
-
-	private final SortedMap<Tuple<String, String>, ModeSwitcherInfoCollector> modeSwitchType2InfoCollector = new TreeMap<>(comparator);
+	private final SortedMap<Tuple<String, String>, ModeSwitcherInfoCollector> modeSwitchType2InfoCollector = new TreeMap<>((o1, o2) -> o1.toString().compareTo(o2.toString()));
 
 	public static void main(String[] args) {
 		String dir = FileUtils.RUNS_SVN+"/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run9/";
@@ -82,20 +75,24 @@ public class ModeSwitchersTripDistance {
 
 		for(String runCase : runCases){
 			ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance();
-			mstd.processEventsFiles(dir+runCase, 1000, 1500);
+			Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(dir+runCase+"/output_network.xml.gz", dir+runCase+"/output_config.xml");
+			sc.getConfig().controler().setOutputDirectory(dir+runCase);
+			mstd.processEventsFiles(sc);
 			mstd.writeResults(dir+runCase+"/analysis/");
 		}
 	}
 
-	public void processEventsFiles (final String eventsDir, final int firstIteration, final int lastIteration){
+	public void processEventsFiles (final Scenario scenario){
 		// data from event files
-		String eventsFileFirstIt = eventsDir+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
-		String eventsFileLastIt = eventsDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+		String outputFilesDir = scenario.getConfig().controler().getOutputDirectory();
+		int firstIteration = scenario.getConfig().controler().getFirstIteration();
+		int lastIteration = scenario.getConfig().controler().getLastIteration();
 
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(eventsDir+"/output_network.xml.gz", eventsDir+"/output_config.xml");
+		String eventsFileFirstIt = outputFilesDir+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
+		String eventsFileLastIt = outputFilesDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsItFirst = getPerson2mode2TripDistances(eventsFileFirstIt,sc);
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsTtLast = getPerson2mode2TripDistances(eventsFileLastIt,sc);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsItFirst = getPerson2mode2TripDistances(eventsFileFirstIt,scenario);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsTtLast = getPerson2mode2TripDistances(eventsFileLastIt,scenario);
 
 		for(Id<Person> pId : person2ModeTravelDistsItFirst.keySet()){
 
@@ -176,7 +173,7 @@ public class ModeSwitchersTripDistance {
 
 		switch (this.tripDistanceType){
 			case ROUTE_DISTANCE:
-				LegModeRouteDistanceDistributionHandler distHandler = new LegModeRouteDistanceDistributionHandler(sc);
+				TripDistanceHandler distHandler = new TripDistanceHandler(sc);
 				events.addHandler(distHandler);
 				reader.readFile(eventsFile);
 				mode2Person2TripDists = distHandler.getMode2PersonId2TravelDistances();
@@ -194,7 +191,7 @@ public class ModeSwitchersTripDistance {
 	}
 
 	public void writeResults(final String outputFolder){
-		String outFile = outputFolder+"/modeSwitchersTripDistances_"+this.tripDistanceType+".txt";
+		String outFile = outputFolder+"modeSwitchersTripDistances_"+this.tripDistanceType+".txt";
 		BufferedWriter writer =  IOUtils.getBufferedWriter(outFile);
 		try {
 			writer.write("firstMode \t lastMode \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");

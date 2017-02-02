@@ -37,8 +37,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.StuckAgentsFilter;
-import playground.agarwalamit.analysis.legMode.tripDistance.LegModeRouteDistanceDistributionHandler;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -48,7 +48,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class WriteTotalTimeDistanceStats {
 
-	private LegModeRouteDistanceDistributionHandler distHandler;
+	private TripDistanceHandler distHandler;
 	private final String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 	private final String cases [] = {"baseCaseCtd", "ei","ci","eci"};
 	private final UserGroup ug = UserGroup.REV_COMMUTER;
@@ -82,7 +82,7 @@ public class WriteTotalTimeDistanceStats {
 					Map<Id<Person>, Double> personId2TravelDist = mode2Person2dist.get(mode);
 					double travelTime = getSumOfValuesInMap(personId2TravelTime);
 					double travelDist = getSumOfValuesInMap(personId2TravelDist);
-//					timeHandler.getTravelMode2NumberOfLegs().get(mode)
+//					timeHandler.getMode2NumberOfLegs().get(mode)
 					writer.write(str+"\t"+mode+"\t"+"NA"+"\t"+travelTime+"\t"+travelDist+"\n");
 				}
 				if(str.equals("baseCaseCtd")) stuckPersonsListBAU = getStuckPersonsList(eventsFile);
@@ -127,7 +127,7 @@ public class WriteTotalTimeDistanceStats {
 	}
 
 	private SortedMap<String,Map<Id<Person>, Double>> getRouteDistances(String eventsFile, Scenario scenario){
-		distHandler = new LegModeRouteDistanceDistributionHandler(scenario);
+		distHandler = new TripDistanceHandler(scenario);
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		events.addHandler(distHandler);

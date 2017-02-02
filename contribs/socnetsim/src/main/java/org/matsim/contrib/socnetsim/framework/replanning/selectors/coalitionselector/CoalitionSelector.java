@@ -20,11 +20,13 @@
 package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,6 +39,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.ScoreWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalculator;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * Selects a combination of plans without "blocking coalition",
@@ -45,6 +48,8 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalcula
  * @author thibautd
  */
 public class CoalitionSelector implements GroupLevelPlanSelector {
+	private static final Logger log = Logger.getLogger( CoalitionSelector.class );
+	
 	private final ConflictSolver conflictSolver;
 	private final WeightCalculator weight;
 
@@ -70,9 +75,10 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			final ReplanningGroup group) {
 		try {
 			final Map<Id, PointingAgent> agents = new LinkedHashMap<Id, PointingAgent>();
-			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan = new HashMap<JointPlan, Collection<PlanRecord>>();
+			final RecordsOfJointPlan recordsPerJointPlan = new RecordsOfJointPlan( jointPlans );
 
 			// create agents
+			log.trace( "initialize pointing agents" );
 			for ( Person person : group.getPersons() ) {
 				final PointingAgent agent =
 					new PointingAgent(
@@ -82,24 +88,34 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 				agents.put( person.getId() , agent );
 
 				for ( PlanRecord r : agent.getRecords() ) {
-					final JointPlan jp = jointPlans.getJointPlan( r.getPlan() );
-					if ( jp != null ) {
-						MapUtils.getCollection(
-								jp,
-								recordsPerJointPlan ).add( r );
-					}
+					recordsPerJointPlan.addRecord( r );
 				}
 			}
 
 			// iterate
+			log.trace( "start iterations" );
 			final GroupPlans groupPlans = new GroupPlans();
+			final Counter counter = new Counter( "do iteration # " );
+			int nextSize = 1;
+			final int maxSize = agents.size();
 			while ( !agents.isEmpty() ) {
+				if ( log.isTraceEnabled() ) {
+					counter.incCounter();
+					final int nAllocated = groupPlans.getAllIndividualPlans().size();
+					if ( nAllocated > nextSize ) {
+						log.trace( nAllocated+" / "+maxSize+" allocated plans" );
+						nextSize *= 2;
+					}
+				}
 				doIteration(
 						jointPlans,
 						agents,
 						recordsPerJointPlan,
 						groupPlans );
 			}
+			if ( log.isTraceEnabled() )
+				log.trace( "did "+counter.getCounter()+
+						" iterations ("+(((double) counter.getCounter()) / group.getPersons().size())+" per person)" );
 
 			return groupPlans;
 		}
@@ -111,73 +127,145 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 	private void doIteration(
 			final JointPlans jointPlans,
 			final Map<Id, PointingAgent> agents,
-			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan,
+			final RecordsOfJointPlan recordsPerJointPlan,
 			final GroupPlans groupPlans) {
-		// Agents all point their prefered feasible plan, feasible meaning that
-		// no co-traveler was already alocated a plan.
+		// Agents all point their preferred feasible plan, feasible meaning that
+		// no co-traveler was already allocated a plan.
 		// If all participants of a joint plan point it, it is selected, as they
 		// represent a blocking coalition for other allocations of the remaining
 		// plans.
-		for ( Map.Entry<Id, PointingAgent> entry : agents.entrySet() ) {
-			final PointingAgent agent = entry.getValue();
+		boolean didSomething = false;
+		for( Iterator<PointingAgent> agentIterator = agents.values().iterator();
+			 agentIterator.hasNext(); ) {
+			final PointingAgent agent = agentIterator.next();
+			if ( agent.isOff() ) {
+				agentIterator.remove();
+				continue;
+			}
 
 			final Plan pointedPlan = agent.getPointedPlan();
 			final JointPlan pointedJointPlan = jointPlans.getJointPlan( pointedPlan );
 
 			if ( pointedJointPlan == null ) {
+				// agent points its individual plan
 				groupPlans.addIndividualPlan( pointedPlan );
 
-				final Id id = entry.getKey();
-				markJointPlansAsInfeasible( id , agents , recordsPerJointPlan );
-				return;
+				final Id id = agent.getPointedPlan().getPerson().getId();
+				markJointPlansAsInfeasible( id , agents , recordsPerJointPlan , jointPlans );
+				agentIterator.remove();
+				didSomething = true;
 			}
-			else if ( areAllPlansPointed( recordsPerJointPlan.get( pointedJointPlan ) ) ) {
-
+			else if ( areAllPlansPointed( recordsPerJointPlan.getRecords( pointedJointPlan ) ) ) {
+				// found a dominating joint plan
 				groupPlans.addJointPlan( pointedJointPlan );
 
 				for ( Id id : pointedJointPlan.getIndividualPlans().keySet() ) {
-					markJointPlansAsInfeasible( id , agents , recordsPerJointPlan );
+					markJointPlansAsInfeasible( id , agents , recordsPerJointPlan , jointPlans );
 				}
-				return;
+				agentIterator.remove();
+				didSomething = true;
 			}
 		}
 
-		conflictSolver.attemptToSolveConflicts(
-				recordsPerJointPlan );
+		if ( !didSomething ) {
+			conflictSolver.attemptToSolveConflicts(
+					recordsPerJointPlan );
+		}
 	}
 
 	private static void markJointPlansAsInfeasible(
 			final Id id,
 			final Map<Id, PointingAgent> agents,
-			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan) {
-		final Iterator<Map.Entry<JointPlan, Collection<PlanRecord>>> it =
-			recordsPerJointPlan.entrySet().iterator();
-		while ( it.hasNext() ) {
-			final Map.Entry<JointPlan, Collection<PlanRecord>> jpEntry = it.next();
-			if ( !jpEntry.getKey().getIndividualPlans().containsKey( id ) ) continue;
+			final RecordsOfJointPlan recordsPerJointPlan,
+			final JointPlans jointPlans ) {
+		final PointingAgent agent = agents.get( id );
+		agent.switchOff();
 
-			for ( PlanRecord record : jpEntry.getValue() ) {
+		for ( PlanRecord plan : agent.getRecords() ) {
+			final JointPlan jointPlan = jointPlans.getJointPlan( plan.getPlan() );
+			if ( jointPlan == null ) continue;
+
+			// could already be handled
+			if ( !recordsPerJointPlan.contains( jointPlan ) ) continue;
+			for ( PlanRecord record : recordsPerJointPlan.remove( jointPlan ) ) {
 				record.setInfeasible();
 			}
-			it.remove();
 		}
-
-		agents.remove( id );
 	}
 
 	private static boolean areAllPlansPointed(
 			final Collection<PlanRecord> records) {
 		for ( PlanRecord record : records ) {
 			assert record.isFeasible();
-			if ( record.getAgent().getPointedPlan() != record.getPlan() ) {
+			if ( !record.isPointed() ) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public static interface ConflictSolver {
-		public void attemptToSolveConflicts( Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan );
+	public interface ConflictSolver {
+		void attemptToSolveConflicts( RecordsOfJointPlan recordsPerJointPlan );
+	}
+
+	public static class RecordsOfJointPlan {
+		private final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan = new HashMap<>();
+		private final Map<Plan, PlanRecord> recordsPerIndividualPlan = new HashMap<>();
+		private final JointPlans jointPlans;
+
+		private int maxJointPlanSize = 0;
+
+		public void addRecord( final PlanRecord r ) {
+			final JointPlan jp = jointPlans.getJointPlan( r.getPlan() );
+			if ( jp != null ) {
+				MapUtils.getCollection(
+						jp,
+						recordsPerJointPlan ).add( r );
+				maxJointPlanSize = Math.max( maxJointPlanSize , jp.getIndividualPlans().size() );
+			}
+			else {
+				recordsPerIndividualPlan.put( r.getPlan() , r );
+			}
+		}
+
+		public RecordsOfJointPlan( final JointPlans jointPlans ) {
+			this.jointPlans = jointPlans;
+		}
+
+		public Collection<PlanRecord> getRecords( final JointPlan jointPlan ) {
+			return recordsPerJointPlan.get( jointPlan );
+		}
+
+		public Collection<PlanRecord> getRecords( final Plan plan ) {
+			final JointPlan jp = jointPlans.getJointPlan( plan );
+			return jp != null ?
+					recordsPerJointPlan.get( jp ) :
+					Collections.singleton( recordsPerIndividualPlan.get( plan ) );
+		}
+
+		public boolean contains( final JointPlan jointPlan ) {
+			return recordsPerJointPlan.containsKey( jointPlan );
+		}
+
+		public Collection<PlanRecord> remove( final JointPlan jointPlan ) {
+			return recordsPerJointPlan.remove( jointPlan );
+		}
+
+		public Collection<PlanRecord> removeJointPlan( final Plan plan ) {
+			return recordsPerJointPlan.remove( jointPlans.getJointPlan( plan ) );
+		}
+
+		public Iterable<Map.Entry<JointPlan, Collection<PlanRecord>>> entrySet() {
+			return recordsPerJointPlan.entrySet();
+		}
+
+		public Iterable<Collection<PlanRecord>> values() {
+			return recordsPerJointPlan.values();
+		}
+
+		public int getMaxJointPlanSize() {
+			return maxJointPlanSize;
+		}
 	}
 }
 

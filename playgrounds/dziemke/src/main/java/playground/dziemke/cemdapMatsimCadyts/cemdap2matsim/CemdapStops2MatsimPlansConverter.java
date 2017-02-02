@@ -20,27 +20,22 @@
 
 package playground.dziemke.cemdapMatsimCadyts.cemdap2matsim;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.dziemke.utils.LogToOutputSaver;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dziemke
@@ -67,18 +62,29 @@ public class CemdapStops2MatsimPlansConverter {
 		int numberOfFirstCemdapOutputFile = 100;
 //		int numberOfFirstCemdapOutputFile = 90;
 
-		int numberOfPlans = 1;
+		int numberOfPlans = 5;
 		boolean allowVariousWorkAndEducationLocations = true;
 		boolean addStayHomePlan = true;
-		
+
 		int numberOfPlansFile = 100;
 //		int numberOfPlansFile = 35;
 
 //		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
 		String outputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/" + numberOfPlansFile + "/";
-		String zonalShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/gemeindenLOR_DHDN_GK4.shp";
+		String zonalShapeFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/gemeindenLOR_DHDN_GK4.shp";
 //		String cemdapDataRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
 		String cemdapDataRoot = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/cemdap_output/";
+
+		if (args.length != 0) {
+			numberOfFirstCemdapOutputFile = Integer.parseInt(args[0]);
+			numberOfPlans = Integer.parseInt(args[1]);
+			allowVariousWorkAndEducationLocations = Boolean.parseBoolean(args[2]);
+			addStayHomePlan = Boolean.parseBoolean(args[3]);
+
+			outputDirectory = args[4];
+			zonalShapeFile = args[5];
+			cemdapDataRoot = args[6];
+		}
 		
 		CemdapStops2MatsimPlansConverter converter = new CemdapStops2MatsimPlansConverter(zonalShapeFile, cemdapDataRoot);
 		
@@ -114,7 +120,7 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 	
 		// Create ObjectAttrubutes for each agent and each plan
-		Map<Integer, ObjectAttributes> personZoneAttributesMap = new HashMap<Integer, ObjectAttributes>();
+		Map<Integer, ObjectAttributes> personZoneAttributesMap = new HashMap<>();
 		for (int planNumber = 0; planNumber < numberOfPlans; planNumber++) {
 			ObjectAttributes personZoneAttributes = new ObjectAttributes();
 			personZoneAttributesMap.put(planNumber, personZoneAttributes);
@@ -123,7 +129,7 @@ public class CemdapStops2MatsimPlansConverter {
 		Map<Id<Person>, Coord> homeZones = new HashMap<>();
 		
 		// Write all (geographic) features of planning area to a map
-		Map<String,SimpleFeature> zones = new HashMap<String, SimpleFeature>();
+		Map<String,SimpleFeature> zones = new HashMap<>();
 		for (SimpleFeature feature: ShapeFileReader.getAllFeatures(zonalShapeFile)) {
 			String shapeId = Cemdap2MatsimUtils.removeLeadingZeroFromString((String) feature.getAttribute("NR"));
 			zones.put(shapeId,feature);
@@ -175,7 +181,7 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 				
 		// If applicable, add a stay-home plan for everybody
-		if (addStayHomePlan == true) {
+		if (addStayHomePlan) {
 			numberOfPlans++;
 			
 			for (Person person : population.getPersons().values()) {

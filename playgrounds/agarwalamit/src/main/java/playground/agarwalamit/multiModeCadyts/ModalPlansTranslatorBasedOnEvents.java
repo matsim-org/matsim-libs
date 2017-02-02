@@ -82,8 +82,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			return null;
 		}
 		this.plansFound++;
-		final cadyts.demand.Plan<ModalLink> planSteps = planStepFactory.getResult();
-		return planSteps;
+		return planStepFactory.getResult();
 	}
 
 	@Override

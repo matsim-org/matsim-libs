@@ -39,9 +39,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.accessibility.FacilityTypes;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -49,8 +47,11 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.households.Household;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -82,7 +83,11 @@ public class ERAfricaActivityLocationAdjuster {
 	private static List<Tuple<Double, Double>> tuplesWork = new ArrayList<>();
 	private static List<Tuple<Double, Double>> tuplesEducation = new ArrayList<>();
 	private static List<Tuple<Double, Double>> tuplesSecondary = new ArrayList<>();
-
+	
+	private static List<Integer> triesSingle = new ArrayList<>();
+	private static List<Integer> triesRing = new ArrayList<>();
+	private static List<Integer> triesEllipse = new ArrayList<>();
+ 
 	/**
 	 * @param args
 	 */
@@ -107,8 +112,8 @@ public class ERAfricaActivityLocationAdjuster {
 		ala.buildQuadTreeFromFacilities(osmFacilitiesFile, ctFacilitiesFile, ctInformalHousing);
 		ala.processHouseholds();
 		
-		writeTuples(populationFolder);
-		
+		writeTuples(finalPopulationFolder);
+		writeTries(finalPopulationFolder);
 		writeUpdatedScenario(sc, finalPopulationFolder);
 
 		Header.printFooter();
@@ -143,6 +148,35 @@ public class ERAfricaActivityLocationAdjuster {
 	}
 	
 	
+	private static void writeTries(String folder){
+		BufferedWriter bw = IOUtils.getBufferedWriter(folder + "tries.csv");
+		try{
+			bw.write("type,tries");
+			bw.newLine();
+			
+			for(Integer i : triesSingle){
+				bw.write(String.format("single,%d\n", i));
+			}
+			for(Integer i : triesRing){
+				bw.write(String.format("ring,%d\n", i));
+			}
+			for(Integer i : triesEllipse){
+				bw.write(String.format("ellipse,%d\n", i));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write tries to file.");
+		}finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close tries file.");
+			}
+		}
+	}
+	
+	
 	private static void writeUpdatedScenario(Scenario sc, String folder){
 		folder += folder.endsWith("/") ? "" : "/";
 		
@@ -153,6 +187,29 @@ public class ERAfricaActivityLocationAdjuster {
 		
 		/* Updated activity locations of population. */
 		new PopulationWriter(sc.getPopulation()).writeV5(folder + "persons.xml.gz");
+		
+		/* Write all the (used) facilities. */
+		ActivityFacilities afs = FacilitiesUtils.createActivityFacilities();
+		for(Person person : sc.getPopulation().getPersons().values()){
+			for(Plan plan : person.getPlans()){
+				for(PlanElement pe : plan.getPlanElements()){
+					if(pe instanceof Activity){
+						Activity activity = (Activity)pe;
+						
+						Id<ActivityFacility> fid = activity.getFacilityId();
+						if(!afs.getFacilities().containsKey(fid)){
+							afs.addActivityFacility(sc.getActivityFacilities().getFacilities().get(fid)); 
+						}
+					}
+				}
+			}
+		}
+		LOG.info("Total number of facilities used: " + afs.getFacilities().size());
+		new FacilitiesWriter(afs).write(folder + "facilities_used.xml.gz");
+		
+		/* Write all the facilities. */
+		LOG.info("Total number of facilities: " + sc.getActivityFacilities().getFacilities().size());
+		new FacilitiesWriter(sc.getActivityFacilities()).write(folder + "facilities_all.xml.gz");
 	}
 	
 	
@@ -214,7 +271,7 @@ public class ERAfricaActivityLocationAdjuster {
 
 	public void buildQuadTreeFromFacilities(String osmFile, String ctLanduseFile, String ctInformalFile){
 		LOG.info("Building the necessary QuadTree objects...");
-		Scenario thisSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		Scenario thisSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		/* Determine the extent of the QuadTree. */
 		double xMin = Double.POSITIVE_INFINITY;
@@ -222,10 +279,10 @@ public class ERAfricaActivityLocationAdjuster {
 		double yMin = Double.POSITIVE_INFINITY;
 		double yMax = Double.NEGATIVE_INFINITY;
 
-		new FacilitiesReaderMatsimV1(thisSc).readFile(osmFile);
-		new FacilitiesReaderMatsimV1(thisSc).readFile(ctLanduseFile);
-		new FacilitiesReaderMatsimV1(thisSc).readFile(ctInformalFile);
-		for(ActivityFacility facility : thisSc.getActivityFacilities().getFacilities().values()){
+		new FacilitiesReaderMatsimV1(sc).readFile(osmFile);
+		new FacilitiesReaderMatsimV1(sc).readFile(ctLanduseFile);
+		new FacilitiesReaderMatsimV1(sc).readFile(ctInformalFile);
+		for(ActivityFacility facility : sc.getActivityFacilities().getFacilities().values()){
 			Coord c = facility.getCoord();
 			xMin = Math.min(xMin, c.getX());
 			xMax = Math.max(xMax, c.getX());
@@ -237,8 +294,8 @@ public class ERAfricaActivityLocationAdjuster {
 		LOG.info("  ... home...");
 		qtHomeFormal = new QuadTree<>(xMin, yMin, xMax, yMax);
 		qtHomeInformal = new QuadTree<>(xMin, yMin, xMax, yMax);
-		for(Id<ActivityFacility> fId : thisSc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.HOME).keySet()){
-			ActivityFacility facility = thisSc.getActivityFacilities().getFacilities().get(fId);
+		for(Id<ActivityFacility> fId : sc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.HOME).keySet()){
+			ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(fId);
 			if(fId.toString().startsWith("gdb")){
 				qtHomeFormal.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 			} else if(fId.toString().startsWith("inf")){
@@ -249,52 +306,52 @@ public class ERAfricaActivityLocationAdjuster {
 		/* Education. */
 		LOG.info("  ... education...");
 		qtEducation = new QuadTree<>(xMin, yMin, xMax, yMax);
-		for(Id<ActivityFacility> fId : thisSc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.EDUCATION).keySet()){
-			ActivityFacility facility = thisSc.getActivityFacilities().getFacilities().get(fId);
+		for(Id<ActivityFacility> fId : sc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.EDUCATION).keySet()){
+			ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(fId);
 			qtEducation.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 		}
 		
 		/* Work. */
 		LOG.info("  ... work...");
 		qtWork = new QuadTree<>(xMin, yMin, xMax, yMax);
-		for(Id<ActivityFacility> fId : thisSc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.WORK).keySet()){
-			ActivityFacility facility = thisSc.getActivityFacilities().getFacilities().get(fId);
+		for(Id<ActivityFacility> fId : sc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.WORK).keySet()){
+			ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(fId);
 			qtWork.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 		}
 		
 		/* Shopping. */
 		LOG.info("  ... shopping...");
 		qtShopping = new QuadTree<>(xMin, yMin, xMax, yMax);
-		for(Id<ActivityFacility> fId : thisSc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.SHOPPING).keySet()){
-			ActivityFacility facility = thisSc.getActivityFacilities().getFacilities().get(fId);
+		for(Id<ActivityFacility> fId : sc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.SHOPPING).keySet()){
+			ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(fId);
 			qtShopping.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 		}
 		
 		/* Leisure. */
 		LOG.info("  ... leisure...");
 		qtLeisure = new QuadTree<>(xMin, yMin, xMax, yMax);
-		for(Id<ActivityFacility> fId : thisSc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.LEISURE).keySet()){
-			ActivityFacility facility = thisSc.getActivityFacilities().getFacilities().get(fId);
+		for(Id<ActivityFacility> fId : sc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.LEISURE).keySet()){
+			ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(fId);
 			qtLeisure.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 		}
 		
 		/* Medical. */
 		LOG.info("  ... medical...");
 		qtMedical = new QuadTree<>(xMin, yMin, xMax, yMax);
-		for(Id<ActivityFacility> fId : thisSc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.MEDICAL).keySet()){
-			ActivityFacility facility = thisSc.getActivityFacilities().getFacilities().get(fId);
+		for(Id<ActivityFacility> fId : sc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.MEDICAL).keySet()){
+			ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(fId);
 			qtMedical.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 		}
-		for(Id<ActivityFacility> fId : thisSc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.HOSPITAL).keySet()){
-			ActivityFacility facility = thisSc.getActivityFacilities().getFacilities().get(fId);
+		for(Id<ActivityFacility> fId : sc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.HOSPITAL).keySet()){
+			ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(fId);
 			qtMedical.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 		}
 		
 		/* Other. */
 		LOG.info("  ... other...");
 		qtOther = new QuadTree<>(xMin, yMin, xMax, yMax);
-		for(Id<ActivityFacility> fId : thisSc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.OTHER).keySet()){
-			ActivityFacility facility = thisSc.getActivityFacilities().getFacilities().get(fId);
+		for(Id<ActivityFacility> fId : sc.getActivityFacilities().getFacilitiesForActivityType(FacilityTypes.OTHER).keySet()){
+			ActivityFacility facility = sc.getActivityFacilities().getFacilities().get(fId);
 			qtOther.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 		}
 		LOG.info("Done building QuadTree objects.");
@@ -319,12 +376,12 @@ public class ERAfricaActivityLocationAdjuster {
 			String mainDwelling = sc.getHouseholds().getHouseholdAttributes().getAttribute(hh.getId().toString(), "mainDwellingType").toString();
 			ActivityFacility homeFacility = null;
 			if(mainDwelling.equalsIgnoreCase("Informal")){
-				homeFacility = sampleSingleActivityFacility(qtHomeInformal, censusCoord);
+				homeFacility = sampleSingleActivityFacility(qtHomeInformal, censusCoord, "homeFormal");
 				
-				/* Informal housing units are removed one selected. */
-				qtHomeInformal.remove(homeFacility.getCoord().getX(), homeFacility.getCoord().getY(), homeFacility);
+				/* Informal housing units are removed once selected. */
+//				qtHomeInformal.remove(homeFacility.getCoord().getX(), homeFacility.getCoord().getY(), homeFacility);
 			} else{
-				homeFacility = sampleSingleActivityFacility(qtHomeFormal, censusCoord);
+				homeFacility = sampleSingleActivityFacility(qtHomeFormal, censusCoord, "homeInformal");
 				
 				/* Remove single houses with capacity of 1. */
 				if(homeFacility.getActivityOptions().get(FacilityTypes.HOME).getCapacity() == 1.0){
@@ -346,12 +403,13 @@ public class ERAfricaActivityLocationAdjuster {
 		LOG.info("Done handling households.");
 	}
 	
-	public ActivityFacility sampleSingleActivityFacility(QuadTree<ActivityFacility> qt, Coord c){
+	public ActivityFacility sampleSingleActivityFacility(QuadTree<ActivityFacility> qt, Coord c, String type){
 		ActivityFacility facility = null;
 		double radius = 1000.0;
 		Collection<ActivityFacility> col = qt.getDisk(c.getX(), c.getY(), radius);
 		int tries = 1;
-		while(col.size() == 0 && tries <= 10){
+		while(col.size() == 0 && tries <= 100){
+//		while(col.size() == 0){
 			radius *= 2.0;
 			col = qt.getDisk(c.getX(), c.getY(), radius);
 			tries++;
@@ -361,20 +419,26 @@ public class ERAfricaActivityLocationAdjuster {
 		if(list.size() > 0){
 			facility = list.get(MatsimRandom.getLocalInstance().nextInt(list.size()));
 		} else{
-			LOG.error("Could not sample a facility.");
+			LOG.error("Could not sample a facility for activity type '" + type + "'.");
+			LOG.error("Facilities in QuadTree: " + qt.size());
+			LOG.warn("Getting the closest facility.");
+			facility = qt.getClosest(c.getX(), c.getY());
 		}
+		triesSingle.add(tries);
 		return facility;
 	}
 	
 	
-	public ActivityFacility sampleActivityFacilityInRing(QuadTree<ActivityFacility> qt, Coord c, double radius){
+	public ActivityFacility sampleActivityFacilityInRing(
+			QuadTree<ActivityFacility> qt, Coord c, double radius, String type){
 		ActivityFacility facility = null;
 		double factor = 0.1;
 		double lower = radius/(1.0 + factor);
 		double upper = radius*(1.0 + factor);
 		Collection<ActivityFacility> col = qt.getRing(c.getX(), c.getY(), lower, upper);
 		int tries = 1;
-		while(col.size() == 0 && tries <= 10){
+		while(col.size() == 0 && tries <= 100){
+//		while(col.size() == 0){
 			factor *= 2.0;
 			lower = radius/(1.0 + factor);
 			upper = radius*(1.0 + factor);
@@ -387,19 +451,24 @@ public class ERAfricaActivityLocationAdjuster {
 		if(list.size() > 0){
 			facility = list.get(MatsimRandom.getLocalInstance().nextInt(list.size()));
 		} else{
-			LOG.error("Could not sample a facility.");
+			LOG.error("Could not sample a facility for activity type '" + type + "'.");
+			LOG.error("Facilities in QuadTree: " + qt.size());
+			LOG.warn("Getting the closest facility.");
+			facility = qt.getClosest(c.getX(), c.getY());
 		}
+		triesRing.add(tries);
 		return facility;
 	}
 	
-	public ActivityFacility sampleActivityFacilityBetweenPrimaries(QuadTree<ActivityFacility> qt, Coord c1, Coord c2, double dist){
+	public ActivityFacility sampleActivityFacilityBetweenPrimaries(
+			QuadTree<ActivityFacility> qt, Coord c1, Coord c2, double dist, String type){
 		ActivityFacility facility = null;
 		double primaryDistance = CoordUtils.calcEuclideanDistance(c1, c2);
 		
 		if(primaryDistance == 0.0){
 			/* It is an activity from a single point. Sample it from a ring
 			 * instead. */
-			facility = sampleActivityFacilityInRing(qt, c1, dist);
+			facility = sampleActivityFacilityInRing(qt, c1, dist, type);
 			return facility;
 		}
 		
@@ -409,7 +478,8 @@ public class ERAfricaActivityLocationAdjuster {
 		double distance = primaryDistance * (1.0 + factor);
 		Collection<ActivityFacility> col = qt.getElliptical(c1.getX(), c1.getY(), c2.getX(), c2.getY(), distance);
 		int tries = 1;
-		while(col.size() == 0 && tries <= 10){
+		while(col.size() == 0 && tries <= 100){
+//		while(col.size() == 0){
 			factor *= 2.0;
 			distance = primaryDistance * (1.0 + factor);
 			col = qt.getElliptical(c1.getX(), c1.getY(), c2.getX(), c2.getY(), distance);
@@ -421,8 +491,12 @@ public class ERAfricaActivityLocationAdjuster {
 		if(list.size() > 0){
 			facility = list.get(MatsimRandom.getLocalInstance().nextInt(list.size()));
 		} else{
-			LOG.error("Could not sample a facility.");
+			LOG.error("Could not sample a facility for activity type '" + type + "'.");
+			LOG.error("Facilities in QuadTree: " + qt.size());
+			LOG.warn("Getting the closest facility to c1.");
+			facility = qt.getClosest(c1.getX(), c1.getY());
 		}
+		triesEllipse.add(tries);
 		return facility;
 	}
 	
@@ -454,7 +528,7 @@ public class ERAfricaActivityLocationAdjuster {
 				double distanceFromHome = CoordUtils.calcEuclideanDistance(
 						oldHome, 
 						activity.getCoord());
-				ActivityFacility af = sampleActivityFacilityInRing(qtWork, home.getCoord(), distanceFromHome);
+				ActivityFacility af = sampleActivityFacilityInRing(qtWork, home.getCoord(), distanceFromHome, "w");
 				activity.setCoord(af.getCoord());
 				activity.setFacilityId(af.getId());
 				double newDistanceFromHome = CoordUtils.calcEuclideanDistance(home.getCoord(), af.getCoord());
@@ -471,7 +545,7 @@ public class ERAfricaActivityLocationAdjuster {
 				double distanceFromHome = CoordUtils.calcEuclideanDistance(
 						oldHome, 
 						activity.getCoord());
-				ActivityFacility af = sampleActivityFacilityInRing(qtEducation, home.getCoord(), distanceFromHome);
+				ActivityFacility af = sampleActivityFacilityInRing(qtEducation, home.getCoord(), distanceFromHome, "e");
 				activity.setCoord(af.getCoord());
 				activity.setFacilityId(af.getId());
 				double newDistanceFromHome = CoordUtils.calcEuclideanDistance(home.getCoord(), af.getCoord());
@@ -504,7 +578,7 @@ public class ERAfricaActivityLocationAdjuster {
 										oldHome, 
 										a.getCoord());
 								ActivityFacility af = sampleActivityFacilityBetweenPrimaries(
-										qt, firstPrimary.getCoord(), secondPrimary.getCoord(), distanceFromHome);
+										qt, firstPrimary.getCoord(), secondPrimary.getCoord(), distanceFromHome, a.getType());
 								a.setCoord(af.getCoord());
 								a.setFacilityId(af.getId());
 								double newDistanceFromHome = CoordUtils.calcEuclideanDistance(home.getCoord(), af.getCoord());
@@ -528,7 +602,7 @@ public class ERAfricaActivityLocationAdjuster {
 						double distanceFromHome = CoordUtils.calcEuclideanDistance(
 								oldHome, 
 								act.getCoord());
-						ActivityFacility af = sampleActivityFacilityInRing(qt, home.getCoord(), distanceFromHome);
+						ActivityFacility af = sampleActivityFacilityInRing(qt, home.getCoord(), distanceFromHome, act.getType());
 						act.setCoord(af.getCoord());
 						act.setFacilityId(af.getId());
 						double newDistanceFromHome = CoordUtils.calcEuclideanDistance(home.getCoord(), af.getCoord());
@@ -547,7 +621,7 @@ public class ERAfricaActivityLocationAdjuster {
 			double distanceFromHome = CoordUtils.calcEuclideanDistance(
 					oldHome, 
 					act.getCoord());
-			ActivityFacility af = sampleActivityFacilityInRing(qt, firstPrimary.getCoord(), distanceFromHome);
+			ActivityFacility af = sampleActivityFacilityInRing(qt, firstPrimary.getCoord(), distanceFromHome, act.getType());
 			act.setCoord(af.getCoord());
 			act.setFacilityId(af.getId());
 			double newDistanceFromPrimary = CoordUtils.calcEuclideanDistance(firstPrimary.getCoord(), af.getCoord());
@@ -569,8 +643,6 @@ public class ERAfricaActivityLocationAdjuster {
 	}
 	
 	
-	
-	
 	private List<Activity> getActivityType(Plan plan, String typePrefix){
 		List<Activity> list = new ArrayList<>();
 		Iterator<PlanElement> iterator = plan.getPlanElements().iterator();
@@ -586,6 +658,7 @@ public class ERAfricaActivityLocationAdjuster {
 
 		return list;
 	}
+	
 	
 	private boolean hasActivityType(Plan plan, String typePrefix){
 		boolean hasActivity = false;

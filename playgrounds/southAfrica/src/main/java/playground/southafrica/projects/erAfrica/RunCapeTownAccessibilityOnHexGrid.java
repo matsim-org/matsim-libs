@@ -23,7 +23,9 @@
  */
 package playground.southafrica.projects.erAfrica;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -31,12 +33,19 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
+import org.matsim.contrib.accessibility.AccessibilityModule;
+import org.matsim.contrib.accessibility.FacilityTypes;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -59,33 +68,54 @@ public class RunCapeTownAccessibilityOnHexGrid {
 	public static void main(String[] args) {
 		Header.printHeader(RunCapeTownAccessibilityOnHexGrid.class.toString(), args);
 		String shapefile = args[0];
-		String facilitiesFile = args[1];
-		String activityType = args[2];
+		String baseFolder = args[1];
+		baseFolder += baseFolder.endsWith("/") ? "" : "/";
+
+		final ActivityFacilitiesImpl points = getHexGridFacilities(shapefile);
+		new FacilitiesWriter(points).write(baseFolder + "measuringPoints.xml.gz");
 		
-		ActivityFacilitiesImpl facilities = getHexGridFacilities(shapefile, activityType);
+		final List<String> activityTypes = Arrays.asList(new String[]{						
+				FacilityTypes.EDUCATION,
+				FacilityTypes.LEISURE,
+				FacilityTypes.MEDICAL,
+				FacilityTypes.SHOPPING,
+				FacilityTypes.WORK }) ; 
+		LOG.info("Using activity types: " + activityTypes.toString());
+
+		Config config = CapeTownConfig.getConfig(baseFolder);
+		Scenario sc = ScenarioUtils.loadScenario(config);
+
+		final Controler controler = new Controler(sc);
+		for(String activityType : activityTypes){
+			AccessibilityModule module = new AccessibilityModule();
+			module.setConsideredActivityType(activityType);
+			module.setPushing2Geoserver(false);
+			module.addAdditionalFacilityData(points);
+			controler.addOverridingModule(module);
+		}
 		
-		//FIXME
-		Scenario sc = null;
-		
-		AccessibilityCalculator ac = new AccessibilityCalculator(sc, facilities);
-		run(ac);
-		
+		controler.run();
+
 		Header.printFooter();
 	}
-	
+
+
+
+
 	public static void run(AccessibilityCalculator ac){
-		
+
 	}
-	
-	
-	
-	public static ActivityFacilitiesImpl getHexGridFacilities(String shapefile, String activityType){
+
+
+
+	public static ActivityFacilitiesImpl getHexGridFacilities(String shapefile){
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
-		
+		facilities.setName("HexGridCentroids");
+
 		ShapeFileReader sfr = new ShapeFileReader();
 		sfr.readFileAndInitialize(shapefile);
 		Collection<SimpleFeature> features = sfr.getFeatureSet();
-		
+
 		if(features.size() > 1){
 			LOG.warn("More than one SimpleFeature... don't know the impact.");
 		}
@@ -99,16 +129,16 @@ public class RunCapeTownAccessibilityOnHexGrid {
 
 		GeneralGrid grid = new GeneralGrid(2000.0, GridType.HEX);
 		grid.generateGrid(mp);
-		
+
 		int idCounter = 0;
 		for(Point p : grid.getGrid().values()){
 			Id<ActivityFacility> id = Id.create(idCounter++, ActivityFacility.class); 
 			Coord c = CoordUtils.createCoord(p.getX(), p.getY());
 			ActivityFacility facility = facilities.getFactory().createActivityFacility(id, c);
-			facility.addActivityOption(facilities.getFactory().createActivityOption(activityType));
+			facility.addActivityOption(facilities.getFactory().createActivityOption("h"));
 			facilities.addActivityFacility(facility);
 		}
-		
+
 		return (ActivityFacilitiesImpl) facilities;
 	}
 

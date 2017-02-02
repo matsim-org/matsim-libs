@@ -29,12 +29,14 @@ import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.controler.SignalsControllerListener;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.router.NetworkWithSignalsTurnInfoBuilder;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Provides;
@@ -77,6 +79,16 @@ public class SylviaSignalsModule extends AbstractModule {
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
             addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
             addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
+            
+            if (getConfig().controler().isLinkToLinkRoutingEnabled()){
+                //use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
+                //michalm, jan'17
+                bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
+            }
+            
+            if (getConfig().qsim().isUsingFastCapacityUpdate()) {
+                throw new RuntimeException("Fast flow capacity update does not support signals");
+            }
         }
 	}
 	

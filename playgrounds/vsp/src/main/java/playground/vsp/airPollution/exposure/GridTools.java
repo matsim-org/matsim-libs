@@ -27,15 +27,15 @@ import org.matsim.api.core.v01.network.Link;
 
 public class GridTools {
 
-	private Map<Id<Link>, ? extends Link> links;
-	private Double xMin;
-	private Double xMax;
-	private Double yMin;
-	private Double yMax;
-	private final Integer noOfXCells;
-	private final Integer noOfYCells;
-	private Map<Id<Link>, Integer> link2ybin;
-	private Map<Id<Link>, Integer> link2xbin;
+	private final Map<Id<Link>, ? extends Link> links;
+	private final  Double xMin;
+	private final  Double xMax;
+	private final  Double yMin;
+	private final  Double yMax;
+	private final  Integer noOfXCells;
+	private final  Integer noOfYCells;
+	private final Map<Id<Link>, Integer> link2ybin = new HashMap<>();
+	private final Map<Id<Link>, Integer> link2xbin = new HashMap<>();
 
 	public GridTools(Map<Id<Link>, ? extends Link> links, Double xMin, Double xMax,
 			Double yMin, Double yMax, Integer noOfXCells, Integer noOfYCells) {
@@ -52,27 +52,24 @@ public class GridTools {
 
 	// TODO maybe store x and y values only if in area of interest now x might be null but y not
 	private void mapLinks2Xcells() {
-		this.link2xbin = new HashMap<>();
 		for(Id<Link> linkId: this.links.keySet()){
-			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells));
+			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX()));
 		}
 	}
 
 	private void mapLinks2Ycells() {
-		this.link2ybin = new HashMap<Id<Link>, Integer>();
 		for(Id<Link> linkId: this.links.keySet()){
-			link2ybin.put(linkId, mapYCoordToBin(this.links.get(linkId).getCoord().getY(), noOfYCells));
+			link2ybin.put(linkId, mapYCoordToBin(this.links.get(linkId).getCoord().getY()));
 		}
 	}
 	
-	private Integer mapXCoordToBin(double xCoord, Integer noOfXCells) {
-
+	private Integer mapXCoordToBin(double xCoord) {
 		if (xCoord <= xMin  || xCoord >= xMax) return null; // xCorrd is not in area of interest
 		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXCells); // gives the relative position along the x-range
 		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
 	
-	private Integer mapYCoordToBin(double yCoord, Integer noOfYCells) {
+	private Integer mapYCoordToBin(double yCoord) {
 
 		if (yCoord <= yMin  || yCoord >= yMax) return null; // xCorrd is not in area of interest
 		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * noOfYCells); // gives the relative position along the x-range

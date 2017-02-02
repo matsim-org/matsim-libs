@@ -171,10 +171,14 @@ public class QVehicle extends QItem implements MobsimVehicle {
 		return this.id;
 	}
 
-	@Override
-	public double getSizeInEquivalents() {
-		return vehicle.getType().getPcuEquivalents();
-	}
+    @Override
+    public double getSizeInEquivalents() {
+        return vehicle.getType().getPcuEquivalents();
+    }
+
+    public double getFlowCapacityConsumptionInEquivalents() {
+        return vehicle.getType().getPcuEquivalents() / vehicle.getType().getFlowEfficiencyFactor();
+    }
 
 	@Override
 	public Vehicle getVehicle() {

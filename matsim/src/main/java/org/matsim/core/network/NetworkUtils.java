@@ -362,12 +362,9 @@ public class NetworkUtils {
     // which returns either the nearest 'left' or 'right' entry link, based on a global
     // config param.
     public static Link getNearestRightEntryLink(Network network, final Coord coord) {
-        if (!(network instanceof Network)) {
-            throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
-        }
         Link nearestRightLink = null;
         Link nearestOverallLink = null;
-        Node nearestNode = NetworkUtils.getNearestNode(((Network) network),coord);
+        Node nearestNode = NetworkUtils.getNearestNode((network),coord);
 
         double[] coordVector = new double[2];
         coordVector[0] = nearestNode.getCoord().getX() - coord.getX();
@@ -379,8 +376,7 @@ public class NetworkUtils {
         List<Link> incidentLinks = new ArrayList<>(nearestNode.getInLinks().values());
         incidentLinks.addAll(nearestNode.getOutLinks().values());
         for (Link link : incidentLinks) {
-            Link r = ((Link) link);
-		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
+		double dist = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
             if (dist <= shortestRightDistance) {
                 // Generate a vector representing the link
                 double[] linkVector = new double[2];
@@ -436,11 +432,8 @@ public class NetworkUtils {
      * @return the link found closest to coord
      */
     public static Link getNearestLink(Network network, final Coord coord) {
-        if (!(network instanceof Network)) {
-            throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
-        }
         Link nearestLink = null;
-        Node nearestNode = NetworkUtils.getNearestNode(((Network) network),coord);
+        Node nearestNode = NetworkUtils.getNearestNode((network),coord);
         if ( nearestNode == null ) {
             log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + network) ;
             return null ;
@@ -457,8 +450,7 @@ public class NetworkUtils {
         // (For Great Britain it would be the "left" side. Could be a global config param...)
         double shortestDistance = Double.MAX_VALUE;
         for (Link link : getIncidentLinks(nearestNode).values()) {
-            Link r = ((Link) link);
-		double dist = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord);
+		double dist = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
             if (dist < shortestDistance) {
                 shortestDistance = dist;
                 nearestLink = link;
@@ -583,6 +575,7 @@ public class NetworkUtils {
 	}
 
 
+	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
 	public static void setOrigId( final Node node, final String id ) {
 		if ( node instanceof NodeImpl ) {
 			((NodeImpl)node).setOrigId( id ) ;
@@ -592,6 +585,7 @@ public class NetworkUtils {
 	}
 
 
+	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
 	public static void setType(Node node, final String type) {
 		if ( node instanceof NodeImpl ) {
 			((NodeImpl)node).setType( type ) ;
@@ -600,7 +594,7 @@ public class NetworkUtils {
 		}
 	}
 
-
+	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
 	public static String getOrigId( Node node ) {
 		if ( node instanceof NodeImpl ) {
 			return ((NodeImpl) node).getOrigId() ;
@@ -610,6 +604,7 @@ public class NetworkUtils {
 	}
 
 
+	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
 	public static String getType( Node node ) {
 		if ( node instanceof NodeImpl ) {
 			return ((NodeImpl) node).getType() ;
@@ -626,22 +621,27 @@ public class NetworkUtils {
 		return link.getLength() / link.getFreespeed(time) ;
 	}
 
-
+	static final String TYPE="type" ;
+	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
 	public static void setType( Link link , String type ) {
-		if ( link instanceof LinkImpl ) {
-			((LinkImpl)link).setType2( type ) ;
-		} else {
-			throw new RuntimeException("wrong implementation of interface Link to do this") ;
+//		if ( link instanceof LinkImpl ) {
+//			((LinkImpl)link).setType2( type ) ;
+//		} else {
+//			throw new RuntimeException("wrong implementation of interface Link to do this") ;
+//		}
+		if ( type != null ) {
+			link.getAttributes().putAttribute(TYPE, type) ;
 		}
 	}
 
-
+	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
 	public static String getType(Link link) {
-		if ( link instanceof LinkImpl ) {
-			return ((LinkImpl)link).getType2() ;	
-		} else {
-			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
-		}
+//		if ( link instanceof LinkImpl ) {
+//			return ((LinkImpl)link).getType2() ;	
+//		} else {
+//			throw new RuntimeException( "getType not possible for this implementation of interface Link" ) ;
+//		}
+		return (String) link.getAttributes().getAttribute(TYPE);
 	}
 
 

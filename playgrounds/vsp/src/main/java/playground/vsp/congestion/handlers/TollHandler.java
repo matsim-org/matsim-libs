@@ -64,10 +64,17 @@ public class TollHandler implements CongestionEventHandler, LinkEnterEventHandle
 	private boolean setMethodsExecuted = false;
 	
 	private double vtts_car;
+	private double congestionTollFactor;
 		
-	public TollHandler(Scenario scenario) {
+	public TollHandler(Scenario scenario, double congestionTollFactor) {
 		this.vtts_car = (scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.congestionTollFactor = congestionTollFactor;
 		log.info("VTTS_car: " + vtts_car);
+		log.info("Congestion toll factor: " + congestionTollFactor);
+	}
+	
+	public TollHandler(Scenario scenario) {
+		this(scenario, 1.0);
 	}
 
 	@Override
@@ -289,12 +296,12 @@ public class TollHandler implements CongestionEventHandler, LinkEnterEventHandle
 						if (timeBin2tollSum.get(time) != null) {
 							// toll sum was calculated before for this time bin
 							double sum = timeBin2tollSum.get(time);
-							double amount = event.getDelay() / 3600.0 * this.vtts_car;
+							double amount = this.congestionTollFactor * (event.getDelay() / 3600.0 * this.vtts_car);
 							double sumNew = sum + amount;
 							timeBin2tollSum.put(time, sumNew);
 						} else {
 							// toll sum was not calculated before for this time bin
-							double amount = event.getDelay() / 3600.0 * this.vtts_car;
+							double amount = this.congestionTollFactor * (event.getDelay() / 3600.0 * this.vtts_car);
 							timeBin2tollSum.put(time, amount);
 						}	
 					}
@@ -309,7 +316,7 @@ public class TollHandler implements CongestionEventHandler, LinkEnterEventHandle
 
 					if (event.getEmergenceTime() < time && event.getEmergenceTime() >= (time - this.timeBinSize)) {
 						// congestion event in time bin
-						double amount = event.getDelay() / 3600.0 * this.vtts_car;
+						double amount = this.congestionTollFactor * (event.getDelay() / 3600.0 * this.vtts_car);
 						timeBin2tollSum.put(time, amount);
 					}
 				}

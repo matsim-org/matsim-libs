@@ -36,21 +36,21 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
     private final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser;
     private final double randomVariance;
     private final String subPopName;
-    private final OpdytsScenarios objectiveFunctionCases;
+    private final OpdytsScenario opdytsScenario;
 
     public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,
-                                final double randomVariance, final OpdytsScenarios objectiveFunctionCases, final String subPopName) {
+                                final double randomVariance, final OpdytsScenario opdytsScenario, final String subPopName) {
         this.scenario = scenario;
         this.rnd = new Random(4711);
         // (careful with using matsim-random since it is always the same sequence in one run)
         this.randomizedUtilityParametersChoser = randomizedUtilityParametersChoser;
         this.randomVariance = randomVariance;
         this.subPopName = subPopName;
-        this.objectiveFunctionCases = objectiveFunctionCases;
+        this.opdytsScenario = opdytsScenario;
     }
 
-    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser, final OpdytsScenarios objectiveFunctionCases) {
-        this(scenario,randomizedUtilityParametersChoser, 0.1, objectiveFunctionCases, null);
+    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser, final OpdytsScenario opdytsScenario) {
+        this(scenario,randomizedUtilityParametersChoser, 0.1, opdytsScenario, null);
     }
 
     @Override
@@ -106,8 +106,8 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
                     newScoringConfig2.getOrCreateScoringParameters(this.subPopName).addModeParams(newModeParams2);
                 }
             }
-            result.add(new ModeChoiceDecisionVariable(newScoringConfig1, this.scenario, this.objectiveFunctionCases,this.subPopName));
-            result.add(new ModeChoiceDecisionVariable(newScoringConfig2, this.scenario, this.objectiveFunctionCases,this.subPopName));
+            result.add(new ModeChoiceDecisionVariable(newScoringConfig1, this.scenario, this.opdytsScenario,this.subPopName));
+            result.add(new ModeChoiceDecisionVariable(newScoringConfig2, this.scenario, this.opdytsScenario,this.subPopName));
         }
         log.warn("giving the following to opdyts:");
         for (ModeChoiceDecisionVariable var : result) {

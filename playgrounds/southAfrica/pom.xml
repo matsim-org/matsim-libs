@@ -54,11 +54,6 @@
 		</dependency>
 		<dependency>
   			<groupId>com.tinkerpop.blueprints</groupId>
-  			<artifactId>blueprints-core</artifactId>
-  			<version>2.2.0</version>
-		</dependency>
-		<dependency>
-  			<groupId>com.tinkerpop.blueprints</groupId>
   			<artifactId>blueprints-graph-jung</artifactId>
   			<version>2.2.0</version>
 		</dependency>
@@ -114,38 +109,38 @@
 		</dependency>
   </dependencies>
   <build>
-	<pluginManagement>
-		<plugins>
-  			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-						<manifestEntries>
-							<Specification-Vendor>MATSim</Specification-Vendor>
-							<Implementation-Vendor>MATSim</Implementation-Vendor>
-						</manifestEntries>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>create-my-bundle</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-  			</plugin>
-  		</plugins>
-  	</pluginManagement>
+<!-- 	<pluginManagement> -->
+<!-- 		<plugins> -->
+<!--   			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-assembly-plugin</artifactId> -->
+<!-- 				<configuration> -->
+<!-- 					<descriptorRefs> -->
+<!-- 						<descriptorRef>jar-with-dependencies</descriptorRef> -->
+<!-- 					</descriptorRefs> -->
+<!-- 					<archive> -->
+<!-- 						<manifest> -->
+<!-- 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries> -->
+<!-- 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> -->
+<!-- 						</manifest> -->
+<!-- 						<manifestEntries> -->
+<!-- 							<Specification-Vendor>MATSim</Specification-Vendor> -->
+<!-- 							<Implementation-Vendor>MATSim</Implementation-Vendor> -->
+<!-- 						</manifestEntries> -->
+<!-- 					</archive> -->
+<!-- 				</configuration> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>create-my-bundle</id> -->
+<!-- 						<phase>package</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>single</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!--   			</plugin> -->
+<!--   		</plugins> -->
+<!--   	</pluginManagement> -->
   </build>
   <repositories>
   <repository>

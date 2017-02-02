@@ -115,10 +115,21 @@ public class RuleBasedTaxiOptimizer
         while (reqIter.hasNext() && idleCount > 0) {
             TaxiRequest req = reqIter.next();
 
-            Iterable<Vehicle> selectedVehs = idleCount > params.nearestVehiclesLimit // we do not want to visit more than a quarter of zones
+            List<Vehicle> selectedVehs = idleCount > params.nearestVehiclesLimit // we do not want to visit more than a quarter of zones
                     ? idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(),
                             params.nearestVehiclesLimit)
                     : idleTaxiRegistry.getVehicles();
+
+            if (selectedVehs.isEmpty()) {
+                //no vehicle in the registry is idle ==> return
+                //Some vehicles may be not idle because they have been assigned another customer,
+                //while for others the time window ends (t1)
+                //
+                //Their statuses will be updated in this time step (we are just before the sim step,
+                //triggered by a MobsimBeforeSimStepEvent). Consequently, they will be
+                //removed from this registry, but till then they are there.
+                return;
+            }
 
             BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
                     .findBestVehicleForRequest(req, selectedVehs);

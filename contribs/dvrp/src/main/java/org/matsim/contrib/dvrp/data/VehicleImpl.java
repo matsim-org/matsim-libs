@@ -29,7 +29,7 @@ public class VehicleImpl
     implements Vehicle
 {
     private final Id<Vehicle> id;
-    private final Link startLink;
+    private Link startLink;
     private final double capacity;
 
     // TW for vehicle
@@ -64,6 +64,13 @@ public class VehicleImpl
     public Link getStartLink()
     {
         return startLink;
+    }
+
+
+    @Override
+    public void setStartLink(Link link)
+    {
+        this.startLink = link;
     }
 
 

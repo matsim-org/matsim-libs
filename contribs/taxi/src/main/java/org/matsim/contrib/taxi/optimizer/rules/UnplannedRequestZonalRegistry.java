@@ -75,7 +75,7 @@ public class UnplannedRequestZonalRegistry
     }
 
 
-    public Iterable<TaxiRequest> findNearestRequests(Node node, int minCount)
+    public List<TaxiRequest> findNearestRequests(Node node, int minCount)
     {
         Zone zone = zonalSystem.getZone(node);
         Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());

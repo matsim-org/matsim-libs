@@ -29,6 +29,7 @@ import org.matsim.contrib.minibus.operator.BasicOperator;
 import org.matsim.contrib.minibus.operator.WelfareCarefulMultiPlanOperator;
 import org.matsim.contrib.minibus.replanning.ReduceStopsToBeServedRFare;
 import org.matsim.contrib.minibus.replanning.ReduceTimeServedRFare;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
@@ -617,6 +618,9 @@ public final class PConfigGroup extends ConfigGroup{
 		return this.operationMode;
 	}
 	
+	public void setWelfareMaximization( boolean val ) {
+		this.welfareMaximization = val ;
+	}
 	public boolean getWelfareMaximization() {
 		return this.welfareMaximization;
 	}
@@ -731,8 +735,10 @@ public final class PConfigGroup extends ConfigGroup{
 		}
 
 	}
-	
-	public void validate(double marginalUtilityOfMoney){
+	@Override
+	protected void checkConsistency( Config config ) {
+		double marginalUtilityOfMoney = config.planCalcScore().getMarginalUtilityOfMoney() ;
+		
 		if (this.mergeTransitLine) {
 			log.info("All routes of a minibus transit line with the same stop sequence will be merged into one single transit route. Note that the transit schedules written to the output directory do not contain all minibus routes anymore.");
 			

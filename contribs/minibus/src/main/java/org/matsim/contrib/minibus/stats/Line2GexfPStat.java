@@ -19,20 +19,24 @@
 
 package org.matsim.contrib.minibus.stats;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * GexfPStat stats for all lines. Each line is written separately to file
@@ -51,8 +55,9 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 	private final HashMap<String, SimpleGexfPStat> lineId2GexfPStat;
 	private Set<String> lastLineIds;
 
-	public Line2GexfPStat(PConfigGroup pConfig){
-		this.pConfig = pConfig;
+	@Inject Line2GexfPStat(Config config){
+		this.pConfig = ConfigUtils.addOrGetModule(config,PConfigGroup.class) ;
+		
 		this.lineId2GexfPStat = new HashMap<>();
 		
 		this.lastLineIds = new TreeSet<>();
@@ -60,6 +65,7 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 		if (this.pConfig.getGexfInterval() > 0) {
 			log.info("enabled");
 		}
+		
 	}
 
 	@Override

@@ -42,7 +42,7 @@ public class LinkVolumeWriter {
 
 	private static final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run110/randomNrFix/slowCapacityUpdate/100pct/output_PassingQ_withHoles_2/";
 	private static final String eventsFile = dir+"/output_events.xml.gz";
-	private Map<Id<Link>, Map<Integer, Double>> linkid2Count = new HashMap<>();
+	private Map<Id<Link>, Map<Integer, Double>> linkid2Volume = new HashMap<>();
 
 	public static void main(String[] args) {
 		LinkVolumeWriter plvw = new LinkVolumeWriter();
@@ -50,21 +50,21 @@ public class LinkVolumeWriter {
 		plvw.writeData(dir+"/analysis/link2Vol.txt");
 	}
 
-	public void processEventsFile(final String eventsFile){
+	private void processEventsFile(final String eventsFile){
 		String vehicleFile = dir+"/output_vehicles.xml.gz";
 		LinkVolumeHandler handler = new LinkVolumeHandler(vehicleFile);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(handler);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
-		this.linkid2Count = handler.getLinkId2TimeSlot2LinkVolumePCU();
+		this.linkid2Volume = handler.getLinkId2TimeSlot2LinkVolumePCU();
 	}
 
-	public void writeData (final String outFile){
+	private void writeData (final String outFile){
 		try (BufferedWriter writer = IOUtils.getBufferedWriter(outFile)) {
-			writer.write("linkId\tcount\n");
-			for(Id<Link> l : this.linkid2Count.keySet()){
-				writer.write(l+"\t"+ MapUtils.doubleValueSum( this.linkid2Count.get(l) )+"\n");
+			writer.write("linkId\tvolumePCU\n");
+			for(Id<Link> l : this.linkid2Volume.keySet()){
+				writer.write(l+"\t"+ MapUtils.doubleValueSum( this.linkid2Volume.get(l) )+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {

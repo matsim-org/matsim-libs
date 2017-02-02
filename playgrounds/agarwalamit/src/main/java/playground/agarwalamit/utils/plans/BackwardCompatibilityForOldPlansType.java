@@ -117,7 +117,7 @@ public class BackwardCompatibilityForOldPlansType {
 							List<Id<Link>> linkIds = convertRouteDescriptionToListOfLinkIds(routeLinks);
 							NetworkRoute nr = popOut.getFactory().getRouteFactories().createRoute(NetworkRoute.class, r.getStartLinkId(), r.getEndLinkId());
 							//exclude first and last lnik from linkIds
-							if( linkIds.size() == 0) {
+							if(linkIds.isEmpty()) {
 							} else if(linkIds.size()==1) {
 								linkIds.remove(0);
 							} else {

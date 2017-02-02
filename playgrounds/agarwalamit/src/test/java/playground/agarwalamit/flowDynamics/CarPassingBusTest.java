@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -70,7 +69,6 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class CarPassingBusTest {
 
-	@Rule public MatsimTestUtils helper = new MatsimTestUtils(); 
 	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private static final boolean isUsingOTFVis = false;
 	
@@ -117,7 +115,7 @@ public class CarPassingBusTest {
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue );
 		config.qsim().setEndTime(24.0*3600);
 		config.qsim().setMainModes(Arrays.asList(TransportMode.car));
-		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
+		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 	}
 

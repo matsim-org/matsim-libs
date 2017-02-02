@@ -22,6 +22,8 @@ package org.matsim.contrib.minibus.hook;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
+import org.matsim.contrib.minibus.operator.POperators;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -43,8 +45,11 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
+import com.google.inject.Inject;
+
 import java.util.HashSet;
 import java.util.Set;
+
 
 /**
  * Hook to register paratransit black box with MATSim
@@ -52,35 +57,32 @@ import java.util.Set;
  * @author aneumann
  */
 final class PControlerListener implements IterationStartsListener, StartupListener, ScoringListener {
-	
+
 	private final static Logger log = Logger.getLogger(PControlerListener.class);
 
-	private final PTransitRouterFactory pTransitRouterFactory;
 	private final PVehiclesFactory pVehiclesFactory;
-	
-	private final AgentsStuckHandlerImpl agentsStuckHandler;
-	private final PBox pBox;
 
-    private final PersonReRouteStuckFactory stuckFactory;
+	@Inject(optional=true) private AgentsStuckHandlerImpl agentsStuckHandler;
+	private final POperators operators ;
 
-    PControlerListener(MatsimServices controler, PBox pBox, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, AgentsStuckHandlerImpl agentsStuckHandler){
-        PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
-        this.pTransitRouterFactory = pTransitRouterFactory;
+	@Inject(optional=true) private PersonReRouteStuckFactory stuckFactory;
+
+	@Inject PControlerListener(Config config, POperators operators ){
+		PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.GROUP_NAME, PConfigGroup.class);
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
-        this.agentsStuckHandler = agentsStuckHandler;
-        this.stuckFactory = stuckFactory;
-		this.pBox = pBox;
+		this.operators = operators ;
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.pBox.notifyStartup(event);
-        addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
-		addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
+		PBox pBox = (PBox) operators ;
+		pBox.notifyStartup(event);
+		addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), pBox.getpTransitSchedule());
+		addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
-		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
-		this.pTransitRouterFactory.updateTransitSchedule(event.getServices().getScenario().getTransitSchedule());
-		
+		//		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
+		//		this.pTransitRouterFactory.updateTransitSchedule();
+
 		if(this.agentsStuckHandler != null){
 			event.getServices().getEvents().addHandler(this.agentsStuckHandler);
 		}
@@ -88,26 +90,27 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+		PBox pBox = (PBox) operators ;
 		final MatsimServices controler = event.getServices();
 		if(event.getIteration() == controler.getConfig().controler().getFirstIteration()){
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
-			this.pBox.notifyIterationStarts(event);
-            removePreviousPTransitScheduleFromOriginalOne(event.getServices().getScenario().getTransitSchedule());
-			addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
+			pBox.notifyIterationStarts(event);
+			removePreviousPTransitScheduleFromOriginalOne(event.getServices().getScenario().getTransitSchedule());
+			addPTransitScheduleToOriginalOne(event.getServices().getScenario().getTransitSchedule(), pBox.getpTransitSchedule());
 			removePreviousPVehiclesFromScenario(event.getServices().getScenario().getTransitVehicles());
-            addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
+			addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
-			this.pTransitRouterFactory.updateTransitSchedule(event.getServices().getScenario().getTransitSchedule());
-			
+			//			this.pTransitRouterFactory.updateTransitSchedule();
+
 			if(this.agentsStuckHandler != null){
-                ParallelPersonAlgorithmRunner.run(controler.getScenario().getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+				ParallelPersonAlgorithmRunner.run(controler.getScenario().getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
 						return stuckFactory.getReRouteStuck(new PlanRouter(
-						controler.getTripRouterProvider().get(),
-						controler.getScenario().getActivityFacilities()
-						), ((MutableScenario)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
+								controler.getTripRouterProvider().get(),
+								controler.getScenario().getActivityFacilities()
+								), ((MutableScenario)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
 					}
 				});
 			}
@@ -115,73 +118,74 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		this.dumpTransitScheduleAndVehicles(event.getServices(), event.getIteration());
 	}
 
-    @Override
+	@Override
 	public void notifyScoring(ScoringEvent event) {
-		this.pBox.notifyScoring(event);
+		PBox pBox = (PBox) operators ;
+		pBox.notifyScoring(event);
 	}
 
-    private final Set<Id<TransitStopFacility>> currentExclusivePFacilityIDs = new HashSet<>();
-    private final Set<Id<TransitLine>> currentExclusivePTransitLineIDs = new HashSet<>();
+	private final Set<Id<TransitStopFacility>> currentExclusivePFacilityIDs = new HashSet<>();
+	private final Set<Id<TransitLine>> currentExclusivePTransitLineIDs = new HashSet<>();
 
 	private void addPTransitScheduleToOriginalOne(TransitSchedule baseSchedule, TransitSchedule pSchedule) {
 		if(pSchedule == null){
 			log.info("pSchedule does not exist, doing nothing");
-            return;
+			return;
 		}
 		for (TransitStopFacility pStop : pSchedule.getFacilities().values()) {
-            if (!baseSchedule.getFacilities().containsKey(pStop.getId())) {
-                baseSchedule.addStopFacility(pStop);
-                currentExclusivePFacilityIDs.add(pStop.getId());
-            }
+			if (!baseSchedule.getFacilities().containsKey(pStop.getId())) {
+				baseSchedule.addStopFacility(pStop);
+				currentExclusivePFacilityIDs.add(pStop.getId());
+			}
 		}
 		for (TransitLine pLine : pSchedule.getTransitLines().values()) {
-            if (!baseSchedule.getTransitLines().containsKey(pLine.getId())) {
-                baseSchedule.addTransitLine(pLine);
-                currentExclusivePTransitLineIDs.add(pLine.getId());
-            }
+			if (!baseSchedule.getTransitLines().containsKey(pLine.getId())) {
+				baseSchedule.addTransitLine(pLine);
+				currentExclusivePTransitLineIDs.add(pLine.getId());
+			}
 		}
 	}
 
-    private void removePreviousPTransitScheduleFromOriginalOne(TransitSchedule transitSchedule) {
-        for (Id<TransitLine> transitLineId : currentExclusivePTransitLineIDs) {
-            transitSchedule.removeTransitLine(transitSchedule.getTransitLines().get(transitLineId));
-        }
-        currentExclusivePTransitLineIDs.clear();
-        for (Id<TransitStopFacility> facilityId : currentExclusivePFacilityIDs) {
-            transitSchedule.removeStopFacility(transitSchedule.getFacilities().get(facilityId));
-        }
-        currentExclusivePFacilityIDs.clear();
-    }
+	private void removePreviousPTransitScheduleFromOriginalOne(TransitSchedule transitSchedule) {
+		for (Id<TransitLine> transitLineId : currentExclusivePTransitLineIDs) {
+			transitSchedule.removeTransitLine(transitSchedule.getTransitLines().get(transitLineId));
+		}
+		currentExclusivePTransitLineIDs.clear();
+		for (Id<TransitStopFacility> facilityId : currentExclusivePFacilityIDs) {
+			transitSchedule.removeStopFacility(transitSchedule.getFacilities().get(facilityId));
+		}
+		currentExclusivePFacilityIDs.clear();
+	}
 
-    private final Set<Id<VehicleType>> currentExclusivePVehicleTypeIDs = new HashSet<>();
-    private final Set<Id<Vehicle>> currentExclusivePVehicleIDs = new HashSet<>();
+	private final Set<Id<VehicleType>> currentExclusivePVehicleTypeIDs = new HashSet<>();
+	private final Set<Id<Vehicle>> currentExclusivePVehicleIDs = new HashSet<>();
 
 	private void addPVehiclesToOriginalOnes(Vehicles baseVehicles, Vehicles pVehicles){
 		for (VehicleType t : pVehicles.getVehicleTypes().values()) {
-            if (!baseVehicles.getVehicleTypes().containsKey(t.getId())) {
-                baseVehicles.addVehicleType(t);
-                currentExclusivePVehicleTypeIDs.add(t.getId());
-            }
+			if (!baseVehicles.getVehicleTypes().containsKey(t.getId())) {
+				baseVehicles.addVehicleType(t);
+				currentExclusivePVehicleTypeIDs.add(t.getId());
+			}
 		}
 		for (Vehicle v : pVehicles.getVehicles().values()) {
-            if (!baseVehicles.getVehicles().containsKey(v.getId())) {
-                baseVehicles.addVehicle(v);
-                currentExclusivePVehicleIDs.add(v.getId());
-            }
+			if (!baseVehicles.getVehicles().containsKey(v.getId())) {
+				baseVehicles.addVehicle(v);
+				currentExclusivePVehicleIDs.add(v.getId());
+			}
 		}
 	}
 
-    private void removePreviousPVehiclesFromScenario(Vehicles vehicles) {
-        for (Id<Vehicle> vehicleId : currentExclusivePVehicleIDs) {
-            vehicles.removeVehicle(vehicleId);
-        }
-        currentExclusivePVehicleIDs.clear();
-        for (Id<VehicleType> vehicleTypeId : currentExclusivePVehicleTypeIDs) {
-            vehicles.removeVehicleType(vehicleTypeId);
-        }
-        currentExclusivePVehicleTypeIDs.clear();
-    }
-	
+	private void removePreviousPVehiclesFromScenario(Vehicles vehicles) {
+		for (Id<Vehicle> vehicleId : currentExclusivePVehicleIDs) {
+			vehicles.removeVehicle(vehicleId);
+		}
+		currentExclusivePVehicleIDs.clear();
+		for (Id<VehicleType> vehicleTypeId : currentExclusivePVehicleTypeIDs) {
+			vehicles.removeVehicleType(vehicleTypeId);
+		}
+		currentExclusivePVehicleTypeIDs.clear();
+	}
+
 	private void dumpTransitScheduleAndVehicles(MatsimServices controler, int iteration){
 		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(controler.getScenario().getTransitSchedule());
 		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getTransitVehicles());

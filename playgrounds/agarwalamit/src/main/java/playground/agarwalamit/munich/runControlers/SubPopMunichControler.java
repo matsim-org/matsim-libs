@@ -168,7 +168,8 @@ public class SubPopMunichControler {
 					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario)controler.getScenario()) ));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV3(controler.getEvents(),
+                    controler.getScenario()) ));
 
 		} else if(internalizeBoth) {
 
@@ -206,7 +207,7 @@ public class SubPopMunichControler {
 		controler.getConfig().controler().setCreateGraphs(true);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		if(internalizeEmission==false && internalizeBoth ==false){
+		if(!internalizeEmission && !internalizeBoth){
 			controler.addControlerListener(new EmissionControlerListener());
 		}
 

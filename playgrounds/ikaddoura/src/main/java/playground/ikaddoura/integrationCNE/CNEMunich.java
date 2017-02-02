@@ -58,7 +58,6 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
-import playground.agarwalamit.utils.FileUtils;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -88,6 +87,10 @@ public class CNEMunich {
 	
 	private static CongestionTollingApproach congestionTollingApproach;
 	private static double kP;
+
+	private static boolean modeChoice = false;
+	
+	private static boolean computeExpectedAirPollutionCosts = false;
 	
 	public static void main(String[] args) throws IOException {
 				
@@ -126,11 +129,18 @@ public class CNEMunich {
 			
 			kP = Double.parseDouble(args[7]);
 			log.info("kP: " + kP);
+
+			modeChoice = Boolean.valueOf(args[8]);
+			log.info("Mode choice for Munich scenario is "+ modeChoice);
+			
+			computeExpectedAirPollutionCosts = Boolean.valueOf(args[9]);
+			log.info("computeExpectedAirPollutionCosts: " + computeExpectedAirPollutionCosts);
 			
 		} else {
-			
-			configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
-//			configFile = "../../../shared-svn/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
+
+//			if (modeChoice) configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
+//			else configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
+			configFile = "../../../shared-svn/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
 
 		}
 
@@ -151,27 +161,33 @@ public class CNEMunich {
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				String ug = "COMMUTER_REV_COMMUTER";
-				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					final String[] availableModes = {"car", "pt_".concat(ug)};
-					final String[] chainBasedModes = {"car", "bike"};
-					@Inject
-					Scenario sc;
+		if (modeChoice) {
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+					String ug = "COMMUTER_REV_COMMUTER";
+					addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name()
+							.concat("_")
+							.concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						final String[] availableModes = {"car", "pt_".concat(ug)};
+						final String[] chainBasedModes = {"car", "bike"};
+						@Inject
+						Scenario sc;
 
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<>());
-						builder.addStrategyModule(new SubtourModeChoice(sc.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
-						builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
-						return builder.build();
-					}
-				});
-			}
-		});
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<>());
+							builder.addStrategyModule(new SubtourModeChoice(sc.getConfig()
+									.global()
+									.getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
+							return builder.build();
+						}
+					});
+				}
+			});
+		}
 
 		// additional things to get the networkRoute for ride mode. For this, ride mode must be assigned in networkModes of the config file.
 		controler.addOverridingModule(new AbstractModule() {
@@ -250,6 +266,8 @@ public class CNEMunich {
 		tunnelLinkIDs.add(Id.create("595870463-586909531-594897602", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 		
+		noiseParameters.setWriteOutputIteration(config.controler().getLastIteration() - config.controler().getFirstIteration());
+		
 		// CNE Integration
 		
 		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
@@ -260,6 +278,7 @@ public class CNEMunich {
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
 		cne.setPersonFilter(new MunichPersonFilter());
+		cne.setComputeExpectedAirPollutionCosts(computeExpectedAirPollutionCosts);
 		controler = cne.prepareControler();
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

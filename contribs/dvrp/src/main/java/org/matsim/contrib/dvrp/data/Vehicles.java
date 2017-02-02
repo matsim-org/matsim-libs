@@ -21,6 +21,8 @@ package org.matsim.contrib.dvrp.data;
 
 import java.util.Comparator;
 
+import org.matsim.contrib.dvrp.schedule.Schedules;
+
 
 public class Vehicles
 {
@@ -37,4 +39,10 @@ public class Vehicles
             return Double.compare(v1.getT1(), v2.getT1());
         }
     };
+
+
+    public static void changeStartLinkToLastLinkInSchedule(Vehicle vehicle)
+    {
+        vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle.getSchedule()));
+    }
 }

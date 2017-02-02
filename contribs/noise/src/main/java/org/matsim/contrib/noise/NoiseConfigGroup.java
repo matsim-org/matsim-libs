@@ -96,6 +96,8 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private Set<String> busIdIdentifier = new HashSet<String>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 	
+	private double noiseTollFactor = 1.0;
+	
 	// ########################################################################################################
 	
 	@Override
@@ -139,6 +141,8 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 		comments.put("hgvIdPrefixes", "Specifies the HGV (heavy goods vehicles, trucks) ID prefix." ) ;
 		comments.put("busIdIdentifier", "Specifies the public transit vehicle ID identifiers. Buses are treated as HGV, other public transit vehicles are neglected." ) ;
+
+		comments.put("noiseTollFactor", "To be used for sensitivity analysis. Default: 1.0 (= the parameter has no effect)" ) ;
 
 		return comments;
 	}
@@ -652,4 +656,14 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		return tmp;
 	}
 
+	@StringGetter( "noiseTollFactor" )
+	public double getNoiseTollFactor() {
+		return noiseTollFactor;
+	}
+
+	@StringSetter( "noiseTollFactor" )
+	public void setNoiseTollFactor(double noiseTollFactor) {
+		this.noiseTollFactor = noiseTollFactor;
+	}
+	
 }

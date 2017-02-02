@@ -164,24 +164,26 @@ public class TestExposurePricing {
 		emissionModule.createEmissionHandler();
 
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule,sc.getConfig().planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
 
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 
 		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyEventHandler);
@@ -227,29 +229,28 @@ public class TestExposurePricing {
 		emissionModule.createEmissionHandler();
 
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-//		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
-//		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
-
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt);
 //		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, sc.getConfig().planCalcScore());
         final playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory(
-                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-                emissionModule,
-                emissionCostModule,
-                controler.getConfig().planCalcScore()
+                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore())
         );
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
 
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 
 		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyEventHandler);

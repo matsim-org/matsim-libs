@@ -152,7 +152,7 @@ public class SubPopMunichExposureControler {
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, gt);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		
@@ -160,11 +160,16 @@ public class SubPopMunichExposureControler {
 			
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
 		
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		
 		// additional things to get the networkRoute for ride mode. For this, ride mode must be assigned in networkModes of the config file.

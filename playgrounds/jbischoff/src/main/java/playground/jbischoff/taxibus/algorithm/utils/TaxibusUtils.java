@@ -21,9 +21,9 @@ package playground.jbischoff.taxibus.algorithm.utils;
 
 import java.util.ArrayList;
 
+import org.matsim.contrib.av.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**

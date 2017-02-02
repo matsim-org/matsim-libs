@@ -25,6 +25,7 @@ import playground.gregor.misanthrope.simulation.physics.CTCellFace;
 import playground.gregor.misanthrope.simulation.physics.CTLinkCell;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by laemmel on 15/10/15.
@@ -52,7 +53,7 @@ public class CTCellTest extends MatsimTestCase {
 		CTCell c = getCTLinkCell();
 		CTCell nb = getCTLinkCell();
 		c.addNeighbor(nb);
-		List<CTCell> nbs = c.getNeighbors();
+		Set<CTCell> nbs = c.getNeighbors();
 		assertEquals("number of neighbors", 1, nbs.size());
 		assertEquals("same neighbor", nb, nbs.iterator().next());
 	}

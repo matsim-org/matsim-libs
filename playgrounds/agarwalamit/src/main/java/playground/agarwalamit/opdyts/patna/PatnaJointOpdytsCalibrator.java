@@ -40,10 +40,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
@@ -55,8 +55,8 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class PatnaJointOpdytsCalibrator {
 
-	public static final String SUB_POP_NAME = PatnaPersonFilter.PatnaUserGroup.urban.toString();
-	public static final OpdytsScenarios PATNA_10_PCT = OpdytsScenarios.PATNA_10Pct;
+	private static final String SUB_POP_NAME = PatnaPersonFilter.PatnaUserGroup.urban.toString();
+	private static final OpdytsScenario PATNA_10_PCT = OpdytsScenario.PATNA_10Pct;
 	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
 
@@ -101,7 +101,8 @@ public class PatnaJointOpdytsCalibrator {
 		modes2consider.add("pt");
 		modes2consider.add("walk");
 
-		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,PATNA_10_PCT);
+		DistanceDistribution referenceStudyDistri = new PatnaCMPDistanceDistribution(PATNA_10_PCT);
+		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
@@ -126,7 +127,7 @@ public class PatnaJointOpdytsCalibrator {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(OpdytsScenarios.PATNA_1Pct); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(referenceStudyDistri); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.

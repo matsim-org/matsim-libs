@@ -41,14 +41,14 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
  * @author benjamin
  *
  */
-public class EmissionModalTravelDisutilityCalculator implements TravelDisutility {
+class EmissionModalTravelDisutilityCalculator implements TravelDisutility {
 
-    final TravelTime timeCalculator;
-    final double marginalUtlOfMoney;
+    private final TravelTime timeCalculator;
+    private final double marginalUtlOfMoney;
 //    double distanceCostRateCar;
 //    double marginalUtlOfTravelTime;
-final EmissionModule emissionModule;
-    final EmissionCostModule emissionCostModule;
+private final EmissionModule emissionModule;
+    private final EmissionCostModule emissionCostModule;
     private final Set<Id<Link>> hotspotLinks;
     private final PlanCalcScoreConfigGroup cnScoringGroup;
 
@@ -125,7 +125,7 @@ final EmissionModule emissionModule;
         WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
         Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
                 vehicle,
-                Integer.parseInt(NetworkUtils.getType(((Link) link))),
+                Integer.parseInt(NetworkUtils.getType(link)),
                 link.getFreespeed(),
                 distance,
                 linkTravelTime

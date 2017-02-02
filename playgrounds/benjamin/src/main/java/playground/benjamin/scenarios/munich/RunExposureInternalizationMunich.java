@@ -95,16 +95,21 @@ public class RunExposureInternalizationMunich {
 		
 		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor),	
-				Boolean.parseBoolean(considerCO2Costs), rgt, gt);
+				Boolean.parseBoolean(considerCO2Costs), rgt);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(GridTools.class).toInstance(gt);
+				bind(ResponsibilityGridTools.class).toInstance(rgt);
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
-		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
+//		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, gt));
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.addOverridingModule(new OTFVisFileWriterModule());

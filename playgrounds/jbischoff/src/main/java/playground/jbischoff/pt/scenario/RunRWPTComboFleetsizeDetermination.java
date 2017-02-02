@@ -22,7 +22,10 @@
  */
 package playground.jbischoff.pt.scenario;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
+import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
+import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -39,11 +42,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-
-
-import playground.jbischoff.pt.VariableAccessConfigGroup;
-import playground.jbischoff.pt.VariableAccessModeConfigGroup;
-import playground.jbischoff.pt.VariableAccessTransitRouterModule;
+import org.matsim.vehicles.*;
 
 /**
  * @author  jbischoff
@@ -68,7 +67,7 @@ public static void main(String[] args) {
 		config.controler().setOutputDirectory(outPutDir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModule("taxi");
+		TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
 		tcg.setTaxisFile(taxisFile);
 		
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
@@ -86,6 +85,7 @@ public static void main(String[] args) {
 		taxi.setDistance(200000);
 		taxi.setTeleported(false);
 		taxi.setMode("taxi");
+		
 		VariableAccessConfigGroup vacfg = new VariableAccessConfigGroup();
 		vacfg.setAccessModeGroup(taxi);
 		vacfg.setAccessModeGroup(walk);
@@ -95,6 +95,8 @@ public static void main(String[] args) {
 		config.transitRouter().setExtensionRadius(0);
 		
 	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+	   taxiCfg.setBreakSimulationIfNotAllRequestsServed(false);
+	   taxiCfg.setChangeStartLinkToLastLinkInSchedule(true);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
 
@@ -102,9 +104,12 @@ public static void main(String[] args) {
        TaxiData taxiData = new TaxiData();
        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
-       controler.addOverridingModule(new TaxiModule(taxiData));
-       double expAveragingAlpha = 0.05;//from the AV flow paper 
 
+       VehicleType avVehType = new VehicleTypeImpl(Id.create("avVehicleType", VehicleType.class));
+       avVehType.setFlowEfficiencyFactor(2);
+       controler.addOverridingModule(new TaxiModule(taxiData, avVehType));
+
+       double expAveragingAlpha = 0.05;//from the AV flow paper 
        controler.addOverridingModule(
                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));

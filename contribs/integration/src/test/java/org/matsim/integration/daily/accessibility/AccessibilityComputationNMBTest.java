@@ -56,8 +56,8 @@ public class AccessibilityComputationNMBTest {
 //		run(1000., false, false);
 //	}
 //	@Test
-//	public void testLocal() {
-//		run(1000., false, true);
+//	public void testLocal_beta10() {
+//		run(500., false, true);
 //	}
 	@Test
 	public void testOnServer() {
@@ -75,6 +75,12 @@ public class AccessibilityComputationNMBTest {
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		config.network().setInputFile(folderStructure + networkFile);
 		
+		// ---------- Change Events
+//		String changeEventsInputFile = "/Users/Dominik/Accessibility/Data/nmbm_change/changeevents200.xml.gz";
+//		config.network().setTimeVariantNetwork(true);
+//		config.network().setChangeEventsInputFile(changeEventsInputFile);
+		// ----------
+		
 		config.facilities().setInputFile(folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz");
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -82,6 +88,10 @@ public class AccessibilityComputationNMBTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
 		config.controler().setRunId("za_nmb_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0]);
+		
+		// Use other beta
+//		config.planCalcScore().setBrainExpBeta(10);
+		//
 		
 //		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/46/";
 //		final String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
@@ -96,6 +106,10 @@ public class AccessibilityComputationNMBTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setOutputCrs(TransformationFactory.WGS84_SA_Albers);
 		
+		// ---------- Change Events
+//		acg.setTimeOfDay(16.*60.*60.);
+		// ----------
+		
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromNetwork.toString());
 		// Network bounds to determine envelope
 //		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
@@ -104,6 +118,16 @@ public class AccessibilityComputationNMBTest {
 		ConfigUtils.setVspDefaults(config);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		// ---------- Change speeds
+//		Network network = scenario.getNetwork();
+//		double maxSpeed = 35./3.6;
+//		for (Link link : network.getLinks().values()) {
+//			System.out.println("----- link = " + link.getId() + " -- speed before = " + link.getFreespeed());
+//			link.setFreespeed(Math.min(maxSpeed, link.getFreespeed()));
+//			System.out.println("----- link = " + link.getId() + " -- speed after = " + link.getFreespeed());
+//		}
+		// ----------
 		
 		// Matrix-based pt
 //		MatrixBasedPtRouterConfigGroup mbpcg = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class);

@@ -93,7 +93,7 @@ public final class MapUtils {
 		SortedMap<T, Double> outMap = new TreeMap<>();
 		double valueSum = MapUtils.doubleValueSum(inMap);
 		for(Entry<T,Double> e : inMap.entrySet()){
-			double legs = (double) e.getValue();
+			double legs = e.getValue();
 			double pctShare = NumberUtils.round( legs*100. / valueSum, 3);
 			outMap.put(e.getKey(), pctShare);
 		}
