@@ -49,16 +49,5 @@ public class LinkInfo {
 		return nr2timeBin;
 	}
 	
-	public void computeAverageAmount() {
-		for (TimeBin timeBin : nr2timeBin.values()) {
-			timeBin.computeAverageAmount();
-		}
-	}
-
-	public void computeAverageAmountPerAgentType() {
-		for (TimeBin timeBin : nr2timeBin.values()) {
-			timeBin.computeAverageAmountPerPersonType();
-		}
-	}
 }
 

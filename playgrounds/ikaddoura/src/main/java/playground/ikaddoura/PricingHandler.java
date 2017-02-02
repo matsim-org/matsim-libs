@@ -45,36 +45,33 @@ public class PricingHandler implements PersonEntersVehicleEventHandler, LinkEnte
 	@Inject
 	private EventsManager events;
 	
-	private double amountSum = 0.;
 	private Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 
 	@Override
 	public void reset(int iteration) {
-		this.amountSum = 0.;
 	}
 
-	public double getAmountSum() {
-		return amountSum;
-	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		
-		double amount = 0.;
-		if (event.getLinkId().toString().equals("link_4_5")) {
-			if (event.getVehicleId().toString().startsWith("lkw")) {
-				amount = -12345.0;
-			} else {
-				amount = -3000.;
+		if (event.getTime() > 9 * 3600.) {
+			double amount = 0.;
+			if (event.getLinkId().toString().equals("link_1_2")) {
+				if (event.getVehicleId().toString().startsWith("lkw")) {
+					amount = -1000.0;
+				} else {
+					amount = -150.;
+				}
+			} else if (event.getLinkId().toString().equals("link_2_6")) {
+				amount = -50.0;
 			}
-		} else if (event.getLinkId().toString().equals("link_7_8")) {
-			amount = -10.0;
+					
+			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), this.vehicleId2personId.get(event.getVehicleId()), amount);
+			this.events.processEvent(moneyEvent);	
+			
+			log.warn(moneyEvent.toString());
 		}
-				
-		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), this.vehicleId2personId.get(event.getVehicleId()), amount);
-		this.events.processEvent(moneyEvent);	
-		
-		log.warn(moneyEvent.toString());
 	}
 
 	@Override

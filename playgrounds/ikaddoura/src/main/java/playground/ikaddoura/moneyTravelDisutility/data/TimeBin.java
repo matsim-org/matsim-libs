@@ -26,8 +26,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-import com.google.inject.Inject;
-
 /**
 * Stores vehicle-specific monetary amounts for each time bin.
 *  
@@ -35,9 +33,6 @@ import com.google.inject.Inject;
 */
 
 public class TimeBin {
-
-	@Inject
-	private AgentFilter agentFilter;
 	
 	private int timeBinNr;
 	
@@ -51,6 +46,14 @@ public class TimeBin {
 		this.personId2amounts = new HashMap<>();
 	}
 
+	public void setAverageAmount(double averageAmount) {
+		this.averageAmount = averageAmount;
+	}
+	
+	public double getAverageAmount() {
+		return averageAmount;
+	}
+	
 	public double getTimeBinNr() {
 		return timeBinNr;
 	}
@@ -58,55 +61,9 @@ public class TimeBin {
 	public Map<Id<Person>, List<Double>> getPersonId2amounts() {
 		return personId2amounts;
 	}
-
-	public double getAverageAmount() {
-		return averageAmount;
-	}
-
+	
 	public Map<String, Double> getAgentTypeId2avgAmount() {
 		return agentType2avgAmount;
-	}
-	
-	public void computeAverageAmount() {
-		double sum = 0.;
-		int counter = 0;
-		for (Id<Person> personId : personId2amounts.keySet()) {
-			for (Double amount : personId2amounts.get(personId)) {
-				sum += amount;
-			}
-			counter++;
-		}
-		
-		this.averageAmount = sum / counter;
-	}
-	
-	public void computeAverageAmountPerPersonType() {
-		final Map<String, Double> agentTypeIdPrefix2AmountSum = new HashMap<>();
-		final Map<String, Integer> agentTypeIdPrefix2Counter = new HashMap<>();
-		
-		for (Id<Person> personId : personId2amounts.keySet()) {
-			double totalAmountOfPerson = 0.;
-			for (Double amount : personId2amounts.get(personId)) {
-				totalAmountOfPerson += amount;
-			}
-			
-			String agentType = this.agentFilter.getAgentTypeFromId(personId);
-			
-			if (agentTypeIdPrefix2AmountSum.containsKey(agentType)) {
-				double amountSum = agentTypeIdPrefix2AmountSum.get(agentType);
-				int counter = agentTypeIdPrefix2Counter.get(agentType);
-				agentTypeIdPrefix2AmountSum.put(agentType, amountSum + totalAmountOfPerson);
-				agentTypeIdPrefix2Counter.put(agentType, counter + 1);
-
-			} else {
-				agentTypeIdPrefix2AmountSum.put(agentType, totalAmountOfPerson);
-				agentTypeIdPrefix2Counter.put(agentType, 1);
-			}
-		}
-		
-		for (String agentType : agentTypeIdPrefix2AmountSum.keySet()) {
-			this.agentType2avgAmount.put(agentType, agentTypeIdPrefix2AmountSum.get(agentType) / agentTypeIdPrefix2Counter.get(agentType) );
-		}
 	}
 
 }

@@ -19,7 +19,6 @@
 
 package playground.ikaddoura.moneyTravelDisutility;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -32,14 +31,13 @@ import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
 
 /**
  * 
- * TODO: Add something like a blendfactor...
- * TODO: Add something like MSA...
+ * TODO: Add a blendfactor?
+ * TODO: Add MSA?
  * 
 * @author ikaddoura
 */
 
 public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
-	private static final Logger log = Logger.getLogger(MoneyTimeDistanceTravelDisutility.class);
 	
 	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
 	private final double sigma;	
@@ -89,7 +87,7 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 				
 		int intervalNr = getIntervalNr(time);
 		
-		double vehicleSpecificAmount = 0.;
+		double estimatedAmount = 0.;
 
 		if (moneyEventAnalysis.getLinkId2info().containsKey(link.getId())) {
 			
@@ -98,20 +96,22 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 			if (linkInfo.getTimeBinNr2timeBin().containsKey(intervalNr)) {
 				
 				TimeBin timeBin = linkInfo.getTimeBinNr2timeBin().get(intervalNr);
-				double avgMoneyAmount = timeBin.getAverageAmount();
-				double avgMoneyAmountVehicleType = timeBin.getAgentTypeId2avgAmount().get(vehicleFilter.getAgentTypeFromId(person.getId()));
+				String agentType = vehicleFilter.getAgentTypeFromId(person.getId());
+
+				double avgMoneyAmountVehicleType = 0.;
+				if (timeBin.getAgentTypeId2avgAmount().containsKey(agentType)) {
+					avgMoneyAmountVehicleType = timeBin.getAgentTypeId2avgAmount().get(agentType);
+				}
 				
 				if (avgMoneyAmountVehicleType != 0.) {
-					vehicleSpecificAmount = avgMoneyAmountVehicleType;
+					estimatedAmount = avgMoneyAmountVehicleType;
 				} else {
-					vehicleSpecificAmount = avgMoneyAmount;
+					estimatedAmount = timeBin.getAverageAmount();;
 				}
 			}
 		}
-		
-		log.warn("avg amount on link " + link.getId() + " at time " + time + " for person " + person.getId() + ": " + vehicleSpecificAmount);
-				
-		double linkExpectedTollDisutility = -1 * this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() * vehicleSpecificAmount;
+						
+		double linkExpectedTollDisutility = -1 * this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() * estimatedAmount;
 		return linkExpectedTollDisutility;
 	}
 	

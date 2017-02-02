@@ -28,8 +28,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -39,6 +41,7 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 import playground.ikaddoura.moneyTravelDisutility.data.LinkInfo;
 import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
 
@@ -50,12 +53,15 @@ import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
  * @author ikaddoura
  */
 
-public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEventHandler, IterationEndsListener {
+public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEventHandler, IterationEndsListener, PersonEntersVehicleEventHandler {
 	private static final Logger log = Logger.getLogger(MoneyEventAnalysis.class);
 	
 	@Inject
 	private Scenario scenario;
-		
+	
+	@Inject
+	private AgentFilter agentFilter;
+	
 	private final Map<Id<Vehicle>, Id<Link>> vehicleId2linkId = new HashMap<>();
 	private final Map<Id<Person>, Id<Vehicle>> personId2vehicleId = new HashMap<>();
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
@@ -76,7 +82,7 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 		Id<Person> personId = event.getPersonId();
 		Id<Vehicle> vehicleId = this.personId2vehicleId.get(personId);
 		Id<Link> linkId = vehicleId2linkId.get(vehicleId);
-		
+				
 		int timeBinNr = getIntervalNr(event.getTime());
 		
 		if (linkId2info.containsKey(linkId)) {
@@ -116,29 +122,79 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 		}
 	}
 
-	private int getIntervalNr(double time) {
-		
-		double timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
-		int timeBinNr = (int) (time / timeBinSize);
-		
-		return timeBinNr;
-	}
-
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		this.vehicleId2linkId.put(event.getVehicleId(), event.getLinkId());
 	}
 
 	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		this.personId2vehicleId.put(event.getPersonId(), event.getVehicleId());
+	}
+	
+	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
 		log.info("Iteration ends. Processing the data in the previous iteration...");
-		for (LinkInfo info : this.linkId2info.values()) {
-
-			info.computeAverageAmount();
-			info.computeAverageAmountPerAgentType();
+		for (LinkInfo linkInfo : this.linkId2info.values()) {
+			
+			for (TimeBin timeBin : linkInfo.getTimeBinNr2timeBin().values()) {
+			
+				// average amount
+				double averageAmount = computeAverageAmount(timeBin);
+				timeBin.setAverageAmount(averageAmount);
+				
+				// average amount per agent type
+				computeAverageAmountPerAgentType(timeBin);				
+			}
 		}
 		log.info("Iteration ends. Processing the data in the previous iteration... Done.");
+	}
+
+	private void computeAverageAmountPerAgentType(TimeBin timeBin) {
+		final Map<String, Double> agentTypeIdPrefix2AmountSum = new HashMap<>();
+		final Map<String, Integer> agentTypeIdPrefix2Counter = new HashMap<>();
+		
+		for (Id<Person> personId : timeBin.getPersonId2amounts().keySet()) {
+			double totalAmountOfPerson = 0.;
+			for (Double amount : timeBin.getPersonId2amounts().get(personId)) {
+				totalAmountOfPerson += amount;
+			}
+			
+			String agentType = this.agentFilter.getAgentTypeFromId(personId);
+			
+			if (agentTypeIdPrefix2AmountSum.containsKey(agentType)) {
+				double amountSum = agentTypeIdPrefix2AmountSum.get(agentType);
+				int counter = agentTypeIdPrefix2Counter.get(agentType);
+				agentTypeIdPrefix2AmountSum.put(agentType, amountSum + totalAmountOfPerson);
+				agentTypeIdPrefix2Counter.put(agentType, counter + 1);
+
+			} else {
+				agentTypeIdPrefix2AmountSum.put(agentType, totalAmountOfPerson);
+				agentTypeIdPrefix2Counter.put(agentType, 1);
+			}
+		}
+		
+		for (String agentType : agentTypeIdPrefix2AmountSum.keySet()) {
+			timeBin.getAgentTypeId2avgAmount().put(agentType, agentTypeIdPrefix2AmountSum.get(agentType) / agentTypeIdPrefix2Counter.get(agentType) );
+		}
+	}
+
+	private double computeAverageAmount(TimeBin timeBin) {
+		double sum = 0.;
+		int counter = 0;
+		for (Id<Person> personId : timeBin.getPersonId2amounts().keySet()) {
+			for (Double amount : timeBin.getPersonId2amounts().get(personId)) {
+				sum += amount;
+			}
+			counter++;
+		}		
+		return sum / counter;
+	}
+	
+	private int getIntervalNr(double time) {
+		double timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();		
+		return (int) (time / timeBinSize);
 	}
 
 	public Map<Id<Link>, LinkInfo> getLinkId2info() {

@@ -50,9 +50,6 @@ public class MoneyTravelDisutilityTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	/**
-	 *
-	 */
 	@Ignore
 	@Test
 	public final void test1() {
@@ -101,5 +98,4 @@ public class MoneyTravelDisutilityTest {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 	}
-		
 }
