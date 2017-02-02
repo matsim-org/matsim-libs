@@ -3,7 +3,7 @@
 
 <population>
 
-<person id="person_0" employed="no">
+<person id="lkw_0" employed="no">
 		<plan selected="yes">
 			<act type="home" x="-500.0" y="9000.0" end_time="08:00:00" />
 			<leg mode="car">
@@ -18,7 +18,7 @@
 
 <!-- ====================================================================== -->
 
-	<person id="person_1" employed="no">
+	<person id="lkw_1" employed="no">
 		<plan selected="yes">
 			<act type="home" x="-500.0" y="9000.0" end_time="08:00:01" />
 			<leg mode="car">
@@ -167,21 +167,5 @@
 	</person>
 
 <!-- ====================================================================== -->
-
-<!-- ====================================================================== -->
-
-	<person id="personNoise_0" employed="no">
-		<plan selected="yes">
-			<act type="home" x="-1000.00" y="0.0" end_time="07:00:00" />
-			<leg mode="car">
-			</leg>
-			<act type="noise_sensitive" x="9999.0" y="0.0" end_time="20:00:00" />
-			<leg mode="car">
-			</leg>
-			<act type="home" x="-1000.00" y="0.0" end_time="07:00:00" />
-		</plan>
-
-	</person>
-
 
 </population>

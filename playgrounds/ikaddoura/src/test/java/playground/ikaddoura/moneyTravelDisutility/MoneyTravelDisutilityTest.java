@@ -22,13 +22,12 @@
  */
 package playground.ikaddoura.moneyTravelDisutility;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -37,6 +36,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import playground.ikaddoura.PricingHandler;
+import playground.ikaddoura.moneyTravelDisutility.data.BerlinAgentFilter;
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
  * @author ikaddoura
@@ -50,6 +53,7 @@ public class MoneyTravelDisutilityTest {
 	/**
 	 *
 	 */
+	@Ignore
 	@Test
 	public final void test1() {
 
@@ -61,22 +65,31 @@ public class MoneyTravelDisutilityTest {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		
-		// noise pricing
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario());
-		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+				
+		// some arbitrary pricing
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().to(PricingHandler.class);
+			}
+		});
 
 		// money travel disutility
 		final MoneyTimeDistanceTravelDisutilityFactory factory = new MoneyTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()));
+		
 		factory.setSigma(sigma);
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				
+				// agent filter
+				this.bind(AgentFilter.class).to(BerlinAgentFilter.class);
+				
 				// travel disutility
-				this.bindCarTravelDisutilityFactory().toInstance( factory );
+				this.bindCarTravelDisutilityFactory().toInstance(factory);
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				
 				// person money event handler + controler listener

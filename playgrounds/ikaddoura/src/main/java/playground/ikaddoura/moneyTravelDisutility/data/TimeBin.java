@@ -24,8 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.api.core.v01.population.Person;
+
+import com.google.inject.Inject;
 
 /**
 * Stores vehicle-specific monetary amounts for each time bin.
@@ -35,55 +36,77 @@ import org.matsim.vehicles.VehicleType;
 
 public class TimeBin {
 
+	@Inject
+	private AgentFilter agentFilter;
+	
 	private int timeBinNr;
 	
-	private final Map<Id<Vehicle>, List<Double>> vehicleId2amounts;
-	private double averageAmount = 0.;
-
-	private final Map<VehicleType, Double> vehicleType2avgAmount = new HashMap<>(); // TODO
+	private final Map<Id<Person>, List<Double>> personId2amounts;
 	
+	private double averageAmount = 0.;
+	private final Map<String, Double> agentType2avgAmount = new HashMap<>();
+		
 	public TimeBin(int timeBinNr) {
 		this.timeBinNr = timeBinNr;
-		this.vehicleId2amounts = new HashMap<>();
+		this.personId2amounts = new HashMap<>();
 	}
 
 	public double getTimeBinNr() {
 		return timeBinNr;
 	}
 
-	public Map<Id<Vehicle>, List<Double>> getVehicleId2amounts() {
-		return vehicleId2amounts;
+	public Map<Id<Person>, List<Double>> getPersonId2amounts() {
+		return personId2amounts;
 	}
 
 	public double getAverageAmount() {
 		return averageAmount;
 	}
 
-	public Map<VehicleType, Double> getVehicleType2avgAmount() {
-		throw new RuntimeException("ToDo! Not yet implemented. Aborting...");
-//		return vehicleType2avgAmount;
+	public Map<String, Double> getAgentTypeId2avgAmount() {
+		return agentType2avgAmount;
 	}
-
-	public void process() {
-		computeAverageAmountPerVehicle();
-		computeAverageAmountPerVehicleType();
-	}
-
-	private void computeAverageAmountPerVehicle() {
+	
+	public void computeAverageAmount() {
 		double sum = 0.;
 		int counter = 0;
-		for (Id<Vehicle> vehicleId : vehicleId2amounts.keySet()) {
-			for (Double amount : vehicleId2amounts.get(vehicleId)) {
+		for (Id<Person> personId : personId2amounts.keySet()) {
+			for (Double amount : personId2amounts.get(personId)) {
 				sum += amount;
-				counter++;
 			}
+			counter++;
 		}
 		
 		this.averageAmount = sum / counter;
 	}
+	
+	public void computeAverageAmountPerPersonType() {
+		final Map<String, Double> agentTypeIdPrefix2AmountSum = new HashMap<>();
+		final Map<String, Integer> agentTypeIdPrefix2Counter = new HashMap<>();
+		
+		for (Id<Person> personId : personId2amounts.keySet()) {
+			double totalAmountOfPerson = 0.;
+			for (Double amount : personId2amounts.get(personId)) {
+				totalAmountOfPerson += amount;
+			}
+			
+			String agentType = this.agentFilter.getAgentTypeFromId(personId);
+			
+			if (agentTypeIdPrefix2AmountSum.containsKey(agentType)) {
+				double amountSum = agentTypeIdPrefix2AmountSum.get(agentType);
+				int counter = agentTypeIdPrefix2Counter.get(agentType);
+				agentTypeIdPrefix2AmountSum.put(agentType, amountSum + totalAmountOfPerson);
+				agentTypeIdPrefix2Counter.put(agentType, counter + 1);
 
-	private void computeAverageAmountPerVehicleType() {
-		// TODO Auto-generated method stub
+			} else {
+				agentTypeIdPrefix2AmountSum.put(agentType, totalAmountOfPerson);
+				agentTypeIdPrefix2Counter.put(agentType, 1);
+			}
+		}
+		
+		for (String agentType : agentTypeIdPrefix2AmountSum.keySet()) {
+			this.agentType2avgAmount.put(agentType, agentTypeIdPrefix2AmountSum.get(agentType) / agentTypeIdPrefix2Counter.get(agentType) );
+		}
 	}
 
 }

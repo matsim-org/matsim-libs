@@ -10,34 +10,6 @@
 		 <param name="inputPlansFile" value="population.xml" />
 	</module>
 	
-	<module name="noise" >
-		<param name="allowForSpeedsOutsideTheValidRange" value="false" />
-		<param name="annualCostRate" value="100.0" />
-		<param name="busIdIdentifier" value="" />
-		<param name="computeCausingAgents" value="true" />
-		<param name="computeNoiseDamages" value="true" />
-		<param name="computePopulationUnits" value="true" />
-		<param name="consideredActivitiesForDamageCalculation" value="noise_sensitive" />
-		<param name="consideredActivitiesForReceiverPointGrid" value="home,work,noise_sensitive" />
-		<param name="hgvIdPrefixes" value="lkw" />
-		<param name="internalizeNoiseDamages" value="true" />
-		<param name="noiseAllocationApproach" value="MarginalCost" />
-		<param name="receiverPointGap" value="100.0" />
-		<param name="receiverPointsGridMaxX" value="0.0" />
-		<param name="receiverPointsGridMaxY" value="0.0" />
-		<param name="receiverPointsGridMinX" value="0.0" />
-		<param name="receiverPointsGridMinY" value="0.0" />
-		<param name="relevantRadius" value="500.0" />
-		<param name="scaleFactor" value="100000.0" />
-		<param name="throwNoiseEventsAffected" value="true" />
-		<param name="throwNoiseEventsCaused" value="true" />
-		<param name="timeBinSizeNoiseComputation" value="3600.0" />
-		<param name="tunnelLinkIDs" value="null" />
-		<param name="tunnelLinkIdFile" value="null" />
-		<param name="useActualSpeedLevel" value="false" />
-		<param name="writeOutputIteration" value="0" />
-	</module>
-	
 	<module name="controler">
 		<param name="outputDirectory" value="" />
 		<param name="eventsFileFormat" value="xml" />
@@ -46,7 +18,7 @@
 		<param name="lastIteration" value="5" />
 		<param name="snapshotFormat" value="otfvis" />
 		<param name="writeSnapshotsInterval" value="0" />
-		<param name="writeEventsInterval" value="0" />
+		<param name="writeEventsInterval" value="1" />
 		<param name="writePlansInterval" value="0" />
 	</module>
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,46 +19,15 @@
 
 package playground.ikaddoura.moneyTravelDisutility.data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 /**
-* Stores time-specific data for each link.
-* 
-* @author ikaddoura
-*/
+ * @author amit
+ */
 
-public class LinkInfo {
+public interface AgentFilter {
 	
-	private final Id<Link> id;
-	private final Map<Integer, TimeBin> nr2timeBin;
-	
-	public LinkInfo(Id<Link> id) {
-		this.id = id;
-		this.nr2timeBin = new HashMap<>();
-	}
+	String getAgentTypeFromId(final Id<Person> id);
 
-	public Id<Link> getId() {
-		return id;
-	}
-
-	public Map<Integer, TimeBin> getTimeBinNr2timeBin() {
-		return nr2timeBin;
-	}
-	
-	public void computeAverageAmount() {
-		for (TimeBin timeBin : nr2timeBin.values()) {
-			timeBin.computeAverageAmount();
-		}
-	}
-
-	public void computeAverageAmountPerAgentType() {
-		for (TimeBin timeBin : nr2timeBin.values()) {
-			timeBin.computeAverageAmountPerPersonType();
-		}
-	}
 }
-

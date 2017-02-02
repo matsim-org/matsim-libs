@@ -28,10 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -47,23 +45,20 @@ import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
 
 /**
  * Analyzes link-, time- and vehicle-specific information about monetary payments.
- * Computes the average monetary payment per link, time and vehicle type (TODO: account for different vehicle types) which is required by the travel disutility computation.
+ * Computes the average monetary payment per link, time and vehicle type which is required by the travel disutility computation.
  * 
  * @author ikaddoura
  */
 
-public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, IterationEndsListener {
+public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEventHandler, IterationEndsListener {
 	private static final Logger log = Logger.getLogger(MoneyEventAnalysis.class);
 	
-	// temporary information
-	private Map<Id<Person>, Id<Vehicle>> personId2vehicleId = new HashMap<>();
-	private Map<Id<Vehicle>, Id<Link>> vehicleId2linkId = new HashMap<>();
-
-	// core information
-	private Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
-	
 	@Inject
-	private Scenario scenario; // TODO: Check?!
+	private Scenario scenario;
+		
+	private final Map<Id<Vehicle>, Id<Link>> vehicleId2linkId = new HashMap<>();
+	private final Map<Id<Person>, Id<Vehicle>> personId2vehicleId = new HashMap<>();
+	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
 	
 	@Override
 	public void reset(int iteration) {
@@ -90,12 +85,12 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 			if (linkMoneyInfo.getTimeBinNr2timeBin().containsKey(timeBinNr)) {
 				TimeBin timeBin = linkMoneyInfo.getTimeBinNr2timeBin().get(timeBinNr);
 				
-				if (timeBin.getVehicleId2amounts().containsKey(vehicleId)) {
-					timeBin.getVehicleId2amounts().get(vehicleId).add(event.getAmount());
+				if (timeBin.getPersonId2amounts().containsKey(vehicleId)) {
+					timeBin.getPersonId2amounts().get(vehicleId).add(event.getAmount());
 				} else {
 					List<Double> amounts = new ArrayList<>();
 					amounts.add(event.getAmount());
-					timeBin.getVehicleId2amounts().put(vehicleId, amounts);
+					timeBin.getPersonId2amounts().put(personId, amounts);
 				}
 				
 			} else {
@@ -103,7 +98,7 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 				TimeBin timeBin = new TimeBin(timeBinNr);
 				List<Double> amounts = new ArrayList<>();
 				amounts.add(event.getAmount());
-				timeBin.getVehicleId2amounts().put(vehicleId, amounts);
+				timeBin.getPersonId2amounts().put(personId, amounts);
 				
 				linkMoneyInfo.getTimeBinNr2timeBin().put(timeBinNr, timeBin);
 			}
@@ -113,7 +108,7 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 			TimeBin timeBin = new TimeBin(timeBinNr);
 			List<Double> amounts = new ArrayList<>();
 			amounts.add(event.getAmount());
-			timeBin.getVehicleId2amounts().put(vehicleId, amounts);
+			timeBin.getPersonId2amounts().put(personId, amounts);
 
 			LinkInfo linkMoneyInfo = new LinkInfo(linkId);
 			linkMoneyInfo.getTimeBinNr2timeBin().put(timeBinNr, timeBin);
@@ -135,16 +130,13 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 	}
 
 	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.personId2vehicleId.put(event.getPersonId(), event.getVehicleId());
-	}
-
-	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
 		log.info("Iteration ends. Processing the data in the previous iteration...");
 		for (LinkInfo info : this.linkId2info.values()) {
-			info.process();
+
+			info.computeAverageAmount();
+			info.computeAverageAmountPerAgentType();
 		}
 		log.info("Iteration ends. Processing the data in the previous iteration... Done.");
 	}
