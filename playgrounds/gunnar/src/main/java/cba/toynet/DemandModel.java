@@ -50,11 +50,11 @@ class DemandModel {
 
 	static void replanPopulation(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final double replanProba, final String expectationFileName,
-			final String demandStatsFileName, final int maxTrials, final int maxFailures,
-			final Map<String, TravelTime> mode2travelTime) {
+			final String demandStatsFileName, final int maxTrials, final int maxFailures, final boolean usePTto1,
+			final boolean usePTto2, final Map<String, TravelTime> mode2travelTime) {
 
 		final ChoiceModel choiceModel = new ChoiceModel(sampleCnt, rnd, scenario, tripRouterProvider, mode2travelTime,
-				maxTrials, maxFailures);
+				maxTrials, maxFailures, usePTto1, usePTto2);
 
 		final DemandAnalyzer demandAnalyzer = new DemandAnalyzer();
 		final ResamplingTest resamplingTest = new ResamplingTest();
@@ -71,7 +71,7 @@ class DemandModel {
 			if (Math.random() < replanProba) {
 
 				System.out.println("Replanning " + person.getId());
-				
+
 				final Set<PlanForResampling> chosenPlans = choiceModel.choosePlans(person);
 				coverageStats.add(((double) chosenPlans.size()) / ((double) TourSequence.Type.values().length));
 
@@ -89,9 +89,10 @@ class DemandModel {
 					}
 					i++;
 				}
-				// System.out.println("CHOICE: " + choiceIndex + ", PROBAS: " + probabilities);
+				// System.out.println("CHOICE: " + choiceIndex + ", PROBAS: " +
+				// probabilities);
 				resamplingTest.registerChoiceAndDistribution(choiceIndex, probabilities);
-				
+
 				final Plan plan = planForResampling.plan;
 				person.getPlans().clear();
 				person.setSelectedPlan(null);
@@ -111,8 +112,8 @@ class DemandModel {
 
 		final Tuple<Double, Double> conf = resamplingTest.getBootstrap95Percent(10 * 1000, rnd);
 		System.out.println("<coverage>\ttest-statistic\t95%-int.");
-		System.out.println(coverageStats.getAvg() + "\t" + resamplingTest.getStatistic() + "\t[" + conf.getA()
-				+ ", " + conf.getB() + "]");
+		System.out.println(coverageStats.getAvg() + "\t" + resamplingTest.getStatistic() + "\t[" + conf.getA() + ", "
+				+ conf.getB() + "]");
 
 		final PrintWriter demandStatsWriter;
 		try {

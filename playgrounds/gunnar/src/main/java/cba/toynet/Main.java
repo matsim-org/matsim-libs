@@ -40,6 +40,9 @@ public class Main {
 	 * ============================================================
 	 */
 
+	static final boolean usePTto1 = true;
+	static final boolean usePTto2 = true;
+
 	static final int outerIts = 10;
 	static final int popSize = 1000;
 	static final double replanProba = 1.0;
@@ -47,7 +50,7 @@ public class Main {
 	static final String experienceFilePrefix = "./output/cba/toynet/experience-after-it";
 	static final String demandStatsFilePrefix = "./output/cba/toynet/demandStats-in-it";
 
-	static final int resampleCnt = 1000;
+	static final int resampleCnt = 1;
 	static final Random rnd = new Random();
 
 	static final int maxTrials = 10;
@@ -64,7 +67,7 @@ public class Main {
 	// private static AverageTravelTime avgTravelTimes = null;
 
 	private static AverageTravelTimeAcrossRuns avgTTsAcrossRuns = null;
-	
+
 	private static void runDemandModel(final Scenario scenario, final int outerIt) {
 
 		if (outerIt == 1) {
@@ -104,7 +107,7 @@ public class Main {
 
 		DemandModel.replanPopulation(resampleCnt, rnd, scenario, factory, outerIt == 1 ? 1.0 : replanProba,
 				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
-				maxFailures, mode2tt);
+				maxFailures, usePTto1, usePTto2, mode2tt);
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write("./input/cba/toynet/population.xml");
