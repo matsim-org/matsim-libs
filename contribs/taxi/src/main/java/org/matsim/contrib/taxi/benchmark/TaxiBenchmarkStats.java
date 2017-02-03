@@ -1,6 +1,7 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.util.*;
@@ -23,6 +24,7 @@ public class TaxiBenchmarkStats
             "StayRatio_fleetAvg" };
 
     protected final TaxiData taxiData;
+    private final PassengerEngine passengerEngine;
     private final OutputDirectoryHierarchy controlerIO;
 
     private final SummaryStatistics passengerWaitTime = new SummaryStatistics();
@@ -34,9 +36,11 @@ public class TaxiBenchmarkStats
 
 
     @Inject
-    public TaxiBenchmarkStats(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
+    public TaxiBenchmarkStats(TaxiData taxiData, PassengerEngine passengerEngine,
+            OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;
+        this.passengerEngine = passengerEngine;
         this.controlerIO = controlerIO;
     }
 
@@ -76,7 +80,7 @@ public class TaxiBenchmarkStats
     protected CSVLineBuilder createAndInitLineBuilder()
     {
         return new CSVLineBuilder()//
-                .addf("%d", taxiData.getRequests().size())//
+                .addf("%d", passengerEngine.getRequests().size())//
                 .addf("%d", taxiData.getVehicles().size())//
                 .addf("%.1f", passengerWaitTime.getMean())//
                 .addf("%.0f", pc95PassengerWaitTime.getMean())//

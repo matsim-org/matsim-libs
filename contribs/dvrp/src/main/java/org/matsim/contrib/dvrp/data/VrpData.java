@@ -29,14 +29,8 @@ public interface VrpData
     Map<Id<Vehicle>, Vehicle> getVehicles();
 
 
-    Map<Id<Request>, Request> getRequests();
-
-
     void addVehicle(Vehicle vehicle);
 
 
-    void addRequest(Request request);
-
-
-    void clearRequestsAndResetSchedules();
+    void resetSchedules();
 }

@@ -55,7 +55,7 @@ public class TaxibusScheduler {
 		this.timer = timer;
 		this.params = params;
 
-        vrpData.clearRequestsAndResetSchedules();
+        vrpData.resetSchedules();
 
 		for (Vehicle veh : this.vrpData.getVehicles().values()) {
 			Schedule schedule = veh.getSchedule();

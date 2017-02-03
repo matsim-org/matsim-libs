@@ -21,8 +21,7 @@ package org.matsim.contrib.taxi.data;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.VrpDataImpl;
 
 
 public class TaxiData
@@ -37,11 +36,6 @@ public class TaxiData
     //    {
     //        return unmodifiableTaxiRanks;
     //    }
-
-    public Map<Id<Request>, TaxiRequest> getTaxiRequests()
-    {
-        return convertMap(getRequests());
-    }
 
     //    public void addTaxiRank(TaxiRank taxiRank)
     //    {

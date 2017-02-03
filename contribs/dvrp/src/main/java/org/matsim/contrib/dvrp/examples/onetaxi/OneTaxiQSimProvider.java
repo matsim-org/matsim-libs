@@ -61,7 +61,7 @@ public class OneTaxiQSimProvider
         OneTaxiOptimizer optimizer = new OneTaxiOptimizer(scenario, vrpData, qSim.getSimTimer());
 
         PassengerEngine passengerEngine = new PassengerEngine(RunOneTaxiExample.MODE, events,
-                new OneTaxiRequestCreator(), optimizer, vrpData, scenario.getNetwork());
+                new OneTaxiRequestCreator(), optimizer, scenario.getNetwork());
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
 

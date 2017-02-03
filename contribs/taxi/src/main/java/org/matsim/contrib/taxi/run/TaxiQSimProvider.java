@@ -112,7 +112,7 @@ public class TaxiQSimProvider
     protected PassengerEngine createPassengerEngine(TaxiOptimizer optimizer)
     {
         return new PassengerEngine(TaxiModule.TAXI_MODE, eventsManager, new TaxiRequestCreator(),
-                optimizer, taxiData, scenario.getNetwork());
+                optimizer, scenario.getNetwork());
     }
 
 

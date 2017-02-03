@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
@@ -42,22 +42,23 @@ public class PassengerEngine
     private InternalInterface internalInterface;
     private final PassengerRequestCreator requestCreator;
     private final VrpOptimizer optimizer;
-    private final VrpData vrpData;
     private final Network network;
+
+    private final Map<Id<Request>, Request> requests = new LinkedHashMap<>();
+    private final Map<Id<Request>, ? extends Request> unmodifiableRequests = Collections
+            .unmodifiableMap(requests);
 
     private final AdvanceRequestStorage advanceRequestStorage;
     private final AwaitingPickupStorage awaitingPickupStorage;
 
 
     public PassengerEngine(String mode, EventsManager eventsManager,
-            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, VrpData vrpData,
-            Network network)
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network)
     {
         this.mode = mode;
         this.eventsManager = eventsManager;
         this.requestCreator = requestCreator;
         this.optimizer = optimizer;
-        this.vrpData = vrpData;
         this.network = network;
 
         advanceRequestStorage = new AdvanceRequestStorage();
@@ -165,7 +166,7 @@ public class PassengerEngine
 
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);
-        vrpData.addRequest(request);
+        requests.put(request.getId(), request);
         return request;
     }
 
@@ -217,5 +218,11 @@ public class PassengerEngine
         passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
         passenger.endLegAndComputeNextState(now);
         internalInterface.arrangeNextAgentState(passenger);
+    }
+
+
+    public Map<Id<Request>, ? extends Request> getRequests()
+    {
+        return unmodifiableRequests;
     }
 }

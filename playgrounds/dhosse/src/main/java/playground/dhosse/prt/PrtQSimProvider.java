@@ -70,7 +70,7 @@ public class PrtQSimProvider
         qSim.addQueueSimulationListeners(optimizer);
 
         PassengerEngine passengerEngine = new PassengerEngine(PrtRequestCreator.MODE, matsimServices.getEvents(),
-                new TaxiRequestCreator(), optimizer, taxiData, matsimServices.getScenario().getNetwork());
+                new TaxiRequestCreator(), optimizer, matsimServices.getScenario().getNetwork());
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
 

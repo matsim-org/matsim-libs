@@ -19,26 +19,27 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
-import org.matsim.contrib.taxi.data.TaxiRequests;
-import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
+import org.matsim.contrib.taxi.scheduler.*;
 
 import com.google.common.collect.Iterables;
 
 
 public class TaxiOptimizationValidation
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(TaxiOptimizerContext optimContext)
+    public static void assertNoUnplannedRequestsWhenIdleVehicles(TaxiScheduler taxiScheduler,
+            TaxiData taxiData, Iterable<? extends Request> requests)
     {
-        int vehCount = Iterables.size(Iterables.filter(optimContext.taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
+        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
+                TaxiSchedulerUtils.createIsIdle(taxiScheduler)));
 
         if (vehCount == 0) {
             return;//OK
         }
 
-        if (TaxiRequests.countRequestsWithStatus(optimContext.taxiData.getTaxiRequests().values(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
+        if (TaxiRequests.countRequestsWithStatus(requests, TaxiRequestStatus.UNPLANNED) == 0) {
             return; //OK
         }
 

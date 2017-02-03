@@ -47,10 +47,10 @@ public class TaxibusPassengerEngine
 
 
     public TaxibusPassengerEngine(String mode, EventsManager eventsManager,
-            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, VrpData vrpData,
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
             Network network)
     {
-        super(mode, eventsManager, requestCreator, optimizer, vrpData, network);
+        super(mode, eventsManager, requestCreator, optimizer, network);
     }
 
 

@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.junit.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
@@ -52,6 +53,7 @@ public class ScheduleReconstructionTest
     }
 
 
+    @SuppressWarnings("unchecked")
     private void runReconstruction(String configFile)
     {
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
@@ -67,22 +69,27 @@ public class ScheduleReconstructionTest
         });
         controler.run();
 
-        TaxiData reconstructedTaxiData = controler.getInjector()
-                .getInstance(ScheduleReconstructor.class).getTaxiData();
+        ScheduleReconstructor scheduleReconstructor = controler.getInjector()
+                .getInstance(ScheduleReconstructor.class);
+
         TaxiData taxiData = controler.getInjector().getInstance(TaxiData.class);
-        Assert.assertNotEquals(taxiData, reconstructedTaxiData);
+        PassengerEngine passengerEngine = controler.getInjector()
+                .getInstance(PassengerEngine.class);
+
+        Assert.assertNotEquals(taxiData, scheduleReconstructor.taxiData);
 
         compareVehicles(taxiData.getVehicles().values(),
-                reconstructedTaxiData.getVehicles().values());
+                scheduleReconstructor.taxiData.getVehicles().values());
 
-        compareRequests(taxiData.getTaxiRequests().values(),
-                reconstructedTaxiData.getTaxiRequests().values());
+        compareRequests((Collection<TaxiRequest>)passengerEngine.getRequests().values(),
+                scheduleReconstructor.taxiRequests.values());
     }
 
 
     private void compareVehicles(Collection<Vehicle> originalVehs,
             Collection<Vehicle> reconstructedVehs)
     {
+        Assert.assertNotEquals(originalVehs, reconstructedVehs);
         Assert.assertEquals(originalVehs.size(), reconstructedVehs.size());
 
         Iterator<Vehicle> rIter = reconstructedVehs.iterator();
@@ -110,7 +117,8 @@ public class ScheduleReconstructionTest
     }
 
 
-    private void compareTasks(List<? extends Task> originalTasks, List<? extends Task> reconstructedTasks)
+    private void compareTasks(List<? extends Task> originalTasks,
+            List<? extends Task> reconstructedTasks)
     {
         Assert.assertEquals(originalTasks.size(), reconstructedTasks.size());
 
@@ -133,6 +141,7 @@ public class ScheduleReconstructionTest
     private void compareRequests(Collection<TaxiRequest> originalReqs,
             Collection<TaxiRequest> reconstructedReqs)
     {
+        Assert.assertNotEquals(originalReqs, reconstructedReqs);
         Assert.assertEquals(originalReqs.size(), reconstructedReqs.size());
 
         Iterator<TaxiRequest> rIter = reconstructedReqs.iterator();

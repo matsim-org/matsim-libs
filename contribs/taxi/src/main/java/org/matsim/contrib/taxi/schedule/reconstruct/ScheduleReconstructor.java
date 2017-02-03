@@ -25,7 +25,8 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
@@ -37,6 +38,7 @@ import com.google.inject.Inject;
 public class ScheduleReconstructor
 {
     final TaxiData taxiData = new TaxiData();
+    final Map<Id<Request>, TaxiRequest> taxiRequests = new LinkedHashMap<>();
     final Map<Id<Link>, ? extends Link> links;
 
     final Map<Id<Person>, ScheduleBuilder> scheduleBuilders = new LinkedHashMap<>();

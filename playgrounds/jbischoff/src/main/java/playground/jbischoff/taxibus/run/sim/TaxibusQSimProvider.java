@@ -95,7 +95,7 @@ public class TaxibusQSimProvider
         qSim.addQueueSimulationListeners(optimizer);
 
         TaxibusPassengerEngine passengerEngine = new TaxibusPassengerEngine(
-                TaxibusUtils.TAXIBUS_MODE, events, new TaxibusRequestCreator(), optimizer, vrpData,
+                TaxibusUtils.TAXIBUS_MODE, events, new TaxibusRequestCreator(), optimizer,
                 scenario.getNetwork());
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);

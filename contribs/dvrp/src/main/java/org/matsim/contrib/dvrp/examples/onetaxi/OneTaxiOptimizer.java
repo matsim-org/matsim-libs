@@ -61,7 +61,7 @@ public class OneTaxiOptimizer
         router = new Dijkstra(scenario.getNetwork(), new TimeAsTravelDisutility(travelTime),
                 travelTime);
 
-        vrpData.clearRequestsAndResetSchedules();//necessary if we run more than 1 iteration
+        vrpData.resetSchedules();//necessary if we run more than 1 iteration
 
         vehicle = vrpData.getVehicles().values().iterator().next();
         schedule = vehicle.getSchedule();

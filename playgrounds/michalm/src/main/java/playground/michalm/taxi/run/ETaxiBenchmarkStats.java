@@ -1,6 +1,7 @@
 package playground.michalm.taxi.run;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.util.CSVLineBuilder;
@@ -23,9 +24,10 @@ public class ETaxiBenchmarkStats
 
 
     @Inject
-    public ETaxiBenchmarkStats(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
+    public ETaxiBenchmarkStats(TaxiData taxiData, PassengerEngine passengerEngine,
+            OutputDirectoryHierarchy controlerIO)
     {
-        super(taxiData, controlerIO);
+        super(taxiData, passengerEngine, controlerIO);
     }
 
 
