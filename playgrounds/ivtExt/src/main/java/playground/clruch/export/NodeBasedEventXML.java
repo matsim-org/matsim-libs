@@ -1,11 +1,5 @@
 package playground.clruch.export;
 
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,10 +8,16 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+
 /**
  * Created by Claudio on 1/26/2017.
  */
-public class NodeBasedEventXML extends AbstractEventXML {
+class NodeBasedEventXML extends AbstractEventXML {
     @Override
     public void generate(Map<String, NavigableMap<Double, Integer>> waitStepFctn, File file) {
         // from the event file extract requests of AVs and arrivals of AVs at customers
@@ -27,7 +27,6 @@ public class NodeBasedEventXML extends AbstractEventXML {
             Element SimulationResult = new Element("SimulationResult");
             Document doc = new Document(SimulationResult);
             doc.setRootElement(SimulationResult);
-
 
             Set<String> s = waitStepFctn.keySet();
             Iterator<String> e = s.iterator();
@@ -49,7 +48,6 @@ public class NodeBasedEventXML extends AbstractEventXML {
 
                 doc.getRootElement().addContent(node);
             }
-
 
             // new XMLOutputter().output(doc, System.out);
             XMLOutputter xmlOutput = new XMLOutputter();

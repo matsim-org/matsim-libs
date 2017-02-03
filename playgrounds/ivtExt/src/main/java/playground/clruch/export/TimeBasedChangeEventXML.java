@@ -1,20 +1,27 @@
 package playground.clruch.export;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
 /**
  * Created by Claudio on 1/26/2017.
  */
-public class TimeBasedChangeEventXML extends AbstractEventXML {
+class TimeBasedChangeEventXML extends AbstractEventXML {
     @Override
     public void generate(Map<String, NavigableMap<Double, Integer>> waitStepFctn, File file) {
         // from the event file extract requests of AVs and arrivals of AVs at customers
@@ -25,11 +32,9 @@ public class TimeBasedChangeEventXML extends AbstractEventXML {
             Document doc = new Document(SimulationResult);
             doc.setRootElement(SimulationResult);
 
-
             Set<String> s = waitStepFctn.keySet();
             Iterator<String> e = s.iterator();
             SortedMap<Double, List<IdNumCust>> visualizationEvents = new TreeMap<>();
-
 
             // iterate through all stations and record events of customer number changes
             while (e.hasNext()) {
@@ -49,7 +54,6 @@ public class TimeBasedChangeEventXML extends AbstractEventXML {
                 }
             }
 
-
             // iterate through the new list and output in the XML file
             Set<Double> s2 = visualizationEvents.keySet();
             System.out.println("Times with events:");
@@ -65,7 +69,6 @@ public class TimeBasedChangeEventXML extends AbstractEventXML {
                 }
                 doc.getRootElement().addContent(node);
             }
-
 
             // new XMLOutputter().output(doc, System.out);
             XMLOutputter xmlOutput = new XMLOutputter();

@@ -1,21 +1,44 @@
 package playground.clruch.export;
 
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
-import org.matsim.core.api.experimental.events.EventsManager;
-
 import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * Created by Claudio on 2/2/2017.
  */
-public class VehicleStatus extends AbstractExport {
+class VehicleStatus extends AbstractExport {
 
     List<Event> enterTrafficEvents = new ArrayList<>();
     Map<String, NavigableMap<Double, IdAVStatus>> vehicleStatus = new TreeMap<>();
-    NavigableMap<Double,Event> relevantEvents = new TreeMap<>();
+    NavigableMap<Double, Event> relevantEvents = new TreeMap<>();
 
     @Override
     void initialize(EventsManager events) {
@@ -25,15 +48,13 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new ActivityStartEventHandler() {
                 @Override
                 public void handleEvent(ActivityStartEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
-
                 @Override
                 public void reset(int iteration) {
-
 
                 }
             });
@@ -42,8 +63,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new ActivityEndEventHandler() {
                 @Override
                 public void handleEvent(ActivityEndEvent event) {
-                    if(EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -57,8 +78,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonDepartureEventHandler() {
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -72,8 +93,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonEntersVehicleEventHandler() {
                 @Override
                 public void handleEvent(PersonEntersVehicleEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -87,8 +108,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonLeavesVehicleEventHandler() {
                 @Override
                 public void handleEvent(PersonLeavesVehicleEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -102,8 +123,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new VehicleEntersTrafficEventHandler() {
                 @Override
                 public void handleEvent(VehicleEntersTrafficEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -117,8 +138,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new VehicleLeavesTrafficEventHandler() {
                 @Override
                 public void handleEvent(VehicleLeavesTrafficEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -132,8 +153,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new LinkLeaveEventHandler() {
                 @Override
                 public void handleEvent(LinkLeaveEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getVehicleId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getVehicleId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -147,8 +168,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new LinkEnterEventHandler() {
                 @Override
                 public void handleEvent(LinkEnterEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getVehicleId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getVehicleId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -162,8 +183,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonArrivalEventHandler() {
                 @Override
                 public void handleEvent(PersonArrivalEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -177,8 +198,8 @@ public class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonDepartureEventHandler() {
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
-                    if(!EventFileToProcessingXML.isPerson(event.getPersonId().toString())){
-                        relevantEvents.put(event.getTime(),event);
+                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                        relevantEvents.put(event.getTime(), event);
                     }
                 }
 
@@ -187,7 +208,6 @@ public class VehicleStatus extends AbstractExport {
 
                 }
             });
-
 
             // TODO: implement recording of rebalancing journeys for visualization
 
@@ -206,41 +226,41 @@ public class VehicleStatus extends AbstractExport {
         File fileExport = new File(directory, "vehicleStatus.xml");
 
         // export to node-based XML file
-        (new VehicleStatusEventXML(vehicleStatus,relevantEvents)).generate3(fileExport);
+        (new VehicleStatusEventXML(vehicleStatus, relevantEvents)).generate3(fileExport);
 
     }
 }
 
-
-
 // GRAVEYARD
 
- /* old implementation
-            events.addHandler(new ActivityStartEventHandler() {
-                @Override
-                public void handleEvent(ActivityStartEvent event) {
-                    relevantEvents.add(event);
-                    //check if it is of actType "AVStay"
-                    // TODO: change frmo string to reference for that string AVStay
-                    if (event.getActType().equals("AVStay")) {
-                        // if the vehicle was not yet recorded, add element to vehicleStatus
-                        String vehicleID = event.getPersonId().toString();
-                        if (!vehicleStatus.containsKey(vehicleID)) {
-                            vehicleStatus.put(vehicleID, new TreeMap<>());
-                        }
-                        double time = event.getTime();
-                        IdAVStatus idAVStatus = new IdAVStatus();
-                        idAVStatus.id = event.getLinkId().toString();
-                        idAVStatus.avStatus = event.getActType();
-                        vehicleStatus.get(vehicleID).put(time, idAVStatus);
-                    }
-                }
-
-
-                @Override
-                public void reset(int iteration) {
-
-
-                }
-            });
-            */
+/*
+ * old implementation
+ * events.addHandler(new ActivityStartEventHandler() {
+ * 
+ * @Override
+ * public void handleEvent(ActivityStartEvent event) {
+ * relevantEvents.add(event);
+ * //check if it is of actType "AVStay"
+ * // TODO: change frmo string to reference for that string AVStay
+ * if (event.getActType().equals("AVStay")) {
+ * // if the vehicle was not yet recorded, add element to vehicleStatus
+ * String vehicleID = event.getPersonId().toString();
+ * if (!vehicleStatus.containsKey(vehicleID)) {
+ * vehicleStatus.put(vehicleID, new TreeMap<>());
+ * }
+ * double time = event.getTime();
+ * IdAVStatus idAVStatus = new IdAVStatus();
+ * idAVStatus.id = event.getLinkId().toString();
+ * idAVStatus.avStatus = event.getActType();
+ * vehicleStatus.get(vehicleID).put(time, idAVStatus);
+ * }
+ * }
+ * 
+ * 
+ * @Override
+ * public void reset(int iteration) {
+ * 
+ * 
+ * }
+ * });
+ */

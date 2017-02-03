@@ -1,5 +1,16 @@
 package playground.clruch.export;
 
+import static playground.clruch.export.EventFileToProcessingXML.isPerson;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -9,16 +20,10 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static playground.clruch.export.EventFileToProcessingXML.isPerson;
-
 /**
  * Created by Claudio on 2/2/2017.
  */
-public class WaitingCustomers extends AbstractExport {
+class WaitingCustomers extends AbstractExport {
 
     // From the existing output_events file, load the data
     List<Event> relevantEvents = new ArrayList<>();
@@ -29,7 +34,8 @@ public class WaitingCustomers extends AbstractExport {
     /**
      * integration function to get to step function from discrete set of events
      *
-     * @param map navigable map with double times and int describing number of increasing / decreasing waiting customers
+     * @param map
+     *            navigable map with double times and int describing number of increasing / decreasing waiting customers
      * @return
      */
     public static NavigableMap<Double, Integer> integrate(NavigableMap<Double, Integer> map) {
@@ -45,7 +51,7 @@ public class WaitingCustomers extends AbstractExport {
     }
 
     @Override
-    void initialize(EventsManager events){
+    void initialize(EventsManager events) {
         // add handlers to read waiting customer queues
         {
             // read the events when person calls AVs
@@ -61,14 +67,14 @@ public class WaitingCustomers extends AbstractExport {
                     relevantEvents.add(event);
                     final String id = event.getPersonId().toString();
                     if (isPerson(id)) {
-//                   System.out.println("dept " + id);
+                        // System.out.println("dept " + id);
                         String linkId = event.getLinkId().toString();
                         deptEvent.put(id, event);
                         if (!waitDelta.containsKey(linkId))
                             waitDelta.put(linkId, new TreeMap<>());
-                        waitDelta.get(linkId).put(event.getTime(),//
+                        waitDelta.get(linkId).put(event.getTime(), //
                                 waitDelta.get(linkId).containsKey(event.getTime()) ? //
-                                        waitDelta.get(linkId).get(event.getTime()) + 1 : 1);
+                        waitDelta.get(linkId).get(event.getTime()) + 1 : 1);
                     }
                 }
             });
@@ -83,13 +89,12 @@ public class WaitingCustomers extends AbstractExport {
                 @Override
                 public void handleEvent(PersonArrivalEvent event) {
                     relevantEvents.add(event);
-//                System.out.println("ARRIVE "+event.getTime()+" "+event.getPersonId());
-//                System.out.println("arrival "+event.getPersonId());
+                    // System.out.println("ARRIVE "+event.getTime()+" "+event.getPersonId());
+                    // System.out.println("arrival "+event.getPersonId());
                 }
             });
             // read the events when AV arrives at agent's location
             events.addHandler(new PersonEntersVehicleEventHandler() {
-
 
                 @Override
                 public void reset(int iteration) {
@@ -112,10 +117,9 @@ public class WaitingCustomers extends AbstractExport {
                         doubleInterval.end = event.getTime();
                         linkOccupation.get(linkId).add(doubleInterval);
 
-                        waitDelta.get(linkId).put(event.getTime(),//
+                        waitDelta.get(linkId).put(event.getTime(), //
                                 waitDelta.get(linkId).containsKey(event.getTime()) ? //
-                                        waitDelta.get(linkId).get(event.getTime()) - 1 : -1);
-
+                        waitDelta.get(linkId).get(event.getTime()) - 1 : -1);
 
                     }
                 }
@@ -124,8 +128,8 @@ public class WaitingCustomers extends AbstractExport {
     }
 
     @Override
-    void writeXML(File directory){
-        File fileExport  = new File(directory, "waitingCustomers.xml");
+    void writeXML(File directory) {
+        File fileExport = new File(directory, "waitingCustomers.xml");
         File fileExport2 = new File(directory, "waitingCustomers_bytime.xml");
 
         // integrate customer number changes to get to waiting customers step function

@@ -1,13 +1,5 @@
 package playground.clruch.export;
 
-/**
- * Comments for class EventFileToProcessingXML
- *
- * @author Claudio Ruch
- * @version 1.0
- */
-
-
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -16,9 +8,12 @@ import java.io.File;
 
 
 /**
+ * Comments for class EventFileToProcessingXML
  * Read an Event file and generate appropriate processing file for network visualization
+ *
+ * @author Claudio Ruch
+ * @version 1.0
  */
-
 public class EventFileToProcessingXML {
     /**
      * checks if person with id is a person or an "av-driver", i.e. a virtual agent
@@ -44,7 +39,6 @@ public class EventFileToProcessingXML {
         final File dir = new File(args[0]);
         File directory = new File(dir, "output/processing");
         File fileImport = new File(dir, "output/output_events.xml");
-        File fileExport3 = new File(dir, "output/processing/vehicleStatus.xml");
         System.out.println("Is directory?  " + dir.isDirectory());
 
         EventsManager events = EventsUtils.createEventsManager();
