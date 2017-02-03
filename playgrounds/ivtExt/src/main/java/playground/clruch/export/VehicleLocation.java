@@ -59,6 +59,94 @@ class VehicleLocation extends AbstractExport {
 
         // add handlers to read vehicle status
         {
+
+
+            // the start location of the vehicles is recorded using the event:
+            // <event time="0.0" type="actend" person="av_av_op1_174" link="237756569_3" actType="BeforeVrpSchedule"  />
+
+            // activityend
+            events.addHandler(new ActivityEndEventHandler() {
+                @Override
+                public void handleEvent(ActivityEndEvent event) {
+                    // check if itis an AV event
+                    if (HelperFunction.isAV(event.getPersonId()) && event.getActType().equals("BeforeVrpSchedule")) {
+
+                        // if AV not recorded, add map
+                        if (!vehicleLocations.containsKey(event.getPersonId().toString())) {
+                            vehicleLocations.put(event.getPersonId().toString(), new TreeMap<>());
+                        }
+
+                        vehicleLocations.get(event.getPersonId().toString()).put(event.getTime(), event.getLinkId().toString());
+                        /*
+                        // if different location than during last time step, add location and time
+                        if (!vehicleLocations.get(event.getPersonId().toString()).floorEntry(event.getTime()).equals(event.getLinkId())) {
+
+                        }
+                        */
+                    }
+                }
+
+
+                @Override
+                public void reset(int iteration) {
+
+                }
+            });
+
+
+            // every subsequent transition will be recorded in a enterslink event
+            events.addHandler(new LinkEnterEventHandler() {
+                @Override
+                public void handleEvent(LinkEnterEvent event) {
+                    if (HelperFunction.vehicleisAV(event.getVehicleId())) {
+
+                        // if AV not recorded, add map
+                        if (!vehicleLocations.containsKey(event.getVehicleId().toString())) {
+                            vehicleLocations.put(event.getVehicleId().toString(), new TreeMap<>());
+                        }
+
+                        vehicleLocations.get(event.getVehicleId().toString()).put(event.getTime(), event.getLinkId().toString());
+                        /*
+                        // if different location than during last time step, add location and time
+                        if (!vehicleLocations.get(event.getPersonId().toString()).floorEntry(event.getTime()).equals(event.getLinkId())) {
+
+                        }
+                        */
+                    }
+
+                }
+
+                @Override
+                public void reset(int iteration) {
+
+                }
+            });
+
+            // TODO: implement recording of rebalancing journeys for visualization
+
+        }
+
+    }
+
+
+    @Override
+    void writeXML(File directory) {
+
+        File fileExport = new File(directory, "vehicleLocations.xml");
+
+        // export to node-based XML file
+        new VehicleLocationEventXML().generate(vehicleLocations, fileExport);
+
+    }
+}
+
+
+
+
+
+/*
+
+
             // activitystart
             events.addHandler(new ActivityStartEventHandler() {
                 @Override
@@ -77,178 +165,147 @@ class VehicleLocation extends AbstractExport {
                         if (!vehicleLocations.get(event.getPersonId().toString()).floorEntry(event.getTime()).equals(event.getLinkId())) {
 
                         }
-                        */
+
                     }
-                }
+                            }
 
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            /*
-
-            // activityend
-            events.addHandler(new ActivityEndEventHandler() {
-                @Override
-                public void handleEvent(ActivityEndEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // departureevent
-            events.addHandler(new PersonDepartureEventHandler() {
-                @Override
-                public void handleEvent(PersonDepartureEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // personentersvehicle
-            events.addHandler(new PersonEntersVehicleEventHandler() {
-                @Override
-                public void handleEvent(PersonEntersVehicleEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // personleavesvehicle
-            events.addHandler(new PersonLeavesVehicleEventHandler() {
-                @Override
-                public void handleEvent(PersonLeavesVehicleEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // vehicleenterstraffic
-            events.addHandler(new VehicleEntersTrafficEventHandler() {
-                @Override
-                public void handleEvent(VehicleEntersTrafficEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // vehicleleavestraffic
-            events.addHandler(new VehicleLeavesTrafficEventHandler() {
-                @Override
-                public void handleEvent(VehicleLeavesTrafficEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // leftlink
-            events.addHandler(new LinkLeaveEventHandler() {
-                @Override
-                public void handleEvent(LinkLeaveEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // entered link
-            events.addHandler(new LinkEnterEventHandler() {
-                @Override
-                public void handleEvent(LinkEnterEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // arrival
-            events.addHandler(new PersonArrivalEventHandler() {
-                @Override
-                public void handleEvent(PersonArrivalEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-            // departure
-            events.addHandler(new PersonDepartureEventHandler() {
-                @Override
-                public void handleEvent(PersonDepartureEvent event) {
-                    dumpIfRelevant(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-
-                }
-            });
-
-
-            */
-            // TODO: implement recording of rebalancing journeys for visualization
+@Override
+public void reset(int iteration) {
 
         }
+        });
 
-    }
 
 
-    @Override
-    void writeXML(File directory) {
+        // activityend
+        events.addHandler(new ActivityEndEventHandler() {
+@Override
+public void handleEvent(ActivityEndEvent event) {
+        dumpIfRelevant(event);
+        }
 
-        File fileExport = new File(directory, "vehicleLocations.xml");
+@Override
+public void reset(int iteration) {
 
-        // export to node-based XML file
-        new VehicleLocationEventXML().generate(vehicleLocations, fileExport);
+        }
+        });
 
-    }
+        // departureevent
+        events.addHandler(new PersonDepartureEventHandler() {
+@Override
+public void handleEvent(PersonDepartureEvent event) {
+        dumpIfRelevant(event);
+        }
 
-    /*
-    @Override
-    void writeXML(File directory) {
-        File fileExport = new File(directory, "vehicleLocations.xml");
+@Override
+public void reset(int iteration) {
 
-        // export to node-based XML file
-        new VehicleLocationEventXML(vehicleLocations,fileExport).generate(vehicleLocations, fileExport);
+        }
+        });
 
-        // export to time-based XML file with only changing information at every time step
-        new TimeBasedChangeEventXML().generate(vehicleLocations, fileExport2);
+        // personentersvehicle
+        events.addHandler(new PersonEntersVehicleEventHandler() {
+@Override
+public void handleEvent(PersonEntersVehicleEvent event) {
+        dumpIfRelevant(event);
+        }
 
-    }
-    */
-}
+@Override
+public void reset(int iteration) {
+
+        }
+        });
+
+        // personleavesvehicle
+        events.addHandler(new PersonLeavesVehicleEventHandler() {
+@Override
+public void handleEvent(PersonLeavesVehicleEvent event) {
+        dumpIfRelevant(event);
+        }
+
+@Override
+public void reset(int iteration) {
+
+        }
+        });
+
+        // vehicleenterstraffic
+        events.addHandler(new VehicleEntersTrafficEventHandler() {
+@Override
+public void handleEvent(VehicleEntersTrafficEvent event) {
+        dumpIfRelevant(event);
+        }
+
+@Override
+public void reset(int iteration) {
+
+        }
+        });
+
+        // vehicleleavestraffic
+        events.addHandler(new VehicleLeavesTrafficEventHandler() {
+@Override
+public void handleEvent(VehicleLeavesTrafficEvent event) {
+        dumpIfRelevant(event);
+        }
+
+@Override
+public void reset(int iteration) {
+
+        }
+        });
+
+        // leftlink
+        events.addHandler(new LinkLeaveEventHandler() {
+@Override
+public void handleEvent(LinkLeaveEvent event) {
+        dumpIfRelevant(event);
+        }
+
+@Override
+public void reset(int iteration) {
+
+        }
+        });
+
+        // entered link
+        events.addHandler(new LinkEnterEventHandler() {
+@Override
+public void handleEvent(LinkEnterEvent event) {
+        dumpIfRelevant(event);
+        }
+
+@Override
+public void reset(int iteration) {
+
+        }
+        });
+
+        // arrival
+        events.addHandler(new PersonArrivalEventHandler() {
+@Override
+public void handleEvent(PersonArrivalEvent event) {
+        dumpIfRelevant(event);
+        }
+
+@Override
+public void reset(int iteration) {
+
+        }
+        });
+
+        // departure
+        events.addHandler(new PersonDepartureEventHandler() {
+@Override
+public void handleEvent(PersonDepartureEvent event) {
+        dumpIfRelevant(event);
+        }
+
+@Override
+public void reset(int iteration) {
+
+        }
+        });
+
+
+        */
