@@ -21,20 +21,26 @@ import org.matsim.core.api.internal.HasPersonId;
 
 
 
-class VehicleStatusEventXML extends AbstractEventXML<String> {
+class VehicleLocationEventXML extends AbstractEventXML<IdAVStatus> {
 
     // TODO: implement without this workaround and ovverride from abstract class in a way that different Map types can be used
     // TODO: all of type Map<String,NavigableMap<Double,ANYDATATYPE>>
     Map<String, NavigableMap<Double, IdAVStatus>> vehicleStatus;
     NavigableMap<Double, Event> relevantEvents;
 
-    public VehicleStatusEventXML(Map<String, NavigableMap<Double, IdAVStatus>> vehicleStatusIn, NavigableMap<Double, Event> relevantEventsIn) {
+    public VehicleStatusEventXML(Map<String, NavigableMap<Double, IdAVStatus>> vehicleLocations) {
         vehicleStatus = vehicleStatusIn;
         relevantEvents = relevantEventsIn;
     }
 
     @Override
-    public void generate(Map<String, NavigableMap<Double, String>> waitStepFctn, File file) {
+    public void generate(Map<String, NavigableMap<Double, IdAVStatus>> waitStepFctn, File file) {
+
+    }
+
+
+
+    public void generate3(File file) {
         // from the event file extract requests of AVs and arrivals of AVs at customers
         // calculate data in the form <node, time, numWaitCustomers> for all node, for all time
         // save as XML file

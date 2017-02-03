@@ -15,5 +15,8 @@ class HelperFunction {
     static boolean isPerson(Id<Person> id) {
         return !id.toString().startsWith("av_");
     }
+    static boolean isAV(Id<Person> id) {
+        return !isPerson(id);
+    }
 
 }
