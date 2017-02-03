@@ -71,8 +71,8 @@ import playground.vsp.congestion.handlers.TollHandler;
  *
  */
 
-public class CNEIntegration2 {
-	private static final Logger log = Logger.getLogger(CNEIntegration2.class);
+public class CNEIntegration {
+	private static final Logger log = Logger.getLogger(CNEIntegration.class);
 
 	private Controler controler = null;
 	private String outputDirectory = null;
@@ -97,7 +97,7 @@ public class CNEIntegration2 {
         DecongestionPID, QBPV3, QBPV9
 	}
 	
-	public CNEIntegration2(String configFile, String outputDirectory) {
+	public CNEIntegration(String configFile, String outputDirectory) {
 		
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -108,18 +108,18 @@ public class CNEIntegration2 {
 		this.gridTools = null;	
 	}
 
-	public CNEIntegration2(String configFile) {
+	public CNEIntegration(String configFile) {
 		this (configFile, null);
 	}
 	
-	public CNEIntegration2(Controler controler, GridTools gridTools, ResponsibilityGridTools responsibilityGridTools) {
+	public CNEIntegration(Controler controler, GridTools gridTools, ResponsibilityGridTools responsibilityGridTools) {
 		this.controler = controler;
 		
 		this.responsibilityGridTools = responsibilityGridTools;
 		this.gridTools = gridTools;
 	}
 
-	public CNEIntegration2(Controler controler) {
+	public CNEIntegration(Controler controler) {
 		this(controler, null, null);
 	}
 

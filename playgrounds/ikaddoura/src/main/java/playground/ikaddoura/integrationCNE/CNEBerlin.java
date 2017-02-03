@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
-import playground.ikaddoura.integrationCNE.CNEIntegration2.CongestionTollingApproach;
+import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -223,7 +223,7 @@ public class CNEBerlin {
 		
 		// CNE Integration
 		
-		CNEIntegration2 cne = new CNEIntegration2(controler, gt, rgt);
+		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
 		cne.setCongestionPricing(congestionPricing);
 		cne.setNoisePricing(noisePricing);
 		cne.setAirPollutionPricing(airPollutionPricing);

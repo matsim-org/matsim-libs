@@ -59,7 +59,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
-import playground.ikaddoura.integrationCNE.CNEIntegration2.CongestionTollingApproach;
+import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -265,7 +265,7 @@ public class CNEMunich {
 		
 		// CNE Integration
 		
-		CNEIntegration2 cne = new CNEIntegration2(controler, gt, rgt);
+		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
 		cne.setCongestionPricing(congestionPricing);
 		cne.setNoisePricing(noisePricing);
 		cne.setAirPollutionPricing(airPollutionPricing);
