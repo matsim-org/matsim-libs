@@ -23,8 +23,6 @@
  */
 package org.matsim.core.network;
 
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -35,7 +33,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
 

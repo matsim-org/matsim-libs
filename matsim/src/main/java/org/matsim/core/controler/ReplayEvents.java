@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author michaz
  */
-public class ReplayEvents {
+public final class ReplayEvents {
 
     public interface Results {
         <T> T get(Class<? extends T> type);

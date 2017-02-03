@@ -62,7 +62,6 @@ public class TaxiModule
         bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
 
         bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
-        // yyyy: Why is this a factory?  See comment in TaxiOptimizerFactory.  kai, jan'2017
 
         addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
         addControlerListenerBinding().to(TaxiStatsDumper.class);

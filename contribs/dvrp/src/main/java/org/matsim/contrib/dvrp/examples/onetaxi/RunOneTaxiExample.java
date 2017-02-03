@@ -74,6 +74,9 @@ public class RunOneTaxiExample
 //		controler.addOverridingModule( new TaxiModule(fleet));
 
 		if (otfvis) {
+			OTFVisConfigGroup otfConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class ) ;
+			otfConfig.setAgentSize(400);
+			otfConfig.setLinkWidth(10);
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		
