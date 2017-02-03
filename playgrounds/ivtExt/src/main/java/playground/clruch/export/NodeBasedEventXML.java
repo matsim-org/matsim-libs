@@ -17,7 +17,7 @@ import org.jdom.output.XMLOutputter;
 /**
  * Created by Claudio on 1/26/2017.
  */
-class NodeBasedEventXML extends AbstractEventXML {
+class NodeBasedEventXML extends AbstractEventXML<Integer> {
     @Override
     public void generate(Map<String, NavigableMap<Double, Integer>> waitStepFctn, File file) {
         // from the event file extract requests of AVs and arrivals of AVs at customers

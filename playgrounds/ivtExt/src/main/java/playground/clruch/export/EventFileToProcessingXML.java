@@ -40,12 +40,17 @@ public class EventFileToProcessingXML {
         VehicleStatus vehicleStatus = new VehicleStatus();
         vehicleStatus.initialize(events);
 
+        // add experimental file to reverse engineer XML file
+        VehicleStatusLab vehicleStatusLab = new VehicleStatusLab();
+        vehicleStatusLab.initialize(events);
+
         // run the events reader
         new MatsimEventsReader(events).readFile(fileImport.toString());
 
         // write XML files
         waitingCustomers.writeXML(directory);
         vehicleStatus.writeXML(directory);
+        vehicleStatusLab.writeXML(directory);
 
         System.out.println("routine finished successfully");
     }
