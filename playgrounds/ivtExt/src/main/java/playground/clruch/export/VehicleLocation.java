@@ -40,18 +40,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 class VehicleLocation extends AbstractExport {
 
     Map<String, NavigableMap<Double, String>> vehicleLocations = new TreeMap<>();
-    List<Event> events = new ArrayList<>();
 
-
-    void dump(Event event) {
-        events.add(event);
-    }
-
-    void dumpIfRelevant(Event event) {
-        if (0 <= event.toString().indexOf("av_av_op1_174")) {
-            dump(event);
-        }
-    }
 
     @Override
     void initialize(EventsManager events) {
@@ -77,12 +66,6 @@ class VehicleLocation extends AbstractExport {
                         }
 
                         vehicleLocations.get(event.getPersonId().toString()).put(event.getTime(), event.getLinkId().toString());
-                        /*
-                        // if different location than during last time step, add location and time
-                        if (!vehicleLocations.get(event.getPersonId().toString()).floorEntry(event.getTime()).equals(event.getLinkId())) {
-
-                        }
-                        */
                     }
                 }
 
@@ -106,12 +89,6 @@ class VehicleLocation extends AbstractExport {
                         }
 
                         vehicleLocations.get(event.getVehicleId().toString()).put(event.getTime(), event.getLinkId().toString());
-                        /*
-                        // if different location than during last time step, add location and time
-                        if (!vehicleLocations.get(event.getPersonId().toString()).floorEntry(event.getTime()).equals(event.getLinkId())) {
-
-                        }
-                        */
                     }
 
                 }
@@ -121,8 +98,6 @@ class VehicleLocation extends AbstractExport {
 
                 }
             });
-
-            // TODO: implement recording of rebalancing journeys for visualization
 
         }
 
@@ -143,169 +118,3 @@ class VehicleLocation extends AbstractExport {
 
 
 
-
-/*
-
-
-            // activitystart
-            events.addHandler(new ActivityStartEventHandler() {
-                @Override
-                public void handleEvent(ActivityStartEvent event) {
-                    // check if itis an AV event
-                    if (HelperFunction.isAV(event.getPersonId())) {
-
-                        // if AV not recorded, add map
-                        if (!vehicleLocations.containsKey(event.getPersonId().toString())) {
-                            vehicleLocations.put(event.getPersonId().toString(), new TreeMap<>());
-                        }
-
-                        vehicleLocations.get(event.getPersonId().toString()).put(event.getTime(), event.getLinkId().toString());
-                        /*
-                        // if different location than during last time step, add location and time
-                        if (!vehicleLocations.get(event.getPersonId().toString()).floorEntry(event.getTime()).equals(event.getLinkId())) {
-
-                        }
-
-                    }
-                            }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-
-
-        // activityend
-        events.addHandler(new ActivityEndEventHandler() {
-@Override
-public void handleEvent(ActivityEndEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // departureevent
-        events.addHandler(new PersonDepartureEventHandler() {
-@Override
-public void handleEvent(PersonDepartureEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // personentersvehicle
-        events.addHandler(new PersonEntersVehicleEventHandler() {
-@Override
-public void handleEvent(PersonEntersVehicleEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // personleavesvehicle
-        events.addHandler(new PersonLeavesVehicleEventHandler() {
-@Override
-public void handleEvent(PersonLeavesVehicleEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // vehicleenterstraffic
-        events.addHandler(new VehicleEntersTrafficEventHandler() {
-@Override
-public void handleEvent(VehicleEntersTrafficEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // vehicleleavestraffic
-        events.addHandler(new VehicleLeavesTrafficEventHandler() {
-@Override
-public void handleEvent(VehicleLeavesTrafficEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // leftlink
-        events.addHandler(new LinkLeaveEventHandler() {
-@Override
-public void handleEvent(LinkLeaveEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // entered link
-        events.addHandler(new LinkEnterEventHandler() {
-@Override
-public void handleEvent(LinkEnterEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // arrival
-        events.addHandler(new PersonArrivalEventHandler() {
-@Override
-public void handleEvent(PersonArrivalEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-        // departure
-        events.addHandler(new PersonDepartureEventHandler() {
-@Override
-public void handleEvent(PersonDepartureEvent event) {
-        dumpIfRelevant(event);
-        }
-
-@Override
-public void reset(int iteration) {
-
-        }
-        });
-
-
-        */
