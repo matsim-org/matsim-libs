@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
+import playground.gregor.gis.cutoutnetwork.BountingBoxFilter;
 import playground.gregor.misanthrope.run.CTRunner;
 import playground.gregor.misanthrope.simulation.CTEvent;
 import playground.gregor.misanthrope.simulation.CTEventsPaulPriorityQueue;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
+import static playground.gregor.misanthrope.simulation.physics.CTCell.MIN_CELL_WIDTH;
 
 public class CTNetwork {
 
@@ -30,6 +31,7 @@ public class CTNetwork {
     private Map<Id<Node>, CTNode> nodes = new ConcurrentHashMap<>();
     private Network network;
     private EventsManager em;
+    private BountingBoxFilter filter;
 
     public CTNetwork(Network network, EventsManager em, CTNetsimEngine engine) {
         this.network = network;
@@ -66,18 +68,17 @@ public class CTNetwork {
         this.network.getLinks().values().forEach(l -> {
 
             double width = l.getCapacity() / 1.33;
-            if (width < 2 * WIDTH) {
+            if (width < MIN_CELL_WIDTH) {
                 if (WIDTH_WRN_CNT++ < 10) {
-                    log.warn("Width of link: " + l.getId() + " is too small. Increasing it from: " + width + " to: " + WIDTH);
+                    log.warn("Width of link: " + l.getId() + " is too small. Increasing it from: " + width + " to: " + MIN_CELL_WIDTH);
                     if (WIDTH_WRN_CNT == 10) {
                         log.warn(Gbl.FUTURE_SUPPRESSED);
                     }
                 }
-                width = 2 * WIDTH;
-
+                width = MIN_CELL_WIDTH;
+                l.setCapacity(width * 1.33);
             }
-            width = WIDTH * ((int) (0.5 + width / WIDTH));
-            l.setCapacity(width * 1.33);
+
         });
         this.network.getNodes().values().parallelStream().forEach(n -> {
             double mxCap = 0;
@@ -105,6 +106,10 @@ public class CTNetwork {
         });
 
         this.links.values().parallelStream().forEach(CTLink::init);
+        this.filter = new BountingBoxFilter(650608, 651253, 9893743, 9894168);
+
+//        this.links.values().stream().filter(l -> this.filter.test(l.getDsLink().getFromNode())).forEach(CTLink::debug);
+//        this.links.values().stream().filter(l -> l.getDsLink().getId().toString().contains("el")).forEach(CTLink::debug);
         this.links.values().forEach(CTLink::debug);
         this.nodes.values().parallelStream().forEach(CTNode::init);
 
@@ -164,6 +169,8 @@ public class CTNetwork {
         if (CTRunner.DEBUG) {
             draw(time);
         }
+//        this.links.values().stream().flatMap(l->l.getCells().stream()).forEach(c->c.updateIntendedCellJumpTimeAndChooseNextJumper(time));
+//        this.nodes.values().stream().forEach(n->n.getCTCell().updateIntendedCellJumpTimeAndChooseNextJumper(time));
 
 
         while (this.events.peek() != null && events.peek().getExecTime() < time + 1) {
@@ -180,7 +187,11 @@ public class CTNetwork {
     }
 
     private void draw(double time) {
-        for (CTLink link : getLinks().values()) {
+
+//        links.values().stream().filter(l -> l.getDsLink().getId().toString().contains("el")).forEach(link -> {
+//        links.values().stream().filter(l -> this.filter.test(l.getDsLink().getFromNode())).forEach(link -> {
+        links.values().forEach(link -> {
+
             Link ll = link.getDsLink();
 
             double dx = ll.getToNode().getCoord().getX() - ll.getFromNode().getCoord().getX();
@@ -190,7 +201,8 @@ public class CTNetwork {
             for (CTCell cell : link.getCells()) {
                 drawCell(cell, time, dx, dy);
             }
-        }
+
+        });
 
     }
 
@@ -210,8 +222,8 @@ public class CTNetwork {
 
     private void drawCell(CTCell cell, double time, double dx, double dy) {
         for (CTPed ped : cell.getPeds()) {
-            double oX = (5 - (ped.hashCode() % 10)) / (20. / WIDTH);
-            double oY = (5 - ((23 * ped.hashCode()) % 10)) / (20. / WIDTH);
+            double oX = (5 - (ped.hashCode() % 10)) / (20. / cell.getWidth());
+            double oY = (5 - ((23 * ped.hashCode()) % 10)) / (20. / cell.getWidth());
 
             double x = cell.getX() + oX / 2.;
             double y = cell.getY() + oY / 2.;

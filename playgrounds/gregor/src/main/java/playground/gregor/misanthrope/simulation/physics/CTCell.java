@@ -16,13 +16,20 @@ import java.util.*;
 
 public abstract class CTCell {
 
+
+    public static final double MAX_CELL_WIDTH = 10;
     public static final double RHO_M = 4.97;
     public static final double V_0 = 1.14;
     public static final double GAMMA = 0.55;
     public static final double P0 = 0.5;
     protected static final Logger log = Logger.getLogger(CTCell.class);
+    public static double MIN_CELL_WIDTH;
     private static int ID = 0;
     private static double Q;
+
+    static {
+        MIN_CELL_WIDTH = 2 * Math.sqrt((V_0 / GAMMA + 1) / (1.5 * Math.sqrt(3) * RHO_M));
+    }
 
     static {
         Q = (V_0 * RHO_M) / (V_0 / GAMMA + 1);
@@ -83,7 +90,7 @@ public abstract class CTCell {
     public synchronized void addFace(CTCellFace face) {
         faces.add(face);
         getNeighbors().add(face.nb);
-//		face.nb.addNeighbor(this);
+        face.nb.addNeighbor(this);
     }
 
     public Set<CTCell> getNeighbors() {
@@ -249,4 +256,7 @@ public abstract class CTCell {
         this.ge.add(e);
     }
 
+    public double getWidth() {
+        return width;
+    }
 }

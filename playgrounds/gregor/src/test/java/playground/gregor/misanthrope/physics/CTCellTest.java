@@ -36,7 +36,7 @@ public class CTCellTest extends MatsimTestCase {
 
 	public void testAddGetFace() throws Exception {
 		CTCell c = getCTLinkCell();
-		CTCellFace face = new CTCellFace(0, 0, 1, 1, null, 1);
+		CTCellFace face = new CTCellFace(0, 0, 1, 1, getCTLinkCell(), 1);
 		c.addFace(face);
 		List<CTCellFace> faces = c.getFaces();
 		assertEquals("number of faces", 1, faces.size());

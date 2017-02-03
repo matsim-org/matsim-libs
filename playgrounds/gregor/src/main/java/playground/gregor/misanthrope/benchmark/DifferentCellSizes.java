@@ -1,4 +1,4 @@
-package playground.gregor.misanthrope.debug;
+package playground.gregor.misanthrope.benchmark;
 /* *********************************************************************** *
  * project: org.matsim.*
  *
@@ -36,7 +36,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
@@ -45,9 +44,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import playground.gregor.misanthrope.events.JumpEventCSVWriter;
 import playground.gregor.misanthrope.events.JumpEventHandler;
 import playground.gregor.misanthrope.router.CTRoutingModule;
-import playground.gregor.misanthrope.run.ArrivalCounter;
 import playground.gregor.misanthrope.run.CTRunner;
 import playground.gregor.misanthrope.simulation.CTMobsimFactory;
+import playground.gregor.misanthrope.simulation.physics.CTCell;
 import playground.gregor.misanthrope.simulation.physics.CTLink;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -56,56 +55,90 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by laemmel on 20/10/15.
  */
-public class Debugger6 {
+public class DifferentCellSizes {
 
-    public static final double WIDTH = 5;
-    public static double AGENTS_LR = 6000;
-    public static double AGENTS_RL = 6000;
-    public static double INV_INFLOW = 0.00003;
-    private static double LL = 64.95190528383289850700;
+    private static final double WIDTH = 20;
+    private static double AGENTS_LR = 10000;
+    private static double AGENTS_RL = 10000;
+    private static double INV_INFLOW = 0.25;
+    private static double LL = 500;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        CTLink.DESIRED_WIDTH_IN_CELLS = 4;
+        List<String> res = new ArrayList<>();
+        res.add("#width in cells, max inflow, avg 1, var 1, avg 2, var 2");
+
+        for (int widthInCells = 2; widthInCells <= 10; widthInCells++) {
+            CTLink.DESIRED_WIDTH_IN_CELLS = widthInCells;
+            INV_INFLOW = 0.25; //30 min
+            TravelTimeObserver obs = new TravelTimeObserver();
+            runAll(obs);
+            res.add(widthInCells + "," + INV_INFLOW + "," + obs.getV1().getMean() + "," + obs.getV1().getVar() + "," + obs.getV2().getMean() + "," + obs.getV2().getVar());
+
+            INV_INFLOW = 1. / 10000; //max
+            obs = new TravelTimeObserver();
+            runAll(obs);
+            res.add(widthInCells + "," + INV_INFLOW + "," + obs.getV1().getMean() + "," + obs.getV1().getVar() + "," + obs.getV2().getMean() + "," + obs.getV2().getVar());
+            res.forEach(System.out::println);
+        }
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File("/Users/laemmel/scenarios/misanthrope/paper/different_cell_sizes_bi")));
+        res.forEach(System.out::println);
+        res.forEach(s -> {
+            try {
+                bw.append(s).append("\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        bw.close();
+
+    }
+
+    private static void runAll(TravelTimeObserver obs) {
         Config c2 = ConfigUtils.createConfig();
         Scenario sc2 = ScenarioUtils.createScenario(c2);
         createSc(sc2);
         createBigPopLR(sc2);
         createBigPopRL(sc2);
         setupConfig(sc2);
-        runScenario(sc2);
-
+        runScenario(sc2, obs);
     }
 
-    private static void runScenario(Scenario sc) {
+    private static void runScenario(Scenario sc, TravelTimeObserver obs) {
         final Controler controller = new Controler(sc);
         controller.getConfig().controler().setOverwriteFileSetting(
                 OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        //DEBUG
-        CTRunner.DEBUG = true;
-//		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-//		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-//
-//
-//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
-        EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
-        InfoBox iBox = new InfoBox(dbg, sc);
-        dbg.addAdditionalDrawer(iBox);
-        //		dbg.addAdditionalDrawer(new Branding());
-//			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
-//			dbg.addAdditionalDrawer(qDbg);
 
         EventsManager em = controller.getEvents();
-//			em.addHandler(qDbg);
-        em.addHandler(dbg);
-        //END_DEBUG
+        //DEBUG
+        CTRunner.DEBUG = false;
+        //		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+        //		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+        //
+        //
+        //		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+        if (CTRunner.DEBUG) {
+            EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+            InfoBox iBox = new InfoBox(dbg, sc);
+            dbg.addAdditionalDrawer(iBox);
+            //		dbg.addAdditionalDrawer(new Branding());
+            //			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+            //			dbg.addAdditionalDrawer(qDbg);
 
+
+            //			em.addHandler(qDbg);
+            em.addHandler(dbg);
+            //END_DEBUG
+        }
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(new File("/Users/laemmel/scenarios/misanthrope/sc1")));
@@ -127,8 +160,7 @@ public class Debugger6 {
         controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addEventHandlerBinding().to(ArrivalCounter.class);
-//                addControlerListenerBinding().to(UTurnCleaner.class);
+                addEventHandlerBinding().toInstance(obs);
                 if (getConfig().controler().getMobsim().equals("ctsim")) {
                     bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
                         @Override
@@ -200,73 +232,36 @@ public class Debugger6 {
     private static void createSc(Scenario sc1) {
         Network net1 = sc1.getNetwork();
         NetworkFactory fac1 = net1.getFactory();
-//		Node n1_0 = fac1.createNode(Id.createNodeId("n1_0"), CoordUtils.createCoord(0, 0));
-//		Node n1_1 = fac1.createNode(Id.createNodeId("n1_1"), CoordUtils.createCoord(10, 0));
-//		Node n1_9 = fac1.createNode(Id.createNodeId("n1_9"), CoordUtils.createCoord(10 + LL, 0));
-//		Node n1_10 = fac1.createNode(Id.createNodeId("n1_10"), CoordUtils.createCoord(10 + LL + 10, 0));
-//		net1.addNode(n1_0);
-//		net1.addNode(n1_1);
-//		net1.addNode(n1_9);
-//		net1.addNode(n1_10);
-//		Link l1_0 = fac1.createLink(Id.createLinkId("l1_0"), n1_0, n1_1);
-//		Link l1_8 = fac1.createLink(Id.createLinkId("e1_8"), n1_1, n1_9);
-//		Link l1_9 = fac1.createLink(Id.createLinkId("l1_9"), n1_9, n1_10);
-//		Link l1_0r = fac1.createLink(Id.createLinkId("l1_0r"), n1_1, n1_0);
-//		Link l1_8r = fac1.createLink(Id.createLinkId("1_8r"), n1_9, n1_1);
-//		Link l1_9r = fac1.createLink(Id.createLinkId("l1_9r"), n1_10, n1_9);
-//		net1.addLink(l1_0);
-//		net1.addLink(l1_8);
-//		net1.addLink(l1_9);
-//		net1.addLink(l1_0r);
-//		net1.addLink(l1_8r);
-//		net1.addLink(l1_9r);
-
-        double x1 = 150;
-        double y1 = 0;
         Node n1_0 = fac1.createNode(Id.createNodeId("n1_0"), CoordUtils.createCoord(0, 0));
+        Node n1_1 = fac1.createNode(Id.createNodeId("n1_1"), CoordUtils.createCoord(30, 0.1));
+        Node n1_9 = fac1.createNode(Id.createNodeId("n1_9"), CoordUtils.createCoord(30 + LL, 0));
+        Node n1_10 = fac1.createNode(Id.createNodeId("n1_10"), CoordUtils.createCoord(30 + LL + 30, 0.1));
         net1.addNode(n1_0);
-        int nodId = 1;
-        int linkId = 0;
-
-        int cnt = 0;
-        for (double angle = 0; angle <= 2 * Math.PI - Math.PI / 3; angle += Math.PI / 10) {
-//            if (MatsimRandom.getRandom().nextDouble() > 0.4){
-//                continue;
-//            }
-            if (cnt++ == 1 || cnt == 6) {
-                continue;
-            }
-            double cos = Math.cos(angle);
-            double sin = Math.sin(angle);
-            double xPrime = x1 * cos - y1 * sin;
-            double yPrime = x1 * sin + y1 * cos;
-            Node n = fac1.createNode(Id.createNodeId("n" + nodId++), CoordUtils.createCoord(xPrime, yPrime));
-            net1.addNode(n);
-            Link l = fac1.createLink(Id.createLinkId("l" + linkId), n1_0, n);
-            Link lr = fac1.createLink(Id.createLinkId("lr" + linkId++), n, n1_0);
-            net1.addLink(l);
-            net1.addLink(lr);
-        }
-
-
+        net1.addNode(n1_1);
+        net1.addNode(n1_9);
+        net1.addNode(n1_10);
+        Link l1_0 = fac1.createLink(Id.createLinkId("l1_0"), n1_0, n1_1);
+        Link l1_8 = fac1.createLink(Id.createLinkId("1_8"), n1_1, n1_9);
+        Link l1_9 = fac1.createLink(Id.createLinkId("l1_9"), n1_9, n1_10);
+        Link l1_0r = fac1.createLink(Id.createLinkId("l1_0r"), n1_1, n1_0);
+        Link l1_8r = fac1.createLink(Id.createLinkId("1_8r"), n1_9, n1_1);
+        Link l1_9r = fac1.createLink(Id.createLinkId("l1_9r"), n1_10, n1_9);
+        net1.addLink(l1_0);
+        net1.addLink(l1_8);
+        net1.addLink(l1_9);
+        net1.addLink(l1_0r);
+        net1.addLink(l1_8r);
+        net1.addLink(l1_9r);
         Set<String> modes = new HashSet<>();
         modes.add("walkct");
         for (Link l : net1.getLinks().values()) {
-
-
             l.setAllowedModes(modes);
-            l.setFreespeed(20);
-            l.setLength(150.);
-//            l.setCapacity((MatsimRandom.getRandom().nextDouble()+0.5)*WIDTH * 1.33);
-            l.setCapacity((1 + 5 * MatsimRandom.getRandom().nextDouble()) * WIDTH * 1.33);
-
-            if (l.getId().toString().contains("0")) {
-                l.setCapacity(10. * 1.33);
-            }
+            l.setFreespeed(CTCell.V_0);
+            l.setLength(30.);
+            l.setCapacity(WIDTH * 1.33);
         }
-
-//		l1_8.setLength(LL);
-//		l1_8r.setLength(LL);
+        l1_8.setLength(LL);
+        l1_8r.setLength(LL);
 
     }
 
@@ -282,13 +277,13 @@ public class Debugger6 {
             pers.addPlan(plan);
             Activity act0;
             act0 = popFac1.createActivityFromLinkId("origin",
-                    Id.create("l0", Link.class));
-            act0.setEndTime(0 * i * INV_INFLOW);
+                    Id.create("l1_0", Link.class));
+            act0.setEndTime(i * INV_INFLOW);
             plan.addActivity(act0);
             Leg leg = popFac1.createLeg("walkct");
             plan.addLeg(leg);
             Activity act1 = popFac1.createActivityFromLinkId("destination",
-                    Id.create("l2", Link.class));
+                    Id.create("l1_9", Link.class));
             plan.addActivity(act1);
             pop1.addPerson(pers);
         }
@@ -308,30 +303,13 @@ public class Debugger6 {
             pers.addPlan(plan);
             Activity act0;
             act0 = popFac1.createActivityFromLinkId("origin",
-                    Id.create("l3", Link.class));
+                    Id.create("l1_9r", Link.class));
             act0.setEndTime(i * INV_INFLOW);
             plan.addActivity(act0);
             Leg leg = popFac1.createLeg("walkct");
             plan.addLeg(leg);
             Activity act1 = popFac1.createActivityFromLinkId("destination",
-                    Id.create("l0", Link.class));
-            plan.addActivity(act1);
-            pop1.addPerson(pers);
-        }
-
-        for (int i = 0; i < AGENTS_RL; i++) {
-            Person pers = popFac1.createPerson(Id.create("c" + (i + offset), Person.class));
-            Plan plan = popFac1.createPlan();
-            pers.addPlan(plan);
-            Activity act0;
-            act0 = popFac1.createActivityFromLinkId("origin",
-                    Id.create("l4", Link.class));
-            act0.setEndTime(i * INV_INFLOW);
-            plan.addActivity(act0);
-            Leg leg = popFac1.createLeg("walkct");
-            plan.addLeg(leg);
-            Activity act1 = popFac1.createActivityFromLinkId("destination",
-                    Id.create("l0", Link.class));
+                    Id.create("l1_0r", Link.class));
             plan.addActivity(act1);
             pop1.addPerson(pers);
         }
