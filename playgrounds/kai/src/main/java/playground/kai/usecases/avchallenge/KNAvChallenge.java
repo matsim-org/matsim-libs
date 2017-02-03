@@ -29,14 +29,14 @@ class KNAvChallenge {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
-        final VrpDataImpl taxiData = new VrpDataImpl();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile("filename");
+        final FleetImpl fleet = new FleetImpl();
+        new VehicleReader(scenario.getNetwork(), fleet).readFile("filename");
         
         // ---
 
 		Controler controler = new Controler( scenario ) ;
 		
-		controler.addOverridingModule(new TaxiModule( taxiData ) ) ;
+		controler.addOverridingModule(new TaxiModule( fleet ) ) ;
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override public void install() {

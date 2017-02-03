@@ -19,12 +19,37 @@
 
 package org.matsim.contrib.dvrp.data;
 
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 
 
-public interface VrpData
+/**
+ * @author michalm
+ */
+public class FleetImpl
+    implements Fleet
 {
-    Map<Id<Vehicle>, ? extends Vehicle> getVehicles();
+    private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
+
+
+    @Override
+    public Map<Id<Vehicle>, ? extends Vehicle> getVehicles()
+    {
+        return Collections.unmodifiableMap(vehicles);
+    }
+
+
+    public void addVehicle(Vehicle vehicle)
+    {
+        vehicles.put(vehicle.getId(), vehicle);
+    }
+
+
+    public void resetSchedules()
+    {
+        for (Vehicle v : vehicles.values()) {
+            v.resetSchedule();
+        }
+    }
 }

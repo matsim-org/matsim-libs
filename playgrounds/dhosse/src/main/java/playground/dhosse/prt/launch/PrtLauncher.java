@@ -31,7 +31,7 @@ public class PrtLauncher {
 		
         Scenario scenario = ScenarioUtils.loadScenario(config);
         
-        VrpDataImpl taxiData = new VrpDataImpl();
+        FleetImpl taxiData = new FleetImpl();
         new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
 		
 		Controler controler = new Controler(config);

@@ -69,7 +69,7 @@ public abstract class AbstractTaxiOptimizer
             //TODO (2) update timeline only if the algo really wants to reschedule in this time step,
             //perhaps by checking if there are any unplanned requests??
             if (doUnscheduleAwaitingRequests) {
-                for (Vehicle v : optimContext.taxiData.getVehicles().values()) {
+                for (Vehicle v : optimContext.fleet.getVehicles().values()) {
                     optimContext.scheduler.updateTimeline(v.getSchedule());
                 }
             }

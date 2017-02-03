@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
@@ -35,19 +35,19 @@ public class TaxiModule
 {
     public static final String TAXI_MODE = "taxi";
 
-    private final VrpData taxiData;
+    private final Fleet fleet;
     private final VehicleType vehicleType;
 
 
-    public TaxiModule(VrpData taxiData)
+    public TaxiModule(Fleet fleet)
     {
-        this(taxiData, VehicleUtils.getDefaultVehicleType());
+        this(fleet, VehicleUtils.getDefaultVehicleType());
     }
 
 
-    public TaxiModule(VrpData taxiData, VehicleType vehicleType)
+    public TaxiModule(Fleet fleet, VehicleType vehicleType)
     {
-        this.taxiData = taxiData;
+        this.fleet = fleet;
         this.vehicleType = vehicleType;
     }
 
@@ -56,7 +56,7 @@ public class TaxiModule
     public void install()
     {
         addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
-        bind(VrpData.class).toInstance(taxiData);
+        bind(Fleet.class).toInstance(fleet);
         bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
 
         bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);

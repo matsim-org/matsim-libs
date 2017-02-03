@@ -86,7 +86,7 @@ public class ZonalTaxiOptimizer
                     new PriorityQueue<Vehicle>(10, LONGEST_WAITING_FIRST));
         }
 
-        for (Vehicle veh : optimContext.taxiData.getVehicles().values()) {
+        for (Vehicle veh : optimContext.fleet.getVehicles().values()) {
             if (optimContext.scheduler.isIdle(veh)) {
                 Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
                 Zone zone = linkToZone.get(link.getId());

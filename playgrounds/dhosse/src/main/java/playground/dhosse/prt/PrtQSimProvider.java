@@ -2,7 +2,7 @@ package playground.dhosse.prt;
 
 import java.util.Collection;
 
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -33,7 +33,7 @@ public class PrtQSimProvider
     private final MatsimServices matsimServices;
     private final Collection<AbstractQSimPlugin> plugins;
 
-    private final VrpData taxiData;
+    private final Fleet taxiData;
     private final TravelTime travelTime;
 
     private final TaxiConfigGroup taxiCfg;
@@ -43,7 +43,7 @@ public class PrtQSimProvider
 
     @Inject
     public PrtQSimProvider(MatsimServices matsimServices,
-            Collection<AbstractQSimPlugin> plugins, VrpData taxiData,
+            Collection<AbstractQSimPlugin> plugins, Fleet taxiData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxiConfigGroup taxiCfg,
             TaxiOptimizerFactory optimizerFactory)
     {

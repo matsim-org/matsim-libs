@@ -23,7 +23,7 @@ import java.util.Collection;
 
 import org.apache.commons.configuration.*;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -56,11 +56,11 @@ public class ETaxiQSimProvider
 
     @Inject
     public ETaxiQSimProvider(EventsManager eventsManager, Collection<AbstractQSimPlugin> plugins,
-            Scenario scenario, VrpData taxiData,
+            Scenario scenario, Fleet fleet,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
             @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType, EvData evData)
     {
-        super(eventsManager, plugins, scenario, taxiData, travelTime, vehicleType, null);
+        super(eventsManager, plugins, scenario, fleet, travelTime, vehicleType, null);
         this.evData = evData;
     }
 
@@ -69,10 +69,10 @@ public class ETaxiQSimProvider
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(taxiCfg);
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-        ETaxiScheduler scheduler = new ETaxiScheduler(scenario, taxiData, qSim.getSimTimer(),
+        ETaxiScheduler scheduler = new ETaxiScheduler(scenario, fleet, qSim.getSimTimer(),
                 schedulerParams, travelTime, travelDisutility);
 
-        ETaxiOptimizerContext optimContext = new ETaxiOptimizerContext(taxiData,
+        ETaxiOptimizerContext optimContext = new ETaxiOptimizerContext(fleet,
                 scenario.getNetwork(), qSim.getSimTimer(), travelTime, travelDisutility, scheduler,
                 evData);
 
@@ -103,7 +103,7 @@ public class ETaxiQSimProvider
                 VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
         ETaxiActionCreator actionCreator = new ETaxiActionCreator(passengerEngine, legCreator,
                 taxiCfg.getPickupDuration(), qSim.getSimTimer());
-        return new VrpAgentSource(actionCreator, taxiData, optimizer, qSim, vehicleType);
+        return new VrpAgentSource(actionCreator, fleet, optimizer, qSim, vehicleType);
     }
 
 }

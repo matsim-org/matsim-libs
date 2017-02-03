@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,17 +39,17 @@ public class OneTaxiQSimProvider
     private final EventsManager events;
     private final Collection<AbstractQSimPlugin> plugins;
 
-    private final VrpData vrpData;
+    private final Fleet fleet;
 
 
     @Inject
     public OneTaxiQSimProvider(Scenario scenario, EventsManager events,
-            Collection<AbstractQSimPlugin> plugins, VrpData vrpData)
+            Collection<AbstractQSimPlugin> plugins, Fleet fleet)
     {
         this.scenario = scenario;
         this.events = events;
         this.plugins = plugins;
-        this.vrpData = vrpData;
+        this.fleet = fleet;
     }
 
 
@@ -58,7 +58,7 @@ public class OneTaxiQSimProvider
     {
         QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
         
-        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(scenario, vrpData, qSim.getSimTimer());
+        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(scenario, fleet, qSim.getSimTimer());
 
         PassengerEngine passengerEngine = new PassengerEngine(RunOneTaxiExample.MODE, events,
                 new OneTaxiRequestCreator(), optimizer, scenario.getNetwork());
@@ -67,7 +67,7 @@ public class OneTaxiQSimProvider
 
         OneTaxiActionCreator actionCreator = new OneTaxiActionCreator(passengerEngine,
                 qSim.getSimTimer());
-        qSim.addAgentSource(new VrpAgentSource(actionCreator, vrpData, optimizer, qSim));
+        qSim.addAgentSource(new VrpAgentSource(actionCreator, fleet, optimizer, qSim));
 
         return qSim;
     }

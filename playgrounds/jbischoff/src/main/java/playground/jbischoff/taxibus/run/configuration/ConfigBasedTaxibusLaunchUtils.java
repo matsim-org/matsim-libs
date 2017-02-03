@@ -20,8 +20,8 @@
 package playground.jbischoff.taxibus.run.configuration;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.VrpDataImpl;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
@@ -58,7 +58,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 		
 		Scenario scenario = controler.getScenario();
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModules().get(TaxibusConfigGroup.GROUP_NAME);
-        final VrpDataImpl vrpData = new VrpDataImpl();
+        final FleetImpl vrpData = new FleetImpl();
         new VehicleReader(scenario.getNetwork(), vrpData).parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
         final TaxibusPassengerOrderManager orderManager;
         final StateLookupTable lookuptable;
@@ -95,7 +95,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 					bind(StateSpace.class).toProvider(Providers.of(null));
 				}
 				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
-				bind(VrpData.class).toInstance(vrpData);
+				bind(Fleet.class).toInstance(vrpData);
 
 			}
 		});

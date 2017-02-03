@@ -12,12 +12,12 @@ import playground.michalm.taxi.data.*;
 
 public class PrtVehicleFactory {
 
-	private VrpData vrpData;
+	private Fleet vrpData;
 	private Scenario scenario;
 	private PrtRankAndPassengerStatsHandler handler;
 	private PrtConfig config;
 	
-	public PrtVehicleFactory(PrtConfig config, VrpData vrpData, Scenario scenario, PrtRankAndPassengerStatsHandler rankHandler){
+	public PrtVehicleFactory(PrtConfig config, Fleet vrpData, Scenario scenario, PrtRankAndPassengerStatsHandler rankHandler){
 		
 		this.config = config;
 		this.vrpData = vrpData;

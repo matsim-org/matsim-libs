@@ -1,6 +1,6 @@
 package playground.dhosse.prt;
 
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.*;
 import org.matsim.core.router.util.*;
@@ -16,7 +16,7 @@ public class PrtModule {
 	private TravelTime ttime;
 	private TravelDisutility tdis;
 	
-	public void configureControler(final Controler controler, VrpData vrpData){
+	public void configureControler(final Controler controler, Fleet vrpData){
 		ModeRoutingParams pars = new ModeRoutingParams();
 		pars.setMode(PrtRequestCreator.MODE);
 		pars.setTeleportedModeSpeed(1.);

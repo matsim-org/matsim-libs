@@ -72,14 +72,14 @@ public class ScheduleReconstructionTest
         ScheduleReconstructor scheduleReconstructor = controler.getInjector()
                 .getInstance(ScheduleReconstructor.class);
 
-        VrpData taxiData = controler.getInjector().getInstance(VrpData.class);
+        Fleet fleet = controler.getInjector().getInstance(Fleet.class);
         PassengerEngine passengerEngine = controler.getInjector()
                 .getInstance(PassengerEngine.class);
 
-        Assert.assertNotEquals(taxiData, scheduleReconstructor.taxiData);
+        Assert.assertNotEquals(fleet, scheduleReconstructor.fleet);
 
-        compareVehicles(taxiData.getVehicles().values(),
-                scheduleReconstructor.taxiData.getVehicles().values());
+        compareVehicles(fleet.getVehicles().values(),
+                scheduleReconstructor.fleet.getVehicles().values());
 
         compareRequests((Collection<TaxiRequest>)passengerEngine.getRequests().values(),
                 scheduleReconstructor.taxiRequests.values());

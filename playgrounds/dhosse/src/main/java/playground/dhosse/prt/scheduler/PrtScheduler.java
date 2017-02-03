@@ -25,7 +25,7 @@ public class PrtScheduler
     private final TaxiSchedulerParams params;
 
 
-    public PrtScheduler(Scenario scenario, VrpData taxiData, MobsimTimer timer,
+    public PrtScheduler(Scenario scenario, Fleet taxiData, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
         super(scenario, taxiData, timer, params, travelTime, travelDisutility);

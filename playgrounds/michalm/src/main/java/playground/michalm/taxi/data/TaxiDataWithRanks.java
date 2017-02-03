@@ -22,11 +22,11 @@ package playground.michalm.taxi.data;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.VrpDataImpl;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 
 
 public class TaxiDataWithRanks
-    extends VrpDataImpl
+    extends FleetImpl
 {
     private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
 

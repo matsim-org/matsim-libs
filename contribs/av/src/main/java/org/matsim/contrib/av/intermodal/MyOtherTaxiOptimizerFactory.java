@@ -31,7 +31,7 @@ final class MyOtherTaxiOptimizerFactory implements TaxiOptimizerFactory {
 		TravelTime travelTime = optimContext.travelTime ;
 		// these not:
 		TaxiScheduler scheduler = optimContext.scheduler ;
-		VrpData taxiData = optimContext.taxiData ;
+		Fleet fleet = optimContext.fleet ;
 		
 		AbstractTaxiOptimizerParams params = null ; // yy need to find out how to get them but should be ok.
 		Collection<TaxiRequest> unplannedRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR); // constructed like this in other examples. kai, jan'17

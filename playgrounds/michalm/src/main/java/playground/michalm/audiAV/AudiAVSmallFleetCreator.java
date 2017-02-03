@@ -42,14 +42,14 @@ public class AudiAVSmallFleetCreator
 
         Network network = NetworkUtils.createNetwork();
         new MatsimNetworkReader(network).readFile(netFile);
-        VrpDataImpl data = new VrpDataImpl();
-        new VehicleReader(network, data).readFile(vehFile);
+        FleetImpl fleet = new FleetImpl();
+        new VehicleReader(network, fleet).readFile(vehFile);
 
         UniformRandom uniform = RandomUtils.getGlobalUniform();
         for (int i = 5; i <= 20; i++) {
             double fraction = (double)i / 10_000;
             List<Vehicle> fractVehs = Lists.newArrayList(Iterables
-                    .filter(data.getVehicles().values(), v -> uniform.trueOrFalse(fraction)));
+                    .filter(fleet.getVehicles().values(), v -> uniform.trueOrFalse(fraction)));
             new VehicleWriter(fractVehs).write(fractVehFilePrefix + fractVehs.size() + ".xml.gz");
         }
     }

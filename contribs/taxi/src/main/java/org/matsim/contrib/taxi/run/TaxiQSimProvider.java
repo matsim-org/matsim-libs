@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.run;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -49,7 +49,7 @@ public class TaxiQSimProvider
     private final Collection<AbstractQSimPlugin> plugins;
 
     protected final Scenario scenario;
-    protected final VrpData taxiData;
+    protected final Fleet fleet;
     protected final TravelTime travelTime;
 
     protected final TaxiConfigGroup taxiCfg;
@@ -59,7 +59,7 @@ public class TaxiQSimProvider
 
     @Inject
     public TaxiQSimProvider(EventsManager eventsManager, Collection<AbstractQSimPlugin> plugins,
-            Scenario scenario, VrpData taxiData,
+            Scenario scenario, Fleet fleet,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
             @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
             TaxiOptimizerFactory optimizerFactory)
@@ -67,7 +67,7 @@ public class TaxiQSimProvider
         this.eventsManager = eventsManager;
         this.plugins = plugins;
         this.scenario = scenario;
-        this.taxiData = taxiData;
+        this.fleet = fleet;
         this.travelTime = travelTime;
         this.taxiCfg = TaxiConfigGroup.get(scenario.getConfig());
         this.vehicleType = vehicleType;
@@ -99,10 +99,10 @@ public class TaxiQSimProvider
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(taxiCfg);
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-        TaxiScheduler scheduler = new TaxiScheduler(scenario, taxiData, qSim.getSimTimer(),
+        TaxiScheduler scheduler = new TaxiScheduler(scenario, fleet, qSim.getSimTimer(),
                 schedulerParams, travelTime, travelDisutility);
 
-        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiData,
+        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(fleet,
                 scenario.getNetwork(), qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
         return optimizerFactory.createTaxiOptimizer(optimContext,
                 taxiCfg.getOptimizerConfigGroup());
@@ -124,6 +124,6 @@ public class TaxiQSimProvider
                 VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
                 taxiCfg.getPickupDuration());
-        return new VrpAgentSource(actionCreator, taxiData, optimizer, qSim, vehicleType);
+        return new VrpAgentSource(actionCreator, fleet, optimizer, qSim, vehicleType);
     }
 }

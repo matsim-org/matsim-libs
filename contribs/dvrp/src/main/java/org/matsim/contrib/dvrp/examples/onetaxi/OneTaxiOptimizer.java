@@ -53,7 +53,7 @@ public class OneTaxiOptimizer
     public static final double DROPOFF_DURATION = 60;
 
 
-    public OneTaxiOptimizer(Scenario scenario, VrpData vrpData, MobsimTimer timer)
+    public OneTaxiOptimizer(Scenario scenario, Fleet fleet, MobsimTimer timer)
     {
         this.timer = timer;
 
@@ -61,9 +61,9 @@ public class OneTaxiOptimizer
         router = new Dijkstra(scenario.getNetwork(), new TimeAsTravelDisutility(travelTime),
                 travelTime);
 
-        ((VrpDataImpl)vrpData).resetSchedules();//necessary if we run more than 1 iteration
+        ((FleetImpl)fleet).resetSchedules();//necessary if we run more than 1 iteration
 
-        vehicle = vrpData.getVehicles().values().iterator().next();
+        vehicle = fleet.getVehicles().values().iterator().next();
         schedule = vehicle.getSchedule();
         schedule.addTask(
                 new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(), "wait"));

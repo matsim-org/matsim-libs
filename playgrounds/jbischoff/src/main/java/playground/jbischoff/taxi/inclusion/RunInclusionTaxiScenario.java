@@ -66,13 +66,13 @@ public class RunInclusionTaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        VrpDataImpl taxiData = new VrpDataImpl();
+        FleetImpl taxiData = new FleetImpl();
         new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
         return createControler(scenario, taxiData, otfvis);
     }
 
 
-    public static Controler createControler(Scenario scenario, VrpData taxiData, boolean otfvis)
+    public static Controler createControler(Scenario scenario, Fleet taxiData, boolean otfvis)
     {
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new JbTaxiModule(taxiData));

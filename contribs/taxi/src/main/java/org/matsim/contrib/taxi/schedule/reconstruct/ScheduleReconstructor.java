@@ -37,7 +37,7 @@ import com.google.inject.Inject;
 
 public class ScheduleReconstructor
 {
-    final VrpDataImpl taxiData = new VrpDataImpl();
+    final FleetImpl fleet = new FleetImpl();
     final Map<Id<Request>, TaxiRequest> taxiRequests = new LinkedHashMap<>();
     final Map<Id<Link>, ? extends Link> links;
 
@@ -92,21 +92,21 @@ public class ScheduleReconstructor
     }
 
 
-    public VrpData getTaxiData()
+    public Fleet getFleet()
     {
         if (!schedulesValidated) {
             validateSchedules();
         }
 
-        return taxiData;
+        return fleet;
     }
 
 
-    public static VrpData reconstructFromFile(Network network, String eventsFile)
+    public static Fleet reconstructFromFile(Network network, String eventsFile)
     {
         EventsManager eventsManager = EventsUtils.createEventsManager();
         ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager);
         new MatsimEventsReader(eventsManager).readFile(eventsFile);
-        return reconstructor.getTaxiData();
+        return reconstructor.getFleet();
     }
 }

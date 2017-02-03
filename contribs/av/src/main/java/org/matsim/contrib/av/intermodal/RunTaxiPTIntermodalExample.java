@@ -91,13 +91,13 @@ public class RunTaxiPTIntermodalExample {
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		VrpDataImpl taxiData = new VrpDataImpl();
+		FleetImpl fleet = new FleetImpl();
 		String taxiFileName = TaxiConfigGroup.get(config).getTaxisFileUrl(config.getContext()).getFile();
-		new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiFileName);
+		new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiFileName);
 		// ---
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new TaxiModule(taxiData));
+		controler.addOverridingModule(new TaxiModule(fleet));
 
 //				// to replace by own dispatch module:
 //				controler.addOverridingModule( new AbstractModule(){

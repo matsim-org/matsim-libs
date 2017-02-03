@@ -30,9 +30,9 @@ import com.google.common.collect.Iterables;
 public class TaxiOptimizationValidation
 {
     public static void assertNoUnplannedRequestsWhenIdleVehicles(TaxiScheduler taxiScheduler,
-            VrpData taxiData, Iterable<? extends Request> requests)
+            Fleet fleet, Iterable<? extends Request> requests)
     {
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
+        int vehCount = Iterables.size(Iterables.filter(fleet.getVehicles().values(),
                 TaxiSchedulerUtils.createIsIdle(taxiScheduler)));
 
         if (vehCount == 0) {

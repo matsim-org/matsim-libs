@@ -74,8 +74,8 @@ public class RunTaxiMiniBenchmark
 
         final Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60,
                 30 * 3600);
-        final VrpDataImpl taxiData = new VrpDataImpl();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
+        final FleetImpl fleet = new FleetImpl();
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
 
         final EventsManager events = EventsUtils.createEventsManager();
         final Collection<AbstractQSimPlugin> plugins = DynQSimModule.createQSimPlugins(config);
@@ -85,7 +85,7 @@ public class RunTaxiMiniBenchmark
         return new MiniBenchmark() {
             public void run(TaxiOptimizerFactory optimizerFactory)
             {
-                new TaxiQSimProvider(events, plugins, scenario, taxiData, estimatedTravelTime,
+                new TaxiQSimProvider(events, plugins, scenario, fleet, estimatedTravelTime,
                         vehicleType, optimizerFactory).get().run();
             }
         };

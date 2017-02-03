@@ -53,13 +53,13 @@ public class RunETaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        VrpDataImpl taxiData = new VrpDataImpl();
-        new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
+        FleetImpl fleet = new FleetImpl();
+        new EvrpVehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
-        ETaxiUtils.initEvData(taxiData, evData);
+        ETaxiUtils.initEvData(fleet, evData);
 
-        Controler controler = RunTaxiScenario.createControler(scenario, taxiData, otfvis);
+        Controler controler = RunTaxiScenario.createControler(scenario, fleet, otfvis);
         controler.addOverridingModule(new EvModule(evData));
         controler.addOverridingModule(new DynQSimModule<>(ETaxiQSimProvider.class));
 

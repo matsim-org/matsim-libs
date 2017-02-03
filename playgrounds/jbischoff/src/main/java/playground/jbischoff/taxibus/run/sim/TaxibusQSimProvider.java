@@ -23,7 +23,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.drt.DrtActionCreator;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.*;
@@ -63,7 +63,7 @@ public class TaxibusQSimProvider
     private final Scenario scenario;
     private final EventsManager events;
     private final Collection<AbstractQSimPlugin> plugins;
-    private final VrpData vrpData;
+    private final Fleet vrpData;
     private final TravelTime travelTime;
     private final TaxibusConfigGroup tbcg;
     private final TaxibusPassengerOrderManager orderManager;
@@ -71,7 +71,7 @@ public class TaxibusQSimProvider
 
     @Inject
     TaxibusQSimProvider(Scenario scenario, EventsManager events,
-            Collection<AbstractQSimPlugin> plugins, VrpData vrpData,
+            Collection<AbstractQSimPlugin> plugins, Fleet vrpData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
             @Nullable TaxibusPassengerOrderManager orderManager, @Nullable StateSpace stateSpace)
     {

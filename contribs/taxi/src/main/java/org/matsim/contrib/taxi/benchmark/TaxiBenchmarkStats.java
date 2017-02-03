@@ -1,7 +1,7 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.util.*;
@@ -23,7 +23,7 @@ public class TaxiBenchmarkStats
             "EmptyDriveRatio_fleetAvg", //
             "StayRatio_fleetAvg" };
 
-    protected final VrpData taxiData;
+    protected final Fleet fleet;
     private final PassengerEngine passengerEngine;
     private final OutputDirectoryHierarchy controlerIO;
 
@@ -36,10 +36,10 @@ public class TaxiBenchmarkStats
 
 
     @Inject
-    public TaxiBenchmarkStats(VrpData taxiData, PassengerEngine passengerEngine,
+    public TaxiBenchmarkStats(Fleet fleet, PassengerEngine passengerEngine,
             OutputDirectoryHierarchy controlerIO)
     {
-        this.taxiData = taxiData;
+        this.fleet = fleet;
         this.passengerEngine = passengerEngine;
         this.controlerIO = controlerIO;
     }
@@ -48,7 +48,7 @@ public class TaxiBenchmarkStats
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
-        TaxiStats singleRunStats = new TaxiStatsCalculator(taxiData.getVehicles().values())
+        TaxiStats singleRunStats = new TaxiStatsCalculator(fleet.getVehicles().values())
                 .getDailyStats();
 
         passengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMean());
@@ -81,7 +81,7 @@ public class TaxiBenchmarkStats
     {
         return new CSVLineBuilder()//
                 .addf("%d", passengerEngine.getRequests().size())//
-                .addf("%d", taxiData.getVehicles().size())//
+                .addf("%d", fleet.getVehicles().size())//
                 .addf("%.1f", passengerWaitTime.getMean())//
                 .addf("%.0f", pc95PassengerWaitTime.getMean())//
                 .addf("%.0f", maxPassengerWaitTime.getMean())//

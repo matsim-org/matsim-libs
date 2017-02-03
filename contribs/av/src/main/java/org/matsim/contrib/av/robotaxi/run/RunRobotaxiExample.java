@@ -57,13 +57,13 @@ public class RunRobotaxiExample {
 		config.checkConsistency();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		VrpDataImpl taxiData = new VrpDataImpl();
-		new VehicleReader(scenario.getNetwork(), taxiData)
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(scenario.getNetwork(), fleet)
 				.readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
-		return createControler(scenario, taxiData, otfvis);
+		return createControler(scenario, fleet, otfvis);
 	}
 
-	public static Controler createControler(Scenario scenario, VrpData taxiData, boolean otfvis) {
+	public static Controler createControler(Scenario scenario, Fleet fleet, boolean otfvis) {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -71,7 +71,7 @@ public class RunRobotaxiExample {
 				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
 			}
 		});
-		controler.addOverridingModule(new TaxiModule(taxiData));
+		controler.addOverridingModule(new TaxiModule(fleet));
 		double expAveragingAlpha = 0.05;// from the AV flow paper
 		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
 		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));

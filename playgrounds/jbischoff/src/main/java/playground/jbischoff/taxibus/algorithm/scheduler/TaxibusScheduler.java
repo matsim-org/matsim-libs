@@ -41,15 +41,15 @@ public class TaxibusScheduler {
 
 	private static final Logger log = Logger.getLogger(TaxibusScheduler.class);
 	private TaxibusSchedulerParams params;
-	private final VrpData vrpData;
+	private final Fleet vrpData;
 	private final MobsimTimer timer;
 
-	public TaxibusScheduler(VrpData vrpData, MobsimTimer timer, TaxibusSchedulerParams params) {
+	public TaxibusScheduler(Fleet vrpData, MobsimTimer timer, TaxibusSchedulerParams params) {
 		this.vrpData = vrpData;
 		this.timer = timer;
 		this.params = params;
 
-        ((VrpDataImpl)vrpData).resetSchedules();
+        ((FleetImpl)vrpData).resetSchedules();
 
 		for (Vehicle veh : this.vrpData.getVehicles().values()) {
 			Schedule schedule = veh.getSchedule();

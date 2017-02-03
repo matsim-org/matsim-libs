@@ -34,11 +34,11 @@ public class PrtRankAndPassengerStatsHandler
     protected Map<Id<TaxiRank>, List<Id<Person>>> rankId2WaitingPassengersList = new HashMap<Id<TaxiRank>, List<Id<Person>>>();
 
     protected PrtData data;
-    private VrpData vrpData;
+    private Fleet vrpData;
     private Scenario scenario;
 
 
-    public PrtRankAndPassengerStatsHandler(VrpData vrpData, Scenario scenario, PrtData data)
+    public PrtRankAndPassengerStatsHandler(Fleet vrpData, Scenario scenario, PrtData data)
     {
         this.vrpData = vrpData;
         this.scenario = scenario;

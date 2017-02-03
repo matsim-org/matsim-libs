@@ -34,21 +34,21 @@ import com.google.common.collect.Iterables;
 
 public class TaxiTimeProfiles
 {
-    public static ProfileCalculator createIdleVehicleCounter(final VrpData taxiData,
+    public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet,
             final TaxiScheduleInquiry scheduleInquiry)
     {
         return new TimeProfiles.SingleValueProfileCalculator("Idle") {
             @Override
             public String calcValue()
             {
-                return Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
+                return Iterables.size(Iterables.filter(fleet.getVehicles().values(),
                         TaxiSchedulerUtils.createIsIdle(scheduleInquiry))) + "";
             }
         };
     }
 
 
-    public static ProfileCalculator createCurrentTaxiTaskOfTypeCounter(final VrpData taxiData)
+    public static ProfileCalculator createCurrentTaxiTaskOfTypeCounter(final Fleet fleet)
     {
         String[] header = TimeProfiles.combineValues((Object[])TaxiTaskType.values());
         return new TimeProfiles.MultiValueProfileCalculator(header) {
@@ -57,7 +57,7 @@ public class TaxiTimeProfiles
             {
                 LongEnumAdder<TaxiTaskType> counter = new LongEnumAdder<>(TaxiTaskType.class);
 
-                for (Vehicle veh : taxiData.getVehicles().values()) {
+                for (Vehicle veh : fleet.getVehicles().values()) {
                     if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
                         TaxiTask currentTask = (TaxiTask)veh.getSchedule().getCurrentTask();
                         counter.increment(currentTask.getTaxiTaskType());

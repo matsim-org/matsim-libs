@@ -37,13 +37,13 @@ public class VehicleReader
     private static final double DEFAULT_T_0 = 0;
     private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
-    private VrpDataImpl data;
+    private FleetImpl fleet;
     private Map<Id<Link>, ? extends Link> links;
 
 
-    public VehicleReader(Network network, VrpDataImpl data)
+    public VehicleReader(Network network, FleetImpl fleet)
     {
-        this.data = data;
+        this.fleet = fleet;
         links = network.getLinks();
     }
 
@@ -52,7 +52,7 @@ public class VehicleReader
     public void startTag(String name, Attributes atts, Stack<String> context)
     {
         if (VEHICLE.equals(name)) {
-            data.addVehicle(createVehicle(atts));
+            fleet.addVehicle(createVehicle(atts));
         }
     }
 

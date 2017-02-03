@@ -59,19 +59,19 @@ public class RunTaxiBenchmark
         config.checkConsistency();
 
         Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
-        final VrpDataImpl taxiData = new VrpDataImpl();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
-        return createControler(scenario, taxiData, runs);
+        final FleetImpl fleet = new FleetImpl();
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
+        return createControler(scenario, fleet, runs);
     }
 
 
-    public static Controler createControler(Scenario scenario, VrpData taxiData, int runs)
+    public static Controler createControler(Scenario scenario, Fleet fleet, int runs)
     {
         scenario.getConfig().controler().setLastIteration(runs - 1);
 
         Controler controler = new Controler(scenario);
         controler.setModules(new TaxiBenchmarkControlerModule());
-        controler.addOverridingModule(new TaxiModule(taxiData));
+        controler.addOverridingModule(new TaxiModule(fleet));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         controler.addOverridingModule(new AbstractModule() {

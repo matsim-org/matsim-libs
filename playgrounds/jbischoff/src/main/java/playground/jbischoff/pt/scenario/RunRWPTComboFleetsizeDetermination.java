@@ -93,7 +93,7 @@ public static void main(String[] args) {
        config.checkConsistency();
 
        Scenario scenario = ScenarioUtils.loadScenario(config);
-       VrpDataImpl taxiData = new VrpDataImpl();
+       FleetImpl taxiData = new FleetImpl();
        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
 

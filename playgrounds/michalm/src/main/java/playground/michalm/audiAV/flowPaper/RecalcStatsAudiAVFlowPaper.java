@@ -22,7 +22,7 @@ package playground.michalm.audiAV.flowPaper;
 import java.util.concurrent.*;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.schedule.reconstruct.ScheduleReconstructor;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.network.NetworkUtils;
@@ -42,16 +42,16 @@ public class RecalcStatsAudiAVFlowPaper
         ExecutorService service = Executors
                 .newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
 
-        for (String fleet : TaxiStatsExtractor.FLEETS) {
+        for (String fleetSize : TaxiStatsExtractor.FLEETS) {
             for (String av : TaxiStatsExtractor.AVS) {
-                String id = TaxiStatsExtractor.getId(fleet, av);
+                String id = TaxiStatsExtractor.getId(fleetSize, av);
 
                 service.execute(() -> {
-                    VrpData taxiData = ScheduleReconstructor.reconstructFromFile(network,
+                    Fleet fleet = ScheduleReconstructor.reconstructFromFile(network,
                             path + id + "/" + id + ".output_events.xml.gz");
 
                     TaxiStatsCalculator calculator = new TaxiStatsCalculator(
-                            taxiData.getVehicles().values());
+                            fleet.getVehicles().values());
                     String prefix = path + id + "/ITERS/it.50/" + id + ".50.";
 
                     new TaxiStatsWriter(calculator.getTaxiStats())

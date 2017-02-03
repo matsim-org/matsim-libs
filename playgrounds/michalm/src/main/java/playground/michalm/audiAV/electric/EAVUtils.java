@@ -35,7 +35,7 @@ import playground.michalm.taxi.ev.ETaxiChargingLogic;
 
 public class EAVUtils
 {
-    public static void initEvData(VrpData taxiData, EvData evData)
+    public static void initEvData(Fleet fleet, EvData evData)
     {
         TemperatureProvider tempProvider = () -> 20;// aux power about 1 kW at 20oC
         double chargingSpeedFactor = 1.; //full speed
@@ -44,7 +44,7 @@ public class EAVUtils
             new ETaxiChargingLogic(c, chargingSpeedFactor);
         }
 
-        for (Vehicle v : taxiData.getVehicles().values()) {
+        for (Vehicle v : fleet.getVehicles().values()) {
             Ev ev = ((EvrpVehicle)v).getEv();
             ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
             ev.setAuxEnergyConsumption(new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider,

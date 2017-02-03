@@ -42,10 +42,10 @@ import playground.michalm.taxi.schedule.ETaxiChargingTask;
 public class ETaxiScheduler
     extends TaxiScheduler
 {
-    public ETaxiScheduler(Scenario scenario, VrpData taxiData, MobsimTimer timer,
+    public ETaxiScheduler(Scenario scenario, Fleet fleet, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
-        super(scenario, taxiData, timer, params, travelTime, travelDisutility);
+        super(scenario, fleet, timer, params, travelTime, travelDisutility);
     }
 
 

@@ -68,13 +68,13 @@ public class RunEAVBenchmark
         config.checkConsistency();
 
         Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
-        final VrpDataImpl taxiData = new VrpDataImpl();
-        new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
+        final FleetImpl fleet = new FleetImpl();
+        new EvrpVehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
-        EAVUtils.initEvData(taxiData, evData);
+        EAVUtils.initEvData(fleet, evData);
 
-        Controler controler = RunTaxiBenchmark.createControler(scenario, taxiData, runs);
+        Controler controler = RunTaxiBenchmark.createControler(scenario, fleet, runs);
         controler.addOverridingModule(new EvModule(evData));
         controler.addOverridingModule(new DynQSimModule<>(ETaxiQSimProvider.class));
 

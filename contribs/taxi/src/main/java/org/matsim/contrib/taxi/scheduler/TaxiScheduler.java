@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
 public class TaxiScheduler
     implements TaxiScheduleInquiry
 {
-    private final VrpData taxiData;
+    private final Fleet fleet;
     protected final TaxiSchedulerParams params;
     private final MobsimTimer timer;
 
@@ -51,10 +51,10 @@ public class TaxiScheduler
     private final LeastCostPathCalculator router;
 
 
-    public TaxiScheduler(Scenario scenario, VrpData taxiData, MobsimTimer timer,
+    public TaxiScheduler(Scenario scenario, Fleet fleet, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
-        this.taxiData = taxiData;
+        this.fleet = fleet;
         this.params = params;
         this.timer = timer;
         this.travelTime = travelTime;
@@ -70,14 +70,14 @@ public class TaxiScheduler
                 travelTime, params.AStarEuclideanOverdoFactor, fastRouterFactory);
 
         if (TaxiConfigGroup.get(scenario.getConfig()).isChangeStartLinkToLastLinkInSchedule()) {
-            for (Vehicle veh : taxiData.getVehicles().values()) {
+            for (Vehicle veh : fleet.getVehicles().values()) {
                 Vehicles.changeStartLinkToLastLinkInSchedule(veh);
             }
         }
 
-        ((VrpDataImpl)taxiData).resetSchedules();
+        ((FleetImpl)fleet).resetSchedules();
 
-        for (Vehicle veh : taxiData.getVehicles().values()) {
+        for (Vehicle veh : fleet.getVehicles().values()) {
             veh.getSchedule()
                     .addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
@@ -296,7 +296,7 @@ public class TaxiScheduler
      */
     public void stopAllAimlessDriveTasks()
     {
-        for (Vehicle veh : taxiData.getVehicles().values()) {
+        for (Vehicle veh : fleet.getVehicles().values()) {
             if (getImmediateDiversion(veh) != null) {
                 stopVehicle(veh);
             }
@@ -489,7 +489,7 @@ public class TaxiScheduler
     public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules()
     {
         removedRequests = new ArrayList<>();
-        for (Vehicle veh : taxiData.getVehicles().values()) {
+        for (Vehicle veh : fleet.getVehicles().values()) {
             removeAwaitingRequestsImpl(veh.getSchedule());
         }
 

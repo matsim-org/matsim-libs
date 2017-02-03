@@ -78,7 +78,7 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 		config.addModule(vacfg);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		VrpDataImpl taxiData = new VrpDataImpl();
+		FleetImpl taxiData = new FleetImpl();
 		new VehicleReader(scenario.getNetwork(), taxiData)
 				.readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 		Controler controler = new Controler(scenario);
