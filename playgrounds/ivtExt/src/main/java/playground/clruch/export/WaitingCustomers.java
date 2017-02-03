@@ -1,7 +1,5 @@
 package playground.clruch.export;
 
-import static playground.clruch.export.EventFileToProcessingXML.isPerson;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +9,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -18,6 +17,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
@@ -27,6 +27,7 @@ class WaitingCustomers extends AbstractExport {
 
     // From the existing output_events file, load the data
     List<Event> relevantEvents = new ArrayList<>();
+    // TODO key of deptEvent could be of type Id<Person>
     Map<String, PersonDepartureEvent> deptEvent = new HashMap<>();
     Map<String, List<DoubleInterval>> linkOccupation = new HashMap<>();
     Map<String, NavigableMap<Double, Integer>> waitDelta = new TreeMap<>();
@@ -65,8 +66,9 @@ class WaitingCustomers extends AbstractExport {
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
                     relevantEvents.add(event);
-                    final String id = event.getPersonId().toString();
-                    if (isPerson(id)) {
+                    final Id<Person> idRaw = event.getPersonId();
+                    final String id = idRaw.toString();
+                    if (HelperFunction.isPerson(idRaw)) {
                         // System.out.println("dept " + id);
                         String linkId = event.getLinkId().toString();
                         deptEvent.put(id, event);
@@ -104,8 +106,9 @@ class WaitingCustomers extends AbstractExport {
                 @Override
                 public void handleEvent(PersonEntersVehicleEvent event) {
                     relevantEvents.add(event);
-                    final String id = event.getPersonId().toString();
-                    if (isPerson(id)) {
+                    final Id<Person> idRaw = event.getPersonId();
+                    final String id = idRaw.toString();
+                    if (HelperFunction.isPerson(idRaw)) {
                         double wait = event.getTime() - deptEvent.get(id).getTime();
                         String linkId = deptEvent.get(id).getLinkId().toString();
 

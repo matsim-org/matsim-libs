@@ -16,18 +16,6 @@ import java.io.File;
  */
 public class EventFileToProcessingXML {
     /**
-     * checks if person with id is a person or an "av-driver", i.e. a virtual agent
-     * the virtual agents start with "av".
-     *
-     * @param id
-     * @return
-     */
-    public static boolean isPerson(String id) {
-        return !id.startsWith("av_");
-    }
-
-
-    /**
      * reads an output events file from a matsim simulation and outputs an XML file to be read by
      * processing
      *

@@ -48,7 +48,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new ActivityStartEventHandler() {
                 @Override
                 public void handleEvent(ActivityStartEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (!HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
@@ -63,7 +63,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new ActivityEndEventHandler() {
                 @Override
                 public void handleEvent(ActivityEndEvent event) {
-                    if (EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
@@ -78,7 +78,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonDepartureEventHandler() {
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (!HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
@@ -93,7 +93,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonEntersVehicleEventHandler() {
                 @Override
                 public void handleEvent(PersonEntersVehicleEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (!HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
@@ -108,7 +108,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonLeavesVehicleEventHandler() {
                 @Override
                 public void handleEvent(PersonLeavesVehicleEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (!HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
@@ -123,7 +123,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new VehicleEntersTrafficEventHandler() {
                 @Override
                 public void handleEvent(VehicleEntersTrafficEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (!HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
@@ -138,7 +138,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new VehicleLeavesTrafficEventHandler() {
                 @Override
                 public void handleEvent(VehicleLeavesTrafficEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (!HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
@@ -153,9 +153,9 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new LinkLeaveEventHandler() {
                 @Override
                 public void handleEvent(LinkLeaveEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getVehicleId().toString())) {
-                        relevantEvents.put(event.getTime(), event);
-                    }
+//                    if (!HelperFunction.isPerson(event.getVehicleId())) { //  FIXME
+//                        relevantEvents.put(event.getTime(), event);
+//                    }
                 }
 
                 @Override
@@ -168,9 +168,9 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new LinkEnterEventHandler() {
                 @Override
                 public void handleEvent(LinkEnterEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getVehicleId().toString())) {
-                        relevantEvents.put(event.getTime(), event);
-                    }
+//                    if (!HelperFunction.isPerson(event.getVehicleId())) { // FIXME
+//                        relevantEvents.put(event.getTime(), event);
+//                    }
                 }
 
                 @Override
@@ -183,7 +183,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonArrivalEventHandler() {
                 @Override
                 public void handleEvent(PersonArrivalEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (!HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
@@ -198,7 +198,7 @@ class VehicleStatus extends AbstractExport {
             events.addHandler(new PersonDepartureEventHandler() {
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
-                    if (!EventFileToProcessingXML.isPerson(event.getPersonId().toString())) {
+                    if (!HelperFunction.isPerson(event.getPersonId())) {
                         relevantEvents.put(event.getTime(), event);
                     }
                 }
