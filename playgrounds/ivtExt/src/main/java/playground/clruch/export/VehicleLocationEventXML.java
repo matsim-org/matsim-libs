@@ -1,4 +1,4 @@
-package playground.clruch;
+package playground.clruch.export;
 
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -14,12 +14,10 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
-/**
- * Created by Claudio on 1/26/2017.
- */
-public class NodeBasedEventXML extends AbstractEventXML {
+class VehicleLocationEventXML extends AbstractEventXML<String> {
+
     @Override
-    public void generate(Map<String, NavigableMap<Double, Integer>> waitStepFctn, File file) {
+    public void generate(Map<String, NavigableMap<Double, String>> vehicleLocations, File file) {
         // from the event file extract requests of AVs and arrivals of AVs at customers
         // calculate data in the form <node, time, numWaitCustomers> for all node, for all time
         // save as XML file
@@ -28,28 +26,26 @@ public class NodeBasedEventXML extends AbstractEventXML {
             Document doc = new Document(SimulationResult);
             doc.setRootElement(SimulationResult);
 
-
-            Set<String> s = waitStepFctn.keySet();
+            Set<String> s = vehicleLocations.keySet();
             Iterator<String> e = s.iterator();
 
             // iterate through all stations with passenger movements and save waiting customers step function.
             while (e.hasNext()) {
                 String statID = (String) e.next();
-                Element node = new Element("node");
+                Element node = new Element("av");
                 node.setAttribute(new Attribute("id", statID));
 
                 // iterate through step function for each node and save number of waiting customers
-                NavigableMap<Double, Integer> StepFctn = waitStepFctn.get(statID);
+                NavigableMap<Double, String> StepFctn = vehicleLocations.get(statID);
                 for (Double timeVal : StepFctn.keySet()) {
                     Element event = new Element("event");
                     event.setAttribute("time", timeVal.toString());
-                    event.setAttribute("numCustWait", StepFctn.get(timeVal).toString());
+                    event.setAttribute("link", StepFctn.get(timeVal).toString());
                     node.addContent(event);
                 }
 
                 doc.getRootElement().addContent(node);
             }
-
 
             // new XMLOutputter().output(doc, System.out);
             XMLOutputter xmlOutput = new XMLOutputter();
@@ -64,3 +60,4 @@ public class NodeBasedEventXML extends AbstractEventXML {
         }
     }
 }
+
