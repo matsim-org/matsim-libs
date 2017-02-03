@@ -22,8 +22,8 @@
 		<param name="lastIteration" value="5" />
 		<param name="snapshotFormat" value="otfvis" />
 		<param name="writeSnapshotsInterval" value="0" />
-		<param name="writeEventsInterval" value="0" />
-		<param name="writePlansInterval" value="0" />
+		<param name="writeEventsInterval" value="5" />
+		<param name="writePlansInterval" value="5" />
 	</module>
 	
 	<module name="noise" >
