@@ -49,6 +49,11 @@
 		<param name="writeEventsInterval" value="0" />
 		<param name="writePlansInterval" value="0" />
 	</module>
+	
+	<module name="travelTimeCalculator" >
+		<param name="analyzedModes" value="car" />
+		<param name="travelTimeBinSize" value="3600" />
+	</module>
 
 	<module name="qsim">
 		<param name="startTime" value="06:00:00" />

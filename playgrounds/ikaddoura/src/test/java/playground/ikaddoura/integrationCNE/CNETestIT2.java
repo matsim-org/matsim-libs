@@ -34,7 +34,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
-import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
+import playground.ikaddoura.integrationCNE.CNEIntegration2.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -42,7 +42,7 @@ import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
  * @author ikaddoura
  *
  */
-public class CNETestIT {
+public class CNETestIT2 {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -57,7 +57,7 @@ public class CNETestIT {
 		String configFile = testUtils.getPackageInputDirectory() + "CNETest/test1/config.xml";
 		
 		// baseCase
-		CNEIntegration cneIntegration1 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "bc");
+		CNEIntegration2 cneIntegration1 = new CNEIntegration2(configFile, testUtils.getOutputDirectory() + "bc/");
 		Controler controler1 = cneIntegration1.prepareControler();		
 		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
 		controler1.getEvents().addHandler(handler1);
@@ -65,10 +65,10 @@ public class CNETestIT {
 		controler1.run();
 
 		// congestion pricing
-		CNEIntegration cneIntegration2 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "c");
+		CNEIntegration2 cneIntegration2 = new CNEIntegration2(configFile, testUtils.getOutputDirectory() + "c/");
 		cneIntegration2.setCongestionPricing(true);
 		cneIntegration2.setCongestionTollingApproach(CongestionTollingApproach.DecongestionPID);
-		cneIntegration2.setkP(999999.);
+		cneIntegration2.setkP(99999.);
 		Controler controler2 = cneIntegration2.prepareControler();
 		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
 		controler2.getEvents().addHandler(handler2);
@@ -76,7 +76,7 @@ public class CNETestIT {
 		controler2.run();
 
 		// noise pricing
-		CNEIntegration cneIntegration3 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "n");
+		CNEIntegration2 cneIntegration3 = new CNEIntegration2(configFile, testUtils.getOutputDirectory() + "n/");
 		cneIntegration3.setNoisePricing(true);
 		Controler controler3 = cneIntegration3.prepareControler();
 		LinkDemandEventHandler handler3 = new LinkDemandEventHandler(controler3.getScenario().getNetwork());
@@ -85,10 +85,10 @@ public class CNETestIT {
 		controler3.run();
 						
 		// congestion + noise pricing
-		CNEIntegration cneIntegration4 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "cn");
+		CNEIntegration2 cneIntegration4 = new CNEIntegration2(configFile, testUtils.getOutputDirectory() + "cn/");
 		cneIntegration4.setCongestionPricing(true);
 		cneIntegration4.setCongestionTollingApproach(CongestionTollingApproach.DecongestionPID);
-		cneIntegration4.setkP(999999.);
+		cneIntegration4.setkP(99999.);
 		cneIntegration4.setNoisePricing(true);
 		Controler controler4 = cneIntegration4.prepareControler();
 		LinkDemandEventHandler handler4 = new LinkDemandEventHandler(controler4.getScenario().getNetwork());
@@ -196,8 +196,8 @@ public class CNETestIT {
 		
 		// baseCase
 		Controler controler1 = new Controler(scenario1);
-		CNEIntegration cneIntegration1 = new CNEIntegration(controler1, gt, rgt);
-		scenario1.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc");
+		CNEIntegration2 cneIntegration1 = new CNEIntegration2(controler1, gt, rgt);
+		scenario1.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc/");
 
 		controler1 = cneIntegration1.prepareControler();		
 		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
@@ -207,10 +207,10 @@ public class CNETestIT {
 
 		// e
 		Scenario scenario2 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
-		scenario2.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "e");
+		scenario2.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "e/");
 		Controler controler2 = new Controler(scenario2);
 
-		CNEIntegration cneIntegration2 = new CNEIntegration(controler2, gt, rgt);
+		CNEIntegration2 cneIntegration2 = new CNEIntegration2(controler2, gt, rgt);
 		cneIntegration2.setAirPollutionPricing(true);
 		controler2 = cneIntegration2.prepareControler();
 
@@ -221,9 +221,9 @@ public class CNETestIT {
 
 		// noise pricing
 		Scenario scenario3 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
-		scenario3.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "n");
+		scenario3.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "n/");
 		Controler controler3 = new Controler(scenario3);
-		CNEIntegration cneIntegration3 = new CNEIntegration(controler3, gt, rgt);
+		CNEIntegration2 cneIntegration3 = new CNEIntegration2(controler3, gt, rgt);
 		cneIntegration3.setNoisePricing(true);
 		controler3 = cneIntegration3.prepareControler();
 		LinkDemandEventHandler handler3 = new LinkDemandEventHandler(controler3.getScenario().getNetwork());
@@ -233,9 +233,9 @@ public class CNETestIT {
 						
 		// (congestion +) air pollution + noise pricing
 		Scenario scenario4 = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup()));
-		scenario4.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "cne");
+		scenario4.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "cne/");
 		Controler controler4 = new Controler(scenario4);
-		CNEIntegration cneIntegration4 = new CNEIntegration(controler4, gt, rgt );
+		CNEIntegration2 cneIntegration4 = new CNEIntegration2(controler4, gt, rgt );
 		cneIntegration4.setAirPollutionPricing(true);
 		cneIntegration4.setNoisePricing(true);
 		cneIntegration4.setCongestionPricing(true); // there is no congestion...
@@ -265,7 +265,7 @@ public class CNETestIT {
 		printResults2(handler4);
 						
 		Assert.assertEquals("BC: all agents should use the short distance route.", 11, demand_highSpeed_lowN_highE(handler1));		
-		Assert.assertEquals("E: no agent should use the high air pollution emission cost route.", 0, demand_highSpeed_lowN_highE(handler2));		
+		Assert.assertEquals("E: fewer agents should use the high air pollution emission cost route.", true, demand_highSpeed_lowN_highE(handler2) < demand_highSpeed_lowN_highE(handler1));		
 		Assert.assertEquals("N: all agents should use the short distance + low n cost route.", 11, demand_highSpeed_lowN_highE(handler3));		
 		Assert.assertEquals("N+E: most agents should use the long distance + low n cost  + low e cost route.", true, demand_lowSpeed_lowN_lowE(handler4) > (demand_mediumSpeed_highN_lowE(handler4) + demand_highSpeed_lowN_highE(handler4)) );		
 	}

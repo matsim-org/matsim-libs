@@ -22,8 +22,8 @@
 		<param name="lastIteration" value="5" />
 		<param name="snapshotFormat" value="otfvis" />
 		<param name="writeSnapshotsInterval" value="0" />
-		<param name="writeEventsInterval" value="5" />
-		<param name="writePlansInterval" value="5" />
+		<param name="writeEventsInterval" value="0" />
+		<param name="writePlansInterval" value="0" />
 	</module>
 	
 	<module name="noise" >
@@ -89,7 +89,7 @@
 		
 		<param name="ModuleProbability_2" value="0.3" />
 		<param name="Module_2" value="ReRoute" />
-		<param name="ModuleDisableAfterIteration_2" value="4" />
+		<param name="ModuleDisableAfterIteration_2" value="14" />
 		
 	</module>
 	
