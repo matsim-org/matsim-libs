@@ -45,8 +45,6 @@ public class PassengerEngine
     private final Network network;
 
     private final Map<Id<Request>, Request> requests = new LinkedHashMap<>();
-    private final Map<Id<Request>, ? extends Request> unmodifiableRequests = Collections
-            .unmodifiableMap(requests);
 
     private final AdvanceRequestStorage advanceRequestStorage;
     private final AwaitingPickupStorage awaitingPickupStorage;
@@ -223,6 +221,6 @@ public class PassengerEngine
 
     public Map<Id<Request>, ? extends Request> getRequests()
     {
-        return unmodifiableRequests;
+        return Collections.unmodifiableMap(requests);
     }
 }

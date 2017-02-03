@@ -91,7 +91,7 @@ public class RunTaxiPTIntermodalExample {
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		VrpData taxiData = new VrpDataImpl();
+		VrpDataImpl taxiData = new VrpDataImpl();
 		String taxiFileName = TaxiConfigGroup.get(config).getTaxisFileUrl(config.getContext()).getFile();
 		new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiFileName);
 		// ---

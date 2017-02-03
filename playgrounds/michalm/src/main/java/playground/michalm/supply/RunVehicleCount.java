@@ -35,7 +35,7 @@ public class RunVehicleCount
         throws IOException
     {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        VrpData data = new VrpDataImpl();
+        VrpDataImpl data = new VrpDataImpl();
         VehicleReader reader = new VehicleReader(scenario.getNetwork(), data);
         reader.readFile(
                 "d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");

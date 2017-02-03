@@ -86,13 +86,13 @@ public class ScheduleReconstructionTest
     }
 
 
-    private void compareVehicles(Collection<Vehicle> originalVehs,
-            Collection<Vehicle> reconstructedVehs)
+    private void compareVehicles(Collection<? extends Vehicle> originalVehs,
+            Collection<? extends Vehicle> reconstructedVehs)
     {
         Assert.assertNotEquals(originalVehs, reconstructedVehs);
         Assert.assertEquals(originalVehs.size(), reconstructedVehs.size());
 
-        Iterator<Vehicle> rIter = reconstructedVehs.iterator();
+        Iterator<? extends Vehicle> rIter = reconstructedVehs.iterator();
         for (Vehicle o : originalVehs) {
             Vehicle r = rIter.next();
 

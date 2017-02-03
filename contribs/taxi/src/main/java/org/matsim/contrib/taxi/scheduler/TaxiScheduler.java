@@ -75,7 +75,7 @@ public class TaxiScheduler
             }
         }
 
-        taxiData.resetSchedules();
+        ((VrpDataImpl)taxiData).resetSchedules();
 
         for (Vehicle veh : taxiData.getVehicles().values()) {
             veh.getSchedule()

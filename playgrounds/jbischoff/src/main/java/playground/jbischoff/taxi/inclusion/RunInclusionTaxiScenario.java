@@ -66,7 +66,7 @@ public class RunInclusionTaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        VrpData taxiData = new VrpDataImpl();
+        VrpDataImpl taxiData = new VrpDataImpl();
         new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
         return createControler(scenario, taxiData, otfvis);
     }

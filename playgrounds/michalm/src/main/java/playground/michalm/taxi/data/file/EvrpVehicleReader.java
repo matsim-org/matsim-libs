@@ -32,7 +32,7 @@ import playground.michalm.taxi.data.EvrpVehicle;
 public class EvrpVehicleReader
     extends VehicleReader
 {
-    public EvrpVehicleReader(Network network, VrpData data)
+    public EvrpVehicleReader(Network network, VrpDataImpl data)
     {
         super(network, data);
     }

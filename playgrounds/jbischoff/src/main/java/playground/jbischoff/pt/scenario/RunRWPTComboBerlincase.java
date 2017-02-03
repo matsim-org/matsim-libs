@@ -59,7 +59,7 @@ public static void main(String[] args) {
        config.checkConsistency();
 
        Scenario scenario = ScenarioUtils.loadScenario(config);
-       VrpData taxiData = new VrpDataImpl();
+       VrpDataImpl taxiData = new VrpDataImpl();
        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
        controler.addOverridingModule(new TaxiModule(taxiData));

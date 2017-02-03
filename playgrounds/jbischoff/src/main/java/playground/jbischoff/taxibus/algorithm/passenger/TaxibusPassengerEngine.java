@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.api.experimental.events.EventsManager;

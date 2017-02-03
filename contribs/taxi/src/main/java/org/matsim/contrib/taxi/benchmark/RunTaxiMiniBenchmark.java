@@ -74,7 +74,7 @@ public class RunTaxiMiniBenchmark
 
         final Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60,
                 30 * 3600);
-        final VrpData taxiData = new VrpDataImpl();
+        final VrpDataImpl taxiData = new VrpDataImpl();
         new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
 
         final EventsManager events = EventsUtils.createEventsManager();

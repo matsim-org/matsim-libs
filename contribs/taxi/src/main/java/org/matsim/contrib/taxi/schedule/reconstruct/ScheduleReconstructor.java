@@ -37,7 +37,7 @@ import com.google.inject.Inject;
 
 public class ScheduleReconstructor
 {
-    final VrpData taxiData = new VrpDataImpl();
+    final VrpDataImpl taxiData = new VrpDataImpl();
     final Map<Id<Request>, TaxiRequest> taxiRequests = new LinkedHashMap<>();
     final Map<Id<Link>, ? extends Link> links;
 

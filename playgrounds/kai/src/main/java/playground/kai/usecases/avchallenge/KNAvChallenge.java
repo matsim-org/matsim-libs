@@ -29,7 +29,7 @@ class KNAvChallenge {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
-        final VrpData taxiData = new VrpDataImpl();
+        final VrpDataImpl taxiData = new VrpDataImpl();
         new VehicleReader(scenario.getNetwork(), taxiData).readFile("filename");
         
         // ---

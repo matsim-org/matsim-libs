@@ -58,7 +58,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 		
 		Scenario scenario = controler.getScenario();
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModules().get(TaxibusConfigGroup.GROUP_NAME);
-        final VrpData vrpData = new VrpDataImpl();
+        final VrpDataImpl vrpData = new VrpDataImpl();
         new VehicleReader(scenario.getNetwork(), vrpData).parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
         final TaxibusPassengerOrderManager orderManager;
         final StateLookupTable lookuptable;

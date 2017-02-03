@@ -53,7 +53,7 @@ public class RunETaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        VrpData taxiData = new VrpDataImpl();
+        VrpDataImpl taxiData = new VrpDataImpl();
         new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());

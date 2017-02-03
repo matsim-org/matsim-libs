@@ -56,7 +56,7 @@ public class RunOneTaxiExample
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final VrpData vrpData = new VrpDataImpl();
+		final VrpDataImpl vrpData = new VrpDataImpl();
 		new VehicleReader(scenario.getNetwork(), vrpData).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
 		
 		// ---

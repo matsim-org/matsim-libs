@@ -26,11 +26,5 @@ import org.matsim.api.core.v01.Id;
 
 public interface VrpData
 {
-    Map<Id<Vehicle>, Vehicle> getVehicles();
-
-
-    void addVehicle(Vehicle vehicle);
-
-
-    void resetSchedules();
+    Map<Id<Vehicle>, ? extends Vehicle> getVehicles();
 }

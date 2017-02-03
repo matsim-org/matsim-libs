@@ -63,7 +63,7 @@ public class RunETaxiBenchmark
         config.checkConsistency();
 
         Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
-        final VrpData taxiData = new VrpDataImpl();
+        final VrpDataImpl taxiData = new VrpDataImpl();
         new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());

@@ -58,6 +58,6 @@ public interface Vehicle
 
     void setAgentLogic(VrpAgentLogic agentLogic);
 
-
+//TODO remove it from the interface?
     void resetSchedule();
 }

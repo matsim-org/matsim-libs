@@ -37,11 +37,11 @@ public class VehicleReader
     private static final double DEFAULT_T_0 = 0;
     private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
-    private VrpData data;
+    private VrpDataImpl data;
     private Map<Id<Link>, ? extends Link> links;
 
 
-    public VehicleReader(Network network, VrpData data)
+    public VehicleReader(Network network, VrpDataImpl data)
     {
         this.data = data;
         links = network.getLinks();

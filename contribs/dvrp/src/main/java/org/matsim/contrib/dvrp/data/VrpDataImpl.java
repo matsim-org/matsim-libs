@@ -31,25 +31,21 @@ public class VrpDataImpl
     implements VrpData
 {
     private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
-    private final Map<Id<Vehicle>, Vehicle> unmodifiableVehicles = Collections
-            .unmodifiableMap(vehicles);
 
 
     @Override
-    public Map<Id<Vehicle>, Vehicle> getVehicles()
+    public Map<Id<Vehicle>, ? extends Vehicle> getVehicles()
     {
-        return unmodifiableVehicles;
+        return Collections.unmodifiableMap(vehicles);
     }
 
 
-    @Override
     public void addVehicle(Vehicle vehicle)
     {
         vehicles.put(vehicle.getId(), vehicle);
     }
 
 
-    @Override
     public void resetSchedules()
     {
         for (Vehicle v : vehicles.values()) {

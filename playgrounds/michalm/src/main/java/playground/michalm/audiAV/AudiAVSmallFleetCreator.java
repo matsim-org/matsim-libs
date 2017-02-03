@@ -42,7 +42,7 @@ public class AudiAVSmallFleetCreator
 
         Network network = NetworkUtils.createNetwork();
         new MatsimNetworkReader(network).readFile(netFile);
-        VrpData data = new VrpDataImpl();
+        VrpDataImpl data = new VrpDataImpl();
         new VehicleReader(network, data).readFile(vehFile);
 
         UniformRandom uniform = RandomUtils.getGlobalUniform();
