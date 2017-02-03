@@ -31,16 +31,11 @@ public class EvDataImpl
     private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
     private final Map<Id<Vehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
 
-    private final Map<Id<Charger>, Charger> unmodifiableChargers = Collections
-            .unmodifiableMap(chargers);
-    private final Map<Id<Vehicle>, ElectricVehicle> unmodifiableEVehicles = Collections
-            .unmodifiableMap(eVehicles);
-
 
     @Override
     public Map<Id<Charger>, Charger> getChargers()
     {
-        return unmodifiableChargers;
+        return Collections.unmodifiableMap(chargers);
     }
 
 
@@ -54,7 +49,7 @@ public class EvDataImpl
     @Override
     public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles()
     {
-        return unmodifiableEVehicles;
+        return Collections.unmodifiableMap(eVehicles);
     }
 
 

@@ -17,57 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data.file;
+package playground.michalm.taxi.data;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.file.ReaderUtils;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
-
-import playground.michalm.taxi.data.*;
+import org.matsim.api.core.v01.Id;
 
 
-public class TaxiRankReader
-    extends MatsimXmlParser
+public class TaxiRankDataImpl
+    implements TaxiRankData
 {
-    private final static String RANK = "rank";
-
-    private final static int DEFAULT_RANK_CAPACITY = Integer.MAX_VALUE;
-
-    private final TaxiRankDataImpl data;
-    private Map<Id<Link>, ? extends Link> links;
-
-
-    public TaxiRankReader(Scenario scenario, TaxiRankDataImpl data)
-    {
-        this.data = data;
-        links = scenario.getNetwork().getLinks();
-    }
+    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
 
 
     @Override
-    public void startTag(String name, Attributes atts, Stack<String> context)
+    public Map<Id<TaxiRank>, ? extends TaxiRank> getTaxiRanks()
     {
-        if (RANK.equals(name)) {
-            data.addTaxiRank(createRank(atts));
-        }
+        return Collections.unmodifiableMap(taxiRanks);
     }
 
 
-    @Override
-    public void endTag(String name, String content, Stack<String> context)
-    {}
-
-
-    private TaxiRank createRank(Attributes atts)
+    public void addTaxiRank(TaxiRank taxiRank)
     {
-        Id<TaxiRank> id = Id.create(atts.getValue("id"), TaxiRank.class);
-        String name = ReaderUtils.getString(atts, "name", id + "");
-        Link link = links.get(Id.createLinkId(atts.getValue("link")));
-        int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_RANK_CAPACITY);
-        return new TaxiRank(id, name, link, capacity);
+        taxiRanks.put(taxiRank.getId(), taxiRank);
     }
 }
