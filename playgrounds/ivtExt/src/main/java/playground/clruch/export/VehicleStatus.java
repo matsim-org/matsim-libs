@@ -1,24 +1,18 @@
 package playground.clruch.export;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -31,17 +25,16 @@ import org.matsim.core.api.experimental.events.EventsManager;
  * Created by Claudio on 2/2/2017.
  */
 class VehicleStatus extends AbstractExport {
+    // TODO: implement recording of rebalancing journeys for visualization
 
-    List<Event> enterTrafficEvents = new ArrayList<>();
-    NavigableMap<Double, Event> relevantEvents = new TreeMap<>();
-    // ---
+    NavigableMap<String, NavigableMap<Double, AVStatus>> vehicleStatus = new TreeMap<>();
     HashMap<String, Set<Id<Person>>> vehicleCustomers = new HashMap<>();
-    Map<String, NavigableMap<Double, AVStatus>> vehicleStatus = new TreeMap<>();
 
     private void put(String vehicle, double time, AVStatus avStatus) {
         if (!vehicleStatus.containsKey(vehicle))
             vehicleStatus.put(vehicle, new TreeMap<>());
         vehicleStatus.get(vehicle).put(time, avStatus);
+        System.out.println("vehicle=" + vehicle + " time=" + time + " status=" + avStatus);
     }
 
     private void putDriveWithCustomer(PersonEntersVehicleEvent event) {
@@ -52,7 +45,13 @@ class VehicleStatus extends AbstractExport {
         put(event.getPersonId().toString(), event.getTime(), AVStatus.DRIVETOCUSTMER);
     }
 
-    // private double driveStartTime = 0;
+    private Set<Id<Person>> getCustomerSet(String vehicle) {
+        if (!vehicleCustomers.containsKey(vehicle))
+            vehicleCustomers.put(vehicle, new HashSet<>());
+
+        return vehicleCustomers.get(vehicle);
+    }
+
     private PersonEntersVehicleEvent firstCustomerEntersVehicleEvent = null;
     private PersonDepartureEvent potentialEmptyDriveEvent = null;
 
@@ -78,44 +77,28 @@ class VehicleStatus extends AbstractExport {
                 }
             });
 
-            // activityend
-            events.addHandler(new ActivityEndEventHandler() {
+            // ===========================================
+
+            // personentersvehicle
+            events.addHandler(new PersonEntersVehicleEventHandler() {
+                // <event time="21574.0" type="PersonEntersVehicle" person="27114_1" vehicle="av_av_op1_174" />
+                // <event time="21589.0" type="PersonEntersVehicle" person="av_av_op1_174" vehicle="av_av_op1_174" />
                 @Override
-                public void handleEvent(ActivityEndEvent event) {
-                    if (HelperFunction.isPerson(event.getPersonId())) {
-                        relevantEvents.put(event.getTime(), event);
+                public void handleEvent(PersonEntersVehicleEvent event) {
+                    final String vehicle = event.getVehicleId().toString();
+                    final Id<Person> person = event.getPersonId();
+                    if (HelperFunction.isPerson(person)) {
+                        Set<Id<Person>> set = getCustomerSet(vehicle);
+                        if (set.isEmpty()) { // if car is empty
+                            firstCustomerEntersVehicleEvent = event; // mark as beginning of DRIVE WITH CUSTOMER STATUS
+                        }
+                        set.add(person);
                     }
                 }
 
                 @Override
                 public void reset(int iteration) {
                     // intentionally empty
-
-                }
-            });
-
-            // ===========================================
-
-            // personentersvehicle
-            events.addHandler(new PersonEntersVehicleEventHandler() {
-                // <event time="21574.0" type="PersonEntersVehicle" person="27114_1" vehicle="av_av_op1_174" />
-                @Override
-                public void handleEvent(PersonEntersVehicleEvent event) {
-                    final String vehicle = event.getVehicleId().toString();
-                    final Id<Person> person = event.getPersonId();
-                    if (HelperFunction.isPerson(person)) {
-                        if (!vehicleCustomers.containsKey(vehicle))
-                            vehicleCustomers.put(vehicle, new HashSet<>());
-                        if (vehicleCustomers.get(vehicle).isEmpty()) {
-                            firstCustomerEntersVehicleEvent = event;
-                        }
-                        vehicleCustomers.get(vehicle).add(person);
-                    }
-                }
-
-                @Override
-                public void reset(int iteration) {
-
                 }
             });
 
@@ -127,10 +110,9 @@ class VehicleStatus extends AbstractExport {
                     final String vehicle = event.getVehicleId().toString();
                     final Id<Person> person = event.getPersonId();
                     if (HelperFunction.isPerson(person)) {
-                        if (!vehicleCustomers.containsKey(vehicle))
-                            vehicleCustomers.put(vehicle, new HashSet<>());
-                        vehicleCustomers.get(vehicle).remove(person);
-                        if (vehicleCustomers.get(vehicle).isEmpty()) {
+                        Set<Id<Person>> set = getCustomerSet(vehicle);
+                        set.remove(person);
+                        if (set.isEmpty()) { // last customer has left the car
                             if (firstCustomerEntersVehicleEvent != null) {
                                 putDriveWithCustomer(firstCustomerEntersVehicleEvent);
                             } else {
@@ -183,8 +165,6 @@ class VehicleStatus extends AbstractExport {
                 }
             });
 
-            // TODO: implement recording of rebalancing journeys for visualization
-
         }
 
     }
@@ -195,41 +175,7 @@ class VehicleStatus extends AbstractExport {
         File fileExport = new File(directory, "vehicleStatus.xml");
 
         // export to node-based XML file
-         new VehicleStatusEventXML().generate(vehicleStatus, fileExport);
+        new VehicleStatusEventXML().generate(vehicleStatus, fileExport);
 
     }
 }
-
-// GRAVEYARD
-
-/*
- * old implementation
- * events.addHandler(new ActivityStartEventHandler() {
- * 
- * @Override
- * public void handleEvent(ActivityStartEvent event) {
- * relevantEvents.add(event);
- * //check if it is of actType "AVStay"
- * // TODO: change frmo string to reference for that string AVStay
- * if (event.getActType().equals("AVStay")) {
- * // if the vehicle was not yet recorded, add element to vehicleStatus
- * String vehicleID = event.getPersonId().toString();
- * if (!vehicleStatus.containsKey(vehicleID)) {
- * vehicleStatus.put(vehicleID, new TreeMap<>());
- * }
- * double time = event.getTime();
- * IdAVStatus idAVStatus = new IdAVStatus();
- * idAVStatus.id = event.getLinkId().toString();
- * idAVStatus.avStatus = event.getActType();
- * vehicleStatus.get(vehicleID).put(time, idAVStatus);
- * }
- * }
- * 
- * 
- * @Override
- * public void reset(int iteration) {
- * 
- * 
- * }
- * });
- */
