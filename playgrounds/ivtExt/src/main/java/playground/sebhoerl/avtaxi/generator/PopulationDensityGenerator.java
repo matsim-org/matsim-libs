@@ -1,6 +1,7 @@
 package playground.sebhoerl.avtaxi.generator;
 
 import com.google.inject.Inject;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -11,26 +12,24 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import playground.clruch.utils.PopulationTools;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PopulationDensityGenerator implements AVGenerator {
+    private static final Logger log = Logger.getLogger(PopulationDensityGenerator.class);
     final long numberOfVehicles;
     long generatedNumberOfVehicles = 0;
 
     final String prefix;
 
-    private List<Link> linkList = new LinkedList<>();
-    private Map<Link, Double> cumulativeDensity = new HashMap<>();
+    private NavigableMap<Double, Link > cumulativeDensity2 = new TreeMap<>();
 
-    public PopulationDensityGenerator(AVGeneratorConfig config, Network network, Population population) {
+    PopulationDensityGenerator(AVGeneratorConfig config, Network network, Population population) {
         this.numberOfVehicles = config.getNumberOfVehicles();
 
         String prefix = config.getPrefix();
@@ -40,6 +39,7 @@ public class PopulationDensityGenerator implements AVGenerator {
         double sum = 0.0;
         Map<Link, Double> density = new HashMap<>();
 
+        int personCount =0;
         for (Person person : population.getPersons().values()) {
             for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
                 if (planElement instanceof Activity) {
@@ -50,21 +50,21 @@ public class PopulationDensityGenerator implements AVGenerator {
                     } else {
                         density.put(link, 1.0);
                     }
-
-                    linkList.add(link);
                     sum += 1.0;
                 }
-
-                break;
             }
+            ++personCount;
         }
+        log.info("personCount "+personCount);
 
         // Compute relative frequencies and cumulative
         double cumsum = 0.0;
 
-        for (Link link : linkList) {
-            cumsum += density.get(link) / sum;
-            cumulativeDensity.put(link, cumsum);
+        for (Map.Entry<Link,Double> entry : density.entrySet()) {
+            cumulativeDensity2.put( cumsum,entry.getKey());
+            cumsum += entry.getValue() / sum;
+
+            log.info("link "+entry.getKey()+  "cumsum "+cumsum);
         }
     }
 
@@ -81,12 +81,8 @@ public class PopulationDensityGenerator implements AVGenerator {
         double r = MatsimRandom.getRandom().nextDouble();
         Link selectedLink = null;
 
-        for (Link link : linkList) {
-            if (r <= cumulativeDensity.get(link)) {
-                selectedLink = link;
-                break;
-            }
-        }
+        selectedLink = cumulativeDensity2.lowerEntry(r).getValue();
+        log.info("car placed at link "+selectedLink+  " r="+r);
 
         Id<Vehicle> id = Id.create("av_" + prefix + String.valueOf(generatedNumberOfVehicles), Vehicle.class);
         return new AVVehicle(id, selectedLink, 4.0, 0.0, 108000.0);

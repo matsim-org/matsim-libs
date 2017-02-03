@@ -1,30 +1,23 @@
 package playground.sebhoerl.avtaxi.dispatcher.single_fifo;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.router.util.TravelTime;
+
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelTime;
+
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.*;
+import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class SingleFIFODispatcher implements AVDispatcher {
     final private SingleRideAppender appender;
@@ -61,6 +54,7 @@ public class SingleFIFODispatcher implements AVDispatcher {
 
     private void reoptimize(double now) {
         while (availableVehicles.size() > 0 && pendingRequests.size() > 0) {
+            System.out.println("single FIFO heuristic is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + "  availableVehicles.size()" + availableVehicles.size());
             AVVehicle vehicle = availableVehicles.poll();
             AVRequest request = pendingRequests.poll();
             appender.schedule(request, vehicle, now);

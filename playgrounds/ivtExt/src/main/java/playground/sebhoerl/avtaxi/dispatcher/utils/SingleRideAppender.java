@@ -24,9 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SingleRideAppender {
-    final private ParallelLeastCostPathCalculator router;
+    final public ParallelLeastCostPathCalculator router;
     final private AVDispatcherConfig config;
-    final private TravelTime travelTime;
+    final public TravelTime travelTime;
 
     private List<AppendTask> tasks = new LinkedList<>();
 

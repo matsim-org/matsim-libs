@@ -89,6 +89,8 @@ public class MultiODHeuristic implements AVDispatcher {
 
     private void reoptimize(double now) {
         while (pendingRequests.size() > 0 && availableVehicles.size() > 0) {
+            System.out.println("Multi-OD heuristic is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + "  availableVehicles.size()" + availableVehicles.size());
+
             AggregatedRequest request = null;
             AVVehicle vehicle = null;
 
@@ -107,7 +109,7 @@ public class MultiODHeuristic implements AVDispatcher {
             removeVehicle(vehicle);
             vehicle2Request.put(vehicle, request);
 
-            assignableRequests.remove(request); // TODO: IMPORTANT; otherwise REscheduling is necessary!!!
+            assignableRequests.remove(request); // TODO: IMPORTANT; otherwise Rescheduling is necessary!!!
             appender.schedule(request, vehicle, now);
 
             long count = request.getSlaveRequests().size() + 1;
