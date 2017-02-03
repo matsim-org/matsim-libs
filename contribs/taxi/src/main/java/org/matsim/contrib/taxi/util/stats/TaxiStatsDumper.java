@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.*;
+import java.util.List;
 
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -41,14 +41,14 @@ public class TaxiStatsDumper
             "StayRatio_fleetAvg", "StayRatio_avg", "StayRatio_sd", null, //
             "OccupDriveRatio_fleetAvg" };
 
-    private final TaxiData taxiData;
+    private final VrpData taxiData;
     private final TaxiConfigGroup taxiCfg;
     private final OutputDirectoryHierarchy controlerIO;
     private final CompactCSVWriter multiDayWriter;
 
 
     @Inject
-    public TaxiStatsDumper(TaxiData taxiData, TaxiConfigGroup taxiCfg,
+    public TaxiStatsDumper(VrpData taxiData, TaxiConfigGroup taxiCfg,
             OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;

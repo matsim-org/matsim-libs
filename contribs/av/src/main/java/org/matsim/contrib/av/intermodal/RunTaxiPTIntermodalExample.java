@@ -24,22 +24,15 @@ package org.matsim.contrib.av.intermodal;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
+import org.matsim.contrib.av.intermodal.router.config.*;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerFactory;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -98,7 +91,7 @@ public class RunTaxiPTIntermodalExample {
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		TaxiData taxiData = new TaxiData();
+		VrpData taxiData = new VrpDataImpl();
 		String taxiFileName = TaxiConfigGroup.get(config).getTaxisFileUrl(config.getContext()).getFile();
 		new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiFileName);
 		// ---

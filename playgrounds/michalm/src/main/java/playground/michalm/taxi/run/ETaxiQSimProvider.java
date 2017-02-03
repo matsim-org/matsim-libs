@@ -23,12 +23,12 @@ import java.util.Collection;
 
 import org.apache.commons.configuration.*;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
@@ -41,7 +41,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import playground.michalm.ev.data.EvData;
-import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.ETaxiOptimizerContext;
 import playground.michalm.taxi.optimizer.assignment.*;
 import playground.michalm.taxi.optimizer.rules.*;
 import playground.michalm.taxi.scheduler.ETaxiScheduler;
@@ -56,7 +56,7 @@ public class ETaxiQSimProvider
 
     @Inject
     public ETaxiQSimProvider(EventsManager eventsManager, Collection<AbstractQSimPlugin> plugins,
-            Scenario scenario, TaxiData taxiData,
+            Scenario scenario, VrpData taxiData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
             @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType, EvData evData)
     {

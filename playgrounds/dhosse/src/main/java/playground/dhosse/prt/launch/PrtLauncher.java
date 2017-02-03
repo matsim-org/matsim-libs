@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -32,7 +31,7 @@ public class PrtLauncher {
 		
         Scenario scenario = ScenarioUtils.loadScenario(config);
         
-		TaxiData taxiData = new TaxiData();
+        VrpData taxiData = new VrpDataImpl();
         new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
 		
 		Controler controler = new Controler(config);

@@ -20,7 +20,7 @@
 package playground.michalm.taxi.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.*;
@@ -35,7 +35,7 @@ public class ETaxiOptimizerContext
     public final EvData evData;
 
 
-    public ETaxiOptimizerContext(TaxiData taxiData, Network network, MobsimTimer timer,
+    public ETaxiOptimizerContext(VrpData taxiData, Network network, MobsimTimer timer,
             TravelTime travelTime, TravelDisutility travelDisutility, ETaxiScheduler scheduler,
             EvData evData)
     {

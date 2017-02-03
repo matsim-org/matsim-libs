@@ -20,8 +20,8 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -53,7 +53,7 @@ public class RunETaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        TaxiData taxiData = new TaxiData();
+        VrpData taxiData = new VrpDataImpl();
         new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
@@ -67,7 +67,8 @@ public class RunETaxiScenario
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding()
+                        .toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
                 addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
             }
         });

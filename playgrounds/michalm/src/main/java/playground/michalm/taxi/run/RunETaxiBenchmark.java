@@ -20,9 +20,9 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.benchmark.*;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -39,7 +39,8 @@ import playground.michalm.taxi.ev.*;
  * times are deterministic. To simulate this property, we remove (1) all other traffic, and (2) link
  * capacity constraints (e.g. by increasing the capacities by 100+ times), as a result all vehicles
  * move with the free-flow speed (which is the effective speed).
- * <p></p>
+ * <p>
+ * </p>
  * To model the impact of traffic, we can use a time-variant network, where we specify different
  * free-flow speeds for each link over time. The default approach is to specify free-flow speeds in
  * each time interval (usually 15 minutes).
@@ -62,7 +63,7 @@ public class RunETaxiBenchmark
         config.checkConsistency();
 
         Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
-        final TaxiData taxiData = new TaxiData();
+        final VrpData taxiData = new VrpDataImpl();
         new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
@@ -76,7 +77,8 @@ public class RunETaxiBenchmark
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding()
+                        .toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
                 addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
                 //override the binding in RunTaxiBenchmark
                 bind(TaxiBenchmarkStats.class).to(ETaxiBenchmarkStats.class).asEagerSingleton();

@@ -22,10 +22,10 @@ package playground.michalm.audiAV.flowPaper;
 import java.util.concurrent.*;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.taxi.schedule.reconstruct.ScheduleReconstructor;
 import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 
 
@@ -47,17 +47,17 @@ public class RecalcStatsAudiAVFlowPaper
                 String id = TaxiStatsExtractor.getId(fleet, av);
 
                 service.execute(() -> {
-                TaxiData taxiData = ScheduleReconstructor.reconstructFromFile(network,
-                        path + id + "/" + id + ".output_events.xml.gz");
+                    VrpData taxiData = ScheduleReconstructor.reconstructFromFile(network,
+                            path + id + "/" + id + ".output_events.xml.gz");
 
-                TaxiStatsCalculator calculator = new TaxiStatsCalculator(
-                        taxiData.getVehicles().values());
-                String prefix = path + id + "/ITERS/it.50/" + id + ".50.";
+                    TaxiStatsCalculator calculator = new TaxiStatsCalculator(
+                            taxiData.getVehicles().values());
+                    String prefix = path + id + "/ITERS/it.50/" + id + ".50.";
 
-                new TaxiStatsWriter(calculator.getTaxiStats())
-                        .write(prefix + "hourly_stats_new_stats.txt");
-                new TaxiHistogramsWriter(calculator.getTaxiStats())
-                        .write(prefix + "hourly_histograms_new_stats.txt");
+                    new TaxiStatsWriter(calculator.getTaxiStats())
+                            .write(prefix + "hourly_stats_new_stats.txt");
+                    new TaxiHistogramsWriter(calculator.getTaxiStats())
+                            .write(prefix + "hourly_histograms_new_stats.txt");
                 });
             }
         }

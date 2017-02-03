@@ -22,12 +22,12 @@ package org.matsim.contrib.taxi.run;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.scheduler.*;
@@ -49,7 +49,7 @@ public class TaxiQSimProvider
     private final Collection<AbstractQSimPlugin> plugins;
 
     protected final Scenario scenario;
-    protected final TaxiData taxiData;
+    protected final VrpData taxiData;
     protected final TravelTime travelTime;
 
     protected final TaxiConfigGroup taxiCfg;
@@ -59,7 +59,7 @@ public class TaxiQSimProvider
 
     @Inject
     public TaxiQSimProvider(EventsManager eventsManager, Collection<AbstractQSimPlugin> plugins,
-            Scenario scenario, TaxiData taxiData,
+            Scenario scenario, VrpData taxiData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
             @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
             TaxiOptimizerFactory optimizerFactory)

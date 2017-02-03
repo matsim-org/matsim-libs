@@ -22,13 +22,13 @@ package org.matsim.contrib.taxi.schedule.reconstruct;
 import java.util.*;
 
 import org.junit.*;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -72,7 +72,7 @@ public class ScheduleReconstructionTest
         ScheduleReconstructor scheduleReconstructor = controler.getInjector()
                 .getInstance(ScheduleReconstructor.class);
 
-        TaxiData taxiData = controler.getInjector().getInstance(TaxiData.class);
+        VrpData taxiData = controler.getInjector().getInstance(VrpData.class);
         PassengerEngine passengerEngine = controler.getInjector()
                 .getInstance(PassengerEngine.class);
 

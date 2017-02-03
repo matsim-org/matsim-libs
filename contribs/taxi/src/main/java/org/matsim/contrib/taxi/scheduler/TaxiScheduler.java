@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
 public class TaxiScheduler
     implements TaxiScheduleInquiry
 {
-    private final TaxiData taxiData;
+    private final VrpData taxiData;
     protected final TaxiSchedulerParams params;
     private final MobsimTimer timer;
 
@@ -51,7 +51,7 @@ public class TaxiScheduler
     private final LeastCostPathCalculator router;
 
 
-    public TaxiScheduler(Scenario scenario, TaxiData taxiData, MobsimTimer timer,
+    public TaxiScheduler(Scenario scenario, VrpData taxiData, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
         this.taxiData = taxiData;
@@ -548,7 +548,7 @@ public class TaxiScheduler
                     return 0;
                 }
 
-                if (((TaxiTask)Schedules.getNextTask(schedule))
+                if ( ((TaxiTask)Schedules.getNextTask(schedule))
                         .getTaxiTaskType() == TaxiTaskType.PICKUP) {
                     //if no diversion and driving to pick up sb then serve that request
                     return params.destinationKnown ? 3 : null;

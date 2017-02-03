@@ -20,11 +20,10 @@
 package playground.michalm.audiAV.electric;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.discharging.*;
@@ -36,7 +35,7 @@ import playground.michalm.taxi.ev.ETaxiChargingLogic;
 
 public class EAVUtils
 {
-    public static void initEvData(TaxiData taxiData, EvData evData)
+    public static void initEvData(VrpData taxiData, EvData evData)
     {
         TemperatureProvider tempProvider = () -> 20;// aux power about 1 kW at 20oC
         double chargingSpeedFactor = 1.; //full speed
@@ -62,7 +61,7 @@ public class EAVUtils
             return false;
         }
 
-        switch (((TaxiTask)schedule.getCurrentTask()).getTaxiTaskType()) {
+        switch ( ((TaxiTask)schedule.getCurrentTask()).getTaxiTaskType()) {
             case PICKUP:
             case OCCUPIED_DRIVE:
             case DROPOFF:

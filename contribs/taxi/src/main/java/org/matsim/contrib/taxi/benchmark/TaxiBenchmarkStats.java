@@ -1,8 +1,8 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -23,7 +23,7 @@ public class TaxiBenchmarkStats
             "EmptyDriveRatio_fleetAvg", //
             "StayRatio_fleetAvg" };
 
-    protected final TaxiData taxiData;
+    protected final VrpData taxiData;
     private final PassengerEngine passengerEngine;
     private final OutputDirectoryHierarchy controlerIO;
 
@@ -36,7 +36,7 @@ public class TaxiBenchmarkStats
 
 
     @Inject
-    public TaxiBenchmarkStats(TaxiData taxiData, PassengerEngine passengerEngine,
+    public TaxiBenchmarkStats(VrpData taxiData, PassengerEngine passengerEngine,
             OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;

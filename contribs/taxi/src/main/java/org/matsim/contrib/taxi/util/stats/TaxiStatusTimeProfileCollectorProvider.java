@@ -23,8 +23,8 @@ import java.awt.*;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
@@ -37,13 +37,13 @@ import com.google.inject.*;
 public class TaxiStatusTimeProfileCollectorProvider
     implements Provider<MobsimListener>
 {
-    private final TaxiData taxiData;
+    private final VrpData taxiData;
     private final PassengerEngine passengerEngine;
     private final MatsimServices matsimServices;
 
 
     @Inject
-    public TaxiStatusTimeProfileCollectorProvider(TaxiData taxiData, MatsimServices matsimServices,
+    public TaxiStatusTimeProfileCollectorProvider(VrpData taxiData, MatsimServices matsimServices,
             PassengerEngine passengerEngine)
     {
         this.taxiData = taxiData;
