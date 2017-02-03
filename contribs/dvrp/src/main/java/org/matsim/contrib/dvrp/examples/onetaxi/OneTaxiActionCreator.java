@@ -43,11 +43,9 @@ public class OneTaxiActionCreator
     @Override
     public DynAction createAction(final Task task, double now)
     {
-        switch (task.getType()) {
-            case DRIVE:
+	    if ( task instanceof DriveTask ) {
                 return VrpLegs.createLegWithOfflineTracker((DriveTask)task, timer);
-
-            case STAY:
+	    } else if ( task instanceof StayTask ) {
                 if (task instanceof OneTaxiServeTask) { //PICKUP or DROPOFF
                     final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
                     final OneTaxiRequest request = serveTask.getRequest();

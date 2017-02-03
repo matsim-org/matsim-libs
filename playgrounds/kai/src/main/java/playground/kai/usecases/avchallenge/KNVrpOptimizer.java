@@ -42,9 +42,6 @@ class KNVrpOptimizer implements VrpOptimizer {
 		if ( rr==null ) { 
 			// no request in queue, schedule 
 			schedule.addTask( new TaxiTask(){
-				@Override public TaskType getType() {
-					return TaskType.STAY ;
-				}
 				@Override public TaskStatus getStatus() {
 					return TaskStatus.STARTED ;
 				}

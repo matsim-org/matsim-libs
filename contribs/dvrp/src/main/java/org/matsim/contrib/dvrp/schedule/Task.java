@@ -24,10 +24,10 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 public interface Task
 {
-    public enum TaskType
-    {
-        STAY, DRIVE;
-    }
+//    public enum TaskType
+//    {
+//        STAY, DRIVE;
+//    }
 
 
     public enum TaskStatus
@@ -36,7 +36,7 @@ public interface Task
     }
 
 
-    TaskType getType();
+//    TaskType getType();
 
 
     TaskStatus getStatus();

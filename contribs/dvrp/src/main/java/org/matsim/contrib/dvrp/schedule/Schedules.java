@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -32,16 +32,20 @@ import com.google.common.collect.Iterables;
 public class Schedules
 {
     public static final Predicate<Task> STAY_TASK_PREDICATE = new Predicate<Task>() {
-        public boolean apply(Task input)
+        @Override
+	public boolean apply(Task input)
         {
-            return input.getType() == TaskType.STAY;
+//            return input.getType() == TaskType.STAY;
+      	  return ( input instanceof StayTask ) ;
         };
     };
 
     public static final Predicate<Task> DRIVE_TASK_PREDICATE = new Predicate<Task>() {
-        public boolean apply(Task input)
+        @Override
+	public boolean apply(Task input)
         {
-            return input.getType() == TaskType.DRIVE;
+//            return input.getType() == TaskType.DRIVE;
+      	  return ( input instanceof DriveTask ) ;
         };
     };
 

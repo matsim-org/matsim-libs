@@ -32,8 +32,10 @@ import org.jfree.data.gantt.*;
 import org.jfree.data.time.*;
 import org.jfree.data.xy.XYDataset;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 
@@ -113,7 +115,8 @@ public class ScheduleCharts
             setDrawBarOutline(true);
 
             setBaseToolTipGenerator(new XYToolTipGenerator() {
-                public String generateToolTip(XYDataset dataset, int series, int item)
+                @Override
+		public String generateToolTip(XYDataset dataset, int series, int item)
                 {
                     return getTask(series, item).getDescription();
                 }
@@ -149,16 +152,12 @@ public class ScheduleCharts
     public static final PaintSelector BASIC_PAINT_SELECTOR = new PaintSelector() {
         public Paint select(Task task)
         {
-            switch (task.getType()) {
-                case DRIVE:
+      	  if ( task instanceof DriveTask ) {
                     return DRIVE_COLOR;
-
-                case STAY:
+      	  } else if ( task instanceof StayTask ) {
                     return WAIT_COLOR;
-
-                default:
-                    throw new IllegalStateException();
-            }
+      	  }
+      	  throw new IllegalStateException();
         }
     };
 
@@ -172,7 +171,12 @@ public class ScheduleCharts
     public static final DescriptionCreator BASIC_DESCRIPTION_CREATOR = new DescriptionCreator() {
         public String create(Task task)
         {
-            return task.getType().name();
+      	  if ( task instanceof StayTask ) {
+      		  return StayTask.class.toString() ;
+      	  } else if ( task instanceof DriveTask ) {
+      		  return DriveTask.class.toString() ;
+      	  }
+      	  throw new RuntimeException("not implemented") ;
         }
     };
 

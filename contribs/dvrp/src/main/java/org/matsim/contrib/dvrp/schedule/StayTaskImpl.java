@@ -44,12 +44,6 @@ public class StayTaskImpl
     }
 
 
-    @Override
-    public TaskType getType()
-    {
-        return TaskType.STAY;
-    }
-
 
     @Override
     public Link getLink()

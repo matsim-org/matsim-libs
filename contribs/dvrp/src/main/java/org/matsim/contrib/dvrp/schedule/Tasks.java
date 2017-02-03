@@ -26,30 +26,22 @@ public class Tasks
 {
     public static Link getBeginLink(Task task)
     {
-        switch (task.getType()) {
-            case DRIVE:
+	    if ( task instanceof DriveTask ) {
                 return ((DriveTask)task).getPath().getFromLink();
-
-            case STAY:
+	    } else if ( task instanceof StayTask ) {
                 return ((StayTask)task).getLink();
-
-            default:
-                throw new IllegalStateException("Only: DRIVE or STAY");
-        }
+	    }
+	    throw new IllegalStateException("Only: DRIVE or STAY");
     }
 
 
     public static Link getEndLink(Task task)
     {
-        switch (task.getType()) {
-            case DRIVE:
+	    if ( task instanceof DriveTask ) {
                 return ((DriveTask)task).getPath().getToLink();
-
-            case STAY:
+	    } else if ( task instanceof StayTask ) {
                 return ((StayTask)task).getLink();
-
-            default:
-                throw new IllegalStateException("Only: DRIVE or STAY");
-        }
+	    }
+	    throw new IllegalStateException("Only: DRIVE or STAY");
     }
 }
