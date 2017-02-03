@@ -10,6 +10,7 @@ import org.matsim.core.router.util.TravelTime;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -23,6 +24,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * SingleRideAppender is used in {@link AVDispatcher} implementations
+ * in order to manage the tasks in the schedule of {@link AVVehicle}
+ */
 public class SingleRideAppender {
     final public ParallelLeastCostPathCalculator router;
     final private AVDispatcherConfig config;
@@ -34,24 +39,6 @@ public class SingleRideAppender {
         this.router = router;
         this.config = config;
         this.travelTime = travelTime;
-    }
-
-    private class AppendTask {
-        final public AVRequest request;
-        final public AVVehicle vehicle;
-
-        final public LeastCostPathFuture pickup;
-        final public LeastCostPathFuture dropoff;
-
-        final public double time;
-
-        public AppendTask(AVRequest request, AVVehicle vehicle, double time, LeastCostPathFuture pickup, LeastCostPathFuture dropoff) {
-            this.request = request;
-            this.vehicle = vehicle;
-            this.pickup = pickup;
-            this.dropoff = dropoff;
-            this.time = time;
-        }
     }
 
     public void schedule(AVRequest request, AVVehicle vehicle, double now) {

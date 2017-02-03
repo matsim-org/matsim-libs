@@ -71,6 +71,14 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
         return new VrpAgentSource(actionCreator, data, optimizer, qsim, vehicleType);
     }
 
+    /**
+     * TODO presumably called only once during initialization
+     * 
+     * @param factories
+     * @param config
+     * @param vehicles
+     * @return
+     */
     @Provides @Singleton
     Map<Id<AVOperator>, AVDispatcher> provideDispatchers( //
 	    Map<String, AVDispatcher.AVDispatcherFactory> factories, // 
@@ -89,7 +97,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
             AVDispatcher dispatcher = factory.createDispatcher(dc);
 
             for (AVVehicle vehicle : vehicles.get(oc.getId())) {
-                dispatcher.addVehicle(vehicle);
+                dispatcher.registerVehicle(vehicle);
                 vehicle.setDispatcher(dispatcher);
             }
 
