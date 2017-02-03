@@ -137,7 +137,10 @@ class VehicleStatus extends AbstractExport {
 
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
-                    potentialEmptyDriveEvent.put(event.getPersonId().toString(), event);
+                    // only departure events of avs are considered.
+                    if(HelperFunction.isAV(event.getPersonId())){
+                        potentialEmptyDriveEvent.put(event.getPersonId().toString(), event);
+                    }
                 }
 
                 @Override
@@ -152,13 +155,14 @@ class VehicleStatus extends AbstractExport {
                 // <event time="21574.0" type="arrival" person="av_av_op1_174" link="236382034_0" legMode="car" />
                 @Override
                 public void handleEvent(PersonArrivalEvent event) {
-                    final String vehicle = event.getPersonId().toString();
+                    final String vehicle = event.getPersonId().toString(); // this is not always an ID to a vehicle
                     if (!vehicleCustomers.containsKey(vehicle) || vehicleCustomers.get(vehicle).isEmpty()) {
                         // this was an empty drive
-                        if (potentialEmptyDriveEvent.containsKey(vehicle))
+                        if (potentialEmptyDriveEvent.containsKey(vehicle)) // only previously registered true vehicles are considered
                             putDriveToCustomer(potentialEmptyDriveEvent.get(vehicle));
-                        else
-                            new RuntimeException("should have value").printStackTrace();
+
+                        //else
+                        //    new RuntimeException("should have value").printStackTrace();
                     }
                 }
 
