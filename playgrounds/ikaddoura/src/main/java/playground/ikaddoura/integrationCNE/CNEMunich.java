@@ -59,7 +59,7 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
-import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
+import playground.ikaddoura.integrationCNE.CNEIntegration2.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -89,9 +89,7 @@ public class CNEMunich {
 	private static double kP;
 
 	private static boolean modeChoice = false;
-	
-	private static boolean computeExpectedAirPollutionCosts = false;
-	
+		
 	public static void main(String[] args) throws IOException {
 				
 		if (args.length > 0) {
@@ -132,9 +130,6 @@ public class CNEMunich {
 
 			modeChoice = Boolean.valueOf(args[8]);
 			log.info("Mode choice for Munich scenario is "+ modeChoice);
-			
-			computeExpectedAirPollutionCosts = Boolean.valueOf(args[9]);
-			log.info("computeExpectedAirPollutionCosts: " + computeExpectedAirPollutionCosts);
 			
 		} else {
 
@@ -270,7 +265,7 @@ public class CNEMunich {
 		
 		// CNE Integration
 		
-		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
+		CNEIntegration2 cne = new CNEIntegration2(controler, gt, rgt);
 		cne.setCongestionPricing(congestionPricing);
 		cne.setNoisePricing(noisePricing);
 		cne.setAirPollutionPricing(airPollutionPricing);
@@ -278,7 +273,6 @@ public class CNEMunich {
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
 		cne.setPersonFilter(new MunichPersonFilter());
-		cne.setComputeExpectedAirPollutionCosts(computeExpectedAirPollutionCosts);
 		controler = cne.prepareControler();
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

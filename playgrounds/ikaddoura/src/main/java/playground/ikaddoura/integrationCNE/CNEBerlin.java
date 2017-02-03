@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
-import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
+import playground.ikaddoura.integrationCNE.CNEIntegration2.CongestionTollingApproach;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -76,9 +76,7 @@ public class CNEBerlin {
 	
 	private static CongestionTollingApproach congestionTollingApproach;
 	private static double kP;
-	
-	private static boolean computeExpectedAirPollutionCosts = false;
-	
+		
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
@@ -117,9 +115,6 @@ public class CNEBerlin {
 			kP = Double.parseDouble(args[7]);
 			log.info("kP: " + kP);
 			
-			computeExpectedAirPollutionCosts = Boolean.valueOf(args[8]);
-			log.info("computeExpectedAirPollutionCosts: " + computeExpectedAirPollutionCosts);
-			
 		} else {
 			
 			outputDirectory = null;
@@ -132,9 +127,7 @@ public class CNEBerlin {
 			sigma = 0.;
 			
 			congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
-			kP = 2 * ( 10 / 3600. );
-			
-			computeExpectedAirPollutionCosts = false;
+			kP = 2 * ( 10 / 3600. );			
 		}
 				
 		CNEBerlin cnControler = new CNEBerlin();
@@ -230,14 +223,13 @@ public class CNEBerlin {
 		
 		// CNE Integration
 		
-		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
+		CNEIntegration2 cne = new CNEIntegration2(controler, gt, rgt);
 		cne.setCongestionPricing(congestionPricing);
 		cne.setNoisePricing(noisePricing);
 		cne.setAirPollutionPricing(airPollutionPricing);
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
-		cne.setComputeExpectedAirPollutionCosts(computeExpectedAirPollutionCosts);
 		controler = cne.prepareControler();
 				
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
