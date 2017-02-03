@@ -1,4 +1,4 @@
-package playground.clruch;
+package playground.clruch.export;
 
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -35,7 +35,7 @@ public class NodeBasedEventXML extends AbstractEventXML {
             // iterate through all stations with passenger movements and save waiting customers step function.
             while (e.hasNext()) {
                 String statID = (String) e.next();
-                Element node = new Element("node");
+                Element node = new Element("link");
                 node.setAttribute(new Attribute("id", statID));
 
                 // iterate through step function for each node and save number of waiting customers

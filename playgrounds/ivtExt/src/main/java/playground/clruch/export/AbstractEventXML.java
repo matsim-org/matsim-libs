@@ -1,4 +1,4 @@
-package playground.clruch;
+package playground.clruch.export;
 
 import java.io.File;
 import java.util.Map;
@@ -9,4 +9,5 @@ import java.util.NavigableMap;
  */
 public abstract class AbstractEventXML {
    public abstract void generate(Map<String, NavigableMap<Double, Integer>> waitStepFctn,  File file);
+
 }
