@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionsel
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.priorityqueue.HasIndex;
 
-final class PlanRecord implements HasIndex {
+public final class PlanRecord implements HasIndex {
 	private final PointingAgent agent;
 	private final double weight;
 	private final Plan plan;
