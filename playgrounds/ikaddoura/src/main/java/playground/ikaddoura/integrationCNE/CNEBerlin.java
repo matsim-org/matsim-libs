@@ -118,7 +118,7 @@ public class CNEBerlin {
 		} else {
 			
 			outputDirectory = null;
-			configFile = "../../../runs-svn/berlin-an-time/input/config.xml";
+			configFile = "../../../runs-svn/berlin-an/input/config.xml";
 			
 			congestionPricing = true;
 			noisePricing = true;

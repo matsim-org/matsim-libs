@@ -89,7 +89,8 @@ public class CNEIntegration {
 
 	private PersonFilter personFilter = null;
 	private AgentFilter agentFilter = new BerlinAgentFilter(); // TODO: account for the case that we do not have any filter!
-
+//	private AgentFilter agentFilter = null;
+	
 	private final GridTools gridTools;
 	private final ResponsibilityGridTools responsibilityGridTools ;
 
