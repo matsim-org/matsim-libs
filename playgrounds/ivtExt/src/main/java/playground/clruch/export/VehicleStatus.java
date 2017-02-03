@@ -3,6 +3,7 @@ package playground.clruch.export;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
@@ -52,8 +53,8 @@ class VehicleStatus extends AbstractExport {
         return vehicleCustomers.get(vehicle);
     }
 
-    private PersonEntersVehicleEvent firstCustomerEntersVehicleEvent = null;
-    private PersonDepartureEvent potentialEmptyDriveEvent = null;
+    private Map<String, PersonEntersVehicleEvent> firstCustomerEntersVehicleEvent = new HashMap<>();
+    private Map<String, PersonDepartureEvent> potentialEmptyDriveEvent = new HashMap<>();
 
     @Override
     void initialize(EventsManager events) {
@@ -90,7 +91,7 @@ class VehicleStatus extends AbstractExport {
                     if (HelperFunction.isPerson(person)) {
                         Set<Id<Person>> set = getCustomerSet(vehicle);
                         if (set.isEmpty()) { // if car is empty
-                            firstCustomerEntersVehicleEvent = event; // mark as beginning of DRIVE WITH CUSTOMER STATUS
+                            firstCustomerEntersVehicleEvent.put(vehicle, event); // mark as beginning of DRIVE WITH CUSTOMER STATUS
                         }
                         set.add(person);
                     }
@@ -113,10 +114,10 @@ class VehicleStatus extends AbstractExport {
                         Set<Id<Person>> set = getCustomerSet(vehicle);
                         set.remove(person);
                         if (set.isEmpty()) { // last customer has left the car
-                            if (firstCustomerEntersVehicleEvent != null) {
-                                putDriveWithCustomer(firstCustomerEntersVehicleEvent);
+                            if (firstCustomerEntersVehicleEvent.containsKey(vehicle)) {
+                                putDriveWithCustomer(firstCustomerEntersVehicleEvent.get(vehicle));
                             } else {
-                                new RuntimeException("this should not be null").printStackTrace();
+                                new RuntimeException("this should have a value").printStackTrace();
 
                             }
                         }
@@ -136,7 +137,7 @@ class VehicleStatus extends AbstractExport {
 
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
-                    potentialEmptyDriveEvent = event;
+                    potentialEmptyDriveEvent.put(event.getPersonId().toString(), event);
                 }
 
                 @Override
@@ -154,7 +155,10 @@ class VehicleStatus extends AbstractExport {
                     final String vehicle = event.getPersonId().toString();
                     if (!vehicleCustomers.containsKey(vehicle) || vehicleCustomers.get(vehicle).isEmpty()) {
                         // this was an empty drive
-                        putDriveToCustomer(potentialEmptyDriveEvent);
+                        if (potentialEmptyDriveEvent.containsKey(vehicle))
+                            putDriveToCustomer(potentialEmptyDriveEvent.get(vehicle));
+                        else
+                            new RuntimeException("should have value").printStackTrace();
                     }
                 }
 
