@@ -65,14 +65,19 @@ class VehicleLocation extends AbstractExport {
                 public void handleEvent(ActivityStartEvent event) {
                     // check if itis an AV event
                     if (HelperFunction.isAV(event.getPersonId())) {
+
                         // if AV not recorded, add map
                         if (!vehicleLocations.containsKey(event.getPersonId().toString())) {
                             vehicleLocations.put(event.getPersonId().toString(), new TreeMap<>());
                         }
+
+                        vehicleLocations.get(event.getPersonId().toString()).put(event.getTime(), event.getLinkId().toString());
+                        /*
                         // if different location than during last time step, add location and time
-                        if (!vehicleLocations.get(event.getPersonId()).floorEntry(event.getTime()).equals(event.getLinkId())) {
-                            vehicleLocations.get(event.getPersonId()).put(event.getTime(), event.getLinkId().toString());
+                        if (!vehicleLocations.get(event.getPersonId().toString()).floorEntry(event.getTime()).equals(event.getLinkId())) {
+
                         }
+                        */
                     }
                 }
 
@@ -222,17 +227,28 @@ class VehicleLocation extends AbstractExport {
 
     }
 
+
+    @Override
+    void writeXML(File directory) {
+
+        File fileExport = new File(directory, "vehicleLocations.xml");
+
+        // export to node-based XML file
+        new VehicleLocationEventXML().generate(vehicleLocations, fileExport);
+
+    }
+
+    /*
     @Override
     void writeXML(File directory) {
         File fileExport = new File(directory, "vehicleLocations.xml");
 
-        /*
         // export to node-based XML file
         new VehicleLocationEventXML(vehicleLocations,fileExport).generate(vehicleLocations, fileExport);
 
         // export to time-based XML file with only changing information at every time step
         new TimeBasedChangeEventXML().generate(vehicleLocations, fileExport2);
-        */
 
     }
+    */
 }

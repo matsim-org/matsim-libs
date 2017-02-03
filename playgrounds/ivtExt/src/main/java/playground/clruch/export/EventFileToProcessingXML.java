@@ -1,5 +1,6 @@
 package playground.clruch.export;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -44,6 +45,10 @@ public class EventFileToProcessingXML {
         VehicleStatusLab vehicleStatusLab = new VehicleStatusLab();
         vehicleStatusLab.initialize(events);
 
+        // add vehicle location reader
+        VehicleLocation vehicleLocation = new VehicleLocation();
+        vehicleLocation.initialize(events);
+
         // run the events reader
         new MatsimEventsReader(events).readFile(fileImport.toString());
 
@@ -51,6 +56,7 @@ public class EventFileToProcessingXML {
         waitingCustomers.writeXML(directory);
         vehicleStatus.writeXML(directory);
         vehicleStatusLab.writeXML(directory);
+        vehicleLocation.writeXML(directory);
 
         System.out.println("routine finished successfully");
     }
