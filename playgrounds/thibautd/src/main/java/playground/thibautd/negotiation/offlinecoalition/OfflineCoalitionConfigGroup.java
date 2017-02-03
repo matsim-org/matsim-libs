@@ -28,7 +28,8 @@ public class OfflineCoalitionConfigGroup extends ReflectiveConfigGroup {
 
 	private double logitScale = 1;
 	private int iterations = 10;
-	private int removalPeriod = 500;
+	// slow and causes problems when some agents get all their plans removed
+	private int removalPeriod = Integer.MAX_VALUE;
 
 	public OfflineCoalitionConfigGroup() {
 		super( GROUP_NAME );
