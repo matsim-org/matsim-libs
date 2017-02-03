@@ -104,7 +104,7 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 					final int nAllocated = groupPlans.getAllIndividualPlans().size();
 					if ( nAllocated > nextSize ) {
 						log.trace( nAllocated+" / "+maxSize+" allocated plans" );
-						nextSize *= 2;
+						while( nAllocated > nextSize ) nextSize *= 2;
 					}
 				}
 				doIteration(
