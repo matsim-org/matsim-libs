@@ -27,8 +27,10 @@ public class EventFileToProcessingXML {
         // read an event output file given String[] args
         final File dir = new File(args[0]);
         File directory = new File(dir, "output/processing");
+        directory.mkdirs();
         File fileImport = new File(dir, "output/output_events.xml");
         System.out.println("Is directory?  " + dir.isDirectory());
+
 
         EventsManager events = EventsUtils.createEventsManager();
         events.addHandler(i -> System.out.println("" + i));

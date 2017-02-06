@@ -62,8 +62,8 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
     }
 
     @Provides @Singleton
-    VrpLegs.LegCreator provideLegCreator() {
-        return VrpLegs.createLegWithOfflineTrackerCreator(qsim.getSimTimer());
+    VrpLegs.LegCreator provideLegCreator(AVOptimizer avOptimizer) {
+        return VrpLegs.createLegWithOnlineTrackerCreator(avOptimizer,qsim.getSimTimer());
     }
 
     @Provides @Singleton

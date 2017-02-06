@@ -1,5 +1,7 @@
 package playground.sebhoerl.avtaxi.dispatcher;
 
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.framework.AVQSimModule;
@@ -31,6 +33,10 @@ public interface AVDispatcher {
      * @param vehicle
      */
     void registerVehicle(AVVehicle vehicle);
+
+    default void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
+
+    }
 
     interface AVDispatcherFactory {
         AVDispatcher createDispatcher(AVDispatcherConfig config);
