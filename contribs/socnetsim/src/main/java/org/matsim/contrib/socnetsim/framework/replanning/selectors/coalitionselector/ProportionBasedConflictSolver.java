@@ -66,39 +66,45 @@ public class ProportionBasedConflictSolver implements CoalitionSelector.Conflict
 		int c = 0;
 		int ignoredIndiv = 0;
 		int ignoredJoint = 0;
-		for ( final Collection<PlanRecord> records : currentMostPointed ) {
-			if ( tabuFriends && tabu.addAndCheckTabu( records ) ) continue;
+		boolean loop = true;
+		while ( loop ) {
+			loop = false;
+			for ( final Collection<PlanRecord> records : currentMostPointed ) {
+				if ( tabuFriends && tabu.addAndCheckTabu( records ) ) continue;
 
-			boolean doneSomething = false;
-			for ( final PlanRecord r : records ) {
-				if ( r.isPointed() ) continue;
-				// for each agent in the joint plan that does not point to the joint plan,
-				// we remove the pointed joint plan.
-				final Plan pointed = r.getAgent().getPointedPlan();
-				final Collection<PlanRecord> recordsInJointPlan = recordsPerJointPlan.getRecords( pointed );
+				boolean doneSomething = false;
+				for ( final PlanRecord r : records ) {
+					if ( r.isPointed() ) continue;
+					// for each agent in the joint plan that does not point to the joint plan,
+					// we remove the pointed joint plan.
+					final Plan pointed = r.getAgent().getPointedPlan();
+					final Collection<PlanRecord> recordsInJointPlan = recordsPerJointPlan.getRecords( pointed );
 
-				// can happen if the initially pointed joint plan was removed for a friend,
-				// when ignoring tabu restrictions.
-				if ( recordsInJointPlan.size() == 1 ) {
-					ignoredIndiv++;
-					continue;
+					// can happen if the initially pointed joint plan was removed for a friend,
+					// when ignoring tabu restrictions.
+					if ( recordsInJointPlan.size() == 1 ) {
+						ignoredIndiv++;
+						continue;
+					}
+					// test if greater than max proportion plus small tolerance, to avoid eg problems with proportion 0.5 with
+					// plans of size 2
+					if ( !tabuFriends && proportionPointedGreaterThan( recordsInJointPlan, maxProportion + 1E-9 ) ) {
+						ignoredJoint++;
+						continue;
+					}
+
+					for ( PlanRecord inPointed : recordsInJointPlan ) {
+						inPointed.setInfeasible();
+					}
+
+					final Collection<PlanRecord> removed = recordsPerJointPlan.removeJointPlan( pointed );
+					assert removed != null;
+					doneSomething = true;
+					// as long as we can "resolve" something for a plan, we continue...
+					loop = true;
 				}
-				// test if greater than max proportion plus small tolerance, to avoid eg problems with proportion 0.5 with
-				// plans of size 2
-				if ( !tabuFriends && proportionPointedGreaterThan( recordsInJointPlan , maxProportion + 1E-9 ) ) {
-					ignoredJoint++;
-					continue;
-				}
-
-				for ( PlanRecord inPointed : recordsInJointPlan ) {
-					inPointed.setInfeasible();
-				}
-
-				final Collection<PlanRecord> removed = recordsPerJointPlan.removeJointPlan( pointed );
-				assert removed != null;
-				doneSomething = true;
+				if ( doneSomething ) c++;
 			}
-			if ( doneSomething ) c++;
 		}
 		if ( log.isTraceEnabled() ) {
 			log.trace( "Handled "+c+" of "+currentMostPointed.size()+" possibly conflicting joint plans" );
