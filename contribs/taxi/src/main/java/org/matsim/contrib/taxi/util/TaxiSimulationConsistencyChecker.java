@@ -21,9 +21,9 @@ package org.matsim.contrib.taxi.util;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -36,21 +36,22 @@ import com.google.inject.Inject;
 public class TaxiSimulationConsistencyChecker
     implements AfterMobsimListener
 {
-    private final PassengerEngine passengerEngine;
+    private final SubmittedTaxiRequestsCollector requestCollector;
     private final TaxiConfigGroup tcg;
 
 
     @Inject
-    public TaxiSimulationConsistencyChecker(PassengerEngine passengerEngine, Config config)
+    public TaxiSimulationConsistencyChecker(SubmittedTaxiRequestsCollector requestCollector,
+            Config config)
     {
-        this.passengerEngine = passengerEngine;
+        this.requestCollector = requestCollector;
         this.tcg = TaxiConfigGroup.get(config);
     }
 
 
     public void addCheckAllRequestsPerformed()
     {
-        for (Request r : passengerEngine.getRequests().values()) {
+        for (Request r : requestCollector.getRequests().values()) {
             TaxiRequest tr = (TaxiRequest)r;
             if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
                 if (tcg.isBreakSimulationIfNotAllRequestsServed()) {

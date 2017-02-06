@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -58,9 +59,10 @@ public class ETaxiQSimProvider
     public ETaxiQSimProvider(EventsManager eventsManager, Collection<AbstractQSimPlugin> plugins,
             Scenario scenario, Fleet fleet,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
-            @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType, EvData evData)
+            @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
+            SubmittedTaxiRequestsCollector requestsCollector, EvData evData)
     {
-        super(eventsManager, plugins, scenario, fleet, travelTime, vehicleType, null);
+        super(eventsManager, plugins, scenario, fleet, travelTime, vehicleType, null, requestsCollector);
         this.evData = evData;
     }
 
@@ -72,9 +74,8 @@ public class ETaxiQSimProvider
         ETaxiScheduler scheduler = new ETaxiScheduler(scenario, fleet, qSim.getSimTimer(),
                 schedulerParams, travelTime, travelDisutility);
 
-        ETaxiOptimizerContext optimContext = new ETaxiOptimizerContext(fleet,
-                scenario.getNetwork(), qSim.getSimTimer(), travelTime, travelDisutility, scheduler,
-                evData);
+        ETaxiOptimizerContext optimContext = new ETaxiOptimizerContext(fleet, scenario.getNetwork(),
+                qSim.getSimTimer(), travelTime, travelDisutility, scheduler, evData);
 
         Configuration optimizerConfig = new MapConfiguration(
                 taxiCfg.getOptimizerConfigGroup().getParams());

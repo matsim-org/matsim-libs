@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,47 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.taxi.passenger;
 
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import java.util.*;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 
 
-/**
- * @author michalm
- */
-public interface Vehicle
-    extends Identifiable<Vehicle>
+public class SubmittedTaxiRequestsCollector
 {
-    Link getStartLink();
+    private final Map<Id<Request>, TaxiRequest> requests = new LinkedHashMap<>();
 
 
-    void setStartLink(Link link);
+    public Map<Id<Request>, ? extends TaxiRequest> getRequests()
+    {
+        return Collections.unmodifiableMap(requests);
+    }
 
 
-    double getCapacity();
+    //to be used by TaxiRequestCreator
+    void addRequest(TaxiRequest request)
+    {
+        requests.put(request.getId(), request);
+    }
 
 
-    // vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
-    double getT0();
-
-
-    double getT1();
-
-
-    void setT1(double t1);
-
-
-    Schedule getSchedule();
-
-
-    VrpAgentLogic getAgentLogic();
-
-
-    void setAgentLogic(VrpAgentLogic agentLogic);
-
-
-    void resetSchedule();
+    public void reset()
+    {
+        requests.clear();
+    }
 }

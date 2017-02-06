@@ -2,7 +2,7 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -24,7 +24,7 @@ public class TaxiBenchmarkStats
             "StayRatio_fleetAvg" };
 
     protected final Fleet fleet;
-    private final PassengerEngine passengerEngine;
+    private final SubmittedTaxiRequestsCollector requestCollector;
     private final OutputDirectoryHierarchy controlerIO;
 
     private final SummaryStatistics passengerWaitTime = new SummaryStatistics();
@@ -36,11 +36,11 @@ public class TaxiBenchmarkStats
 
 
     @Inject
-    public TaxiBenchmarkStats(Fleet fleet, PassengerEngine passengerEngine,
+    public TaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
             OutputDirectoryHierarchy controlerIO)
     {
         this.fleet = fleet;
-        this.passengerEngine = passengerEngine;
+        this.requestCollector = requestCollector;
         this.controlerIO = controlerIO;
     }
 
@@ -80,7 +80,7 @@ public class TaxiBenchmarkStats
     protected CSVLineBuilder createAndInitLineBuilder()
     {
         return new CSVLineBuilder()//
-                .addf("%d", passengerEngine.getRequests().size())//
+                .addf("%d", requestCollector.getRequests().size())//
                 .addf("%d", fleet.getVehicles().size())//
                 .addf("%.1f", passengerWaitTime.getMean())//
                 .addf("%.0f", pc95PassengerWaitTime.getMean())//

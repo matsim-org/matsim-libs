@@ -26,14 +26,28 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+import com.google.inject.Inject;
+
 
 public class TaxiRequestCreator
     implements PassengerRequestCreator
 {
+    private final SubmittedTaxiRequestsCollector requestsCollector;
+
+
+    @Inject
+    public TaxiRequestCreator(SubmittedTaxiRequestsCollector requestsCollector)
+    {
+        this.requestsCollector = requestsCollector;
+    }
+
+
     @Override
     public TaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink,
             Link toLink, double t0, double t1, double now)
     {
-        return new TaxiRequest(id, passenger, fromLink, toLink, t0, now);
+        TaxiRequest request = new TaxiRequest(id, passenger, fromLink, toLink, t0, now);
+        requestsCollector.addRequest(request);
+        return request;
     }
 }

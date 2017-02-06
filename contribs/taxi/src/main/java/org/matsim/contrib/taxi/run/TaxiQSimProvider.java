@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.taxi.passenger.*;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -55,6 +55,7 @@ public class TaxiQSimProvider
     protected final TaxiConfigGroup taxiCfg;
     private final VehicleType vehicleType;//TODO resolve this by subclassing (without guice)??
     private final TaxiOptimizerFactory optimizerFactory;//TODO resolve this by subclassing (without guice)??
+    private final SubmittedTaxiRequestsCollector requestsCollector;
 
 
     @Inject
@@ -62,7 +63,7 @@ public class TaxiQSimProvider
             Scenario scenario, Fleet fleet,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime,
             @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
-            TaxiOptimizerFactory optimizerFactory)
+            TaxiOptimizerFactory optimizerFactory, SubmittedTaxiRequestsCollector requestsCollector)
     {
         this.eventsManager = eventsManager;
         this.plugins = plugins;
@@ -72,6 +73,7 @@ public class TaxiQSimProvider
         this.taxiCfg = TaxiConfigGroup.get(scenario.getConfig());
         this.vehicleType = vehicleType;
         this.optimizerFactory = optimizerFactory;
+        this.requestsCollector = requestsCollector;
     }
 
 
@@ -79,6 +81,8 @@ public class TaxiQSimProvider
     public Mobsim get()
     {
         QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
+        
+        requestsCollector.reset();
 
         TaxiOptimizer optimizer = createTaxiOptimizer(qSim);
         qSim.addQueueSimulationListeners(optimizer);
@@ -102,8 +106,8 @@ public class TaxiQSimProvider
         TaxiScheduler scheduler = new TaxiScheduler(scenario, fleet, qSim.getSimTimer(),
                 schedulerParams, travelTime, travelDisutility);
 
-        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(fleet,
-                scenario.getNetwork(), qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
+        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(fleet, scenario.getNetwork(),
+                qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
         return optimizerFactory.createTaxiOptimizer(optimContext,
                 taxiCfg.getOptimizerConfigGroup());
     }
@@ -111,8 +115,8 @@ public class TaxiQSimProvider
 
     protected PassengerEngine createPassengerEngine(TaxiOptimizer optimizer)
     {
-        return new PassengerEngine(TaxiModule.TAXI_MODE, eventsManager, new TaxiRequestCreator(),
-                optimizer, scenario.getNetwork());
+        return new PassengerEngine(TaxiModule.TAXI_MODE, eventsManager,
+                new TaxiRequestCreator(requestsCollector), optimizer, scenario.getNetwork());
     }
 
 

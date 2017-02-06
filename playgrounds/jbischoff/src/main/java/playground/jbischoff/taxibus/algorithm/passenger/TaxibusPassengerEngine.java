@@ -42,7 +42,7 @@ public class TaxibusPassengerEngine
 
     private int abortWarn = 0;
     List<MobsimAgent> allAgentsHandled  = new ArrayList<>();
-
+    private EventsManager eventsManager;
 
 
     public TaxibusPassengerEngine(String mode, EventsManager eventsManager,
@@ -50,6 +50,7 @@ public class TaxibusPassengerEngine
             Network network)
     {
         super(mode, eventsManager, requestCreator, optimizer, network);
+        this.eventsManager = eventsManager;
     }
 
 

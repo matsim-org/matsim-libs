@@ -24,8 +24,8 @@ import java.awt.*;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
@@ -38,16 +38,16 @@ public class TaxiStatusTimeProfileCollectorProvider
     implements Provider<MobsimListener>
 {
     private final Fleet fleet;
-    private final PassengerEngine passengerEngine;
+    private final SubmittedTaxiRequestsCollector requestCollector;
     private final MatsimServices matsimServices;
 
 
     @Inject
     public TaxiStatusTimeProfileCollectorProvider(Fleet fleet, MatsimServices matsimServices,
-            PassengerEngine passengerEngine)
+            SubmittedTaxiRequestsCollector requestCollector)
     {
         this.fleet = fleet;
-        this.passengerEngine = passengerEngine;
+        this.requestCollector = requestCollector;
         this.matsimServices = matsimServices;
     }
 
@@ -58,7 +58,7 @@ public class TaxiStatusTimeProfileCollectorProvider
         ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
                 TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(fleet), //
                 TaxiTimeProfiles.createRequestsWithStatusCounter(
-                        passengerEngine.getRequests().values(), TaxiRequestStatus.UNPLANNED));
+                        requestCollector.getRequests().values(), TaxiRequestStatus.UNPLANNED));
 
         TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
                 "taxi_status_time_profiles", matsimServices);

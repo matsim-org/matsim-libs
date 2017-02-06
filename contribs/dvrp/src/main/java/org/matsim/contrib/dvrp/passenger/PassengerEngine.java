@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
@@ -38,13 +38,11 @@ public class PassengerEngine
 {
     private final String mode;
 
-    protected EventsManager eventsManager;
+    private EventsManager eventsManager;
     private InternalInterface internalInterface;
     private final PassengerRequestCreator requestCreator;
     private final VrpOptimizer optimizer;
     private final Network network;
-
-    private final Map<Id<Request>, Request> requests = new LinkedHashMap<>();
 
     private final AdvanceRequestStorage advanceRequestStorage;
     private final AwaitingPickupStorage awaitingPickupStorage;
@@ -164,7 +162,6 @@ public class PassengerEngine
 
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);
-        requests.put(request.getId(), request);
         return request;
     }
 
@@ -216,11 +213,5 @@ public class PassengerEngine
         passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
         passenger.endLegAndComputeNextState(now);
         internalInterface.arrangeNextAgentState(passenger);
-    }
-
-
-    public Map<Id<Request>, ? extends Request> getRequests()
-    {
-        return Collections.unmodifiableMap(requests);
     }
 }

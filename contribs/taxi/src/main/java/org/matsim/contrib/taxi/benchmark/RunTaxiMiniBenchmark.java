@@ -22,10 +22,11 @@ package org.matsim.contrib.taxi.benchmark;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
@@ -76,6 +77,7 @@ public class RunTaxiMiniBenchmark
                 30 * 3600);
         final FleetImpl fleet = new FleetImpl();
         new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
+        final SubmittedTaxiRequestsCollector requestsCollector = new SubmittedTaxiRequestsCollector();
 
         final EventsManager events = EventsUtils.createEventsManager();
         final Collection<AbstractQSimPlugin> plugins = DynQSimModule.createQSimPlugins(config);
@@ -86,7 +88,7 @@ public class RunTaxiMiniBenchmark
             public void run(TaxiOptimizerFactory optimizerFactory)
             {
                 new TaxiQSimProvider(events, plugins, scenario, fleet, estimatedTravelTime,
-                        vehicleType, optimizerFactory).get().run();
+                        vehicleType, optimizerFactory, requestsCollector).get().run();
             }
         };
     }

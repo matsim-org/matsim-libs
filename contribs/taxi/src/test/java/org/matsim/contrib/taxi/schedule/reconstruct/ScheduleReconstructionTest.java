@@ -23,13 +23,13 @@ import java.util.*;
 
 import org.junit.*;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.config.*;
@@ -73,15 +73,15 @@ public class ScheduleReconstructionTest
                 .getInstance(ScheduleReconstructor.class);
 
         Fleet fleet = controler.getInjector().getInstance(Fleet.class);
-        PassengerEngine passengerEngine = controler.getInjector()
-                .getInstance(PassengerEngine.class);
+        SubmittedTaxiRequestsCollector requestCollector = controler.getInjector()
+                .getInstance(SubmittedTaxiRequestsCollector.class);
 
         Assert.assertNotEquals(fleet, scheduleReconstructor.fleet);
 
         compareVehicles(fleet.getVehicles().values(),
                 scheduleReconstructor.fleet.getVehicles().values());
 
-        compareRequests((Collection<TaxiRequest>)passengerEngine.getRequests().values(),
+        compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
                 scheduleReconstructor.taxiRequests.values());
     }
 
