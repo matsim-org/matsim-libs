@@ -37,7 +37,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.agarwalamit.analysis.emission.AirPollutionExposureAnalysisControlerListener;
 import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionCostHandler;
 import playground.agarwalamit.utils.PersonFilter;
@@ -52,7 +51,6 @@ import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
-import playground.ikaddoura.moneyTravelDisutility.data.BerlinAgentFilter;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -87,10 +85,9 @@ public class CNEIntegration {
 	private CongestionTollingApproach congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 	private double kP = 0.;
 
-	private PersonFilter personFilter = null;
-	private AgentFilter agentFilter = new BerlinAgentFilter(); // TODO: account for the case that we do not have any filter!
-//	private AgentFilter agentFilter = null;
-	
+	private PersonFilter personFilter = null; // TODO : i think, we can somehow merge the personFilter or agentFilter. amit
+	private AgentFilter agentFilter  = null;
+
 	private final GridTools gridTools;
 	private final ResponsibilityGridTools responsibilityGridTools ;
 
@@ -192,35 +189,15 @@ public class CNEIntegration {
 			
 			if (noisePricing) {	
 				ncg.setInternalizeNoiseDamages(true);
+				controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			} else {
 				ncg.setInternalizeNoiseDamages(false);
+				controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			}
-		}
-		
-		// ########################## Air pollution ##########################
-		
-		EmissionModule emissionModule = null;
-		EmissionResponsibilityCostModule emissionCostModule = null;
 
-		if (analyzeAirPollution) {
-			
-			final double emissionEfficiencyFactor = 1.0;
-			final boolean considerCO2Costs = true;
-			final double emissionCostFactor = 1.0;
-			
-			emissionModule = new EmissionModule(controler.getScenario());
-			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
-			emissionModule.createLookupTables();
-			emissionModule.createEmissionHandler();
-			
-			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools);
 		}
-		
-		// final is required if binding. Amit Jan 17
-		final EmissionModule finalEmissionModule = emissionModule;
-		final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
 						
-		// ########################## Pricing setup ##########################
+		// ########################## Congestion ##########################
 				
 		if (congestionPricing) {
 						
@@ -261,25 +238,59 @@ public class CNEIntegration {
 			}
 		
 		}
-		
-		if (noisePricing) {
-			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-		}
-		
-		if (airPollutionPricing) {
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bind(GridTools.class).toInstance(gridTools);
-					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
-					bind(EmissionModule.class).toInstance(finalEmissionModule);
-					bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
-					addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
-				}
-			});
 
-		} 
-		
+		// ########################## Air pollution ##########################
+
+		EmissionModule emissionModule = null;
+		EmissionResponsibilityCostModule emissionCostModule = null;
+
+		if (analyzeAirPollution) {
+
+			final double emissionEfficiencyFactor = 1.0;
+			final boolean considerCO2Costs = true;
+			final double emissionCostFactor = 1.0;
+
+			emissionModule = new EmissionModule(controler.getScenario());
+			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
+			emissionModule.createLookupTables();
+			emissionModule.createEmissionHandler();
+
+			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools);
+
+			// final is required if binding. Amit Jan 17
+			final EmissionModule finalEmissionModule = emissionModule;
+			final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
+
+			if (airPollutionPricing) {
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bind(GridTools.class).toInstance(gridTools);
+						bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
+						bind(EmissionModule.class).toInstance(finalEmissionModule);
+						bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
+						addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
+					}
+				});
+
+			} else {
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bind(GridTools.class).toInstance(gridTools);
+						bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
+						bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
+
+						addControlerListenerBinding().to(EmissionControlerListener.class); // just to write the emission events
+
+						if(personFilter!=null) bind(PersonFilter.class).toInstance(personFilter);
+						bind(ExperiencedEmissionCostHandler.class);
+						addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
+					}
+				});
+			}
+		}
+
 		// ########################## Travel disutility ##########################
 		
 		if (useTripAndAgentSpecificVTTSForRouting) {
@@ -326,33 +337,7 @@ public class CNEIntegration {
 				}
 			}); 
 		}		
-		
-		// ########################## Analysis setup ##########################
-		
-		// Noise analysis
-		
-		if (analyzeNoise && this.noisePricing == false) {
-			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-		}
-		
-		// Air pollution analysis
-		if (analyzeAirPollution) {
-			if (!airPollutionPricing) {
-				controler.addControlerListener(new EmissionControlerListener());
-			}
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bind(GridTools.class).toInstance(gridTools);
-					bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
-					bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
-					if(personFilter!=null) bind(PersonFilter.class).toInstance(personFilter);
-					bind(ExperiencedEmissionCostHandler.class);
-					addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
-				}
-			});
-		}
-		
+
 		return controler;
 	}
 	

@@ -59,7 +59,7 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 	@Inject
 	private Scenario scenario;
 	
-	@Inject
+	@Inject(optional=true)
 	private AgentFilter agentFilter;
 	
 	private final Map<Id<Vehicle>, Id<Link>> vehicleId2linkId = new HashMap<>();
@@ -145,7 +145,7 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 				timeBin.setAverageAmount(averageAmount);
 				
 				// average amount per agent type
-				computeAverageAmountPerAgentType(timeBin);				
+				if (this.agentFilter != null) computeAverageAmountPerAgentType(timeBin);
 			}
 		}
 		log.info("Iteration ends. Processing the data in the previous iteration... Done.");
@@ -160,7 +160,7 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 			for (Double amount : timeBin.getPersonId2amounts().get(personId)) {
 				totalAmountOfPerson += amount;
 			}
-			
+
 			String agentType = this.agentFilter.getAgentTypeFromId(personId);
 			
 			if (agentTypeIdPrefix2AmountSum.containsKey(agentType)) {

@@ -96,17 +96,21 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 			if (linkInfo.getTimeBinNr2timeBin().containsKey(intervalNr)) {
 				
 				TimeBin timeBin = linkInfo.getTimeBinNr2timeBin().get(intervalNr);
-				String agentType = vehicleFilter.getAgentTypeFromId(person.getId());
 
-				double avgMoneyAmountVehicleType = 0.;
-				if (timeBin.getAgentTypeId2avgAmount().containsKey(agentType)) {
-					avgMoneyAmountVehicleType = timeBin.getAgentTypeId2avgAmount().get(agentType);
-				}
-				
-				if (avgMoneyAmountVehicleType != 0.) {
-					estimatedAmount = avgMoneyAmountVehicleType;
+				if(this.vehicleFilter != null) {
+					String agentType = vehicleFilter.getAgentTypeFromId(person.getId());
+					double avgMoneyAmountVehicleType = 0.;
+					if (timeBin.getAgentTypeId2avgAmount().containsKey(agentType)) {
+						avgMoneyAmountVehicleType = timeBin.getAgentTypeId2avgAmount().get(agentType);
+					}
+
+					if (avgMoneyAmountVehicleType != 0.) {
+						estimatedAmount = avgMoneyAmountVehicleType;
+					} else {
+						estimatedAmount = timeBin.getAverageAmount();
+					}
 				} else {
-					estimatedAmount = timeBin.getAverageAmount();;
+					estimatedAmount = timeBin.getAverageAmount();
 				}
 			}
 		}

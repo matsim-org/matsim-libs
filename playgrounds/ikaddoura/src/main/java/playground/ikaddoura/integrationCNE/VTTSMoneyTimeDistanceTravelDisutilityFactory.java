@@ -47,7 +47,7 @@ public final class VTTSMoneyTimeDistanceTravelDisutilityFactory implements Trave
 	@Inject
 	private Scenario scenario;
 
-	@Inject
+	@Inject(optional = true)
 	private AgentFilter vehicleFilter;
 	
 	private double sigma = 0. ;
