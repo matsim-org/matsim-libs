@@ -26,23 +26,12 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class OfflineCoalitionConfigGroup extends ReflectiveConfigGroup {
 	private static final String GROUP_NAME = "offlineCoalition";
 
-	private double logitScale = 1;
 	private int iterations = 10;
 	// slow and causes problems when some agents get all their plans removed
 	private int removalPeriod = Integer.MAX_VALUE;
 
 	public OfflineCoalitionConfigGroup() {
 		super( GROUP_NAME );
-	}
-
-	@StringGetter("logitScale")
-	public double getLogitScale() {
-		return logitScale;
-	}
-
-	@StringSetter("logitScale")
-	public void setLogitScale( final double logitScale ) {
-		this.logitScale = logitScale;
 	}
 
 	@StringGetter("iterations")

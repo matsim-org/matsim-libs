@@ -25,6 +25,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
 import org.matsim.contrib.socnetsim.framework.replanning.removers.LexicographicForCompositionExtraPlanRemover;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.ScoreWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.ProportionBasedConflictSolver;
 import org.matsim.core.controler.AbstractModule;
@@ -50,12 +51,9 @@ public class OfflineCoalitionModule extends AbstractModule {
 
 	@Provides
 	public CoalitionSelector createSelector(
-			final SocialNetwork socialNetwork,
-			final OfflineCoalitionConfigGroup conf ) {
+			final SocialNetwork socialNetwork ) {
 		return new CoalitionSelector(
-				new LogitWeight(
-						MatsimRandom.getLocalInstance(),
-						conf.getLogitScale() ),
+				new ScoreWeight(),
 				new ProportionBasedConflictSolver( socialNetwork ) );
 	}
 }
