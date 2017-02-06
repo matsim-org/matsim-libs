@@ -14,7 +14,7 @@ import org.matsim.contrib.av.drt.tasks.DrtTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -56,7 +56,7 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 	@Override
 	protected void scheduleUnplannedRequests() {
 		Set<TaxibusRequest> handledRequests = new HashSet<>();
-		Schedule<DrtTask> schedule = (Schedule<DrtTask>)veh.getSchedule();
+		Schedule schedule = veh.getSchedule();
 		for (TaxibusRequest req : this.unplannedRequests) {
 			if (!req.getToLink().getId().equals(this.commonDestination)) {
 				throw new RuntimeException("optimizer only supports one single destination");
@@ -147,11 +147,11 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 	/**
 	 * @param schedule
 	 */
-	private boolean removeAllTasksSinceLastPickup(Schedule<DrtTask> schedule) {
+	private boolean removeAllTasksSinceLastPickup(Schedule schedule) {
 		int idx = schedule.getTaskCount()-1;
 		int lastPickupIdx = idx;
 		for (int i = idx; i>= 0; i--){
-			DrtTask task = schedule.getTasks().get(i);
+			Task task = schedule.getTasks().get(i);
 			if (task instanceof DrtPickupTask) {
 				lastPickupIdx = task.getTaskIdx();
 				break;
@@ -172,19 +172,19 @@ public class StatebasedOptimizer extends AbstractTaxibusOptimizer {
 	 * @param schedule
 	 * @return
 	 */
-	private DrtPickupTask getLastPickupTask(Schedule<DrtTask> schedule) {
+	private DrtPickupTask getLastPickupTask(Schedule schedule) {
 		int idx = schedule.getTaskCount()-1;
 		for (int i = idx; i>= 0; i--){
-			DrtTask task = schedule.getTasks().get(i);
+			Task task = schedule.getTasks().get(i);
 			if (task instanceof DrtPickupTask) return (DrtPickupTask) task;
 		}
 		return null;
 	}
 	
-	private boolean isSimilarPathAlreadyInTour(Schedule<DrtTask> schedule, VrpPathWithTravelData path){
+	private boolean isSimilarPathAlreadyInTour(Schedule schedule, VrpPathWithTravelData path){
 		int idx = schedule.getTaskCount()-1;
 		for (int i = idx; i>= 0; i--){
-			DrtTask task = schedule.getTasks().get(i);
+			Task task = schedule.getTasks().get(i);
 			if (task instanceof DrtDriveTask){
 				DrtDriveTask dtask = (DrtDriveTask) task;
 				if ((dtask.getPath().getFromLink().equals(path.getFromLink())) &&(dtask.getPath().getToLink().equals(path.getToLink()))){

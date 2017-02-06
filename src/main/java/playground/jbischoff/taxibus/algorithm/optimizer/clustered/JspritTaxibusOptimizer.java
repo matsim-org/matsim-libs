@@ -129,12 +129,10 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 	 * contrib.dvrp.schedule.Schedule)
 	 */
 	@Override
-	public void nextTask(Schedule<? extends Task> schedule) {
-		@SuppressWarnings("unchecked")
-		Schedule<DrtTask> taxibusSchedule = (Schedule<DrtTask>) schedule;
-		context.scheduler.updateBeforeNextTask(taxibusSchedule);
+	public void nextTask(Schedule schedule) {
+		context.scheduler.updateBeforeNextTask(schedule);
 
-		DrtTask newCurrentTask = taxibusSchedule.nextTask();
+		Task newCurrentTask = schedule.nextTask();
 	}
 
 	/*

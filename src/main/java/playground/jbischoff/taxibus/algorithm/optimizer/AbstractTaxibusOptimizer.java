@@ -69,7 +69,7 @@ public abstract class AbstractTaxibusOptimizer
             
 
             for (Vehicle v : optimContext.vrpData.getVehicles().values()) {
-                optimContext.scheduler.updateTimeline((Schedule<DrtTask>) v.getSchedule());
+                optimContext.scheduler.updateTimeline(v.getSchedule());
             }
             if (e.getSimulationTime() % 60 == 0){
             scheduleUnplannedRequests();
@@ -104,16 +104,14 @@ public abstract class AbstractTaxibusOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Schedule schedule)
     {
-        @SuppressWarnings("unchecked")
-		Schedule<DrtTask> taxibusSchedule = (Schedule<DrtTask>) schedule;
-        optimContext.scheduler.updateBeforeNextTask(taxibusSchedule);
+        optimContext.scheduler.updateBeforeNextTask(schedule);
 
-        DrtTask newCurrentTask = taxibusSchedule.nextTask();
+        Task newCurrentTask = schedule.nextTask();
 
         if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-            requiresReoptimization = doReoptimizeAfterNextTask(newCurrentTask);
+            requiresReoptimization = doReoptimizeAfterNextTask((DrtTask)newCurrentTask);
         }
     }
 
@@ -128,7 +126,7 @@ public abstract class AbstractTaxibusOptimizer
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {
-        optimContext.scheduler.updateTimeline((Schedule<DrtTask>) driveTask.getSchedule());
+        optimContext.scheduler.updateTimeline(driveTask.getSchedule());
 
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
