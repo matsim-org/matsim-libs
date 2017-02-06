@@ -54,7 +54,7 @@ public class KNTaxibusExample {
 //		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
-		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
+//		config.qsim().setSnapshotStyle(SnapshotStyle.);
 		
 		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
 //		visConfig.setMapOverlayMode(true);

@@ -38,9 +38,9 @@ import org.matsim.core.network.io.MatsimNetworkReader;
  */
 public class RunIntermodalEventAnalysis {
 public static void main(String[] args) {
-	String networkFile = "C:/net/ils4/jbischoff/multimodal/output/r10-w1000_2_10_cl/r10-w1000_2_10_cl.output_network.xml.gz";
-	String eventsFile = "C:/net/ils4/jbischoff/multimodal/output/r10-w1000_2_10_cl/r10-w1000_2_10_cl.output_events.xml.gz";
-	String outFile = "C:/net/ils4/jbischoff/multimodal/output/r10-w1000_2_10_cl/intermodalChains.csv";
+	String networkFile = "D:/runs-svn/bvg_intermodal/r02.output_network.xml.gz";
+	String eventsFile = "D:/runs-svn/bvg_intermodal/r02.output_events.xml.gz";
+	String outFile = "D:/runs-svn/bvg_intermodal/r02.intermodalChains.csv";
 	
 	Network network = NetworkUtils.createNetwork();
 	new MatsimNetworkReader(network).readFile(networkFile);

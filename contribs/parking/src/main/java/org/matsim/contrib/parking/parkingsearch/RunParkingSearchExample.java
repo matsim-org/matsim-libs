@@ -54,7 +54,7 @@ public class RunParkingSearchExample {
 	 *            turns otfvis visualisation on or off
 	 */
 	public void run(boolean otfvis) {
-		Config config = ConfigUtils.loadConfig("src/main/ressources/parkingsearch/config.xml");
+		Config config = ConfigUtils.loadConfig("src/main/resources/parkingsearch/config.xml");
 		config.plans().setInputFile("population100.xml");
 		config.facilities().setInputFile("parkingFacilities.xml");
 		config.controler().setOutputDirectory("output");
