@@ -64,7 +64,7 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output_convergence_1000.output_plans/";
+			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output2/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -79,8 +79,8 @@ public class DecongestionRun {
 		decongestionSettings.setTOLL_BLEND_FACTOR(0.);
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setKi(0.);
-		decongestionSettings.setKp(0.025);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setKp(0.05);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.8);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 		
