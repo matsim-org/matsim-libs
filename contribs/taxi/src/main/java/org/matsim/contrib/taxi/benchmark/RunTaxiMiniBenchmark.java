@@ -22,10 +22,11 @@ package org.matsim.contrib.taxi.benchmark;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
@@ -41,7 +42,8 @@ import org.matsim.vehicles.*;
  * times are deterministic. To simulate this property, we remove (1) all other traffic, and (2) link
  * capacity constraints (e.g. by increasing the capacities by 100+ times), as a result all vehicles
  * move with the free-flow speed (which is the effective speed).
- * <p></p>
+ * <p>
+ * </p>
  * To model the impact of traffic, we can use a time-variant network, where we specify different
  * free-flow speeds for each link over time. The default approach is to specify free-flow speeds in
  * each time interval (usually 15 minutes).
@@ -73,8 +75,9 @@ public class RunTaxiMiniBenchmark
 
         final Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60,
                 30 * 3600);
-        final TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
+        final FleetImpl fleet = new FleetImpl();
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
+        final SubmittedTaxiRequestsCollector requestsCollector = new SubmittedTaxiRequestsCollector();
 
         final EventsManager events = EventsUtils.createEventsManager();
         final Collection<AbstractQSimPlugin> plugins = DynQSimModule.createQSimPlugins(config);
@@ -84,8 +87,8 @@ public class RunTaxiMiniBenchmark
         return new MiniBenchmark() {
             public void run(TaxiOptimizerFactory optimizerFactory)
             {
-                new TaxiQSimProvider(events, plugins, scenario, taxiData, estimatedTravelTime,
-                        vehicleType, optimizerFactory).get().run();
+                new TaxiQSimProvider(events, plugins, scenario, fleet, estimatedTravelTime,
+                        vehicleType, optimizerFactory, requestsCollector).get().run();
             }
         };
     }

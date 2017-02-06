@@ -4,12 +4,12 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.schedule.*;
@@ -25,7 +25,7 @@ public class PrtScheduler
     private final TaxiSchedulerParams params;
 
 
-    public PrtScheduler(Scenario scenario, TaxiData taxiData, MobsimTimer timer,
+    public PrtScheduler(Scenario scenario, Fleet taxiData, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
         super(scenario, taxiData, timer, params, travelTime, travelDisutility);

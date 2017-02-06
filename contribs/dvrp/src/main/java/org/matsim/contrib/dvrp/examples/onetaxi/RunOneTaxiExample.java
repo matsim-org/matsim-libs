@@ -56,8 +56,8 @@ public class RunOneTaxiExample
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final VrpData vrpData = new VrpDataImpl();
-		new VehicleReader(scenario.getNetwork(), vrpData).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
+		final FleetImpl fleet = new FleetImpl();
+		new VehicleReader(scenario.getNetwork(), fleet).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
 		
 		// ---
 
@@ -66,12 +66,12 @@ public class RunOneTaxiExample
 		controler.addOverridingModule(new AbstractModule() {
 			@Override public void install() {
 				addRoutingModuleBinding(MODE).toInstance(new DynRoutingModule(MODE));
-				bind(VrpData.class).toInstance(vrpData);
+				bind(Fleet.class).toInstance(fleet);
 			}
 		});
 
 		controler.addOverridingModule(new DynQSimModule<>(OneTaxiQSimProvider.class));
-//		controler.addOverridingModule( new TaxiModule(vrpData));
+//		controler.addOverridingModule( new TaxiModule(fleet));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

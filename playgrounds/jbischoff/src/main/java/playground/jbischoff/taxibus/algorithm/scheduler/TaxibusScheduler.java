@@ -22,16 +22,9 @@ package playground.jbischoff.taxibus.algorithm.scheduler;
 import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.av.drt.TaxibusRequest;
-import org.matsim.contrib.av.drt.tasks.DrtDriveTask;
-import org.matsim.contrib.av.drt.tasks.DrtDriveWithPassengerTask;
-import org.matsim.contrib.av.drt.tasks.DrtDropoffTask;
-import org.matsim.contrib.av.drt.tasks.DrtPickupTask;
-import org.matsim.contrib.av.drt.tasks.DrtStayTask;
-import org.matsim.contrib.av.drt.tasks.DrtTask;
-import org.matsim.contrib.av.drt.tasks.DrtTaskWithRequests;
+import org.matsim.contrib.av.drt.tasks.*;
 import org.matsim.contrib.av.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -39,6 +32,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
@@ -47,15 +41,15 @@ public class TaxibusScheduler {
 
 	private static final Logger log = Logger.getLogger(TaxibusScheduler.class);
 	private TaxibusSchedulerParams params;
-	private final VrpData vrpData;
+	private final Fleet vrpData;
 	private final MobsimTimer timer;
 
-	public TaxibusScheduler(VrpData vrpData, MobsimTimer timer, TaxibusSchedulerParams params) {
+	public TaxibusScheduler(Fleet vrpData, MobsimTimer timer, TaxibusSchedulerParams params) {
 		this.vrpData = vrpData;
 		this.timer = timer;
 		this.params = params;
 
-        vrpData.clearRequestsAndResetSchedules();
+        ((FleetImpl)vrpData).resetSchedules();
 
 		for (Vehicle veh : this.vrpData.getVehicles().values()) {
 			Schedule schedule = veh.getSchedule();

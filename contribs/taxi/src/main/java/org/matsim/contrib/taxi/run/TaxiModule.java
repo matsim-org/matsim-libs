@@ -19,9 +19,10 @@
 
 package org.matsim.contrib.taxi.run;
 
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.controler.AbstractModule;
@@ -35,19 +36,19 @@ public class TaxiModule
 {
     public static final String TAXI_MODE = "taxi";
 
-    private final TaxiData taxiData;
+    private final Fleet fleet;
     private final VehicleType vehicleType;
 
 
-    public TaxiModule(TaxiData taxiData)
+    public TaxiModule(Fleet fleet)
     {
-        this(taxiData, VehicleUtils.getDefaultVehicleType());
+        this(fleet, VehicleUtils.getDefaultVehicleType());
     }
 
 
-    public TaxiModule(TaxiData taxiData, VehicleType vehicleType)
+    public TaxiModule(Fleet fleet, VehicleType vehicleType)
     {
-        this.taxiData = taxiData;
+        this.fleet = fleet;
         this.vehicleType = vehicleType;
     }
 
@@ -56,8 +57,9 @@ public class TaxiModule
     public void install()
     {
         addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
-        bind(TaxiData.class).toInstance(taxiData);
+        bind(Fleet.class).toInstance(fleet);
         bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
+        bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
 
         bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
         // yyyy: Why is this a factory?  See comment in TaxiOptimizerFactory.  kai, jan'2017

@@ -177,8 +177,8 @@ public class AssignmentETaxiOptimizer
 
     private VehicleData initVehicleDataForCharging(AssignmentChargerPlugData pData)
     {
-        Iterable<Vehicle> vehiclesBelowMinSocLevel = Iterables.filter(
-                optimContext.taxiData.getVehicles().values(), this::doNeedChargingScheduling);
+        Iterable<? extends Vehicle> vehiclesBelowMinSocLevel = Iterables.filter(
+                optimContext.fleet.getVehicles().values(), this::doNeedChargingScheduling);
 
         //XXX if chargers are heavily used then shorten the planning horizon;
         //(like with undersupply of taxis)

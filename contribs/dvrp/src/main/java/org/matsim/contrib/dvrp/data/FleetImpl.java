@@ -17,31 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data;
+package org.matsim.contrib.dvrp.data;
 
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.taxi.data.TaxiData;
 
 
-public class TaxiDataWithRanks
-    extends TaxiData
+/**
+ * @author michalm
+ */
+public class FleetImpl
+    implements Fleet
 {
-    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
-
-    private final Map<Id<TaxiRank>, TaxiRank> unmodifiableTaxiRanks = Collections
-            .unmodifiableMap(taxiRanks);
+    private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
 
 
-    public Map<Id<TaxiRank>, TaxiRank> getTaxiRanks()
+    @Override
+    public Map<Id<Vehicle>, ? extends Vehicle> getVehicles()
     {
-        return unmodifiableTaxiRanks;
+        return Collections.unmodifiableMap(vehicles);
     }
 
 
-    public void addTaxiRank(TaxiRank taxiRank)
+    public void addVehicle(Vehicle vehicle)
     {
-        taxiRanks.put(taxiRank.getId(), taxiRank);
+        vehicles.put(vehicle.getId(), vehicle);
+    }
+
+
+    public void resetSchedules()
+    {
+        for (Vehicle v : vehicles.values()) {
+            v.resetSchedule();
+        }
     }
 }

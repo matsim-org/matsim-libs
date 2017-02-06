@@ -113,11 +113,11 @@ public class AssignmentTaxiOptimizer
 
     private VehicleData initVehicleData(AssignmentRequestData rData)
     {
-        int idleVehs = Iterables.size(Iterables.filter(optimContext.taxiData.getVehicles().values(),
+        int idleVehs = Iterables.size(Iterables.filter(optimContext.fleet.getVehicles().values(),
                 TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
         double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
                 params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
-        return new VehicleData(optimContext, optimContext.taxiData.getVehicles().values(),
+        return new VehicleData(optimContext, optimContext.fleet.getVehicles().values(),
                 vehPlanningHorizon);
     }
 }

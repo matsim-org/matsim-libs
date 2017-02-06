@@ -24,19 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 
-public interface VrpData
+public interface Fleet
 {
-    Map<Id<Vehicle>, Vehicle> getVehicles();
-
-
-    Map<Id<Request>, Request> getRequests();
-
-
-    void addVehicle(Vehicle vehicle);
-
-
-    void addRequest(Request request);
-
-
-    void clearRequestsAndResetSchedules();
+    Map<Id<Vehicle>, ? extends Vehicle> getVehicles();
 }

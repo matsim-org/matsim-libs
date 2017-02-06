@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.data.file;
+package playground.michalm.taxi.data;
+
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.*;
-import org.xml.sax.Attributes;
-
-import playground.michalm.ev.EvUnitConversions;
-import playground.michalm.taxi.data.EvrpVehicle;
 
 
-public class EvrpVehicleReader
-    extends VehicleReader
+public class TaxiRankDataImpl
+    implements TaxiRankData
 {
-    public EvrpVehicleReader(Network network, FleetImpl fleet)
-    {
-        super(network, fleet);
-    }
+    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
 
 
     @Override
-    protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0,
-            double t1, Attributes atts)
+    public Map<Id<TaxiRank>, ? extends TaxiRank> getTaxiRanks()
     {
-        double batteryCapacity_kWh = ReaderUtils.getDouble(atts, "battery_capacity", 20);
-        double initialSoc_kWh = ReaderUtils.getDouble(atts, "initial_soc",
-                0.8 * batteryCapacity_kWh);
-        return new EvrpVehicle(id, startLink, capacity, t0, t1,
-                batteryCapacity_kWh * EvUnitConversions.J_PER_kWh,
-                initialSoc_kWh * EvUnitConversions.J_PER_kWh);
+        return Collections.unmodifiableMap(taxiRanks);
+    }
+
+
+    public void addTaxiRank(TaxiRank taxiRank)
+    {
+        taxiRanks.put(taxiRank.getId(), taxiRank);
     }
 }

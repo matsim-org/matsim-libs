@@ -2,15 +2,15 @@ package playground.dhosse.prt;
 
 import java.util.Collection;
 
-import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.controler.MatsimServices;
@@ -33,7 +33,7 @@ public class PrtQSimProvider
     private final MatsimServices matsimServices;
     private final Collection<AbstractQSimPlugin> plugins;
 
-    private final TaxiData taxiData;
+    private final Fleet taxiData;
     private final TravelTime travelTime;
 
     private final TaxiConfigGroup taxiCfg;
@@ -43,7 +43,7 @@ public class PrtQSimProvider
 
     @Inject
     public PrtQSimProvider(MatsimServices matsimServices,
-            Collection<AbstractQSimPlugin> plugins, TaxiData taxiData,
+            Collection<AbstractQSimPlugin> plugins, Fleet taxiData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxiConfigGroup taxiCfg,
             TaxiOptimizerFactory optimizerFactory)
     {
@@ -70,7 +70,7 @@ public class PrtQSimProvider
         qSim.addQueueSimulationListeners(optimizer);
 
         PassengerEngine passengerEngine = new PassengerEngine(PrtRequestCreator.MODE, matsimServices.getEvents(),
-                new TaxiRequestCreator(), optimizer, taxiData, matsimServices.getScenario().getNetwork());
+                new TaxiRequestCreator(null), optimizer, matsimServices.getScenario().getNetwork());
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
 

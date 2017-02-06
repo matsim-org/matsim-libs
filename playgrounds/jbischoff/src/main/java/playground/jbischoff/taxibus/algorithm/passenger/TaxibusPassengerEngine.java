@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -43,14 +42,15 @@ public class TaxibusPassengerEngine
 
     private int abortWarn = 0;
     List<MobsimAgent> allAgentsHandled  = new ArrayList<>();
-
+    private EventsManager eventsManager;
 
 
     public TaxibusPassengerEngine(String mode, EventsManager eventsManager,
-            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, VrpData vrpData,
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
             Network network)
     {
-        super(mode, eventsManager, requestCreator, optimizer, vrpData, network);
+        super(mode, eventsManager, requestCreator, optimizer, network);
+        this.eventsManager = eventsManager;
     }
 
 

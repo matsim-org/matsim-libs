@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.data;
+package playground.michalm.taxi.data;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.*;
 
 
-public class TaxiData
-    extends VrpDataImpl
+public interface TaxiRankData
 {
-    //    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
-
-    //    private final Map<Id<TaxiRank>, TaxiRank> unmodifiableTaxiRanks = Collections
-    //            .unmodifiableMap(taxiRanks);
-
-    //    public Map<Id<TaxiRank>, TaxiRank> getTaxiRanks()
-    //    {
-    //        return unmodifiableTaxiRanks;
-    //    }
-
-    public Map<Id<Request>, TaxiRequest> getTaxiRequests()
-    {
-        return convertMap(getRequests());
-    }
-
-    //    public void addTaxiRank(TaxiRank taxiRank)
-    //    {
-    //        taxiRanks.put(taxiRank.getId(), taxiRank);
-    //    }
-
-
-    //casts Collection of supertype S to Collection of type T
-    @SuppressWarnings("unchecked")
-    protected static <I, S, T> Map<I, T> convertMap(Map<I, S> collection)
-    {
-        return (Map<I, T>)collection;
-    }
+    Map<Id<TaxiRank>, ? extends TaxiRank> getTaxiRanks();
 }

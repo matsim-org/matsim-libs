@@ -23,11 +23,10 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -43,10 +42,10 @@ import playground.michalm.taxi.schedule.ETaxiChargingTask;
 public class ETaxiScheduler
     extends TaxiScheduler
 {
-    public ETaxiScheduler(Scenario scenario, TaxiData taxiData, MobsimTimer timer,
+    public ETaxiScheduler(Scenario scenario, Fleet fleet, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
-        super(scenario, taxiData, timer, params, travelTime, travelDisutility);
+        super(scenario, fleet, timer, params, travelTime, travelDisutility);
     }
 
 
@@ -62,6 +61,7 @@ public class ETaxiScheduler
             return super.calcNewEndTime(task, newBeginTime);
         }
     }
+
 
     //FIXME underestimated due to the ongoing AUX/drive consumption
     //not a big issue for e-rule-based dispatching (no look ahead)
@@ -109,7 +109,7 @@ public class ETaxiScheduler
     protected Integer countUnremovablePlannedTasks(Schedule schedule)
     {
         Task currentTask = schedule.getCurrentTask();
-        switch (((TaxiTask)currentTask).getTaxiTaskType()) {
+        switch ( ((TaxiTask)currentTask).getTaxiTaskType()) {
             case EMPTY_DRIVE:
                 Task nextTask = Schedules.getNextTask(schedule);
                 if (! (nextTask instanceof ETaxiChargingTask)) {

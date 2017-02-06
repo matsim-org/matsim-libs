@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
 public class TaxiScheduler
     implements TaxiScheduleInquiry
 {
-    private final TaxiData taxiData;
+    private final Fleet fleet;
     protected final TaxiSchedulerParams params;
     private final MobsimTimer timer;
 
@@ -51,10 +51,10 @@ public class TaxiScheduler
     private final LeastCostPathCalculator router;
 
 
-    public TaxiScheduler(Scenario scenario, TaxiData taxiData, MobsimTimer timer,
+    public TaxiScheduler(Scenario scenario, Fleet fleet, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
-        this.taxiData = taxiData;
+        this.fleet = fleet;
         this.params = params;
         this.timer = timer;
         this.travelTime = travelTime;
@@ -70,14 +70,14 @@ public class TaxiScheduler
                 travelTime, params.AStarEuclideanOverdoFactor, fastRouterFactory);
 
         if (TaxiConfigGroup.get(scenario.getConfig()).isChangeStartLinkToLastLinkInSchedule()) {
-            for (Vehicle veh : taxiData.getVehicles().values()) {
+            for (Vehicle veh : fleet.getVehicles().values()) {
                 Vehicles.changeStartLinkToLastLinkInSchedule(veh);
             }
         }
 
-        taxiData.clearRequestsAndResetSchedules();
+        ((FleetImpl)fleet).resetSchedules();
 
-        for (Vehicle veh : taxiData.getVehicles().values()) {
+        for (Vehicle veh : fleet.getVehicles().values()) {
             veh.getSchedule()
                     .addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
@@ -296,7 +296,7 @@ public class TaxiScheduler
      */
     public void stopAllAimlessDriveTasks()
     {
-        for (Vehicle veh : taxiData.getVehicles().values()) {
+        for (Vehicle veh : fleet.getVehicles().values()) {
             if (getImmediateDiversion(veh) != null) {
                 stopVehicle(veh);
             }
@@ -489,7 +489,7 @@ public class TaxiScheduler
     public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules()
     {
         removedRequests = new ArrayList<>();
-        for (Vehicle veh : taxiData.getVehicles().values()) {
+        for (Vehicle veh : fleet.getVehicles().values()) {
             removeAwaitingRequestsImpl(veh.getSchedule());
         }
 
@@ -548,7 +548,7 @@ public class TaxiScheduler
                     return 0;
                 }
 
-                if (((TaxiTask)Schedules.getNextTask(schedule))
+                if ( ((TaxiTask)Schedules.getNextTask(schedule))
                         .getTaxiTaskType() == TaxiTaskType.PICKUP) {
                     //if no diversion and driving to pick up sb then serve that request
                     return params.destinationKnown ? 3 : null;

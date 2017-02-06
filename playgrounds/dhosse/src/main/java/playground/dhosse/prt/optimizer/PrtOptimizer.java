@@ -86,7 +86,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
     {
         idleVehicles = new HashSet<>();
 
-        for (Vehicle veh : this.optimizerContext.taxiData.getVehicles().values()) {
+        for (Vehicle veh : this.optimizerContext.fleet.getVehicles().values()) {
             if (this.scheduler.isIdle(veh)) {
                 idleVehicles.add(veh);
             }

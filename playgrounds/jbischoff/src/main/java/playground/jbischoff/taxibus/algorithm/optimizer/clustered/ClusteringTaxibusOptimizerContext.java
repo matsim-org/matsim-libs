@@ -3,7 +3,7 @@ package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.*;
 
@@ -13,7 +13,7 @@ import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
 public class ClusteringTaxibusOptimizerContext
 {
-    public final VrpData vrpData;
+    public final Fleet vrpData;
     public final Scenario scenario;
     public final MobsimTimer timer;
     public final TravelTime travelTime;
@@ -32,7 +32,7 @@ public class ClusteringTaxibusOptimizerContext
     public final double minOccupancy;
     public final boolean returnToDepot;
 
-    public ClusteringTaxibusOptimizerContext(VrpData vrpData, Scenario scenario, MobsimTimer timer,
+    public ClusteringTaxibusOptimizerContext(Fleet vrpData, Scenario scenario, MobsimTimer timer,
             TravelTime travelTime, TravelDisutility travelDisutility, TaxibusScheduler scheduler,
            TaxibusConfigGroup tbcg)
     {

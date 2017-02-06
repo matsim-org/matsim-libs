@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
@@ -36,24 +36,24 @@ public class VrpAgentSource
     implements AgentSource
 {
     private final DynActionCreator nextActionCreator;
-    private final VrpData vrpData;
+    private final Fleet fleet;
     private final VrpOptimizer optimizer;
     private final QSim qSim;
     private final VehicleType vehicleType;
 
 
-    public VrpAgentSource(DynActionCreator nextActionCreator, VrpData vrpData,
+    public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet,
             VrpOptimizer optimizer, QSim qSim)
     {
-        this(nextActionCreator, vrpData, optimizer, qSim, VehicleUtils.getDefaultVehicleType());
+        this(nextActionCreator, fleet, optimizer, qSim, VehicleUtils.getDefaultVehicleType());
     }
 
 
-    public VrpAgentSource(DynActionCreator nextActionCreator, VrpData vrpData,
+    public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet,
             VrpOptimizer optimizer, QSim qSim, VehicleType vehicleType)
     {
         this.nextActionCreator = nextActionCreator;
-        this.vrpData = vrpData;
+        this.fleet = fleet;
         this.optimizer = optimizer;
         this.qSim = qSim;
         this.vehicleType = vehicleType;
@@ -64,7 +64,7 @@ public class VrpAgentSource
     public void insertAgentsIntoMobsim()
     {
         VehiclesFactory vehicleFactory = VehicleUtils.getFactory();
-        for (Vehicle vrpVeh : vrpData.getVehicles().values()) {
+        for (Vehicle vrpVeh : fleet.getVehicles().values()) {
             Id<Vehicle> id = vrpVeh.getId();
             Id<Link> startLinkId = vrpVeh.getStartLink().getId();
 

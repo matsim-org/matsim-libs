@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,63 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.taxi.passenger;
 
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 
 
-/**
- * @author michalm
- */
-public class VrpDataImpl
-    implements VrpData
+public class SubmittedTaxiRequestsCollector
 {
-    private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
-    private final Map<Id<Request>, Request> requests = new LinkedHashMap<>();
-
-    private final Map<Id<Vehicle>, Vehicle> unmodifiableVehicles = Collections
-            .unmodifiableMap(vehicles);
-    private final Map<Id<Request>, Request> unmodifiableRequests = Collections
-            .unmodifiableMap(requests);
+    private final Map<Id<Request>, TaxiRequest> requests = new LinkedHashMap<>();
 
 
-    @Override
-    public Map<Id<Vehicle>, Vehicle> getVehicles()
+    public Map<Id<Request>, ? extends TaxiRequest> getRequests()
     {
-        return unmodifiableVehicles;
+        return Collections.unmodifiableMap(requests);
     }
 
 
-    @Override
-    public Map<Id<Request>, Request> getRequests()
-    {
-        return unmodifiableRequests;
-    }
-
-
-    @Override
-    public void addVehicle(Vehicle vehicle)
-    {
-        vehicles.put(vehicle.getId(), vehicle);
-    }
-
-
-    @Override
-    public void addRequest(Request request)
+    //to be used by TaxiRequestCreator
+    void addRequest(TaxiRequest request)
     {
         requests.put(request.getId(), request);
     }
 
 
-    @Override
-    public void clearRequestsAndResetSchedules()
+    public void reset()
     {
-        for (Vehicle v : vehicles.values()) {
-            v.resetSchedule();
-        }
-
         requests.clear();
     }
 }

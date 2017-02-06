@@ -23,44 +23,18 @@
 package playground.jbischoff.pt.scenario;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.av.intermodal.router.VariableAccessTransit;
-import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterImplFactory;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
+import org.matsim.contrib.av.intermodal.router.config.*;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl.Builder;
-import org.matsim.core.replanning.modules.TripsToLegsModule;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
-
-import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModes;
 import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModesModule;
 
 /**
@@ -104,7 +78,7 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 		config.addModule(vacfg);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		TaxiData taxiData = new TaxiData();
+		FleetImpl taxiData = new FleetImpl();
 		new VehicleReader(scenario.getNetwork(), taxiData)
 				.readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 		Controler controler = new Controler(scenario);

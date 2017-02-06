@@ -37,11 +37,11 @@ public class ScheduleBuilder
     private TaxiRequest currentRequest = null;
 
 
-    ScheduleBuilder(TaxiData taxiData, Id<Person> personId, Link link, double t0)
+    ScheduleBuilder(FleetImpl fleet, Id<Person> personId, Link link, double t0)
     {
         Vehicle vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0,
                 Double.NaN);
-        taxiData.addVehicle(vehicle);
+        fleet.addVehicle(vehicle);
         schedule = vehicle.getSchedule();
     }
 
