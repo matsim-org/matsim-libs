@@ -1,19 +1,16 @@
 package playground.clruch.utils;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
+import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
-import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 
 /**
  * Created by Claudio on 1/4/2017.
@@ -26,7 +23,7 @@ import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
  * remaining legs are replace by <leg mode="av" dep_time="prevActivityEndTime" trav_time="NextActivityStartTime-PrevActivityEndTime"> </leg>
  */
 
-
+// TODO move closer to PopulationConverter
 public class PopulationTools {
 
     private static final Logger log = Logger.getLogger(PopulationTools.class);

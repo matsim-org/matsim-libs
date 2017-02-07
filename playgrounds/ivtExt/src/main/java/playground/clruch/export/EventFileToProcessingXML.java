@@ -1,11 +1,10 @@
 package playground.clruch.export;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import java.io.File;
+
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-
-import java.io.File;
 
 
 /**
@@ -31,7 +30,8 @@ public class EventFileToProcessingXML {
         File fileImport = new File(dir, "output/output_events.xml");
         System.out.println("Is directory?  " + dir.isDirectory());
 
-
+        // TODO reduce printouts
+        // TODO move into function of class
         EventsManager events = EventsUtils.createEventsManager();
         events.addHandler(i -> System.out.println("" + i));
 

@@ -68,7 +68,7 @@ class WaitingCustomers extends AbstractExport {
                     relevantEvents.add(event);
                     final Id<Person> idRaw = event.getPersonId();
                     final String id = idRaw.toString();
-                    if (HelperFunction.isPerson(idRaw)) {
+                    if (HelperFunctions.isHuman(idRaw)) {
                         // System.out.println("dept " + id);
                         String linkId = event.getLinkId().toString();
                         deptEvent.put(id, event);
@@ -108,7 +108,7 @@ class WaitingCustomers extends AbstractExport {
                     relevantEvents.add(event);
                     final Id<Person> idRaw = event.getPersonId();
                     final String id = idRaw.toString();
-                    if (HelperFunction.isPerson(idRaw)) {
+                    if (HelperFunctions.isHuman(idRaw)) {
                         double wait = event.getTime() - deptEvent.get(id).getTime();
                         String linkId = deptEvent.get(id).getLinkId().toString();
 

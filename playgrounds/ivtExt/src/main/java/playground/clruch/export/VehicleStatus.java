@@ -88,7 +88,7 @@ class VehicleStatus extends AbstractExport {
                 public void handleEvent(PersonEntersVehicleEvent event) {
                     final String vehicle = event.getVehicleId().toString();
                     final Id<Person> person = event.getPersonId();
-                    if (HelperFunction.isPerson(person)) {
+                    if (HelperFunctions.isHuman(person)) {
                         Set<Id<Person>> set = getCustomerSet(vehicle);
                         if (set.isEmpty()) { // if car is empty
                             firstCustomerEntersVehicleEvent.put(vehicle, event); // mark as beginning of DRIVE WITH CUSTOMER STATUS
@@ -110,7 +110,7 @@ class VehicleStatus extends AbstractExport {
                 public void handleEvent(PersonLeavesVehicleEvent event) {
                     final String vehicle = event.getVehicleId().toString();
                     final Id<Person> person = event.getPersonId();
-                    if (HelperFunction.isPerson(person)) {
+                    if (HelperFunctions.isHuman(person)) {
                         Set<Id<Person>> set = getCustomerSet(vehicle);
                         set.remove(person);
                         if (set.isEmpty()) { // last customer has left the car
@@ -138,7 +138,7 @@ class VehicleStatus extends AbstractExport {
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
                     // only departure events of avs are considered.
-                    if(HelperFunction.isAV(event.getPersonId())){
+                    if(HelperFunctions.isPersonAV(event.getPersonId())){
                         potentialEmptyDriveEvent.put(event.getPersonId().toString(), event);
                     }
                 }

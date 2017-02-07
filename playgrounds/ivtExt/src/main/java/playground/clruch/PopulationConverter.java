@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 
-
+// TODO move to "prep" for "preprocessing" package
 public class PopulationConverter {
     public static void main(String[] args) throws MalformedURLException {
         final File dir = new File(args[0]);
