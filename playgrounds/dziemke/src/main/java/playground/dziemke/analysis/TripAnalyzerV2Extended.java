@@ -32,7 +32,8 @@ public class TripAnalyzerV2Extended {
 	public static final Logger log = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
 	/* Parameters */
-	private static final String runId = "run_200";	// <----------
+//	private static final String runId = "run_200";	// <----------
+	private static final String runId = "be_102";	// <----------
 	private static final String usedIteration = "300"; // most frequently used value: 150 // <----------
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
@@ -66,12 +67,15 @@ public class TripAnalyzerV2Extended {
 	/* Input and output */
 	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml"; // <----------
 //	private static final String networkFile = "../../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz"; // <----------
-	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
-			"/" + runId + "." + usedIteration + ".events.xml.gz";
+//	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
+//			"/" + runId + "." + usedIteration + ".events.xml.gz";
+	private static final String eventsFile = "../../../runs-svn/berlin_scenario_2016/" + runId + "/" + runId + ".output_events.xml.gz";
 	private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + 
 			cemdapPersonsInputFileId + "/persons1.dat";
-	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
-	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+//	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
+	private static final String planningAreaShapeFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/Berlin_DHDN_GK4.shp";
+//	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";	// <----------
+	private static String outputDirectory = "../../../runs-svn/berlin_scenario_2016/" + runId + "/analysis";	// <----------
 	
 	private static String gnuplotScriptName = "plot_rel_path_run.gnu";
 
@@ -202,7 +206,7 @@ public class TripAnalyzerV2Extended {
 	private static void adaptOutputDirectory() {
 		outputDirectory = outputDirectory + "_" + usedIteration;
 	    if (onlySpecificMode) {
-			outputDirectory = outputDirectory + specificMode;
+			outputDirectory = outputDirectory + "_" + specificMode;
 		}
 	    if (onlyInterior) {
 			outputDirectory = outputDirectory + "_int";
