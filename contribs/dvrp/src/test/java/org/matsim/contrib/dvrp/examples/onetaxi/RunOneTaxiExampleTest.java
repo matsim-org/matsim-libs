@@ -27,6 +27,6 @@ public class RunOneTaxiExampleTest
     @Test
     public void testRun()
     {
-        RunOneTaxiExample.run(false);
+        RunOneTaxiExample.run(false, 3);
     }
 }

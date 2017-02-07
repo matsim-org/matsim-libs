@@ -24,6 +24,9 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSim;
+
+import com.google.inject.Inject;
 
 
 public class OneTaxiActionCreator
@@ -33,10 +36,11 @@ public class OneTaxiActionCreator
     private final MobsimTimer timer;
 
 
-    public OneTaxiActionCreator(PassengerEngine passengerEngine, MobsimTimer timer)
+    @Inject
+    public OneTaxiActionCreator(PassengerEngine passengerEngine, QSim qSim)
     {
         this.passengerEngine = passengerEngine;
-        this.timer = timer;
+        this.timer = qSim.getSimTimer();
     }
 
 

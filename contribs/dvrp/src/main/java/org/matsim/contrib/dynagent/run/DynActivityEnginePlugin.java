@@ -3,7 +3,7 @@ package org.matsim.contrib.dynagent.run;
 import java.util.*;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 
 import com.google.inject.*;

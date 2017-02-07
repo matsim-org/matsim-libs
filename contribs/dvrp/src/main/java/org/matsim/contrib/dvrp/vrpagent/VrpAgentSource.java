@@ -21,8 +21,8 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
@@ -30,6 +30,8 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.*;
+
+import com.google.inject.Inject;
 
 
 public class VrpAgentSource
@@ -42,15 +44,16 @@ public class VrpAgentSource
     private final VehicleType vehicleType;
 
 
-    public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet,
-            VrpOptimizer optimizer, QSim qSim)
+    @Inject
+    public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer,
+            QSim qSim)
     {
         this(nextActionCreator, fleet, optimizer, qSim, VehicleUtils.getDefaultVehicleType());
     }
 
 
-    public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet,
-            VrpOptimizer optimizer, QSim qSim, VehicleType vehicleType)
+    public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer,
+            QSim qSim, VehicleType vehicleType)
     {
         this.nextActionCreator = nextActionCreator;
         this.fleet = fleet;

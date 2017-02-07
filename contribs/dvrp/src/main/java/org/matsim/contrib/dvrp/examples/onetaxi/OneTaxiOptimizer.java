@@ -30,9 +30,12 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+
+import com.google.inject.Inject;
 
 
 /**
@@ -47,25 +50,23 @@ public class OneTaxiOptimizer
     private final LeastCostPathCalculator router;
 
     private final Vehicle vehicle;//we have only one vehicle
-    private final Schedule schedule;// the vehicle's schedule
 
     public static final double PICKUP_DURATION = 120;
     public static final double DROPOFF_DURATION = 60;
 
 
-    public OneTaxiOptimizer(Scenario scenario, Fleet fleet, MobsimTimer timer)
+    @Inject
+    public OneTaxiOptimizer(Scenario scenario, Fleet fleet, QSim qsim)
     {
-        this.timer = timer;
+        this.timer = qsim.getSimTimer();
 
         travelTime = new FreeSpeedTravelTime();
         router = new Dijkstra(scenario.getNetwork(), new TimeAsTravelDisutility(travelTime),
                 travelTime);
 
-        ((FleetImpl)fleet).resetSchedules();//necessary if we run more than 1 iteration
-
         vehicle = fleet.getVehicles().values().iterator().next();
-        schedule = vehicle.getSchedule();
-        schedule.addTask(
+        vehicle.resetSchedule();
+        vehicle.getSchedule().addTask(
                 new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(), "wait"));
     }
 
@@ -73,16 +74,17 @@ public class OneTaxiOptimizer
     @Override
     public void requestSubmitted(Request request)
     {
+        Schedule schedule = vehicle.getSchedule();
         StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
         double currentTime = timer.getTimeOfDay();
 
         switch (lastTask.getStatus()) {
             case PLANNED:
-                schedule.removeLastTask();// remove waiting
+                schedule.removeLastTask();// remove wait task
                 break;
 
             case STARTED:
-                lastTask.setEndTime(currentTime);// shorten waiting
+                lastTask.setEndTime(currentTime);// shorten wait task
                 break;
 
             default:
@@ -97,19 +99,19 @@ public class OneTaxiOptimizer
                 Math.max(vehicle.getT0(), currentTime) : //
                 Schedules.getLastTask(schedule).getEndTime();
 
-        VrpPathWithTravelData p1 = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0,
-                router, travelTime);
-        schedule.addTask(new DriveTaskImpl(p1));
+        VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(),
+                fromLink, t0, router, travelTime);
+        schedule.addTask(new DriveTaskImpl(pathToCustomer));
 
-        double t1 = p1.getArrivalTime();
+        double t1 = pathToCustomer.getArrivalTime();
         double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, true, req));
 
-        VrpPathWithTravelData p2 = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router,
-                travelTime);
-        schedule.addTask(new DriveTaskImpl(p2));
+        VrpPathWithTravelData pathWithCustomer = VrpPaths.calcAndCreatePath(fromLink, toLink, t2,
+                router, travelTime);
+        schedule.addTask(new DriveTaskImpl(pathWithCustomer));
 
-        double t3 = p2.getArrivalTime();
+        double t3 = pathWithCustomer.getArrivalTime();
         double t4 = t3 + DROPOFF_DURATION;// 1 minute for dropping off the passenger
         schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, false, req));
 
@@ -134,6 +136,7 @@ public class OneTaxiOptimizer
      */
     private void shiftTimings()
     {
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
             return;
         }
