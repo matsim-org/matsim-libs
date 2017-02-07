@@ -209,7 +209,7 @@ public class TaxibusScheduler {
 
 		} else {
 			for (Task task : bestSched.getTasks()){
-				log.error(task.toString()+" " +task.getType() +" "+task.getStatus() );
+				log.error(task.toString() /*+" " +task.getType()*/ +" "+task.getStatus() );
 			}
 			throw new IllegalStateException();
 		}
