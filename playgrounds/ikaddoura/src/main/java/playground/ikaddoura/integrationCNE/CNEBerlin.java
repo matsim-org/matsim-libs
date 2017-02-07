@@ -231,9 +231,9 @@ public class CNEBerlin {
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
-		controler = cne.prepareControler();
-
 		cne.setAgentFilter(new BerlinAgentFilter());
+
+		controler = cne.prepareControler();
 				
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();

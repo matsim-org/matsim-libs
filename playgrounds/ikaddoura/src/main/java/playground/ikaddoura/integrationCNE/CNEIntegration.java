@@ -184,6 +184,7 @@ public class CNEIntegration {
 		NoiseContext noiseContext = null;
 		
 		if (analyzeNoise) {
+			
 			noiseContext = new NoiseContext(controler.getScenario());
 			NoiseConfigGroup ncg = (NoiseConfigGroup) controler.getScenario().getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 			
@@ -194,7 +195,6 @@ public class CNEIntegration {
 				ncg.setInternalizeNoiseDamages(false);
 				controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			}
-
 		}
 						
 		// ########################## Congestion ##########################
@@ -231,7 +231,6 @@ public class CNEIntegration {
 						this.addControlerListenerBinding().toInstance(decongestion);
 					}
 				});
-				
 				
 			} else {
 				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
