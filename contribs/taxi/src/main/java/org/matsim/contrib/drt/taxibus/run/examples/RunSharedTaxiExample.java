@@ -17,69 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.scenario;
+package org.matsim.contrib.drt.taxibus.run.examples;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
-import playground.jbischoff.sharedTaxi.SharedTaxiContolerListener;
-import playground.jbischoff.sharedTaxi.SharedTaxiTripAnalyzer;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author jbischoff
- *
+ * An example of a shared taxi system using DRT / taxibus infrastructure. 
+ * A maximum of two passengers share a trip in this example.
+ * 
  */
 public class RunSharedTaxiExample {
+	
 
 	public static void main(String[] args) {
+
+		Config config = ConfigUtils.loadConfig("./src/main/resources/taxibus_example/configShared.xml", new TaxibusConfigGroup());
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
+		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 		
-		Config config = ConfigUtils.loadConfig(args[0], new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
+		visConfig.setAgentSize(250);
+		visConfig.setLinkWidth(5);
+		visConfig.setDrawNonMovingItems(true);
+		visConfig.setDrawTime(true);
+		
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 		
-		//Analysis code:
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-			bind(SharedTaxiTripAnalyzer.class).asEagerSingleton();
-			addControlerListenerBinding().to(SharedTaxiContolerListener.class);
-			bindScoringFunctionFactory().toInstance(new ScoringFunctionFactory() {
-				
-				@Override
-				public ScoringFunction createNewScoringFunction(Person person) {
-					SumScoringFunction sumScoringFunction = new SumScoringFunction();
-					final CharyparNagelScoringParameters params =
-							new CharyparNagelScoringParameters.Builder(scenario, person.getId()).build();
-					sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
-					sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
-					sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
-					sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-					
-					return sumScoringFunction;
-				}
-			});
-			}
-		});
+		//Comment out the following line in case you do not require OTFVis visualisation
+		controler.addOverridingModule( new OTFVisLiveModule() );
+		
 		controler.run();
+
+	
 	}
+
+	
+	
 }

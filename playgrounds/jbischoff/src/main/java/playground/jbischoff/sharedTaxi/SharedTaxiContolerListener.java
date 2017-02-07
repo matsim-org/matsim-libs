@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.taxibus.analysis.sharedTaxi;
+package playground.jbischoff.sharedTaxi;
 
 import javax.inject.Inject;
 
