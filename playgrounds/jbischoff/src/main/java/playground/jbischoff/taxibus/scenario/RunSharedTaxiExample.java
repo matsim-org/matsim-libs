@@ -21,6 +21,10 @@ package playground.jbischoff.taxibus.scenario;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.taxibus.analysis.sharedTaxi.SharedTaxiContolerListener;
+import org.matsim.contrib.drt.taxibus.analysis.sharedTaxi.SharedTaxiTripAnalyzer;
+import org.matsim.contrib.drt.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
+import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -35,11 +39,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
-import playground.jbischoff.taxibus.analysis.sharedTaxi.SharedTaxiContolerListener;
-import playground.jbischoff.taxibus.analysis.sharedTaxi.SharedTaxiTripAnalyzer;
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
 /**
  * @author jbischoff

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +16,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.scenario;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+package org.matsim.contrib.drt.taxibus.algorithm.scheduler;
+
+import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
-public class RunConfigBasedExample {
+public class TaxibusSchedulerParams extends TaxiSchedulerParams {
 
-	public static void main(String[] args) {
+	public TaxibusSchedulerParams(double pickupDuration,
+			double dropoffDuration) {
+		super(true, false, pickupDuration, dropoffDuration, 1.0);
+		//		We assume we a) know where we are heading to and b) do not allow diversions once a bus is running
 		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.run();
 	}
+
 }

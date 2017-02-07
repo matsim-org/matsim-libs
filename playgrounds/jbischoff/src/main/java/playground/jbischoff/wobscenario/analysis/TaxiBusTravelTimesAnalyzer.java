@@ -29,9 +29,8 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.contrib.drt.taxibus.algorithm.utils.TaxibusUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
 
 /**
  * @author  jbischoff

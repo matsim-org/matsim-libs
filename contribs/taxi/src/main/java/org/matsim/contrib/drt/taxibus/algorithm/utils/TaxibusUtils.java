@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +16,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.scenario;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+package org.matsim.contrib.drt.taxibus.algorithm.utils;
+
+import java.util.ArrayList;
+
+import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
-public class RunConfigBasedExample {
+public class TaxibusUtils {
+    public static final String TAXIBUS_MODE = "taxibus";
 
-	public static void main(String[] args) {
-		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+
+
+public static double calcPathCost(ArrayList<VrpPathWithTravelData> newPath ){
+	double cost = 0.0;
 	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.run();
+	for (VrpPathWithTravelData path : newPath){
+		cost += path.getTravelTime();
 	}
+	
+	return cost;
+}
+
+
+
+public static void printRequestPath(TaxibusDispatch best) {
+	System.out.println("RequestPath for vehicle : "+best.vehicle.getId());
+	for (TaxibusRequest r : best.requests){
+	System.out.println(r.toString() + "\tfrom\t"+ r.getFromLink().getId().toString() + "\tto:\t"+ r.getToLink().getId().toString());
+	}
+	for (VrpPathWithTravelData p : best.path){
+		System.out.println("Path from\t" + p.getFromLink().getId().toString()+ "\tto\t"+ p.getToLink().getId().toString());
+		
+	}
+	
+}
 }
