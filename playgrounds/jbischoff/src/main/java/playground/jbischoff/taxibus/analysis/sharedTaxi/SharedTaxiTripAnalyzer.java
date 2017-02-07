@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.sharedtaxi.analysis;
+package playground.jbischoff.taxibus.analysis.sharedTaxi;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

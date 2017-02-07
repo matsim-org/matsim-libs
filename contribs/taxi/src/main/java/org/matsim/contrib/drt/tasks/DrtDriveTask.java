@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.algorithm.tubs.datastructure;
+package org.matsim.contrib.drt.tasks;
 
-public class State {
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
-	int time;
-	int slack;
-	Integer confirmations;
-	
-	State(int time, int slack, int confirmations) {
-		this.time = time;
-		this.slack = slack;
-		this.confirmations = confirmations;
+/**
+ * @author  jbischoff
+ *	Task for driving w/o pax
+ */
+public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
+
+	public DrtDriveTask(VrpPathWithTravelData path) {
+		super(path);
+		// TODO Auto-generated constructor stub
 	}
-	
-	
-	
-	
+
+	@Override
+	public DrtTaskType getDrtTaskType() {
+		
+		return DrtTaskType.DRIVE_EMPTY;
+	}
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+    }
+
+
 }

@@ -17,34 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.av.drt.tasks;
+package org.matsim.contrib.drt.tasks;
 
 import java.util.HashSet;
 
-import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
 
 
-public class DrtDropoffTask
+public class DrtPickupTask
     extends StayTaskImpl
     implements DrtTaskWithRequests
 {
     private final TaxibusRequest request;
 
 
-    public DrtDropoffTask(double beginTime, double endTime, TaxibusRequest request)
+    public DrtPickupTask(double beginTime, double endTime, TaxibusRequest request)
     {
-        super(beginTime, endTime, request.getToLink());
+        super(beginTime, endTime, request.getFromLink());
 
         this.request = request;
-        request.setDropoffTask(this);
+        request.setPickupTask(this);
     }
 
     @Override
     public DrtTaskType getDrtTaskType()
     {
-        return DrtTaskType.DROPOFF;
+        return DrtTaskType.PICKUP;
     }
 
 
@@ -74,9 +74,10 @@ public class DrtDropoffTask
 		if (request!=this.request) {
 			throw new IllegalStateException();
 		}
-		request.setDropoffTask(null);
+		request.setPickupTask(null);
 		
 	}
+	
 	@Override
 	public void removeFromAllRequests() {
 		removeFromRequest(this.request);

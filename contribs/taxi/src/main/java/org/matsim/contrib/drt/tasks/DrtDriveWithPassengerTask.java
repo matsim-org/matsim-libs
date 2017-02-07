@@ -17,11 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.av.drt.tasks;
+package org.matsim.contrib.drt.tasks;
 
 import java.util.Set;
 
-import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 

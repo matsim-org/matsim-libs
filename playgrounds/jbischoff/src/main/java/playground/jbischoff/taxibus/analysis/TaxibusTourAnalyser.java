@@ -46,7 +46,6 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-import playground.jbischoff.utils.JbUtils;
 
 /**
  * @author  jbischoff
@@ -154,7 +153,7 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 	}
 
 	private void handlePickup(ActivityEndEvent event) {
-		int hour = JbUtils.getHour(event.getTime());
+		int hour = getHour(event.getTime());
 		
 		Id<Vehicle> vid = p2vid(event.getPersonId());
 		int pax = 1;
@@ -250,6 +249,13 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 		}
 		
 	}
+	private int getHour(double time){
+		int hour = (int) Math.floor(time/(3600));
+		if (hour>23){
+			hour = hour%24;
+		}
+		return hour;
+	}
 }
 class TaxibusTour implements Comparable<TaxibusTour>{
 	int occupancy;
@@ -304,5 +310,7 @@ class TaxibusTour implements Comparable<TaxibusTour>{
 	public int compareTo(TaxibusTour arg0) {
 		return firstPickup.compareTo(arg0.firstPickup);
 	}
+	
+	
 	
 }

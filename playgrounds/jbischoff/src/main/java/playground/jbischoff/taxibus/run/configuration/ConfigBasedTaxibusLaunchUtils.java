@@ -25,16 +25,13 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
 import com.google.inject.util.Providers;
 
-
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
-import playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateLookupTable;
-import playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateSpace;
+
 import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
 
@@ -43,67 +40,50 @@ import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
  *
  */
 public class ConfigBasedTaxibusLaunchUtils {
-		private Controler controler;
-		
-		
-		
-		public ConfigBasedTaxibusLaunchUtils(Controler controler) {
-			this.controler = controler;
-			
-		}
-		
-	 
-	public  void initiateTaxibusses(){
-		//this is done exactly once per simulation
-		
+	private Controler controler;
+
+	public ConfigBasedTaxibusLaunchUtils(Controler controler) {
+		this.controler = controler;
+
+	}
+
+	public void initiateTaxibusses() {
+		// this is done exactly once per simulation
+
 		Scenario scenario = controler.getScenario();
-		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModules().get(TaxibusConfigGroup.GROUP_NAME);
-        final FleetImpl vrpData = new FleetImpl();
-        new VehicleReader(scenario.getNetwork(), vrpData).parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
-        final TaxibusPassengerOrderManager orderManager;
-        final StateLookupTable lookuptable;
-	
-		if (tbcg.getAlgorithm().equals("stateBased")){
-			lookuptable = new StateLookupTable(7.25*3600, 8*3600, 60, 0, controler.getConfig().controler().getOutputDirectory());
-			controler.addControlerListener(lookuptable);
-		} else {
-			lookuptable = null;
-		}
-		if (tbcg.getAlgorithm().equals("clustered")){	
-		orderManager = new TaxibusPassengerOrderManager();
+		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModules()
+				.get(TaxibusConfigGroup.GROUP_NAME);
+		final FleetImpl fleetData = new FleetImpl();
+		new VehicleReader(scenario.getNetwork(), fleetData)
+				.parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
+		final TaxibusPassengerOrderManager orderManager;
+
+		if ((tbcg.getAlgorithm().equals("clustered_jsprit"))||(tbcg.getAlgorithm().equals("jsprit"))) {
+			orderManager = new TaxibusPassengerOrderManager();
 		} else {
 			orderManager = null;
 		}
-		
+
 		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
-        controler.addOverridingModule(new DynQSimModule<>(TaxibusQSimProvider.class));
+		controler.addOverridingModule(new DynQSimModule<>(TaxibusQSimProvider.class));
 		controler.addOverridingModule(new AbstractModule() {
-			
+
 			@Override
 			public void install() {
-				
-				if (orderManager!=null){
-				addEventHandlerBinding().toInstance(orderManager);
-				bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
-				}else {
+
+				if (orderManager != null) {
+					addEventHandlerBinding().toInstance(orderManager);
+					bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
+				} else {
 					bind(TaxibusPassengerOrderManager.class).toProvider(Providers.of(null));
 				}
-				if (lookuptable!=null){
-					bind(StateSpace.class).toInstance(lookuptable);
-					}
-				else {
-					bind(StateSpace.class).toProvider(Providers.of(null));
-				}
+
 				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
-				bind(Fleet.class).toInstance(vrpData);
+				bind(Fleet.class).toInstance(fleetData);
 
 			}
 		});
-		
-		
-		
-		
-	}
 
+	}
 
 }

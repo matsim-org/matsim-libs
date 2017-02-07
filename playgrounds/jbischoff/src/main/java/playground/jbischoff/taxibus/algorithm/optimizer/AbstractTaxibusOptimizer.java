@@ -22,9 +22,9 @@ package playground.jbischoff.taxibus.algorithm.optimizer;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import org.matsim.contrib.av.drt.TaxibusRequest;
-import org.matsim.contrib.av.drt.tasks.DrtTask;
-import org.matsim.contrib.av.drt.tasks.DrtTask.DrtTaskType;
+import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.tasks.DrtTask;
+import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;

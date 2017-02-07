@@ -17,12 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.av.drt;
+package org.matsim.contrib.drt;
 
-import org.matsim.contrib.av.drt.tasks.DrtDropoffTask;
-import org.matsim.contrib.av.drt.tasks.DrtPickupTask;
-import org.matsim.contrib.av.drt.tasks.DrtStayTask;
-import org.matsim.contrib.av.drt.tasks.DrtTask;
+import org.matsim.contrib.drt.tasks.DrtDropoffTask;
+import org.matsim.contrib.drt.tasks.DrtPickupTask;
+import org.matsim.contrib.drt.tasks.DrtStayTask;
+import org.matsim.contrib.drt.tasks.DrtTask;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;

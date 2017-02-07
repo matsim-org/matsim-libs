@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.analysis;
+package playground.jbischoff.wobscenario.analysis;
 
 import java.io.File;
 import java.util.HashSet;
@@ -32,6 +32,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.jbischoff.taxibus.analysis.TaxibusTourAnalyser;
 
 /**
  * @author  jbischoff

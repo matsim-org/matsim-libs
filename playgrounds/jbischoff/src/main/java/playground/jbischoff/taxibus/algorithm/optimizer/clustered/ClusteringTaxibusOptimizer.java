@@ -31,8 +31,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.av.drt.TaxibusRequest;
-import org.matsim.contrib.av.drt.tasks.DrtTask;
+import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -57,6 +56,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
     final Collection<TaxibusRequest> unplannedRequests;
     final Random r = MatsimRandom.getLocalInstance();
     final RequestDispatcher dispatcher;
+    
 	/**
 	 * 
 	 */

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.sharedtaxi.analysis;
+package playground.jbischoff.taxibus.analysis.sharedTaxi;
 
 import javax.inject.Inject;
 

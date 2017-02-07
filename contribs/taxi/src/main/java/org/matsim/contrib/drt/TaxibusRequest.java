@@ -17,16 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.av.drt;
+package org.matsim.contrib.drt;
 
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.av.drt.tasks.DrtDriveWithPassengerTask;
-import org.matsim.contrib.av.drt.tasks.DrtTask;
-import org.matsim.contrib.av.drt.tasks.DrtTaskWithRequests;
-import org.matsim.contrib.av.drt.tasks.DrtTask.DrtTaskType;
+import org.matsim.contrib.drt.tasks.DrtDriveWithPassengerTask;
+import org.matsim.contrib.drt.tasks.DrtTask;
+import org.matsim.contrib.drt.tasks.DrtTaskWithRequests;
+import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.RequestImpl;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;

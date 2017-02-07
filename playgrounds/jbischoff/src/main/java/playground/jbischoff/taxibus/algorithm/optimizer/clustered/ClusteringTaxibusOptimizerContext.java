@@ -28,7 +28,6 @@ public class ClusteringTaxibusOptimizerContext
     public final int capacity;
     public final int vehiclesAtSameTime;
     public final int clusteringRounds;
-    public final int routingRounds;
     public final double minOccupancy;
     public final boolean returnToDepot;
 
@@ -49,7 +48,6 @@ public class ClusteringTaxibusOptimizerContext
         clustering_period_min= tbcg.getClustering_period_min();
         prebook_period_min = tbcg.getPrebook_period_min();
         clusteringRounds = tbcg.getClusteringRounds();
-        routingRounds=tbcg.getRoutingRounds();
         minOccupancy = tbcg.getMinOccupancy();
         vehiclesAtSameTime = tbcg.getNumberOfVehiclesDispatchedAtSameTime();
         Coord coord1 = scenario.getNetwork().getLinks().get(Id.createLinkId(tbcg.getServiceAreaCentroid_1())).getCoord();

@@ -22,7 +22,7 @@ package playground.jbischoff.taxibus.run.sim;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.av.drt.DrtActionCreator;
+import org.matsim.contrib.drt.DrtActionCreator;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -42,13 +42,11 @@ import playground.jbischoff.taxibus.algorithm.optimizer.clustered.ClusteringTaxi
 import playground.jbischoff.taxibus.algorithm.optimizer.clustered.ClusteringTaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.optimizer.clustered.JspritDispatchCreator;
 import playground.jbischoff.taxibus.algorithm.optimizer.clustered.JspritTaxibusOptimizer;
-import playground.jbischoff.taxibus.algorithm.optimizer.clustered.SimpleDispatchCreator;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.sharedTaxi.SharedTaxiOptimizer;
 import playground.jbischoff.taxibus.algorithm.passenger.*;
 import playground.jbischoff.taxibus.algorithm.scheduler.*;
-import playground.jbischoff.taxibus.algorithm.tubs.StatebasedOptimizer;
-import playground.jbischoff.taxibus.algorithm.tubs.datastructure.StateSpace;
+
 import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
@@ -63,26 +61,24 @@ public class TaxibusQSimProvider
     private final Scenario scenario;
     private final EventsManager events;
     private final Collection<AbstractQSimPlugin> plugins;
-    private final Fleet vrpData;
+    private final Fleet fleetData;
     private final TravelTime travelTime;
     private final TaxibusConfigGroup tbcg;
     private final TaxibusPassengerOrderManager orderManager;
-    private final StateSpace stateSpace;
 
     @Inject
     TaxibusQSimProvider(Scenario scenario, EventsManager events,
             Collection<AbstractQSimPlugin> plugins, Fleet vrpData,
             @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
-            @Nullable TaxibusPassengerOrderManager orderManager, @Nullable StateSpace stateSpace)
+            @Nullable TaxibusPassengerOrderManager orderManager)
     {
         this.scenario = scenario;
         this.events = events;
         this.plugins = plugins;
-        this.vrpData = vrpData;
+        this.fleetData = vrpData;
         this.travelTime = travelTime;
         this.tbcg = tbcg;
         this.orderManager = orderManager;
-        this.stateSpace = stateSpace;
     }
 
 
@@ -107,7 +103,7 @@ public class TaxibusQSimProvider
         LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
         DrtActionCreator actionCreator = new DrtActionCreator(passengerEngine, legCreator,
                 tbcg.getPickupDuration());
-        qSim.addAgentSource(new VrpAgentSource(actionCreator, vrpData, optimizer, qSim));
+        qSim.addAgentSource(new VrpAgentSource(actionCreator, fleetData, optimizer, qSim));
 
         return qSim;
     }
@@ -120,8 +116,8 @@ public class TaxibusQSimProvider
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
         TaxibusSchedulerParams params = new TaxibusSchedulerParams(tbcg.getPickupDuration(),
                 tbcg.getDropoffDuration());
-        TaxibusScheduler scheduler = new TaxibusScheduler(vrpData, qSim.getSimTimer(), params);
-        TaxibusOptimizerContext optimizerContext = new TaxibusOptimizerContext(vrpData, scenario,
+        TaxibusScheduler scheduler = new TaxibusScheduler(fleetData, qSim.getSimTimer(), params);
+        TaxibusOptimizerContext optimizerContext = new TaxibusOptimizerContext(fleetData, scenario,
                 qSim.getSimTimer(), travelTime, travelDisutility, scheduler,
                 tbcg);
 
@@ -129,21 +125,16 @@ public class TaxibusQSimProvider
 
             case "sharedTaxi":
             	return new SharedTaxiOptimizer(optimizerContext, false, tbcg.getDetourFactor());
-            case "stateBased":
-            	return new StatebasedOptimizer(optimizerContext, false, this.stateSpace , tbcg);
-            case "clustered":
-            {
-            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(vrpData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
-            	return new ClusteringTaxibusOptimizer(context, new SimpleDispatchCreator(context));
-            }
+            
             case "jsprit":
             {
-            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(vrpData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
             	return new JspritTaxibusOptimizer(context);
             }
+           
             case "clustered_jsprit":
             {
-            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(vrpData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
             	return new ClusteringTaxibusOptimizer(context, new JspritDispatchCreator(context));
             }
             default:

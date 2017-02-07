@@ -17,21 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.av.drt.tasks;
+package org.matsim.contrib.drt.tasks;
 
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
 
-public interface DrtTask
-    extends Task
+
+public class DrtStayTask
+    extends StayTaskImpl
+    implements DrtTask
 {
-    static enum DrtTaskType
+    public DrtStayTask(double beginTime, double endTime, Link link)
     {
-    	        DRIVE_EMPTY, // drive empty might be needed later.
-        STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
-        PICKUP, DRIVE_WITH_PASSENGER, DROPOFF;//serving n customers (TaxibusTaskWithRequests)
+        super(beginTime, endTime, link);
     }
 
 
-    DrtTaskType getDrtTaskType();
+    @Override
+    public DrtTaskType getDrtTaskType()
+    {
+        return DrtTaskType.STAY;
+    }
+
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+    }
 }

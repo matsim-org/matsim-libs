@@ -24,7 +24,6 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -46,15 +45,16 @@ public class KNTaxibusExample {
 		// all vehicles start at same place; all passengers start at same place:
 
 		//TODO: Kai, in case you use this, please update your SVN first, Joschka // Dec 2016
-		// passengers live in larger area and want to go to railway station (now with nicer routes):
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configClustered.xml", new TaxibusConfigGroup());
-//		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configJsprit.xml", new TaxibusConfigGroup());
+		// passengers live in larger area and want to go to railway station (now with nicer routes), two different algorithms:
+		
+//		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configClustered.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configJsprit.xml", new TaxibusConfigGroup());
 		
 		// passengers live in larger area and have distributed destinations, shared taxi for 2 persons:
 //		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
-//		config.qsim().setSnapshotStyle(SnapshotStyle.);
+		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 		
 		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
 //		visConfig.setMapOverlayMode(true);

@@ -21,7 +21,7 @@ package playground.jbischoff.taxibus.algorithm.optimizer.clustered;
 
 import java.util.Set;
 
-import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.drt.TaxibusRequest;
 
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 

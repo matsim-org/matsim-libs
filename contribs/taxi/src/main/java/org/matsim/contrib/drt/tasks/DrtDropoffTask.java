@@ -17,21 +17,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.av.drt.tasks;
-import java.util.Set;
+package org.matsim.contrib.drt.tasks;
 
-import org.matsim.contrib.av.drt.TaxibusRequest;
+import java.util.HashSet;
+
+import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
 
 
-
-public interface DrtTaskWithRequests
-    extends DrtTask
+public class DrtDropoffTask
+    extends StayTaskImpl
+    implements DrtTaskWithRequests
 {
-    Set<TaxibusRequest> getRequests();
+    private final TaxibusRequest request;
 
 
-    //called (when removing a task) in order to update the request2task assignment 
-    void removeFromRequest(TaxibusRequest request);
-    void removeFromAllRequests();
+    public DrtDropoffTask(double beginTime, double endTime, TaxibusRequest request)
+    {
+        super(beginTime, endTime, request.getToLink());
+
+        this.request = request;
+        request.setDropoffTask(this);
+    }
+
+    @Override
+    public DrtTaskType getDrtTaskType()
+    {
+        return DrtTaskType.DROPOFF;
+    }
+
+
+    public TaxibusRequest getRequest()
+    {
+        return request;
+    }
+
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+    }
+
+
+	@Override
+	public HashSet<TaxibusRequest> getRequests() {
+		HashSet<TaxibusRequest> t = new HashSet<>();
+		t.add(request);
+		return t;
+	}
+
+
+	@Override
+	public void removeFromRequest(TaxibusRequest request) {
+		if (request!=this.request) {
+			throw new IllegalStateException();
+		}
+		request.setDropoffTask(null);
+		
+	}
+	@Override
+	public void removeFromAllRequests() {
+		removeFromRequest(this.request);
+	}
 }

@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.av.drt.TaxibusRequest;
+import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -99,10 +99,10 @@ public class CentroidBasedRequestDeterminatorAndFilter implements RequestDetermi
 			}
 			filteredRequests.get(quad).add(r);
 		}
-		Logger.getLogger(getClass()).info("Filtered cluster sizes: ");
-		for (int i =0;i<=7;i++){
-			Logger.getLogger(getClass()).info("Quad: "+i+" requests: "+filteredRequests.get(i).size());
-		}
+//		Logger.getLogger(getClass()).info("Filtered cluster sizes: ");
+//		for (int i =0;i<=7;i++){
+//			Logger.getLogger(getClass()).info("Quad: "+i+" requests: "+filteredRequests.get(i).size());
+//		}
 		return filteredRequests;
 	}
 	

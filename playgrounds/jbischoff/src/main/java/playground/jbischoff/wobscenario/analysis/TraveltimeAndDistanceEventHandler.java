@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.analysis;
+package playground.jbischoff.wobscenario.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -43,8 +43,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import playground.jbischoff.wobscenario.analysis.WobDistanceAnalyzer;
 
 /**
  * @author jbischoff

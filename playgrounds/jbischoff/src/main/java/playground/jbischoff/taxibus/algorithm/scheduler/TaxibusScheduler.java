@@ -23,9 +23,9 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.av.drt.TaxibusRequest;
-import org.matsim.contrib.av.drt.tasks.*;
-import org.matsim.contrib.av.drt.tasks.DrtTask.DrtTaskType;
+import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.tasks.*;
+import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;

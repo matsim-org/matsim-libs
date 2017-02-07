@@ -25,7 +25,6 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	private static final String CLUSTERING_PERIOD_MIN = "clustering_period_min";
 	private static final String PREBOOK_PERIOD_MIN = "prebook_period_min";
 	private static final String CLUSTERINGROUNDS = "clusteringRounds";
-	private static final String ROUTINGROUNDS = "routingRounds";
 	private static final String MINOCCUPANCY = "minOccupancy";
 	private static final String SERVICE_AREA_1_CENTROID_LINK = "serviceAreaCentroid_1_Link";
 	private static final String SERVICE_AREA_2_CENTROID_LINK = "serviceAreaCentroid_2_Link";
@@ -53,7 +52,6 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	private double clustering_period_min = 15;
 	private double prebook_period_min = 15;
 	private int clusteringRounds = 100;
-	private int routingRounds = 100;
 	private double minOccupancy = 3;
 	private String serviceAreaCentroid_1 = null;
 	private String serviceAreaCentroid_2 = null;
@@ -86,13 +84,12 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 		
 		map.put(DETOURFACTOR, "[SharedTaxi] shared Taxi detour factor. Default = 1.2");
 
-		map.put(VEHICLESONDISPATCH, "[Clustered] Number of vehicles dispatched at the same time - per line");
-		map.put(VEHCAP, "[Clustered] Vehicle capacity per vehicle.");
-		map.put(CLUSTERING_PERIOD_MIN,"[Clustered]Period in minutes after which clustering is repeated. Default 15 minutes.");
-		map.put(PREBOOK_PERIOD_MIN,"[Clustered]Prebooking period for requests. Default 15 minutes.");
-		map.put(CLUSTERINGROUNDS,"[Clustered]Rounds for clustering requests together. Default is 100.");
-		map.put(ROUTINGROUNDS,"[Clustered]Rounds for generating routes. Default is 100.");
-		map.put(MINOCCUPANCY,"[Clustered]Minimum taxibus occupancy. Default is 3. If less requests occur, a single bus takes them all.");
+		map.put(VEHICLESONDISPATCH, "[Clustered_jsprit] Number of vehicles dispatched at the same time - per line");
+		map.put(VEHCAP, "[Clustered_jsprit] Vehicle capacity per vehicle.");
+		map.put(CLUSTERING_PERIOD_MIN,"[Clustered_jsprit]Period in minutes after which clustering is repeated. Default 15 minutes.");
+		map.put(PREBOOK_PERIOD_MIN,"[Clustered_jsprit, jsprit]Prebooking period for requests. Default 15 minutes.");
+		map.put(CLUSTERINGROUNDS,"[Clustered_jsprit]Rounds for clustering requests together. Default is 100.");
+		map.put(MINOCCUPANCY,"[Clustered_jsprit]Minimum taxibus occupancy. Default is 3. If less requests occur, a single bus takes them all.");
 		map.put(SERVICE_AREA_1_CENTROID_LINK, "[Clustered] Link Id that sets taxibus service area 1 centroid. Service areas may overlap");
 		map.put(SERVICE_AREA_2_CENTROID_LINK, "[Clustered] Link Id that sets taxibus service area 2 centroid. Service areas may overlap");
 		map.put(SERVICE_AREA_1_RADIUS, "[Clustered] Radius (in meters) around service area 1 where taxibus trips are possible");
@@ -216,14 +213,7 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	public void setClusteringRounds(int clusteringRounds) {
 		this.clusteringRounds = clusteringRounds;
 	}
-	@StringGetter(ROUTINGROUNDS)
-	public int getRoutingRounds() {
-		return routingRounds;
-	}
-	@StringSetter(ROUTINGROUNDS)
-	public void setRoutingRounds(int routingRounds) {
-		this.routingRounds = routingRounds;
-	}
+
 	@StringGetter(MINOCCUPANCY)
 	public double getMinOccupancy() {
 		return minOccupancy;
