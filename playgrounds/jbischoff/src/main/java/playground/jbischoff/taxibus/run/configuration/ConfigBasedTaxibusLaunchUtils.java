@@ -25,15 +25,15 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
 import com.google.inject.util.Providers;
 
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
-
+import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
 import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
-import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
 
 /**
  * @author jbischoff
@@ -77,8 +77,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 				} else {
 					bind(TaxibusPassengerOrderManager.class).toProvider(Providers.of(null));
 				}
-
-				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
+		        addRoutingModuleBinding(TaxibusUtils.TAXIBUS_MODE).toInstance(new DynRoutingModule(TaxibusUtils.TAXIBUS_MODE));
 				bind(Fleet.class).toInstance(fleetData);
 
 			}

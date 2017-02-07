@@ -23,12 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.TaxibusRequest;
-import org.matsim.contrib.drt.tasks.DrtTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -39,7 +37,6 @@ import org.matsim.core.router.ImaginaryNode;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusScheduler;
@@ -56,7 +53,7 @@ public class SharedTaxiDispatchFinder {
 	private final TaxibusScheduler scheduler;
 	private final MultiNodeDijkstra router;
 	private final double maximumDetourFactor;
-	private int sharedRides = 0;
+//	private int sharedRides = 0;
 	public SharedTaxiDispatchFinder(TaxibusOptimizerContext optimContext, double maximumDetourFactor) {
 		this.optimContext = optimContext;
 		this.maximumDetourFactor = maximumDetourFactor;

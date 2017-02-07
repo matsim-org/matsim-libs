@@ -47,7 +47,7 @@ public class SharedTaxiConfigGroup extends ReflectiveConfigGroup{
 	private boolean scoreRides = false;
 	
 	public static SharedTaxiConfigGroup get(Config config) {
-		return (SharedTaxiConfigGroup) config.getModule(GROUP_NAME);
+		return (SharedTaxiConfigGroup) config.getModules().get(GROUP_NAME);
 	}
 	
 	public SharedTaxiConfigGroup() {

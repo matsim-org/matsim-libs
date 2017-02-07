@@ -376,7 +376,6 @@ public class TaxibusScheduler {
 		}
 
 		double endTime = timer.getTimeOfDay();
-		Task currentTask = schedule.getCurrentTask();
 
 		updateTimelineImpl(schedule, endTime);
 
@@ -489,7 +488,6 @@ public class TaxibusScheduler {
 
 	// =========================================================================================
 
-	private List<TaxibusRequest> removedRequests;
 
 	/**
 	 * Awaiting == unpicked-up, i.e. requests with status PLANNED or
