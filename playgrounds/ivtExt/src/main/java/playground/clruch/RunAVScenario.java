@@ -1,7 +1,5 @@
 package playground.clruch;
 
-
-
 import java.io.File;
 import java.net.MalformedURLException;
 
@@ -18,7 +16,9 @@ import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
-
+/**
+ * main entry point 
+ */
 public class RunAVScenario {
     @Deprecated
     public static Network NETWORKINSTANCE;
