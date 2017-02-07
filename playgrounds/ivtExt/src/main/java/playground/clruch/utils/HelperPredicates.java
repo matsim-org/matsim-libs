@@ -1,10 +1,10 @@
-package playground.clruch.export;
+package playground.clruch.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-class HelperFunctions {
+public class HelperPredicates {
     public static final String PREFIX = "av_";
 
     /**
@@ -14,15 +14,15 @@ class HelperFunctions {
      * @param id
      * @return
      */
-    static boolean isHuman(Id<Person> id) {
+    public static boolean isHuman(Id<Person> id) {
         return !id.toString().startsWith(PREFIX);
     }
 
-    static boolean isPersonAV(Id<Person> id) {
+    public static boolean isPersonAV(Id<Person> id) {
         return !isHuman(id);
     }
 
-    static boolean isVehicleAV(Id<Vehicle> id) {
+    public static boolean isVehicleAV(Id<Vehicle> id) {
         return id.toString().startsWith(PREFIX);
     }
 }

@@ -1,4 +1,4 @@
-package playground.clruch.utils;
+package playground.clruch.prep;
 
 import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
 

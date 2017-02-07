@@ -1,4 +1,4 @@
-package playground.clruch;
+package playground.clruch.prep;
 
 
 
@@ -13,7 +13,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.utils.GZHandler;
-import playground.clruch.utils.PopulationTools;
 
 import java.io.File;
 import java.io.IOException;

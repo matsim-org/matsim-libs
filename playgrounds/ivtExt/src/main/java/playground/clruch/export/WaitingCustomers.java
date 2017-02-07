@@ -20,6 +20,8 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.utils.HelperPredicates;
+
 /**
  * Created by Claudio on 2/2/2017.
  */
@@ -68,7 +70,7 @@ class WaitingCustomers extends AbstractExport {
                     relevantEvents.add(event);
                     final Id<Person> idRaw = event.getPersonId();
                     final String id = idRaw.toString();
-                    if (HelperFunctions.isHuman(idRaw)) {
+                    if (HelperPredicates.isHuman(idRaw)) {
                         // System.out.println("dept " + id);
                         String linkId = event.getLinkId().toString();
                         deptEvent.put(id, event);
@@ -108,7 +110,7 @@ class WaitingCustomers extends AbstractExport {
                     relevantEvents.add(event);
                     final Id<Person> idRaw = event.getPersonId();
                     final String id = idRaw.toString();
-                    if (HelperFunctions.isHuman(idRaw)) {
+                    if (HelperPredicates.isHuman(idRaw)) {
                         double wait = event.getTime() - deptEvent.get(id).getTime();
                         String linkId = deptEvent.get(id).getLinkId().toString();
 

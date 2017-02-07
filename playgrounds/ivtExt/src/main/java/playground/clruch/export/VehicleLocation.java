@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.utils.HelperPredicates;
+
 /**
  * Created by Claudio on 2/2/2017.
  */
@@ -58,7 +60,7 @@ class VehicleLocation extends AbstractExport {
                 @Override
                 public void handleEvent(ActivityEndEvent event) {
                     // check if itis an AV event
-                    if (HelperFunctions.isPersonAV(event.getPersonId()) && event.getActType().equals("BeforeVrpSchedule")) {
+                    if (HelperPredicates.isPersonAV(event.getPersonId()) && event.getActType().equals("BeforeVrpSchedule")) {
 
                         // if AV not recorded, add map
                         if (!vehicleLocations.containsKey(event.getPersonId().toString())) {
@@ -81,7 +83,7 @@ class VehicleLocation extends AbstractExport {
             events.addHandler(new LinkEnterEventHandler() {
                 @Override
                 public void handleEvent(LinkEnterEvent event) {
-                    if (HelperFunctions.isVehicleAV(event.getVehicleId())) {
+                    if (HelperPredicates.isVehicleAV(event.getVehicleId())) {
 
                         // if AV not recorded, add map
                         if (!vehicleLocations.containsKey(event.getVehicleId().toString())) {
