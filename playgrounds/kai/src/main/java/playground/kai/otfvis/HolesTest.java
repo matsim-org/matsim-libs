@@ -20,6 +20,7 @@
 
 package playground.kai.otfvis;
 
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
@@ -38,6 +39,9 @@ public class HolesTest {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
+		controler.addOverridingModule(new OTFVisFileWriterModule());
+
 		controler.run() ;
 		
 		org.matsim.contrib.otfvis.OTFVis.main( new String[] {"output/holes/ITERS/it.0/0.otfvis.mvi"} ) ;
