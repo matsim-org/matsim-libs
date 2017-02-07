@@ -238,7 +238,6 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 		double sum = 0.;
 
 		for (Id<Person> personId : timeBin.getPersonId2amounts().keySet()) {
-			System.out.println(personId);
 			for (Double amount : timeBin.getPersonId2amounts().get(personId)) {
 				sum += amount;
 			}
