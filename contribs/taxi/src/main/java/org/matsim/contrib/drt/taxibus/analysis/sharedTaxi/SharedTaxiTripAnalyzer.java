@@ -189,7 +189,7 @@ public class SharedTaxiTripAnalyzer
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if (event.getActType().startsWith(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
-			this.vehicles2pax.remove(Id.createVehicleId(event.getPersonId().toString()), new Integer(0));
+			this.vehicles2pax.remove(Id.createVehicleId(event.getPersonId().toString()));
 		}
 
 	}
