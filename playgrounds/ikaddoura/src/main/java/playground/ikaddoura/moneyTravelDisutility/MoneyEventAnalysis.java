@@ -64,14 +64,26 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 	
 	private final Map<Id<Vehicle>, Id<Link>> vehicleId2linkId = new HashMap<>();
 	private final Map<Id<Person>, Id<Vehicle>> personId2vehicleId = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
+
+	// only for testing purposes
+	protected MoneyEventAnalysis(Scenario scenario) {
+		this.scenario = scenario;
+	}
 	
+	// required
+	public MoneyEventAnalysis() {
+	
+	}
+
 	@Override
 	public void reset(int iteration) {
 		
 		log.info("Resetting money event analysis information before the mobsim starts.");
 		
 		this.personId2vehicleId.clear();
+		this.vehicleId2personId.clear();
 		this.vehicleId2linkId.clear();
 		this.linkId2info.clear();
 	}
@@ -124,12 +136,44 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		
 		this.vehicleId2linkId.put(event.getVehicleId(), event.getLinkId());
+		
+		int timeBinNr = getIntervalNr(event.getTime());
+		
+		Id<Vehicle> vehicleId = event.getVehicleId();
+		Id<Person> personId = this.vehicleId2personId.get(vehicleId);
+		Id<Link> linkId = vehicleId2linkId.get(vehicleId);
+		
+		if (linkId2info.containsKey(linkId)) {
+			LinkInfo linkMoneyInfo = linkId2info.get(linkId);
+			
+			if (linkMoneyInfo.getTimeBinNr2timeBin().containsKey(timeBinNr)) {
+				TimeBin timeBin = linkMoneyInfo.getTimeBinNr2timeBin().get(timeBinNr);
+				timeBin.getEnteringAgents().add(personId);
+				
+			} else {
+				
+				TimeBin timeBin = new TimeBin(timeBinNr);
+				timeBin.getEnteringAgents().add(personId);
+				linkMoneyInfo.getTimeBinNr2timeBin().put(timeBinNr, timeBin);
+			}
+			
+		} else {
+			
+			TimeBin timeBin = new TimeBin(timeBinNr);
+			timeBin.getEnteringAgents().add(personId);
+			
+			LinkInfo linkMoneyInfo = new LinkInfo(linkId);
+			linkMoneyInfo.getTimeBinNr2timeBin().put(timeBinNr, timeBin);
+			linkId2info.put(linkId, linkMoneyInfo);
+		}
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		this.personId2vehicleId.put(event.getPersonId(), event.getVehicleId());
+		this.vehicleId2personId.put(event.getVehicleId(), event.getPersonId());
 	}
 	
 	@Override
@@ -154,7 +198,7 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 	private void computeAverageAmountPerAgentType(TimeBin timeBin) {
 		final Map<String, Double> agentTypeIdPrefix2AmountSum = new HashMap<>();
 		final Map<String, Integer> agentTypeIdPrefix2Counter = new HashMap<>();
-		
+				
 		for (Id<Person> personId : timeBin.getPersonId2amounts().keySet()) {
 			double totalAmountOfPerson = 0.;
 			for (Double amount : timeBin.getPersonId2amounts().get(personId)) {
@@ -165,12 +209,22 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 			
 			if (agentTypeIdPrefix2AmountSum.containsKey(agentType)) {
 				double amountSum = agentTypeIdPrefix2AmountSum.get(agentType);
-				int counter = agentTypeIdPrefix2Counter.get(agentType);
 				agentTypeIdPrefix2AmountSum.put(agentType, amountSum + totalAmountOfPerson);
-				agentTypeIdPrefix2Counter.put(agentType, counter + 1);
 
 			} else {
 				agentTypeIdPrefix2AmountSum.put(agentType, totalAmountOfPerson);
+			}
+		}
+		
+		for (Id<Person> personId : timeBin.getEnteringAgents()) {
+
+			String agentType = this.agentFilter.getAgentTypeFromId(personId);
+			
+			if (agentTypeIdPrefix2Counter.containsKey(agentType)) {
+				int counter = agentTypeIdPrefix2Counter.get(agentType);
+				agentTypeIdPrefix2Counter.put(agentType, counter + 1);
+
+			} else {
 				agentTypeIdPrefix2Counter.put(agentType, 1);
 			}
 		}
@@ -182,14 +236,14 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 
 	private double computeAverageAmount(TimeBin timeBin) {
 		double sum = 0.;
-		int counter = 0;
+
 		for (Id<Person> personId : timeBin.getPersonId2amounts().keySet()) {
+			System.out.println(personId);
 			for (Double amount : timeBin.getPersonId2amounts().get(personId)) {
 				sum += amount;
 			}
-			counter++;
 		}		
-		return sum / counter;
+		return sum / timeBin.getEnteringAgents().size();
 	}
 	
 	private int getIntervalNr(double time) {

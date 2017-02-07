@@ -19,6 +19,7 @@
 
 package playground.ikaddoura.moneyTravelDisutility.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class TimeBin {
 	private int timeBinNr;
 	
 	private final Map<Id<Person>, List<Double>> personId2amounts;
+	private final List<Id<Person>> enteringAgents;
 	
 	private double averageAmount = 0.;
 	private final Map<String, Double> agentType2avgAmount = new HashMap<>();
@@ -44,6 +46,7 @@ public class TimeBin {
 	public TimeBin(int timeBinNr) {
 		this.timeBinNr = timeBinNr;
 		this.personId2amounts = new HashMap<>();
+		this.enteringAgents = new ArrayList<>();
 	}
 
 	public void setAverageAmount(double averageAmount) {
@@ -64,6 +67,10 @@ public class TimeBin {
 	
 	public Map<String, Double> getAgentTypeId2avgAmount() {
 		return agentType2avgAmount;
+	}
+
+	public List<Id<Person>> getEnteringAgents() {
+		return enteringAgents;
 	}
 
 }
