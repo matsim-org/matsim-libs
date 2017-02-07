@@ -129,7 +129,6 @@ public class ScheduleReconstructionTest
             Assert.assertEquals(o.getBeginTime(), r.getBeginTime(), 0);
             Assert.assertEquals(o.getEndTime(), r.getEndTime(), 0);
             Assert.assertEquals(o.getTaskIdx(), r.getTaskIdx());
-//            Assert.assertEquals(o.getType(), r.getType());
             Assert.assertEquals( ((TaxiTask)o).getTaxiTaskType(), ((TaxiTask)r).getTaxiTaskType());
 
             Assert.assertEquals(TaskStatus.PERFORMED, o.getStatus());

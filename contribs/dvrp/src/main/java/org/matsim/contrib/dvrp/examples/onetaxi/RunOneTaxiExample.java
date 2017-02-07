@@ -33,61 +33,63 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunOneTaxiExample
 {
-	public static final String MODE = "taxi";
-	private static final String ONE_TAXI_GROUP_NAME = "one_taxi";
-	private static final String TAXIS_FILE = "taxisFile";
+    public static final String MODE = "taxi";
+    private static final String ONE_TAXI_GROUP_NAME = "one_taxi";
+    private static final String TAXIS_FILE = "taxisFile";
 
 
-	public static void run(boolean otfvis)
-	{
-		String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
-		run(configFile, otfvis);
-	}
+    public static void run(boolean otfvis)
+    {
+        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+        run(configFile, otfvis);
+    }
 
 
-	public static void run(String configFile, boolean otfvis)
-	{
-		ConfigGroup oneTaxiCfg = new ConfigGroup(ONE_TAXI_GROUP_NAME) {};
-		Config config = ConfigUtils.loadConfig(configFile, new OTFVisConfigGroup(), oneTaxiCfg);
-		config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
-		config.checkConsistency();
-		
-		// ---
+    public static void run(String configFile, boolean otfvis)
+    {
+        ConfigGroup oneTaxiCfg = new ConfigGroup(ONE_TAXI_GROUP_NAME) {};
+        Config config = ConfigUtils.loadConfig(configFile, new OTFVisConfigGroup(), oneTaxiCfg);
+        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        config.checkConsistency();
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+        // ---
 
-		final FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
-		
-		// ---
+        Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(scenario);
+        final FleetImpl fleet = new FleetImpl();
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override public void install() {
-				addRoutingModuleBinding(MODE).toInstance(new DynRoutingModule(MODE));
-				bind(Fleet.class).toInstance(fleet);
-			}
-		});
+        // ---
 
-		controler.addOverridingModule(new DynQSimModule<>(OneTaxiQSimProvider.class));
-//		controler.addOverridingModule( new TaxiModule(fleet));
+        Controler controler = new Controler(scenario);
 
-		if (otfvis) {
-			OTFVisConfigGroup otfConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class ) ;
-			otfConfig.setAgentSize(400);
-			otfConfig.setLinkWidth(10);
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-		
-		// ---
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install()
+            {
+                addRoutingModuleBinding(MODE).toInstance(new DynRoutingModule(MODE));
+                bind(Fleet.class).toInstance(fleet);
+            }
+        });
 
-		controler.run();
-	}
+        controler.addOverridingModule(new DynQSimModule<>(OneTaxiQSimProvider.class));
+
+        if (otfvis) {
+            OTFVisConfigGroup otfConfig = ConfigUtils.addOrGetModule(config,
+                    OTFVisConfigGroup.class);
+            otfConfig.setAgentSize(400);
+            otfConfig.setLinkWidth(10);
+            controler.addOverridingModule(new OTFVisLiveModule());
+        }
+
+        // ---
+
+        controler.run();
+    }
 
 
-	public static void main(String... args)
-	{
-		run(true);
-	}
+    public static void main(String... args)
+    {
+        run(true);
+    }
 }

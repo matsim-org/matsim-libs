@@ -44,7 +44,6 @@ public class StayTaskImpl
     }
 
 
-
     @Override
     public Link getLink()
     {

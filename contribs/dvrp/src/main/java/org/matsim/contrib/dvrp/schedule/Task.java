@@ -24,19 +24,10 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 public interface Task
 {
-//    public enum TaskType
-//    {
-//        STAY, DRIVE;
-//    }
-
-
     public enum TaskStatus
     {
         PLANNED, STARTED, PERFORMED;
     }
-
-
-//    TaskType getType();
 
 
     TaskStatus getStatus();
@@ -56,14 +47,12 @@ public interface Task
     int getTaskIdx();
 
 
-    // SETTERS:
     void setBeginTime(double beginTime);
 
 
     void setEndTime(double endTime);
 
 
-    //
     TaskTracker getTaskTracker();
 
 

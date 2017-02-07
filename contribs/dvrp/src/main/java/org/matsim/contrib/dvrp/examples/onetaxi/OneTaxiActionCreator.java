@@ -43,27 +43,23 @@ public class OneTaxiActionCreator
     @Override
     public DynAction createAction(final Task task, double now)
     {
-	    if ( task instanceof DriveTask ) {
-                return VrpLegs.createLegWithOfflineTracker((DriveTask)task, timer);
-	    } else if ( task instanceof StayTask ) {
-                if (task instanceof OneTaxiServeTask) { //PICKUP or DROPOFF
-                    final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
-                    final OneTaxiRequest request = serveTask.getRequest();
-
-                    if (serveTask.isPickup()) {
-                        return new SinglePassengerPickupActivity(passengerEngine, serveTask,
-                                request, OneTaxiOptimizer.PICKUP_DURATION, "OneTaxiPickup");
-                    }
-                    else {
-                        return new SinglePassengerDropoffActivity(passengerEngine, serveTask,
-                                request, "OneTaxiDropoff");
-                    }
-                }
-                else { //WAIT
-                    return new VrpActivity("OneTaxiStay", (StayTask)task);
-                }
+        if (task instanceof DriveTask) {
+            return VrpLegs.createLegWithOfflineTracker((DriveTask)task, timer);
         }
+        else if (task instanceof OneTaxiServeTask) { //PICKUP or DROPOFF
+            final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
 
-        throw new RuntimeException();
+            if (serveTask.isPickup()) {
+                return new SinglePassengerPickupActivity(passengerEngine, serveTask,
+                        serveTask.getRequest(), OneTaxiOptimizer.PICKUP_DURATION, "OneTaxiPickup");
+            }
+            else {
+                return new SinglePassengerDropoffActivity(passengerEngine, serveTask,
+                        serveTask.getRequest(), "OneTaxiDropoff");
+            }
+        }
+        else { //WAIT
+            return new VrpActivity("OneTaxiStay", (StayTask)task);
+        }
     }
 }

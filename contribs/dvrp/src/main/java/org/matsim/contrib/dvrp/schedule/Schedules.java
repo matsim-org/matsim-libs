@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -33,19 +32,17 @@ public class Schedules
 {
     public static final Predicate<Task> STAY_TASK_PREDICATE = new Predicate<Task>() {
         @Override
-	public boolean apply(Task input)
+        public boolean apply(Task input)
         {
-//            return input.getType() == TaskType.STAY;
-      	  return ( input instanceof StayTask ) ;
+            return (input instanceof StayTask);
         };
     };
 
     public static final Predicate<Task> DRIVE_TASK_PREDICATE = new Predicate<Task>() {
         @Override
-	public boolean apply(Task input)
+        public boolean apply(Task input)
         {
-//            return input.getType() == TaskType.DRIVE;
-      	  return ( input instanceof DriveTask ) ;
+            return (input instanceof DriveTask);
         };
     };
 
@@ -116,7 +113,7 @@ public class Schedules
     {
         int taskIdx = schedule.getStatus() == ScheduleStatus.PLANNED ? //
                 0 : schedule.getCurrentTask().getTaskIdx() + 1;
-        
+
         return schedule.getTasks().get(taskIdx);
     }
 
@@ -125,12 +122,12 @@ public class Schedules
     {
         int taskIdx = schedule.getStatus() == ScheduleStatus.COMPLETED ? //
                 schedule.getTaskCount() - 1 : schedule.getCurrentTask().getTaskIdx() - 1;
-        
+
         return schedule.getTasks().get(taskIdx);
     }
 
 
-    public static  Link getLastLinkInSchedule(Schedule schedule)
+    public static Link getLastLinkInSchedule(Schedule schedule)
     {
         List<? extends Task> tasks = schedule.getTasks();
         return tasks.isEmpty() ? //
