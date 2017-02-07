@@ -285,13 +285,13 @@ public class AccessibilityUtils {
 	}
 	
 	
-	public static File createOSMDownloadScript(String regionName, String minLon, String minLat, String maxLon, String maxLat) throws IOException {
-	    File osmDownloadScript = new File("script");
-	    Writer streamWriter = new OutputStreamWriter(new FileOutputStream(osmDownloadScript));
-	    PrintWriter printWriter = new PrintWriter(streamWriter);
-	    String command = "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"";
-	    printWriter.println(command);
-	    printWriter.close();
-	    return osmDownloadScript;
-	}
+//	public static File createOSMDownloadScript(String regionName, String minLon, String minLat, String maxLon, String maxLat) throws IOException {
+//	    File osmDownloadScript = new File("script");
+//	    Writer streamWriter = new OutputStreamWriter(new FileOutputStream(osmDownloadScript));
+//	    PrintWriter printWriter = new PrintWriter(streamWriter);
+//	    String command = "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"";
+//	    printWriter.println(command);
+//	    printWriter.close();
+//	    return osmDownloadScript;
+//	}
 }
