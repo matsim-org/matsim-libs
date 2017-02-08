@@ -51,7 +51,7 @@ abstract class AbstractEventXML<Type> {
     //          ...
     //      </L1ElName>
     //      ...
-    public void generate(Map<String, NavigableMap<Double, Type>> timeStepData, File file) {
+    public final void generate(Map<String, NavigableMap<Double, Type>> timeStepData, File file) {
         try {
             Element SimulationResult = new Element(xmlTitle);
             Document doc = new Document(SimulationResult);

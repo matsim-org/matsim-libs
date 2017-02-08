@@ -6,18 +6,16 @@ import java.util.*;
  * Created by Claudio on 1/26/2017.
  */
 
-// OBSOLETE: Saving the changes in fill levels at station per time is not needed anymore. Can be deleted in future commit.
+// TODO OBSOLETE: Saving the changes in fill levels at station per time is not needed anymore. Can be deleted in future commit.
 
-
+@Deprecated
 class TimeBasedChangeEventXML extends AbstractEventXML<IdNumCust> {
-    public TimeBasedChangeEventXML(String xmlTitleIn, String L1ElNameIn, String L1AttrNameIn, String L2ElNameIn, String L2Attr1NameIn, String L2Attr2NameIn) {
+    private TimeBasedChangeEventXML(String xmlTitleIn, String L1ElNameIn, String L1AttrNameIn, String L2ElNameIn, String L2Attr1NameIn, String L2Attr2NameIn) {
         super(xmlTitleIn, L1ElNameIn, L1AttrNameIn, L2ElNameIn, L2Attr1NameIn, L2Attr2NameIn);
     }
 
-
-
     // rearranges stated sorted values to a time sorted list
-    public void rearrangeInTime(Map<String, NavigableMap<Double, Integer>> waitStepFctn, NavigableMap<Double, List<IdNumCust>> timeSortedEvents) {
+    private void rearrangeInTime(Map<String, NavigableMap<Double, Integer>> waitStepFctn, NavigableMap<Double, List<IdNumCust>> timeSortedEvents) {
 
         SortedMap<Double, List<IdNumCust>> tempMap = new TreeMap<>();
 
@@ -51,12 +49,6 @@ class TimeBasedChangeEventXML extends AbstractEventXML<IdNumCust> {
 
 
 }
-
-
-
-
-
-
 
 
 // -----------------------------------------------------------------------------------

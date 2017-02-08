@@ -184,7 +184,7 @@ class VehicleStatus extends AbstractExport {
         File fileExport = new File(directory, "vehicleStatus.xml");
 
         // export to node-based XML file
-        new VehicleStatusEventXML("SimulationResult","av","id","event","time","status").generate(vehicleStatus, fileExport);
+        new VehicleStatusEventXML().generate(vehicleStatus, fileExport);
 
     }
 }

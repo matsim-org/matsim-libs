@@ -102,7 +102,7 @@ class WaitingCustomers extends AbstractExport {
                     final Id<Person> idRaw = event.getPersonId();
                     final String id = idRaw.toString();
                     if (HelperPredicates.isHuman(idRaw)) {
-                        double wait = event.getTime() - deptEvent.get(id).getTime();
+                        // double wait = event.getTime() - deptEvent.get(id).getTime();
                         String linkId = deptEvent.get(id).getLinkId().toString();
                         if (!linkOccupation.containsKey(linkId))
                             linkOccupation.put(linkId, new ArrayList<>());
@@ -124,8 +124,6 @@ class WaitingCustomers extends AbstractExport {
     @Override
     void writeXML(File directory) {
         File fileExport = new File(directory, "waitingCustomers.xml");
-        File fileExport2 = new File(directory, "waitingCustomers_bytime.xml");
-
 
         // integrate customer number changes to get to waiting customers step function
         Map<String, NavigableMap<Double, Integer>> waitStepFctn;
@@ -135,9 +133,8 @@ class WaitingCustomers extends AbstractExport {
             System.out.println("==========");
         }
 
-
         // export to node-based XML file
-        new NodeBasedEventXML("SimulationResult", "link", "id", "event", "time", "numCustWait").generate(waitStepFctn, fileExport);
+        new NodeBasedEventXML().generate(waitStepFctn, fileExport);
 
     }
 }
