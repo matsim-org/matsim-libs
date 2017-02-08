@@ -38,9 +38,6 @@ public class LazyDispatcher extends AbstractDispatcher {
     final private Queue<AVRequest> pendingRequests = new LinkedList<>();
     private Link[] destLinks = null;
 
-    @Deprecated
-    private boolean reoptimize = false;
-
     public LazyDispatcher(EventsManager eventsManager, SingleRideAppender appender, Link[] sendAVtoLink) {
         super(eventsManager, appender);
         this.destLinks = sendAVtoLink;
@@ -49,7 +46,6 @@ public class LazyDispatcher extends AbstractDispatcher {
     @Override
     public void onRequestSubmitted(AVRequest request) {
         pendingRequests.add(request);
-        reoptimize = true;
     }
 
     @Override
@@ -237,7 +233,6 @@ public class LazyDispatcher extends AbstractDispatcher {
                 }
             }
         }
-        reoptimize = false;
     }
 
     @Override
