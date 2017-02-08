@@ -118,7 +118,7 @@ public abstract class AbstractTask
 
 
     @Override
-    public void initTaskTracker(TaskTracker taskTracker)
+    public void initTaskTracker(TaskTracker taskTracker1)
     {
         if (this.taskTracker != null) {
             throw new IllegalStateException("Tracking already initialized");
@@ -128,7 +128,7 @@ public abstract class AbstractTask
             throw new IllegalStateException("Allowed only for STARTED tasks");
         }
 
-        this.taskTracker = taskTracker;
+        this.taskTracker = taskTracker1;
     }
 
 

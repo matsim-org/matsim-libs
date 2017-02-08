@@ -24,48 +24,98 @@ import java.util.List;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 
+/**
+ * A Schedule contains Tasks.
+ * <br/><br/>
+ * Design comments:<ul>
+ * <li> This interface makes fairly strong assumptions on its implementation.  I am wondering a bit if the design
+ * purpose might not be better expressed by removing the interfaces and simply have the implementation.  kai, feb'17
+ * </ul>
+ * 
+ * @author (of documentation) nagel
+ *
+ */
 public interface Schedule
 {
-    public enum ScheduleStatus
-    {
-        UNPLANNED, PLANNED, STARTED, COMPLETED;
-    };
+	public enum ScheduleStatus
+	{
+		UNPLANNED, PLANNED, STARTED, COMPLETED;
+	};
 
 
-    Vehicle getVehicle();
+	/**
+	 * Back pointer to the vehicle that contains the schedule.  Set in constructor of ScheduleImpl.
+	 */
+	Vehicle getVehicle();
 
 
-    List<? extends Task> getTasks();// unmodifiableList
+	/**
+	 * Tasks in the schedule.
+	 */
+	List<? extends Task> getTasks();// unmodifiableList
 
 
-    int getTaskCount();
+	/**
+	 * Shortcut to getTasks().size() 
+	 */
+	int getTaskCount();
 
 
-    Task getCurrentTask();
+	/**
+	 * Pointer to current task.
+	 */
+	Task getCurrentTask();
 
 
-    ScheduleStatus getStatus();
+	/**
+	 * A Task can be planned, started, and done.  A schedule can in addition be unplanned.  And the naming is a bit different.
+	 */
+	ScheduleStatus getStatus();
 
 
-    double getBeginTime();
+	/**
+	 * Returns the begin time of the initial task, or fails if the Schedule is unplanned.
+	 */
+	double getBeginTime();
 
 
-    double getEndTime();
+	/**
+	 * Returns the end time of the final task, or fails if the Schedule is unplanned.
+	 */
+	double getEndTime();
 
 
-    // schedule modification functionality:
+	// schedule modification functionality:
 
-    void addTask(Task task);
-
-
-    void addTask(int taskIdx, Task task);
-
-
-    void removeLastTask();
+	/**
+	 * Add a Task to the Schedule.  This should set the back pointer of the Task to the Schedule.
+	 */
+	void addTask(Task task);
 
 
-    void removeTask(Task task);
+	/**
+	 * Insert a Task into the Schedule at the specified position.  The method should re-set all task indices of those tasks
+	 * that are moved.
+	 */
+	void addTask(int taskIdx, Task task);
 
 
-    Task nextTask();//this one seems synchronous (will be executed when switching between DynActions)
+	/**
+	 * Does what it says.
+	 */
+	void removeLastTask();
+
+
+	/**
+	 * Remove a Task from the Schedule at the specified position.  The method should re-set all task indices of those tasks
+	 * that are moved.
+	 */
+	void removeTask(Task task);
+
+
+	/**
+	 * This behaves a bit like it.next() in collections: It moves to the next task, makes it the current one, and
+	 * returns it.  If no task is left, it sets the Schedule to completed and returns null.
+	 */
+	Task nextTask();//this one seems synchronous (will be executed when switching between DynActions)
 }
