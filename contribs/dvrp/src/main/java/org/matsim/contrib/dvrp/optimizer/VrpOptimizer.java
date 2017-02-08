@@ -23,14 +23,27 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.schedule.*;
 
 
+/**
+ * Minimal functionality of dvrp optimizers in the dvrp contrib.
+ * 
+ * @author (of documentation) nagel
+ */
 public interface VrpOptimizer
 {
-    /**
-     * This function can be generalized (in the future) to encompass request modification,
-     * cancellation etc.
-     */
-    void requestSubmitted(Request request);
+	/**
+	 * This is called by the framework every time a request is submitted so that the optimizer is notified of it.
+	 * <br/><br/>
+	 * Design comments:<ul>
+	 * <li> This function can be generalized (in the future) to encompass request modification,
+	 * cancellation etc. mm, 2016??
+	 * </ul>
+	 */
+	void requestSubmitted(Request request);
 
 
-    void nextTask(Schedule schedule);
+	/**
+	 * Called by the framework when it moves on to the next task.  It is presumably the task of the optimizer to
+	 * update the "currentTask" setting.
+	 */
+	void nextTask(Schedule schedule);
 }
