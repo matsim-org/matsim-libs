@@ -29,9 +29,9 @@ import java.util.List;
  * in order to manage the tasks in the schedule of {@link AVVehicle}
  */
 public class SingleRideAppender {
-    final public ParallelLeastCostPathCalculator router;
-    final private AVDispatcherConfig config;
-    final public TravelTime travelTime;
+    public final ParallelLeastCostPathCalculator router;
+    private final AVDispatcherConfig config;
+    public final TravelTime travelTime;
 
     private List<AppendTask> tasks = new LinkedList<>();
 

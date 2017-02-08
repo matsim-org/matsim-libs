@@ -37,7 +37,6 @@ class VehicleStatus extends AbstractExport {
         if (!vehicleStatus.containsKey(vehicle))
             vehicleStatus.put(vehicle, new TreeMap<>());
         vehicleStatus.get(vehicle).put(time, avStatus);
-        System.out.println("vehicle=" + vehicle + " time=" + time + " status=" + avStatus);
     }
 
     private void putDriveWithCustomer(PersonEntersVehicleEvent event) {
@@ -189,3 +188,5 @@ class VehicleStatus extends AbstractExport {
 
     }
 }
+
+
