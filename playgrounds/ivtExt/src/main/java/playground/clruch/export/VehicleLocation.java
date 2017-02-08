@@ -1,37 +1,14 @@
 package playground.clruch.export;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.clruch.utils.HelperPredicates;

@@ -1,11 +1,5 @@
 package playground.clruch.export;
 
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,6 +7,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
+
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * Created by Claudio on 1/26/2017.
@@ -34,23 +34,22 @@ abstract class AbstractEventXML<Type> {
         L2Attr2Name = L2Attr2NameIn;
     }
 
-
     // Take the Map timeStepData which for some IDs contains series of changes for times Double
     // in the data format Type. Save them in an XML with the structure:
-    //    <xmlTitle>
-    //      <L1ElName L1AttrName="String1">
-    //          <L2ElName L2Attr1Name="Double1ofString1" L2Attr2Name="Type1ofString1" />
-    //          <L2ElName L2Attr1Name="Double2ofString1" L2Attr2Name="Type2ofString1" />
-    //          <L2ElName L2Attr1Name="Double3ofString1" L2Attr2Name="Type3ofString1" />
-    //          ...
-    //      </L1ElName>
-    //      <L1ElName L1AttrName="String1">
-    //          <L2ElName L2Attr1Name="Double1ofString2" L2Attr2Name="Type1ofString2" />
-    //          <L2ElName L2Attr1Name="Double2ofString2" L2Attr2Name="Type2ofString2" />
-    //          <L2ElName L2Attr1Name="Double3ofString2" L2Attr2Name="Type3ofString2" />
-    //          ...
-    //      </L1ElName>
-    //      ...
+    // <xmlTitle>
+    // <L1ElName L1AttrName="String1">
+    // <L2ElName L2Attr1Name="Double1ofString1" L2Attr2Name="Type1ofString1" />
+    // <L2ElName L2Attr1Name="Double2ofString1" L2Attr2Name="Type2ofString1" />
+    // <L2ElName L2Attr1Name="Double3ofString1" L2Attr2Name="Type3ofString1" />
+    // ...
+    // </L1ElName>
+    // <L1ElName L1AttrName="String1">
+    // <L2ElName L2Attr1Name="Double1ofString2" L2Attr2Name="Type1ofString2" />
+    // <L2ElName L2Attr1Name="Double2ofString2" L2Attr2Name="Type2ofString2" />
+    // <L2ElName L2Attr1Name="Double3ofString2" L2Attr2Name="Type3ofString2" />
+    // ...
+    // </L1ElName>
+    // ...
     public final void generate(Map<String, NavigableMap<Double, Type>> timeStepData, File file) {
         try {
             Element SimulationResult = new Element(xmlTitle);
@@ -79,10 +78,9 @@ abstract class AbstractEventXML<Type> {
             xmlOutput.setFormat(Format.getPrettyFormat());
             xmlOutput.output(doc, new FileWriter(file));
 
-            System.out.println("File Saved!");
+            System.out.println("exported " + file.getName());
         } catch (IOException io) {
             System.out.println(io.getMessage());
         }
     }
 }
-

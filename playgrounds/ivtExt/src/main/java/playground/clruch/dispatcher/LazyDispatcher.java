@@ -1,14 +1,22 @@
 package playground.clruch.dispatcher;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.AbstractTask;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -18,6 +26,7 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.router.SimpleBlockingRouter;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -28,7 +37,6 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
-import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LazyDispatcher extends AbstractDispatcher {
@@ -62,47 +70,46 @@ public class LazyDispatcher extends AbstractDispatcher {
         availableVehicles.add(vehicle);
     }
 
-
     @Deprecated
     Map<AVVehicle, LinkTimePair> diversionPoints = new ConcurrentHashMap<>();
 
     @Deprecated
     @Override
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
-        System.out.println("nextLinkEntered: "+avVehicle.getId()+" " + driveTask.
-                toString() + " next diversion at:" + linkTimePair.link.getId() + " time " + linkTimePair.time);
+        System.out.println("nextLinkEntered: " + avVehicle.getId() + " " + driveTask.toString() + " next diversion at:" + linkTimePair.link.getId() + " time " + linkTimePair.time);
         diversionPoints.put(avVehicle, linkTimePair);
 
     }
 
     private void reoptimize(double now) {
-        //System.out.println("lazy dispatcher is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + "  availableVehicles.size()" + availableVehicles.size());
+        // System.out.println("lazy dispatcher is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + " availableVehicles.size()" +
+        // availableVehicles.size());
         Iterator<AVRequest> requestIterator = pendingRequests.iterator();
         // iterate over all pending requests and all available vehicles and assign a vehicle if it is on the same
         // link as the pending request
 
         /*
-        while (requestIterator.hasNext()) {
-
-            AVRequest request = requestIterator.next();
-            Link custLocation = request.getFromLink();
-            Iterator<AVVehicle> vehicleIterator = availableVehicles.iterator();
-            while (vehicleIterator.hasNext()) {
-                AVVehicle vehicle = vehicleIterator.next();
-                Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
-                AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
-                Link avLocation = stayTask.getLink();
-                if (avLocation.equals(custLocation)) {
-                    requestIterator.remove();
-                    vehicleIterator.remove();
-                    appender.schedule(request, vehicle, now);
-                    //System.out.println("matched AV and customer at link " + avLocation.getId().toString());
-                    break;
-                }
-            }
-
-        }
-        */
+         * while (requestIterator.hasNext()) {
+         * 
+         * AVRequest request = requestIterator.next();
+         * Link custLocation = request.getFromLink();
+         * Iterator<AVVehicle> vehicleIterator = availableVehicles.iterator();
+         * while (vehicleIterator.hasNext()) {
+         * AVVehicle vehicle = vehicleIterator.next();
+         * Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
+         * AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
+         * Link avLocation = stayTask.getLink();
+         * if (avLocation.equals(custLocation)) {
+         * requestIterator.remove();
+         * vehicleIterator.remove();
+         * appender.schedule(request, vehicle, now);
+         * //System.out.println("matched AV and customer at link " + avLocation.getId().toString());
+         * break;
+         * }
+         * }
+         * 
+         * }
+         */
 
         for (AVVehicle vehicle : vehicles) {
             // if task 00 drivetask
@@ -119,34 +126,23 @@ public class LazyDispatcher extends AbstractDispatcher {
                     if (diversionPoints.containsKey(vehicle)) {
                         AVDriveTask avDriveTask = (AVDriveTask) avTask;
                         if (!avDriveTask.getPath().getToLink().equals(destLinks[2])) {
-                            System.out.println("REROUTING "+vehicle.getId());
-                            //avDriveTask.getPath()
+                            System.out.println("REROUTING " + vehicle.getId());
+                            // avDriveTask.getPath()
                             TaskTracker taskTracker = avDriveTask.getTaskTracker();
                             OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
                             final LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
-                            //diversionPoints.get(vehicle);
+                            // diversionPoints.get(vehicle);
 
                             final LinkTimePair diversionPoint = linkTimePair;
-                            //linkTimePair.link
-                            //VrpPathWithTravelData newSubPath = null;
+                            // linkTimePair.link
+                            // VrpPathWithTravelData newSubPath = null;
                             Link divLink = linkTimePair.link;
                             double startTime = linkTimePair.time;
 
-                            // TODO extract to separate class
-                            ParallelLeastCostPathCalculator router = appender.router;
-                            LeastCostPathFuture drivepath = router.calcLeastCostPath(divLink.getToNode(), destLinks[2].getFromNode(), startTime, null, null);
-                            while (!drivepath.isDone()) {
-                                try {
-                                    Thread.sleep(5);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            VrpPathWithTravelData newSubPath = VrpPaths.createPath(divLink, destLinks[2], startTime, drivepath.get(), appender.travelTime);
-
+                            SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+                            VrpPathWithTravelData newSubPath = simpleBlockingRouter.getRoute(divLink, destLinks[2], startTime);
                             System.out.println(newSubPath.getFromLink().getId() + " =? " + diversionPoint.link.getId());
-                            System.out.println(
-                                    newSubPath.getDepartureTime() + " =? " + diversionPoint.time);
+                            System.out.println(newSubPath.getDepartureTime() + " =? " + diversionPoint.time);
 
                             if (newSubPath.getFromLink().getId() == diversionPoint.link.getId())
                                 onlineDriveTaskTracker.divertPath(newSubPath);
@@ -165,14 +161,12 @@ public class LazyDispatcher extends AbstractDispatcher {
             List<AbstractTask> tasks = schedule.getTasks();
             if (!tasks.isEmpty()) {
 
-
                 AVTask lastTask = (AVTask) Schedules.getLastTask(schedule);
 
                 {
                     // System.out.println("Task from time " + lastTask.getBeginTime() + " to " + lastTask.getEndTime());
                     // System.out.println("Number of tasks: " + schedule.getTasks().size());
                 }
-
 
                 // if so, change end to +1 seconds, append ride to link and stay to simEndTime
                 // TODO: change end time from hard-coded 108000 to appropriate value
@@ -181,38 +175,24 @@ public class LazyDispatcher extends AbstractDispatcher {
                     AVStayTask stayTask = (AVStayTask) lastTask;
                     if (!stayTask.getLink().equals(destLinks[1])) {
 
-
                         {
                             System.out.println("schedule for vehicle id " + vehicle.getId() + " time now = " + now); // TODO
                             for (AbstractTask task : tasks)
                                 System.out.println(" " + task);
                         }
-                        // remove the last stay task
+                        // finish or remove the last stay task
 
                         if (stayTask.getStatus() == Task.TaskStatus.STARTED) {
                             stayTask.setEndTime(now);
-                            // schedule.removeLastTask();
                         } else {
                             schedule.removeLastTask();
                             System.out.println("The last task was removed for " + vehicle.getId());
                         }
 
+                        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+                        VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute(stayTask.getLink(), destLinks[1], now);
 
-                        // add the drive task
-                        //Link[] routePoints =new Link[] {stayTask.getLink(),destLinks[1]};
-                        ParallelLeastCostPathCalculator router = appender.router;
-                        LeastCostPathFuture drivepath = router.calcLeastCostPath(stayTask.getLink().getToNode(), destLinks[1].getFromNode(), now, null, null);
-                        while (!drivepath.isDone()) {
-                            try {
-                                Thread.sleep(5);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        VrpPathWithTravelData routePoints = VrpPaths.createPath(stayTask.getLink(), destLinks[1], now, drivepath.get(), appender.travelTime);
-
-
-                        //AVDriveTask rebalanceTask = new AVDriveTask(new VrpPathWithTravelDataImpl(now, 15.0, routePoints, linkTTs));
+                        // AVDriveTask rebalanceTask = new AVDriveTask(new VrpPathWithTravelDataImpl(now, 15.0, routePoints, linkTTs));
                         AVDriveTask rebalanceTask = new AVDriveTask(routePoints);
                         schedule.addTask(rebalanceTask);
                         System.out.println("sending AV " + vehicle.getId() + " to " + destLinks[1].getId());
@@ -229,7 +209,6 @@ public class LazyDispatcher extends AbstractDispatcher {
                         }
                     }
 
-
                 }
             }
         }
@@ -238,7 +217,6 @@ public class LazyDispatcher extends AbstractDispatcher {
     @Override
     public void onNextTimestep(double now) {
         appender.update();
-        //if (reoptimize)
         reoptimize(now);
     }
 
@@ -267,7 +245,7 @@ public class LazyDispatcher extends AbstractDispatcher {
             // TODO use network
             Link sendAVtoLink2 = playground.clruch.RunAVScenario.NETWORKINSTANCE.getLinks().get(l2);
             Link sendAVtoLink3 = playground.clruch.RunAVScenario.NETWORKINSTANCE.getLinks().get(l3);
-            Link[] sendAVtoLinks = new Link[]{sendAVtoLink1, sendAVtoLink2, sendAVtoLink3};
+            Link[] sendAVtoLinks = new Link[] { sendAVtoLink1, sendAVtoLink2, sendAVtoLink3 };
             // put the link into the lazy dispatcher
             return new LazyDispatcher(eventsManager, new SingleRideAppender(config, router, travelTime), sendAVtoLinks);
         }

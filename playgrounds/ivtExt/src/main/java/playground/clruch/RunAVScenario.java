@@ -12,6 +12,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.clruch.export.EventFileToProcessingXML;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -25,6 +26,7 @@ public class RunAVScenario {
 
     public static void main(String[] args) throws MalformedURLException {
         File configFile = new File(args[0]);
+        final File dir = configFile.getParentFile();
 
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -38,5 +40,7 @@ public class RunAVScenario {
         controler.addOverridingModule(new AVModule());
 
         controler.run();
+        
+        EventFileToProcessingXML.convert(dir);
     }
 }
