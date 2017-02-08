@@ -38,6 +38,7 @@ public class LazyDispatcher extends AbstractDispatcher {
     final private Queue<AVRequest> pendingRequests = new LinkedList<>();
     private Link[] destLinks = null;
 
+    @Deprecated
     private boolean reoptimize = false;
 
     public LazyDispatcher(EventsManager eventsManager, SingleRideAppender appender, Link[] sendAVtoLink) {
@@ -66,8 +67,10 @@ public class LazyDispatcher extends AbstractDispatcher {
     }
 
 
+    @Deprecated
     Map<AVVehicle, LinkTimePair> diversionPoints = new ConcurrentHashMap<>();
 
+    @Deprecated
     @Override
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
         System.out.println("nextLinkEntered: "+avVehicle.getId()+" " + driveTask.
@@ -133,6 +136,7 @@ public class LazyDispatcher extends AbstractDispatcher {
                             Link divLink = linkTimePair.link;
                             double startTime = linkTimePair.time;
 
+                            // TODO extract to separate class
                             ParallelLeastCostPathCalculator router = appender.router;
                             LeastCostPathFuture drivepath = router.calcLeastCostPath(divLink.getToNode(), destLinks[2].getFromNode(), startTime, null, null);
                             while (!drivepath.isDone()) {
@@ -240,7 +244,7 @@ public class LazyDispatcher extends AbstractDispatcher {
     public void onNextTimestep(double now) {
         appender.update();
         //if (reoptimize)
-            reoptimize(now);
+        reoptimize(now);
     }
 
     static public class Factory implements AVDispatcherFactory {
@@ -265,6 +269,7 @@ public class LazyDispatcher extends AbstractDispatcher {
             Id<Link> l2 = Id.createLinkId("236193238_1_r");
             Id<Link> l3 = Id.createLinkId("9904005_1_rL2");
             Link sendAVtoLink1 = network.getLinks().get(l1);
+            // TODO use network
             Link sendAVtoLink2 = playground.clruch.RunAVScenario.NETWORKINSTANCE.getLinks().get(l2);
             Link sendAVtoLink3 = playground.clruch.RunAVScenario.NETWORKINSTANCE.getLinks().get(l3);
             Link[] sendAVtoLinks = new Link[]{sendAVtoLink1, sendAVtoLink2, sendAVtoLink3};

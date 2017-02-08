@@ -34,8 +34,21 @@ public interface AVDispatcher {
      */
     void registerVehicle(AVVehicle vehicle);
 
+    /**
+     * Function was introduced with sebhoerl's help
+     * function is invoked from {@link AVOptimizer}
+     * whenever a vehicle moves to the next link.
+     * 
+     * However, this happens in a multi-threaded environment,
+     * so information may not be in-sync from within the dispatcher.
+     * Use with care.  
+     * 
+     * @param avVehicle
+     * @param driveTask
+     * @param linkTimePair
+     */
     default void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
-
+        // default behavior is intentionally empty
     }
 
     interface AVDispatcherFactory {
