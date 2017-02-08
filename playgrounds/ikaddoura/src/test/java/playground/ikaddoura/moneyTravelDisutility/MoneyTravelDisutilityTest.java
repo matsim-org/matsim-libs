@@ -22,12 +22,10 @@
  */
 package playground.ikaddoura.moneyTravelDisutility;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -39,7 +37,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.ikaddoura.PricingHandler;
 
 /**
- * Simply plugging everything together and starting a run.
+ * Simply plugging everything together and starting a run for an empty scenario.
  * 
  * @author ikaddoura
  *
@@ -49,17 +47,14 @@ public class MoneyTravelDisutilityTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	@Ignore
 	@Test
 	public final void test1() {
 
 		double sigma = 0.;
 		
-		String configFile = testUtils.getPackageInputDirectory() + "test1/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "test1/");
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		scenario.getConfig().controler().setLastIteration(0);
+		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test1/");
 		Controler controler = new Controler(scenario);
 				
 		// some arbitrary pricing

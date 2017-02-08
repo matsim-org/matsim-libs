@@ -67,16 +67,6 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
 
-	// only for testing purposes
-	protected MoneyEventAnalysis(Scenario scenario) {
-		this.scenario = scenario;
-	}
-	
-	// required
-	public MoneyEventAnalysis() {
-	
-	}
-
 	@Override
 	public void reset(int iteration) {
 		
