@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered;
+package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,7 +40,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 /**
  *
  */
-public class CentroidBasedRequestDeterminatorAndFilter implements RequestDeterminator {
+public class CentroidBasedRequestDeterminatorAndFilter implements RequestDeterminator, RequestFilter {
 
 	final double radius1;
 	final double radius2;

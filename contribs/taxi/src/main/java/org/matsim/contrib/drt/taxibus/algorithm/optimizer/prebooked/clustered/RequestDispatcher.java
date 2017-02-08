@@ -17,32 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered;
+package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 
-import java.util.List;
 import java.util.Set;
 
 import org.matsim.contrib.drt.TaxibusRequest;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public interface RequestDeterminator {
+public interface RequestDispatcher {
 
-	boolean isRequestServable(Request request);
-
-	/**
-	 * @param requests
-	 * @return
-	 */
-	List<Set<TaxibusRequest>> prefilterRequests(Set<TaxibusRequest> requests);
-	
+	TaxibusDispatch createDispatch (Set<TaxibusRequest> commonRequests);
 }

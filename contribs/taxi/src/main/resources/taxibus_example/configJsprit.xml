@@ -13,23 +13,22 @@
 		
 		<!-- Taxibus algorithms: Possible parameters are clustered, sharedTaxi,stateBased -->
 		<param name="algorithm" value="jsprit" />
-		<!-- [Clustered]Rounds for clustering requests together. Default is 100. -->
-		<param name="clusteringRounds" value="100" />
-		<!-- [Clustered]Period in minutes after which clustering is repeated. Default 15 minutes. -->
+	
+		<!-- [Clustered_jsprit, jsprit]Period in minutes after which clustering is repeated. Default 15 minutes. -->
 		<param name="clustering_period_min" value="15.0" />
-		<!-- [Clustered]Minimum taxibus occupancy. Default is 3. If less requests occur, a single bus takes them all. -->
-		<param name="minOccupancy" value="3.0" />
-		<!-- [Clustered]Prebooking period for requests. Default 15 minutes. -->
+	
+		<!-- [Clustered_jsprit, jsprit]Prebooking period for requests. Default 15 minutes. -->
 		<param name="prebook_period_min" value="5.0" />
-		<!-- [Clustered]Rounds for generating routes. Default is 100. -->
 
 		<param name="vehicleCapacity" value="8" />
-		<!-- [Clustered] Number of vehicles dispatched at the same time - per line -->
-		<param name="vehiclesDispatchedAtSameTime" value="8" />
 	
+		<!-- [Clustered_jsprit, jsprit] Link Id that sets taxibus service area 1 centroid. Service areas may overlap for jsprit. -->
 		<param name="serviceAreaCentroid_1_Link" value="47619" />
+		<!-- [Clustered_jsprit, jsprit] Radius (in meters) around service area 1 where taxibus trips are possible -->
 		<param name="serviceArea_1_Radius_m" value="5000" />
+		<!-- [Clustered_jsprit, jsprit] Link Id that sets taxibus service area 2 centroid. Service areas may overlap for jsprit. -->
 		<param name="serviceAreaCentroid_2_Link" value="47619" />
+		<!-- [Clustered_jsprit, jsprit] Radius (in meters) around service area 2 where taxibus trips are possible -->
 		<param name="serviceArea_2_Radius_m" value="5000" />
 	
 

@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.DrtActionCreator;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered.ClusteringTaxibusOptimizer;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered.ClusteringTaxibusOptimizerContext;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered.JspritDispatchCreator;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered.JspritTaxibusOptimizer;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered.ClusteringTaxibusOptimizer;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered.JspritDispatchCreator;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.jsprit.JspritTaxibusOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.sharedTaxi.SharedTaxiOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.passenger.*;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.*;
@@ -125,13 +125,13 @@ public class TaxibusQSimProvider
             
             case "jsprit":
             {
-            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+            	PrebookedTaxibusOptimizerContext context = new PrebookedTaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
             	return new JspritTaxibusOptimizer(context);
             }
            
             case "clustered_jsprit":
             {
-            	ClusteringTaxibusOptimizerContext context = new ClusteringTaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+            	PrebookedTaxibusOptimizerContext context = new PrebookedTaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
             	return new ClusteringTaxibusOptimizer(context, new JspritDispatchCreator(context));
             }
             default:

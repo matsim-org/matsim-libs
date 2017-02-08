@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered;
+package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.jsprit;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizer;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -72,11 +73,12 @@ import com.graphhopper.jsprit.core.util.Solutions;
  *
  */
 /**
- *
+ * A taxibus optimizer relying on the Jsprit package for both pickup/delivery planning and
+ *  the actual planning of tours. Includes the dispatching to the scheduler.
  */
 public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 
-	final ClusteringTaxibusOptimizerContext context;
+	final PrebookedTaxibusOptimizerContext context;
 	final Collection<TaxibusRequest> unplannedRequests;
 	final Random r = MatsimRandom.getLocalInstance();
 	private final Dijkstra router;
@@ -84,7 +86,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 	/**
 	 * 
 	 */
-	public JspritTaxibusOptimizer(ClusteringTaxibusOptimizerContext context) {
+	public JspritTaxibusOptimizer(PrebookedTaxibusOptimizerContext context) {
 		this.context = context;
 		this.unplannedRequests = new HashSet<>();
 		this.router = new Dijkstra(context.scenario.getNetwork(), context.travelDisutility, context.travelTime);
@@ -148,21 +150,14 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 			}
 			unplannedRequests.removeAll(dueRequests);
 			if (dueRequests.size() > 0) {
-				List<Set<TaxibusRequest>> filteredRequests = context.requestDeterminator.prefilterRequests(dueRequests);
-				
-				for (Set<TaxibusRequest> requestcluster : filteredRequests  ){
-					if (requestcluster.size()>0)
-					{
-				
+					
 				VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
 				vrpBuilder.setFleetSize(FleetSize.FINITE);
 				Map<String, Vehicle> vehicles = new HashMap<>();
 				Map<String, TaxibusRequest> requests = new HashMap<>();
-
 				VehicleTypeImpl.Builder vehicleTypeBuilder = VehicleTypeImpl.Builder.newInstance("vehicleType")
 						.addCapacityDimension(0, context.capacity);
 				VehicleType vehicleType = vehicleTypeBuilder.build();
-
 				for (Vehicle veh : this.context.vrpData.getVehicles().values()) {
 					if (context.scheduler.isIdle(veh)) {
 						Coord startCoord = veh.getStartLink().getCoord();
@@ -173,7 +168,6 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 						vehicleBuilder.setType(vehicleType);
 						vehicleBuilder.setEarliestStart(e.getSimulationTime());
 						VehicleImpl vehicle = vehicleBuilder.build();
-
 						vrpBuilder.addVehicle(vehicle);
 
 					}
@@ -181,10 +175,10 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 				}
 
 				if (vrpBuilder.getAddedVehicles().isEmpty()) {
-					this.unplannedRequests.addAll(requestcluster);
+					this.unplannedRequests.addAll(dueRequests);
 				} else {
 					
-					for (TaxibusRequest req : requestcluster) {
+					for (TaxibusRequest req : dueRequests) {
 
 						String rId = req.getId().toString();
 						requests.put(rId, req);
@@ -254,7 +248,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 					 */
 //					SolutionPrinter.print(bestSolution);
 
-				}}}
+				}
 			}
 		}
 	}

@@ -80,22 +80,21 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> map = super.getComments();
 
 		map.put(VEHICLES_FILE, "Taxi Vehicles file");
-		map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are clustered, sharedTaxi,stateBased"); 
+		map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are clustered_jsprit, jsprit, sharedTaxi"); 
 		
 		map.put(DETOURFACTOR, "[SharedTaxi] shared Taxi detour factor. Default = 1.2");
 
-		map.put(VEHICLESONDISPATCH, "[Clustered_jsprit] Number of vehicles dispatched at the same time - per line");
+		map.put(VEHICLESONDISPATCH, "[Clustered_jsprit] Number of vehicles dispatched at the same time");
 		map.put(VEHCAP, "[Clustered_jsprit] Vehicle capacity per vehicle.");
-		map.put(CLUSTERING_PERIOD_MIN,"[Clustered_jsprit]Period in minutes after which clustering is repeated. Default 15 minutes.");
+		map.put(CLUSTERING_PERIOD_MIN,"[Clustered_jsprit, jsprit] Period in minutes after which clustering is repeated. Default 15 minutes.");
 		map.put(PREBOOK_PERIOD_MIN,"[Clustered_jsprit, jsprit]Prebooking period for requests. Default 15 minutes.");
 		map.put(CLUSTERINGROUNDS,"[Clustered_jsprit]Rounds for clustering requests together. Default is 100.");
 		map.put(MINOCCUPANCY,"[Clustered_jsprit]Minimum taxibus occupancy. Default is 3. If less requests occur, a single bus takes them all.");
-		map.put(SERVICE_AREA_1_CENTROID_LINK, "[Clustered] Link Id that sets taxibus service area 1 centroid. Service areas may overlap");
-		map.put(SERVICE_AREA_2_CENTROID_LINK, "[Clustered] Link Id that sets taxibus service area 2 centroid. Service areas may overlap");
-		map.put(SERVICE_AREA_1_RADIUS, "[Clustered] Radius (in meters) around service area 1 where taxibus trips are possible");
-		map.put(SERVICE_AREA_2_RADIUS, "[Clustered] Radius (in meters) around service area 2 where taxibus trips are possible");
-		map.put(RETURN_TO_DEPOT, "[clustered] Determines whether the bus returns to its depot (=startLink) after each ride");
-		map.put(DESTINATIONID, "[StateBased] Common destination link id for statebased optimizer");
+		map.put(SERVICE_AREA_1_CENTROID_LINK, "[Clustered_jsprit, jsprit] Link Id that sets taxibus service area 1 centroid. Service areas may overlap for jsprit.");
+		map.put(SERVICE_AREA_2_CENTROID_LINK, "[Clustered_jsprit, jsprit] Link Id that sets taxibus service area 2 centroid. Service areas may overlap for jsprit.");
+		map.put(SERVICE_AREA_1_RADIUS, "[Clustered_jsprit, jsprit] Radius (in meters) around service area 1 where taxibus trips are possible");
+		map.put(SERVICE_AREA_2_RADIUS, "[Clustered_jsprit, jsprit] Radius (in meters) around service area 2 where taxibus trips are possible");
+		map.put(RETURN_TO_DEPOT, "[Clustered_jsprit, jsprit] Determines whether the bus returns to its depot (=startLink) after each ride");
 		
 		return map;
 	}

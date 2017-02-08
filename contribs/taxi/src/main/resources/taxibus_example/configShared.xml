@@ -11,8 +11,9 @@
 		<param name="dropoffDuration" value="1.0" />
 		<param name="pickupDuration" value="1.0" />
 		
-		<!-- Taxibus algorithms: Possible parameters are clustered, sharedTaxi,stateBased -->
+		<!-- Taxibus algorithms: Possible parameters are clustered_jsprit, jsprit, sharedTaxi -->
 		<param name="algorithm" value="sharedTaxi"/>
+		<!-- [SharedTaxi] shared Taxi detour factor. Default = 1.2 -->
 		<param name="detourFactor" value="1.5"/>
 
 

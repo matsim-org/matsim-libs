@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered;
+package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.tasks.DrtStayTask;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -67,13 +68,13 @@ import com.graphhopper.jsprit.core.util.Solutions;
  *
  */
 public class JspritDispatchCreator implements RequestDispatcher {
-	private final ClusteringTaxibusOptimizerContext context;
+	private final PrebookedTaxibusOptimizerContext context;
 	private final Dijkstra router;
 
 	/**
 	 * 
 	 */
-	public JspritDispatchCreator(ClusteringTaxibusOptimizerContext context) {
+	public JspritDispatchCreator(PrebookedTaxibusOptimizerContext context) {
 		this.context = context;
 		this.router = new Dijkstra(context.scenario.getNetwork(), context.travelDisutility, context.travelTime);
 	}

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.drt.taxibus.algorithm.optimizer.clustered;
+package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +33,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizer;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -51,7 +52,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
  */
 public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 
-	final ClusteringTaxibusOptimizerContext context;
+	final PrebookedTaxibusOptimizerContext context;
     final Collection<TaxibusRequest> unplannedRequests;
     final Random r = MatsimRandom.getLocalInstance();
     final RequestDispatcher dispatcher;
@@ -59,7 +60,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	/**
 	 * 
 	 */
-	public ClusteringTaxibusOptimizer(ClusteringTaxibusOptimizerContext context, RequestDispatcher dispatcher) {
+	public ClusteringTaxibusOptimizer(PrebookedTaxibusOptimizerContext context, RequestDispatcher dispatcher) {
 		this.context=context;
 		this.unplannedRequests = new HashSet<>();
 		this.dispatcher = dispatcher;
@@ -108,7 +109,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			}
 			unplannedRequests.removeAll(dueRequests);
 			if (dueRequests.size()>0){
-			List<Set<TaxibusRequest>> filteredRequests = context.requestDeterminator.prefilterRequests(dueRequests);
+			List<Set<TaxibusRequest>> filteredRequests = context.requestFilter.prefilterRequests(dueRequests);
 			Set<Set<TaxibusRequest>> clusteredRides = clusterRequests(filteredRequests);
 			for (Set<TaxibusRequest> cluster : clusteredRides){
 				TaxibusDispatch dispatch = dispatcher.createDispatch(cluster);
