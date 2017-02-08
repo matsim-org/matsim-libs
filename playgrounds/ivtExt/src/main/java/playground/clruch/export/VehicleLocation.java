@@ -112,7 +112,7 @@ class VehicleLocation extends AbstractExport {
         File fileExport = new File(directory, "vehicleLocations.xml");
 
         // export to node-based XML file
-        new VehicleLocationEventXML().generate(vehicleLocations, fileExport);
+        new VehicleLocationEventXML("SimulationResult","av","id","event","time","link").generate(vehicleLocations, fileExport);
 
     }
 }

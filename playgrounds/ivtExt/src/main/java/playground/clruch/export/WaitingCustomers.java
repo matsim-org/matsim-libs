@@ -1,12 +1,7 @@
 package playground.clruch.export;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
@@ -37,8 +32,7 @@ class WaitingCustomers extends AbstractExport {
     /**
      * integration function to get to step function from discrete set of events
      *
-     * @param map
-     *            navigable map with double times and int describing number of increasing / decreasing waiting customers
+     * @param map navigable map with double times and int describing number of increasing / decreasing waiting customers
      * @return
      */
     public static NavigableMap<Double, Integer> integrate(NavigableMap<Double, Integer> map) {
@@ -71,14 +65,13 @@ class WaitingCustomers extends AbstractExport {
                     final Id<Person> idRaw = event.getPersonId();
                     final String id = idRaw.toString();
                     if (HelperPredicates.isHuman(idRaw)) {
-                        // System.out.println("dept " + id);
                         String linkId = event.getLinkId().toString();
                         deptEvent.put(id, event);
                         if (!waitDelta.containsKey(linkId))
                             waitDelta.put(linkId, new TreeMap<>());
                         waitDelta.get(linkId).put(event.getTime(), //
                                 waitDelta.get(linkId).containsKey(event.getTime()) ? //
-                        waitDelta.get(linkId).get(event.getTime()) + 1 : 1);
+                                        waitDelta.get(linkId).get(event.getTime()) + 1 : 1);
                     }
                 }
             });
@@ -93,8 +86,6 @@ class WaitingCustomers extends AbstractExport {
                 @Override
                 public void handleEvent(PersonArrivalEvent event) {
                     relevantEvents.add(event);
-                    // System.out.println("ARRIVE "+event.getTime()+" "+event.getPersonId());
-                    // System.out.println("arrival "+event.getPersonId());
                 }
             });
             // read the events when AV arrives at agent's location
@@ -113,8 +104,6 @@ class WaitingCustomers extends AbstractExport {
                     if (HelperPredicates.isHuman(idRaw)) {
                         double wait = event.getTime() - deptEvent.get(id).getTime();
                         String linkId = deptEvent.get(id).getLinkId().toString();
-
-                        System.out.println("enter " + id + "  " + deptEvent.get(id).getTime() + " - " + event.getTime() + " =" + wait + " " + linkId);
                         if (!linkOccupation.containsKey(linkId))
                             linkOccupation.put(linkId, new ArrayList<>());
                         DoubleInterval doubleInterval = new DoubleInterval();
@@ -124,7 +113,7 @@ class WaitingCustomers extends AbstractExport {
 
                         waitDelta.get(linkId).put(event.getTime(), //
                                 waitDelta.get(linkId).containsKey(event.getTime()) ? //
-                        waitDelta.get(linkId).get(event.getTime()) - 1 : -1);
+                                        waitDelta.get(linkId).get(event.getTime()) - 1 : -1);
 
                     }
                 }
@@ -137,20 +126,18 @@ class WaitingCustomers extends AbstractExport {
         File fileExport = new File(directory, "waitingCustomers.xml");
         File fileExport2 = new File(directory, "waitingCustomers_bytime.xml");
 
+
         // integrate customer number changes to get to waiting customers step function
         Map<String, NavigableMap<Double, Integer>> waitStepFctn;
         {
             waitStepFctn = waitDelta.entrySet().stream() //
                     .collect(Collectors.toMap(Map.Entry::getKey, entry -> integrate(entry.getValue())));
             System.out.println("==========");
-            waitStepFctn.entrySet().stream().forEach(System.out::println);
         }
 
-        // export to node-based XML file
-        new NodeBasedEventXML().generate(waitStepFctn, fileExport);
 
-        // export to time-based XML file with only changing information at every time step
-        new TimeBasedChangeEventXML().generate(waitStepFctn, fileExport2);
+        // export to node-based XML file
+        new NodeBasedEventXML("SimulationResult", "link", "id", "event", "time", "numCustWait").generate(waitStepFctn, fileExport);
 
     }
 }

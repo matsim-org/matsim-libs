@@ -37,7 +37,6 @@ class VehicleStatus extends AbstractExport {
         if (!vehicleStatus.containsKey(vehicle))
             vehicleStatus.put(vehicle, new TreeMap<>());
         vehicleStatus.get(vehicle).put(time, avStatus);
-        System.out.println("vehicle=" + vehicle + " time=" + time + " status=" + avStatus);
     }
 
     private void putDriveWithCustomer(PersonEntersVehicleEvent event) {
@@ -185,7 +184,9 @@ class VehicleStatus extends AbstractExport {
         File fileExport = new File(directory, "vehicleStatus.xml");
 
         // export to node-based XML file
-        new VehicleStatusEventXML().generate(vehicleStatus, fileExport);
+        new VehicleStatusEventXML("SimulationResult","av","id","event","time","status").generate(vehicleStatus, fileExport);
 
     }
 }
+
+

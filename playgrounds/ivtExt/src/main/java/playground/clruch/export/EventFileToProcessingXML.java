@@ -43,9 +43,6 @@ public class EventFileToProcessingXML {
         VehicleStatus vehicleStatus = new VehicleStatus();
         vehicleStatus.initialize(events);
 
-        // add experimental file to reverse engineer XML file
-        VehicleStatusLab vehicleStatusLab = new VehicleStatusLab();
-        vehicleStatusLab.initialize(events);
 
         // add vehicle location reader
         VehicleLocation vehicleLocation = new VehicleLocation();
@@ -57,7 +54,6 @@ public class EventFileToProcessingXML {
         // write XML files
         waitingCustomers.writeXML(directory);
         vehicleStatus.writeXML(directory);
-        vehicleStatusLab.writeXML(directory);
         vehicleLocation.writeXML(directory);
 
         System.out.println("routine finished successfully");
