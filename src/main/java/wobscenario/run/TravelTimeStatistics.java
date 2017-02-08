@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.wobscenario.analysis;
+package wobscenario.run;
 
 import java.io.File;
 import java.util.HashSet;
@@ -32,6 +32,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import wobscenario.analysis.BSWOB_TaxibusTraveltimeAndDistanceEventHandler;
+import wobscenario.analysis.BSWOB_TraveltimeAndDistanceEventHandler;
+import wobscenario.analysis.TaxibusTourAnalyser;
 
 /**
  * @author  jbischoff

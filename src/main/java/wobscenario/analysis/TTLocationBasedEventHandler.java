@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.wobscenario.analysis;
+package wobscenario.analysis;
 
 import java.util.HashMap;
 import java.util.HashSet;

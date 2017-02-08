@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,50 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.vsp.analysis.modules.ptDriverPrefix;
+package wobscenario.run;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 
 /**
- * Collects the public vehicle Driver IDs.
- * 
- * @author ikaddoura
+ * @author  jbischoff
  *
  */
-public class PtDriverIdHandler implements TransitDriverStartsEventHandler {
-	private final static Logger log = Logger.getLogger(PtDriverIdHandler.class);
-	private final static List<Id> ptDriverIDs = new ArrayList<Id>(); //was neither final not static
+public class RunManyPolicyCases {
 
-	@Override
-	public void reset(int iteration) {
-		this.ptDriverIDs.clear();
-	}
+	public static void main(String[] args) {
 
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		Id ptDriverId = event.getDriverId();
-		
-		if (!this.ptDriverIDs.contains(ptDriverId)){
-			this.ptDriverIDs.add(ptDriverId);
-			
+		String[] runs = {"configPC85","configPC86"};
+		for (int i = 0; i<runs.length;i++){
+			String[] file = {"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/configs/"+runs[i]+".xml"};
+//			String[] file = {"D:/runs-svn/vw_rufbus/delievery/20160121/runs/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
+			RunTaxibusPolicyCase.main(file);
 		}
+		
 	}
 
-	public List<Id> getPtDriverIDs() {
-		
-		if (ptDriverIDs.isEmpty()){
-			log.warn("No pt driver(s) identified. List is empty!");
-		}
-		return ptDriverIDs;
-	}
-	
 }

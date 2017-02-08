@@ -17,14 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.wobscenario.analysis;
+package wobscenario.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;

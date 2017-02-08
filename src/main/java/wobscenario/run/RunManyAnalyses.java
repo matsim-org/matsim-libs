@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,59 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.analysis.modules;
-
-import java.util.List;
-
-import org.matsim.core.events.handler.EventHandler;
+package wobscenario.run;
 
 /**
- * 
- * Some common methods for analysis modules.
- * 
- * @author aneumann
+ * @author  jbischoff
  *
  */
-public abstract class AbstractAnalysisModule {
-	
-	private final String name;
-	
-	/**
-	 * 
-	 * @param name The name of the module.
-	 */
-	public AbstractAnalysisModule(String name){
-		this.name = name;
+public class RunManyAnalyses {
+
+	public static void main(String[] args) {
+
+		String[] runs = {"vw079	"};
+		for (int i = 0; i<runs.length;i++){
+			String[] file = {"D:/runs-svn/vw_rufbus/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
+//			String[] file = {"D:/runs-svn/vw_rufbus/delievery/20160121/runs/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
+			TravelTimeStatistics.main(file);
+		}
+		
 	}
-	
-	/**
-	 * 
-	 * @return The name of that module
-	 */
-	public String getName() {
-		return this.name;
-	}
-	
-	/**
-	 * 
-	 * @return A list of all the event handler of the module, if necessary, otherwise an empty List.
-	 */
-	public abstract List<EventHandler> getEventHandler();
-	
-	/**
-	 * Hook called before the events stream is processed.
-	 */
-	public abstract void preProcessData();
-	
-	/**
-	 * Hook after the events stream is processed.
-	 */
-	public abstract void postProcessData();
-	
-	/**
-	 * 
-	 * @return Write the results collected by the module to the given output folder.
-	 */
-	public abstract void writeResults(String outputFolder);
-	
+
 }

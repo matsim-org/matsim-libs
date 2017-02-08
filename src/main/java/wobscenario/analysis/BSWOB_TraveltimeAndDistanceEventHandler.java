@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.wobscenario.analysis;
+package wobscenario.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,12 +34,10 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
@@ -52,8 +50,8 @@ import org.matsim.vehicles.Vehicle;
  * An analyis tool to evaluate passengers going from Braunschweig to Wolfsburg.
  *
  */
-public class BSWOB_TaxibusTraveltimeAndDistanceEventHandler implements ActivityStartEventHandler, PersonDepartureEventHandler,
-		ActivityEndEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler {
+public class BSWOB_TraveltimeAndDistanceEventHandler implements ActivityStartEventHandler, PersonDepartureEventHandler,
+		ActivityEndEventHandler, LinkEnterEventHandler {
 	Map<Id<Person>, String> lastActivity = new HashMap<>();
 	Map<Id<Person>, Double> lastDeparture = new HashMap<>();
 	Map<Id<Person>, Double> currentDistance = new HashMap<>();
@@ -71,10 +69,9 @@ public class BSWOB_TaxibusTraveltimeAndDistanceEventHandler implements ActivityS
 	private final Network network;
 	private boolean onlyVW;
 
-	public BSWOB_TaxibusTraveltimeAndDistanceEventHandler(Network network, boolean onlyVW) {
+	public BSWOB_TraveltimeAndDistanceEventHandler(Network network, boolean onlyVW) {
 		this.network = network;
 		this.onlyVW = onlyVW;
-		this.monitoredModes.add("taxibus");
 	}
 
 	@Override
@@ -82,7 +79,9 @@ public class BSWOB_TaxibusTraveltimeAndDistanceEventHandler implements ActivityS
 
 	}
 
-	
+	public void addMode(String monitoredMode) {
+		this.monitoredModes.add(monitoredMode);
+	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
@@ -281,15 +280,5 @@ public class BSWOB_TaxibusTraveltimeAndDistanceEventHandler implements ActivityS
 
 	private Id<Person> vId2PId(Id<Vehicle> vid) {
 		return Id.createPersonId(vid.toString());
-	}
-
-	/* (non-Javadoc)
-	 * @see org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler#handleEvent(org.matsim.api.core.v01.events.PersonEntersVehicleEvent)
-	 */
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (lastDeparture.containsKey(event.getPersonId())) {
-			this.lastDeparture.put(event.getPersonId(), event.getTime());
-			}		
 	}
 }

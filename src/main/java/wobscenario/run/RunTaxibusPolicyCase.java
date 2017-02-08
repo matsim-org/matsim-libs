@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.wobscenario.run;
+package wobscenario.run;
 
 import java.util.HashSet;
 import java.util.Random;
