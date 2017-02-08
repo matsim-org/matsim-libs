@@ -22,6 +22,10 @@
 			cost of obtaining longer paths -->
 		<param name="AStarEuclideanOverdoFactor" value="1.0" />
 
+		<param name="breakIfNotAllRequestsServed" value="false" />
+		
+		<param name="changeStartLinkToLastLinkInSchedule" value="true" />
+		
 		<!-- If false, the drop-off location remains unknown to the optimizer and 
 			scheduler until the end of pickup -->
 		<param name="destinationKnown" value="false" />
