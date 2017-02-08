@@ -21,8 +21,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.path.*;
@@ -56,13 +55,11 @@ public class OneTaxiOptimizer
 
 
     @Inject
-    public OneTaxiOptimizer(Scenario scenario, Fleet fleet, QSim qsim)
+    public OneTaxiOptimizer(Network network, Fleet fleet, QSim qSim)
     {
-        this.timer = qsim.getSimTimer();
-
+        timer = qSim.getSimTimer();
         travelTime = new FreeSpeedTravelTime();
-        router = new Dijkstra(scenario.getNetwork(), new TimeAsTravelDisutility(travelTime),
-                travelTime);
+        router = new Dijkstra(network, new TimeAsTravelDisutility(travelTime), travelTime);
 
         vehicle = fleet.getVehicles().values().iterator().next();
         vehicle.resetSchedule();
@@ -124,7 +121,7 @@ public class OneTaxiOptimizer
     @Override
     public void nextTask(Schedule schedule)
     {
-        shiftTimings();
+        updateTimings();
         schedule.nextTask();
     }
 
@@ -134,7 +131,7 @@ public class OneTaxiOptimizer
      * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(Schedule)} in the
      * taxi contrib
      */
-    private void shiftTimings()
+    private void updateTimings()
     {
         Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
