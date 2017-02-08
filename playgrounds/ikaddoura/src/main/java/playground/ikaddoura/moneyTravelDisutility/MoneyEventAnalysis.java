@@ -30,9 +30,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -50,10 +52,12 @@ import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
  * Analyzes link-, time- and vehicle-specific information about monetary payments.
  * Computes the average monetary payment per link, time and vehicle type which is required by the travel disutility computation.
  * 
+ * TODO: The agent money event should be extended by an optional link ID information!
+ * 
  * @author ikaddoura
  */
 
-public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEventHandler, IterationEndsListener, PersonEntersVehicleEventHandler {
+public class MoneyEventAnalysis implements PersonMoneyEventHandler, VehicleEntersTrafficEventHandler, LinkEnterEventHandler, IterationEndsListener, PersonEntersVehicleEventHandler {
 	private static final Logger log = Logger.getLogger(MoneyEventAnalysis.class);
 	
 	@Inject
@@ -84,7 +88,10 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 		Id<Person> personId = event.getPersonId();
 		Id<Vehicle> vehicleId = this.personId2vehicleId.get(personId);
 		Id<Link> linkId = vehicleId2linkId.get(vehicleId);
-				
+		
+		if (vehicleId == null) log.warn("Vehicle Id is null. " + event.toString());
+		if (linkId == null) log.warn("Link Id is null. " + event.toString());
+
 		int timeBinNr = getIntervalNr(event.getTime());
 		
 		if (linkId2info.containsKey(linkId)) {
@@ -220,7 +227,17 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 		}
 		
 		for (String agentType : agentTypeIdPrefix2AmountSum.keySet()) {
-			timeBin.getAgentTypeId2avgAmount().put(agentType, agentTypeIdPrefix2AmountSum.get(agentType) / agentTypeIdPrefix2Counter.get(agentType) );
+			
+			if (agentTypeIdPrefix2Counter.get(agentType) == null) {
+				log.warn("No entering agent of type " + agentType + " in time bin " + timeBin.getTimeBinNr() + " even though there are person money events."
+						+ "Can't compute the average amount per time bin.");
+			} else {
+				double amountSum = agentTypeIdPrefix2AmountSum.get(agentType);
+				double counter = agentTypeIdPrefix2Counter.get(agentType);
+				double averageAmount = amountSum / counter;
+				
+				if (averageAmount != 0.) timeBin.getAgentTypeId2avgAmount().put(agentType, averageAmount);
+			}
 		}
 	}
 
@@ -231,8 +248,16 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 			for (Double amount : timeBin.getPersonId2amounts().get(personId)) {
 				sum += amount;
 			}
-		}		
-		return sum / timeBin.getEnteringAgents().size();
+		}
+		
+		double average = 0.;
+		if (timeBin.getEnteringAgents().size() == 0) {
+			log.warn("No entering agent in time bin " + timeBin.getTimeBinNr() + " even though there are person money events."
+					+ "Can't compute the average amount per time bin.");
+		} else {
+			average = sum / timeBin.getEnteringAgents().size();
+		}
+		return average;
 	}
 	
 	private int getIntervalNr(double time) {
@@ -242,6 +267,11 @@ public class MoneyEventAnalysis implements PersonMoneyEventHandler, LinkEnterEve
 
 	public Map<Id<Link>, LinkInfo> getLinkId2info() {
 		return linkId2info;
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.vehicleId2linkId.put(event.getVehicleId(), event.getLinkId());		
 	}
 }
 
