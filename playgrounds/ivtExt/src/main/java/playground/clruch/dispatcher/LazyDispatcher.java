@@ -44,7 +44,7 @@ public class LazyDispatcher extends UniversalDispatcher {
         // System.out.println("The task type is " + task.getAVTaskType().toString());
         if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
             // FIXME! maybe add too many!
-            availableVehicles.add((AVVehicle) task.getSchedule().getVehicle());
+//            availableVehicles.add((AVVehicle) task.getSchedule().getVehicle());
         }
     }
 
@@ -82,68 +82,72 @@ public class LazyDispatcher extends UniversalDispatcher {
         for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
             Link dest = vehicleLinkPair.getDestination();
             if (dest != null && !dest.equals(destLinks[2])) {
-                divertVehicle(vehicleLinkPair, destLinks[2]);
+//                divertVehicle(vehicleLinkPair, destLinks[2]); // TODO
             }
         }
 
         // send all available vehicles which are in a stay task towards a certain link
-        Iterator<AVVehicle> vehicleIterator = availableVehicles.iterator();
-        while (vehicleIterator.hasNext()) {
-            AVVehicle vehicle = vehicleIterator.next();
-            Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
-            List<AbstractTask> tasks = schedule.getTasks();
-            if (!tasks.isEmpty()) {
-
-                AVTask lastTask = (AVTask) Schedules.getLastTask(schedule);
-
-                {
-                    // System.out.println("Task from time " + lastTask.getBeginTime() + " to " + lastTask.getEndTime());
-                    // System.out.println("Number of tasks: " + schedule.getTasks().size());
-                }
-
-                // if so, change end to +1 seconds, append ride to link and stay to simEndTime
-                // TODO: change end time from hard-coded 108000 to appropriate value
-                if (lastTask.getAVTaskType().equals(AVTask.AVTaskType.STAY)) {
-                    double scheduleEndTime = schedule.getEndTime();
-                    AVStayTask stayTask = (AVStayTask) lastTask;
-                    if (!stayTask.getLink().equals(destLinks[1])) {
-
-                        {
-                            System.out.println("schedule for vehicle id " + vehicle.getId() + " time now = " + now); // TODO
-                            for (AbstractTask task : tasks)
-                                System.out.println(" " + task);
-                        }
-                        // finish or remove the last stay task
-
-                        if (stayTask.getStatus() == Task.TaskStatus.STARTED) {
-                            stayTask.setEndTime(now);
-                        } else {
-                            schedule.removeLastTask();
-                            System.out.println("The last task was removed for " + vehicle.getId());
-                        }
-
-                        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
-                        VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute(stayTask.getLink(), destLinks[1], now);
-
-                        // AVDriveTask rebalanceTask = new AVDriveTask(new VrpPathWithTravelDataImpl(now, 15.0, routePoints, linkTTs));
-                        AVDriveTask rebalanceTask = new AVDriveTask(routePoints);
-                        schedule.addTask(rebalanceTask);
-                        System.out.println("sending AV " + vehicle.getId() + " to " + destLinks[1].getId());
-
-                        // add additional stay task
-                        // TODO what happens if scheduleEndTime is smaller than the end time of the previously added AV drive task
-                        schedule.addTask(new AVStayTask(rebalanceTask.getEndTime(), scheduleEndTime, destLinks[1]));
-                        // remove from available vehicles
-                        vehicleIterator.remove();
-                        {
-                            System.out.println("schedule for vehicle id " + vehicle.getId() + " MODIFIED");
-                            for (AbstractTask task : schedule.getTasks())
-                                System.out.println(" " + task);
-                        }
-                    }
-
-                }
+//        Iterator<AVVehicle> vehicleIterator = availableVehicles.iterator();
+        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+            Link dest = vehicleLinkPair.getDestination();
+            if (dest == null) {
+                divertVehicle(vehicleLinkPair, destLinks[1]);
             }
+//            AVVehicle vehicle = vehicleIterator.next();
+//            Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
+//            List<AbstractTask> tasks = schedule.getTasks();
+//            if (!tasks.isEmpty()) {
+//
+//                AVTask lastTask = (AVTask) Schedules.getLastTask(schedule);
+//
+//                {
+//                    // System.out.println("Task from time " + lastTask.getBeginTime() + " to " + lastTask.getEndTime());
+//                    // System.out.println("Number of tasks: " + schedule.getTasks().size());
+//                }
+//
+//                // if so, change end to +1 seconds, append ride to link and stay to simEndTime
+//                // TODO: change end time from hard-coded 108000 to appropriate value
+//                if (lastTask.getAVTaskType().equals(AVTask.AVTaskType.STAY)) {
+//                    double scheduleEndTime = schedule.getEndTime();
+//                    AVStayTask stayTask = (AVStayTask) lastTask;
+//                    if (!stayTask.getLink().equals(destLinks[1])) {
+//
+//                        {
+//                            System.out.println("schedule for vehicle id " + vehicle.getId() + " time now = " + now); // TODO
+//                            for (AbstractTask task : tasks)
+//                                System.out.println(" " + task);
+//                        }
+//                        // finish or remove the last stay task
+//
+//                        if (stayTask.getStatus() == Task.TaskStatus.STARTED) {
+//                            stayTask.setEndTime(now);
+//                        } else {
+//                            schedule.removeLastTask();
+//                            System.out.println("The last task was removed for " + vehicle.getId());
+//                        }
+//
+//                        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+//                        VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute(stayTask.getLink(), destLinks[1], now);
+//
+//                        // AVDriveTask rebalanceTask = new AVDriveTask(new VrpPathWithTravelDataImpl(now, 15.0, routePoints, linkTTs));
+//                        AVDriveTask rebalanceTask = new AVDriveTask(routePoints);
+//                        schedule.addTask(rebalanceTask);
+//                        System.out.println("sending AV " + vehicle.getId() + " to " + destLinks[1].getId());
+//
+//                        // add additional stay task
+//                        // TODO what happens if scheduleEndTime is smaller than the end time of the previously added AV drive task
+//                        schedule.addTask(new AVStayTask(rebalanceTask.getEndTime(), scheduleEndTime, destLinks[1]));
+//                        // remove from available vehicles
+//                        vehicleIterator.remove();
+//                        {
+//                            System.out.println("schedule for vehicle id " + vehicle.getId() + " MODIFIED");
+//                            for (AbstractTask task : schedule.getTasks())
+//                                System.out.println(" " + task);
+//                        }
+//                    }
+//
+//                }
+//            }
         }
     }
 

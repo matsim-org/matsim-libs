@@ -11,6 +11,7 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -28,8 +29,8 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 public abstract class UniversalDispatcher extends AbstractDispatcher {
 
     public final List<AVVehicle> vehicles = new ArrayList<>();
-    @Deprecated
-    public Queue<AVVehicle> availableVehicles = new LinkedList<>(); // TODO remove
+    // @Deprecated
+    // public Queue<AVVehicle> availableVehicles = new LinkedList<>(); // TODO remove
     @Deprecated
     final private Queue<AVRequest> pendingRequests = new LinkedList<>(); // TODO remove
 
@@ -73,6 +74,7 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
     protected void divertVehicle(VehicleLinkPair vehicleLinkPair, Link dest) {
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
         List<AbstractTask> tasks = schedule.getTasks();
+        // TODO this check is obsolete!
         if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED)) {
             AbstractTask abstractTask = schedule.getCurrentTask();
             AVTask avTask = (AVTask) abstractTask;
@@ -96,6 +98,42 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
                     new RuntimeException("links no good").printStackTrace();
                     System.out.println("SKIPPED BECAUSE OF MISMATCH!");
                 }
+                break;
+            }
+            case STAY: {
+                final double scheduleEndTime = schedule.getEndTime(); // typically 108000.0
+
+                AVStayTask stayTask = (AVStayTask) avTask; // TODO rename
+
+                if (!stayTask.getLink().equals(dest)) {
+                    if (stayTask.getStatus() == Task.TaskStatus.STARTED) {
+                        stayTask.setEndTime(vehicleLinkPair.linkTimePair.time);
+                    } else {
+                        schedule.removeLastTask();
+                        System.out.println("The last task was removed for " + vehicleLinkPair.avVehicle.getId());
+                    }
+                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+                    VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute( //
+                            vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
+
+                    // AVDriveTask rebalanceTask = new AVDriveTask(new VrpPathWithTravelDataImpl(now, 15.0, routePoints, linkTTs));
+                    AVDriveTask rebalanceTask = new AVDriveTask(routePoints);
+                    schedule.addTask(rebalanceTask);
+                    // System.out.println("sending AV " + vehicle.getId() + " to " + destLinks[1].getId());
+
+                    // add additional stay task
+                    // TODO what happens if scheduleEndTime is smaller than the end time of the previously added AV drive task
+                    schedule.addTask(new AVStayTask(rebalanceTask.getEndTime(), scheduleEndTime, dest));
+                    // remove from available vehicles
+                    // vehicleIterator.remove();
+                    {
+                        System.out.println("schedule for vehicle id " + vehicleLinkPair.avVehicle.getId() + " MODIFIED");
+                        for (AbstractTask task : schedule.getTasks())
+                            System.out.println(" " + task);
+                    }
+                }
+                // else
+                // System.out.println("vehicle already there! " + dest.getId());
                 break;
             }
             default:
@@ -132,7 +170,7 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
     @Override
     protected final void protected_registerVehicle(AVVehicle vehicle) {
         vehicles.add(vehicle);
-        availableVehicles.add(vehicle);
+        // availableVehicles.add(vehicle);
 
     }
 
