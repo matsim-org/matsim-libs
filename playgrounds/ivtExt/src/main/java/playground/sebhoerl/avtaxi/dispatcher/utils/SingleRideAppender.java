@@ -30,10 +30,10 @@ import java.util.List;
  */
 public class SingleRideAppender {
     public final ParallelLeastCostPathCalculator router;
-    private final AVDispatcherConfig config;
+    public final AVDispatcherConfig config;
     public final TravelTime travelTime;
 
-    private List<AppendTask> tasks = new LinkedList<>();
+    public List<AppendTask> tasks = new LinkedList<>();
 
     public SingleRideAppender(AVDispatcherConfig config, ParallelLeastCostPathCalculator router, TravelTime travelTime) {
         this.router = router;
@@ -51,7 +51,7 @@ public class SingleRideAppender {
         tasks.add(new AppendTask(request, vehicle, now, pickup, dropoff));
     }
 
-    public void schedule(AppendTask task) {
+    private void schedule(AppendTask task) {
         AVRequest request = task.request;
         AVVehicle vehicle = task.vehicle;
         double now = task.time;

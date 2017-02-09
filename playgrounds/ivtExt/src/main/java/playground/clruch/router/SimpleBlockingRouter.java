@@ -13,17 +13,17 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  */
 // VrpPathWithTravelData newSubPath;
 // {
-//    ParallelLeastCostPathCalculator router = appender.router;
-//    LeastCostPathFuture drivepath = router.calcLeastCostPath( //
-//            divLink.getToNode(), destLinks[2].getFromNode(), startTime, null, null);
-//    while (!drivepath.isDone()) {
-//        try {
-//            Thread.sleep(5);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//    newSubPath = VrpPaths.createPath(divLink, destLinks[2], startTime, drivepath.get(), appender.travelTime);
+// ParallelLeastCostPathCalculator router = appender.router;
+// LeastCostPathFuture drivepath = router.calcLeastCostPath( //
+// divLink.getToNode(), destLinks[2].getFromNode(), startTime, null, null);
+// while (!drivepath.isDone()) {
+// try {
+// Thread.sleep(5);
+// } catch (InterruptedException e) {
+// e.printStackTrace();
+// }
+// }
+// newSubPath = VrpPaths.createPath(divLink, destLinks[2], startTime, drivepath.get(), appender.travelTime);
 // }
 // add the drive task
 // Link[] routePoints =new Link[] {stayTask.getLink(),destLinks[1]};
@@ -31,7 +31,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 // {
 // ParallelLeastCostPathCalculator router = appender.router;
 // LeastCostPathFuture drivepath = router.calcLeastCostPath( //
-//         stayTask.getLink().getToNode(), destLinks[1].getFromNode(), now, null,
+// stayTask.getLink().getToNode(), destLinks[1].getFromNode(), now, null,
 // null);
 // while (!drivepath.isDone()) {
 // try {
@@ -53,21 +53,24 @@ public class SimpleBlockingRouter {
 
     /**
      * 
-     * @param divLink can be stayTask.getLink() from stay task, or linkTimePair.link from driving task diversion point
-     * @param destLink destination link
-     * @param startTime can be now when switching from stay task, or linkTimePair.time from driving task diversion point
+     * @param divLink
+     *            can be stayTask.getLink() from stay task, or linkTimePair.link from driving task diversion point
+     * @param destLink
+     *            destination link
+     * @param startTime
+     *            can be now when switching from stay task, or linkTimePair.time from driving task diversion point
      * @return
      */
     public VrpPathWithTravelData getRoute(Link divLink, Link destLink, double startTime) {
         LeastCostPathFuture drivepath = router.calcLeastCostPath( //
                 divLink.getToNode(), destLink.getFromNode(), startTime, null, null);
-        while (!drivepath.isDone())
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
+        try {
+            Thread.sleep(1);
+            while (!drivepath.isDone())
+                Thread.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return VrpPaths.createPath(divLink, destLink, startTime, drivepath.get(), travelTime);
     }
 
