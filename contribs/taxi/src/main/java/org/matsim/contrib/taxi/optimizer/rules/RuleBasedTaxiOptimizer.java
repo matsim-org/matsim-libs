@@ -58,6 +58,7 @@ public class RuleBasedTaxiOptimizer
         this.params = params;
 
         if (optimContext.scheduler.getParams().vehicleDiversion) {
+            //hmmmm, change into warning?? or even allow it (e.g. for empty taxi relocaton)??
             throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
         }
 
