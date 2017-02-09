@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
@@ -161,8 +161,9 @@ public class AssignmentETaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule schedule)
+    public void nextTask(Vehicle vehicle)
     {
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.STARTED) {
             if (schedule.getCurrentTask() instanceof ETaxiChargingTask) {
                 if (scheduledForCharging.remove(schedule.getVehicle().getId()) == null) {
@@ -171,14 +172,14 @@ public class AssignmentETaxiOptimizer
             }
         }
 
-        super.nextTask(schedule);
+        super.nextTask(vehicle);
     }
 
 
     private VehicleData initVehicleDataForCharging(AssignmentChargerPlugData pData)
     {
-        Iterable<? extends Vehicle> vehiclesBelowMinSocLevel = Iterables.filter(
-                optimContext.fleet.getVehicles().values(), this::doNeedChargingScheduling);
+        Iterable<? extends Vehicle> vehiclesBelowMinSocLevel = Iterables
+                .filter(optimContext.fleet.getVehicles().values(), this::doNeedChargingScheduling);
 
         //XXX if chargers are heavily used then shorten the planning horizon;
         //(like with undersupply of taxis)

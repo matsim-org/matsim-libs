@@ -80,6 +80,7 @@ public class TaxiTracesAnalyser
         for (StockholmServedRequest r : servedRequests) {
             taxiIds.add(r.taxiId);
 
+            @SuppressWarnings("deprecation")
             int hourInWeek = r.getStartTime().getDay() * 24 + r.getStartTime().getHours();
             reqsPerHour[hourInWeek]++;
         }
@@ -98,6 +99,7 @@ public class TaxiTracesAnalyser
 
     private void analyseTaxis()
     {
+        @SuppressWarnings("unchecked")
         Set<String>[] taxisInHour = new Set[7 * 24];
         for (int d = 0; d < 7; d++) {
             for (int h = 0; h < 24; h++) {
@@ -106,6 +108,7 @@ public class TaxiTracesAnalyser
         }
 
         for (TaxiTrace tt : taxiTraces) {
+            @SuppressWarnings("deprecation")
             int hourInWeek = tt.time.getDay() * 24 + tt.time.getHours();
             taxisInHour[hourInWeek].add(tt.taxiId);
         }
@@ -120,6 +123,7 @@ public class TaxiTracesAnalyser
     }
 
 
+    @SuppressWarnings("unused")
     private void saveHiredTaxiTracesAsXYPlot(String file)
     {
         try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file))) {
@@ -134,6 +138,7 @@ public class TaxiTracesAnalyser
     }
 
 
+    @SuppressWarnings("unused")
     private void saveODAsXYPlot(String file)
     {
         try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file))) {

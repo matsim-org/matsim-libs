@@ -115,10 +115,11 @@ public class InclusionRuleBasedTaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule schedule)
+    public void nextTask(Vehicle vehicle)
     {
-        super.nextTask(schedule);
+        super.nextTask(vehicle);
 
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(schedule);
             if (lastTask.getBeginTime() < schedule.getVehicle().getT1()) {

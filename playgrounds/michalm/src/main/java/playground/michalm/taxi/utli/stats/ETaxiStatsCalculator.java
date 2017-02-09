@@ -24,7 +24,6 @@ import java.util.List;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculators;
 
 import playground.michalm.taxi.schedule.ETaxiChargingTask;

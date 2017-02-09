@@ -44,6 +44,7 @@ public class BarcelonaDemandGeneratorFromServedRequests
     }
 
 
+    @SuppressWarnings("deprecation")
     public void generateDemand(Iterable<BarcelonaServedRequest> requests,
             double selectionProbability)
     {
@@ -65,7 +66,9 @@ public class BarcelonaDemandGeneratorFromServedRequests
     private int calcStartTime(BarcelonaServedRequest request)
     {
         Date startTime = request.getStartTime();
+        @SuppressWarnings("deprecation")
         int h = startTime.getHours();
+        @SuppressWarnings("deprecation")
         int m = startTime.getMinutes();
 
         if (h < BarcelonaServedRequests.ZERO_HOUR) {

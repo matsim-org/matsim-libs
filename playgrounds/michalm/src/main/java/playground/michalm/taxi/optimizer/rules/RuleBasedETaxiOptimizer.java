@@ -22,7 +22,6 @@ package playground.michalm.taxi.optimizer.rules;
 import java.util.Collections;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -82,13 +81,12 @@ public class RuleBasedETaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule schedule)
+    public void nextTask(Vehicle vehicle)
     {
-        super.nextTask(schedule);
+        super.nextTask(vehicle);
 
-        Vehicle veh = schedule.getVehicle();
-        if (optimContext.scheduler.isIdle(veh) && isUndercharged(veh)) {
-            chargeIdleUnderchargedVehicles(Collections.singleton(veh));
+        if (optimContext.scheduler.isIdle(vehicle) && isUndercharged(vehicle)) {
+            chargeIdleUnderchargedVehicles(Collections.singleton(vehicle));
         }
     }
 

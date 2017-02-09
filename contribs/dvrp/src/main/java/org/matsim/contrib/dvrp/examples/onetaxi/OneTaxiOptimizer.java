@@ -119,10 +119,10 @@ public class OneTaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule schedule)
+    public void nextTask(Vehicle vehicle)
     {
         updateTimings();
-        schedule.nextTask();
+        vehicle.getSchedule().nextTask();
     }
 
 

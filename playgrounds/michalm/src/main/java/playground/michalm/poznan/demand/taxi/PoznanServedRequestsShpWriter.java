@@ -41,6 +41,7 @@ public class PoznanServedRequestsShpWriter
     }
 
 
+    @SuppressWarnings("deprecation")
     public void write(String originsShpFile, String destinationsShpFile)
     {
         CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);

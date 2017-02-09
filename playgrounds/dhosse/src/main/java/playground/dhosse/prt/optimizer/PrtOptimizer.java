@@ -56,8 +56,8 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	}
 
 	@Override
-	public void nextTask(Schedule schedule) {
-		
+	public void nextTask(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
         this.scheduler.updateBeforeNextTask(schedule);
         Task newCurrentTask = schedule.nextTask();
 

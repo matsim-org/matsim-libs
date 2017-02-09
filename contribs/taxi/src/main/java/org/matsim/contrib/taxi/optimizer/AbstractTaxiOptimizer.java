@@ -118,8 +118,9 @@ public abstract class AbstractTaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule schedule)
+    public void nextTask(Vehicle vehicle)
     {
+        Schedule schedule = vehicle.getSchedule();
         optimContext.scheduler.updateBeforeNextTask(schedule);
 
         Task newCurrentTask = schedule.nextTask();

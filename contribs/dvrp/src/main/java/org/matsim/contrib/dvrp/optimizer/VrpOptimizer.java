@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.data.*;
 
 
 /**
@@ -30,20 +29,22 @@ import org.matsim.contrib.dvrp.schedule.*;
  */
 public interface VrpOptimizer
 {
-	/**
-	 * This is called by the framework every time a request is submitted so that the optimizer is notified of it.
-	 * <br/><br/>
-	 * Design comments:<ul>
-	 * <li> This function can be generalized (in the future) to encompass request modification,
-	 * cancellation etc. mm, 2016??
-	 * </ul>
-	 */
-	void requestSubmitted(Request request);
+    /**
+     * This is called by the framework every time a request is submitted so that the optimizer is
+     * notified of it. <br/>
+     * <br/>
+     * Design comments:
+     * <ul>
+     * <li>This function can be generalized (in the future) to encompass request modification,
+     * cancellation etc. mm, 2016??
+     * </ul>
+     */
+    void requestSubmitted(Request request);
 
 
-	/**
-	 * Called by the framework when it moves on to the next task.  It is presumably the task of the optimizer to
-	 * update the "currentTask" setting.
-	 */
-	void nextTask(Schedule schedule);
+    /**
+     * Called by the framework when it moves on to the next task. It is presumably the task of the
+     * optimizer to update the "currentTask" setting.
+     */
+    void nextTask(Vehicle vehicle);
 }

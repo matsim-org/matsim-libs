@@ -3,7 +3,7 @@ package playground.sebhoerl.avtaxi.schedule;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -41,7 +41,8 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
     }
 
     @Override
-    public void nextTask(Schedule schedule) {
+    public void nextTask(Vehicle vehicle) {
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
             schedule.nextTask();
             return;

@@ -22,23 +22,15 @@
  */
 package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -89,10 +81,10 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	 * @see org.matsim.contrib.dvrp.optimizer.VrpOptimizer#nextTask(org.matsim.contrib.dvrp.schedule.Schedule)
 	 */
 	@Override
-	public void nextTask(Schedule schedule) {
+	public void nextTask(Vehicle vehicle) {
+        Schedule schedule = vehicle.getSchedule();
         context.scheduler.updateBeforeNextTask(schedule);
-        
-        Task newCurrentTask = schedule.nextTask();		
+        schedule.nextTask();		
 	}
 
 	/* (non-Javadoc)

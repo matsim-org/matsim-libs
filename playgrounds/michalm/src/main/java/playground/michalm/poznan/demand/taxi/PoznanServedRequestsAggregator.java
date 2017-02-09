@@ -79,6 +79,7 @@ public class PoznanServedRequestsAggregator
 
         Matrices aggregatedMatrices = MatrixUtils.aggregateMatrices(demandAggregator.getMatrices(),
                 new Function<String, String>() {
+                    @SuppressWarnings("deprecation")
                     @Override
                     public String apply(String key)
                     {
