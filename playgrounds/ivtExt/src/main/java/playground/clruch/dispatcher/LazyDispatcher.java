@@ -1,12 +1,7 @@
 package playground.clruch.dispatcher;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -30,20 +25,16 @@ import playground.clruch.router.SimpleBlockingRouter;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public class LazyDispatcher extends AbstractDispatcher {
+public class LazyDispatcher extends UniversalDispatcher {
     public static final String IDENTIFIER = "LazyDispatcher";
-    public final List<AVVehicle> vehicles = new ArrayList<>();
-    final private Queue<AVVehicle> availableVehicles = new LinkedList<>();
-    final private Queue<AVRequest> pendingRequests = new LinkedList<>();
+
     private Link[] destLinks = null;
 
     public LazyDispatcher(EventsManager eventsManager, SingleRideAppender appender, Link[] sendAVtoLink) {
@@ -52,39 +43,31 @@ public class LazyDispatcher extends AbstractDispatcher {
     }
 
     @Override
-    public void onRequestSubmitted(AVRequest request) {
-        pendingRequests.add(request);
-    }
-
-    @Override
     public void onNextTaskStarted(AVTask task) {
-        System.out.println("The task type is " + task.getAVTaskType().toString());
+//        System.out.println("The task type is " + task.getAVTaskType().toString());
         if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
+            // FIXME! maybe add too many!
             availableVehicles.add((AVVehicle) task.getSchedule().getVehicle());
         }
     }
 
-    @Override
-    public void protected_registerVehicle(AVVehicle vehicle) {
-        vehicles.add(vehicle);
-        availableVehicles.add(vehicle);
-    }
-
-    @Deprecated
-    Map<AVVehicle, LinkTimePair> diversionPoints = new ConcurrentHashMap<>();
+    // @Deprecated
+    // Map<AVVehicle, LinkTimePair> diversionPoints = new ConcurrentHashMap<>();
 
     @Deprecated
     @Override
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
-        System.out.println("nextLinkEntered: " + avVehicle.getId() + " " + driveTask.toString() + " next diversion at:" + linkTimePair.link.getId() + " time " + linkTimePair.time);
-        diversionPoints.put(avVehicle, linkTimePair);
+        // System.out.println("nextLinkEntered: " + avVehicle.getId() + " " + driveTask.toString() + " next diversion at:" + linkTimePair.link.getId() + " time
+        // " + linkTimePair.time);
+        // diversionPoints.put(avVehicle, linkTimePair);
 
     }
 
-    private void reoptimize(double now) {
+    @Override
+    public void reoptimize(double now) {
         // System.out.println("lazy dispatcher is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + " availableVehicles.size()" +
         // availableVehicles.size());
-        Iterator<AVRequest> requestIterator = pendingRequests.iterator();
+        // Iterator<AVRequest> requestIterator = pendingRequests.iterator();
         // iterate over all pending requests and all available vehicles and assign a vehicle if it is on the same
         // link as the pending request
 
@@ -123,7 +106,8 @@ public class LazyDispatcher extends AbstractDispatcher {
                 AbstractTask abstractTask = schedule.getCurrentTask();
                 AVTask avTask = (AVTask) abstractTask;
                 if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {
-                    if (diversionPoints.containsKey(vehicle)) {
+                    // if (diversionPoints.containsKey(vehicle))
+                    {
                         AVDriveTask avDriveTask = (AVDriveTask) avTask;
                         if (!avDriveTask.getPath().getToLink().equals(destLinks[2])) {
                             System.out.println("REROUTING " + vehicle.getId());
@@ -214,11 +198,9 @@ public class LazyDispatcher extends AbstractDispatcher {
         }
     }
 
-    @Override
-    public void onNextTimestep(double now) {
-        appender.update();
-        reoptimize(now);
-    }
+    // @Override
+    // public void onNextTimestep(double now) {
+    // }
 
     static public class Factory implements AVDispatcherFactory {
         @Inject

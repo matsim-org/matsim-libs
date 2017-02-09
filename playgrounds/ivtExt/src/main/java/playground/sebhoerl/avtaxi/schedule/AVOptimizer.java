@@ -4,9 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.inject.name.Named;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
