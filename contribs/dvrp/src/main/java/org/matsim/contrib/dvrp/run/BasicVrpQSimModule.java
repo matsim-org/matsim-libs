@@ -30,11 +30,7 @@ import org.matsim.contrib.dynagent.run.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.*;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
-import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
+import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 
 import com.google.inject.*;
 
@@ -73,18 +69,7 @@ public class BasicVrpQSimModule
     @Provides
     private Collection<AbstractQSimPlugin> provideQSimPlugins(Config config)
     {
-        final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-        plugins.add(new MessageQueuePlugin(config));
-        plugins.add(new DynActivityEnginePlugin(config));
-        plugins.add(new QNetsimEnginePlugin(config));
-        if (config.network().isTimeVariantNetwork()) {
-            plugins.add(new NetworkChangeEventsPlugin(config));
-        }
-        if (config.transit().isUseTransit()) {
-            plugins.add(new TransitEnginePlugin(config));
-        }
-        plugins.add(new TeleportationPlugin(config));
-        plugins.add(new PopulationPlugin(config));
+        final Collection<AbstractQSimPlugin> plugins = DynQSimModule.createQSimPlugins(config);
         plugins.add(new PassengerEnginePlugin(config, mode));
         plugins.add(new VrpAgentSourcePlugin(config));
         plugins.add(new VrpOptimizerPlugin(config));
