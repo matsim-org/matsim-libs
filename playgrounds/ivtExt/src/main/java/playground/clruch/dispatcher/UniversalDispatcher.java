@@ -16,7 +16,9 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 public abstract class UniversalDispatcher extends AbstractDispatcher {
 
     public final List<AVVehicle> vehicles = new ArrayList<>();
+    @Deprecated
     public Queue<AVVehicle> availableVehicles = new LinkedList<>(); // TODO remove
+    @Deprecated
     final private Queue<AVRequest> pendingRequests = new LinkedList<>(); // TODO remove
 
     // ---

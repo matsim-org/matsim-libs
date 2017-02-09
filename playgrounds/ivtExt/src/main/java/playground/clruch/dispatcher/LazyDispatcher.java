@@ -42,9 +42,10 @@ public class LazyDispatcher extends UniversalDispatcher {
         this.destLinks = sendAVtoLink;
     }
 
+    @Deprecated
     @Override
     public void onNextTaskStarted(AVTask task) {
-//        System.out.println("The task type is " + task.getAVTaskType().toString());
+        // System.out.println("The task type is " + task.getAVTaskType().toString());
         if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
             // FIXME! maybe add too many!
             availableVehicles.add((AVVehicle) task.getSchedule().getVehicle());
@@ -224,9 +225,8 @@ public class LazyDispatcher extends UniversalDispatcher {
             Id<Link> l2 = Id.createLinkId("236193238_1_r");
             Id<Link> l3 = Id.createLinkId("9904005_1_rL2");
             Link sendAVtoLink1 = network.getLinks().get(l1);
-            // TODO use network
-            Link sendAVtoLink2 = playground.clruch.RunAVScenario.NETWORKINSTANCE.getLinks().get(l2);
-            Link sendAVtoLink3 = playground.clruch.RunAVScenario.NETWORKINSTANCE.getLinks().get(l3);
+            Link sendAVtoLink2 = network.getLinks().get(l2);
+            Link sendAVtoLink3 = network.getLinks().get(l3);
             Link[] sendAVtoLinks = new Link[] { sendAVtoLink1, sendAVtoLink2, sendAVtoLink3 };
             // put the link into the lazy dispatcher
             return new LazyDispatcher(eventsManager, new SingleRideAppender(config, router, travelTime), sendAVtoLinks);
