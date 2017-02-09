@@ -1,31 +1,18 @@
 package playground.clruch.dispatcher;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import playground.clruch.router.SimpleBlockingRouter;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
-import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LazyDispatcher extends UniversalDispatcher {
@@ -38,27 +25,10 @@ public class LazyDispatcher extends UniversalDispatcher {
         this.destLinks = sendAVtoLink;
     }
 
-    @Deprecated
-    @Override
-    public void onNextTaskStarted(AVTask task) {
-        // System.out.println("The task type is " + task.getAVTaskType().toString());
-        if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
-            // FIXME! maybe add too many!
-//            availableVehicles.add((AVVehicle) task.getSchedule().getVehicle());
-        }
-    }
-
     @Override
     public void reoptimize(double now) {
-        // System.out.println("lazy dispatcher is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + " availableVehicles.size()" +
-        // availableVehicles.size());
-        // Iterator<AVRequest> requestIterator = pendingRequests.iterator();
-        // iterate over all pending requests and all available vehicles and assign a vehicle if it is on the same
-        // link as the pending request
-
         /*
          * while (requestIterator.hasNext()) {
-         * 
          * AVRequest request = requestIterator.next();
          * Link custLocation = request.getFromLink();
          * Iterator<AVVehicle> vehicleIterator = availableVehicles.iterator();
@@ -75,79 +45,36 @@ public class LazyDispatcher extends UniversalDispatcher {
          * break;
          * }
          * }
-         * 
          * }
          */
 
-        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-            Link dest = vehicleLinkPair.getDestination();
-            if (dest != null && !dest.equals(destLinks[2])) {
-//                divertVehicle(vehicleLinkPair, destLinks[2]); // TODO
+        if (2 * 60 < now) {
+            if (now < 5 * 60) {
+                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                    setVehicleDiversion(vehicleLinkPair, destLinks[0]);
+                }
+            } else //
+            if (now < 10 * 60) {
+                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                    setVehicleDiversion(vehicleLinkPair, destLinks[3]);
+                }
+            } else //
+            if (now < 45 * 60) {
+                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                    setVehicleDiversion(vehicleLinkPair, destLinks[1]);
+                }
+            } else //
+//            if (now < 25 * 60) {
+//                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+//                    setVehicleDiversion(vehicleLinkPair, destLinks[2]);
+//                }
+//            } else //
+            if (now < 3100) {
+                // for (VehicleLinkPair vehicleLinkPair : getStayableVehicles()) {
+                // setVehicleStay(vehicleLinkPair);
+                // }
             }
-        }
 
-        // send all available vehicles which are in a stay task towards a certain link
-//        Iterator<AVVehicle> vehicleIterator = availableVehicles.iterator();
-        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-            Link dest = vehicleLinkPair.getDestination();
-            if (dest == null) {
-                divertVehicle(vehicleLinkPair, destLinks[1]);
-            }
-//            AVVehicle vehicle = vehicleIterator.next();
-//            Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
-//            List<AbstractTask> tasks = schedule.getTasks();
-//            if (!tasks.isEmpty()) {
-//
-//                AVTask lastTask = (AVTask) Schedules.getLastTask(schedule);
-//
-//                {
-//                    // System.out.println("Task from time " + lastTask.getBeginTime() + " to " + lastTask.getEndTime());
-//                    // System.out.println("Number of tasks: " + schedule.getTasks().size());
-//                }
-//
-//                // if so, change end to +1 seconds, append ride to link and stay to simEndTime
-//                // TODO: change end time from hard-coded 108000 to appropriate value
-//                if (lastTask.getAVTaskType().equals(AVTask.AVTaskType.STAY)) {
-//                    double scheduleEndTime = schedule.getEndTime();
-//                    AVStayTask stayTask = (AVStayTask) lastTask;
-//                    if (!stayTask.getLink().equals(destLinks[1])) {
-//
-//                        {
-//                            System.out.println("schedule for vehicle id " + vehicle.getId() + " time now = " + now); // TODO
-//                            for (AbstractTask task : tasks)
-//                                System.out.println(" " + task);
-//                        }
-//                        // finish or remove the last stay task
-//
-//                        if (stayTask.getStatus() == Task.TaskStatus.STARTED) {
-//                            stayTask.setEndTime(now);
-//                        } else {
-//                            schedule.removeLastTask();
-//                            System.out.println("The last task was removed for " + vehicle.getId());
-//                        }
-//
-//                        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
-//                        VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute(stayTask.getLink(), destLinks[1], now);
-//
-//                        // AVDriveTask rebalanceTask = new AVDriveTask(new VrpPathWithTravelDataImpl(now, 15.0, routePoints, linkTTs));
-//                        AVDriveTask rebalanceTask = new AVDriveTask(routePoints);
-//                        schedule.addTask(rebalanceTask);
-//                        System.out.println("sending AV " + vehicle.getId() + " to " + destLinks[1].getId());
-//
-//                        // add additional stay task
-//                        // TODO what happens if scheduleEndTime is smaller than the end time of the previously added AV drive task
-//                        schedule.addTask(new AVStayTask(rebalanceTask.getEndTime(), scheduleEndTime, destLinks[1]));
-//                        // remove from available vehicles
-//                        vehicleIterator.remove();
-//                        {
-//                            System.out.println("schedule for vehicle id " + vehicle.getId() + " MODIFIED");
-//                            for (AbstractTask task : schedule.getTasks())
-//                                System.out.println(" " + task);
-//                        }
-//                    }
-//
-//                }
-//            }
         }
     }
 
@@ -169,13 +96,15 @@ public class LazyDispatcher extends UniversalDispatcher {
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config) {
             // load some random link from the network
-            Id<Link> l1 = Id.createLinkId("9904005_1_rL2");
+            Id<Link> l1 = Id.createLinkId("238277009_1_r");
             Id<Link> l2 = Id.createLinkId("236193238_1_r");
             Id<Link> l3 = Id.createLinkId("9904005_1_rL2");
+            Id<Link> l4 = Id.createLinkId("237049585_0L3");
             Link sendAVtoLink1 = network.getLinks().get(l1);
             Link sendAVtoLink2 = network.getLinks().get(l2);
             Link sendAVtoLink3 = network.getLinks().get(l3);
-            Link[] sendAVtoLinks = new Link[] { sendAVtoLink1, sendAVtoLink2, sendAVtoLink3 };
+            Link sendAVtoLink4 = network.getLinks().get(l4);
+            Link[] sendAVtoLinks = new Link[] { sendAVtoLink1, sendAVtoLink2, sendAVtoLink3 , sendAVtoLink4 };
             // put the link into the lazy dispatcher
             return new LazyDispatcher(eventsManager, new SingleRideAppender(config, router, travelTime), sendAVtoLinks);
         }

@@ -29,118 +29,109 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 public abstract class UniversalDispatcher extends AbstractDispatcher {
 
     public final List<AVVehicle> vehicles = new ArrayList<>();
-    // @Deprecated
-    // public Queue<AVVehicle> availableVehicles = new LinkedList<>(); // TODO remove
     @Deprecated
-    final private Queue<AVRequest> pendingRequests = new LinkedList<>(); // TODO remove
+    final private Queue<AVRequest> pendingRequests = new LinkedList<>(); // TODO replace with something better!
 
     // ---
     public UniversalDispatcher(EventsManager eventsManager, SingleRideAppender appender) {
         super(eventsManager, appender);
     }
 
-    private double private_now_time = -1; // TODO not good design
+    private double private_now = -1; // TODO not good design
 
-    protected Collection<VehicleLinkPair> getDivertableVehicles() {
-        Collection<VehicleLinkPair> collection = new LinkedList<>();
+    private Collection<AVVehicle> getFunctioningVehicles() {
+        Collection<AVVehicle> collection = new LinkedList<>();
         for (AVVehicle avVehicle : vehicles) {
             Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-            List<AbstractTask> tasks = schedule.getTasks();
-            if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED)) {
-                AbstractTask abstractTask = schedule.getCurrentTask();
-                AVTask avTask = (AVTask) abstractTask;
-                switch (avTask.getAVTaskType()) {
-                case DRIVE: {
-                    AVDriveTask avDriveTask = (AVDriveTask) avTask;
-                    TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                    OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                    collection.add(new VehicleLinkPair(avVehicle, onlineDriveTaskTracker.getDiversionPoint()));
-                    break;
-                }
-                case STAY: {
-                    AVStayTask avStayTask = (AVStayTask) avTask;
-                    LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), private_now_time);
-                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
-                    break;
-                }
-                default:
-                    break;
-                }
-            }
+            // List<AbstractTask> tasks = schedule.getTasks();
+            // if (schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED) && tasks.isEmpty())
+            // throw new RuntimeException("nonono");
+            if (schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED))
+                collection.add(avVehicle);
         }
         return collection;
     }
 
-    protected void divertVehicle(VehicleLinkPair vehicleLinkPair, Link dest) {
-        Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
-        List<AbstractTask> tasks = schedule.getTasks();
-        // TODO this check is obsolete!
-        if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED)) {
+    protected Collection<VehicleLinkPair> getDivertableVehicles() {
+        Collection<VehicleLinkPair> collection = new LinkedList<>();
+        for (AVVehicle avVehicle : getFunctioningVehicles()) {
+            Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
             AbstractTask abstractTask = schedule.getCurrentTask();
-            AVTask avTask = (AVTask) abstractTask;
-            switch (avTask.getAVTaskType()) {
-            // TODO STAY task
-            case DRIVE: {
-                AVDriveTask avDriveTask = (AVDriveTask) avTask;
-                System.out.println("REROUTING " + vehicleLinkPair.avVehicle.getId());
-                TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-
-                SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
-                VrpPathWithTravelData newSubPath = simpleBlockingRouter.getRoute( //
-                        vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
-                System.out.println(newSubPath.getFromLink().getId() + " =? " + vehicleLinkPair.linkTimePair.link.getId());
-                System.out.println(newSubPath.getDepartureTime() + " =? " + vehicleLinkPair.linkTimePair.time);
-
-                if (newSubPath.getFromLink().getId() == vehicleLinkPair.linkTimePair.link.getId())
-                    onlineDriveTaskTracker.divertPath(newSubPath);
-                else {
-                    new RuntimeException("links no good").printStackTrace();
-                    System.out.println("SKIPPED BECAUSE OF MISMATCH!");
+            new AVTaskAdapter(abstractTask) {
+                @Override
+                public void handle(AVDriveTask avDriveTask) {
+                    TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                    OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                    collection.add(new VehicleLinkPair(avVehicle, onlineDriveTaskTracker.getDiversionPoint()));
                 }
-                break;
-            }
-            case STAY: {
-                final double scheduleEndTime = schedule.getEndTime(); // typically 108000.0
 
-                AVStayTask stayTask = (AVStayTask) avTask; // TODO rename
-
-                if (!stayTask.getLink().equals(dest)) {
-                    if (stayTask.getStatus() == Task.TaskStatus.STARTED) {
-                        stayTask.setEndTime(vehicleLinkPair.linkTimePair.time);
-                    } else {
-                        schedule.removeLastTask();
-                        System.out.println("The last task was removed for " + vehicleLinkPair.avVehicle.getId());
-                    }
-                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
-                    VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute( //
-                            vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
-
-                    // AVDriveTask rebalanceTask = new AVDriveTask(new VrpPathWithTravelDataImpl(now, 15.0, routePoints, linkTTs));
-                    AVDriveTask rebalanceTask = new AVDriveTask(routePoints);
-                    schedule.addTask(rebalanceTask);
-                    // System.out.println("sending AV " + vehicle.getId() + " to " + destLinks[1].getId());
-
-                    // add additional stay task
-                    // TODO what happens if scheduleEndTime is smaller than the end time of the previously added AV drive task
-                    schedule.addTask(new AVStayTask(rebalanceTask.getEndTime(), scheduleEndTime, dest));
-                    // remove from available vehicles
-                    // vehicleIterator.remove();
-                    {
-                        System.out.println("schedule for vehicle id " + vehicleLinkPair.avVehicle.getId() + " MODIFIED");
-                        for (AbstractTask task : schedule.getTasks())
-                            System.out.println(" " + task);
-                    }
+                @Override
+                public void handle(AVStayTask avStayTask) {
+                    LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), private_now);
+                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
                 }
-                // else
-                // System.out.println("vehicle already there! " + dest.getId());
-                break;
-            }
-            default:
-                break;
-            }
+            };
         }
+        return collection;
+    }
 
+    protected void setVehicleDiversion(VehicleLinkPair vehicleLinkPair, Link dest) {
+        Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
+        // List<AbstractTask> tasks = schedule.getTasks();
+        // TODO this check is obsolete!
+        if (!schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED))
+            throw new RuntimeException("abuse of API");
+        
+            AbstractTask abstractTask = schedule.getCurrentTask();
+
+            new AVTaskAdapter(abstractTask) {
+                @Override
+                public void handle(AVDriveTask avDriveTask) {
+                    if (!avDriveTask.getPath().getToLink().equals(dest)) {
+                        System.out.println("REROUTING " + vehicleLinkPair.avVehicle.getId());
+                        TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                        OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+
+                        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+                        VrpPathWithTravelData newSubPath = simpleBlockingRouter.getRoute( //
+                                vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
+                        System.out.println(newSubPath.getFromLink().getId() + " =? " + vehicleLinkPair.linkTimePair.link.getId());
+                        System.out.println(newSubPath.getDepartureTime() + " =? " + vehicleLinkPair.linkTimePair.time);
+
+                        if (newSubPath.getFromLink().getId() == vehicleLinkPair.linkTimePair.link.getId())
+                            onlineDriveTaskTracker.divertPath(newSubPath);
+                        else {
+                            new RuntimeException("links no good").printStackTrace();
+                            System.out.println("SKIPPED BECAUSE OF MISMATCH!");
+                        }
+                    }
+                }
+
+                @Override
+                public void handle(AVStayTask avStayTask) {
+                    if (!avStayTask.getLink().equals(dest)) { // ignore request where location == target
+                        final double scheduleEndTime = schedule.getEndTime(); // typically 108000.0
+                        if (avStayTask.getStatus() == Task.TaskStatus.STARTED) {
+                            avStayTask.setEndTime(vehicleLinkPair.linkTimePair.time);
+                        } else {
+                            schedule.removeLastTask();
+                            System.out.println("The last task was removed for " + vehicleLinkPair.avVehicle.getId());
+                        }
+                        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+                        VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute( //
+                                vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
+                        final AVDriveTask avDriveTask = new AVDriveTask(routePoints);
+                        schedule.addTask(avDriveTask);
+                        schedule.addTask(new AVStayTask(avDriveTask.getEndTime(), scheduleEndTime, dest));
+                        {
+                            System.out.println("schedule for vehicle id " + vehicleLinkPair.avVehicle.getId() + " MODIFIED");
+                            for (AbstractTask task : schedule.getTasks())
+                                System.out.println(" " + task);
+                        }
+                    }
+
+                }
+            };
     }
 
     public final void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
@@ -153,13 +144,14 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
     }
 
     // TODO this will not be necessary!!!
-    // @Override
-    // public void onNextTaskStarted(AVTask task) {
-    // }
+    @Override
+    public final void onNextTaskStarted(AVTask task) {
+        // intentionally empty
+    }
 
     @Override
     public final void onNextTimestep(double now) {
-        private_now_time = now;
+        private_now = now;
         appender.update();
         reoptimize(now);
 
@@ -170,8 +162,6 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
     @Override
     protected final void protected_registerVehicle(AVVehicle vehicle) {
         vehicles.add(vehicle);
-        // availableVehicles.add(vehicle);
-
     }
 
 }
