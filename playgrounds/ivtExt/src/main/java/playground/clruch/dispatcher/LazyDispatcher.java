@@ -8,13 +8,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.AbstractTask;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.tracker.TaskTracker;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -52,18 +48,6 @@ public class LazyDispatcher extends UniversalDispatcher {
         }
     }
 
-    // @Deprecated
-    // Map<AVVehicle, LinkTimePair> diversionPoints = new ConcurrentHashMap<>();
-
-    @Deprecated
-    @Override
-    public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
-        // System.out.println("nextLinkEntered: " + avVehicle.getId() + " " + driveTask.toString() + " next diversion at:" + linkTimePair.link.getId() + " time
-        // " + linkTimePair.time);
-        // diversionPoints.put(avVehicle, linkTimePair);
-
-    }
-
     @Override
     public void reoptimize(double now) {
         // System.out.println("lazy dispatcher is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + " availableVehicles.size()" +
@@ -95,49 +79,13 @@ public class LazyDispatcher extends UniversalDispatcher {
          * }
          */
 
-        for (AVVehicle vehicle : vehicles) {
-            // if task 00 drivetask
-            // if current index == 3
-            // ersety path mit neuem dest
-
-            Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
-            List<AbstractTask> tasks = schedule.getTasks();
-            if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED)) {
-
-                AbstractTask abstractTask = schedule.getCurrentTask();
-                AVTask avTask = (AVTask) abstractTask;
-                if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {
-                    // if (diversionPoints.containsKey(vehicle))
-                    {
-                        AVDriveTask avDriveTask = (AVDriveTask) avTask;
-                        if (!avDriveTask.getPath().getToLink().equals(destLinks[2])) {
-                            System.out.println("REROUTING " + vehicle.getId());
-                            // avDriveTask.getPath()
-                            TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                            OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                            final LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
-                            // diversionPoints.get(vehicle);
-
-                            final LinkTimePair diversionPoint = linkTimePair;
-                            // linkTimePair.link
-                            // VrpPathWithTravelData newSubPath = null;
-                            Link divLink = linkTimePair.link;
-                            double startTime = linkTimePair.time;
-
-                            SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
-                            VrpPathWithTravelData newSubPath = simpleBlockingRouter.getRoute(divLink, destLinks[2], startTime);
-                            System.out.println(newSubPath.getFromLink().getId() + " =? " + diversionPoint.link.getId());
-                            System.out.println(newSubPath.getDepartureTime() + " =? " + diversionPoint.time);
-
-                            if (newSubPath.getFromLink().getId() == diversionPoint.link.getId())
-                                onlineDriveTaskTracker.divertPath(newSubPath);
-                            else
-                                System.out.println("SKIPPED BECAUSE OF MISMATCH!");
-                        }
-                    }
-                }
+        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+            Link dest = vehicleLinkPair.getDestination();
+            if (dest != null && !dest.equals(destLinks[2])) {
+                divertVehicle(vehicleLinkPair, destLinks[2]);
             }
         }
+
         // send all available vehicles which are in a stay task towards a certain link
         Iterator<AVVehicle> vehicleIterator = availableVehicles.iterator();
         while (vehicleIterator.hasNext()) {
@@ -198,10 +146,6 @@ public class LazyDispatcher extends UniversalDispatcher {
             }
         }
     }
-
-    // @Override
-    // public void onNextTimestep(double now) {
-    // }
 
     static public class Factory implements AVDispatcherFactory {
         @Inject
