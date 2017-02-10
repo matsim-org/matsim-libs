@@ -149,7 +149,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 			DecimalFormat df = new DecimalFormat( "####0.00" );
 			try {
 				bw.write("Zone;");
-				for (int i = 0; i<24; i++){
+				for (int i = 3; i<24; i++){
 				bw.write(i+" trips;"+i+" avWt;");	
 				}
 				bw.write("total;averageWait");
@@ -161,7 +161,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 					bw.write(e.getKey()+";");
 					double allTrips = 0.;
 					double allWait = 0.;
-					for (int i = 0; i<24; i++){
+					for (int i = 3; i<24; i++){
 						double waitTime = waitTimes[i];
 						int trips = e.getValue()[i];
 						double averageWaitTime = waitTime/trips;
@@ -169,8 +169,8 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 						bw.write(trips+";"+df.format(averageWaitTime)+";");
 						allTrips+=trips;
 						allWait+=waitTime;
-						totalWait[i]+=allWait;
-						totalTrips[i]+=allTrips;
+						totalWait[i]+=waitTime;
+						totalTrips[i]+=trips;
 						
 					} 
 					
@@ -181,7 +181,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 					
 				}
 				bw.write("allZones;");
-				for (int i = 0; i<24; i++){
+				for (int i = 3; i<24; i++){
 					double waitTime = totalWait[i];
 					int trips = totalTrips[i];
 					double averageWaitTime = waitTime/trips;
@@ -192,7 +192,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 				bw.close();
 				BufferedWriter csvt = IOUtils.getBufferedWriter(filename+"t");
 				csvt.write("\"String\"");
-				for (int i = 0; i<50;i++) csvt.write(",\"Real\"");
+				for (int i = 0; i<21;i++) csvt.write(",\"Real\"");
 				csvt.flush();
 				csvt.close();
 				

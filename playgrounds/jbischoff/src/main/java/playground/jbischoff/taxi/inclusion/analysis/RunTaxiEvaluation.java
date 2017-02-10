@@ -64,7 +64,7 @@ public class RunTaxiEvaluation {
 		// List<String> list =
 		// Collections.singletonList("00.0k_AV1.0_flowCap100");
 
-		for (int i = 50; i <= 1000; i = i + 50) {
+		for (int i = 500; i <= 1000; i = i + 50) {
 			String runId = "taxis_" + i;
 			String dir = "D:/runs-svn/barrierFreeTaxi/1500_run_" + i + "/";
 			System.out.println("run " + runId);
