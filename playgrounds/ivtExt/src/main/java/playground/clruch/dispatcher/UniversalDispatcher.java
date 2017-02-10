@@ -45,25 +45,24 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * alternative to {@link AbstractDispatcher}
  */
 public abstract class UniversalDispatcher implements AVDispatcher {
-    protected final AVDispatcherConfig config;
+    protected final AVDispatcherConfig avDispatcherConfig;
     protected final TravelTime travelTime;
-    protected final ParallelLeastCostPathCalculator router;
+    protected final ParallelLeastCostPathCalculator parallelLeastCostPathCalculator;
     protected final EventsManager eventsManager;
 
-    private final List<AVVehicle> vehicles = new ArrayList<>();
-    private final Set<AVRequest> pendingRequests = new HashSet<>();
+    private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
+    private final Set<AVRequest> pendingRequests = new HashSet<>(); // access via getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>();
 
-    // ---
     public UniversalDispatcher( //
-            AVDispatcherConfig config, //
+            AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
-            ParallelLeastCostPathCalculator router, //
+            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager //
     ) {
-        this.config = config;
+        this.avDispatcherConfig = avDispatcherConfig;
         this.travelTime = travelTime;
-        this.router = router;
+        this.parallelLeastCostPathCalculator = parallelLeastCostPathCalculator;
         this.eventsManager = eventsManager;
     }
 
@@ -91,26 +90,22 @@ public abstract class UniversalDispatcher implements AVDispatcher {
      * function call leaves the state of the {@link UniversalDispatcher} unchanged.
      * successive calls to the function return the identical collection.
      * 
-     * @return collection of all vehicles that currently are in the
+     * @return collection of all vehicles that currently are in the last task, which is of type STAY
      */
     protected final Map<Link, Queue<AVVehicle>> getStayVehicles() {
         Map<Link, Queue<AVVehicle>> map = new HashMap<>();
         for (AVVehicle avVehicle : getFunctioningVehicles()) {
             Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-            AbstractTask abstractTask = Schedules.getLastTask(schedule);
-            if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) {
-                AVTask avTask = (AVTask) abstractTask;
-                if (avTask.getAVTaskType().equals(AVTask.AVTaskType.STAY)) {
-                    new AVTaskAdapter(abstractTask) {
-                        public void handle(AVStayTask avStayTask) {
-                            Link link = avStayTask.getLink();
-                            if (!map.containsKey(link))
-                                map.put(link, new LinkedList<>());
-                            map.get(link).add(avVehicle);
-                        }
-                    };
-                }
-            }
+            AbstractTask abstractTask = Schedules.getLastTask(schedule); // <- last task
+            if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
+                new AVTaskAdapter(abstractTask) {
+                    public void handle(AVStayTask avStayTask) { // <- type of task is STAY
+                        final Link link = avStayTask.getLink();
+                        if (!map.containsKey(link))
+                            map.put(link, new LinkedList<>());
+                        map.get(link).add(avVehicle); // <- append vehicle to list of vehicles at link
+                    }
+                };
         }
         return Collections.unmodifiableMap(map);
     }
@@ -127,7 +122,7 @@ public abstract class UniversalDispatcher implements AVDispatcher {
         matchedRequests.add(avRequest);
 
         // System.out.println(private_now + " @ " + avVehicle.getId() + " picksup " + avRequest.getPassenger().getId());
-        AVTimingParameters timing = config.getParent().getTimingParameters();
+        AVTimingParameters timing = avDispatcherConfig.getParent().getTimingParameters();
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
 
         AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
@@ -137,7 +132,7 @@ public abstract class UniversalDispatcher implements AVDispatcher {
         AVPickupTask pickupTask = new AVPickupTask(private_now, private_now + timing.getPickupDurationPerStop(), avRequest.getFromLink(), Arrays.asList(avRequest));
         schedule.addTask(pickupTask);
 
-        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(router, travelTime);
+        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(parallelLeastCostPathCalculator, travelTime);
         VrpPathWithTravelData dropoffPath = simpleBlockingRouter.getRoute(avRequest.getFromLink(), avRequest.getToLink(), pickupTask.getEndTime());
         AVDriveTask dropoffDriveTask = new AVDriveTask(dropoffPath, Arrays.asList(avRequest));
         schedule.addTask(dropoffDriveTask);
@@ -195,7 +190,7 @@ public abstract class UniversalDispatcher implements AVDispatcher {
                     TaskTracker taskTracker = avDriveTask.getTaskTracker();
                     OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
 
-                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(router, travelTime);
+                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(parallelLeastCostPathCalculator, travelTime);
                     VrpPathWithTravelData newSubPath = simpleBlockingRouter.getRoute( //
                             vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
                     System.out.println(newSubPath.getFromLink().getId() + " =? " + vehicleLinkPair.linkTimePair.link.getId());
@@ -220,7 +215,7 @@ public abstract class UniversalDispatcher implements AVDispatcher {
                         schedule.removeLastTask();
                         System.out.println("The last task was removed for " + vehicleLinkPair.avVehicle.getId());
                     }
-                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(router, travelTime);
+                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(parallelLeastCostPathCalculator, travelTime);
                     VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute( //
                             vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
                     final AVDriveTask avDriveTask = new AVDriveTask(routePoints);
