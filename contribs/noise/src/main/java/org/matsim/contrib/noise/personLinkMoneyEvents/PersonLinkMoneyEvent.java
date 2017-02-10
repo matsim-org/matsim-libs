@@ -23,12 +23,19 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 
 /**
-* @author ikaddoura
+ * The idea is to have a standard events format to be used by various external cost pricing approaches.
+ * 
+ * The normal {@link PersonMoneyEvent} is not sufficient since we need refer the toll to a specific link
+ * and the link information may not be available when the money event is thrown. Also, the routing relevant time
+ * may be different than the time when the event itself is thrown.
+ * 
+ * @author ikaddoura
 */
 
 public class PersonLinkMoneyEvent extends Event implements HasPersonId{
