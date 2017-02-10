@@ -27,8 +27,7 @@ public class RunVirtualNetworkTest {
 
         if (virtualnetworkXML.isFile()) {
             System.out.println("now creating VirtualNetwork based on XML file.");
-            VirtualNetwork virtualNetwork = new VirtualNetwork();
-            virtualNetwork.loadFromXML(network, virtualnetworkXML);
+            VirtualNetwork virtualNetwork = VirtualNetwork.loadFromXML(network, virtualnetworkXML);
         } else {
             System.out.println("no virutalNetwork.xml file");
         }
