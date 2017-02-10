@@ -45,8 +45,8 @@ public class RunTaxibusExample {
 
 		
 		//Select either of the following config files
-//		Config config = ConfigUtils.loadConfig("./src/main/resources/taxibus_example/configClustered.xml", new TaxibusConfigGroup());
-		Config config = ConfigUtils.loadConfig("./src/main/resources/taxibus_example/configJsprit.xml", new TaxibusConfigGroup());
+//		Config config = ConfigUtils.loadConfig("taxibus_example/configClustered.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig("taxibus_example/configJsprit.xml", new TaxibusConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);

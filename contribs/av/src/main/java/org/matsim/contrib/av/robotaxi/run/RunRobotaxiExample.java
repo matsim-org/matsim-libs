@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 public class RunRobotaxiExample {
 
 	public static void main(String[] args) {
-		String configFile = "./src/main/resources/cottbus_robotaxi/config.xml";
+		String configFile = "cottbus_robotaxi/config.xml";
 		RunRobotaxiExample.run(configFile, false);
 	}
 

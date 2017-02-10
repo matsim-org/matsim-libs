@@ -42,7 +42,7 @@ public class RunSharedTaxiExample {
 
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig("./src/main/resources/taxibus_example/configShared.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig("taxibus_example/configShared.xml", new TaxibusConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);

@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunParkingSearchExample {
 
 	public static void main(String[] args) {
-		// set to false, if you don't require visualisation, the the example will run for 10 iterations
+		// set to false, if you don't require visualisation, then the example will run for 10 iterations
 		new RunParkingSearchExample().run(false);
 
 	}
@@ -54,7 +54,7 @@ public class RunParkingSearchExample {
 	 *            turns otfvis visualisation on or off
 	 */
 	public void run(boolean otfvis) {
-		Config config = ConfigUtils.loadConfig("src/main/resources/parkingsearch/config.xml");
+		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml");
 		config.plans().setInputFile("population100.xml");
 		config.facilities().setInputFile("parkingFacilities.xml");
 		config.controler().setOutputDirectory("output");

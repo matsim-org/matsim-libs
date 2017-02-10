@@ -49,7 +49,7 @@ public class RunTaxiScenario
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         FleetImpl fleet = new FleetImpl();
-        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
         return createControler(scenario, fleet, otfvis);
     }
 
@@ -73,8 +73,9 @@ public class RunTaxiScenario
 
     public static void main(String[] args)
     {
-        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
-        //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
+        String configFile = "one_taxi/one_taxi_config.xml";
+        //for a different scenario:
+        //String configFile = "mielec_2014_02/config.xml";
         RunTaxiScenario.run(configFile, true);
     }
 }
