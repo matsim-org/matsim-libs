@@ -46,9 +46,15 @@ extends Identifiable<Vehicle>
 
 
 	// vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
+	/**
+	 * earliest time when vehicle is available (inclusive)
+	 */
 	double getT0();
 
 
+	/**
+	 * earliest time when vehicle is <i>no longer</i> available
+	 */
 	double getT1();
 
 
