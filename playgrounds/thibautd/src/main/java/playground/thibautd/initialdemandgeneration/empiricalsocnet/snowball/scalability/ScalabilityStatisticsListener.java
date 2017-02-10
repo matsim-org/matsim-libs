@@ -24,6 +24,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -149,7 +150,7 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 					(Ego e) -> nCliqueTies.get( e ) / e.getAlters().size() );
 
 			log.info( "write connected components statistics..." );
-			final Collection<Set<Id>> components = SnaUtils.identifyConnectedComponents( sn );
+			final Collection<Set<Id<Person>>> components = SnaUtils.identifyConnectedComponents( sn );
 			writer.write( "\t"+components.size()+"\t" );
 			writeBoxPlot( components , Set::size );
 

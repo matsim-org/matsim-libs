@@ -22,6 +22,7 @@ package playground.thibautd.initialdemandgeneration.socnetgen.analysis;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 import org.matsim.core.config.ConfigUtils;
@@ -51,19 +52,19 @@ public class IdentifyAndWriteComponents {
 	
 		final SocialNetwork sn = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 
-		final Collection<Set<Id>> components = SnaUtils.identifyConnectedComponents( sn );
+		final Collection<Set<Id<Person>>> components = SnaUtils.identifyConnectedComponents( sn );
 
 		log.info( components.size()+" components" );
 
 		writeComponents( outputRawFile, components );
 	}
 
-	public static void writeComponents( final String outputRawFile , final Collection<Set<Id>> components ) {
+	public static void writeComponents( final String outputRawFile , final Collection<Set<Id<Person>>> components ) {
 		try (final BufferedWriter writer = IOUtils.getBufferedWriter( outputRawFile )) {
 			writer.write( "agentId\tcomponentId\tcomponentSize" );
 
 			int i = 0;
-			for ( Set<Id> component : components ) {
+			for ( Set<Id<Person>> component : components ) {
 				final int compNr = i++;
 
 				final int size = component.size();

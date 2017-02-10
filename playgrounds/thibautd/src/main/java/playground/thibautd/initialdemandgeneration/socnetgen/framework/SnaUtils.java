@@ -21,12 +21,25 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 import org.matsim.contrib.socnetsim.utils.CollectionUtils;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.Vehicle;
+import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
+import playground.thibautd.initialdemandgeneration.socnetgen.analysis.SocialNetworkAsMatsimNetworkUtils;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -204,20 +217,20 @@ public class SnaUtils {
 		return ((double) sum) / count;
 	}
 
-	public static Collection<Set<Id>> identifyConnectedComponents(
+	public static Collection<Set<Id<Person>>> identifyConnectedComponents(
 			final SocialNetwork sn) {
 		if ( !sn.isReflective() ) {
 			throw new IllegalArgumentException( "the algorithm is valid only with reflective networks" );
 		}
 		final Map<Id<Person>, Set<Id<Person>>> altersMap = new LinkedHashMap<>( sn.getMapRepresentation() );
-		final Collection< Set<Id> > components = new ArrayList< Set<Id> >();
+		final Collection< Set<Id<Person>> > components = new ArrayList<>();
 	
 		while ( !altersMap.isEmpty() ) {
 			// DFS implemented as a loop (recursion results in a stackoverflow on
 			// big networks)
 			final Id<Person> seed = CollectionUtils.getElement( 0 , altersMap.keySet() );
 	
-			final Set<Id> component = new HashSet<Id>();
+			final Set<Id<Person>> component = new HashSet<>();
 			components.add( component );
 			component.add( seed );
 	
@@ -225,7 +238,7 @@ public class SnaUtils {
 			stack.add( seed );
 	
 			while ( !stack.isEmpty() ) {
-				final Id current = stack.remove();
+				final Id<Person> current = stack.remove();
 				final Set<Id<Person>> alters = altersMap.remove( current );
 	
 				for ( Id<Person> alter : alters ) {
@@ -238,6 +251,70 @@ public class SnaUtils {
 		}
 	
 		return components;
+	}
+
+	public static void sampleSocialDistances(
+			final SocialNetwork socialNetwork,
+			final Random random,
+			final int nPairs,
+			final DistanceCallback callback  ) {
+		final Network matsimNetwork = SocialNetworkAsMatsimNetworkUtils.convertToNetwork( socialNetwork );
+
+		// Fast dijkstra is approx. twice as fast here.
+		final LeastCostPathCalculator dijkstra =
+			new FastDijkstraFactory().createPathCalculator(
+				matsimNetwork,
+				new TravelDisutility() {
+					@Override
+					public double getLinkTravelDisutility(Link link,
+							double time, Person person, Vehicle vehicle) {
+						return 1;
+					}
+
+					@Override
+					public double getLinkMinimumTravelDisutility(Link link) {
+						return 1;
+					}
+				},
+				( link, time, person, vehicle ) -> 1 );
+
+		log.info( "searching for the biggest connected component..." );
+		Set<Id<Person>> biggestComponent = null;
+		for ( Set<Id<Person>> component : SnaUtils.identifyConnectedComponents( socialNetwork ) ) {
+			if ( biggestComponent == null || biggestComponent.size() < component.size() ) {
+				biggestComponent = component;
+			}
+		}
+
+		log.info( "considering only biggest component with size "+ biggestComponent.size() );
+		log.info( "ignoring "+( socialNetwork.getEgos().size() - biggestComponent.size() )+" agents ("+
+				( ( socialNetwork.getEgos().size() - biggestComponent.size() ) * 100d / socialNetwork.getEgos().size() )+"%)" );
+
+		final List<Node> egos = new ArrayList<>( biggestComponent.size() );
+
+		for ( Id<Person> id : biggestComponent ) {
+			egos.add( matsimNetwork.getNodes().get( Id.create( id , Node.class ) ) );
+		}
+
+		final Counter counter = new Counter( "sampling pair # " );
+		for ( int i = 0; i < nPairs; i++ ) {
+			counter.incCounter();
+			final Node ego = egos.get( random.nextInt( egos.size() ) );
+			final Node alter = egos.get( random.nextInt( egos.size() ) );
+
+			final LeastCostPathCalculator.Path path = dijkstra.calcLeastCostPath( ego, alter, 0, null, null );
+
+			callback.notifyDistance(
+					Id.create( ego.getId() , Person.class ) ,
+					Id.create( alter.getId() , Person.class ) ,
+					path.travelCost );
+		}
+		counter.printCounter();
+	}
+
+	@FunctionalInterface
+	public interface DistanceCallback {
+		void notifyDistance( final Id<Person> ego , final Id<Person> alter , final double distance );
 	}
 }
 
