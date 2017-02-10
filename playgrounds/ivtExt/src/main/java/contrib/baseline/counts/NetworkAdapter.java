@@ -29,100 +29,65 @@ import org.matsim.core.network.NetworkChangeEvent;
 import java.util.*;
 
 /**
- * Compares expected and observed counts and changes the network outgoing of the count station link.
+ * Compares expected and observed counts and changes the network outgoing with the flow spider of the count station link.
  * The changes are returned as network change events with a net change factor for each link (if the
  * net change factor is larger than the minimalChangeThreshold).
- *
- * Example:
- *  - Network: link_1 -> link_with_count_station -> link_2
- *  - Expected count: 10, observed count: 8, correctionFactor: 10/8 = 1.25
- *  - changeFactorPerLevel = 0.9, minimalChangeThreshold = 0.1
- *  => flow-capacity of link_with_count_station is multiplied with 1.25
- *  => because the change difference (1.25 - 1 = 0.25) is > threshold (0.1) the next network level is change too
- *  => flow-capacity of link_1 and link_2 are multiplied with (1 + (0.9 * 0.25) =) 1.225
- *  => because the change difference (1.225 - 1 = 0.225) is still > threshold (0.1),
- *     the next level would be changed too, and so on...
  *
  * @author boescpa
  */
 public class NetworkAdapter {
 
 	private final Network network;
-	private final double changeFactorPerLevel;
 	private final double minimalChangeThreshold;
 
 	public NetworkAdapter(Network network) {
-		this(network, 0.9, 0.01);
-
+		this(network, 0.005);
 	}
 
-	public NetworkAdapter(Network network, double changeFactorPerLevel, double minimalChangeThreshold) {
+	public NetworkAdapter(Network network, double minimalChangeThreshold) {
 		this.network = network;
-		this.changeFactorPerLevel = changeFactorPerLevel;
 		this.minimalChangeThreshold = minimalChangeThreshold;
 	}
 
 	public List<NetworkChangeEvent> identifyNetworkChanges (
-			Map<String, Integer> expectedCounts, Map<String, Integer> observedCounts) {
+			Map<String, Integer> expectedCounts,
+			Map<String, Integer> observedCounts,
+			Map<String, Map<String, Double>> changeSpiders) {
 
-		List<NetworkChangeEvent>  networkChanges = new LinkedList<>();
+		// todo-boescpa: Gewichtung mit absolutExpectedMenge
+		// idee: weiteren faktor für berechnung link correction der besteht aus:
+		// 			expectedCounts(thisStation) / max(expectedCounts)
 
+		// calculate net effect of count corrections for each affected link
+		Map<String, Double> netEffects = new HashMap<>();
 		for (String countLinkId : expectedCounts.keySet()) {
-			Link countLink = network.getLinks().get(Id.create(countLinkId, Link.class));
 			double expectedCount = expectedCounts.get(countLinkId);
 			double observedCount = observedCounts.get(countLinkId);
-			double correctionFactor = expectedCount / observedCount;
-			double absCorrection = 1 - correctionFactor;
-
-			Set<Link> currentFront = new HashSet<>();
-			// the origin link:
-			currentFront.add(countLink);
-			networkChanges.add(getNetworkChangeEvents(currentFront, correctionFactor));
-			// the remaining links:
-			while (Math.abs(absCorrection) > minimalChangeThreshold) {
-				Set<Link> newFront = new HashSet<>();
-				for (Link currentFrontLink : currentFront) {
-					newFront.addAll(currentFrontLink.getFromNode().getInLinks().values());
-					newFront.addAll(currentFrontLink.getToNode().getOutLinks().values());
-				}
-				currentFront = newFront;
-				absCorrection *= changeFactorPerLevel;
-				correctionFactor = 1 - absCorrection;
-				if (!currentFront.isEmpty()) {
-					networkChanges.add(getNetworkChangeEvents(currentFront, correctionFactor));
-				}
+			double correction = (expectedCount / observedCount) - 1;
+			Map<String, Double> countLinkSpider = changeSpiders.get(countLinkId);
+			for (String linkId : countLinkSpider.keySet()) {
+				double linkCorrection = countLinkSpider.get(linkId) * correction;
+				double netEffect = netEffects.containsKey(linkId)? netEffects.get(linkId) : 0;
+				netEffect += linkCorrection;
+				netEffects.put(linkId, netEffect);
 			}
 		}
-		return simplifyEvents(networkChanges);
+
+		// if net effect is larger than minimalChangeThreshold, create a network change event
+		List<NetworkChangeEvent>  networkChanges = new ArrayList<>(netEffects.size());
+		for (String linkId : netEffects.keySet()) {
+			double netEffect = netEffects.get(linkId);
+			if (Math.abs(netEffect) > minimalChangeThreshold) {
+				networkChanges.add(getNetworkChangeEvent(linkId, 1 + netEffect));
+			}
+		}
+
+		return networkChanges;
 	}
 
-	private List<NetworkChangeEvent> simplifyEvents(List<NetworkChangeEvent> networkChanges) {
-
-		Map<Link, Double> netEffects = new HashMap<>();
-
-		for (NetworkChangeEvent event : networkChanges) {
-			for (Link link : event.getLinks()) {
-				double netEffect = netEffects.containsKey(link)? netEffects.get(link) : 0;
-				netEffect += event.getFlowCapacityChange().getValue() - 1;
-				netEffects.put(link, netEffect);
-			}
-		}
-
-		List<NetworkChangeEvent> simplifiedEvents = new ArrayList<>(netEffects.size());
-		for (Link link : netEffects.keySet()) {
-			if (netEffects.get(link) > minimalChangeThreshold) {
-				Set<Link> linkSet = new HashSet<>();
-				linkSet.add(link);
-				simplifiedEvents.add(getNetworkChangeEvents(linkSet, 1 + netEffects.get(link)));
-			}
-		}
-
-		return simplifiedEvents;
-	}
-
-	private NetworkChangeEvent getNetworkChangeEvents(Set<Link> countLinks, double correctionFactor) {
+	private NetworkChangeEvent getNetworkChangeEvent(String linkId, double correctionFactor) {
 		NetworkChangeEvent event = new NetworkChangeEvent(0);
-		event.addLinks(countLinks);
+		event.addLink(network.getLinks().get(Id.createLinkId(linkId)));
 		event.setFlowCapacityChange(
 				new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.FACTOR, correctionFactor));
 		return event;

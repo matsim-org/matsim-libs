@@ -23,6 +23,7 @@ package contrib.baseline.counts;
 
 import com.vividsolutions.jts.util.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * WHAT IS IT FOR?
+ * Testing network spider creator.
  *
  * @author boescpa
  */

@@ -21,19 +21,26 @@
 
 package contrib.baseline.counts;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import com.vividsolutions.jts.util.*;
+import org.junit.*;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,65 +52,65 @@ import java.util.Map;
  */
 public class TestNetworkAdapter {
 
-	@Ignore
+	private static boolean setUpIsDone = false;
+	private static NetworkSpiderCreator spiderCreator;
+	private static Network network;
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Before
+	public void prepareTests() {
+		if (setUpIsDone) return;
+		// prepare spider creator
+		List<String> links = new ArrayList<>(2);
+		links.add("3323");links.add("4232");
+		spiderCreator = new NetworkSpiderCreator(links);
+		// run simulation
+		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
+		config.controler().setLastIteration(0);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		network = scenario.getNetwork();
+		final Controler controler = new Controler(scenario);
+		controler.getEvents().addHandler(spiderCreator);
+		controler.run();
+		setUpIsDone = true;
+	}
+
 	@Test
-	public void testNoCutting() {
-		Network network = getNetwork();
-		NetworkAdapter adapter = new NetworkAdapter(network, 0.5, 0.1);
+	public void testNetworkAdaptorOneCountStation() {
+		NetworkAdapter networkAdapter = new NetworkAdapter(network);
 		Map<String, Integer> expectedCounts = new HashMap<>();
-		expectedCounts.put("link_count_1", 10);
-		expectedCounts.put("link_count_2", 20);
+		expectedCounts.put("3323", 150);
 		Map<String, Integer> observedCounts = new HashMap<>();
-		observedCounts.put("link_count_1", 15);
-		observedCounts.put("link_count_2", 15);
-		List<NetworkChangeEvent> networkChanges = adapter.identifyNetworkChanges(expectedCounts, observedCounts);
-
-		double netChange_link_1 = 0;
-		for (NetworkChangeEvent event : networkChanges) {
-			if (event.getLinks().contains(network.getLinks().get(Id.createLinkId("link_1")))) {
-				netChange_link_1 = event.getFlowCapacityChange().getValue();
-			}
+		observedCounts.put("3323", spiderCreator.createAbsoluteSpider("3323").get("3323"));
+		List<NetworkChangeEvent> changeEvents =
+				networkAdapter.identifyNetworkChanges(expectedCounts, observedCounts, spiderCreator.createAllRelativeSpiders());
+		// Output:
+		System.out.println("Expected: " + expectedCounts.get("3323") + "; Observed: " + observedCounts.get("3323"));
+		for (NetworkChangeEvent changeEvent : changeEvents) {
+			System.out.println("Link: " + changeEvent.getLinks().toString() + ";" +
+					" Change Factor: " + changeEvent.getFlowCapacityChange().getValue());
 		}
-		Assert.assertTrue("Observed value: " + netChange_link_1,
-				netChange_link_1 == 1.125);
 	}
 
-	private Network getNetwork() {
-		Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
-		//
-		//	link_1									link_3
-		//		  \								   /
-		//			link_count_1  --  link_count_2
-		//		  /								   \
-		//	link_2									link_4
-		//
-		NetworkFactory factory = network.getFactory();
-		Node node_1 = factory.createNode(Id.createNodeId("node_1"), new Coord(0, 0));
-		Node node_2 = factory.createNode(Id.createNodeId("node_2"), new Coord(2, 0));
-		Node node_3 = factory.createNode(Id.createNodeId("node_3"), new Coord(1, 1));
-		Node node_4 = factory.createNode(Id.createNodeId("node_4"), new Coord(1, 2));
-		Node node_5 = factory.createNode(Id.createNodeId("node_5"), new Coord(1, 3));
-		Node node_6 = factory.createNode(Id.createNodeId("node_6"), new Coord(0, 4));
-		Node node_7 = factory.createNode(Id.createNodeId("node_7"), new Coord(2, 4));
-		Link link_1 = factory.createLink(Id.createLinkId("link_1"), node_1, node_3);
-		Link link_2 = factory.createLink(Id.createLinkId("link_2"), node_2, node_3);
-		Link link_count_1 = factory.createLink(Id.createLinkId("link_count_1"), node_3, node_4);
-		Link link_count_2 = factory.createLink(Id.createLinkId("link_count_2"), node_4, node_5);
-		Link link_3 = factory.createLink(Id.createLinkId("link_3"), node_5, node_6);
-		Link link_4 = factory.createLink(Id.createLinkId("link_4"), node_5, node_7);
-		network.addNode(node_1);
-		network.addNode(node_2);
-		network.addNode(node_3);
-		network.addNode(node_4);
-		network.addNode(node_5);
-		network.addNode(node_6);
-		network.addNode(node_7);
-		network.addLink(link_1);
-		network.addLink(link_2);
-		network.addLink(link_count_1);
-		network.addLink(link_count_2);
-		network.addLink(link_3);
-		network.addLink(link_4);
-		return network;
+	@Test
+	public void testNetworkAdaptorTwoCountStations() {
+		NetworkAdapter networkAdapter = new NetworkAdapter(network);
+		Map<String, Integer> expectedCounts = new HashMap<>();
+		expectedCounts.put("3323", 150); expectedCounts.put("4232", 150);
+		Map<String, Integer> observedCounts = new HashMap<>();
+		observedCounts.put("3323", spiderCreator.createAbsoluteSpider("3323").get("3323"));
+		observedCounts.put("4232", spiderCreator.createAbsoluteSpider("4232").get("4232"));
+		List<NetworkChangeEvent> changeEvents =
+				networkAdapter.identifyNetworkChanges(expectedCounts, observedCounts, spiderCreator.createAllRelativeSpiders());
+		// Output:
+		System.out.println("3323 - Expected: " + expectedCounts.get("3323") + "; Observed: " + observedCounts.get("3323"));
+		System.out.println("4232 - Expected: " + expectedCounts.get("4232") + "; Observed: " + observedCounts.get("4232"));
+		for (NetworkChangeEvent changeEvent : changeEvents) {
+			System.out.println("Link: " + changeEvent.getLinks().toString() + ";" +
+					" Change Factor: " + changeEvent.getFlowCapacityChange().getValue());
+		}
 	}
+
 }
