@@ -52,6 +52,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 	private Map<String,int[]> zoneDepartures = new TreeMap<>();
 	private final boolean onlyBarrierFreeRequests;
 	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, "EPSG:25833");
+	private double overallAverageWaitTime = 0;
 	
 		public ZoneBasedBarrierFreeTaxiCustomerWaitHandler(Network network,Map<String,Geometry> zones, boolean onlyBarrierFreeRequests) {
 			this.numberOfTrips = 0;
@@ -161,7 +162,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 					bw.write(e.getKey()+";");
 					double allTrips = 0.;
 					double allWait = 0.;
-					for (int i = 3; i<24; i++){
+					for (int i = 6; i<24; i++){
 						double waitTime = waitTimes[i];
 						int trips = e.getValue()[i];
 						double averageWaitTime = waitTime/trips;
@@ -181,13 +182,18 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 					
 				}
 				bw.write("allZones;");
-				for (int i = 3; i<24; i++){
+				double allHoursCustomers = 0;
+				double allHoursWait = 0;
+				for (int i = 6; i<24; i++){
 					double waitTime = totalWait[i];
 					int trips = totalTrips[i];
 					double averageWaitTime = waitTime/trips;
 					if (trips == 0) averageWaitTime = 0;
+					allHoursWait += waitTime;
+					allHoursCustomers += trips;
 					bw.write(trips+";"+df.format(averageWaitTime)+";");
 					} 
+				this.overallAverageWaitTime = allHoursWait/allHoursCustomers;
 				bw.flush();
 				bw.close();
 				BufferedWriter csvt = IOUtils.getBufferedWriter(filename+"t");
@@ -213,5 +219,12 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 	    	return null;
 	    	
 	    }
+		
+		/**
+		 * @return the overallAverageWaitTime
+		 */
+		public double getOverallAverageWaitTime() {
+			return overallAverageWaitTime;
+		}
 	    
 }
