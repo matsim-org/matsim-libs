@@ -37,21 +37,21 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 public abstract class AbstractTaxibusOptimizer
     implements TaxibusOptimizer
 {
-    protected final TaxibusOptimizerContext optimContext;
-    protected final Collection<TaxibusRequest> unplannedRequests;
+    private final TaxibusOptimizerContext optimContext;
+    private final Collection<TaxibusRequest> unplannedRequests;
 
     private final boolean doUnscheduleAwaitingRequests;//PLANNED or TAXI_DISPATCHED
     private final boolean destinationKnown;
     private final boolean vehicleDiversion;
 
-    protected boolean requiresReoptimization = false;
+    private boolean requiresReoptimization = false;
 
 
     public AbstractTaxibusOptimizer(TaxibusOptimizerContext optimContext,
              boolean doUnscheduleAwaitingRequests)
     {
         this.optimContext = optimContext;
-        this.unplannedRequests = new TreeSet<TaxibusRequest>(Requests.ABSOLUTE_COMPARATOR);
+        this.unplannedRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
        	this.doUnscheduleAwaitingRequests=doUnscheduleAwaitingRequests;
 
         destinationKnown = optimContext.scheduler.getParams().destinationKnown;
@@ -132,4 +132,24 @@ public abstract class AbstractTaxibusOptimizer
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
     }
+
+
+protected TaxibusOptimizerContext getOptimContext() {
+	return optimContext;
+}
+
+
+protected Collection<TaxibusRequest> getUnplannedRequests() {
+	return unplannedRequests;
+}
+
+
+protected boolean isRequiresReoptimization() {
+	return requiresReoptimization;
+}
+
+
+protected void setRequiresReoptimization(boolean requiresReoptimization) {
+	this.requiresReoptimization = requiresReoptimization;
+}
 }

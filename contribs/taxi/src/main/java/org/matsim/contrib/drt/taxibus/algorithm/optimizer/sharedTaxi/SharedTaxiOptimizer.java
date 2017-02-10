@@ -50,15 +50,15 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 	@Override
 	protected void scheduleUnplannedRequests() {
 		Set<TaxibusRequest> handledRequests = new HashSet<>();
-		for (TaxibusRequest request : unplannedRequests){
+		for (TaxibusRequest request : getUnplannedRequests()){
 			TaxibusDispatch bestPath = findBestVehicleForRequest(request);
 			if (bestPath!= null){ 
-				optimContext.scheduler.scheduleRequest(bestPath);
+				getOptimContext().scheduler.scheduleRequest(bestPath);
 				handledRequests.add(request);}
 			
 		}
 		
-		unplannedRequests.removeAll(handledRequests);
+		getUnplannedRequests().removeAll(handledRequests);
 
 	}
 
@@ -67,20 +67,20 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 		Link fromLink = req.getFromLink();
 		Set<Vehicle> idleVehicles = new HashSet<>();
 		Set<Vehicle> busyVehicles = new HashSet<>();
-		for (Vehicle veh : this.optimContext.vrpData.getVehicles().values()){
+		for (Vehicle veh : this.getOptimContext().vrpData.getVehicles().values()){
 			Schedule schedule = veh.getSchedule();
-			if (optimContext.scheduler.isIdle(veh)){
+			if (getOptimContext().scheduler.isIdle(veh)){
 				// empty vehicle = no customer onboard so far, we are adding those requests to a Set and let the ordinary 
 				// BestDispatchFinder do the job
 				idleVehicles.add(veh);
 			}
-			else if (optimContext.scheduler.isStarted(veh)){
+			else if (getOptimContext().scheduler.isStarted(veh)){
 				// busy vehicle = we are currently picking someone up, maximum of passengers for this optimizer = 2;
 				DrtTaskType  type =  ((DrtTask)schedule.getCurrentTask()).getDrtTaskType();
 //				Logger.getLogger(getClass()).info(veh.getId() + " "+ type);
 				if (type.equals(DrtTaskType.DRIVE_EMPTY)){
 					
-					Set<TaxibusRequest> currentRequests = optimContext.scheduler.getCurrentlyPlannedRequests(schedule);
+					Set<TaxibusRequest> currentRequests = getOptimContext().scheduler.getCurrentlyPlannedRequests(schedule);
 					if (currentRequests.size()<2){
 						busyVehicles.add(veh);
 					}
