@@ -33,7 +33,7 @@ import org.matsim.core.api.internal.HasPersonId;
  * 
  * The normal {@link PersonMoneyEvent} is not sufficient since we need refer the toll to a specific link
  * and the link information may not be available when the money event is thrown. Also, the routing relevant time
- * may be different than the time when the event itself is thrown.
+ * may be different from the time when the event is thrown.
  * 
  * @author ikaddoura
 */
