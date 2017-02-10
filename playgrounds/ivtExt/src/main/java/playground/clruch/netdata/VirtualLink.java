@@ -5,25 +5,25 @@ package playground.clruch.netdata;
  */
 public class VirtualLink {
     // only used for debugging
-    final private String id;
-    final private VirtualNode from;
-    final private VirtualNode to;
+    private final String id;
+    private final VirtualNode from;
+    private final VirtualNode to;
 
-    VirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn){
-        this.id = idIn;
-        this.from = fromIn;
-        this.to = toIn;
+    VirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn) {
+        id = idIn;
+        from = fromIn;
+        to = toIn;
     }
 
-    public String getId(){
-        return this.id;
+    public String getId() {
+        return id;
     }
 
-    public VirtualNode getFrom(){
-        return  this.from;
+    public VirtualNode getFrom() {
+        return from;
     }
 
-    public VirtualNode getTo(){
-        return  this.to;
+    public VirtualNode getTo() {
+        return to;
     }
 }

@@ -34,7 +34,7 @@ public class LazyDispatcher extends UniversalDispatcher {
     }
 
     @Override
-    public void reoptimize(double now) {
+    public void redispatch(double now) {
 
         if (Math.round(now) % 30 == 0) {
             // System.out.println("============ TIME " + now);

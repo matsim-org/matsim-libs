@@ -19,6 +19,10 @@ public class VehicleLinkPair {
         this.avVehicle = avVehicle;
         this.linkTimePair = linkTimePair;
     }
+    
+    public Link getDivertableLocation() {
+        return linkTimePair.link;
+    }
 
     /**
      * TODO temporary solution

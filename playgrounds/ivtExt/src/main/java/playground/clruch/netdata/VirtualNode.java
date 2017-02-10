@@ -1,10 +1,9 @@
 package playground.clruch.netdata;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
+
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * Created by Claudio on 2/8/2017.
@@ -12,18 +11,18 @@ import java.util.Set;
 public class VirtualNode {
     // only used for debugging
     private final String id;
-    private final Set<Id<Link>> linkIDs;
+    private final Set<Link> links;
 
-    VirtualNode(String idIn, Set<Id<Link>> linkIDsIn) {
+    VirtualNode(String idIn, Set<Link> linksIn) {
         this.id = idIn;
-        this.linkIDs = linkIDsIn;
+        this.links = linksIn;
     }
 
-    Set<Id<Link>> getLinkIDs() {
-        return this.linkIDs;
+    public Set<Link> getLinks() {
+        return Collections.unmodifiableSet(links);
     }
 
-    String getId() {
-        return this.id;
+    public String getId() {
+        return id;
     }
 }
