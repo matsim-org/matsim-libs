@@ -1,10 +1,9 @@
 package playground.clruch.dispatcher;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -15,62 +14,79 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LazyDispatcher extends UniversalDispatcher {
     public static final String IDENTIFIER = LazyDispatcher.class.getSimpleName();
+    public static final int DEBUG_PERIOD = 5 * 60;
+    public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
     private Link[] destLinks = null;
 
-    public LazyDispatcher(EventsManager eventsManager, SingleRideAppender appender, Link[] sendAVtoLink) {
-        super(eventsManager, appender);
+    public LazyDispatcher( //
+            AVDispatcherConfig config, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator router, //
+            EventsManager eventsManager, //
+            Link[] sendAVtoLink) {
+        super(config, travelTime, router, eventsManager);
         this.destLinks = sendAVtoLink;
     }
 
     @Override
     public void redispatch(double now) {
 
-        if (Math.round(now) % 30 == 0) {
-            // System.out.println("============ TIME " + now);
+        if (Math.round(now) % DEBUG_PERIOD == 0) {
+            System.out.println("==================== TIME " + now);
+            System.out.println(getStatusString());
 
-            Set<Link> unmatched = new HashSet<>();
+            // debug info
+            for (AVVehicle avVehicle : getFunctioningVehicles())
+                if (avVehicle.getId().toString().equals(DEBUG_AVVEHICLE))
+                    System.out.println(ScheduleUtils.scheduleOf(avVehicle));
+
+            Queue<Link> unmatchedRequestLinks = new LinkedList<>();
             {
-                Map<Link, Queue<AVVehicle>> map = getStayVehicles();
-                Collection<AVRequest> collection = getAVRequests();
-                if (!map.isEmpty() && !collection.isEmpty()) {
-                    // System.out.println(now + " @ " + map.size() + " <-> " + collection.size());
-                    for (AVRequest avRequest : collection) {
-                        Link link = avRequest.getFromLink();
-                        if (map.containsKey(link)) {
-                            Queue<AVVehicle> queue = map.get(link);
-                            if (queue.isEmpty()) {
-                                unmatched.add(link);
-                            } else {
-                                AVVehicle avVehicle = queue.poll();
-                                setAcceptRequest(avVehicle, avRequest);
-                            }
+                Map<Link, Queue<AVVehicle>> stayVehicles = getStayVehicles();
+                Collection<AVRequest> avRequests = getAVRequests();
+                for (AVRequest avRequest : avRequests) {
+                    Link link = avRequest.getFromLink();
+                    if (stayVehicles.containsKey(link)) {
+                        Queue<AVVehicle> queue = stayVehicles.get(link);
+                        if (queue.isEmpty()) {
+                            unmatchedRequestLinks.add(link);
+                        } else {
+                            AVVehicle avVehicle = queue.poll();
+                            setAcceptRequest(avVehicle, avRequest);
                         }
+                    } else {
+                        unmatchedRequestLinks.add(link);
                     }
                 }
             }
+            System.out.println("#unmatchedRequestLinks " + unmatchedRequestLinks.size());
+            System.out.println(getStatusString());
+            // Collection<VehicleLinkPair> collection = getDivertableVehicles();
 
-            if (!unmatched.isEmpty()) {
-                Collection<VehicleLinkPair> collection = getDivertableVehicles();
+            // if (!collection.isEmpty()) {
+            // System.out.println("PROBING [" + collection.iterator().next().avVehicle.getId() + "]");
+            // }
+            if (!unmatchedRequestLinks.isEmpty()) {
 
-                for (VehicleLinkPair vehicleLinkPair : collection) {
-                    if (unmatched.isEmpty())
+                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                    // System.out.println("TESTING [" + vehicleLinkPair.avVehicle.getId() + "]");
+                    if (unmatchedRequestLinks.isEmpty())
                         break;
                     Link dest = vehicleLinkPair.getDestination();
-                    if (dest == null) { // stay task
-                        Link link = unmatched.iterator().next();
+                    if (dest == null) { // vehicle in stay task
+                        Link link = unmatchedRequestLinks.poll();
                         setVehicleDiversion(vehicleLinkPair, link);
-                        unmatched.remove(link);
                     }
                 }
             }
@@ -155,7 +171,8 @@ public class LazyDispatcher extends UniversalDispatcher {
             Link sendAVtoLink4 = network.getLinks().get(l4);
             Link[] sendAVtoLinks = new Link[] { sendAVtoLink1, sendAVtoLink2, sendAVtoLink3, sendAVtoLink4 };
             // put the link into the lazy dispatcher
-            return new LazyDispatcher(eventsManager, new SingleRideAppender(config, router, travelTime), sendAVtoLinks);
+            return new LazyDispatcher( //
+                    config, travelTime, router, eventsManager, sendAVtoLinks);
         }
     }
 }

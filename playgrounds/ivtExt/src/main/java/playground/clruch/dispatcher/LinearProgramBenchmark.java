@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
@@ -19,9 +20,10 @@ import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
+import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
-import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LinearProgramBenchmark extends PartitionedDispatcher {
     public static final int REBALANCING_PERIOD = 5 * 60; // TODO
@@ -29,13 +31,17 @@ public class LinearProgramBenchmark extends PartitionedDispatcher {
     final AbstractRequestSelector abstractRequestSelector;
     final AbstractVehicleDestMatcher abstractVehicleDestMatcher;
 
-    public LinearProgramBenchmark(EventsManager eventsManager, SingleRideAppender appender, //
+    public LinearProgramBenchmark( //
+            AVDispatcherConfig config, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator router, //
+            EventsManager eventsManager, //
             VirtualNetwork virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRequestSelector abstractRequestSelector, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher //
     ) {
-        super(eventsManager, appender, virtualNetwork);
+        super(config, travelTime, router, eventsManager, virtualNetwork);
         this.abstractVirtualNodeDest = abstractVirtualNodeDest;
         this.abstractRequestSelector = abstractRequestSelector;
         this.abstractVehicleDestMatcher = abstractVehicleDestMatcher;
