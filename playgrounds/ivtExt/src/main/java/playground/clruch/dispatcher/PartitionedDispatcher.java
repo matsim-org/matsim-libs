@@ -30,7 +30,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     }
 
     @Deprecated
-    Map<VirtualNode, Long> getAvailableVehicleCount() { // better to use getAvailableVehicles()
+    protected Map<VirtualNode, Long> getAvailableVehicleCount() { // better to use getAvailableVehicles()
         return getDivertableVehicles().stream() //
                 .parallel() //
                 .map(VehicleLinkPair::getDivertableLocation) //
@@ -38,7 +38,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                 .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
     }
 
-    Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableVehicles() {
+    protected Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableVehicles() {
         Map<VirtualNode, List<VehicleLinkPair>> map = new HashMap<>();
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
             map.put(virtualNode, new ArrayList<>());
@@ -53,7 +53,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     }
 
     @Deprecated
-    Map<VirtualNode, Long> getRequestCount() {
+    protected Map<VirtualNode, Long> getRequestCount() {
         return getAVRequests().stream() //
                 .parallel() //
                 .map(AVRequest::getFromLink) //
@@ -61,7 +61,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                 .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
     }
 
-    Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {
+    protected Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {
         Map<VirtualNode, List<AVRequest>> map = new HashMap<>();
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
             map.put(virtualNode, new ArrayList<>());

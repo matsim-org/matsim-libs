@@ -5,43 +5,13 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
- * class was generated to unify the code snippets below
+ * class obtains the path that connects two given nodes
  */
-// VrpPathWithTravelData newSubPath;
-// {
-// ParallelLeastCostPathCalculator router = appender.router;
-// LeastCostPathFuture drivepath = router.calcLeastCostPath( //
-// divLink.getToNode(), destLinks[2].getFromNode(), startTime, null, null);
-// while (!drivepath.isDone()) {
-// try {
-// Thread.sleep(5);
-// } catch (InterruptedException e) {
-// e.printStackTrace();
-// }
-// }
-// newSubPath = VrpPaths.createPath(divLink, destLinks[2], startTime, drivepath.get(), appender.travelTime);
-// }
-// add the drive task
-// Link[] routePoints =new Link[] {stayTask.getLink(),destLinks[1]};
-// VrpPathWithTravelData routePoints;
-// {
-// ParallelLeastCostPathCalculator router = appender.router;
-// LeastCostPathFuture drivepath = router.calcLeastCostPath( //
-// stayTask.getLink().getToNode(), destLinks[1].getFromNode(), now, null,
-// null);
-// while (!drivepath.isDone()) {
-// try {
-// Thread.sleep(5);
-// } catch (InterruptedException e) {
-// e.printStackTrace();
-// }
-// }
-// routePoints = VrpPaths.createPath(stayTask.getLink(), destLinks[1], now, drivepath.get(), appender.travelTime);
-// }
 public class SimpleBlockingRouter {
     private final ParallelLeastCostPathCalculator router;
     private final TravelTime travelTime;
@@ -71,7 +41,13 @@ public class SimpleBlockingRouter {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return VrpPaths.createPath(divLink, destLink, startTime, drivepath.get(), travelTime);
+        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(divLink, destLink, startTime, drivepath.get(), travelTime);
+
+        System.out.println(VrpPathUtils.toString(vrpPathWithTravelData));
+        if (!VrpPathUtils.isConsistent(vrpPathWithTravelData)) {
+            throw new RuntimeException("path not consistent");
+        }
+        return vrpPathWithTravelData;
     }
 
 }

@@ -14,7 +14,7 @@ public class ScheduleUtils {
         for (AbstractTask task : schedule.getTasks()) {
             boolean isStarted = task.getStatus().equals(Task.TaskStatus.STARTED);
             if (isStarted && !flag)
-                stringBuilder.append("_X(hidden=" + hiddenCount + ")\n");
+                stringBuilder.append("_X( " + hiddenCount + " ... )\n");
             flag |= isStarted;
             if (flag) {
                 stringBuilder.append(isStarted ? ">" : " ");
