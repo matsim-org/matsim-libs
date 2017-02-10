@@ -60,7 +60,7 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
  * 
  * @author cdobler
  */
-public class MultiNodeDijkstra extends Dijkstra {
+public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculator {
 	
 	private final static Logger log = Logger.getLogger(MultiNodeDijkstra.class);
 	
