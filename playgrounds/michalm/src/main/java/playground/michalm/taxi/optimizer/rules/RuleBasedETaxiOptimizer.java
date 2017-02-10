@@ -54,7 +54,7 @@ public class RuleBasedETaxiOptimizer
         this.params = params;
         evData = optimContext.evData;
         eScheduler = (ETaxiScheduler)optimContext.scheduler;
-        eDispatchFinder = new BestChargerFinder(dispatchFinder);
+        eDispatchFinder = new BestChargerFinder(getDispatchFinder());
     }
 
 
@@ -63,7 +63,7 @@ public class RuleBasedETaxiOptimizer
     {
         if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
             chargeIdleUnderchargedVehicles(
-                    Iterables.filter(idleTaxiRegistry.getVehicles(), this::isUndercharged));
+                    Iterables.filter(getIdleTaxiRegistry().getVehicles(), this::isUndercharged));
         }
 
         super.notifyMobsimBeforeSimStep(e);

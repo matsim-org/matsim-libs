@@ -116,7 +116,7 @@ public class ZonalTaxiOptimizer
             }
 
             Iterable<Vehicle> filteredVehs = Collections.singleton(idleVehsInZone.peek());
-            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
+            BestDispatchFinder.Dispatch<TaxiRequest> best = getDispatchFinder()
                     .findBestVehicleForRequest(req, filteredVehs);
 
             if (best != null) {

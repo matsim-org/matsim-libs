@@ -35,9 +35,9 @@ import org.matsim.contrib.zone.*;
 public class RuleBasedTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    protected final BestDispatchFinder dispatchFinder;
+    private final BestDispatchFinder dispatchFinder;
 
-    protected final IdleTaxiZonalRegistry idleTaxiRegistry;
+    private final IdleTaxiZonalRegistry idleTaxiRegistry;
     private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
     private final RuleBasedTaxiOptimizerParams params;
@@ -214,4 +214,14 @@ public class RuleBasedTaxiOptimizer
     {
         return task.getTaxiTaskType() == TaxiTaskType.STAY;
     }
+
+
+protected BestDispatchFinder getDispatchFinder() {
+	return dispatchFinder;
+}
+
+
+protected IdleTaxiZonalRegistry getIdleTaxiRegistry() {
+	return idleTaxiRegistry;
+}
 }
