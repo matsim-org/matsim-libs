@@ -38,8 +38,8 @@ public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
     private final AssignmentTaxiOptimizerParams params;
-    protected final FastMultiNodeDijkstra router;
-    protected final BackwardFastMultiNodeDijkstra backwardRouter;
+    private final FastMultiNodeDijkstra router;
+    private final BackwardFastMultiNodeDijkstra backwardRouter;
     private final FastAStarEuclidean euclideanRouter;
     private final VehicleAssignmentProblem<TaxiRequest> assignmentProblem;
     private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
@@ -79,7 +79,7 @@ public class AssignmentTaxiOptimizer
                 optimContext.scheduler.getParams().AStarEuclideanOverdoFactor, fastRouterFactory);
 
         assignmentProblem = new VehicleAssignmentProblem<TaxiRequest>(optimContext.travelTime,
-                router, backwardRouter, euclideanRouter, params.nearestRequestsLimit,
+                getRouter(), getBackwardRouter(), euclideanRouter, params.nearestRequestsLimit,
                 params.nearestVehiclesLimit);
 
         assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
@@ -120,4 +120,14 @@ public class AssignmentTaxiOptimizer
         return new VehicleData(optimContext, optimContext.fleet.getVehicles().values(),
                 vehPlanningHorizon);
     }
+
+
+protected FastMultiNodeDijkstra getRouter() {
+	return router;
+}
+
+
+protected BackwardFastMultiNodeDijkstra getBackwardRouter() {
+	return backwardRouter;
+}
 }

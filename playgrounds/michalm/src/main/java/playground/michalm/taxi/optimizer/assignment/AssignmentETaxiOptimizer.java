@@ -89,8 +89,8 @@ public class AssignmentETaxiOptimizer
             throw new RuntimeException("charge-scheduling must be followed up by req-scheduling");
         }
 
-        eAssignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, router,
-                backwardRouter);
+        eAssignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, getRouter(),
+                getBackwardRouter());
 
         eAssignmentCostProvider = new ETaxiToPlugAssignmentCostProvider(params);
 

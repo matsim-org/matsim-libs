@@ -85,11 +85,11 @@ public class MultiNodeDijkstra extends Dijkstra {
 		this.searchAllEndNodes = searchAllEndNodes;
 	}
 	
-	public ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes) {
+	public static ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes) {
 		return new ImaginaryNode(nodes);
 	}
 	
-	public ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes, Coord coord) {
+	public static ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes, Coord coord) {
 		return new ImaginaryNode(nodes, coord);
 	}
 	
