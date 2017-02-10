@@ -113,7 +113,7 @@ public class AssignmentETaxiOptimizer
                 unscheduleAwaitingRequests();
             }
             scheduleCharging();
-            requiresReoptimization = true;
+            setRequiresReoptimization(true);
         }
 
         super.notifyMobsimBeforeSimStep(e);

@@ -18,10 +18,10 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 	@Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        if (requiresReoptimization) {
+        if (isRequiresReoptimization()) {
             scheduleUnplannedRequests();
             if(this.getUnplannedRequests().size() < 1){
-                requiresReoptimization = false;
+                setRequiresReoptimization(false);
             }
         }
     }

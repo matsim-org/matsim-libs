@@ -40,7 +40,7 @@ public abstract class AbstractTaxiOptimizer
     private final boolean vehicleDiversion;
     private final int reoptimizationTimeStep;
 
-    protected boolean requiresReoptimization = false;
+    private boolean requiresReoptimization = false;
 
 
     public AbstractTaxiOptimizer(TaxiOptimizerContext optimContext,
@@ -154,5 +154,15 @@ protected Collection<TaxiRequest> getUnplannedRequests() {
 
 protected TaxiOptimizerContext getOptimContext() {
 	return optimContext;
+}
+
+
+protected boolean isRequiresReoptimization() {
+	return requiresReoptimization;
+}
+
+
+protected void setRequiresReoptimization(boolean requiresReoptimization) {
+	this.requiresReoptimization = requiresReoptimization;
 }
 }
