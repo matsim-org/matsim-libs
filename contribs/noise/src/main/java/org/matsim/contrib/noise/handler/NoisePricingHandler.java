@@ -62,17 +62,8 @@ public class NoisePricingHandler implements NoiseEventCausedHandler {
 		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
 		this.events.processEvent(moneyEvent);
 		
-		// the emergence time is the end time of the current time bin
-		if (this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() > this.noiseContext.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize()) {
-			int subTimeBins = (int) (this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() / this.noiseContext.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
-			
-			for (int n = 0; n < subTimeBins; n++) {
-				
-				double relevantTime = event.getEmergenceTime() - this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() + (this.noiseContext.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize() * n) + ( (this.noiseContext.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize() / 2. ));
-				PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, relevantTime);
-				this.events.processEvent(linkMoneyEvent);
-			}
-		}
+		PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, event.getLinkEnteringTime());
+		this.events.processEvent(linkMoneyEvent);
 	}
 
 	public double getAmountSum() {

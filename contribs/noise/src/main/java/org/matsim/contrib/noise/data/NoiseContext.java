@@ -59,7 +59,8 @@ public class NoiseContext {
 	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
 	
-	private Set<Id<Vehicle>> busVehicleIDs = new HashSet<Id<Vehicle>>();
+	private Set<Id<Vehicle>> busVehicleIDs = new HashSet<>();
+	private Map<Id<Link>, Map<Id<Vehicle>, Double>> linkId2vehicleId2lastEnterTime = new HashMap<>();
 	
 	// for routing purposes
 	
@@ -500,6 +501,14 @@ public class NoiseContext {
 
 	public void setBusVehicleIDs(Set<Id<Vehicle>> busVehicleIDs) {
 		this.busVehicleIDs = busVehicleIDs;
+	}
+
+	public Map<Id<Link>, Map<Id<Vehicle>, Double>> getLinkId2vehicleId2lastEnterTime() {
+		return linkId2vehicleId2lastEnterTime;
+	}
+
+	public void setLinkId2vehicleId2lastEnterTime(Map<Id<Link>, Map<Id<Vehicle>, Double>> link2vehicle2enterTime) {
+		this.linkId2vehicleId2lastEnterTime = link2vehicle2enterTime;
 	}
 
 }

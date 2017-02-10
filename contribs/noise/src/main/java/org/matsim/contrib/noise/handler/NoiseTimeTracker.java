@@ -139,6 +139,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 		
 		this.noiseContext.getNoiseLinks().clear();
 		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
+		this.noiseContext.getLinkId2vehicleId2lastEnterTime().clear();
 		this.noiseContext.setCurrentTimeBinEndTime(this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 		
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
@@ -271,6 +272,15 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 		if (this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getVehicleId())
 				|| this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
 			// car, lkw or bus
+			
+			if (this.noiseContext.getLinkId2vehicleId2lastEnterTime().containsKey(event.getLinkId())) {
+				this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(event.getLinkId()).put(event.getVehicleId(), event.getTime());
+				
+			} else {
+				Map<Id<Vehicle>, Double> vehicleId2enterTime = new HashMap<>();
+				vehicleId2enterTime.put(event.getVehicleId(), event.getTime());
+				this.noiseContext.getLinkId2vehicleId2lastEnterTime().put(event.getLinkId(), vehicleId2enterTime);
+			}
 			
 			if (this.noiseContext.getNoiseLinks().containsKey(event.getLinkId())) {
 				this.noiseContext.getNoiseLinks().get(event.getLinkId()).getEnteringVehicleIds().add(event.getVehicleId());
@@ -602,8 +612,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 					
 					if (amount != 0.) {
 						
-						// The person Id is assumed to be equal to the vehicle Id.
-						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getEventTime(), this.noiseContext.getCurrentTimeBinEndTime(), Id.create(vehicleId, Person.class), vehicleId, amount, linkId);
+						// The person Id is assumed to be equal to the vehicle Id. TODO: get person Id from PersonEntersVehicleEvent
+						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getEventTime(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId), Id.create(vehicleId, Person.class), vehicleId, amount, linkId);
 						events.processEvent(noiseEvent);
 						
 						if (this.collectNoiseEvents) {
