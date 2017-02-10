@@ -65,6 +65,10 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 	private final Map<Id<Person>, Id<Vehicle>> personId2vehicleId = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
+	
+	private static int warnCounter1 = 0;
+	private static int warnCounter2 = 0;
+	private static int warnCounter3 = 0;
 
 	@Override
 	public void reset(int iteration) {
@@ -74,6 +78,10 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 		this.personId2vehicleId.clear();
 		this.vehicleId2personId.clear();
 		this.linkId2info.clear();
+		
+		warnCounter1 = 0;
+		warnCounter2 = 0;
+		warnCounter3 = 0;
 	}
 
 	@Override
@@ -83,7 +91,15 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 		Id<Person> personId = event.getPersonId();
 		Id<Vehicle> vehicleId = this.personId2vehicleId.get(personId);
 		
-		if (vehicleId == null) log.warn("Vehicle Id is null. " + event.toString());
+		if (warnCounter1 <= 5) {
+			if (vehicleId == null) {
+				log.warn("No vehicle Id information available. " + event.toString());
+				if (warnCounter1 == 5) {
+					log.warn("Further log statements of this type are not printed out.");
+				}
+				warnCounter1++;
+			}
+		}
 
 		int timeBinNr = getIntervalNr(event.getRelevantTime());
 		
@@ -220,8 +236,16 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 		for (String agentType : agentTypeIdPrefix2AmountSum.keySet()) {
 			
 			if (agentTypeIdPrefix2Counter.get(agentType) == null) {
-				log.warn("No entering agent of type " + agentType + " in time bin " + timeBin.getTimeBinNr() + " even though there are person money events (total monetary amounts: " + agentTypeIdPrefix2AmountSum.get(agentType) + ")."
-						+ " Can't compute the average amount per time bin.");
+				
+				if (warnCounter2 <= 5) {
+					log.warn("No entering agent of type " + agentType + " in time bin " + timeBin.getTimeBinNr() + " even though there are person money events (total monetary amounts: " + agentTypeIdPrefix2AmountSum.get(agentType) + ")."
+							+ " Can't compute the average amount per time bin.");
+					warnCounter2++;
+					if (warnCounter2 == 5) {
+						log.warn("Further log statements of this type are not printed out.");
+					}
+				}
+				
 			} else {
 				double amountSum = agentTypeIdPrefix2AmountSum.get(agentType);
 				double counter = agentTypeIdPrefix2Counter.get(agentType);
@@ -243,8 +267,15 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 		
 		double average = 0.;
 		if (timeBin.getEnteringAgents().size() == 0) {
-			log.warn("No entering agent in time bin " + timeBin.getTimeBinNr() + " even though there are person money events (total monetary amounts: " + sum + ")."
-					+ " Can't compute the average amount per time bin.");
+			if (warnCounter3 <= 5) {
+				log.warn("No entering agent in time bin " + timeBin.getTimeBinNr() + " even though there are person money events (total monetary amounts: " + sum + ")."
+						+ " Can't compute the average amount per time bin.");
+				warnCounter3++;
+				if (warnCounter3 == 5) {
+					log.warn("Further log statements of this type are not printed out.");
+				}
+			}
+
 		} else {
 			average = sum / timeBin.getEnteringAgents().size();
 		}
