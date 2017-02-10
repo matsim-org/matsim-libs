@@ -67,7 +67,7 @@ public class CNETestIT {
 		// congestion pricing
 		CNEIntegration cneIntegration2 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "c/");
 		cneIntegration2.setCongestionPricing(true);
-		cneIntegration2.setCongestionTollingApproach(CongestionTollingApproach.DecongestionPID);
+		cneIntegration2.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
 		cneIntegration2.setkP(99999.);
 		Controler controler2 = cneIntegration2.prepareControler();
 		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
@@ -87,7 +87,7 @@ public class CNETestIT {
 		// congestion + noise pricing
 		CNEIntegration cneIntegration4 = new CNEIntegration(configFile, testUtils.getOutputDirectory() + "cn/");
 		cneIntegration4.setCongestionPricing(true);
-		cneIntegration4.setCongestionTollingApproach(CongestionTollingApproach.DecongestionPID);
+		cneIntegration4.setCongestionTollingApproach(CongestionTollingApproach.QBPV3);
 		cneIntegration4.setkP(99999.);
 		cneIntegration4.setNoisePricing(true);
 		Controler controler4 = cneIntegration4.prepareControler();
@@ -128,9 +128,6 @@ public class CNETestIT {
 		// the demand on the noise sensitive route should go down in case of noise pricing (n)
 		Assert.assertEquals(true, getNoiseSensitiveRouteDemand(handler3) < getNoiseSensitiveRouteDemand(handler1));
 		
-		// the demand on the long and uncongested route should go up in case of noise pricing (n)
-		Assert.assertEquals(true, getLongUncongestedDemand(handler3) > getLongUncongestedDemand(handler1));	
-
 		// the demand on the bottleneck link should go down in case of congestion + noise pricing (cn)
 		Assert.assertEquals(true, getBottleneckDemand(handler4) < getBottleneckDemand(handler1));
 		
@@ -265,9 +262,16 @@ public class CNETestIT {
 		printResults2(handler4);
 						
 		Assert.assertEquals("BC: all agents should use the short distance route.", 11, demand_highSpeed_lowN_highE(handler1));		
+	
 		Assert.assertEquals("E: fewer agents should use the high air pollution emission cost route.", true, demand_highSpeed_lowN_highE(handler2) < demand_highSpeed_lowN_highE(handler1));		
+		Assert.assertEquals("E: most agents should use the medium distance low air pollution emission cost route.", true, demand_mediumSpeed_highN_lowE(handler2) > 6);		
+
 		Assert.assertEquals("N: all agents should use the short distance + low n cost route.", 11, demand_highSpeed_lowN_highE(handler3));		
-		Assert.assertEquals("N+E: most agents should use the long distance + low n cost  + low e cost route.", true, demand_lowSpeed_lowN_lowE(handler4) > (demand_mediumSpeed_highN_lowE(handler4) + demand_highSpeed_lowN_highE(handler4)) );		
+		
+		Assert.assertEquals("N+E: more agents should use the long distance + low n cost  + low e cost route.", true, demand_lowSpeed_lowN_lowE(handler4) > demand_lowSpeed_lowN_lowE(handler1) 
+				&& demand_lowSpeed_lowN_lowE(handler4) > (demand_lowSpeed_lowN_lowE(handler2)) && demand_lowSpeed_lowN_lowE(handler4) > (demand_lowSpeed_lowN_lowE(handler3)) );		
+		Assert.assertEquals("N+E: most agents should use the long distance low air pollution emission + low noise cost route.", true, demand_lowSpeed_lowN_lowE(handler4) > 6);		
+		
 	}
 
 	private void printResults2(LinkDemandEventHandler handler) {

@@ -30,10 +30,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -125,15 +124,15 @@ public class MoneyEventAnalysisTest {
 		moneyAnalysis.handleEvent(new LinkEnterEvent(960., vehicleId1, linkId2));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(960., vehicleId2, linkId2));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(960., vehicleId3, linkId2));
-		moneyAnalysis.handleEvent(new PersonMoneyEvent(966., personId2, -99.));
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(966., personId2, linkId2, -99., 966.));
 		
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId1, linkId3));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId2, linkId3));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId3, linkId3));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId4, linkId3));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId5, linkId3));
-		moneyAnalysis.handleEvent(new PersonMoneyEvent(3661., personId2, -123.));
-		moneyAnalysis.handleEvent(new PersonMoneyEvent(3662., personId3, -8.));
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(3661., personId2, linkId3, -123., 3661.));
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(3662., personId3, linkId3, -8., 3662.));
 
 		moneyAnalysis.notifyIterationEnds(new IterationEndsEvent(controler, 0));
 		
@@ -249,7 +248,7 @@ public class MoneyEventAnalysisTest {
 		moneyAnalysis.handleEvent(new LinkEnterEvent(960., vehicleId1, linkId2));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(960., vehicleId2, linkId2));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(960., vehicleId3, linkId2));
-		moneyAnalysis.handleEvent(new PersonMoneyEvent(966., personId2, -99.));
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(966., personId2, linkId2, -99., 966.));
 		
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId1, linkId3));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId2, linkId3));
@@ -257,8 +256,8 @@ public class MoneyEventAnalysisTest {
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId4, linkId3));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId5, linkId3));
 		moneyAnalysis.handleEvent(new LinkEnterEvent(3660., vehicleId6, linkId3));
-		moneyAnalysis.handleEvent(new PersonMoneyEvent(3661., personId2, -123.));
-		moneyAnalysis.handleEvent(new PersonMoneyEvent(3662., personId3, -8.));
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(3661., personId2, linkId3, -123., 3661.));
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(3662., personId3, linkId3, -8., 3662.));
 
 		moneyAnalysis.notifyIterationEnds(new IterationEndsEvent(controler, 0));
 		
@@ -351,9 +350,8 @@ public class MoneyEventAnalysisTest {
 		moneyAnalysis.reset(0);
 		
 		moneyAnalysis.handleEvent(new PersonEntersVehicleEvent(0., personId1, vehicleId1));
-		moneyAnalysis.handleEvent(new VehicleEntersTrafficEvent(0, personId1, linkId1, vehicleId1, "car", 0.));
 		
-		moneyAnalysis.handleEvent(new PersonMoneyEvent(60., personId1, -99.));
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(60., personId1, linkId1, -99., 60.));
 		
 		moneyAnalysis.handleEvent(new LinkEnterEvent(60., vehicleId1, linkId1));
 		
@@ -409,10 +407,9 @@ public class MoneyEventAnalysisTest {
 		moneyAnalysis.reset(0);
 		
 		moneyAnalysis.handleEvent(new PersonEntersVehicleEvent(0., personId1, vehicleId1));
-		moneyAnalysis.handleEvent(new VehicleEntersTrafficEvent(0, personId1, linkId1, vehicleId1, "car", 0.));		
 		moneyAnalysis.handleEvent(new LinkEnterEvent(60., vehicleId1, linkId1));
 		
-		moneyAnalysis.handleEvent(new PersonMoneyEvent(960., personId1, -99.));
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(960., personId1, linkId1, -99., 960.));
 		
 		moneyAnalysis.notifyIterationEnds(new IterationEndsEvent(controler, 0));
 	}
