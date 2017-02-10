@@ -39,7 +39,7 @@ public final class NoiseEventCaused extends Event {
 
 	public final static String EVENT_TYPE = "noiseEventCaused";
 
-	public final static String ATTRIBUTE_EMERGENCE_TIME = "emergenceTime";
+	public final static String ATTRIBUTE_EMERGENCE_TIME = "emergenceTime"; // right now: indicates the time bin end time, should rather be sth. like link enter time
 	public final static String ATTRIBUTE_LINK_ID = "linkId";
 	public final static String ATTRIBUTE_VEHICLE_ID = "causingVehicleId";
 	public final static String ATTRIBUTE_AGENT_ID = "causingAgentId";

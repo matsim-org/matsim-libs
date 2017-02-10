@@ -38,7 +38,7 @@ public final class NoiseEventAffected extends Event {
 
 	public final static String EVENT_TYPE = "noiseEventAffected";
 	
-	public final static String ATTRIBUTE_EMERGENCE_TIME = "emergenceTime";
+	public final static String ATTRIBUTE_EMERGENCE_TIME = "emergenceTime"; // indicates the time bin end time
 	public final static String ATTRIBUTE_AGENT_ID = "affectedAgentId";
 	public final static String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
 	public final static String ATTRIBUTE_RECEIVERPOINT_ID = "receiverPointId";
