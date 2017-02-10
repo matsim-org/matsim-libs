@@ -49,24 +49,20 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
         bind(AVDispatchmentListener.class);
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public PassengerEngine providePassengerEngine(EventsManager events, AVRequestCreator requestCreator, AVOptimizer optimizer, AVData data, Network network) {
-        return new PassengerEngine(
-                AVModule.AV_MODE,
-                events,
-                requestCreator,
-                optimizer,
-                data,
-                network
-        );
+        return new PassengerEngine(AVModule.AV_MODE, events, requestCreator, optimizer, data, network);
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     VrpLegs.LegCreator provideLegCreator(AVOptimizer avOptimizer) {
-        return VrpLegs.createLegWithOnlineTrackerCreator(avOptimizer,qsim.getSimTimer());
+        return VrpLegs.createLegWithOnlineTrackerCreator(avOptimizer, qsim.getSimTimer());
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public VrpAgentSource provideAgentSource(AVActionCreator actionCreator, AVData data, AVOptimizer optimizer, @Named(AVModule.AV_MODE) VehicleType vehicleType) {
         return new VrpAgentSource(actionCreator, data, optimizer, qsim, vehicleType);
     }
@@ -79,10 +75,11 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
      * @param vehicles
      * @return
      */
-    @Provides @Singleton
+    @Provides
+    @Singleton
     Map<Id<AVOperator>, AVDispatcher> provideDispatchers( //
-	    Map<String, AVDispatcher.AVDispatcherFactory> factories, // 
-	    AVConfig config, Map<Id<AVOperator>, List<AVVehicle>> vehicles) {
+            Map<String, AVDispatcher.AVDispatcherFactory> factories, //
+            AVConfig config, Map<Id<AVOperator>, List<AVVehicle>> vehicles) {
         Map<Id<AVOperator>, AVDispatcher> dispatchers = new HashMap<>();
 
         for (AVOperatorConfig oc : config.getOperatorConfigs()) {

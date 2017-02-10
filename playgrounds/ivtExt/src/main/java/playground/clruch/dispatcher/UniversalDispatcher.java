@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.clruch.router.SimpleBlockingRouter;
+import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
@@ -37,8 +38,7 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
 
 public abstract class UniversalDispatcher extends AbstractDispatcher {
-    private static final String DEBUG_AVVEHICLE = "av_av_op1_1";
-    
+
     private final List<AVVehicle> vehicles = new ArrayList<>();
     private final Set<AVRequest> pendingRequests = new HashSet<>();
     private Set<AVRequest> matchedRequests = new HashSet<>();
@@ -50,18 +50,30 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
 
     private double private_now = -1;
 
-    private final Collection<AVVehicle> getFunctioningVehicles() {
+    protected final Collection<AVVehicle> getFunctioningVehicles() {
         if (vehicles.isEmpty() || !vehicles.get(0).getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
         return Collections.unmodifiableList(vehicles);
     }
 
+    /**
+     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
+     * successive calls to the function return the identical collection.
+     * 
+     * @return collection of all requests that have not been matched
+     */
     protected final Collection<AVRequest> getAVRequests() {
         pendingRequests.removeAll(matchedRequests);
         matchedRequests.clear();
         return Collections.unmodifiableCollection(pendingRequests);
     }
 
+    /**
+     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
+     * successive calls to the function return the identical collection.
+     * 
+     * @return collection of all vehicles that currently are in the
+     */
     protected final Map<Link, Queue<AVVehicle>> getStayVehicles() {
         Map<Link, Queue<AVVehicle>> map = new HashMap<>();
         for (AVVehicle avVehicle : getFunctioningVehicles()) {
@@ -84,10 +96,18 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
         return Collections.unmodifiableMap(map);
     }
 
+    public final String getStatusString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("#requests " + getAVRequests().size());
+        stringBuilder.append(", #stay " + getStayVehicles().size());
+        stringBuilder.append(", #divert " + getDivertableVehicles().size());
+        return stringBuilder.toString();
+    }
+
     protected final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         matchedRequests.add(avRequest);
 
-        System.out.println(private_now + " @ " + avVehicle.getId() + " picksup " + avRequest.getPassenger().getId());
+        // System.out.println(private_now + " @ " + avVehicle.getId() + " picksup " + avRequest.getPassenger().getId());
         AVTimingParameters timing = appender.config.getParent().getTimingParameters();
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
 
@@ -108,12 +128,7 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
         schedule.addTask(dropoffTask);
 
         // jan: following computation is mandatory for the internal scoring function
-        double distance = 0.0; // TODO extract to separate class
-        for (Link link : dropoffPath)
-            distance += link.getLength();
-        // for (int i = 0; i < dropoffPath.getLinkCount(); i++) {
-        // distance += dropoffPath.getLink(i).getLength();
-        // }
+        final double distance = VrpPathUtils.getDistance(dropoffPath);
         avRequest.getRoute().setDistance(distance);
 
         if (dropoffTask.getEndTime() < scheduleEndTime)
@@ -151,7 +166,7 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
     }
 
     protected final void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link dest) {
-        Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
+        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
         AbstractTask abstractTask = schedule.getCurrentTask();
         new AVTaskAdapter(abstractTask) {
             @Override
@@ -193,11 +208,6 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
                     schedule.addTask(avDriveTask);
                     schedule.addTask(new AVStayTask(avDriveTask.getEndTime(), scheduleEndTime, dest));
 
-                    if (vehicleLinkPair.avVehicle.getId().toString().equals("av_av_op1_1")) {
-                        System.out.println("schedule for vehicle id " + vehicleLinkPair.avVehicle.getId() + " MODIFIED");
-                        for (AbstractTask task : schedule.getTasks())
-                            System.out.println(" " + task);
-                    }
                 }
 
             }
