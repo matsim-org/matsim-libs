@@ -60,7 +60,7 @@ public class VehicleAssignmentProblem<D>
     private AssignmentDestinationData<D> dData;
 
 
-    public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
+    public VehicleAssignmentProblem(TravelTime travelTime, MultiNodePathCalculator router,
             BackwardFastMultiNodeDijkstra backwardRouter)
     {
         //we do not need Euclidean router when there is not kNN filtering
@@ -68,7 +68,7 @@ public class VehicleAssignmentProblem<D>
     }
 
 
-    public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
+    public VehicleAssignmentProblem(TravelTime travelTime, MultiNodePathCalculator router,
             BackwardFastMultiNodeDijkstra backwardRouter, FastAStarEuclidean euclideanRouter,
             int nearestDestinationLimit, int nearestVehicleLimit)
     {

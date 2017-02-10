@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 public class OneToManyPathSearch
 {
     public static OneToManyPathSearch createForwardSearch(
-            FastMultiNodeDijkstra forwardMultiNodeDijkstra)
+		    MultiNodePathCalculator forwardMultiNodeDijkstra)
     {
         return new OneToManyPathSearch(forwardMultiNodeDijkstra, true);
     }
@@ -73,11 +73,11 @@ public class OneToManyPathSearch
     }
 
 
-    private final FastMultiNodeDijkstra multiNodeDijkstra;//forward or backward
+    private final MultiNodePathCalculator multiNodeDijkstra;//forward or backward
     private final boolean forward;
 
 
-    private OneToManyPathSearch(FastMultiNodeDijkstra multiNodeDijkstra, boolean forward)
+    private OneToManyPathSearch(MultiNodePathCalculator multiNodeDijkstra, boolean forward)
     {
         this.multiNodeDijkstra = multiNodeDijkstra;
         this.forward = forward;
@@ -113,7 +113,7 @@ public class OneToManyPathSearch
 
     private void calculatePaths(Node fromNode, Map<Id<Node>, ToNode> toNodes, double startTime)
     {
-        ImaginaryNode imaginaryNode = multiNodeDijkstra.createImaginaryNode(toNodes.values());
+        ImaginaryNode imaginaryNode = MultiNodeDijkstra.createImaginaryNode(toNodes.values());
         multiNodeDijkstra.setSearchAllEndNodes(true);
         multiNodeDijkstra.calcLeastCostPath(fromNode, imaginaryNode, startTime, null, null);
 

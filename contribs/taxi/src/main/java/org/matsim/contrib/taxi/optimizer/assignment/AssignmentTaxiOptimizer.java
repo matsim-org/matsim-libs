@@ -122,7 +122,7 @@ public class AssignmentTaxiOptimizer
     }
 
 
-protected FastMultiNodeDijkstra getRouter() {
+protected MultiNodePathCalculator getRouter() {
 	return router;
 }
 

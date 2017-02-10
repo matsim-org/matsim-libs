@@ -3,6 +3,7 @@
  */
 package org.matsim.core.router;
 
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 /**
@@ -11,5 +12,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
  * @author nagel
  */
 public interface MultiNodePathCalculator extends LeastCostPathCalculator {
+
+	void setSearchAllEndNodes(boolean b);
+
+	Path constructPath(Node fromNode, Node node, double startTime);
 
 }
