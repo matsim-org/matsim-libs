@@ -18,7 +18,6 @@ import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
@@ -30,8 +29,13 @@ public class LazyDispatcher extends UniversalDispatcher {
 
     private Link[] destLinks = null;
 
-    public LazyDispatcher(EventsManager eventsManager, SingleRideAppender appender, Link[] sendAVtoLink) {
-        super(eventsManager, appender);
+    public LazyDispatcher( //
+            AVDispatcherConfig config, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator router, //
+            EventsManager eventsManager, //
+            Link[] sendAVtoLink) {
+        super(config, travelTime, router, eventsManager);
         this.destLinks = sendAVtoLink;
     }
 
@@ -68,7 +72,7 @@ public class LazyDispatcher extends UniversalDispatcher {
             }
             System.out.println("#unmatchedRequestLinks " + unmatchedRequestLinks.size());
             System.out.println(getStatusString());
-//            Collection<VehicleLinkPair> collection = getDivertableVehicles();
+            // Collection<VehicleLinkPair> collection = getDivertableVehicles();
 
             // if (!collection.isEmpty()) {
             // System.out.println("PROBING [" + collection.iterator().next().avVehicle.getId() + "]");
@@ -76,7 +80,7 @@ public class LazyDispatcher extends UniversalDispatcher {
             if (!unmatchedRequestLinks.isEmpty()) {
 
                 for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-//                    System.out.println("TESTING [" + vehicleLinkPair.avVehicle.getId() + "]");
+                    // System.out.println("TESTING [" + vehicleLinkPair.avVehicle.getId() + "]");
                     if (unmatchedRequestLinks.isEmpty())
                         break;
                     Link dest = vehicleLinkPair.getDestination();
@@ -167,7 +171,8 @@ public class LazyDispatcher extends UniversalDispatcher {
             Link sendAVtoLink4 = network.getLinks().get(l4);
             Link[] sendAVtoLinks = new Link[] { sendAVtoLink1, sendAVtoLink2, sendAVtoLink3, sendAVtoLink4 };
             // put the link into the lazy dispatcher
-            return new LazyDispatcher(eventsManager, new SingleRideAppender(config, router, travelTime), sendAVtoLinks);
+            return new LazyDispatcher( //
+                    config, travelTime, router, eventsManager, sendAVtoLinks);
         }
     }
 }

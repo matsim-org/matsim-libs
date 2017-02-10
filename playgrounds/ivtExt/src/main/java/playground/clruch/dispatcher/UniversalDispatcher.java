@@ -23,29 +23,48 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.router.SimpleBlockingRouter;
 import playground.clruch.utils.VrpPathUtils;
+import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
+import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public abstract class UniversalDispatcher extends AbstractDispatcher {
+/**
+ * alternative to {@link AbstractDispatcher}
+ */
+public abstract class UniversalDispatcher implements AVDispatcher {
+    protected final AVDispatcherConfig config;
+    protected final TravelTime travelTime;
+    protected final ParallelLeastCostPathCalculator router;
+    protected final EventsManager eventsManager;
 
     private final List<AVVehicle> vehicles = new ArrayList<>();
     private final Set<AVRequest> pendingRequests = new HashSet<>();
-    private Set<AVRequest> matchedRequests = new HashSet<>();
+    private final Set<AVRequest> matchedRequests = new HashSet<>();
 
     // ---
-    public UniversalDispatcher(EventsManager eventsManager, SingleRideAppender appender) {
-        super(eventsManager, appender);
+    public UniversalDispatcher( //
+            AVDispatcherConfig config, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator router, //
+            EventsManager eventsManager //
+    ) {
+        this.config = config;
+        this.travelTime = travelTime;
+        this.router = router;
+        this.eventsManager = eventsManager;
     }
 
     private double private_now = -1;
@@ -108,7 +127,7 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
         matchedRequests.add(avRequest);
 
         // System.out.println(private_now + " @ " + avVehicle.getId() + " picksup " + avRequest.getPassenger().getId());
-        AVTimingParameters timing = appender.config.getParent().getTimingParameters();
+        AVTimingParameters timing = config.getParent().getTimingParameters();
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
 
         AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
@@ -118,7 +137,7 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
         AVPickupTask pickupTask = new AVPickupTask(private_now, private_now + timing.getPickupDurationPerStop(), avRequest.getFromLink(), Arrays.asList(avRequest));
         schedule.addTask(pickupTask);
 
-        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+        SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(router, travelTime);
         VrpPathWithTravelData dropoffPath = simpleBlockingRouter.getRoute(avRequest.getFromLink(), avRequest.getToLink(), pickupTask.getEndTime());
         AVDriveTask dropoffDriveTask = new AVDriveTask(dropoffPath, Arrays.asList(avRequest));
         schedule.addTask(dropoffDriveTask);
@@ -176,7 +195,7 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
                     TaskTracker taskTracker = avDriveTask.getTaskTracker();
                     OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
 
-                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(router, travelTime);
                     VrpPathWithTravelData newSubPath = simpleBlockingRouter.getRoute( //
                             vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
                     System.out.println(newSubPath.getFromLink().getId() + " =? " + vehicleLinkPair.linkTimePair.link.getId());
@@ -201,7 +220,7 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
                         schedule.removeLastTask();
                         System.out.println("The last task was removed for " + vehicleLinkPair.avVehicle.getId());
                     }
-                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(appender.router, appender.travelTime);
+                    SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(router, travelTime);
                     VrpPathWithTravelData routePoints = simpleBlockingRouter.getRoute( //
                             vehicleLinkPair.linkTimePair.link, dest, vehicleLinkPair.linkTimePair.time);
                     final AVDriveTask avDriveTask = new AVDriveTask(routePoints);
@@ -232,17 +251,15 @@ public abstract class UniversalDispatcher extends AbstractDispatcher {
     @Override
     public final void onNextTimestep(double now) {
         private_now = now;
-        if (0 < appender.tasks.size())
-            throw new RuntimeException("appender cannot have tasks!");
-        appender.update();
         redispatch(now);
     }
 
     public abstract void redispatch(double now);
 
     @Override
-    protected final void protected_registerVehicle(AVVehicle vehicle) {
+    public final void registerVehicle(AVVehicle vehicle) {
         vehicles.add(vehicle);
+        eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
 }

@@ -1,13 +1,19 @@
 package playground.clruch.dispatcher;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.router.util.TravelTime;
 
-import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
+import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class EvalDispatcher extends UniversalDispatcher {
 
-    public EvalDispatcher(EventsManager eventsManager, SingleRideAppender appender) {
-        super(eventsManager, appender);
+    public EvalDispatcher(//
+            AVDispatcherConfig config, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator router, //
+            EventsManager eventsManager) {
+        super(config, travelTime, router, eventsManager);
         // TODO Auto-generated constructor stub
     }
 

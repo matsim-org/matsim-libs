@@ -19,6 +19,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+@Deprecated
 public class TestDispatcher extends AbstractDispatcher {
     public static final String IDENTIFIER = "TestDispatcher";
 

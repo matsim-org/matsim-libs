@@ -8,22 +8,29 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
-import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
+import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
 
-    public PartitionedDispatcher(EventsManager eventsManager, SingleRideAppender appender, VirtualNetwork virtualNetwork) {
-        super(eventsManager, appender);
+    public PartitionedDispatcher( //
+            AVDispatcherConfig config, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator router, //
+            EventsManager eventsManager, //
+            VirtualNetwork virtualNetwork) {
+        super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
     }
 
     @Deprecated
-    Map<VirtualNode, Long> getAvailableVehicleCount() { // better to use getAvailableVehicles() 
+    Map<VirtualNode, Long> getAvailableVehicleCount() { // better to use getAvailableVehicles()
         return getDivertableVehicles().stream() //
                 .parallel() //
                 .map(VehicleLinkPair::getDivertableLocation) //
@@ -53,7 +60,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                 .map(virtualNetwork::getVirtualNode) //
                 .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
     }
-    
+
     Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {
         Map<VirtualNode, List<AVRequest>> map = new HashMap<>();
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
@@ -67,6 +74,5 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                 });
         return map;
     }
-
 
 }
