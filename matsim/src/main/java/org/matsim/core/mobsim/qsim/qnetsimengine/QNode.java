@@ -242,8 +242,8 @@ public class QNode implements NetsimNode {
 			String string = "Cannot move vehicle " + veh.getId() + " from link " + currentLink.getId() + " to link "
 					+ nextQLink.getLink().getId();
 			log.warn(string);
-			throw new RuntimeException(string);
-			// return false;
+//			throw new RuntimeException(string); // TODO this indicates that the car will get stuck
+			 return false;
 		}
 		// if ( !nextQLink.getLink().getAllowedModes().contains(
 		// veh.getDriver().getMode() ) ) {
