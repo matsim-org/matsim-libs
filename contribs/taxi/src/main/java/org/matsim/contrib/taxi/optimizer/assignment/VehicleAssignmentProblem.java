@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
@@ -61,7 +62,7 @@ public class VehicleAssignmentProblem<D>
 
 
     public VehicleAssignmentProblem(TravelTime travelTime, MultiNodePathCalculator router,
-            BackwardFastMultiNodeDijkstra backwardRouter)
+		    BackwardMultiNodePathCalculator backwardRouter)
     {
         //we do not need Euclidean router when there is not kNN filtering
         this(travelTime, router, backwardRouter, null, -1, -1);
@@ -69,7 +70,7 @@ public class VehicleAssignmentProblem<D>
 
 
     public VehicleAssignmentProblem(TravelTime travelTime, MultiNodePathCalculator router,
-            BackwardFastMultiNodeDijkstra backwardRouter, FastAStarEuclidean euclideanRouter,
+		    BackwardMultiNodePathCalculator backwardRouter, FastAStarEuclidean euclideanRouter,
             int nearestDestinationLimit, int nearestVehicleLimit)
     {
         this.travelTime = travelTime;

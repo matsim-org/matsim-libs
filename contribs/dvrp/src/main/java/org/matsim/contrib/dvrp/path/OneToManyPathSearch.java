@@ -24,6 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -40,7 +41,7 @@ public class OneToManyPathSearch
 
 
     public static OneToManyPathSearch createBackwardSearch(
-            BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra)
+		    BackwardMultiNodePathCalculator backwardMultiNodeDijkstra)
     {
         return new OneToManyPathSearch(backwardMultiNodeDijkstra, false);
     }

@@ -78,7 +78,7 @@ public class AssignmentTaxiOptimizer
                 optimContext.travelDisutility, optimContext.travelTime,
                 optimContext.scheduler.getParams().AStarEuclideanOverdoFactor, fastRouterFactory);
 
-        assignmentProblem = new VehicleAssignmentProblem<TaxiRequest>(optimContext.travelTime,
+        assignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime,
                 getRouter(), getBackwardRouter(), euclideanRouter, params.nearestRequestsLimit,
                 params.nearestVehiclesLimit);
 
@@ -127,7 +127,7 @@ protected MultiNodePathCalculator getRouter() {
 }
 
 
-protected BackwardFastMultiNodeDijkstra getBackwardRouter() {
+protected BackwardMultiNodePathCalculator getBackwardRouter() {
 	return backwardRouter;
 }
 }
