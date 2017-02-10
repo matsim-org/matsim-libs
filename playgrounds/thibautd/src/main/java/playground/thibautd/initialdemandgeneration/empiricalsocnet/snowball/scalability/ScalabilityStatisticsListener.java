@@ -37,9 +37,12 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -52,6 +55,8 @@ import java.util.stream.DoubleStream;
  */
 public class ScalabilityStatisticsListener implements AutoCloseable {
 	private static final Logger log = Logger.getLogger( ScalabilityStatisticsListener.class );
+
+	private static final int N_DISTANCES = 500;
 	
 	private final BufferedWriter writer;
 	private final Set<Set<Ego>> cliques = new HashSet<>();
@@ -77,6 +82,7 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 					"overlapMin\toverlapQ1\toverlapMedian\toverlapQ3\toverlapMax\t" +
 					"nConnectedComponents\t" +
 					"componentSizeMin\tcomponentSizeQ1\tcomponentSizeMedian\tcomponentSizeQ3\tcomponentSizeMax\t" +
+					"socialDistanceMin\tsocialDistanceQ1\tsocialDistanceMedian\tsocialDistanceQ3\tsocialDistanceMax\t" +
 					"peakMemoryUsage_bytes" );
 		}
 		catch ( IOException e ) {
@@ -153,6 +159,16 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 			final Collection<Set<Id<Person>>> components = SnaUtils.identifyConnectedComponents( sn );
 			writer.write( "\t"+components.size()+"\t" );
 			writeBoxPlot( components , Set::size );
+
+			log.info( "write social distance statistics..." );
+			final List<Double> distances = new ArrayList<>( N_DISTANCES + 1 );
+			distances.add( 1d ); // to be sure to have the minimum
+			SnaUtils.sampleSocialDistances(
+					sn,
+					new Random( 123 ),
+					N_DISTANCES,
+					(e,a,d) -> distances.add( d ) );
+			writeBoxPlot( distances , d -> d );
 
 			log.info( "write memory statistics..." );
 			writer.write( "\t"+peakMemory_bytes.get() );
