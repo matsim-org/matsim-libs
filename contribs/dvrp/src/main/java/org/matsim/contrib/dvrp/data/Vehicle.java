@@ -29,35 +29,46 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
  * @author michalm
  */
 public interface Vehicle
-    extends Identifiable<Vehicle>
+extends Identifiable<Vehicle>
 {
-    Link getStartLink();
+	Link getStartLink();
 
 
-    void setStartLink(Link link);
+	void setStartLink(Link link);
 
 
-    double getCapacity();
+	/**
+	 * Design comment(s):<ul>
+	 * <li> Does not use the MATSim vehicle model, so I cannot tell if this is with or without driver.  kai, feb'17
+	 * </ul> 
+	 */
+	double getCapacity();
 
 
-    // vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
-    double getT0();
+	// vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
+	double getT0();
 
 
-    double getT1();
+	double getT1();
 
 
-    void setT1(double t1);
+	void setT1(double t1);
 
 
-    Schedule getSchedule();
+	/**
+	 * Design comment(s):<ul>
+	 * <li> The Schedule is meant to be changed only by the optimizer.  Note, however, that the present 
+	 * design does not prevent other classes to change it, so be careful to not do that.  kai, feb'17
+	 * </ul>
+	 */
+	Schedule getSchedule();
 
 
-    VrpAgentLogic getAgentLogic();
+	VrpAgentLogic getAgentLogic();
 
 
-    void setAgentLogic(VrpAgentLogic agentLogic);
+	void setAgentLogic(VrpAgentLogic agentLogic);
 
 
-    void resetSchedule();
+	void resetSchedule();
 }
