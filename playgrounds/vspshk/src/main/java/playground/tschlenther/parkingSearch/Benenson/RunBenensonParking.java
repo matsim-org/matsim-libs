@@ -39,7 +39,7 @@ public class RunBenensonParking {
 		Config config = ConfigUtils.loadConfig(inputDir + "config.xml");
 		config.plans().setInputFile(inputDir + "population10.xml");
 		config.facilities().setInputFile(inputDir + "parkingFacilities_destKnapp.xml");
-		config.controler().setOutputDirectory("C:/Users/Work/Bachelor Arbeit/RUNS/BenensonParking/try_160117/test_accepted_Distance_200mNetwork/");
+		config.controler().setOutputDirectory("C:/Users/Work/Bachelor Arbeit/RUNS/BenensonParking/try_100217/test_accepted_Distance_beforeEntering_200mNetwork/");
 		config.network().setInputFile("C:/Users/Work/Bachelor Arbeit/input/grid_network_length200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		if (otfvis) {

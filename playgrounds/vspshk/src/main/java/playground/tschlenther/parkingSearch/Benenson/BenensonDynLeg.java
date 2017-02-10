@@ -26,7 +26,7 @@ public class BenensonDynLeg extends ParkingDynLeg{
 	private static final Logger logger = Logger.getLogger(BenensonDynLeg.class);
 	private double totalObservedParkingSpaces = 0.0;
 	private double observedFreeParkingSpaces = 0.0;
-	private double firstDestLinkEnterTimer = 0;
+	private double firstDestLinkEnterTime = 0;
 	private ParkingMode legStage = ParkingMode.DRIVING;
 	
 	public BenensonDynLeg(String mode, NetworkRoute route, ParkingSearchLogic logic,
@@ -56,14 +56,14 @@ public class BenensonDynLeg extends ParkingDynLeg{
 		}
 		else if (this.legStage == ParkingMode.SEARCH_FOR_NEXT){
 			logger.error("vehicle " + this.vehicleId + " in PHASE3 auf link " + this.currentLinkId);
-			if( ((BenensonParkingSearchLogic)this.logic).isDriverInAcceptableDistance(currentLinkId, route.getEndLinkId(), this.firstDestLinkEnterTimer, timer.getTimeOfDay()) ){
+			//if( ((BenensonParkingSearchLogic)this.logic).isDriverInAcceptableDistance(currentLinkId, route.getEndLinkId(), this.firstDestLinkEnterTimer, timer.getTimeOfDay()) ){
 			
 				hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
 				
 				logger.error("vehicle " + this.vehicleId + " probiert in Phase 3 auf Link " + this.currentLinkId + ", " +
-						(int)(timer.getTimeOfDay() - this.firstDestLinkEnterTimer)/60 + ":" + (int)(timer.getTimeOfDay() - this.firstDestLinkEnterTimer)%60
+						(int)(timer.getTimeOfDay() - this.firstDestLinkEnterTime)/60 + ":" + (int)(timer.getTimeOfDay() - this.firstDestLinkEnterTime)%60
 						+ " min nach Erreichen des Ziels zu parken. Resultat: " + hasFoundParking);
-			}
+			//}
 		}
 		else{
 			observeAndMemorizeParkingSituation();
@@ -132,14 +132,14 @@ public class BenensonDynLeg extends ParkingDynLeg{
 				// need to find the next link
 				Id<Link> nextLinkId;
 				if(this.legStage == ParkingMode.SEARCH_FOR_NEXT){
-					nextLinkId = this.logic.getNextLink(currentLinkId, vehicleId);
+					nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkPhase3(currentLinkId, this.route.getEndLinkId(), vehicleId, firstDestLinkEnterTime, this.timer.getTimeOfDay());
 				}
 				else{
-					nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, false);
+					nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkPhase2(currentLinkId, route.getEndLinkId(), vehicleId, false);
 				}
 				if(nextLinkId.equals(route.getEndLinkId()) && this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
 						this.legStage = ParkingMode.SEARCH_FOR_NEXT;
-						this.firstDestLinkEnterTimer = timer.getTimeOfDay();
+						this.firstDestLinkEnterTime = timer.getTimeOfDay();
 				}
 				currentAndNextParkLink = new Tuple<Id<Link>, Id<Link>>(currentLinkId, nextLinkId);
 				return nextLinkId;
