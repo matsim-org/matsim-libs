@@ -90,7 +90,7 @@ public class AssignmentTaxiOptimizer
     protected void scheduleUnplannedRequests()
     {
         //advance request not considered => horizon==0 
-        AssignmentRequestData rData = new AssignmentRequestData(optimContext, 0, unplannedRequests);
+        AssignmentRequestData rData = new AssignmentRequestData(getOptimContext(), 0, getUnplannedRequests());
         if (rData.getSize() == 0) {
             return;
         }
@@ -105,19 +105,19 @@ public class AssignmentTaxiOptimizer
                 cost);
 
         for (Dispatch<TaxiRequest> a : assignments) {
-            optimContext.scheduler.scheduleRequest(a.vehicle, a.destination, a.path);
-            unplannedRequests.remove(a.destination);
+            getOptimContext().scheduler.scheduleRequest(a.vehicle, a.destination, a.path);
+            getUnplannedRequests().remove(a.destination);
         }
     }
 
 
     private VehicleData initVehicleData(AssignmentRequestData rData)
     {
-        int idleVehs = Iterables.size(Iterables.filter(optimContext.fleet.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
+        int idleVehs = Iterables.size(Iterables.filter(getOptimContext().fleet.getVehicles().values(),
+                TaxiSchedulerUtils.createIsIdle(getOptimContext().scheduler)));
         double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
                 params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
-        return new VehicleData(optimContext, optimContext.fleet.getVehicles().values(),
+        return new VehicleData(getOptimContext(), getOptimContext().fleet.getVehicles().values(),
                 vehPlanningHorizon);
     }
 

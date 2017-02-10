@@ -70,7 +70,7 @@ public class ZonalTaxiOptimizer
         initIdleVehiclesInZones();
         scheduleUnplannedRequestsWithinZones();
 
-        if (!unplannedRequests.isEmpty()) {
+        if (!getUnplannedRequests().isEmpty()) {
             super.scheduleUnplannedRequests();
         }
     }
@@ -86,8 +86,8 @@ public class ZonalTaxiOptimizer
                     new PriorityQueue<Vehicle>(10, LONGEST_WAITING_FIRST));
         }
 
-        for (Vehicle veh : optimContext.fleet.getVehicles().values()) {
-            if (optimContext.scheduler.isIdle(veh)) {
+        for (Vehicle veh : getOptimContext().fleet.getVehicles().values()) {
+            if (getOptimContext().scheduler.isIdle(veh)) {
                 Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
                 Zone zone = linkToZone.get(link.getId());
                 if (zone != null) {
@@ -101,7 +101,7 @@ public class ZonalTaxiOptimizer
 
     private void scheduleUnplannedRequestsWithinZones()
     {
-        Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+        Iterator<TaxiRequest> reqIter = getUnplannedRequests().iterator();
         while (reqIter.hasNext()) {
             TaxiRequest req = reqIter.next();
 
@@ -120,7 +120,7 @@ public class ZonalTaxiOptimizer
                     .findBestVehicleForRequest(req, filteredVehs);
 
             if (best != null) {
-                optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+                getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
                 reqIter.remove();
                 idleVehsInZone.remove(best.vehicle);
             }

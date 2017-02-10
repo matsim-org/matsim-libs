@@ -136,7 +136,7 @@ public class AssignmentETaxiOptimizer
     //if socCheckTimeStep is too small --> small number of idle plugs --> poorer assignments
     protected void scheduleCharging()
     {
-        AssignmentChargerPlugData pData = new AssignmentChargerPlugData(optimContext,
+        AssignmentChargerPlugData pData = new AssignmentChargerPlugData(getOptimContext(),
                 evData.getChargers().values());
         if (pData.getSize() == 0) {
             return;
@@ -179,12 +179,12 @@ public class AssignmentETaxiOptimizer
     private VehicleData initVehicleDataForCharging(AssignmentChargerPlugData pData)
     {
         Iterable<? extends Vehicle> vehiclesBelowMinSocLevel = Iterables
-                .filter(optimContext.fleet.getVehicles().values(), this::doNeedChargingScheduling);
+                .filter(getOptimContext().fleet.getVehicles().values(), this::doNeedChargingScheduling);
 
         //XXX if chargers are heavily used then shorten the planning horizon;
         //(like with undersupply of taxis)
         double chargingPlanningHorizon = 10 * 60;//10 minutes (should be longer than socCheckTimeStep)
-        VehicleData vData = new VehicleData(optimContext, vehiclesBelowMinSocLevel,
+        VehicleData vData = new VehicleData(getOptimContext(), vehiclesBelowMinSocLevel,
                 chargingPlanningHorizon);
 
         //filter least charged vehicles

@@ -20,7 +20,7 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
     {
         if (requiresReoptimization) {
             scheduleUnplannedRequests();
-            if(this.unplannedRequests.size() < 1){
+            if(this.getUnplannedRequests().size() < 1){
                 requiresReoptimization = false;
             }
         }
@@ -28,7 +28,7 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 
 	protected void scheduleUnplannedRequests() {
 		
-		new NPersonsProblem(optimContext).scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
+		new NPersonsProblem(getOptimContext()).scheduleUnplannedRequests((Queue<TaxiRequest>)getUnplannedRequests());
 		
 	}
 

@@ -32,8 +32,8 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 public abstract class AbstractTaxiOptimizer
     implements TaxiOptimizer
 {
-    protected final TaxiOptimizerContext optimContext;
-    protected final Collection<TaxiRequest> unplannedRequests;
+    private final TaxiOptimizerContext optimContext;
+    private final Collection<TaxiRequest> unplannedRequests;
 
     private final boolean doUnscheduleAwaitingRequests;//PLANNED or TAXI_DISPATCHED
     private final boolean destinationKnown;
@@ -145,4 +145,14 @@ public abstract class AbstractTaxiOptimizer
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
     }
+
+
+protected Collection<TaxiRequest> getUnplannedRequests() {
+	return unplannedRequests;
+}
+
+
+protected TaxiOptimizerContext getOptimContext() {
+	return optimContext;
+}
 }

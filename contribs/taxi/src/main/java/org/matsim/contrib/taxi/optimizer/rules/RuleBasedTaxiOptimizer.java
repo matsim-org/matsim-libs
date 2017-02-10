@@ -96,8 +96,8 @@ public class RuleBasedTaxiOptimizer
                 return false;
 
             case DEMAND_SUPPLY_EQUIL:
-                int awaitingReqCount = Requests.countRequests(unplannedRequests,
-                        new Requests.IsUrgentPredicate(optimContext.timer.getTimeOfDay()));
+                int awaitingReqCount = Requests.countRequests(getUnplannedRequests(),
+                        new Requests.IsUrgentPredicate(getOptimContext().timer.getTimeOfDay()));
 
                 return awaitingReqCount > idleTaxiRegistry.getVehicleCount();
 
@@ -112,7 +112,7 @@ public class RuleBasedTaxiOptimizer
     {
         int idleCount = idleTaxiRegistry.getVehicleCount();
 
-        Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+        Iterator<TaxiRequest> reqIter = getUnplannedRequests().iterator();
         while (reqIter.hasNext() && idleCount > 0) {
             TaxiRequest req = reqIter.next();
 
@@ -135,7 +135,7 @@ public class RuleBasedTaxiOptimizer
             BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
                     .findBestVehicleForRequest(req, selectedVehs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+            getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
             reqIter.remove();
             unplannedRequestRegistry.removeRequest(req);
@@ -148,22 +148,22 @@ public class RuleBasedTaxiOptimizer
     private void scheduleIdleVehiclesImpl()
     {
         Iterator<Vehicle> vehIter = idleTaxiRegistry.getVehicles().iterator();
-        while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
+        while (vehIter.hasNext() && !getUnplannedRequests().isEmpty()) {
             Vehicle veh = vehIter.next();
 
             Link link = ((TaxiStayTask)veh.getSchedule().getCurrentTask()).getLink();
-            Iterable<TaxiRequest> selectedReqs = unplannedRequests
+            Iterable<TaxiRequest> selectedReqs = getUnplannedRequests()
                     .size() > params.nearestRequestsLimit
                             ? unplannedRequestRegistry.findNearestRequests(link.getToNode(),
                                     params.nearestRequestsLimit)
-                            : unplannedRequests;
+                            : getUnplannedRequests();
 
             BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
                     .findBestRequestForVehicle(veh, selectedReqs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+            getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
-            unplannedRequests.remove(best.destination);
+            getUnplannedRequests().remove(best.destination);
             unplannedRequestRegistry.removeRequest(best.destination);
         }
     }
@@ -189,7 +189,7 @@ public class RuleBasedTaxiOptimizer
                 idleTaxiRegistry.removeVehicle(schedule.getVehicle());
             }
         }
-        else if (optimContext.scheduler.isIdle(schedule.getVehicle())) {
+        else if (getOptimContext().scheduler.isIdle(schedule.getVehicle())) {
             idleTaxiRegistry.addVehicle(schedule.getVehicle());
         }
         else {

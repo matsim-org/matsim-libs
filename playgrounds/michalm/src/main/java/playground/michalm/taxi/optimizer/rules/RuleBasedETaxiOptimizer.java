@@ -85,7 +85,7 @@ public class RuleBasedETaxiOptimizer
     {
         super.nextTask(vehicle);
 
-        if (optimContext.scheduler.isIdle(vehicle) && isUndercharged(vehicle)) {
+        if (getOptimContext().scheduler.isIdle(vehicle) && isUndercharged(vehicle)) {
             chargeIdleUnderchargedVehicles(Collections.singleton(vehicle));
         }
     }
