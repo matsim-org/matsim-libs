@@ -23,8 +23,8 @@
 	<event time="30500.0" type="actend" person="1" link="Link4" facility="4" actType="home"  />
 	<event time="30500.0" type="actend" person="2" link="Link4" facility="4" actType="home"  />
 	
-	<event time="32400.0" type="noiseEventAffected" emergenceTime="32400.0" affectedAgentId="1" amount="100" receiverPointId="1" activityType="home" />
-	<event time="32400.0" type="noiseEventAffected" emergenceTime="32400.0" affectedAgentId="2" amount="100" receiverPointId="1" activityType="home" />
-	<event time="32400.0" type="noiseEventCaused" emergenceTime="32400.0" causingAgentId="0" causingVehicleId="0" amount="100" linkId="Link4" />
+	<event time="32400.0" type="noiseEventAffected" timeBinEndTime="32400.0" affectedAgentId="1" amount="100" receiverPointId="1" activityType="home" />
+	<event time="32400.0" type="noiseEventAffected" timeBinEndTime="32400.0" affectedAgentId="2" amount="100" receiverPointId="1" activityType="home" />
+	<event time="32400.0" type="noiseEventCaused" timeBinEndTime="32400.0" linkEnteringTime="29100.0" causingAgentId="0" causingVehicleId="0" amount="100" linkId="Link4" />
 	
 </events>
