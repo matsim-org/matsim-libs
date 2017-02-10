@@ -23,7 +23,9 @@
 package org.matsim.contrib.noise.handler;
 
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.events.NoiseEventCaused;
+import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 
@@ -38,11 +40,11 @@ public class NoisePricingHandler implements NoiseEventCausedHandler {
 
 	private final EventsManager events;
 	private double amountSum = 0.;
-	private double noiseTollFactor;
+	private final NoiseContext noiseContext;
 
-	public NoisePricingHandler(EventsManager eventsManager, double noiseTollFactor) {
+	public NoisePricingHandler(EventsManager eventsManager, NoiseContext noiseContext) {
 		this.events = eventsManager;
-		this.noiseTollFactor = noiseTollFactor;
+		this.noiseContext = noiseContext;
 	}
 
 	@Override
@@ -54,11 +56,23 @@ public class NoisePricingHandler implements NoiseEventCausedHandler {
 	public void handleEvent(NoiseEventCaused event) {
 		
 		// negative amount since from here the amount is interpreted as costs
-		double amount = this.noiseTollFactor * event.getAmount() * (-1);
+		double amount = this.noiseContext.getNoiseParams().getNoiseTollFactor() * event.getAmount() * (-1);
 		this.amountSum = this.amountSum + amount;
 		
 		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
 		this.events.processEvent(moneyEvent);
+		
+		// the emergence time is the end time of the current time bin
+		if (this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() > this.noiseContext.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize()) {
+			int subTimeBins = (int) (this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() / this.noiseContext.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize());
+			
+			for (int n = 0; n < subTimeBins; n++) {
+				
+				double relevantTime = event.getEmergenceTime() - this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() + (this.noiseContext.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize() * n) + ( (this.noiseContext.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize() / 2. ));
+				PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, relevantTime);
+				this.events.processEvent(linkMoneyEvent);
+			}
+		}
 	}
 
 	public double getAmountSum() {

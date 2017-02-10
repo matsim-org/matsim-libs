@@ -116,7 +116,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		}
 			
 		if (this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
-			this.pricing = new NoisePricingHandler(event.getServices().getEvents(), noiseContext.getNoiseParams().getNoiseTollFactor());
+			this.pricing = new NoisePricingHandler(event.getServices().getEvents(), noiseContext);
 			event.getServices().getEvents().addHandler(this.pricing);
 		}		
 	}
