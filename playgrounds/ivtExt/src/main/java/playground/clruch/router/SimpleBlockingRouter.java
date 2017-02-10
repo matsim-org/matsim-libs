@@ -5,6 +5,7 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
@@ -40,7 +41,13 @@ public class SimpleBlockingRouter {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return VrpPaths.createPath(divLink, destLink, startTime, drivepath.get(), travelTime);
+        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(divLink, destLink, startTime, drivepath.get(), travelTime);
+
+        System.out.println(VrpPathUtils.toString(vrpPathWithTravelData));
+        if (!VrpPathUtils.isConsistent(vrpPathWithTravelData)) {
+            throw new RuntimeException("path not consistent");
+        }
+        return vrpPathWithTravelData;
     }
 
 }

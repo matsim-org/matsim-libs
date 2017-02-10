@@ -26,11 +26,11 @@ public class LazyDispatcher extends UniversalDispatcher {
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
     public LazyDispatcher( //
-            AVDispatcherConfig config, //
+            AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
-            ParallelLeastCostPathCalculator router, //
+            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager) {
-        super(config, travelTime, router, eventsManager);
+        super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
     }
 
     @Override
