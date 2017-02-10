@@ -29,6 +29,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 import playground.clruch.dispatcher.LazyDispatcher;
+import playground.clruch.dispatcher.PulseDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -90,7 +91,7 @@ public class AVModule extends AbstractModule {
         bind(SingleFIFODispatcher.Factory.class);
         bind(SingleHeuristicDispatcher.Factory.class);
         bind(MultiODHeuristic.Factory.class);
-//        bind(TestDispatcher.Factory.class);
+        bind(PulseDispatcher.Factory.class);
         bind(LazyDispatcher.Factory.class);
 
         // TODO: Also change identifiers of other dispatchers to class internal
@@ -98,7 +99,7 @@ public class AVModule extends AbstractModule {
         AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
-//        AVUtils.bindDispatcherFactory(binder(), TestDispatcher.IDENTIFIER).to(TestDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.IDENTIFIER).to(PulseDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LazyDispatcher.IDENTIFIER).to(LazyDispatcher.Factory.class);
     }
 
