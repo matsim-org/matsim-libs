@@ -8,7 +8,7 @@
 		<param name="dropoffDuration" value="60" />
 		<param name="onlineVehicleTracker" value="false" />
 
-		<param name="taxisFile" value="../dvrp/src/main/resources/one_taxi/one_taxi_vehicles.xml" />
+		<param name="taxisFile" value="../../../../../dvrp/src/main/resources/one_taxi/one_taxi_vehicles.xml" />
 
 		<param name="timeProfiles" value="false" />
 		<param name="detailedStats" value="false" />
