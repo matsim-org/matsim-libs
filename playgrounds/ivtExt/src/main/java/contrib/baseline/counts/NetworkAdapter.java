@@ -54,19 +54,17 @@ public class NetworkAdapter {
 			Map<String, Integer> observedCounts,
 			Map<String, Map<String, Double>> changeSpiders) {
 
-		// todo-boescpa: Gewichtung mit absolutExpectedMenge
-		// idee: weiteren faktor für berechnung link correction der besteht aus:
-		// 			expectedCounts(thisStation) / max(expectedCounts)
-
 		// calculate net effect of count corrections for each affected link
+		int maxExpectedCount = Collections.max(expectedCounts.values()); // to scale for importance of count station
 		Map<String, Double> netEffects = new HashMap<>();
 		for (String countLinkId : expectedCounts.keySet()) {
 			double expectedCount = expectedCounts.get(countLinkId);
 			double observedCount = observedCounts.get(countLinkId);
-			double correction = (expectedCount / observedCount) - 1;
+			double countCorrection = (expectedCount / observedCount) - 1;
+			double stationImportanceCorrection = expectedCount / maxExpectedCount;
 			Map<String, Double> countLinkSpider = changeSpiders.get(countLinkId);
 			for (String linkId : countLinkSpider.keySet()) {
-				double linkCorrection = countLinkSpider.get(linkId) * correction;
+				double linkCorrection = countLinkSpider.get(linkId) * countCorrection * stationImportanceCorrection;
 				double netEffect = netEffects.containsKey(linkId)? netEffects.get(linkId) : 0;
 				netEffect += linkCorrection;
 				netEffects.put(linkId, netEffect);

@@ -98,7 +98,7 @@ public class TestNetworkAdapter {
 	public void testNetworkAdaptorTwoCountStations() {
 		NetworkAdapter networkAdapter = new NetworkAdapter(network);
 		Map<String, Integer> expectedCounts = new HashMap<>();
-		expectedCounts.put("3323", 150); expectedCounts.put("4232", 150);
+		expectedCounts.put("3323", 150); expectedCounts.put("4232", expectedCounts.get("3323"));
 		Map<String, Integer> observedCounts = new HashMap<>();
 		observedCounts.put("3323", spiderCreator.createAbsoluteSpider("3323").get("3323"));
 		observedCounts.put("4232", spiderCreator.createAbsoluteSpider("4232").get("4232"));
@@ -113,4 +113,23 @@ public class TestNetworkAdapter {
 		}
 	}
 
+	@Test
+	public void testScalingOfCountStationImportance() {
+		NetworkAdapter networkAdapter = new NetworkAdapter(network);
+		Map<String, Integer> expectedCounts = new HashMap<>();
+		expectedCounts.put("3323", 150);
+		Map<String, Integer> observedCounts = new HashMap<>();
+		observedCounts.put("3323", spiderCreator.createAbsoluteSpider("3323").get("3323"));
+		observedCounts.put("4232", spiderCreator.createAbsoluteSpider("4232").get("4232"));
+		expectedCounts.put("4232", observedCounts.get("4232") - (expectedCounts.get("3323") - observedCounts.get("4232")));
+		List<NetworkChangeEvent> changeEvents =
+				networkAdapter.identifyNetworkChanges(expectedCounts, observedCounts, spiderCreator.createAllRelativeSpiders());
+		// Output:
+		System.out.println("3323 - Expected: " + expectedCounts.get("3323") + "; Observed: " + observedCounts.get("3323"));
+		System.out.println("4232 - Expected: " + expectedCounts.get("4232") + "; Observed: " + observedCounts.get("4232"));
+		for (NetworkChangeEvent changeEvent : changeEvents) {
+			System.out.println("Link: " + changeEvent.getLinks().toString() + ";" +
+					" Change Factor: " + changeEvent.getFlowCapacityChange().getValue());
+		}
+	}
 }
