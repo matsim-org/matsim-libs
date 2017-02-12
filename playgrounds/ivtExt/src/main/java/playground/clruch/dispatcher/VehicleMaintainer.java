@@ -32,7 +32,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;
 
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
-    private Double private_now = (double) -1;
+    private Double private_now = null;
 
     public VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
@@ -109,8 +109,9 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     @Override
     public final void onNextTimestep(double now) {
-        private_now = now;
+        private_now = now; // time available
         redispatch(now);
+        private_now = null; // time unavailable
     }
 
     /**
@@ -119,7 +120,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
      * @throws NullPointerException
      *             if dispatching has not started yet
      */
-    public final double getTimeNow() {
+    protected final double getTimeNow() {
         return private_now;
     }
 
