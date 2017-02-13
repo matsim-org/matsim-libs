@@ -14,13 +14,13 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.router.SimpleBlockingRouter;
-import playground.clruch.utils.ScheduleUtils;
 import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVTimingParameters;
@@ -123,9 +123,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             public void handle(AVDriveTask avDriveTask) {
                 if (!avDriveTask.getPath().getToLink().equals(destination)) {
                     // vehicleLinkPair.avVehicle.
-                    System.out.println("REROUTING [" + vehicleLinkPair.avVehicle.getId() + " @" + 1 + "]");
-                    System.out.println("schedule before:");
-                    System.out.println(ScheduleUtils.scheduleOf(vehicleLinkPair.avVehicle));
+//                    System.out.println("REROUTING [" + vehicleLinkPair.avVehicle.getId() + " @" + 1 + "]");
+                    // final int pathLengthAnte = avDriveTask.getPath().getLinkCount();
 
                     SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(parallelLeastCostPathCalculator, travelTime);
                     VrpPathWithTravelData vrpPathWithTravelData = simpleBlockingRouter.getRoute( //
@@ -134,16 +133,31 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     // System.out.println(newSubPath.getDepartureTime() + " =? " + vehicleLinkPair.linkTimePair.time);
                     {
                         TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                        OnlineDriveTaskTrackerImpl onlineDriveTaskTrackerImpl = (OnlineDriveTaskTrackerImpl) taskTracker;
+                        final int diversionLinkIndex = onlineDriveTaskTrackerImpl.getDiversionLinkIndex();
+                        final int lengthOfDiversion = vrpPathWithTravelData.getLinkCount();
                         OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
                         onlineDriveTaskTracker.divertPath(vrpPathWithTravelData);
+                        VrpPathUtils.assertIsConsistent(avDriveTask.getPath());
+
+                        final int lengthOfCombination = avDriveTask.getPath().getLinkCount();
+//                        System.out.println(String.format("[@%d of %d]", diversionLinkIndex, lengthOfCombination));
+                        if (diversionLinkIndex + lengthOfDiversion != lengthOfCombination)
+                            throw new RuntimeException("mismatch " + diversionLinkIndex + "+" + lengthOfDiversion + " != " + lengthOfCombination);
+
                     }
                     // newSubPath.getArrivalTime()
-
-                    AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
-                    avStayTask.setBeginTime(avDriveTask.getEndTime());
-                    System.out.println("schedule after:");
-                    System.out.println(ScheduleUtils.scheduleOf(vehicleLinkPair.avVehicle));
-                    System.out.println("---");
+                    final double scheduleEndTime;
+                    {
+                        AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
+                        scheduleEndTime = avStayTask.getEndTime();
+                    }
+                    schedule.removeLastTask(); // remove stay task
+                    // FIXME regarding min max of begin and end time!!! when NOT to append stayTask?
+                    schedule.addTask(new AVStayTask(avDriveTask.getEndTime(), scheduleEndTime, destination)); // TODO redundant
+                    // System.out.println("schedule after:");
+                    // System.out.println(ScheduleUtils.scheduleOf(vehicleLinkPair.avVehicle));
+                    // System.out.println("---");
                 }
             }
 
@@ -166,7 +180,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     schedule.addTask(avDriveTask);
                     schedule.addTask(new AVStayTask(avDriveTask.getEndTime(), scheduleEndTime, destination)); // TODO redundant
                     // ---
-                    System.out.println(ScheduleUtils.scheduleOf(vehicleLinkPair.avVehicle));
+                    // System.out.println(ScheduleUtils.scheduleOf(vehicleLinkPair.avVehicle));
                 }
             }
         };
@@ -193,7 +207,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     public final String getStatusString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#requests " + getAVRequests().size());
-        stringBuilder.append(", #stay " + getStayVehicles().size()); // TODO count better!
+        stringBuilder.append(", #stay " + //
+                getStayVehicles().values().stream().flatMap(s -> s.stream()).count());
         stringBuilder.append(", #divert " + getDivertableVehicles().size());
         return stringBuilder.toString();
     }

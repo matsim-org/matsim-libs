@@ -4,19 +4,22 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPath;
 
+/**
+ * print out links and nodes
+ */
 public class VrpPathUtils {
-    public static double getDistance(VrpPathWithTravelData vrpPathWithTravelData) {
+    public static double getDistance(VrpPath vrpPath) {
         double distance = 0;
-        for (Link link : vrpPathWithTravelData)
+        for (Link link : vrpPath)
             distance += link.getLength();
         return distance;
     }
 
-    public static String toString(VrpPathWithTravelData vrpPathWithTravelData) {
+    public static String toString(VrpPath vrpPath) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Link link : vrpPathWithTravelData) {
+        for (Link link : vrpPath) {
             stringBuilder.append(link.getId().toString() + '\t');
             stringBuilder.append(link.getFromNode().getId().toString() + '\t');
             stringBuilder.append(link.getToNode().getId().toString() + '\n');
@@ -24,9 +27,9 @@ public class VrpPathUtils {
         return stringBuilder.toString().trim();
     }
 
-    public static boolean isConsistent(VrpPathWithTravelData vrpPathWithTravelData) {
+    public static boolean isConsistent(VrpPath vrpPath) {
         boolean status = true;
-        Iterator<Link> iterator = vrpPathWithTravelData.iterator();
+        Iterator<Link> iterator = vrpPath.iterator();
         Node node = iterator.next().getToNode();
         while (iterator.hasNext()) {
             Link link = iterator.next();
@@ -34,6 +37,13 @@ public class VrpPathUtils {
             node = link.getToNode();
         }
         return status;
+    }
+
+    public static void assertIsConsistent(VrpPath vrpPath) {
+        if (!isConsistent(vrpPath)) {
+            System.out.println(toString(vrpPath));
+            throw new RuntimeException("path is not consistent");
+        }
     }
 
 }
