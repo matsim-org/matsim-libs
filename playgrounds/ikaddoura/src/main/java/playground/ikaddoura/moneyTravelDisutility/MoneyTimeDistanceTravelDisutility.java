@@ -39,30 +39,42 @@ import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
 
 public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 	
-	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
+	private final TravelDisutility travelDisutility;
 	private final double sigma;	
 	private Scenario scenario;
 	private MoneyEventAnalysis moneyEventAnalysis;
 	private AgentFilter vehicleFilter;
 	
 	public MoneyTimeDistanceTravelDisutility(
-			TravelDisutility randomizedTimeDistanceTravelDisutility,
+			TravelDisutility travelDisutility,
 			double sigma,
 			Scenario scenario,
 			MoneyEventAnalysis moneyEventHandler,
 			AgentFilter vehicleFilter) {
 
-		this.randomizedTimeDistanceTravelDisutility = randomizedTimeDistanceTravelDisutility;
+		this.travelDisutility = travelDisutility;
 		this.sigma = sigma;
 		this.scenario = scenario;
 		this.moneyEventAnalysis = moneyEventHandler;
 		this.vehicleFilter = vehicleFilter;
 	}
+	
+	public MoneyTimeDistanceTravelDisutility(
+			TravelDisutility travelDisutility,
+			Scenario scenario,
+			MoneyEventAnalysis moneyEventHandler) {
+
+		this.travelDisutility = travelDisutility;
+		this.sigma = 0.;
+		this.scenario = scenario;
+		this.moneyEventAnalysis = moneyEventHandler;
+		this.vehicleFilter = null;
+	}
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 				
-		double randomizedTimeDistanceDisutilityForLink = this.randomizedTimeDistanceTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+		double travelDisutility = this.travelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
 		
 		double logNormalRnd = 1. ;
 		if ( sigma != 0. ) {
@@ -72,12 +84,12 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person, vehicle);
 		double randomizedTollDisutility = linkExpectedTollDisutility * logNormalRnd;
 		
-		return randomizedTimeDistanceDisutilityForLink + randomizedTollDisutility;
+		return travelDisutility + randomizedTollDisutility;
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		throw new UnsupportedOperationException();
+		return link.getLength() / link.getFreespeed();
 	}
 
 	private double calculateExpectedTollDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
