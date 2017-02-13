@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 
-class OnlineDriveTaskTrackerImpl
+public class OnlineDriveTaskTrackerImpl // jan made this public
         implements OnlineDriveTaskTracker {
     private final DriveTask driveTask;
     private final VrpLeg vrpDynLeg;
@@ -99,7 +99,7 @@ class OnlineDriveTaskTrackerImpl
 
 
     public void divertPath(VrpPathWithTravelData newSubPath) {
-        LinkTimePair diversionPoint = getDiversionPoint();
+        LinkTimePair diversionPoint = getDiversionPoint(); // FIXME this may return null but is not handled here 
 
         if (!newSubPath.getFromLink().equals(diversionPoint.link)) {
             throw new IllegalArgumentException("links dont match: "+newSubPath.getFromLink().getId()+"!="+diversionPoint.link.getId());
@@ -108,7 +108,7 @@ class OnlineDriveTaskTrackerImpl
             throw new IllegalArgumentException("times dont match");
         }
 
-        int diversionLinkIdx = currentLinkIdx + (vrpDynLeg.canChangeNextLink() ? 0 : 1);
+        int diversionLinkIdx = currentLinkIdx + (vrpDynLeg.canChangeNextLink() ? 0 : 1); // TODO use getDiversionLinkIdx()
         DivertedVrpPath divertedPath = new DivertedVrpPath(path, newSubPath, diversionLinkIdx);
         initForPath(divertedPath);
 
@@ -130,6 +130,11 @@ class OnlineDriveTaskTrackerImpl
 
     public int getCurrentLinkIdx() {
         return currentLinkIdx;
+    }
+    
+    // jan added this function
+    public int getDiversionLinkIndex() {
+    	return getCurrentLinkIdx() + (vrpDynLeg.canChangeNextLink() ? 0 : 1);
     }
 
 

@@ -42,11 +42,8 @@ public class SimpleBlockingRouter {
             e.printStackTrace();
         }
         VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(divLink, destLink, startTime, drivepath.get(), travelTime);
-
-        System.out.println(VrpPathUtils.toString(vrpPathWithTravelData));
-        if (!VrpPathUtils.isConsistent(vrpPathWithTravelData)) {
-            throw new RuntimeException("path not consistent");
-        }
+        
+        VrpPathUtils.assertIsConsistent(vrpPathWithTravelData);
         return vrpPathWithTravelData;
     }
 

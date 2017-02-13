@@ -47,8 +47,7 @@ public class PulseDispatcher extends UniversalDispatcher {
 
     @Override
     public void redispatch(double now) {
-
-        if (Math.round(now) % DEBUG_PERIOD == 0 && now < 20000) {
+        if (3600 < now && Math.round(now) % DEBUG_PERIOD == 0 && now < 90000) {
             System.out.println("==================== TIME " + now);
             System.out.println(getStatusString());
 
@@ -59,8 +58,8 @@ public class PulseDispatcher extends UniversalDispatcher {
             // END: debug info
 
             for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-                if (random.nextInt(20) == 0) {
-                    System.out.println("- diversion -");
+                if (random.nextInt(3) == 0) {
+                    // System.out.println("- diversion -");
                     setVehicleDiversion(vehicleLinkPair, links.get(index));
                     ++index;
                     index %= links.size();
@@ -70,8 +69,7 @@ public class PulseDispatcher extends UniversalDispatcher {
     }
 
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
-        System.out.println("moved "+avVehicle.getId() + " -> " + linkTimePair.link.getId());
-        // default implementation: for now, do nothing
+        // System.out.println("moved " + avVehicle.getId() + " -> " + linkTimePair.link.getId());
     }
 
     public static class Factory implements AVDispatcherFactory {
