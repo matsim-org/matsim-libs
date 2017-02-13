@@ -292,50 +292,53 @@ public class CNEIntegration {
 
 		// ########################## Travel disutility ##########################
 		
-		if (useTripAndAgentSpecificVTTSForRouting) {
-			final VTTSMoneyTimeDistanceTravelDisutilityFactory factory = new VTTSMoneyTimeDistanceTravelDisutilityFactory(
-					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore())
-					);
-			factory.setSigma(sigma);
+		if (this.congestionPricing || this.noisePricing || this.airPollutionPricing) {
 			
-			controler.addOverridingModule(new AbstractModule(){
-				@Override
-				public void install() {
-					
-					if (agentFilter != null) this.bind(AgentFilter.class).toInstance(agentFilter);
-									
-					// travel disutility
-					this.bindCarTravelDisutilityFactory().toInstance(factory);
-					this.bind(MoneyEventAnalysis.class).asEagerSingleton();
-					
-					// person money event handler + controler listener
-					this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
-					this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
-				}
-			}); 			
-			
-		} else {
-			final MoneyTimeDistanceTravelDisutilityFactory factory = new MoneyTimeDistanceTravelDisutilityFactory(
-					new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()));
-			
-			factory.setSigma(sigma);
-			
-			controler.addOverridingModule(new AbstractModule(){
-				@Override
-				public void install() {
-					
-					if (agentFilter != null) this.bind(AgentFilter.class).toInstance(agentFilter);
-									
-					// travel disutility
-					this.bindCarTravelDisutilityFactory().toInstance(factory);
-					this.bind(MoneyEventAnalysis.class).asEagerSingleton();
-					
-					// person money event handler + controler listener
-					this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
-					this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
-				}
-			}); 
-		}		
+			if (useTripAndAgentSpecificVTTSForRouting) {
+				final VTTSMoneyTimeDistanceTravelDisutilityFactory factory = new VTTSMoneyTimeDistanceTravelDisutilityFactory(
+						new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore())
+						);
+				factory.setSigma(sigma);
+				
+				controler.addOverridingModule(new AbstractModule(){
+					@Override
+					public void install() {
+						
+						if (agentFilter != null) this.bind(AgentFilter.class).toInstance(agentFilter);
+										
+						// travel disutility
+						this.bindCarTravelDisutilityFactory().toInstance(factory);
+						this.bind(MoneyEventAnalysis.class).asEagerSingleton();
+						
+						// person money event handler + controler listener
+						this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
+						this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
+					}
+				}); 			
+				
+			} else {
+				final MoneyTimeDistanceTravelDisutilityFactory factory = new MoneyTimeDistanceTravelDisutilityFactory(
+						new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()));
+				
+				factory.setSigma(sigma);
+				
+				controler.addOverridingModule(new AbstractModule(){
+					@Override
+					public void install() {
+						
+						if (agentFilter != null) this.bind(AgentFilter.class).toInstance(agentFilter);
+										
+						// travel disutility
+						this.bindCarTravelDisutilityFactory().toInstance(factory);
+						this.bind(MoneyEventAnalysis.class).asEagerSingleton();
+						
+						// person money event handler + controler listener
+						this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
+						this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
+					}
+				}); 
+			}		
+		}
 
 		return controler;
 	}
