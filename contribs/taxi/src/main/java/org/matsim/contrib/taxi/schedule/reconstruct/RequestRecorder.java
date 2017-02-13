@@ -64,7 +64,7 @@ public class RequestRecorder
             if (oldRequest != null) {
                 throw new IllegalStateException("Currently only one request per passenger");
             }
-            reconstructor.taxiData.addRequest(request);
+            reconstructor.taxiRequests.put(request.getId(), request);
         }
     }
 

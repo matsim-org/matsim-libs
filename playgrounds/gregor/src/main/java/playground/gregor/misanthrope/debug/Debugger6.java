@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
@@ -44,8 +45,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import playground.gregor.misanthrope.events.JumpEventCSVWriter;
 import playground.gregor.misanthrope.events.JumpEventHandler;
 import playground.gregor.misanthrope.router.CTRoutingModule;
+import playground.gregor.misanthrope.run.ArrivalCounter;
 import playground.gregor.misanthrope.run.CTRunner;
 import playground.gregor.misanthrope.simulation.CTMobsimFactory;
+import playground.gregor.misanthrope.simulation.physics.CTLink;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 
@@ -64,15 +67,17 @@ public class Debugger6 {
     public static final double WIDTH = 5;
     public static double AGENTS_LR = 6000;
     public static double AGENTS_RL = 6000;
-    public static double INV_INFLOW = 0.3;
+    public static double INV_INFLOW = 0.00003;
     private static double LL = 64.95190528383289850700;
 
     public static void main(String[] args) {
+
+        CTLink.DESIRED_WIDTH_IN_CELLS = 4;
         Config c2 = ConfigUtils.createConfig();
         Scenario sc2 = ScenarioUtils.createScenario(c2);
         createSc(sc2);
         createBigPopLR(sc2);
-//        createBigPopRL(sc2);
+        createBigPopRL(sc2);
         setupConfig(sc2);
         runScenario(sc2);
 
@@ -81,9 +86,7 @@ public class Debugger6 {
     private static void runScenario(Scenario sc) {
         final Controler controller = new Controler(sc);
         controller.getConfig().controler().setOverwriteFileSetting(
-                true ?
-                        OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-                        OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+                OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         //DEBUG
         CTRunner.DEBUG = true;
 //		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
@@ -93,7 +96,7 @@ public class Debugger6 {
 //		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
         EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
         InfoBox iBox = new InfoBox(dbg, sc);
-//        dbg.addAdditionalDrawer(iBox);
+        dbg.addAdditionalDrawer(iBox);
         //		dbg.addAdditionalDrawer(new Branding());
 //			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 //			dbg.addAdditionalDrawer(qDbg);
@@ -124,6 +127,8 @@ public class Debugger6 {
         controller.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
+                addEventHandlerBinding().to(ArrivalCounter.class);
+//                addControlerListenerBinding().to(UTurnCleaner.class);
                 if (getConfig().controler().getMobsim().equals("ctsim")) {
                     bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
                         @Override
@@ -253,10 +258,10 @@ public class Debugger6 {
             l.setFreespeed(20);
             l.setLength(150.);
 //            l.setCapacity((MatsimRandom.getRandom().nextDouble()+0.5)*WIDTH * 1.33);
-            l.setCapacity(WIDTH * 1.33);
+            l.setCapacity((1 + 5 * MatsimRandom.getRandom().nextDouble()) * WIDTH * 1.33);
 
             if (l.getId().toString().contains("0")) {
-                l.setCapacity(1.5 * WIDTH * 1.33);
+                l.setCapacity(10. * 1.33);
             }
         }
 
@@ -277,8 +282,8 @@ public class Debugger6 {
             pers.addPlan(plan);
             Activity act0;
             act0 = popFac1.createActivityFromLinkId("origin",
-                    Id.create("lr0", Link.class));
-            act0.setEndTime(i * INV_INFLOW);
+                    Id.create("l0", Link.class));
+            act0.setEndTime(0 * i * INV_INFLOW);
             plan.addActivity(act0);
             Leg leg = popFac1.createLeg("walkct");
             plan.addLeg(leg);
@@ -303,7 +308,24 @@ public class Debugger6 {
             pers.addPlan(plan);
             Activity act0;
             act0 = popFac1.createActivityFromLinkId("origin",
-                    Id.create("l2r", Link.class));
+                    Id.create("l3", Link.class));
+            act0.setEndTime(i * INV_INFLOW);
+            plan.addActivity(act0);
+            Leg leg = popFac1.createLeg("walkct");
+            plan.addLeg(leg);
+            Activity act1 = popFac1.createActivityFromLinkId("destination",
+                    Id.create("l0", Link.class));
+            plan.addActivity(act1);
+            pop1.addPerson(pers);
+        }
+
+        for (int i = 0; i < AGENTS_RL; i++) {
+            Person pers = popFac1.createPerson(Id.create("c" + (i + offset), Person.class));
+            Plan plan = popFac1.createPlan();
+            pers.addPlan(plan);
+            Activity act0;
+            act0 = popFac1.createActivityFromLinkId("origin",
+                    Id.create("l4", Link.class));
             act0.setEndTime(i * INV_INFLOW);
             plan.addActivity(act0);
             Leg leg = popFac1.createLeg("walkct");

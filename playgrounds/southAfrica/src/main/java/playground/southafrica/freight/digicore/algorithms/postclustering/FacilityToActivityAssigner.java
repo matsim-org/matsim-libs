@@ -178,7 +178,10 @@ public class FacilityToActivityAssigner {
 		
 		for(Future<DigicoreVehicle> future : listOfJobs){
 			try {
-				newVehicles.addDigicoreVehicle(future.get());
+				DigicoreVehicle vehicle = future.get();
+				if(vehicle != null){
+					newVehicles.addDigicoreVehicle(vehicle);
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				throw new RuntimeException("Cannot add vehicle during multithreaded consolidation.");

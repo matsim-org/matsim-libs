@@ -46,14 +46,14 @@ public class NPersonsProblem {
     public void scheduleUnplannedRequests(Queue<TaxiRequest> unplannedRequests)
     {
         while (!unplannedRequests.isEmpty()) {
-        	if(optimConfig.taxiData.getVehicles().size()>0&&optimConfig.timer.getTimeOfDay() > 32000){
+        	if(optimConfig.fleet.getVehicles().size()>0&&optimConfig.timer.getTimeOfDay() > 32000){
         		System.out.print("");
         	}
         	List<BestDispatchFinder.Dispatch<TaxiRequest>> requests = new ArrayList<BestDispatchFinder.Dispatch<TaxiRequest>>();
             TaxiRequest req = unplannedRequests.peek();
 
             BestDispatchFinder.Dispatch<TaxiRequest> best = vrpFinder.findBestVehicleForRequest(req,
-                    optimConfig.taxiData.getVehicles().values());
+                    optimConfig.fleet.getVehicles().values());
 
             if (best == null) {
 //            	log.info("No vrp found for request " + req.getId().toString() + " at " + 

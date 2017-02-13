@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -25,6 +26,7 @@ import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
@@ -32,6 +34,9 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesUtils;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author dziemke
@@ -106,6 +111,28 @@ public class AccessibilityUtils {
 		for ( Link link : network.getLinks().values() ) {
 			ActivityFacility facility = ff.createActivityFacility( Id.create(link.getId(),ActivityFacility.class) , link.getCoord(), link.getId() ) ;
 			facilities.addActivityFacility(facility);
+		}
+		return facilities ;
+	}
+	
+	
+	public static final ActivityFacilities createFacilityFromBuildingShapefile(String shapeFileName, String identifierCaption, String numberOfHouseholdsCaption) {
+		ShapeFileReader shapeFileReader = new ShapeFileReader();
+		Collection<SimpleFeature> features = shapeFileReader.readFileAndInitialize(shapeFileName);
+		
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("DensitiyFacilities");
+		ActivityFacilitiesFactory aff = facilities.getFactory();
+		
+		for (SimpleFeature feature : features) {
+			String featureId = (String) feature.getAttribute(identifierCaption);
+			Integer numberOfHouseholds = Integer.parseInt((String) feature.getAttribute(numberOfHouseholdsCaption));
+			Geometry geometry = (Geometry) feature.getDefaultGeometry();
+			Coord coord = CoordUtils.createCoord(geometry.getCentroid().getX(), geometry.getCentroid().getY());
+			
+			for (int i = 0; i < numberOfHouseholds; i++) {
+				ActivityFacility facility = aff.createActivityFacility(Id.create(featureId + "_" + i, ActivityFacility.class), coord);
+				facilities.addActivityFacility(facility);
+			}
 		}
 		return facilities ;
 	}
@@ -258,13 +285,13 @@ public class AccessibilityUtils {
 	}
 	
 	
-	public static File createOSMDownloadScript(String regionName, String minLon, String minLat, String maxLon, String maxLat) throws IOException {
-	    File osmDownloadScript = new File("script");
-	    Writer streamWriter = new OutputStreamWriter(new FileOutputStream(osmDownloadScript));
-	    PrintWriter printWriter = new PrintWriter(streamWriter);
-	    String command = "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"";
-	    printWriter.println(command);
-	    printWriter.close();
-	    return osmDownloadScript;
-	}
+//	public static File createOSMDownloadScript(String regionName, String minLon, String minLat, String maxLon, String maxLat) throws IOException {
+//	    File osmDownloadScript = new File("script");
+//	    Writer streamWriter = new OutputStreamWriter(new FileOutputStream(osmDownloadScript));
+//	    PrintWriter printWriter = new PrintWriter(streamWriter);
+//	    String command = "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"";
+//	    printWriter.println(command);
+//	    printWriter.close();
+//	    return osmDownloadScript;
+//	}
 }

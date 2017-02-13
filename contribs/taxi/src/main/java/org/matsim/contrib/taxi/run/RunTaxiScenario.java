@@ -20,11 +20,11 @@
 package org.matsim.contrib.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,16 +48,16 @@ public class RunTaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
-        return createControler(scenario, taxiData, otfvis);
+        FleetImpl fleet = new FleetImpl();
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
+        return createControler(scenario, fleet, otfvis);
     }
 
 
-    public static Controler createControler(Scenario scenario, TaxiData taxiData, boolean otfvis)
+    public static Controler createControler(Scenario scenario, Fleet fleet, boolean otfvis)
     {
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TaxiModule(taxiData));
+        controler.addOverridingModule(new TaxiModule(fleet));
         double expAveragingAlpha = 0.05;//from the AV flow paper 
         controler.addOverridingModule(
                 VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
@@ -73,8 +73,9 @@ public class RunTaxiScenario
 
     public static void main(String[] args)
     {
-        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
-        //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
+        String configFile = "one_taxi/one_taxi_config.xml";
+        //for a different scenario:
+        //String configFile = "mielec_2014_02/config.xml";
         RunTaxiScenario.run(configFile, true);
     }
 }

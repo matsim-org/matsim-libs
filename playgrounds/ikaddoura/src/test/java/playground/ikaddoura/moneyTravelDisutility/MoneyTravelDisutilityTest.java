@@ -26,10 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.noise.NoiseCalculationOnline;
-import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -38,7 +34,11 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.ikaddoura.PricingHandler;
+
 /**
+ * Simply plugging everything together and starting a run for an empty scenario.
+ * 
  * @author ikaddoura
  *
  */
@@ -47,36 +47,37 @@ public class MoneyTravelDisutilityTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	/**
-	 *
-	 */
 	@Test
 	public final void test1() {
 
 		double sigma = 0.;
 		
-		String configFile = testUtils.getPackageInputDirectory() + "test1/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "test1/");
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		scenario.getConfig().controler().setLastIteration(0);
+		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test1/");
 		Controler controler = new Controler(scenario);
-		
-		// noise pricing
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario());
-		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+				
+		// some arbitrary pricing
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().to(PricingHandler.class);
+			}
+		});
 
 		// money travel disutility
 		final MoneyTimeDistanceTravelDisutilityFactory factory = new MoneyTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()));
+		
 		factory.setSigma(sigma);
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				
+								
 				// travel disutility
-				this.bindCarTravelDisutilityFactory().toInstance( factory );
+				this.bindCarTravelDisutilityFactory().toInstance(factory);
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				
 				// person money event handler + controler listener
@@ -87,6 +88,6 @@ public class MoneyTravelDisutilityTest {
 
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
-	}
 		
+	}
 }

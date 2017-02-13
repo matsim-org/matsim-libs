@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -32,15 +32,15 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 public abstract class AbstractTaxiOptimizer
     implements TaxiOptimizer
 {
-    protected final TaxiOptimizerContext optimContext;
-    protected final Collection<TaxiRequest> unplannedRequests;
+    private final TaxiOptimizerContext optimContext;
+    private final Collection<TaxiRequest> unplannedRequests;
 
     private final boolean doUnscheduleAwaitingRequests;//PLANNED or TAXI_DISPATCHED
     private final boolean destinationKnown;
     private final boolean vehicleDiversion;
     private final int reoptimizationTimeStep;
 
-    protected boolean requiresReoptimization = false;
+    private boolean requiresReoptimization = false;
 
 
     public AbstractTaxiOptimizer(TaxiOptimizerContext optimContext,
@@ -69,9 +69,8 @@ public abstract class AbstractTaxiOptimizer
             //TODO (2) update timeline only if the algo really wants to reschedule in this time step,
             //perhaps by checking if there are any unplanned requests??
             if (doUnscheduleAwaitingRequests) {
-                for (Vehicle v : optimContext.taxiData.getVehicles().values()) {
-                    optimContext.scheduler
-                            .updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
+                for (Vehicle v : optimContext.fleet.getVehicles().values()) {
+                    optimContext.scheduler.updateTimeline(v.getSchedule());
                 }
             }
 
@@ -119,15 +118,15 @@ public abstract class AbstractTaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Vehicle vehicle)
     {
-        Schedule<TaxiTask> taxiSchedule = TaxiSchedules.asTaxiSchedule(schedule);
-        optimContext.scheduler.updateBeforeNextTask(taxiSchedule);
+        Schedule schedule = vehicle.getSchedule();
+        optimContext.scheduler.updateBeforeNextTask(schedule);
 
-        TaxiTask newCurrentTask = taxiSchedule.nextTask();
+        Task newCurrentTask = schedule.nextTask();
 
         if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-            requiresReoptimization = doReoptimizeAfterNextTask(newCurrentTask);
+            requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
         }
     }
 
@@ -141,10 +140,29 @@ public abstract class AbstractTaxiOptimizer
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {
-        optimContext.scheduler
-                .updateTimeline(TaxiSchedules.asTaxiSchedule(driveTask.getSchedule()));
+        optimContext.scheduler.updateTimeline(driveTask.getSchedule());
 
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
     }
+
+
+protected Collection<TaxiRequest> getUnplannedRequests() {
+	return unplannedRequests;
+}
+
+
+protected TaxiOptimizerContext getOptimContext() {
+	return optimContext;
+}
+
+
+protected boolean isRequiresReoptimization() {
+	return requiresReoptimization;
+}
+
+
+protected void setRequiresReoptimization(boolean requiresReoptimization) {
+	this.requiresReoptimization = requiresReoptimization;
+}
 }

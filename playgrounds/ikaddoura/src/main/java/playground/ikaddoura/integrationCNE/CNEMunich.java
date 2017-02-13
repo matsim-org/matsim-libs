@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
@@ -60,6 +61,7 @@ import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -89,9 +91,7 @@ public class CNEMunich {
 	private static double kP;
 
 	private static boolean modeChoice = false;
-	
-	private static boolean computeExpectedAirPollutionCosts = false;
-	
+		
 	public static void main(String[] args) throws IOException {
 				
 		if (args.length > 0) {
@@ -132,9 +132,6 @@ public class CNEMunich {
 
 			modeChoice = Boolean.valueOf(args[8]);
 			log.info("Mode choice for Munich scenario is "+ modeChoice);
-			
-			computeExpectedAirPollutionCosts = Boolean.valueOf(args[9]);
-			log.info("computeExpectedAirPollutionCosts: " + computeExpectedAirPollutionCosts);
 			
 		} else {
 
@@ -278,7 +275,16 @@ public class CNEMunich {
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
 		cne.setPersonFilter(new MunichPersonFilter());
-		cne.setComputeExpectedAirPollutionCosts(computeExpectedAirPollutionCosts);
+
+		cne.setAgentFilter(new AgentFilter() {
+			final String goodsVehiclesPrefix = "gv";
+			@Override
+			public String getAgentTypeFromId(Id<Person> id) {
+				if (id.toString().startsWith(goodsVehiclesPrefix)) return "gv";
+				else return "pv";
+			}
+		});
+
 		controler = cne.prepareControler();
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

@@ -510,7 +510,7 @@ public class NoiseTest {
 		
 		for(NoiseEventCaused event: noiseCalculation.getTimeTracker().getNoiseEventsCaused()){
 			
-			if(event.getEmergenceTime() >= endTime - 3600 && event.getEmergenceTime() <= endTime){
+			if(event.getTimeBinEndTime() >= endTime - 3600 && event.getTimeBinEndTime() <= endTime){
 				
 				Id<Link> linkId = event.getLinkId();
 				int amount = 1;
@@ -843,7 +843,7 @@ public class NoiseTest {
 		for (NoiseEventCaused event : noiseCalculation.getTimeTracker().getNoiseEventsCaused()) {
 			tested = true;
 
-			if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
+			if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
 				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
@@ -852,7 +852,7 @@ public class NoiseTest {
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
 				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
@@ -861,7 +861,7 @@ public class NoiseTest {
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
 				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
@@ -870,7 +870,7 @@ public class NoiseTest {
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
 				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
@@ -880,6 +880,7 @@ public class NoiseTest {
 				}
 				counter++;
 			} else {
+				log.warn(event.toString());
 				Assert.assertEquals("There should either be no further events, or the amount should be zero.", 0., event.getAmount(), MatsimTestUtils.EPSILON);
 			}
 		}		
@@ -891,7 +892,7 @@ public class NoiseTest {
 		for (NoiseEventAffected event : noiseCalculation.getTimeTracker().getNoiseEventsAffected()) {
 			tested2 = true;
 
-			if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
+			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
 				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.020745817449213576, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
@@ -900,7 +901,7 @@ public class NoiseTest {
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter2++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
 				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.017444990107520864, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
@@ -909,7 +910,7 @@ public class NoiseTest {
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter2++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
 				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.028225601971719153, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
@@ -978,16 +979,16 @@ public class NoiseTest {
 		for (NoiseEventCaused event : noiseCalculation.getTimeTracker().getNoiseEventsCaused()) {
 			tested = true;
 
-			if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
+			if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.008531432493391652, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.008531432493391652, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.00011994155845965193, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.00011994155845965193, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
 			} else {
@@ -1002,13 +1003,13 @@ public class NoiseTest {
 		for (NoiseEventAffected event : noiseCalculation.getTimeTracker().getNoiseEventsAffected()) {
 			tested2 = true;
 
-			if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
+			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.020745817449213576, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter2++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.017444990107520864, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter2++;
-			} else if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
+			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.028225601971719153, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter2++;
 			} else {

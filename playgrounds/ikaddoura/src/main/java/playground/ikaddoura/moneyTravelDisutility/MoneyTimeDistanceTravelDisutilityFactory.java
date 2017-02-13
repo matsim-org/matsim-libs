@@ -27,6 +27,8 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
+
 
 /**
  * 
@@ -38,11 +40,14 @@ import com.google.inject.Inject;
 public final class MoneyTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	@Inject
-	private MoneyEventAnalysis moneyEventHandler;
+	private MoneyEventAnalysis moneyAnalysis;
 	
 	@Inject
 	private Scenario scenario;
 
+	@Inject(optional = true)
+	private AgentFilter vehicleFilter;
+	
 	private double sigma = 0. ;
 	private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
 
@@ -59,7 +64,8 @@ public final class MoneyTimeDistanceTravelDisutilityFactory implements TravelDis
 				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.sigma,
 				this.scenario,
-				this.moneyEventHandler
+				this.moneyAnalysis,
+				this.vehicleFilter
 			);
 	}
 	

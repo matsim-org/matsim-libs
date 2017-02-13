@@ -18,8 +18,11 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,7 +50,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author dziemke
  */
 public class AccessibilityComputationKiberaTest {
-	public static final Logger log = Logger.getLogger(AccessibilityComputationKiberaTest.class);
+	public static final Logger LOG = Logger.getLogger(AccessibilityComputationKiberaTest.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -94,15 +97,53 @@ public class AccessibilityComputationKiberaTest {
 		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
 		// Create script to download OSM
-		File osmDownloadScript = AccessibilityUtils.createOSMDownloadScript(tmpFolder + "kibera.osm", "36.7715", "-1.3198", "36.8014", "-1.3055");
+		String regionName = tmpFolder + "kibera.osm";
+		String minLon = "36.7715";
+		String minLat = "-1.3198";
+		String maxLon = "36.8014";
+		String maxLat = "-1.3055";
+		
+//		File osmDownloadScript = AccessibilityUtils.createOSMDownloadScript(tmpFolder + "kibera.osm", "36.7715", "-1.3198", "36.8014", "-1.3055");
 	    try {
-	        ProcessBuilder pb = new ProcessBuilder("bash", osmDownloadScript.toString());
+//	        ProcessBuilder pb = new ProcessBuilder("bash", osmDownloadScript.toString());
+	        ProcessBuilder pb = new ProcessBuilder("bash", "-c", "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"");
+//	        /usr/local/bin/wget -O tmp/kibera.osm "http://api.openstreetmap.org/api/0.6/map?bbox=36.7715,-1.3198,36.8014,-1.3055"
 	        pb.inheritIO();
-	        Process process = pb.start();
-	        process.waitFor();
-	    } finally {
-	        osmDownloadScript.delete();
-	    }
+	        System.out.println("----- directory = " + pb.directory());
+	        System.out.println("----- environment = " + pb.environment());
+	        Process subProcess = pb.start();
+	        subProcess.waitFor();
+	        
+	        //----------
+		    InputStream inputStream = subProcess.getInputStream(); 
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			String line;
+
+			InputStream errorStream = subProcess.getErrorStream(); 
+			BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
+			String errorLine = null;
+
+			while ( (line=reader.readLine())!=null 
+					|| (errorLine=errorReader.readLine())!=null 
+					) {
+				if ( line!=null ) {
+					LOG.info(line);
+				}
+				else if ( errorLine!=null ) {
+					LOG.warn(errorLine);
+				} else {
+					throw new RuntimeException("should not happen") ;
+				}
+			}
+			// Input stream closed, subProcess disconnected
+		    //----------
+			
+	    } catch (Exception e) {
+			LOG.error(e.getMessage());
+			throw new RuntimeException("execute command failed") ;
+		}
+	    
+	    
 		
 	    // Create network and facility files
 	    CreateNetwork.createNetwork(osmFile, tmpFolder, networkFile, inputCRS, outputCRS);
@@ -130,7 +171,7 @@ public class AccessibilityComputationKiberaTest {
 		
 		// Activity types
 		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.DRINKING_WATER, FacilityTypes.CLINIC});
-		log.info("Using activity types: " + activityTypes);
+		LOG.info("Using activity types: " + activityTypes);
 		
 		// Network density points (as proxy for population density)
 		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork()); // will be aggregated in downstream code!

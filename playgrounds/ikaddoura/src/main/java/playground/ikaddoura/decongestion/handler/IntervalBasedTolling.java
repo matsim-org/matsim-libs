@@ -22,6 +22,7 @@ package playground.ikaddoura.decongestion.handler;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
@@ -57,6 +58,7 @@ public class IntervalBasedTolling implements LinkLeaveEventHandler {
 			if (decongestionInfo.getlinkInfos().get(event.getLinkId()).getTime2toll().containsKey(currentTimeBin)) {
 				double toll = decongestionInfo.getlinkInfos().get(event.getLinkId()).getTime2toll().get(currentTimeBin);
 				this.eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), this.decongestionInfo.getVehicleId2personId().get(event.getVehicleId()), -1. * toll));
+				this.eventsManager.processEvent(new PersonLinkMoneyEvent(event.getTime(), this.decongestionInfo.getVehicleId2personId().get(event.getVehicleId()), event.getLinkId(), -1. * toll, event.getTime()));
 				this.totalTollPayments = this.totalTollPayments + toll;
 			}		
 		}

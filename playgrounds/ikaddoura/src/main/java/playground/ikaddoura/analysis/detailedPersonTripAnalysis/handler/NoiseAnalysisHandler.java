@@ -94,7 +94,7 @@ public class NoiseAnalysisHandler implements NoiseEventCausedHandler, NoiseEvent
 		double maxDepTime = 0.;
 		
 		for (int tripNr : basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).keySet()) {
-			if (event.getEmergenceTime() >= basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr)) {
+			if (event.getTimeBinEndTime() >= basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr)) {
 				if (basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr) >= maxDepTime) {
 					tripNumber = tripNr;
 				}

@@ -128,8 +128,8 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				}
 								
 				// 6) store the updated toll
-				Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-				time2toll.put(intervalNr, smoothedToll);
+				if (smoothedToll > 0.) this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, smoothedToll);
+				
 				
 //				if (intervalNr == 117) {
 //					log.warn("link: " + linkId + " / time interval: " + intervalNr);

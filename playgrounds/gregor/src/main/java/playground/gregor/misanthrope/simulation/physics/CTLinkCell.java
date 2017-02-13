@@ -20,7 +20,6 @@ package playground.gregor.misanthrope.simulation.physics;
  * *********************************************************************** */
 
 import org.matsim.core.gbl.MatsimRandom;
-import playground.gregor.misanthrope.run.CTRunner;
 import playground.gregor.misanthrope.simulation.CTEvent;
 
 import java.util.*;
@@ -86,8 +85,8 @@ public class CTLinkCell extends CTCell {
 		}
 		this.next = nextJumper;
 
-        double x = CTRunner.WIDTH / 0.1;
-        minJumpTime = Math.min(minJumpTime, x);
+		double x = width / 0.1;
+		minJumpTime = Math.min(minJumpTime, x);
 
 		this.nextCellJumpTime = now + minJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);

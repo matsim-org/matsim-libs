@@ -61,7 +61,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
 
 /**
  * Created by laemmel on 15/10/15.
@@ -381,7 +380,7 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		double var2 = ttObserver2.ttVariance.getVar();
 
 
-        double cellHeight = 3. * WIDTH / 4.;
+        double cellHeight = 3. * (8 / 2) / 4.;
         double nrCells = (int) (80. / cellHeight);
 		double realLength = cellHeight * nrCells;
 		double expctdTT = realLength / CTCell.V_0 - 0.5;

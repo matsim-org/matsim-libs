@@ -22,15 +22,16 @@ package org.matsim.contrib.taxi.schedule.reconstruct;
 import java.util.*;
 
 import org.junit.*;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -41,17 +42,18 @@ public class ScheduleReconstructionTest
     @Test
     public void testOneTaxiReconstruction()
     {
-        runReconstruction("./src/main/resources/one_taxi/one_taxi_config.xml");
+        runReconstruction("one_taxi/one_taxi_config.xml");
     }
 
 
     @Test
     public void testMielecReconstruction()
     {
-        runReconstruction("./src/main/resources/mielec_2014_02/mielec_taxi_benchmark_config.xml");
+        runReconstruction("mielec_2014_02/mielec_taxi_benchmark_config.xml");
     }
 
 
+    @SuppressWarnings("unchecked")
     private void runReconstruction(String configFile)
     {
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
@@ -67,25 +69,30 @@ public class ScheduleReconstructionTest
         });
         controler.run();
 
-        TaxiData reconstructedTaxiData = controler.getInjector()
-                .getInstance(ScheduleReconstructor.class).getTaxiData();
-        TaxiData taxiData = controler.getInjector().getInstance(TaxiData.class);
-        Assert.assertNotEquals(taxiData, reconstructedTaxiData);
+        ScheduleReconstructor scheduleReconstructor = controler.getInjector()
+                .getInstance(ScheduleReconstructor.class);
 
-        compareVehicles(taxiData.getVehicles().values(),
-                reconstructedTaxiData.getVehicles().values());
+        Fleet fleet = controler.getInjector().getInstance(Fleet.class);
+        SubmittedTaxiRequestsCollector requestCollector = controler.getInjector()
+                .getInstance(SubmittedTaxiRequestsCollector.class);
 
-        compareRequests(taxiData.getTaxiRequests().values(),
-                reconstructedTaxiData.getTaxiRequests().values());
+        Assert.assertNotEquals(fleet, scheduleReconstructor.fleet);
+
+        compareVehicles(fleet.getVehicles().values(),
+                scheduleReconstructor.fleet.getVehicles().values());
+
+        compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
+                scheduleReconstructor.taxiRequests.values());
     }
 
 
-    private void compareVehicles(Collection<Vehicle> originalVehs,
-            Collection<Vehicle> reconstructedVehs)
+    private void compareVehicles(Collection<? extends Vehicle> originalVehs,
+            Collection<? extends Vehicle> reconstructedVehs)
     {
+        Assert.assertNotEquals(originalVehs, reconstructedVehs);
         Assert.assertEquals(originalVehs.size(), reconstructedVehs.size());
 
-        Iterator<Vehicle> rIter = reconstructedVehs.iterator();
+        Iterator<? extends Vehicle> rIter = reconstructedVehs.iterator();
         for (Vehicle o : originalVehs) {
             Vehicle r = rIter.next();
 
@@ -95,8 +102,8 @@ public class ScheduleReconstructionTest
             Assert.assertEquals(o.getT0(), r.getT0(), 0);
             Assert.assertEquals(o.getT1(), r.getT1(), 0);
 
-            Schedule<TaxiTask> oSchedule = TaxiSchedules.asTaxiSchedule(o.getSchedule());
-            Schedule<TaxiTask> rSchedule = TaxiSchedules.asTaxiSchedule(r.getSchedule());
+            Schedule oSchedule = o.getSchedule();
+            Schedule rSchedule = r.getSchedule();
 
             Assert.assertEquals(oSchedule.getBeginTime(), rSchedule.getBeginTime(), 0);
             Assert.assertEquals(oSchedule.getEndTime(), rSchedule.getEndTime(), 0);
@@ -110,19 +117,19 @@ public class ScheduleReconstructionTest
     }
 
 
-    private void compareTasks(List<TaxiTask> originalTasks, List<TaxiTask> reconstructedTasks)
+    private void compareTasks(List<? extends Task> originalTasks,
+            List<? extends Task> reconstructedTasks)
     {
         Assert.assertEquals(originalTasks.size(), reconstructedTasks.size());
 
-        Iterator<TaxiTask> rIter = reconstructedTasks.iterator();
-        for (TaxiTask o : originalTasks) {
-            TaxiTask r = rIter.next();
+        Iterator<? extends Task> rIter = reconstructedTasks.iterator();
+        for (Task o : originalTasks) {
+            Task r = rIter.next();
 
             Assert.assertEquals(o.getBeginTime(), r.getBeginTime(), 0);
             Assert.assertEquals(o.getEndTime(), r.getEndTime(), 0);
             Assert.assertEquals(o.getTaskIdx(), r.getTaskIdx());
-            Assert.assertEquals(o.getType(), r.getType());
-            Assert.assertEquals(o.getTaxiTaskType(), r.getTaxiTaskType());
+            Assert.assertEquals( ((TaxiTask)o).getTaxiTaskType(), ((TaxiTask)r).getTaxiTaskType());
 
             Assert.assertEquals(TaskStatus.PERFORMED, o.getStatus());
             Assert.assertEquals(TaskStatus.PLANNED, r.getStatus());
@@ -133,6 +140,7 @@ public class ScheduleReconstructionTest
     private void compareRequests(Collection<TaxiRequest> originalReqs,
             Collection<TaxiRequest> reconstructedReqs)
     {
+        Assert.assertNotEquals(originalReqs, reconstructedReqs);
         Assert.assertEquals(originalReqs.size(), reconstructedReqs.size());
 
         Iterator<TaxiRequest> rIter = reconstructedReqs.iterator();

@@ -78,6 +78,9 @@ class TimeStructureOptimizer {
 			throw new RuntimeException();
 		}
 
+		// >>>>>>>>>> MODIFIED CODE >>>>>>>>>>
+
+		// find optimal time structure based on whatever travel time is available
 		final BestTimeResponseStrategyFunctionality initialPlanData = new BestTimeResponseStrategyFunctionality(plan,
 				this.scenario.getNetwork(), this.scoringParams, this.timeDiscretization, travelTimes);
 		final TimeAllocator<Facility, String> timeAlloc = initialPlanData.getTimeAllocator();
@@ -89,7 +92,41 @@ class TimeStructureOptimizer {
 			act.setEndTime(timeAlloc.getResultPoint()[i]);
 		}
 
-		// return the corresponding utility value
-		return timeAlloc.getResultValue();
+		if ((this.tripRouterProvider != null) && (this.mode2travelTime != null)) {
+			// a proper departure time optimization has been run
+			return timeAlloc.getResultValue();
+		} else if ((this.tripRouterProvider == null) && (this.mode2travelTime == null)) {
+			// the departure times are right now chosen based on 
+			
+			// TODO
+			
+			return 0.0;
+		} else {
+			throw new RuntimeException();
+		}
+
+		// <<<<<<<<<< MODIFIED CODE <<<<<<<<<<
+		
+		// >>>>>>>>>> FUNCTIONAL CODE >>>>>>>>>>
+		//
+		// final BestTimeResponseStrategyFunctionality initialPlanData = new
+		// BestTimeResponseStrategyFunctionality(plan,
+		// this.scenario.getNetwork(), this.scoringParams,
+		// this.timeDiscretization, travelTimes);
+		// final TimeAllocator<Facility, String> timeAlloc =
+		// initialPlanData.getTimeAllocator();
+		// timeAlloc.optimizeDepartureTimes(initialPlanData.plannedActivities,
+		// this.maxTrials, this.maxFailures);
+		//
+		// // set departure times in the plan that was passed to this function
+		// for (int i = 0; i < timeAlloc.getResultPoint().length; i++) {
+		// final Activity act = (Activity) plan.getPlanElements().get(2 * i);
+		// act.setEndTime(timeAlloc.getResultPoint()[i]);
+		// }
+		//
+		// // return the corresponding utility value
+		// return timeAlloc.getResultValue();
+		//
+		// <<<<<<<<<< FUNCTIONAL CODE <<<<<<<<<<
 	}
 }

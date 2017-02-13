@@ -19,39 +19,44 @@
 
 package playground.ikaddoura.moneyTravelDisutility;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
+import playground.ikaddoura.moneyTravelDisutility.data.LinkInfo;
+import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
+
 /**
  * 
- * TODO: Add something like a blendfactor...
- * TODO: Add something like MSA...
+ * TODO: Add a blendfactor?
+ * TODO: Add MSA?
  * 
 * @author ikaddoura
 */
 
 public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
-	private static final Logger log = Logger.getLogger(MoneyTimeDistanceTravelDisutility.class);
-
+	
 	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
 	private final double sigma;	
 	private Scenario scenario;
 	private MoneyEventAnalysis moneyEventAnalysis;
-		
+	private AgentFilter vehicleFilter;
+	
 	public MoneyTimeDistanceTravelDisutility(
 			TravelDisutility randomizedTimeDistanceTravelDisutility,
 			double sigma,
 			Scenario scenario,
-			MoneyEventAnalysis moneyEventHandler) {
+			MoneyEventAnalysis moneyEventHandler,
+			AgentFilter vehicleFilter) {
 
 		this.randomizedTimeDistanceTravelDisutility = randomizedTimeDistanceTravelDisutility;
 		this.sigma = sigma;
 		this.scenario = scenario;
 		this.moneyEventAnalysis = moneyEventHandler;
+		this.vehicleFilter = vehicleFilter;
 	}
 
 	@Override
@@ -79,21 +84,38 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 		
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration i based on the tolls in iteration i-1 */
-		
-		// TODO: identify vehicle type based on vehicles file or vehicle ID
-		
+				
 		int intervalNr = getIntervalNr(time);
 		
-		double avgMoneyAmountPerVehcile = 0.;
-		
+		double estimatedAmount = 0.;
+
 		if (moneyEventAnalysis.getLinkId2info().containsKey(link.getId())) {
-			if (moneyEventAnalysis.getLinkId2info().get(link.getId()).getTimeBinNr2timeBin().containsKey(intervalNr)) {
-				avgMoneyAmountPerVehcile = moneyEventAnalysis.getLinkId2info().get(link.getId()).getTimeBinNr2timeBin().get(intervalNr).getAverageAmount();
-				log.warn("avg money amount: " + avgMoneyAmountPerVehcile);
+			
+			LinkInfo linkInfo = moneyEventAnalysis.getLinkId2info().get(link.getId());
+			
+			if (linkInfo.getTimeBinNr2timeBin().containsKey(intervalNr)) {
+				
+				TimeBin timeBin = linkInfo.getTimeBinNr2timeBin().get(intervalNr);
+
+				if(this.vehicleFilter != null) {
+					String agentType = vehicleFilter.getAgentTypeFromId(person.getId());
+					double avgMoneyAmountVehicleType = 0.;
+					if (timeBin.getAgentTypeId2avgAmount().containsKey(agentType)) {
+						avgMoneyAmountVehicleType = timeBin.getAgentTypeId2avgAmount().get(agentType);
+					}
+
+					if (avgMoneyAmountVehicleType != 0.) {
+						estimatedAmount = avgMoneyAmountVehicleType;
+					} else {
+						estimatedAmount = timeBin.getAverageAmount();
+					}
+				} else {
+					estimatedAmount = timeBin.getAverageAmount();
+				}
 			}
 		}
-				
-		double linkExpectedTollDisutility = -1 * this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() * avgMoneyAmountPerVehcile;
+						
+		double linkExpectedTollDisutility = -1 * this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() * estimatedAmount;
 		return linkExpectedTollDisutility;
 	}
 	

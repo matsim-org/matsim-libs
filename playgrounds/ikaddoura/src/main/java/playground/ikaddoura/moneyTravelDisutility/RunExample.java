@@ -35,6 +35,9 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
+import playground.ikaddoura.moneyTravelDisutility.data.BerlinAgentFilter;
+
 /**
  * 
  * @author ikaddoura
@@ -44,18 +47,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunExample {
 	private static final Logger log = Logger.getLogger(RunExample.class);
 
-	private static String configFile;
-	private static double sigma;
-	
+	private static String configFile = "/Users/ihab/Desktop/test/config.xml";
+	private static double sigma = 0.;
+
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
 			throw new RuntimeException("Not yet implemented. Aborting...");
-			
-		} else {
-			
-			configFile = "/Users/ihab/Desktop/test/config.xml";
-			sigma = 0.;
 		}
 				
 		RunExample runner = new RunExample();
@@ -72,23 +70,28 @@ public class RunExample {
 				
 		log.info("Loading scenario... Done.");
 
+		// money travel disutility
 		final MoneyTimeDistanceTravelDisutilityFactory factory = new MoneyTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()));
+		
 		factory.setSigma(sigma);
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				
+				this.bind(AgentFilter.class).to(BerlinAgentFilter.class);
+								
 				// travel disutility
-				this.bindCarTravelDisutilityFactory().toInstance( factory );
+				this.bindCarTravelDisutilityFactory().toInstance(factory);
+				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				
 				// person money event handler + controler listener
-//				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
 			}
 		}); 
+			
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();

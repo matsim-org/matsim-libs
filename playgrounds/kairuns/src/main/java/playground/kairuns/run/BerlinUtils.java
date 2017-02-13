@@ -277,7 +277,7 @@ final class BerlinUtils {
 	static void setStrategies(Config config, boolean equil, boolean modeChoice) {
 		{
 			StrategySettings stratSets = new StrategySettings( ) ;
-			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() ) ;
+			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() ) ;
 			stratSets.setWeight(0.9);
 			config.strategy().addStrategySettings(stratSets);
 		}

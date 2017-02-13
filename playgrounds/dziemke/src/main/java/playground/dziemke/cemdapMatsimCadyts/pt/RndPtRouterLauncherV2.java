@@ -93,7 +93,7 @@ public class RndPtRouterLauncherV2 {
 
 		{
 			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-			stratSets.setStrategyName(DefaultSelector.ChangeExpBeta.name());
+			stratSets.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
 			stratSets.setWeight(0.9);
 			config.strategy().addStrategySettings(stratSets);
 		}

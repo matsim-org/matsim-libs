@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.misanthrope.router.CTRoutingModule;
 import playground.gregor.misanthrope.simulation.CTMobsimFactory;
+import playground.gregor.misanthrope.simulation.physics.CTLink;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -44,7 +45,6 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer
 
 public class CTRunner implements IterationStartsListener {
     private static final Logger log = Logger.getLogger(CTRunner.class);
-    public static double WIDTH = 4;
     public static boolean DEBUG = false;
 
     private MatsimServices controller;
@@ -56,7 +56,7 @@ public class CTRunner implements IterationStartsListener {
             System.exit(-1);
         }
         if (args.length >= 3) {
-            WIDTH = Double.parseDouble(args[2]);
+            CTLink.DESIRED_WIDTH_IN_CELLS = Double.parseDouble(args[2]);
         }
         String qsimConf = args[0];
 
@@ -119,7 +119,8 @@ public class CTRunner implements IterationStartsListener {
 
             @Override
             public void install() {
-//                addControlerListenerBinding().to(UTurnCleaner.class);
+                addEventHandlerBinding().to(ArrivalCounter.class);
+                addControlerListenerBinding().to(UTurnCleaner.class);
                 if (getConfig().controler().getMobsim().equals("ctsim")) {
                     bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
                         @Override

@@ -22,21 +22,21 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
+import static playground.gregor.misanthrope.simulation.physics.CTCell.MAX_CELL_WIDTH;
+import static playground.gregor.misanthrope.simulation.physics.CTCell.MIN_CELL_WIDTH;
+
 
 public class CTLink implements CTNetworkEntity {
 
 
     private static final Logger log = Logger.getLogger(CTLink.class);
     private static final double EPSILON = 0.00001;
-    private static double LENGTH;
+    public static double DESIRED_WIDTH_IN_CELLS = 2;
     private static int EL_WRN_CNT = 0;
 
     private static int LENGTH_WRN_CNT = 0;
 
-    static {
-        LENGTH = 3 * Math.sqrt(3) / 2 * WIDTH;
-    }
+
 
     private final CTNetwork network;
     private final CTNode dsNode;
@@ -49,6 +49,7 @@ public class CTLink implements CTNetworkEntity {
     private CTLinkCell usJumpOn;
     private Set<CTCell> dsJumpOns;
     private Set<CTCell> usJumpOns;
+    private double cellWidth;
 
     public CTLink(Link l, Link rev, EventsManager em, CTNetwork ctNetwork, CTNode from, CTNode to) {
         this.dsLink = l;
@@ -72,25 +73,34 @@ public class CTLink implements CTNetworkEntity {
                     log.warn(Gbl.FUTURE_SUPPRESSED);
                 }
             }
-            ls.x1 = ls.x0 += 10 * ls.dx;
-            ls.y1 = ls.y0 += 10 * ls.dy;
-            ls.length = 10;
+            ls.x1 = ls.x0 += 20 * ls.dx;
+            ls.y1 = ls.y0 += 20 * ls.dy;
+            ls.length = 20;
             ls.width = 50;
         }
 
 
+        double tmp = ls.width / DESIRED_WIDTH_IN_CELLS;
+        if (tmp < MIN_CELL_WIDTH) {
+            tmp = ls.width;
+        } else if (tmp > MAX_CELL_WIDTH) {
+            int nrCells = (int) (ls.width / MAX_CELL_WIDTH) + 1;
+            tmp = ls.width / nrCells;
+        }
 
+        this.cellWidth = tmp;
+        double minLength = 3 * Math.sqrt(3) / 2 * this.cellWidth;
         pruneEnds(ls);
 
         double length = ls.length;
-        if (length < LENGTH) {
+        if (length < minLength) {
             if (LENGTH_WRN_CNT++ < 10) {
-                log.warn("Length of link: " + this.dsLink.getId() + " is too small. Increasing it from: " + length + " to: " + LENGTH);
+                log.warn("Length of link: " + this.dsLink.getId() + " is too small. Increasing it from: " + length + " to: " + minLength);
                 if (LENGTH_WRN_CNT == 10) {
                     log.warn(Gbl.FUTURE_SUPPRESSED);
                 }
             }
-            length = LENGTH;
+            length = minLength;
         }
 
 
@@ -122,9 +132,9 @@ public class CTLink implements CTNetworkEntity {
         Map<ProtoCell, CTCell> cellsMap = new HashMap<>();
         Map<ProtoCell, Geometry> geoMap = new HashMap<>();
         int id = 0;
-        double area = (1.5 * Math.sqrt(3) * (WIDTH / 2) * (WIDTH / 2));
+        double area = (1.5 * Math.sqrt(3) * (cellWidth / 2) * (cellWidth / 2));
         for (ProtoCell pt : cells) {
-            CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, WIDTH / 2, area);
+            CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, cellWidth / 2, area);
             cellsMap.put(pt, c);
             Coordinate[] coords = new Coordinate[pt.edges.size() * 2];
             int idx = 0;
@@ -183,11 +193,11 @@ public class CTLink implements CTNetworkEntity {
         //identify cells
         this.dsJumpOns = new HashSet<>();
         this.usJumpOns = new HashSet<>();
-        for (double incr = 0; incr <= width; incr += WIDTH / 8.) {
-            double dsX = bounds[1].x + ls.dy * incr - WIDTH * ls.dx / 2.;
-            double dsY = bounds[1].y - ls.dx * incr - WIDTH * ls.dy / 2.;
-            double usX = bounds[0].x + ls.dy * incr + WIDTH * ls.dx / 2.;
-            double usY = bounds[0].y - ls.dx * incr + WIDTH * ls.dy / 2.;
+        for (double incr = 0; incr <= width; incr += cellWidth / 8.) {
+            double dsX = bounds[1].x + ls.dy * incr - cellWidth * ls.dx / 2.;
+            double dsY = bounds[1].y - ls.dx * incr - cellWidth * ls.dy / 2.;
+            double usX = bounds[0].x + ls.dy * incr + cellWidth * ls.dx / 2.;
+            double usY = bounds[0].y - ls.dx * incr + cellWidth * ls.dy / 2.;
             CTCell dsJumpOn = qt.getClosest(dsX, dsY);
 
             dsJumpOns.add(dsJumpOn);
@@ -199,7 +209,7 @@ public class CTLink implements CTNetworkEntity {
 
 
         //create pseudo cells
-        this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, WIDTH * 2, area);// * width);
+        this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, cellWidth * 2, area);// * width);
         double dir = Math.PI / 2.;
         for (CTCell ctCell : dsJumpOns) {
             CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
@@ -207,7 +217,7 @@ public class CTLink implements CTNetworkEntity {
             this.dsJumpOn.addNeighbor(ctCell);
             ctCell.addNeighbor(this.dsJumpOn);
         }
-        this.usJumpOn = new CTLinkCell(0, 0, this.network, this, WIDTH * 2, area);// * width);
+        this.usJumpOn = new CTLinkCell(0, 0, this.network, this, cellWidth * 2, area);// * width);
         dir = -Math.PI / 2.;
         for (CTCell ctCell : usJumpOns) {
             CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
@@ -274,7 +284,7 @@ public class CTLink implements CTNetworkEntity {
 
     private double getAngle(double frX, double frY, double toX1, double toY1, double toX2, double toY2) {
 
-        final double l1 = Math.sqrt(3) / 4 * WIDTH;
+        final double l1 = Math.sqrt(3) / 4 * cellWidth;
         double cosAlpha = ((toX1 - frX) * (toX2 - frX) + (toY1 - frY) * (toY2 - frY)) / l1;
         double alpha = Math.acos(cosAlpha);
         if (CGAL.isLeftOfLine(toX1, toY1, frX, frY, toX2, toY2) < 0) {
@@ -287,8 +297,8 @@ public class CTLink implements CTNetworkEntity {
     private List<ProtoCell> computeProtoCells(double dx, double dy, double width, double length, LineSegment ls) {
         List<ProtoCell> cells = new ArrayList<>();
 
-        double w = width + WIDTH - WIDTH / 20;
-        double l = length + WIDTH * Math.sqrt(3) / 2;
+        double w = width + cellWidth - cellWidth / 20;
+        double l = length + cellWidth * Math.sqrt(3) / 2;
 
 
         Voronoi v = new Voronoi(0.0001);
@@ -297,18 +307,18 @@ public class CTLink implements CTNetworkEntity {
         List<Double> xl = new ArrayList<>();
         List<Double> yl = new ArrayList<>();
         boolean even = true;
-        for (double yIncr = -WIDTH * Math.sqrt(3) / 4; yIncr < l; yIncr += WIDTH * Math.sqrt(3) / 4) {
+        for (double yIncr = -cellWidth * Math.sqrt(3) / 4; yIncr < l; yIncr += cellWidth * Math.sqrt(3) / 4) {
 
 
             double xIncr = 0;
             if (even) {
-                xIncr += WIDTH * 0.75;
+                xIncr += cellWidth * 0.75;
             }
             even = !even;
             int idx = 0;
-            for (; xIncr < w; xIncr += WIDTH * 1.5) {
-                double x = ls.x0 - dy * w / 2 + dy * WIDTH * Math.sqrt(3) / 8 + dx * yIncr + dy * xIncr;
-                double y = ls.y0 + dx * w / 2 - dx * WIDTH * Math.sqrt(3) / 8 + dy * yIncr - dx * xIncr;
+            for (; xIncr < w; xIncr += cellWidth * 1.5) {
+                double x = ls.x0 - dy * w / 2 + dy * cellWidth * Math.sqrt(3) / 8 + dx * yIncr + dy * xIncr;
+                double y = ls.y0 + dx * w / 2 - dx * cellWidth * Math.sqrt(3) / 8 + dy * yIncr - dx * xIncr;
 
                 //				double x = x0 + xIncr*ldx;
                 yl.add(y);
@@ -348,7 +358,7 @@ public class CTLink implements CTNetworkEntity {
         double maxY = y1 > y0 ? y1 : y0;
         maxY = maxY > y2 ? maxY : y2;
         maxY = maxY > y3 ? maxY : y3;
-        List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - WIDTH, maxX + WIDTH, minY - WIDTH, maxY + WIDTH);
+        List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - cellWidth, maxX + cellWidth, minY - cellWidth, maxY + cellWidth);
         for (GraphEdge ge : edges) {
             ProtoCell c0 = cells.get(ge.site1);
             c0.edges.add(ge);

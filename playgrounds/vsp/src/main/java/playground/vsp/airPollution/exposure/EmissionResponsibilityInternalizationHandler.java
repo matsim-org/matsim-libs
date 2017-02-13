@@ -27,6 +27,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
@@ -68,8 +69,11 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 		double amount2Pay = - coldEmissionCosts;
 		
 		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay);
-		
 		eventsManager.processEvent(moneyEvent);
+		
+		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time);
+		eventsManager.processEvent(moneyLinkEvent);
+
 	}
 
 	private void calculateWarmEmissionCostsAndThrowEvent(WarmEmissionEvent event) {
@@ -79,8 +83,10 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 		double amount2Pay = - warmEmissionCosts;
 		
 		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay);
-		
 		eventsManager.processEvent(moneyEvent);
+		
+		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time);
+		eventsManager.processEvent(moneyLinkEvent);
 	}
 	
 }

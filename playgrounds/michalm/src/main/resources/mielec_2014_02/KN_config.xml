@@ -8,7 +8,7 @@
 		<param name="dropoffDuration" value="60" />
 		<param name="onlineVehicleTracker" value="false" />
 
-		<param name="taxisFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/taxis-25.xml" />
+		<param name="taxisFile" value="../../../../../../contribs/taxi/src/main/resources/mielec_2014_02/taxis-25.xml" />
 		<!-- param name="taxisFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/taxis-50.xml" / -->
 
 		<parameterset type="optimizer">

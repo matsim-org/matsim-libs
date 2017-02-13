@@ -24,10 +24,11 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.facilities.Facility;
 
 
 public class TaxiRank
-    implements BasicLocation<TaxiRank>
+    implements Facility<TaxiRank>
 {
     private final Id<TaxiRank> id;
     private final String name;
@@ -92,5 +93,19 @@ public class TaxiRank
     public boolean hasCapacity()
     {
         return taxis.size() < this.capacity;
+    }
+
+
+    @Override
+    public Map<String, Object> getCustomAttributes()
+    {
+        return null;
+    }
+
+
+    @Override
+    public Id<Link> getLinkId()
+    {
+        return link.getId();
     }
 }

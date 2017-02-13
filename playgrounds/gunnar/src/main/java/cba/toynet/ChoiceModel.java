@@ -44,11 +44,15 @@ class ChoiceModel {
 
 	private final List<TourSequence> tourSeqAlts = new ArrayList<>(TourSequence.Type.values().length);
 
+	private final boolean usePTto1;
+
+	private final boolean usePTto2;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	ChoiceModel(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
-			final int maxTrials, final int maxFailures) {
+			final int maxTrials, final int maxFailures, final boolean usePTto1, final boolean usePTto2) {
 		this.sampleCnt = sampleCnt;
 		this.rnd = rnd;
 		this.scenario = scenario;
@@ -56,6 +60,8 @@ class ChoiceModel {
 		this.mode2travelTime = mode2travelTime;
 		this.maxTrials = maxTrials;
 		this.maxFailures = maxFailures;
+		this.usePTto1 = usePTto1;
+		this.usePTto2 = usePTto2;
 
 		for (TourSequence.Type type : TourSequence.Type.values()) {
 			final TourSequence tourSeq = new TourSequence(type);
@@ -85,7 +91,7 @@ class ChoiceModel {
 		final List<Double> congestedTravelTimeUtilities = new ArrayList<>(TourSequence.Type.values().length);
 
 		final UtilityFunction utilityFunction = new UtilityFunction(this.scenario, this.tripRouterProvider,
-				this.mode2travelTime, this.maxTrials, this.maxFailures);
+				this.mode2travelTime, this.maxTrials, this.maxFailures, this.usePTto1, this.usePTto2);
 		for (int i = 0; i < this.tourSeqAlts.size(); i++) {
 			utilityFunction.evaluate(planAlts.get(i), this.tourSeqAlts.get(i));
 			activityModeOnlyUtilities.add(utilityFunction.getActivityModeOnlyUtility());

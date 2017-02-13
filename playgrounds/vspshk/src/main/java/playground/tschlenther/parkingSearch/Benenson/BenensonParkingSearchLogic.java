@@ -38,9 +38,9 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		this.network = network;
 	}
 	
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> destinationLinkId, Id<Vehicle> vehicleId, boolean hasTriedDestLinkBefore) {
+	public Id<Link> getNextLinkPhase2(Id<Link> currentLinkId, Id<Link> destinationLinkId, Id<Vehicle> vehicleId, boolean hasTriedDestLinkBefore) {
 		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Id<Link>> nextNodes = new ArrayList<>();
+		//List<Id<Link>> nextNodes = new ArrayList<>();
 		
 		//es wird nicht die Distanz zur Aktivität, sondern zum fromNode des Aktivitätenlinks berechnet
 		Node destination = network.getLinks().get(destinationLinkId).getFromNode();
@@ -50,14 +50,15 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		Id<Link> nextLinkId = null;
 		
 		
-		/*
-		 * TODO: Problem (beim grid-Net):
+		/* 10.02: nicht mehr aktuell
+		 * (wenn in PHASE 3 verwendet):
+		 * TODO: Problem (beim grid-Net) :
 		 * wenn agent auf destLink fährt wird er immer umkehren und immer "auf der selben Seite" der aktivität suchen. => generelles Benenson-Problem.
-		 * 
+		 * => Lösung ist Annahme zufälligen Routens in PHASE3
 		 */
 		for (Id<Link> outlinkId : currentLink.getToNode().getOutLinks().keySet()){
 			if(outlinkId.equals(destinationLinkId)){
-				if(!hasTriedDestLinkBefore) return outlinkId;
+				if(!hasTriedDestLinkBefore) return outlinkId;			//TODO: nicht nötig wenn nextLink methogen nach Phasen aufgeteilt
 			}
 			nextNode = network.getLinks().get(outlinkId).getToNode();
 			double dd = NetworkUtils.getEuclideanDistance(destination.getCoord(),nextNode.getCoord());
@@ -79,15 +80,20 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 
 	}
 
-	@Override
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
+	
+	public Id<Link> getNextLinkPhase3(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay) {
 		// TODO Auto-generated method stub
 		//throw new RuntimeException("i don't want this to happen");
-		
+		Id<Link> nextLink = null;
 		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
-		Id<Link> randomKey = keys.get(random.nextInt(keys.size()));
-		return randomKey;
+		do{
+			List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
+			if(!(nextLink == null)) keys.remove(keys.indexOf(nextLink));
+			nextLink= keys.get(random.nextInt(keys.size()));	
+		}
+		while(!isDriverInAcceptableDistance(nextLink, endLinkId, firstDestLinkEnterTime, timeOfDay));
+		
+		return nextLink;
 	}
 
 	
@@ -169,7 +175,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * @param timeOfDay
 	 * @return
 	 */
-	public boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId,	double firstDestLinkEnterTimer, double timeOfDay) {
+	public boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId,	double firstDestLinkEnterTime, double timeOfDay) {
 		/*
 		 * PROBLEM: am Anfang von PHASE3 wird selbst der DestLink nicht akzeptiert, da Distanz zwischen fromNode und toNode zu groß
 		 * (wenn LinkLength > 100m)
@@ -184,7 +190,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		double distToDest = NetworkUtils.getEuclideanDistance(
 				network.getLinks().get(currentLinkId).getToNode().getCoord(), network.getLinks().get(endLinkId).getFromNode().getCoord());
 		
-		double timeSpent = timeOfDay - firstDestLinkEnterTimer;
+		double timeSpent = timeOfDay - firstDestLinkEnterTime;
 		double acceptedDistance = 100 + ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN * (timeSpent / 60);
 		
 		if (acceptedDistance > ACCEPTED_DISTANCE_MAX) acceptedDistance = ACCEPTED_DISTANCE_MAX;
@@ -194,6 +200,12 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		if (distToDest <= acceptedDistance) return true;		
 		
 		return false;
+	}
+
+	@Override
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

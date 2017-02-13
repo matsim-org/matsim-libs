@@ -3,13 +3,9 @@
  */
 package org.matsim.contrib.av.intermodal;
 
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerFactory;
+import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -32,7 +28,7 @@ final class MyTaxiOptimizerFactory implements TaxiOptimizerFactory {
 				
 				// TODO Auto-generated method stub
 			}
-			@Override public void nextTask(Schedule<? extends Task> schedule) {
+			@Override public void nextTask(Vehicle vehicle) {
 				// what is this?  Presumably, a "schedule", which is attached to a single "taxi", here asks to be extended?? kai, jan'17
 				
 				// TODO Auto-generated method stub

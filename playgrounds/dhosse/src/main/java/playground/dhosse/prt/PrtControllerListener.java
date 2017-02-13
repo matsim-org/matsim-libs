@@ -1,7 +1,7 @@
 package playground.dhosse.prt;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
@@ -29,14 +29,14 @@ public class PrtControllerListener implements StartupListener, IterationStartsLi
 
 
 	public PrtControllerListener(PrtConfig config, MatsimServices controler,
-			PrtData data, VrpData vrpData, Scenario scenario) {
+			PrtData data, Fleet vrpData, Scenario scenario) {
 		
 		this.cch = new CostContainerHandler(controler.getScenario().getNetwork(),
 				config.getFixedCost(), config.getVariableCostsD());
 		this.cc = new CostContainers2PersonMoneyEvent(controler, cch);
 		this.rsh = new PrtRankAndPassengerStatsHandler(vrpData, scenario, data);
 		this.statsWriter = new PrtStatsWriter(config, cch, rsh);
-		this.vfl = new PrtVehicleFactory(config, vrpData, scenario, rsh);
+		this.vfl = new PrtVehicleFactory(config, (FleetImpl)vrpData, null, scenario, rsh);
 		
 	}
 	

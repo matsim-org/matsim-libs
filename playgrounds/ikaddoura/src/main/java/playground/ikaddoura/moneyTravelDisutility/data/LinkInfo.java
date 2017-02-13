@@ -49,11 +49,5 @@ public class LinkInfo {
 		return nr2timeBin;
 	}
 	
-	public void process() {
-		for (TimeBin timeBin : nr2timeBin.values()) {
-			timeBin.process();
-		}
-	}
-
 }
 

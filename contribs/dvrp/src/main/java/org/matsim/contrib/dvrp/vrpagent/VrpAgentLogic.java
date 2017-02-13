@@ -79,14 +79,14 @@ public class VrpAgentLogic
     @Override
     public DynAction computeNextAction(DynAction oldAction, double now)
     {
-        Schedule<?> schedule = vehicle.getSchedule();
+        Schedule schedule = vehicle.getSchedule();
 
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
         // else: PLANNED or STARTED
 
-        optimizer.nextTask(schedule);
+        optimizer.nextTask(vehicle);
         // remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
 
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
@@ -105,7 +105,7 @@ public class VrpAgentLogic
         return new AbstractDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE) {
             public double getEndTime()
             {
-                Schedule<?> s = vehicle.getSchedule();
+                Schedule s = vehicle.getSchedule();
 
                 switch (s.getStatus()) {
                     case PLANNED:

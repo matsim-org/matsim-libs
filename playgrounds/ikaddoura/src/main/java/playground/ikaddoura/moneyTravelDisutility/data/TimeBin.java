@@ -19,13 +19,13 @@
 
 package playground.ikaddoura.moneyTravelDisutility.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.api.core.v01.population.Person;
 
 /**
 * Stores vehicle-specific monetary amounts for each time bin.
@@ -34,56 +34,43 @@ import org.matsim.vehicles.VehicleType;
 */
 
 public class TimeBin {
-
+	
 	private int timeBinNr;
 	
-	private final Map<Id<Vehicle>, List<Double>> vehicleId2amounts;
-	private double averageAmount = 0.;
-
-	private final Map<VehicleType, Double> vehicleType2avgAmount = new HashMap<>(); // TODO
+	private final Map<Id<Person>, List<Double>> personId2amounts;
+	private final List<Id<Person>> enteringAgents;
 	
+	private double averageAmount = 0.;
+	private final Map<String, Double> agentType2avgAmount = new HashMap<>();
+		
 	public TimeBin(int timeBinNr) {
 		this.timeBinNr = timeBinNr;
-		this.vehicleId2amounts = new HashMap<>();
+		this.personId2amounts = new HashMap<>();
+		this.enteringAgents = new ArrayList<>();
 	}
 
+	public void setAverageAmount(double averageAmount) {
+		this.averageAmount = averageAmount;
+	}
+	
+	public double getAverageAmount() {
+		return averageAmount;
+	}
+	
 	public double getTimeBinNr() {
 		return timeBinNr;
 	}
 
-	public Map<Id<Vehicle>, List<Double>> getVehicleId2amounts() {
-		return vehicleId2amounts;
+	public Map<Id<Person>, List<Double>> getPersonId2amounts() {
+		return personId2amounts;
+	}
+	
+	public Map<String, Double> getAgentTypeId2avgAmount() {
+		return agentType2avgAmount;
 	}
 
-	public double getAverageAmount() {
-		return averageAmount;
-	}
-
-	public Map<VehicleType, Double> getVehicleType2avgAmount() {
-		throw new RuntimeException("ToDo! Not yet implemented. Aborting...");
-//		return vehicleType2avgAmount;
-	}
-
-	public void process() {
-		computeAverageAmountPerVehicle();
-		computeAverageAmountPerVehicleType();
-	}
-
-	private void computeAverageAmountPerVehicle() {
-		double sum = 0.;
-		int counter = 0;
-		for (Id<Vehicle> vehicleId : vehicleId2amounts.keySet()) {
-			for (Double amount : vehicleId2amounts.get(vehicleId)) {
-				sum += amount;
-				counter++;
-			}
-		}
-		
-		this.averageAmount = sum / counter;
-	}
-
-	private void computeAverageAmountPerVehicleType() {
-		// TODO Auto-generated method stub
+	public List<Id<Person>> getEnteringAgents() {
+		return enteringAgents;
 	}
 
 }

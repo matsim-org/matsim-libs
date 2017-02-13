@@ -45,6 +45,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
+import playground.ikaddoura.moneyTravelDisutility.data.BerlinAgentFilter;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -76,9 +77,7 @@ public class CNEBerlin {
 	
 	private static CongestionTollingApproach congestionTollingApproach;
 	private static double kP;
-	
-	private static boolean computeExpectedAirPollutionCosts = false;
-	
+		
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
@@ -117,13 +116,10 @@ public class CNEBerlin {
 			kP = Double.parseDouble(args[7]);
 			log.info("kP: " + kP);
 			
-			computeExpectedAirPollutionCosts = Boolean.valueOf(args[8]);
-			log.info("computeExpectedAirPollutionCosts: " + computeExpectedAirPollutionCosts);
-			
 		} else {
 			
 			outputDirectory = null;
-			configFile = "../../../runs-svn/berlin-an-time/input/config.xml";
+			configFile = "../../../runs-svn/berlin-an/input/config.xml";
 			
 			congestionPricing = true;
 			noisePricing = true;
@@ -132,9 +128,7 @@ public class CNEBerlin {
 			sigma = 0.;
 			
 			congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
-			kP = 2 * ( 10 / 3600. );
-			
-			computeExpectedAirPollutionCosts = false;
+			kP = 2 * ( 10 / 3600. );			
 		}
 				
 		CNEBerlin cnControler = new CNEBerlin();
@@ -237,7 +231,8 @@ public class CNEBerlin {
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
-		cne.setComputeExpectedAirPollutionCosts(computeExpectedAirPollutionCosts);
+		cne.setAgentFilter(new BerlinAgentFilter());
+
 		controler = cne.prepareControler();
 				
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

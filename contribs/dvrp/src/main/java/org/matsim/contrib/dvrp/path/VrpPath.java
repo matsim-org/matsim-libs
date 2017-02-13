@@ -22,6 +22,11 @@ package org.matsim.contrib.dvrp.path;
 import org.matsim.api.core.v01.network.Link;
 
 
+/**
+ * Contains relevant information about a dvrp path.  But not (as far as I can see) information about where we are.
+ * 
+ * @author (of documentation) nagel
+ */
 public interface VrpPath
     extends Iterable<Link>
 {

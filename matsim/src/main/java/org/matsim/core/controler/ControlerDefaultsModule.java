@@ -36,7 +36,7 @@ import org.matsim.counts.CountsModule;
 import org.matsim.pt.counts.PtCountsModule;
 import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 
-public class ControlerDefaultsModule extends AbstractModule {
+public final class ControlerDefaultsModule extends AbstractModule {
     @Override
     public void install() {
         install(new EventsManagerModule());

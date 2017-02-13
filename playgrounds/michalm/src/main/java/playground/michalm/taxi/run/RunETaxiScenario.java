@@ -20,8 +20,8 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -53,13 +53,13 @@ public class RunETaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        TaxiData taxiData = new TaxiData();
-        new EvrpVehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
+        FleetImpl fleet = new FleetImpl();
+        new EvrpVehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
-        ETaxiUtils.initEvData(taxiData, evData);
+        ETaxiUtils.initEvData(fleet, evData);
 
-        Controler controler = RunTaxiScenario.createControler(scenario, taxiData, otfvis);
+        Controler controler = RunTaxiScenario.createControler(scenario, fleet, otfvis);
         controler.addOverridingModule(new EvModule(evData));
         controler.addOverridingModule(new DynQSimModule<>(ETaxiQSimProvider.class));
 
@@ -67,7 +67,8 @@ public class RunETaxiScenario
             @Override
             public void install()
             {
-                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+                addMobsimListenerBinding()
+                        .toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
                 addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
             }
         });

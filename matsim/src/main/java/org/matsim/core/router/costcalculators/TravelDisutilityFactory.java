@@ -32,6 +32,15 @@ import org.matsim.core.router.util.TravelTime;
  * in the getLinkTravelDisutility(...) call.  However, there is a danger that someone memorizes the person in a class-global 
  * (= private) field ... and then the class is no longer thread safe.  Thus, we may be safer by having one instance of
  * of TravelDisutility per router thread.  kai/michaelz/dgrether, apr'13
+ * <li> Seems to me that the above arguments are obsolete with guice ... each inject could pull a new instance.  HOWEVER, it seems that we 
+ * either need to pass the TravelTime object into the creator, or at least the mode (so it can pull the correct TravelTime).  Neither is
+ * possible with a syntax of type
+ * <pre>
+ *    addTravelDisutilityBinding(mode).to???</pre>
+ * The only option I can think about would be something like
+ * <pre>
+ * addTravelDistuilityBinding(mode).toProvider( new TravelDisutilityProvider(mode) ) ;
+ * </pre>
  * </ul>
  * 
  * @author dgrether

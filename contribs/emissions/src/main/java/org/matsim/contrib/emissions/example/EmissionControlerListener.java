@@ -24,11 +24,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
@@ -37,7 +37,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
  * @author benjamin
  *
  */
-public class EmissionControlerListener implements StartupListener, IterationStartsListener, ShutdownListener {
+public class EmissionControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
 	
 	private MatsimServices controler;
@@ -80,10 +80,11 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	}
 
 	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		logger.info("closing emission events file...");
-		emissionEventWriter.closeFile();
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		if(lastIteration.equals(event.getIteration())){
+			logger.info("closing emission events file...");
+			emissionEventWriter.closeFile();
+			emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		}
 	}
-	
 }

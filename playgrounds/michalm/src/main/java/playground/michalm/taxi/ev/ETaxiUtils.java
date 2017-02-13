@@ -20,9 +20,8 @@
 package playground.michalm.taxi.ev;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.data.TaxiData;
 
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.discharging.*;
@@ -33,7 +32,7 @@ import playground.michalm.taxi.data.EvrpVehicle.Ev;
 
 public class ETaxiUtils
 {
-    public static void initEvData(TaxiData taxiData, EvData evData)
+    public static void initEvData(Fleet fleet, EvData evData)
     {
         TemperatureProvider tempProvider = () -> 20;// aux power about 1 kW at 20oC
         double chargingSpeedFactor = 1.; //full speed
@@ -42,7 +41,7 @@ public class ETaxiUtils
             new ETaxiChargingLogic(c, chargingSpeedFactor);
         }
 
-        for (Vehicle v : taxiData.getVehicles().values()) {
+        for (Vehicle v : fleet.getVehicles().values()) {
             Ev ev = ((EvrpVehicle)v).getEv();
             ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
             ev.setAuxEnergyConsumption(
