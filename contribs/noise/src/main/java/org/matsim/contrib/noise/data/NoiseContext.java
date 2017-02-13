@@ -59,7 +59,8 @@ public class NoiseContext {
 	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
 	
-	private Set<Id<Vehicle>> busVehicleIDs = new HashSet<>();
+	private Set<Id<Vehicle>> asBusConsideredTransitVehicleIDs = new HashSet<>();
+	private Set<Id<Vehicle>> notConsideredTransitVehicleIDs = new HashSet<>();
 	private Map<Id<Link>, Map<Id<Vehicle>, Double>> linkId2vehicleId2lastEnterTime = new HashMap<>();
 	
 	// for routing purposes
@@ -496,11 +497,11 @@ public class NoiseContext {
 	}
 
 	public Set<Id<Vehicle>> getBusVehicleIDs() {
-		return busVehicleIDs;
+		return asBusConsideredTransitVehicleIDs;
 	}
 
 	public void setBusVehicleIDs(Set<Id<Vehicle>> busVehicleIDs) {
-		this.busVehicleIDs = busVehicleIDs;
+		this.asBusConsideredTransitVehicleIDs = busVehicleIDs;
 	}
 
 	public Map<Id<Link>, Map<Id<Vehicle>, Double>> getLinkId2vehicleId2lastEnterTime() {
@@ -509,6 +510,14 @@ public class NoiseContext {
 
 	public void setLinkId2vehicleId2lastEnterTime(Map<Id<Link>, Map<Id<Vehicle>, Double>> link2vehicle2enterTime) {
 		this.linkId2vehicleId2lastEnterTime = link2vehicle2enterTime;
+	}
+
+	public Set<Id<Vehicle>> getNotConsideredTransitVehicleIDs() {
+		return notConsideredTransitVehicleIDs;
+	}
+
+	public void setNotConsideredTransitVehicleIDs(Set<Id<Vehicle>> notConsideredTransitVehicleIDs) {
+		this.notConsideredTransitVehicleIDs = notConsideredTransitVehicleIDs;
 	}
 
 }

@@ -120,6 +120,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 							+ "This message is only given once");
 					cWarn2++;
 				}
+				this.noiseContext.getNotConsideredTransitVehicleIDs().add(event.getVehicleId());
 			}
 		}
 	}
@@ -269,10 +270,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	public void handleEvent(LinkEnterEvent event) {
 		checkTime(event.getTime());
 
-		if (this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getVehicleId())
-				|| this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
-			// car, lkw or bus
-			
+		if (this.noiseContext.getNotConsideredTransitVehicleIDs().contains(event.getVehicleId())) {
+			// not considered transit vehicle
+		} else {
+			// car, lkw or a considered transit vehicle (e.g. bus)
+					
 			if (this.noiseContext.getLinkId2vehicleId2lastEnterTime().containsKey(event.getLinkId())) {
 				this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(event.getLinkId()).put(event.getVehicleId(), event.getTime());
 				
@@ -316,10 +318,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCarAgentsEntering();
 				cars++;
 				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCarAgentsEntering(cars);			
-			}
-			
-		} else {
-			// a transit vehicle which is not considered
+			}		
 		}
 	}
 	
