@@ -73,7 +73,7 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-				
+
 		double travelDisutility = this.travelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
 		
 		double logNormalRnd = 1. ;
@@ -83,7 +83,6 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 				
 		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person, vehicle);
 		double randomizedTollDisutility = linkExpectedTollDisutility * logNormalRnd;
-		
 		return travelDisutility + randomizedTollDisutility;
 	}
 
@@ -93,7 +92,7 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 	}
 
 	private double calculateExpectedTollDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		
+				
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration i based on the tolls in iteration i-1 */
 				
@@ -126,7 +125,7 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 				}
 			}
 		}
-						
+				
 		double linkExpectedTollDisutility = -1 * this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() * estimatedAmount;
 		return linkExpectedTollDisutility;
 	}

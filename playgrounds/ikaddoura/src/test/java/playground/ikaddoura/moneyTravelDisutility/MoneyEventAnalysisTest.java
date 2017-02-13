@@ -196,9 +196,9 @@ public class MoneyEventAnalysisTest {
 		final Id<Vehicle> vehicleId5 = Id.createVehicleId("vehicle5");
 		final Id<Vehicle> vehicleId6 = Id.createVehicleId("vehicle6");
 
-		Id<Link> linkId1 = Id.createLinkId("link1");
-		Id<Link> linkId2 = Id.createLinkId("link2");
-		Id<Link> linkId3 = Id.createLinkId("link3");
+		final Id<Link> linkId1 = Id.createLinkId("link1");
+		final Id<Link> linkId2 = Id.createLinkId("link2");
+		final Id<Link> linkId3 = Id.createLinkId("link3");
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		Controler controler = new Controler(scenario);
@@ -226,7 +226,7 @@ public class MoneyEventAnalysisTest {
 		});
 		
 		controler.getConfig().controler().setLastIteration(0);
-		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test1/");
+		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test2/");
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 				
@@ -311,9 +311,9 @@ public class MoneyEventAnalysisTest {
 		
 		final Id<Vehicle> vehicleId1 = Id.createVehicleId("vehicle1");
 		
-		Id<Link> linkId1 = Id.createLinkId("link1");
-		Id<Link> linkId2 = Id.createLinkId("link2");
-		Id<Link> linkId3 = Id.createLinkId("link3");
+		final Id<Link> linkId1 = Id.createLinkId("link1");
+		final Id<Link> linkId2 = Id.createLinkId("link2");
+		final Id<Link> linkId3 = Id.createLinkId("link3");
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		Controler controler = new Controler(scenario);
@@ -341,7 +341,7 @@ public class MoneyEventAnalysisTest {
 		});
 		
 		controler.getConfig().controler().setLastIteration(0);
-		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test1/");
+		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test3/");
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 				
@@ -370,7 +370,7 @@ public class MoneyEventAnalysisTest {
 		
 		final Id<Vehicle> vehicleId1 = Id.createVehicleId("vehicle1");
 		
-		Id<Link> linkId1 = Id.createLinkId("link1");
+		final Id<Link> linkId1 = Id.createLinkId("link1");
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		Controler controler = new Controler(scenario);
@@ -398,7 +398,7 @@ public class MoneyEventAnalysisTest {
 		});
 		
 		controler.getConfig().controler().setLastIteration(0);
-		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test1/");
+		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test4/");
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 				
@@ -412,6 +412,59 @@ public class MoneyEventAnalysisTest {
 		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(960., personId1, linkId1, -99., 960.));
 		
 		moneyAnalysis.notifyIterationEnds(new IterationEndsEvent(controler, 0));
+	}
+	
+	// money events for taxi vehicles
+	@Test
+	public final void test5() {
+		
+		final Id<Person> personId1 = Id.createPersonId("person1");
+		
+		final Id<Person> taxiDriverPersonId = Id.createPersonId("taxi1");
+		final Id<Vehicle> vehicleId1 = Id.createVehicleId("taxi1");
+		final Id<Link> linkId1 = Id.createLinkId("link1");
+
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		Controler controler = new Controler(scenario);
+		
+		MoneyEventAnalysis moneyAnalysis = new MoneyEventAnalysis();
+
+		final MoneyTimeDistanceTravelDisutilityFactory factory = new MoneyTimeDistanceTravelDisutilityFactory(
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()));
+				
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+								
+				// travel disutility
+				this.bindCarTravelDisutilityFactory().toInstance(factory);
+				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
+				
+				// person money event handler + controler listener
+				this.addControlerListenerBinding().toInstance(moneyAnalysis);
+				this.addEventHandlerBinding().toInstance(moneyAnalysis);
+			}
+		});
+		
+		controler.getConfig().controler().setLastIteration(0);
+		controler.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory() + "test5/");
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+				
+		// add a fake iteration
+		
+		moneyAnalysis.reset(0);
+		
+		moneyAnalysis.handleEvent(new PersonEntersVehicleEvent(0., taxiDriverPersonId, vehicleId1));
+		moneyAnalysis.handleEvent(new PersonEntersVehicleEvent(1., personId1, vehicleId1));
+		moneyAnalysis.handleEvent(new LinkEnterEvent(60., vehicleId1, linkId1));
+		
+		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(360., taxiDriverPersonId, linkId1, -99., 360.));
+		
+		moneyAnalysis.notifyIterationEnds(new IterationEndsEvent(controler, 0));
+		
+		System.out.println("average amount: " + moneyAnalysis.getLinkId2info().get(linkId1).getTimeBinNr2timeBin().get(0).getAverageAmount());
+		Assert.assertEquals("wrong average amount", -99., moneyAnalysis.getLinkId2info().get(linkId1).getTimeBinNr2timeBin().get(0).getAverageAmount(), MatsimTestUtils.EPSILON);
 	}
 	
 }

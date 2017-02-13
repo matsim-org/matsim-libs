@@ -69,6 +69,7 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 	private static int warnCounter1 = 0;
 	private static int warnCounter2 = 0;
 	private static int warnCounter3 = 0;
+	private static int warnCounter4 = 0;
 
 	@Override
 	public void reset(int iteration) {
@@ -77,7 +78,13 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 		
 		this.personId2vehicleId.clear();
 		this.vehicleId2personId.clear();
-		this.linkId2info.clear();
+		
+		for (LinkInfo linkInfo : this.linkId2info.values()) {
+			for (TimeBin timeBin : linkInfo.getTimeBinNr2timeBin().values()) {
+				timeBin.getEnteringAgents().clear();
+				timeBin.getPersonId2amounts().clear();
+			}
+		}
 		
 		warnCounter1 = 0;
 		warnCounter2 = 0;
@@ -137,7 +144,7 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 			LinkInfo linkMoneyInfo = new LinkInfo(linkId);
 			linkMoneyInfo.getTimeBinNr2timeBin().put(timeBinNr, timeBin);
 			linkId2info.put(linkId, linkMoneyInfo);
-		}
+		}		
 	}
 
 	@Override
@@ -176,18 +183,40 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		
+		// a person should only be in one vehicle
+		// a vehicle may have several passengers (transit, taxi, ...)
+		
 		this.personId2vehicleId.put(event.getPersonId(), event.getVehicleId());
-		this.vehicleId2personId.put(event.getVehicleId(), event.getPersonId());
+
+		if (this.vehicleId2personId.containsKey(event.getVehicleId()) && (!event.getPersonId().toString().equals(event.getPersonId().toString()))) {
+			if (warnCounter2 <= 5) {
+				log.warn(event.getPersonId() + " enters vehicle " + event.getVehicleId() + ". Person " + this.vehicleId2personId.get(event.getVehicleId()) + " has entered the vehicle before"
+						+ " and is considered as the transit / taxi driver.");
+				if (warnCounter4 == 5) {
+					log.warn("Further log statements of this type are not printed out.");
+				}
+			}
+		} else {
+			this.vehicleId2personId.put(event.getVehicleId(), event.getPersonId());
+		}	
 	}
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		log.info("Iteration ends. Processing the data in the previous iteration...");
+		log.info("+++++ Iteration ends. Processing the data in the previous iteration...");
+		
 		for (LinkInfo linkInfo : this.linkId2info.values()) {
 			
 			for (TimeBin timeBin : linkInfo.getTimeBinNr2timeBin().values()) {
 			
+				// resetting averages from previous iteration
+				timeBin.setAverageAmount(0.);
+				timeBin.getAgentTypeId2avgAmount().clear();
+				
+				// compute averages for the current iteration
+				
 				// average amount
 				double averageAmount = computeAverageAmount(timeBin);
 				timeBin.setAverageAmount(averageAmount);
@@ -196,7 +225,7 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 				if (this.agentFilter != null) computeAverageAmountPerAgentType(timeBin);
 			}
 		}
-		log.info("Iteration ends. Processing the data in the previous iteration... Done.");
+		log.info("+++++ Iteration ends. Processing the data in the previous iteration... Done.");
 	}
 
 	private void computeAverageAmountPerAgentType(TimeBin timeBin) {
