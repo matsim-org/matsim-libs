@@ -35,6 +35,13 @@ import org.matsim.api.core.v01.population.Person;
 
 public class TimeBin {
 	
+	@Override
+	public String toString() {
+		return "TimeBin [timeBinNr=" + timeBinNr + ", personId2amounts=" + personId2amounts + ", enteringAgents="
+				+ enteringAgents + ", averageAmount=" + averageAmount + ", agentType2avgAmount=" + agentType2avgAmount
+				+ "]";
+	}
+
 	private int timeBinNr;
 	
 	private final Map<Id<Person>, List<Double>> personId2amounts;

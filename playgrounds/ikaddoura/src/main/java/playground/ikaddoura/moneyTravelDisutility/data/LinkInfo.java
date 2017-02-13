@@ -33,6 +33,11 @@ import org.matsim.api.core.v01.network.Link;
 
 public class LinkInfo {
 	
+	@Override
+	public String toString() {
+		return "LinkInfo [id=" + id + ", nr2timeBin=" + nr2timeBin + "]";
+	}
+
 	private final Id<Link> id;
 	private final Map<Integer, TimeBin> nr2timeBin;
 	
