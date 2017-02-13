@@ -58,7 +58,7 @@ public class VariableAccessTransitRouterImplTest {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		TransitRouterConfig trConfig = new TransitRouterConfig(config);
-		trConfig.setSearchRadius(1000.0); // default
+		trConfig.setSearchRadius(1300.0); // default 1000m
 		trConfig.setBeelineWalkConnectionDistance(150.0); // default 100.0m
 		trConfig.setAdditionalTransferTime(0.0); // default
 		trConfig.setUtilityOfLineSwitch_utl(-1.0); // default
@@ -269,8 +269,8 @@ public class VariableAccessTransitRouterImplTest {
 		 * Y=1230.770m:	cost direct pt trip = 108.3078	+ 77.58185	+ 0 = 185.8897
 		 * 
 		 * Y=1153.846m:	cost transfer pt trip = 74.46155	+ 106.1999	+ 0 = 180.6615
-		 * Y=1154m:	 	cost transfer pt trip = 74.448	+ 106.2119		+ 0 = 180.6599
-		 * Y=1230m:		cost transfer pt trip = 67.76	+ 112.1399		+ 0 = 179.8999
+		 * Y=1154m:	 	cost transfer pt trip = 74.448		+ 106.2119	+ 0 = 180.6599
+		 * Y=1230m:		cost transfer pt trip = 67.76		+ 112.1399	+ 0 = 179.8999
 		 * Y=1230.770m:	cost transfer pt trip = 67.69224	+ 82.2		+ 0 = 149.8922
 		 * 
 		 * Y=1153.846m:	cost direct pt trip = 155.1203 vs. 180.6615 cost transfer pt trip
@@ -281,8 +281,8 @@ public class VariableAccessTransitRouterImplTest {
 		 */
 		ActivityFacility workXCoord3950 = actFacilFacImpl.createActivityFacility(Id.create("workXCoord3950", ActivityFacility.class), CoordUtils.createCoord(3950.0, 1050.0));
 
-		ActivityFacility homeAtDirectTripSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(Id.create("homeAtDirectTripSideOfDecisionPoint", ActivityFacility.class), CoordUtils.createCoord(1153.846, 1050.0));
-		ActivityFacility homeAtTransferTripSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(Id.create("homeAtTransferTripSideOfDecisionPoint", ActivityFacility.class), CoordUtils.createCoord(1154.0, 1050.0));
+		ActivityFacility homeAtDirectTripSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(Id.create("homeAtDirectTripSideOfDecisionPoint", ActivityFacility.class), CoordUtils.createCoord(1050.0, 1050.0 + 1230.0)); //path cost 142.18109293326305
+		ActivityFacility homeAtTransferTripSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(Id.create("homeAtTransferTripSideOfDecisionPoint", ActivityFacility.class), CoordUtils.createCoord(1050.0, 1050.0 + 1230.77)); //path cost 148.2922402801634
 
 		List<Leg> legsAtDirectTripSideOfDecisionPoint = router.calcRoute(homeAtDirectTripSideOfDecisionPoint, workXCoord3950, 7*60*60, personCarNeverAvailable);
 		Assert.assertTrue(legsAtDirectTripSideOfDecisionPoint.get(0).getMode().equals("walk"));
@@ -293,10 +293,10 @@ public class VariableAccessTransitRouterImplTest {
 		List<Leg> legsAtTransferTripSideOfDecisionPoint = router.calcRoute(homeAtTransferTripSideOfDecisionPoint, workXCoord3950, 7*60*60, personCarNeverAvailable);
 		Assert.assertTrue(legsAtTransferTripSideOfDecisionPoint.get(0).getMode().equals("walk"));
 		Assert.assertTrue(legsAtTransferTripSideOfDecisionPoint.get(1).getMode().equals("pt"));
-		Assert.assertTrue(legsAtTransferTripSideOfDecisionPoint.get(2).getMode().equals("walk"));
-//		Assert.assertTrue(legsAtTransferTripSideOfDecisionPoint.get(3).getMode().equals("pt"));
-//		Assert.assertTrue(legsAtTransferTripSideOfDecisionPoint.get(4).getMode().equals("walk"));
-//		Assert.assertEquals(5, legsAtTransferTripSideOfDecisionPoint.size()); // 3
+		Assert.assertTrue(legsAtTransferTripSideOfDecisionPoint.get(2).getMode().equals("transit_walk"));
+		Assert.assertTrue(legsAtTransferTripSideOfDecisionPoint.get(3).getMode().equals("pt"));
+		Assert.assertTrue(legsAtTransferTripSideOfDecisionPoint.get(4).getMode().equals("walk"));
+		Assert.assertEquals(5, legsAtTransferTripSideOfDecisionPoint.size()); // 3
 		
 //		router.calcRoute(homeXCoord2050, workXCoord3950, 8*60*60, personCarNeverAvailable);
 //		direct walk cost 167.2
