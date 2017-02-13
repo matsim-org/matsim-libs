@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.utils.collections.Tuple;
@@ -59,9 +60,10 @@ public class NoiseContext {
 	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
 	
-	private Set<Id<Vehicle>> asBusConsideredTransitVehicleIDs = new HashSet<>();
-	private Set<Id<Vehicle>> notConsideredTransitVehicleIDs = new HashSet<>();
-	private Map<Id<Link>, Map<Id<Vehicle>, Double>> linkId2vehicleId2lastEnterTime = new HashMap<>();
+	private final Set<Id<Vehicle>> asBusConsideredTransitVehicleIDs = new HashSet<>();
+	private final Set<Id<Vehicle>> notConsideredTransitVehicleIDs = new HashSet<>();
+	private final Map<Id<Link>, Map<Id<Vehicle>, Double>> linkId2vehicleId2lastEnterTime = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 	
 	// for routing purposes
 	
@@ -500,24 +502,15 @@ public class NoiseContext {
 		return asBusConsideredTransitVehicleIDs;
 	}
 
-	public void setBusVehicleIDs(Set<Id<Vehicle>> busVehicleIDs) {
-		this.asBusConsideredTransitVehicleIDs = busVehicleIDs;
-	}
-
 	public Map<Id<Link>, Map<Id<Vehicle>, Double>> getLinkId2vehicleId2lastEnterTime() {
 		return linkId2vehicleId2lastEnterTime;
-	}
-
-	public void setLinkId2vehicleId2lastEnterTime(Map<Id<Link>, Map<Id<Vehicle>, Double>> link2vehicle2enterTime) {
-		this.linkId2vehicleId2lastEnterTime = link2vehicle2enterTime;
 	}
 
 	public Set<Id<Vehicle>> getNotConsideredTransitVehicleIDs() {
 		return notConsideredTransitVehicleIDs;
 	}
 
-	public void setNotConsideredTransitVehicleIDs(Set<Id<Vehicle>> notConsideredTransitVehicleIDs) {
-		this.notConsideredTransitVehicleIDs = notConsideredTransitVehicleIDs;
+	public Map<Id<Vehicle>, Id<Person>> getVehicleId2PersonId() {
+		return vehicleId2personId;
 	}
-
 }

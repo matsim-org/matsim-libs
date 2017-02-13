@@ -31,8 +31,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -58,7 +60,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 
-public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverStartsEventHandler {
+public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
 	private static final boolean printLog = false;
@@ -611,8 +613,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 					
 					if (amount != 0.) {
 						
-						// The person Id is assumed to be equal to the vehicle Id. TODO: get person Id from PersonEntersVehicleEvent
-						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getEventTime(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId), Id.create(vehicleId, Person.class), vehicleId, amount, linkId);
+						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getEventTime(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId), this.noiseContext.getVehicleId2PersonId().get(vehicleId), vehicleId, amount, linkId);
 						events.processEvent(noiseEvent);
 						
 						if (this.collectNoiseEvents) {
@@ -908,6 +909,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 
 	public final void setUseCompression(boolean useCompression) {
 		this.useCompression = useCompression;
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		this.noiseContext.getVehicleId2PersonId().put(event.getVehicleId(), event.getPersonId());
 	}
 	
 }
