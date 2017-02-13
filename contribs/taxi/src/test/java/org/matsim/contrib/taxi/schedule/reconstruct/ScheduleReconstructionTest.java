@@ -42,14 +42,14 @@ public class ScheduleReconstructionTest
     @Test
     public void testOneTaxiReconstruction()
     {
-        runReconstruction("./src/main/resources/one_taxi/one_taxi_config.xml");
+        runReconstruction("one_taxi/one_taxi_config.xml");
     }
 
 
     @Test
     public void testMielecReconstruction()
     {
-        runReconstruction("./src/main/resources/mielec_2014_02/mielec_taxi_benchmark_config.xml");
+        runReconstruction("mielec_2014_02/mielec_taxi_benchmark_config.xml");
     }
 
 
