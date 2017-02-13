@@ -42,6 +42,7 @@ import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import org.matsim.core.utils.misc.Time;
 import playground.singapore.springcalibration.run.TaxiUtils;
 
 /**
@@ -235,21 +236,25 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 	 */
 	private void newPlanWithTaxiStages(Plan plan, Leg leg) {
 		Plan tmpPlan = PopulationUtils.createPlan();
-		
+		double time = 0;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				Activity currentActivity = (Activity)pe;
+				if(currentActivity.getEndTime()!= Time.UNDEFINED_TIME)
+					time=currentActivity.getEndTime();
+				else
+					time+=currentActivity.getMaximumDuration();
 				Leg nextLeg = PlanUtils.getNextLeg(plan, currentActivity);
 				tmpPlan.addActivity(currentActivity);
 				
 				if (nextLeg == leg) {	
 					Coord coord = currentActivity.getCoord();
-					int hour = (int)(currentActivity.getEndTime() / 3600.0);
+					int hour = (int)(time/ 3600.0);
 					double taxiWaitTime = this.taxiUtils.getWaitingTime(coord, hour);
-					double taxiWaitEndTime = currentActivity.getEndTime() + taxiWaitTime;
+					double taxiWaitEndTime = time + taxiWaitTime;
 					
 					Leg taxiWalkLeg = PopulationUtils.createLeg(TaxiUtils.taxi_walk);
-					taxiWalkLeg.setDepartureTime(currentActivity.getEndTime());
+					taxiWalkLeg.setDepartureTime(time);
 					taxiWalkLeg.setTravelTime(0.0);
 					tmpPlan.addLeg(taxiWalkLeg);
 										
@@ -259,9 +264,10 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 				}
 				
 			}
-			if (pe instanceof Leg) {
+			else if (pe instanceof Leg) {
 				Leg currentLeg = (Leg)pe;
 				tmpPlan.addLeg(currentLeg);
+				time += currentLeg.getTravelTime();
 			}
 			
 		}
