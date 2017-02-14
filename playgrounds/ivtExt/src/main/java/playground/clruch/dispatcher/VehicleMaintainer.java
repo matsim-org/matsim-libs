@@ -146,7 +146,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         // TODO measure
         long tic = System.nanoTime();
         // TODO need to process AbstractDirectives!!!!
-        // private_vehicleDirectives.values().stream().parallel().forEach(AbstractDirective::execute);
+         private_vehicleDirectives.values().stream().parallel().forEach(AbstractDirective::execute);
         routingTimeNano += System.nanoTime() - tic;
         private_vehicleDirectives.clear();
     }

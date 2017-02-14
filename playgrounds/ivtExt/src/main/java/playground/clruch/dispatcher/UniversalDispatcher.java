@@ -98,48 +98,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      *            provided by getAVRequests()
      */
     protected final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
-        boolean status = matchedRequests.add(avRequest);
-        GlobalAssert.that(status); // matchedRequests did not already contain avRequest
-        GlobalAssert.that(pendingRequests.contains(avRequest));
-       
-        final AVTimingParameters timing = avDispatcherConfig.getParent().getTimingParameters();
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-
-        {
-            AbstractTask currentTask = schedule.getCurrentTask();
-            AbstractTask lastTask = Schedules.getLastTask(schedule);
-            GlobalAssert.that(currentTask == lastTask); // check that current task is last task in schedule
-        }
-
-        final double endPickupTime = getTimeNow() + timing.getPickupDurationPerStop();
-        final SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(parallelLeastCostPathCalculator, travelTime);
-        VrpPathWithTravelData vrpPathWithTravelData = simpleBlockingRouter.getRoute( //
-                avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
-
-        final double scheduleEndTime = schedule.getEndTime();
-        {
-            AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
-            avStayTask.setEndTime(getTimeNow()); // finish the last task now
-        }
-
-        schedule.addTask(new AVPickupTask( //
-                getTimeNow(), endPickupTime, avRequest.getFromLink(), Arrays.asList(avRequest)));
-
-        schedule.addTask(new AVDriveTask( //
-                vrpPathWithTravelData, Arrays.asList(avRequest)));
-
-        final double endDropoffTime = vrpPathWithTravelData.getArrivalTime() + timing.getDropoffDurationPerStop();
-        schedule.addTask(new AVDropoffTask( //
-                vrpPathWithTravelData.getArrivalTime(), endDropoffTime, avRequest.getToLink(), Arrays.asList(avRequest)));
-
-        // TODO redundant
-        if (endDropoffTime < scheduleEndTime)
-            schedule.addTask(new AVStayTask( //
-                    endDropoffTime, scheduleEndTime, avRequest.getToLink()));
-
-        // jan: following computation is mandatory for the internal scoring function
-        final double distance = VrpPathUtils.getDistance(vrpPathWithTravelData);
-        avRequest.getRoute().setDistance(distance);
+        createAcceptRequestDirective(avVehicle, avRequest);
     }
 
     private void createAcceptRequestDirective(AVVehicle avVehicle, AVRequest avRequest) {
@@ -147,7 +106,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
         GlobalAssert.that(pendingRequests.contains(avRequest));
 
-        final AVTimingParameters timing = avDispatcherConfig.getParent().getTimingParameters();
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
 
         {
@@ -156,15 +114,12 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             GlobalAssert.that(currentTask == lastTask); // check that current task is last task in schedule
         }
 
-        final double endPickupTime = getTimeNow() + timing.getPickupDurationPerStop();
+        final double endPickupTime = getTimeNow() + pickupDurationPerStop;
         FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
                 avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
 
-        AbstractDirective abstractDirective = new AcceptRequestDirective( //
-                avVehicle, avRequest, futurePathContainer, getTimeNow(), timing.getDropoffDurationPerStop());
-        assignDirective(avVehicle, abstractDirective);
-
-        abstractDirective.execute(); // TODO temporary for testing
+        assignDirective(avVehicle, new AcceptRequestDirective( //
+                avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
     }
 
     /**
