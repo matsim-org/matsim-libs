@@ -22,7 +22,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LazyDispatcher extends UniversalDispatcher {
     public static final String IDENTIFIER = LazyDispatcher.class.getSimpleName();
-    public static final int DEBUG_PERIOD = 5 * 60;
+    public static final int DEBUG_PERIOD = 60;
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
     public LazyDispatcher( //
@@ -36,9 +36,9 @@ public class LazyDispatcher extends UniversalDispatcher {
     @Override
     public void redispatch(double now) {
 
-        if (Math.round(now) % DEBUG_PERIOD == 0) {
+        if (Math.round(now) % DEBUG_PERIOD == 0 && now < 100000) {
             System.out.println("==================== TIME " + now);
-            System.out.println(getStatusString());
+            System.out.println(getUniversalDispatcherStatusString());
 
             // BEGIN: debug info
             for (AVVehicle avVehicle : getFunctioningVehicles())
@@ -46,6 +46,7 @@ public class LazyDispatcher extends UniversalDispatcher {
                     System.out.println(ScheduleUtils.scheduleOf(avVehicle));
             // END: debug info
 
+            int acceptCount = 0;
             final Queue<Link> unmatchedRequestLinks = new LinkedList<>();
             {
                 Map<Link, Queue<AVVehicle>> stayVehicles = getStayVehicles();
@@ -59,6 +60,7 @@ public class LazyDispatcher extends UniversalDispatcher {
                         } else {
                             AVVehicle avVehicle = queue.poll();
                             setAcceptRequest(avVehicle, avRequest);
+                            ++acceptCount;
                         }
                     } else {
                         unmatchedRequestLinks.add(link);
@@ -66,7 +68,8 @@ public class LazyDispatcher extends UniversalDispatcher {
                 }
             }
             System.out.println("#unmatchedRequestLinks " + unmatchedRequestLinks.size());
-            System.out.println(getStatusString());
+            System.out.println(getUniversalDispatcherStatusString());
+            int divertedCount = 0;
 
             if (!unmatchedRequestLinks.isEmpty())
                 for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
@@ -77,8 +80,12 @@ public class LazyDispatcher extends UniversalDispatcher {
                     if (dest == null) { // vehicle in stay task
                         Link link = unmatchedRequestLinks.poll();
                         setVehicleDiversion(vehicleLinkPair, link);
+                        ++divertedCount;
                     }
                 }
+
+            if (0 < divertedCount || 0 < acceptCount)
+                System.out.println("#diverted " + divertedCount + ", #accepted " + acceptCount);
         }
     }
 

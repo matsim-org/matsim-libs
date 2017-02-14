@@ -1,12 +1,11 @@
 package playground.sebhoerl.plcpc;
 
-import org.matsim.core.router.util.LeastCostPathCalculator;
-
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ParallelLeastCostPathCalculatorWorker extends Thread implements LeastCostPathCalculatorWorker {
+import org.matsim.core.router.util.LeastCostPathCalculator;
+
+class ParallelLeastCostPathCalculatorWorker extends Thread implements LeastCostPathCalculatorWorker {
     final private BlockingQueue<ParallelLeastCostPathCalculatorTask> pending = new LinkedBlockingQueue<>();
     final private LeastCostPathCalculator router;
 
@@ -27,7 +26,7 @@ public class ParallelLeastCostPathCalculatorWorker extends Thread implements Lea
     public void run() {
         try {
             while (true) {
-                ParallelLeastCostPathCalculatorTask task = pending.take();
+                ParallelLeastCostPathCalculatorTask task = pending.take(); // blocking call; waits until element is available 
                 task.result = router.calcLeastCostPath(task.fromNode, task.toNode, task.time, task.person, task.vehicle);
 
                 synchronized (waitLock) {

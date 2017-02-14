@@ -21,6 +21,11 @@ public class SimpleBlockingRouter {
         this.travelTime = travelTime;
     }
 
+    private LeastCostPathFuture getRouteFuture(Link divLink, Link destLink, double startTime) {
+        return router.calcLeastCostPath( // <- non-blocking call
+                divLink.getToNode(), destLink.getFromNode(), startTime, null, null);
+    }
+
     /**
      * 
      * @param divLink
@@ -32,17 +37,21 @@ public class SimpleBlockingRouter {
      * @return
      */
     public VrpPathWithTravelData getRoute(Link divLink, Link destLink, double startTime) {
-        LeastCostPathFuture drivepath = router.calcLeastCostPath( //
-                divLink.getToNode(), destLink.getFromNode(), startTime, null, null);
+        LeastCostPathFuture leastCostPathFuture = getRouteFuture(divLink, destLink, startTime);
+
+        return getRouteBlocking(divLink, destLink, startTime, leastCostPathFuture, travelTime);
+    }
+
+    public static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
         try {
-            Thread.sleep(1);
-            while (!drivepath.isDone())
-                Thread.sleep(1);
+            Thread.sleep(0, 100000);
+            while (!leastCostPathFuture.isDone())
+                Thread.sleep(0, 100000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(divLink, destLink, startTime, drivepath.get(), travelTime);
-        
+        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(startLink, destLink, startTime, leastCostPathFuture.get(), travelTime);
+
         VrpPathUtils.assertIsConsistent(vrpPathWithTravelData);
         return vrpPathWithTravelData;
     }

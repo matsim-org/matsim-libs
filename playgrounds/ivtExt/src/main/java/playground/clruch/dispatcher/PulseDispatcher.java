@@ -49,7 +49,7 @@ public class PulseDispatcher extends UniversalDispatcher {
     public void redispatch(double now) {
         if (3600 < now && Math.round(now) % DEBUG_PERIOD == 0 && now < 90000) {
             System.out.println("==================== TIME " + now);
-            System.out.println(getStatusString());
+            System.out.println(getUniversalDispatcherStatusString());
 
             // BEGIN: debug info
             for (AVVehicle avVehicle : getFunctioningVehicles())
@@ -65,6 +65,8 @@ public class PulseDispatcher extends UniversalDispatcher {
                     index %= links.size();
                 }
             }
+            
+            System.out.println(getVehicleMaintainerStatusString());
         }
     }
 
