@@ -1,7 +1,5 @@
 package playground.clruch.dispatcher;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -19,7 +17,7 @@ public class VehicleLinkPair {
         this.avVehicle = avVehicle;
         this.linkTimePair = linkTimePair;
     }
-    
+
     public Link getDivertableLocation() {
         return linkTimePair.link;
     }
@@ -31,14 +29,13 @@ public class VehicleLinkPair {
      */
     public Link getDestination() {
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-        List<AbstractTask> tasks = schedule.getTasks();
-        if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED)) {
-            AbstractTask abstractTask = schedule.getCurrentTask();
-            AVTask avTask = (AVTask) abstractTask;
-            if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {
-                AVDriveTask avDriveTask = (AVDriveTask) avTask;
-                return avDriveTask.getPath().getToLink();
-            }
+        // List<AbstractTask> tasks = schedule.getTasks();
+        // if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED))
+        AbstractTask abstractTask = schedule.getCurrentTask();
+        AVTask avTask = (AVTask) abstractTask;
+        if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {
+            AVDriveTask avDriveTask = (AVDriveTask) avTask;
+            return avDriveTask.getPath().getToLink();
         }
         return null;
     }

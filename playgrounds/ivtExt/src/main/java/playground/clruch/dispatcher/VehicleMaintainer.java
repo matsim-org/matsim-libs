@@ -26,12 +26,15 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
  * The purpose of VehicleMaintainer is to register {@link AVVehicle}
  * and provide the collection of available vehicles to derived class.
  * 
  * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s.
+ * path computations attached to assignments are computed in parallel
+ * {@link ParallelLeastCostPathCalculator}.
  */
 public abstract class VehicleMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;

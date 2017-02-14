@@ -35,6 +35,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final FuturePathFactory futurePathFactory;
 
+    // TODO perhaps make it a linkedHashSet for the ordering
     private final Set<AVRequest> pendingRequests = new HashSet<>(); // access via getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
 
