@@ -1,5 +1,8 @@
 package playground.sebhoerl.plcpc;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -10,9 +13,6 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 public class ParallelLeastCostPathCalculator implements MobsimAfterSimStepListener, IterationEndsListener, ShutdownListener {
     private Logger log = Logger.getLogger(ParallelLeastCostPathCalculator.class);

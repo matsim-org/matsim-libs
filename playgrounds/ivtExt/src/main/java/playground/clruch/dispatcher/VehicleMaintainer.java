@@ -51,7 +51,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
      * @param avVehicle
      * @param abstractDirective
      */
-    protected void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
+    /* package */ void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective(avVehicle));
         private_vehicleDirectives.put(avVehicle, abstractDirective);
     }
@@ -65,7 +65,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         return !private_vehicleDirectives.containsKey(avVehicle);
     }
 
-    protected final Collection<AVVehicle> getFunctioningVehicles() { // <- function will be private in the future
+    protected /* package */ final Collection<AVVehicle> getFunctioningVehicles() { // <- function will be private in the future
         if (vehicles.isEmpty() || !vehicles.get(0).getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
         return Collections.unmodifiableList(vehicles);
@@ -122,7 +122,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
                     public void handle(AVStayTask avStayTask) {
                         // for empty vehicles the current task has to be the last task
                         if (Schedules.isLastTask(abstractTask))
-                            if (avStayTask.getBeginTime() + 5 < getTimeNow()) { // TODO magic const
+                            if (avStayTask.getBeginTime() <= getTimeNow()) { // TODO comment on condition
                                 LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
                                 collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
                             }
@@ -143,10 +143,10 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         private_now = now; // <- time available to derived class via getTimeNow()
         redispatch(now);
         private_now = null; // <- time unavailable
-        // TODO measure
         long tic = System.nanoTime();
-        // TODO need to process AbstractDirectives!!!!
-         private_vehicleDirectives.values().stream().parallel().forEach(AbstractDirective::execute);
+        private_vehicleDirectives.values().stream() //
+                .parallel() //
+                .forEach(AbstractDirective::execute);
         routingTimeNano += System.nanoTime() - tic;
         private_vehicleDirectives.clear();
     }
@@ -163,8 +163,9 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     public abstract void redispatch(double now);
 
-    public String getStatusString() { // TODO still needs to evaluate
+    public String getVehicleMaintainerStatusString() { // TODO still needs to evaluate
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("#directives " + private_vehicleDirectives.size() + ", ");
         stringBuilder.append("total routingTime=" + (routingTimeNano * 1e-9) + " sec");
         return stringBuilder.toString();
     }

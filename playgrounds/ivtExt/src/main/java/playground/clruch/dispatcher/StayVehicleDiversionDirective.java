@@ -18,7 +18,6 @@ class StayVehicleDiversionDirective extends VehicleDiversionDirective {
 
     @Override
     void execute() {
-        // TODO Auto-generated method stub
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
         AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
         final AVStayTask avStayTask = (AVStayTask) abstractTask;

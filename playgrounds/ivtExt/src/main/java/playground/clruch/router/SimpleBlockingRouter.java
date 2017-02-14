@@ -44,9 +44,9 @@ public class SimpleBlockingRouter {
 
     public static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
         try {
-            Thread.sleep(1); // TODO sleep less
+            Thread.sleep(0, 100000);
             while (!leastCostPathFuture.isDone())
-                Thread.sleep(1);
+                Thread.sleep(0, 100000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
