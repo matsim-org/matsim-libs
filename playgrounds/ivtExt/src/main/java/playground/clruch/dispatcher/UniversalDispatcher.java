@@ -21,6 +21,8 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.router.FuturePathContainer;
+import playground.clruch.router.FuturePathFactory;
 import playground.clruch.router.SimpleBlockingRouter;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.VrpPathUtils;
@@ -41,6 +43,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  */
 public abstract class UniversalDispatcher extends VehicleMaintainer {
     protected final AVDispatcherConfig avDispatcherConfig;
+    private final FuturePathFactory futurePathFactory;
     protected final TravelTime travelTime;
     protected final ParallelLeastCostPathCalculator parallelLeastCostPathCalculator;
 
@@ -55,8 +58,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     ) {
         super(eventsManager);
         this.avDispatcherConfig = avDispatcherConfig;
+        this.futurePathFactory = new FuturePathFactory(parallelLeastCostPathCalculator, travelTime);
         this.travelTime = travelTime;
         this.parallelLeastCostPathCalculator = parallelLeastCostPathCalculator;
+
     }
 
     /**
@@ -87,7 +92,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         final AVTimingParameters timing = avDispatcherConfig.getParent().getTimingParameters();
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-        final double scheduleEndTime = schedule.getEndTime();
 
         {
             AbstractTask currentTask = schedule.getCurrentTask();
@@ -95,18 +99,19 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             GlobalAssert.of(currentTask == lastTask); // check that current task is last task in schedule
         }
 
+        final double endPickupTime = getTimeNow() + timing.getPickupDurationPerStop();
+        final SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(parallelLeastCostPathCalculator, travelTime);
+        VrpPathWithTravelData vrpPathWithTravelData = simpleBlockingRouter.getRoute( //
+                avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
+
+        final double scheduleEndTime = schedule.getEndTime();
         {
             AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
             avStayTask.setEndTime(getTimeNow()); // finish the last task now
         }
 
-        final double endPickupTime = getTimeNow() + timing.getPickupDurationPerStop();
         schedule.addTask(new AVPickupTask( //
                 getTimeNow(), endPickupTime, avRequest.getFromLink(), Arrays.asList(avRequest)));
-
-        final SimpleBlockingRouter simpleBlockingRouter = new SimpleBlockingRouter(parallelLeastCostPathCalculator, travelTime);
-        VrpPathWithTravelData vrpPathWithTravelData = simpleBlockingRouter.getRoute( //
-                avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
 
         schedule.addTask(new AVDriveTask( //
                 vrpPathWithTravelData, Arrays.asList(avRequest)));
@@ -123,6 +128,31 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // jan: following computation is mandatory for the internal scoring function
         final double distance = VrpPathUtils.getDistance(vrpPathWithTravelData);
         avRequest.getRoute().setDistance(distance);
+    }
+
+    private void createAcceptRequestDirective(AVVehicle avVehicle, AVRequest avRequest) {
+        boolean status = matchedRequests.add(avRequest);
+        GlobalAssert.of(status); // matchedRequests did not already contain avRequest
+        GlobalAssert.of(pendingRequests.contains(avRequest));
+
+        final AVTimingParameters timing = avDispatcherConfig.getParent().getTimingParameters();
+        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
+
+        {
+            AbstractTask currentTask = schedule.getCurrentTask();
+            AbstractTask lastTask = Schedules.getLastTask(schedule);
+            GlobalAssert.of(currentTask == lastTask); // check that current task is last task in schedule
+        }
+
+        final double endPickupTime = getTimeNow() + timing.getPickupDurationPerStop();
+        FuturePathContainer futurePathContainer = futurePathFactory.getFuturePathContainer( //
+                avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
+
+        AbstractDirective abstractDirective = new AcceptRequestDirective( //
+                avVehicle, avRequest, futurePathContainer, timing.getDropoffDurationPerStop());
+        assignDirective(avVehicle, abstractDirective);
+
+        abstractDirective.execute(getTimeNow()); // TODO temporary for testing
     }
 
     /**
@@ -190,13 +220,34 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     final AVDriveTask avDriveTask = new AVDriveTask(vrpPathWithTravelData);
                     schedule.addTask(avDriveTask);
                     final double endDriveTime = avDriveTask.getEndTime();
-                    
+
                     // TODO redundant
                     if (endDriveTime < scheduleEndTime)
                         schedule.addTask(new AVStayTask(endDriveTime, scheduleEndTime, destination));
                 }
             }
         };
+    }
+
+    // TODO obviously these functions are nearly identical -> abstract
+    private void createDriveVehicleDiversionDirective(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+        FuturePathContainer futurePathContainer = futurePathFactory.getFuturePathContainer( //
+                vehicleLinkPair.linkTimePair.link, destination, vehicleLinkPair.linkTimePair.time);
+
+        AbstractDirective abstractDirective = new DriveVehicleDiversionDirective(vehicleLinkPair, destination, futurePathContainer);
+        assignDirective(vehicleLinkPair.avVehicle, abstractDirective);
+
+        abstractDirective.execute(getTimeNow());
+    }
+
+    private void createStayVehicleDiversionDirective(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+        FuturePathContainer futurePathContainer = futurePathFactory.getFuturePathContainer( //
+                vehicleLinkPair.linkTimePair.link, destination, vehicleLinkPair.linkTimePair.time);
+
+        AbstractDirective abstractDirective = new StayVehicleDiversionDirective(vehicleLinkPair, destination, futurePathContainer);
+        assignDirective(vehicleLinkPair.avVehicle, abstractDirective);
+
+        abstractDirective.execute(getTimeNow()); // TODO temporary for testing
     }
 
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {

@@ -20,6 +20,11 @@ public class SimpleBlockingRouter {
         this.router = router;
         this.travelTime = travelTime;
     }
+    
+    public LeastCostPathFuture getRouteFuture(Link divLink, Link destLink, double startTime) {
+        return router.calcLeastCostPath( // <- non-blocking call
+                divLink.getToNode(), destLink.getFromNode(), startTime, null, null);
+    }
 
     /**
      * 
@@ -32,16 +37,33 @@ public class SimpleBlockingRouter {
      * @return
      */
     public VrpPathWithTravelData getRoute(Link divLink, Link destLink, double startTime) {
-        LeastCostPathFuture drivepath = router.calcLeastCostPath( //
+        // TODO call function above
+        LeastCostPathFuture leastCostPathFuture = router.calcLeastCostPath( // <- non-blocking call
                 divLink.getToNode(), destLink.getFromNode(), startTime, null, null);
+        
+        // TODO call static method below instead
         try {
-            Thread.sleep(1);
-            while (!drivepath.isDone())
+            Thread.sleep(1); // TODO sleep less
+            while (!leastCostPathFuture.isDone())
                 Thread.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(divLink, destLink, startTime, drivepath.get(), travelTime);
+        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(divLink, destLink, startTime, leastCostPathFuture.get(), travelTime);
+        
+        VrpPathUtils.assertIsConsistent(vrpPathWithTravelData);
+        return vrpPathWithTravelData;
+    }
+    
+    public static VrpPathWithTravelData getRouteBlocking(Link divLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
+        try {
+            Thread.sleep(1); // TODO sleep less
+            while (!leastCostPathFuture.isDone())
+                Thread.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(divLink, destLink, startTime, leastCostPathFuture.get(), travelTime);
         
         VrpPathUtils.assertIsConsistent(vrpPathWithTravelData);
         return vrpPathWithTravelData;

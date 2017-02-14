@@ -33,9 +33,18 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
     private Double private_now = null;
+    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new HashMap<>();
 
     public VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
+    }
+
+    protected void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
+        private_vehicleDirectives.put(avVehicle, abstractDirective);
+    }
+
+    private boolean isWithoutDirective(AVVehicle avVehicle) {
+        return !private_vehicleDirectives.containsKey(avVehicle);
     }
 
     protected final Collection<AVVehicle> getFunctioningVehicles() {
@@ -52,19 +61,20 @@ public abstract class VehicleMaintainer implements AVDispatcher {
      */
     protected final Map<Link, Queue<AVVehicle>> getStayVehicles() {
         Map<Link, Queue<AVVehicle>> map = new HashMap<>();
-        for (AVVehicle avVehicle : getFunctioningVehicles()) {
-            Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule(); // TODO insert directly into next line
-            AbstractTask abstractTask = Schedules.getLastTask(schedule); // <- last task
-            if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
-                new AVTaskAdapter(abstractTask) {
-                    public void handle(AVStayTask avStayTask) { // <- type of task is STAY
-                        final Link link = avStayTask.getLink();
-                        if (!map.containsKey(link))
-                            map.put(link, new LinkedList<>());
-                        map.get(link).add(avVehicle); // <- append vehicle to list of vehicles at link
-                    }
-                };
-        }
+        for (AVVehicle avVehicle : getFunctioningVehicles())
+            if (isWithoutDirective(avVehicle)) {
+                Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule(); // TODO insert directly into next line
+                AbstractTask abstractTask = Schedules.getLastTask(schedule); // <- last task
+                if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
+                    new AVTaskAdapter(abstractTask) {
+                        public void handle(AVStayTask avStayTask) { // <- type of task is STAY
+                            final Link link = avStayTask.getLink();
+                            if (!map.containsKey(link))
+                                map.put(link, new LinkedList<>());
+                            map.get(link).add(avVehicle); // <- append vehicle to list of vehicles at link
+                        }
+                    };
+            }
         return Collections.unmodifiableMap(map);
     }
 
@@ -73,33 +83,34 @@ public abstract class VehicleMaintainer implements AVDispatcher {
      */
     protected final Collection<VehicleLinkPair> getDivertableVehicles() {
         Collection<VehicleLinkPair> collection = new LinkedList<>();
-        for (AVVehicle avVehicle : getFunctioningVehicles()) {
-            Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-            AbstractTask abstractTask = schedule.getCurrentTask();
-            new AVTaskAdapter(abstractTask) {
-                @Override
-                public void handle(AVDriveTask avDriveTask) {
-                    // for empty cars the drive task is second to last task
-                    if (Schedules.isNextToLastTask(abstractTask)) {
-                        TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                        OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                        LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null 
-                        if (linkTimePair != null) // TODO treat null case ? 
-                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
-                    }
-                }
-
-                @Override
-                public void handle(AVStayTask avStayTask) {
-                    // for empty vehicles the current task has to be the last task
-                    if (Schedules.isLastTask(abstractTask))
-                        if (avStayTask.getBeginTime() + 5 < getTimeNow()) { // TODO magic const
-                            LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
-                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+        for (AVVehicle avVehicle : getFunctioningVehicles())
+            if (isWithoutDirective(avVehicle)) {
+                Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
+                AbstractTask abstractTask = schedule.getCurrentTask();
+                new AVTaskAdapter(abstractTask) {
+                    @Override
+                    public void handle(AVDriveTask avDriveTask) {
+                        // for empty cars the drive task is second to last task
+                        if (Schedules.isNextToLastTask(abstractTask)) {
+                            TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                            OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                            LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
+                            if (linkTimePair != null) // TODO treat null case ?
+                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
                         }
-                }
-            };
-        }
+                    }
+
+                    @Override
+                    public void handle(AVStayTask avStayTask) {
+                        // for empty vehicles the current task has to be the last task
+                        if (Schedules.isLastTask(abstractTask))
+                            if (avStayTask.getBeginTime() + 5 < getTimeNow()) { // TODO magic const
+                                LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
+                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                            }
+                    }
+                };
+            }
         return collection;
     }
 
@@ -114,6 +125,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         private_now = now; // time available
         redispatch(now);
         private_now = null; // time unavailable
+        private_vehicleDirectives.clear();
     }
 
     /**
