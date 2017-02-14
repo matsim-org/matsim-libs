@@ -30,16 +30,18 @@ public class QSimModule extends AbstractModule {
 			// yyyyyy why are the different traffic dynamics not working for the lanes?  kai, feb'17
 		} else {
 			switch( config.qsim().getTrafficDynamics() ) {
-//			case assignmentEmulating:
-//				bind(QNetworkFactory.class).to( AssignmentEmulatingQLaneNetworkFactory.class ) ;
-//				break;
-			case queue:
-			case withHoles:
-				bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
-				break;
-			default:
-				throw new RuntimeException("not implemented") ;
-				// yyyyyy means, I think, that the kinematic waves option does not work here.  ????  kai, feb'17
+	//			case assignmentEmulating:
+//					bind(QNetworkFactory.class).to( AssignmentEmulatingQLaneNetworkFactory.class ) ;
+//					break;
+				case queue:
+				case withHoles:
+				case KWM:
+					bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
+					break;
+				default:
+					throw new RuntimeException("not implemented") ;
+					// yyyyyy means, I think, that the kinematic waves option does not work here.  ????  kai, feb'17
+					// the case for kinematic waves was missing here, should work now. amit, feb'17
 			}
 		}
 	}

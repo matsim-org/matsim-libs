@@ -43,9 +43,9 @@ public class TripAnalyzerV2Extended {
 	private static final String specificMode = TransportMode.car;
 	
 	private static final boolean onlyInterior = false; // "int"
-	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis // <----------
+	private static final boolean onlyBerlinBased = false; // "ber"; usually varied for analysis // <----------
 	
-	private static final boolean useDistanceFilter = true; // "dist"; usually varied for analysis // <----------
+	private static final boolean useDistanceFilter = false; // "dist"; usually varied for analysis // <----------
 	// private static final double double minDistance = 0;
 	private static final double maxDistance_km = 100;
 
@@ -227,7 +227,7 @@ public class TripAnalyzerV2Extended {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		outputDirectory = outputDirectory + "_2";
+		outputDirectory = outputDirectory;
 		new File(outputDirectory).mkdir();
 	}
 	
