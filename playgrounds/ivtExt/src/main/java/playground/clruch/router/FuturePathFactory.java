@@ -6,6 +6,9 @@ import org.matsim.core.router.util.TravelTime;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+/**
+ * factory that emits {@link FuturePathContainer}
+ */
 public class FuturePathFactory {
     private final ParallelLeastCostPathCalculator parallelLeastCostPathCalculator;
     private final TravelTime travelTime;
@@ -17,10 +20,9 @@ public class FuturePathFactory {
         this.travelTime = travelTime;
     }
 
-    public FuturePathContainer getFuturePathContainer(Link divLink, Link destLink, double startTime) {
+    public FuturePathContainer createFuturePathContainer(Link startLink, Link destLink, double startTime) {
         LeastCostPathFuture leastCostPathFuture = parallelLeastCostPathCalculator.calcLeastCostPath( // <- non-blocking call
-                divLink.getToNode(), destLink.getFromNode(), startTime, null, null);
-
-        return new FuturePathContainer(divLink, destLink, startTime, leastCostPathFuture, travelTime);
+                startLink.getToNode(), destLink.getFromNode(), startTime, null, null);
+        return new FuturePathContainer(startLink, destLink, startTime, leastCostPathFuture, travelTime);
     }
 }

@@ -21,7 +21,7 @@ class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
     }
 
     @Override
-    void execute(double getTimeNow) {
+    void execute() {
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
         AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
         final AVDriveTask avDriveTask = (AVDriveTask) abstractTask;

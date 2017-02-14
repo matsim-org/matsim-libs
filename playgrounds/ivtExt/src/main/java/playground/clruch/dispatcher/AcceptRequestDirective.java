@@ -19,18 +19,20 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 class AcceptRequestDirective extends AbstractDirective {
     final AVVehicle avVehicle;
     final AVRequest avRequest;
+    final double getTimeNow;
     final double dropoffDurationPerStop;
 
     public AcceptRequestDirective(AVVehicle avVehicle, AVRequest avRequest, //
-            FuturePathContainer futurePathContainer, double dropoffDurationPerStop) {
+            FuturePathContainer futurePathContainer, final double getTimeNow, double dropoffDurationPerStop) {
         super(futurePathContainer);
         this.avVehicle = avVehicle;
         this.avRequest = avRequest;
+        this.getTimeNow = getTimeNow;
         this.dropoffDurationPerStop = dropoffDurationPerStop;
     }
 
     @Override
-    void execute(final double getTimeNow) {
+    void execute() {
         VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
 
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
@@ -51,9 +53,9 @@ class AcceptRequestDirective extends AbstractDirective {
 
         final double endDropoffTime = vrpPathWithTravelData.getArrivalTime() + dropoffDurationPerStop;
         schedule.addTask(new AVDropoffTask( //
-                vrpPathWithTravelData.getArrivalTime(), // start of dropoff // TODO function call redundant 
-                endDropoffTime, // end of dropoff 
-                avRequest.getToLink(), // location of dropoff 
+                vrpPathWithTravelData.getArrivalTime(), // start of dropoff // TODO function call redundant
+                endDropoffTime, // end of dropoff
+                avRequest.getToLink(), // location of dropoff
                 Arrays.asList(avRequest)));
 
         // TODO redundant

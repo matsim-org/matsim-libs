@@ -19,6 +19,7 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
@@ -39,15 +40,27 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         this.eventsManager = eventsManager;
     }
 
+    /**
+     * maps given {@link AVVehicle} to given {@link AbstractDirective}
+     * 
+     * @param avVehicle
+     * @param abstractDirective
+     */
     protected void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
+        GlobalAssert.that(isWithoutDirective(avVehicle));
         private_vehicleDirectives.put(avVehicle, abstractDirective);
     }
 
+    /**
+     * 
+     * @param avVehicle
+     * @return true if given {@link AVVehicle} doesn't have a {@link AbstractDirective} assigned to it
+     */
     private boolean isWithoutDirective(AVVehicle avVehicle) {
         return !private_vehicleDirectives.containsKey(avVehicle);
     }
 
-    protected final Collection<AVVehicle> getFunctioningVehicles() {
+    protected final Collection<AVVehicle> getFunctioningVehicles() { // <- function will be private in the future
         if (vehicles.isEmpty() || !vehicles.get(0).getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
         return Collections.unmodifiableList(vehicles);
@@ -124,7 +137,9 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     public final void onNextTimestep(double now) {
         private_now = now; // time available
         redispatch(now);
-        private_now = null; // time unavailable
+        // private_vehicleDirectives.values().stream().parallel().forEach(AbstractDirective::execute); // TODO try this
+        private_now = null; // time unavailable // TODO move line 1 up
+        // TODO need to process AbstractDirectives!!!!
         private_vehicleDirectives.clear();
     }
 

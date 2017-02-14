@@ -13,6 +13,4 @@ abstract class VehicleDiversionDirective extends AbstractDirective {
         this.vehicleLinkPair = vehicleLinkPair;
         this.destination = destination;
     }
-
-
 }

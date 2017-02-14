@@ -44,7 +44,9 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public abstract class UniversalDispatcher extends VehicleMaintainer {
     protected final AVDispatcherConfig avDispatcherConfig;
     private final FuturePathFactory futurePathFactory;
+    @Deprecated
     protected final TravelTime travelTime;
+    @Deprecated
     protected final ParallelLeastCostPathCalculator parallelLeastCostPathCalculator;
 
     private final Set<AVRequest> pendingRequests = new HashSet<>(); // access via getAVRequests()
@@ -87,8 +89,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      */
     protected final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         boolean status = matchedRequests.add(avRequest);
-        GlobalAssert.of(status); // matchedRequests did not already contain avRequest
-        GlobalAssert.of(pendingRequests.contains(avRequest));
+        GlobalAssert.that(status); // matchedRequests did not already contain avRequest
+        GlobalAssert.that(pendingRequests.contains(avRequest));
 
         final AVTimingParameters timing = avDispatcherConfig.getParent().getTimingParameters();
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
@@ -96,7 +98,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         {
             AbstractTask currentTask = schedule.getCurrentTask();
             AbstractTask lastTask = Schedules.getLastTask(schedule);
-            GlobalAssert.of(currentTask == lastTask); // check that current task is last task in schedule
+            GlobalAssert.that(currentTask == lastTask); // check that current task is last task in schedule
         }
 
         final double endPickupTime = getTimeNow() + timing.getPickupDurationPerStop();
@@ -132,8 +134,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     private void createAcceptRequestDirective(AVVehicle avVehicle, AVRequest avRequest) {
         boolean status = matchedRequests.add(avRequest);
-        GlobalAssert.of(status); // matchedRequests did not already contain avRequest
-        GlobalAssert.of(pendingRequests.contains(avRequest));
+        GlobalAssert.that(status); // matchedRequests did not already contain avRequest
+        GlobalAssert.that(pendingRequests.contains(avRequest));
 
         final AVTimingParameters timing = avDispatcherConfig.getParent().getTimingParameters();
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
@@ -141,18 +143,18 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         {
             AbstractTask currentTask = schedule.getCurrentTask();
             AbstractTask lastTask = Schedules.getLastTask(schedule);
-            GlobalAssert.of(currentTask == lastTask); // check that current task is last task in schedule
+            GlobalAssert.that(currentTask == lastTask); // check that current task is last task in schedule
         }
 
         final double endPickupTime = getTimeNow() + timing.getPickupDurationPerStop();
-        FuturePathContainer futurePathContainer = futurePathFactory.getFuturePathContainer( //
+        FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
                 avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
 
         AbstractDirective abstractDirective = new AcceptRequestDirective( //
-                avVehicle, avRequest, futurePathContainer, timing.getDropoffDurationPerStop());
+                avVehicle, avRequest, futurePathContainer, getTimeNow(), timing.getDropoffDurationPerStop());
         assignDirective(avVehicle, abstractDirective);
 
-        abstractDirective.execute(getTimeNow()); // TODO temporary for testing
+        abstractDirective.execute(); // TODO temporary for testing
     }
 
     /**
@@ -231,23 +233,23 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     // TODO obviously these functions are nearly identical -> abstract
     private void createDriveVehicleDiversionDirective(final VehicleLinkPair vehicleLinkPair, final Link destination) {
-        FuturePathContainer futurePathContainer = futurePathFactory.getFuturePathContainer( //
+        FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
                 vehicleLinkPair.linkTimePair.link, destination, vehicleLinkPair.linkTimePair.time);
 
         AbstractDirective abstractDirective = new DriveVehicleDiversionDirective(vehicleLinkPair, destination, futurePathContainer);
         assignDirective(vehicleLinkPair.avVehicle, abstractDirective);
 
-        abstractDirective.execute(getTimeNow());
+        abstractDirective.execute();
     }
 
     private void createStayVehicleDiversionDirective(final VehicleLinkPair vehicleLinkPair, final Link destination) {
-        FuturePathContainer futurePathContainer = futurePathFactory.getFuturePathContainer( //
+        FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
                 vehicleLinkPair.linkTimePair.link, destination, vehicleLinkPair.linkTimePair.time);
 
         AbstractDirective abstractDirective = new StayVehicleDiversionDirective(vehicleLinkPair, destination, futurePathContainer);
         assignDirective(vehicleLinkPair.avVehicle, abstractDirective);
 
-        abstractDirective.execute(getTimeNow()); // TODO temporary for testing
+        abstractDirective.execute(); // TODO temporary for testing
     }
 
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {

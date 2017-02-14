@@ -55,7 +55,7 @@ public class SimpleBlockingRouter {
         return vrpPathWithTravelData;
     }
     
-    public static VrpPathWithTravelData getRouteBlocking(Link divLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
+    public static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
         try {
             Thread.sleep(1); // TODO sleep less
             while (!leastCostPathFuture.isDone())
@@ -63,7 +63,7 @@ public class SimpleBlockingRouter {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(divLink, destLink, startTime, leastCostPathFuture.get(), travelTime);
+        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(startLink, destLink, startTime, leastCostPathFuture.get(), travelTime);
         
         VrpPathUtils.assertIsConsistent(vrpPathWithTravelData);
         return vrpPathWithTravelData;
