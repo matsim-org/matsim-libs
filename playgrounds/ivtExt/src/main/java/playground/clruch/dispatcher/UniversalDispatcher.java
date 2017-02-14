@@ -44,7 +44,9 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * alternative implementation of {@link AVDispatcher}; supersedes {@link AbstractDispatcher}.
  */
 public abstract class UniversalDispatcher extends VehicleMaintainer {
-    protected final AVDispatcherConfig avDispatcherConfig;
+    // TODO at least remove the use of this variable inside the core functions!
+    @Deprecated
+    protected final AVDispatcherConfig avDispatcherConfig; // so far used only for timing parameters
     private final FuturePathFactory futurePathFactory;
     @Deprecated
     protected final TravelTime travelTime;
@@ -53,8 +55,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     private final Set<AVRequest> pendingRequests = new HashSet<>(); // access via getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
+    
+    private final double pickupDurationPerStop;
+    private final double dropoffDurationPerStop;
 
-    public UniversalDispatcher( //
+    protected UniversalDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
@@ -66,6 +71,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         this.travelTime = travelTime;
         this.parallelLeastCostPathCalculator = parallelLeastCostPathCalculator;
 
+        // TODO not used yet
+        pickupDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getPickupDurationPerStop();
+        dropoffDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getDropoffDurationPerStop();
     }
 
     /**
@@ -93,7 +101,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
         GlobalAssert.that(pendingRequests.contains(avRequest));
-
+       
         final AVTimingParameters timing = avDispatcherConfig.getParent().getTimingParameters();
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
 

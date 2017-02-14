@@ -39,9 +39,9 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
-    private long routingTime = 0; // <- cpu time required to compute paths and update schedules
+    private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
 
-    public VehicleMaintainer(EventsManager eventsManager) {
+    protected VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
     }
 
@@ -140,14 +140,14 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     @Override
     public final void onNextTimestep(double now) {
-        private_now = now; // time available
+        private_now = now; // <- time available to derived class via getTimeNow()
         redispatch(now);
+        private_now = null; // <- time unavailable
         // TODO measure
         long tic = System.nanoTime();
-        // private_vehicleDirectives.values().stream().parallel().forEach(AbstractDirective::execute); // TODO try this
-        routingTime += System.nanoTime() - tic;
-        private_now = null; // time unavailable // TODO move line 1 up
         // TODO need to process AbstractDirectives!!!!
+        // private_vehicleDirectives.values().stream().parallel().forEach(AbstractDirective::execute);
+        routingTimeNano += System.nanoTime() - tic;
         private_vehicleDirectives.clear();
     }
 
@@ -165,7 +165,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     public String getStatusString() { // TODO still needs to evaluate
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("routingTime=" + (routingTime * 1e-6) + " sec");
+        stringBuilder.append("total routingTime=" + (routingTimeNano * 1e-9) + " sec");
         return stringBuilder.toString();
     }
 }
