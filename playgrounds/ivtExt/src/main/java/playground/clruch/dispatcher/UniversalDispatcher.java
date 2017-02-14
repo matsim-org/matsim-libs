@@ -29,6 +29,7 @@ import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
@@ -39,7 +40,8 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
- * alternative to {@link AbstractDispatcher}
+ * purpose of {@link UniversalDispatcher} is to collect and manage {@link AVRequest}s
+ * alternative implementation of {@link AVDispatcher}; supersedes {@link AbstractDispatcher}.
  */
 public abstract class UniversalDispatcher extends VehicleMaintainer {
     protected final AVDispatcherConfig avDispatcherConfig;

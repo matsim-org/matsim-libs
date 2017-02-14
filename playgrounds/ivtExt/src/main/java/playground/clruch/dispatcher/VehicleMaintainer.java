@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -27,14 +28,18 @@ import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
 /**
- * purpose of VehicleMaintainer is to register vehicles and provide list of available vehicles to derived class
+ * The purpose of VehicleMaintainer is to register {@link AVVehicle}
+ * and provide the collection of available vehicles to derived class.
+ * 
+ * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s.
  */
 public abstract class VehicleMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;
 
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
     private Double private_now = null;
-    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new HashMap<>();
+    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
+    private long routingTime = 0; // <- cpu time required to compute paths and update schedules
 
     public VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
@@ -137,7 +142,10 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     public final void onNextTimestep(double now) {
         private_now = now; // time available
         redispatch(now);
+        // TODO measure
+        long tic = System.nanoTime();
         // private_vehicleDirectives.values().stream().parallel().forEach(AbstractDirective::execute); // TODO try this
+        routingTime += System.nanoTime() - tic;
         private_now = null; // time unavailable // TODO move line 1 up
         // TODO need to process AbstractDirectives!!!!
         private_vehicleDirectives.clear();
@@ -155,4 +163,9 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     public abstract void redispatch(double now);
 
+    public String getStatusString() { // TODO still needs to evaluate
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("routingTime=" + (routingTime * 1e-6) + " sec");
+        return stringBuilder.toString();
+    }
 }
