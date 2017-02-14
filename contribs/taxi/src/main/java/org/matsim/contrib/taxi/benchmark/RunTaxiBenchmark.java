@@ -60,7 +60,7 @@ public class RunTaxiBenchmark
 
         Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final FleetImpl fleet = new FleetImpl();
-        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
+        new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
         return createControler(scenario, fleet, runs);
     }
 

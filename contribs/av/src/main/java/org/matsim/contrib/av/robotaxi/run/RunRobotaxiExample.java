@@ -58,8 +58,8 @@ public class RunRobotaxiExample {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet)
-				.readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
+		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+
 		return createControler(scenario, fleet, otfvis);
 	}
 
