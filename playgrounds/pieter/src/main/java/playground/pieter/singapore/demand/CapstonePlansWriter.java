@@ -306,12 +306,16 @@ public class CapstonePlansWriter {
      */
     public static void main(String[] args) throws SQLException, NoConnectionException, ClassNotFoundException,
             InstantiationException, IllegalAccessException, IOException {
-        DataBaseAdmin dba = new DataBaseAdmin(new File("/Users/fouriep/IdeaProjects/matsim/playgrounds/pieter/connections/capstone.properties"));
+        System.out.println("This class requires 3 command lineparametrs to run:");
+        System.out.println("1. A .properties file that contains connection information for the jdbc driver;");
+        System.out.println("2. The prefix for naming the output files (plans, object attributes and facilities);");
+        System.out.println("3. The fraction of the synthetic population to include in the plans file. (0 < x <= 1).");
+        DataBaseAdmin dba = new DataBaseAdmin(new File(args[0]));
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         FacilitiesToSQL f2sql = new FacilitiesToSQL(dba, scenario);
         f2sql.loadFacilitiesFromSQL("p_facilities.new_facilities");
         CapstonePlansWriter.clearHomeTimesAndAddExtraHomeTypes(scenario.getActivityFacilities());
-        new CapstonePlansWriter(scenario, dba).run("capsUnroutedPlans", 0.25);
+        new CapstonePlansWriter(scenario, dba).run(args[1], Double.parseDouble(args[2]));
 
     }
     //the home activity should not have opening times,else bad things happen
