@@ -159,6 +159,7 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 			final Collection<Set<Id<Person>>> components = SnaUtils.identifyConnectedComponents( sn );
 			writer.write( "\t"+components.size()+"\t" );
 			writeBoxPlot( components , Set::size );
+			writer.write( "\t" );
 
 			log.info( "write social distance statistics..." );
 			final List<Double> distances = new ArrayList<>( N_DISTANCES + 1 );
