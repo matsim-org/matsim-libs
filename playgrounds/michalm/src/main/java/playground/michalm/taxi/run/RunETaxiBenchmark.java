@@ -64,7 +64,7 @@ public class RunETaxiBenchmark
 
         Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final FleetImpl fleet = new FleetImpl();
-        new EvrpVehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
+        new EvrpVehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
         ETaxiUtils.initEvData(fleet, evData);

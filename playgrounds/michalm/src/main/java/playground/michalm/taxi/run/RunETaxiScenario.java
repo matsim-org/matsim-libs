@@ -54,7 +54,7 @@ public class RunETaxiScenario
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         FleetImpl fleet = new FleetImpl();
-        new EvrpVehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFile());
+        new EvrpVehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
         EvData evData = new EvDataImpl();
         new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
         ETaxiUtils.initEvData(fleet, evData);
