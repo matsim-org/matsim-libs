@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
-import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.*;
 
 import playground.sebhoerl.avtaxi.passenger.AVPassengerDropoffActivity;
 import playground.sebhoerl.avtaxi.passenger.AVPassengerPickupActivity;
@@ -33,17 +33,17 @@ public class AVActionCreator implements VrpAgentLogic.DynActionCreator {
     private Double pickupDuration;
 
     @Override
-    public DynAction createAction(final Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
     {
     	if (task instanceof AVTask) {
     		switch (((AVTask) task).getAVTaskType()) {
     			case PICKUP:
     				AVPickupTask mpt = (AVPickupTask) task;
-    	    		return new AVPassengerPickupActivity(passengerEngine, mpt, mpt.getRequests(),
+    	    		return new AVPassengerPickupActivity(passengerEngine, dynAgent, mpt, mpt.getRequests(),
     	                    pickupDuration, PICKUP_ACTIVITY_TYPE);
                 case DROPOFF:
     				AVDropoffTask mdt = (AVDropoffTask) task;
-    				return new AVPassengerDropoffActivity(passengerEngine, mdt, mdt.getRequests(),
+    				return new AVPassengerDropoffActivity(passengerEngine, dynAgent, mdt, mdt.getRequests(),
                             DROPOFF_ACTIVITY_TYPE);
                 case DRIVE:
     				return legCreator.createLeg((DriveTask)task);

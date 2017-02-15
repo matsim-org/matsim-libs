@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
-import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.*;
 
 
 
@@ -56,7 +56,7 @@ public class DrtActionCreator
 
 
     @Override
-    public DynAction createAction(final Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
     {
         DrtTask tt = (DrtTask)task;
 
@@ -67,12 +67,12 @@ public class DrtActionCreator
 
             case PICKUP:
                 final DrtPickupTask pst = (DrtPickupTask)task;
-                return new SinglePassengerPickupActivity(passengerEngine, pst, pst.getRequest(),
+                return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
                         pickupDuration, TAXIBUS_PICKUP_NAME);
 
             case DROPOFF:
                 final DrtDropoffTask dst = (DrtDropoffTask)task;
-                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest(), TAXIBUS_DROPOFF_NAME);
+                return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(), TAXIBUS_DROPOFF_NAME);
 
             case STAY:
                 return new VrpActivity(TAXIBUS_STAY_NAME, (DrtStayTask)task);

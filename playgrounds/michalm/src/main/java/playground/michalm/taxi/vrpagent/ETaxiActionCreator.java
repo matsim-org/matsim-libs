@@ -22,7 +22,7 @@ package playground.michalm.taxi.vrpagent;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
-import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -40,12 +40,12 @@ public class ETaxiActionCreator
 
 
     @Override
-    public DynAction createAction(Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, Task task, double now)
     {
         if (task instanceof ETaxiChargingTask) {
             return new ETaxiAtChargerActivity((ETaxiChargingTask)task);
         }
 
-        return super.createAction(task, now);
+        return super.createAction(dynAgent, task, now);
     }
 }

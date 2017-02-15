@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.vrpagent;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.contrib.taxi.schedule.*;
 
 
@@ -48,7 +48,7 @@ public class TaxiActionCreator
 
 
     @Override
-    public DynAction createAction(final Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
     {
         TaxiTask tt = (TaxiTask)task;
 
@@ -59,12 +59,12 @@ public class TaxiActionCreator
 
             case PICKUP:
                 final TaxiPickupTask pst = (TaxiPickupTask)task;
-                return new SinglePassengerPickupActivity(passengerEngine, pst, pst.getRequest(),
+                return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
                         pickupDuration, PICKUP_ACTIVITY_TYPE);
 
             case DROPOFF:
                 final TaxiDropoffTask dst = (TaxiDropoffTask)task;
-                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest(),
+                return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(),
                         DROPOFF_ACTIVITY_TYPE);
 
             case STAY:

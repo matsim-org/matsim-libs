@@ -11,21 +11,20 @@ import org.matsim.contrib.taxi.data.TaxiRequest;
 public class NPersonsDropoffActivity extends VrpActivity {
 
 	private final PassengerEngine passengerEngine;
-    private final StayTask dropoffTask;
+    private final DynAgent driver;
     private final List<TaxiRequest> requests;
 	
-	public NPersonsDropoffActivity(PassengerEngine passengerEngine,
+	public NPersonsDropoffActivity(PassengerEngine passengerEngine, DynAgent driver,
 			StayTask dropoffTask, List<TaxiRequest> requests) {
 		super("PassengerDropoff", dropoffTask);
 		this.passengerEngine = passengerEngine;
-        this.dropoffTask = dropoffTask;
+        this.driver = driver;
         this.requests = requests;
 	}
 	
 	@Override
     public void finalizeAction(double now)
     {
-        DynAgent driver = dropoffTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
         List<TaxiRequest> processed = new ArrayList<TaxiRequest>();
         for(TaxiRequest request : this.requests){
         	if(!processed.contains(request)){

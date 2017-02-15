@@ -35,7 +35,7 @@ public class VrpAgentLogic
 
     public interface DynActionCreator
     {
-        DynAction createAction(Task task, double now);
+        DynAction createAction(DynAgent dynAgent, Task task, double now);
     }
 
 
@@ -51,7 +51,6 @@ public class VrpAgentLogic
         this.dynActionCreator = dynActionCreator;
 
         this.vehicle = vehicle;
-        this.vehicle.setAgentLogic(this);
     }
 
 
@@ -67,12 +66,6 @@ public class VrpAgentLogic
     public DynAgent getDynAgent()
     {
         return agent;
-    }
-
-
-    public Vehicle getVehicle()
-    {
-        return vehicle;
     }
 
 
@@ -94,7 +87,7 @@ public class VrpAgentLogic
         }
 
         Task task = schedule.getCurrentTask();
-        DynAction action = dynActionCreator.createAction(task, now);
+        DynAction action = dynActionCreator.createAction(agent, task, now);
 
         return action;
     }

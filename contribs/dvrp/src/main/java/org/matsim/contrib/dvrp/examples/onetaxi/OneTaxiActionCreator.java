@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 
@@ -45,7 +45,7 @@ public class OneTaxiActionCreator
 
 
     @Override
-    public DynAction createAction(final Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
     {
         if (task instanceof DriveTask) {
             return VrpLegs.createLegWithOfflineTracker((DriveTask)task, timer);
@@ -54,11 +54,11 @@ public class OneTaxiActionCreator
             final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
 
             if (serveTask.isPickup()) {
-                return new SinglePassengerPickupActivity(passengerEngine, serveTask,
+                return new SinglePassengerPickupActivity(passengerEngine, dynAgent, serveTask,
                         serveTask.getRequest(), OneTaxiOptimizer.PICKUP_DURATION, "OneTaxiPickup");
             }
             else {
-                return new SinglePassengerDropoffActivity(passengerEngine, serveTask,
+                return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, serveTask,
                         serveTask.getRequest(), "OneTaxiDropoff");
             }
         }
