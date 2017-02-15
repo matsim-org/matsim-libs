@@ -41,7 +41,8 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 	
 	private final TravelDisutility travelDisutility;
 	private final double sigma;	
-	private Scenario scenario;
+	private final double timeBinSize;
+	private final double marginalUtilityOfMoney;
 	private MoneyEventAnalysis moneyEventAnalysis;
 	private AgentFilter vehicleFilter;
 	
@@ -54,9 +55,10 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 
 		this.travelDisutility = travelDisutility;
 		this.sigma = sigma;
-		this.scenario = scenario;
 		this.moneyEventAnalysis = moneyEventHandler;
 		this.vehicleFilter = vehicleFilter;
+		this.timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
+		this.marginalUtilityOfMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 	}
 	
 	public MoneyTimeDistanceTravelDisutility(
@@ -66,9 +68,10 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 
 		this.travelDisutility = travelDisutility;
 		this.sigma = 0.;
-		this.scenario = scenario;
 		this.moneyEventAnalysis = moneyEventHandler;
 		this.vehicleFilter = null;
+		this.timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
+		this.marginalUtilityOfMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 	}
 
 	@Override
@@ -100,22 +103,17 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 		
 		double estimatedAmount = 0.;
 
-		if (moneyEventAnalysis.getLinkId2info().containsKey(link.getId())) {
-			
-			LinkInfo linkInfo = moneyEventAnalysis.getLinkId2info().get(link.getId());
-			
-			if (linkInfo.getTimeBinNr2timeBin().containsKey(intervalNr)) {
-				
-				TimeBin timeBin = linkInfo.getTimeBinNr2timeBin().get(intervalNr);
+		LinkInfo linkInfo = moneyEventAnalysis.getLinkId2info().get(link.getId());
+		if (linkInfo != null) {
+						
+			TimeBin timeBin = linkInfo.getTimeBinNr2timeBin().get(intervalNr);
+			if (timeBin != null) {
 
 				if(this.vehicleFilter != null) {
 					String agentType = vehicleFilter.getAgentTypeFromId(person.getId());
-					double avgMoneyAmountVehicleType = 0.;
-					if (timeBin.getAgentTypeId2avgAmount().containsKey(agentType)) {
-						avgMoneyAmountVehicleType = timeBin.getAgentTypeId2avgAmount().get(agentType);
-					}
-
-					if (avgMoneyAmountVehicleType != 0.) {
+					Double avgMoneyAmountVehicleType = timeBin.getAgentTypeId2avgAmount().get(agentType);
+					
+					if (avgMoneyAmountVehicleType != null && avgMoneyAmountVehicleType != 0.) {
 						estimatedAmount = avgMoneyAmountVehicleType;
 					} else {
 						estimatedAmount = timeBin.getAverageAmount();
@@ -126,15 +124,12 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 			}
 		}
 				
-		double linkExpectedTollDisutility = -1 * this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney() * estimatedAmount;
+		double linkExpectedTollDisutility = -1 * this.marginalUtilityOfMoney * estimatedAmount;
 		return linkExpectedTollDisutility;
 	}
 	
 	private int getIntervalNr(double time) {
-		
-		double timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 		int timeBinNr = (int) (time / timeBinSize);
-		
 		return timeBinNr;
 	}
 	
