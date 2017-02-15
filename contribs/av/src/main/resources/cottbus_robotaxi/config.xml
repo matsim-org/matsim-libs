@@ -46,7 +46,9 @@
 
 		<!-- An XML file specifying the taxi fleet. The file format according to 
 			dvrp_vehicles_v1.dtd -->
-		<param name="taxisFile" value="taxis_2000.xml" />
+		<!-- To create your own vehicles, see org.matsim.contrib.av.vehicles.CreateTaxiVehicles  -->
+		<param name="taxisFile" value="taxis_5000.xml" />
+		<!--  param name="taxisFile" value="taxis_2000.xml" /  -->
 
 		<!-- If true, time profiles of vehicle statuses (i.e. current task type) 
 			and the number of unplanned requests -->
@@ -91,7 +93,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/robotaxi" />
+		<param name="outputDirectory" value="output/robotaxi" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />

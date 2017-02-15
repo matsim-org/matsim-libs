@@ -37,6 +37,12 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * simulation runs for 10 iterations, this takes quite a bit time (25 minutes or
  * so). You may switch on OTFVis visualisation in the main method below.
  * The scenario should run out of the box without any additional files.
+ * If required, you may find all input files in the resource path 
+ * or in the jar maven has downloaded).
+ * There are two vehicle files: 2000 vehicles and 5000, which may be set in the config.
+ * Different fleet sizes can be created using {@link org.matsim.contrib.robotaxi.vehicles.CreateTaxiVehicles}
+ * 
+ * 
  */
 public class RunRobotaxiExample {
 
