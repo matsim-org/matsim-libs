@@ -71,7 +71,7 @@ public class VariableAccessTransitRouterImplTest {
 		trConfig.setMarginalUtilityOfTravelTimePt_utl_s(-0.01);
 		trConfig.setMarginalUtilityOfTravelTimeWalk_utl_s(-0.05);
 		trConfig.setMarginalUtilityOfWaitingPt_utl_s(-0.05);
-		trConfig.setBeelineWalkSpeed(0.641025641025641); // default value, equals result the of default beeline distance factor 1.3 and default walk speed 3.0 km/h
+		trConfig.setBeelineWalkSpeed(0.641025641025641); // default value, equals result of default beeline distance factor 1.3 and default walk speed 3.0 km/h
 		// The directWalkFactor can only be set in the TransitRouterConfigGroup, not in the TransitRouterConfig. Assuming the default remains 1.0 .
 		// Check with trConfig.getDirectWalkFactor(); 
 		
@@ -159,45 +159,45 @@ public class VariableAccessTransitRouterImplTest {
 		ActivityFacility workAtDirectWalkSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(Id.create("workAtDirectWalkSideOfDecisionPoint", ActivityFacility.class), CoordUtils.createCoord(3872.0, 1050.0));
 		
 		Person personCarNeverAvailable = scenario.getPopulation().getPersons().get(Id.create("car_never_available", Person.class));
-//		
-//		// Check decision point between direct walk and combined access+pt+egress trip
-//		List<Leg> legsAtPtSideOfDecisionPoint = router.calcRoute(homeXCoord2050, workAtPtSideOfDecisionPoint, 8*60*60, personCarNeverAvailable);
-//		Assert.assertEquals("walk", legsAtPtSideOfDecisionPoint.get(0).getMode());
-//		Assert.assertEquals("pt", legsAtPtSideOfDecisionPoint.get(1).getMode());
-//		Assert.assertEquals("walk", legsAtPtSideOfDecisionPoint.get(2).getMode());
-//		Assert.assertEquals(3, legsAtPtSideOfDecisionPoint.size());
-//		
-//		List<Leg> legsAtDecisionPoint = router.calcRoute(homeXCoord2050, workAtDecisionPoint, 8*60*60, personCarNeverAvailable);
-//		Assert.assertEquals("walk", legsAtDecisionPoint.get(0).getMode());
-//		Assert.assertEquals("pt", legsAtDecisionPoint.get(1).getMode());
-//		Assert.assertEquals("walk", legsAtDecisionPoint.get(2).getMode());
-//		Assert.assertEquals(3, legsAtDecisionPoint.size());
-//		
-//		List<Leg> legsAtDirectWalkSideOfDecisionPoint = router.calcRoute(homeXCoord2050, workAtDirectWalkSideOfDecisionPoint, 8*60*60, personCarNeverAvailable);
-//		Assert.assertEquals("walk", legsAtDirectWalkSideOfDecisionPoint.get(0).getMode());
-//		Assert.assertEquals(1, legsAtDirectWalkSideOfDecisionPoint.size());
-//		
-//		// Check legs returned - start and end links - for a combined access+pt+egress trip and for a direct walk trip
-//		Assert.assertEquals(Id.create("2122", Link.class), legsAtPtSideOfDecisionPoint.get(0).getRoute().getStartLinkId());
-//		Assert.assertEquals(Id.create("11", Link.class), legsAtPtSideOfDecisionPoint.get(0).getRoute().getEndLinkId());
-//		Assert.assertEquals(Id.create("11", Link.class), legsAtPtSideOfDecisionPoint.get(1).getRoute().getStartLinkId());
-//		Assert.assertEquals(Id.create("33", Link.class), legsAtPtSideOfDecisionPoint.get(1).getRoute().getEndLinkId());
-//		Assert.assertEquals(Id.create("33", Link.class), legsAtPtSideOfDecisionPoint.get(2).getRoute().getStartLinkId());
-//		Assert.assertEquals(Id.create("23", Link.class), legsAtPtSideOfDecisionPoint.get(2).getRoute().getEndLinkId());  // on a train link!
-//		
-//		Assert.assertEquals(Id.create("2122", Link.class), legsAtDirectWalkSideOfDecisionPoint.get(0).getRoute().getStartLinkId());
-//		Assert.assertEquals(Id.create("23", Link.class), legsAtDirectWalkSideOfDecisionPoint.get(0).getRoute().getEndLinkId());
-//		
-//		// Check legs returned - distances and travel times - for a combined access+pt+egress trip and for a direct walk trip
-//		Assert.assertEquals(1000.0*1.3, legsAtPtSideOfDecisionPoint.get(0).getRoute().getDistance(), 0.001);
-////		Assert.assertEquals(100.00+2400.00+3600.00, legsAtPtSideOfDecisionPoint.get(1).getRoute().getDistance(), 0.001); // actual value = 3770 
-//		Assert.assertEquals(77.0*1.3, legsAtPtSideOfDecisionPoint.get(2).getRoute().getDistance(), 0.001);
-//		Assert.assertEquals(1000.0/0.641025641025641, legsAtPtSideOfDecisionPoint.get(0).getTravelTime(), 0.001);
-//		Assert.assertEquals(240.0+540.0, legsAtPtSideOfDecisionPoint.get(1).getTravelTime(), 0.001);
-//		Assert.assertEquals(77.0/0.641025641025641, legsAtPtSideOfDecisionPoint.get(2).getTravelTime(), 0.001);
-//		
-//		Assert.assertEquals(1822.0*1.3, legsAtDirectWalkSideOfDecisionPoint.get(0).getRoute().getDistance(), 0.001);
-//		Assert.assertEquals(1822.0/0.641025641025641, legsAtDirectWalkSideOfDecisionPoint.get(0).getTravelTime(), 0.001);
+		
+		// Check decision point between direct walk and combined access+pt+egress trip
+		List<Leg> legsAtPtSideOfDecisionPoint = router.calcRoute(homeXCoord2050, workAtPtSideOfDecisionPoint, 8*60*60, personCarNeverAvailable);
+		Assert.assertEquals("walk", legsAtPtSideOfDecisionPoint.get(0).getMode());
+		Assert.assertEquals("pt", legsAtPtSideOfDecisionPoint.get(1).getMode());
+		Assert.assertEquals("walk", legsAtPtSideOfDecisionPoint.get(2).getMode());
+		Assert.assertEquals(3, legsAtPtSideOfDecisionPoint.size());
+		
+		List<Leg> legsAtDecisionPoint = router.calcRoute(homeXCoord2050, workAtDecisionPoint, 8*60*60, personCarNeverAvailable);
+		Assert.assertEquals("walk", legsAtDecisionPoint.get(0).getMode());
+		Assert.assertEquals("pt", legsAtDecisionPoint.get(1).getMode());
+		Assert.assertEquals("walk", legsAtDecisionPoint.get(2).getMode());
+		Assert.assertEquals(3, legsAtDecisionPoint.size());
+		
+		List<Leg> legsAtDirectWalkSideOfDecisionPoint = router.calcRoute(homeXCoord2050, workAtDirectWalkSideOfDecisionPoint, 8*60*60, personCarNeverAvailable);
+		Assert.assertEquals("walk", legsAtDirectWalkSideOfDecisionPoint.get(0).getMode());
+		Assert.assertEquals(1, legsAtDirectWalkSideOfDecisionPoint.size());
+		
+		// Check legs returned - start and end links - for a combined access+pt+egress trip and for a direct walk trip
+		Assert.assertEquals(Id.create("2122", Link.class), legsAtPtSideOfDecisionPoint.get(0).getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("11", Link.class), legsAtPtSideOfDecisionPoint.get(0).getRoute().getEndLinkId());
+		Assert.assertEquals(Id.create("11", Link.class), legsAtPtSideOfDecisionPoint.get(1).getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("33", Link.class), legsAtPtSideOfDecisionPoint.get(1).getRoute().getEndLinkId());
+		Assert.assertEquals(Id.create("33", Link.class), legsAtPtSideOfDecisionPoint.get(2).getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("23", Link.class), legsAtPtSideOfDecisionPoint.get(2).getRoute().getEndLinkId());  // on a train link!
+		
+		Assert.assertEquals(Id.create("2122", Link.class), legsAtDirectWalkSideOfDecisionPoint.get(0).getRoute().getStartLinkId());
+		Assert.assertEquals(Id.create("23", Link.class), legsAtDirectWalkSideOfDecisionPoint.get(0).getRoute().getEndLinkId());
+		
+		// Check legs returned - distances and travel times - for a combined access+pt+egress trip and for a direct walk trip
+		Assert.assertEquals(1000.0*1.3, legsAtPtSideOfDecisionPoint.get(0).getRoute().getDistance(), 0.001);
+//		Assert.assertEquals(4818.191, legsAtPtSideOfDecisionPoint.get(1).getRoute().getDistance(), 0.001); // actual value = 3770 
+		Assert.assertEquals(77.0*1.3, legsAtPtSideOfDecisionPoint.get(2).getRoute().getDistance(), 0.001);
+		Assert.assertEquals(1000.0/0.641025641025641, legsAtPtSideOfDecisionPoint.get(0).getTravelTime(), 0.001);
+		Assert.assertEquals(240.0+540.0, legsAtPtSideOfDecisionPoint.get(1).getTravelTime(), 0.001);
+		Assert.assertEquals(77.0/0.641025641025641, legsAtPtSideOfDecisionPoint.get(2).getTravelTime(), 0.001);
+		
+		Assert.assertEquals(1822.0*1.3, legsAtDirectWalkSideOfDecisionPoint.get(0).getRoute().getDistance(), 0.001);
+		Assert.assertEquals(1822.0/0.641025641025641, legsAtDirectWalkSideOfDecisionPoint.get(0).getTravelTime(), 0.001);
 		
 		/* Check decision point between two Transit Stops
 		 * From home coord between stops 3 and 6 (2000m distance between these stops)
@@ -235,7 +235,7 @@ public class VariableAccessTransitRouterImplTest {
 		 * TRANSFER PT TRIP
 		 * cost of access walk to stop 6 = 0.088 * (2000-Y)
 		 * access walk to stop 6 Y=1153.846m -> cost = 74.46155
-		 * access walk to stop 6 Y=1154m -> cost = 74.448   initial time 26519.76 --> equal
+		 * access walk to stop 6 Y=1154m -> cost = 74.448
 		 * access walk to stop 6 Y=1230m -> cost = 67.76
 		 * access walk to stop 6 Y=1230.770m -> cost = 67.69224
 		 * 
@@ -248,10 +248,6 @@ public class VariableAccessTransitRouterImplTest {
 		 * waiting time = 0.0012s for Y=2000-20*60*0.641025641025641=1230.770 (rounded up) 
 		 * (-> catch 7:20:00 red line train at stop 6 vs. 7:40:00 blue line train at stop 1)
 		 * distance travelled in pt = 1900.026 (stop 6->stop 5b sqrt((3950-2050)^2+(3060-3050)^2)) + 2155.945 (stop 2b->stop 1) = 4055.971
-		 * 
-		 * 6->5b travelCost 45.41226315607242, currCost 74.44800000000001, currTime 26519.76, travelTime 720.2400000000016 vs. sqrt((3950-2050)^2+(3060-3050)^2)*0.01+480.24*0.05+4*60*0.01=45.41226  -->equal
-		 * 5b->2b travelTime 156.0, currTime 27240.0, travelCost 13.8, currCost 119.86026315607242 vs. 100*0.05 + 156*0.05+1 = 13.8  -> equal
-		 * 2b->1  travelTime 744.0, currTime 27396.0, travelCost 49.15945268321995, currCost 133.66026315607243 length 2155.945268321995 vs. 2155.945268321995*0.01+504*0.05+(3*60+20+40)*0.01=49.15945   -->was 1.6 too much, because pt wait until arrival of blue line train at xx:x5:00, not until departure at xx:x5:40, so 40s less waiting time but 40s more in vehicle time
 		 * 
 		 * transfer distance = 100m
 		 * transfer travel time = distance / beelineWalkSpeed + additionalTransferTime = 100m/0.641025641025641 + 0 = 156s
@@ -291,17 +287,6 @@ public class VariableAccessTransitRouterImplTest {
 		ActivityFacility workAtTransitStop1 = actFacilFacImpl.createActivityFacility(Id.create("workAtTransitStop1", ActivityFacility.class), CoordUtils.createCoord(1050.0, 1050.0));
 		ActivityFacility homeAtDirectTripSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(Id.create("homeAtDirectTripSideOfDecisionPoint", ActivityFacility.class), CoordUtils.createCoord(3950.0, 1050.0 + 1153.846)); //path cost 155.4387738424332
 		ActivityFacility homeAtTransferTripSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(Id.create("homeAtTransferTripSideOfDecisionPoint", ActivityFacility.class), CoordUtils.createCoord(3950.0, 1050.0 + 1154.0)); //path cost 182.81971583929237  travel cost 108.37171583929236
-		
-		ActivityFacility facilityAtTransitStop2b = actFacilFacImpl.createActivityFacility(Id.create("facilityAtTransitStop2b", ActivityFacility.class), CoordUtils.createCoord(2050.0, 2960.0));
-		ActivityFacility facilityAtTransitStop5b = actFacilFacImpl.createActivityFacility(Id.create("facilityAtTransitStop5b", ActivityFacility.class), CoordUtils.createCoord(2050.0, 3060.0));
-		ActivityFacility facilityAtTransitStop6 = actFacilFacImpl.createActivityFacility(Id.create("facilityAtTransitStop6", ActivityFacility.class), CoordUtils.createCoord(3950.0, 3050.0));
-		
-		router.calcRoute(facilityAtTransitStop6, facilityAtTransitStop5b, 26519.76, personCarNeverAvailable); // 45.41226315607242
-		router.calcRoute(facilityAtTransitStop5b, facilityAtTransitStop2b, 27240.0, personCarNeverAvailable); // pathCost = directWalkCost = 8.8
-		router.calcRoute(facilityAtTransitStop2b, workAtTransitStop1, 27396.0, personCarNeverAvailable); //49.15945268321995 --- with PtWaitUtil_s = 0: 23.95945268321995 -> pt wait 504s
-		router.calcRoute(facilityAtTransitStop5b, workAtTransitStop1, 27240.0, personCarNeverAvailable); //57.95945268321995  --> + 8.8 not 13.8 for transfer
-		router.calcRoute(homeAtTransferTripSideOfDecisionPoint, facilityAtTransitStop5b, 7*60*60, personCarNeverAvailable); // 119.86026315607242
-		router.calcRoute(facilityAtTransitStop6, workAtTransitStop1, 26519.76, personCarNeverAvailable); // 108.37171583929238  --> still 45.41226315607242+49.15945268321995 + 13.8 for transfer
 
 		List<Leg> legsAtDirectTripSideOfDecisionPoint = router.calcRoute(homeAtDirectTripSideOfDecisionPoint, workAtTransitStop1, 7*60*60, personCarNeverAvailable);
 		Assert.assertEquals("walk", legsAtDirectTripSideOfDecisionPoint.get(0).getMode());
@@ -320,18 +305,13 @@ public class VariableAccessTransitRouterImplTest {
 		Assert.assertEquals("pt", legsAtTransferTripSideOfDecisionPoint.get(3).getMode());
 		Assert.assertEquals("walk", legsAtTransferTripSideOfDecisionPoint.get(4).getMode());
 		Assert.assertEquals(5, legsAtTransferTripSideOfDecisionPoint.size()); // 3
-		
+
 		Assert.assertEquals(Id.create("Red Line", TransitLine.class), ((ExperimentalTransitRoute) legsAtTransferTripSideOfDecisionPoint.get(1).getRoute()).getLineId());
 		Assert.assertEquals(Id.create("6", TransitStopFacility.class), ((ExperimentalTransitRoute) legsAtTransferTripSideOfDecisionPoint.get(1).getRoute()).getAccessStopId());
 		Assert.assertEquals(Id.create("5b", TransitStopFacility.class), ((ExperimentalTransitRoute) legsAtTransferTripSideOfDecisionPoint.get(1).getRoute()).getEgressStopId());
 		Assert.assertEquals(Id.create("Blue Line", TransitLine.class), ((ExperimentalTransitRoute) legsAtTransferTripSideOfDecisionPoint.get(3).getRoute()).getLineId());
 		Assert.assertEquals(Id.create("2b", TransitStopFacility.class), ((ExperimentalTransitRoute) legsAtTransferTripSideOfDecisionPoint.get(3).getRoute()).getAccessStopId());
 		Assert.assertEquals(Id.create("1", TransitStopFacility.class), ((ExperimentalTransitRoute) legsAtTransferTripSideOfDecisionPoint.get(3).getRoute()).getEgressStopId());
-		
-//		router.calcRoute(homeXCoord2050, workXCoord3950, 8*60*60, personCarNeverAvailable);
-//		direct walk cost 167.2
-//		path cost 153.58190974780297, whereof 88.0 access walk and 65.58190974780295 pt travelCost, p (path) p.travelTime=780.0
-//		debug mode shows MarginalUtility values set above in the transitRouterConfig, so these should already be used for calculation
 		
 	}
 
