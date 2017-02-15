@@ -25,7 +25,8 @@ public class EventFileToProcessingXML {
     public static void main(String[] args) {
 
         // read an event output file given String[] args
-        final File dir = new File(args[0]);
+        //final File dir = new File(args[0]);
+        final File dir = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs");
         File directory = new File(dir, "output/processing");
         File fileImport = new File(dir, "output/output_events.xml");
         System.out.println("Is directory?  " + dir.isDirectory());
