@@ -62,6 +62,9 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
+		this.experiencedPlansService.finishIteration(); 
+		// (currently sets scores to experienced plans)
+		
 		if(planCalcScoreConfigGroup.isWriteExperiencedPlans()) {
 			final int writePlansInterval = controlerConfigGroup.getWritePlansInterval();
 			if (writePlansInterval > 0 && event.getIteration() % writePlansInterval == 0) {
