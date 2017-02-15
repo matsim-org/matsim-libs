@@ -62,11 +62,9 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 	@Inject(optional=true)
 	private AgentFilter agentFilter;
 	
-	private final Map<Id<Person>, Id<Vehicle>> personId2vehicleId = new HashMap<>();
-	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<Person>> vehicleId2driverIdToBeCharged = new HashMap<>();
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
 	
-	private static int warnCounter1 = 0;
 	private static int warnCounter2 = 0;
 	private static int warnCounter3 = 0;
 	private static int warnCounter4 = 0;
@@ -74,10 +72,10 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 	@Override
 	public void reset(int iteration) {
 		
-		log.info("Resetting money event analysis information before the mobsim starts.");
+		log.info("Resetting money event analysis information before the mobsim starts."
+				+ "The average monetary payments are not set to zero in case they are required during the simulation.");
 		
-		this.personId2vehicleId.clear();
-		this.vehicleId2personId.clear();
+		this.vehicleId2driverIdToBeCharged.clear();
 		
 		for (LinkInfo linkInfo : this.linkId2info.values()) {
 			for (TimeBin timeBin : linkInfo.getTimeBinNr2timeBin().values()) {
@@ -86,7 +84,6 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 			}
 		}
 		
-		warnCounter1 = 0;
 		warnCounter2 = 0;
 		warnCounter3 = 0;
 	}
@@ -96,37 +93,28 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 
 		Id<Link> linkId = event.getLinkId();
 		Id<Person> personId = event.getPersonId();
-		Id<Vehicle> vehicleId = this.personId2vehicleId.get(personId);
-		
-		if (warnCounter1 <= 5) {
-			if (vehicleId == null) {
-				log.warn("No vehicle Id information available. " + event.toString());
-				if (warnCounter1 == 5) {
-					log.warn("Further log statements of this type are not printed out.");
-				}
-				warnCounter1++;
-			}
-		}
 
 		int timeBinNr = getIntervalNr(event.getRelevantTime());
-		
-		if (linkId2info.containsKey(linkId)) {
-			LinkInfo linkMoneyInfo = linkId2info.get(linkId);
-			
-			if (linkMoneyInfo.getTimeBinNr2timeBin().containsKey(timeBinNr)) {
-				TimeBin timeBin = linkMoneyInfo.getTimeBinNr2timeBin().get(timeBinNr);
+
+		LinkInfo linkMoneyInfo = linkId2info.get(linkId);
+		if (linkMoneyInfo != null) {
+
+			TimeBin timeBin = linkMoneyInfo.getTimeBinNr2timeBin().get(timeBinNr);
+			if (timeBin != null) {
 				
-				if (timeBin.getPersonId2amounts().containsKey(vehicleId)) {
-					timeBin.getPersonId2amounts().get(vehicleId).add(event.getAmount());
+				List<Double> amounts = timeBin.getPersonId2amounts().get(personId);
+				
+				if (amounts != null) {
+					timeBin.getPersonId2amounts().get(personId).add(event.getAmount());
 				} else {
-					List<Double> amounts = new ArrayList<>();
+					amounts = new ArrayList<>();
 					amounts.add(event.getAmount());
 					timeBin.getPersonId2amounts().put(personId, amounts);
 				}
 				
 			} else {
 				
-				TimeBin timeBin = new TimeBin(timeBinNr);
+				timeBin = new TimeBin(timeBinNr);
 				List<Double> amounts = new ArrayList<>();
 				amounts.add(event.getAmount());
 				timeBin.getPersonId2amounts().put(personId, amounts);
@@ -141,7 +129,7 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 			amounts.add(event.getAmount());
 			timeBin.getPersonId2amounts().put(personId, amounts);
 
-			LinkInfo linkMoneyInfo = new LinkInfo(linkId);
+			linkMoneyInfo = new LinkInfo(linkId);
 			linkMoneyInfo.getTimeBinNr2timeBin().put(timeBinNr, timeBin);
 			linkId2info.put(linkId, linkMoneyInfo);
 		}		
@@ -154,7 +142,7 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 
 		Id<Link> linkId = event.getLinkId();
 		Id<Vehicle> vehicleId = event.getVehicleId();
-		Id<Person> personId = this.vehicleId2personId.get(vehicleId);
+		Id<Person> personId = this.vehicleId2driverIdToBeCharged.get(vehicleId);
 		
 		if (linkId2info.containsKey(linkId)) {
 			LinkInfo linkMoneyInfo = linkId2info.get(linkId);
@@ -184,21 +172,18 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		
-		// a person should only be in one vehicle
-		// a vehicle may have several passengers (transit, taxi, ...)
+		// a vehicle may have several passengers (transit, taxi, ...) but we are interested in the driver to be charged. In the case of AV it is an imaginary vehicle driver (robot)...
 		
-		this.personId2vehicleId.put(event.getPersonId(), event.getVehicleId());
-
-		if (this.vehicleId2personId.containsKey(event.getVehicleId()) && (!event.getPersonId().toString().equals(event.getPersonId().toString()))) {
+		if (this.vehicleId2driverIdToBeCharged.containsKey(event.getVehicleId()) && (!event.getPersonId().toString().equals(event.getPersonId().toString()))) {
 			if (warnCounter2 <= 5) {
-				log.warn(event.getPersonId() + " enters vehicle " + event.getVehicleId() + ". Person " + this.vehicleId2personId.get(event.getVehicleId()) + " has entered the vehicle before"
+				log.warn(event.getPersonId() + " enters vehicle " + event.getVehicleId() + ". Person " + this.vehicleId2driverIdToBeCharged.get(event.getVehicleId()) + " has entered the vehicle before"
 						+ " and is considered as the transit / taxi driver.");
 				if (warnCounter4 == 5) {
 					log.warn("Further log statements of this type are not printed out.");
 				}
 			}
 		} else {
-			this.vehicleId2personId.put(event.getVehicleId(), event.getPersonId());
+			this.vehicleId2driverIdToBeCharged.put(event.getVehicleId(), event.getPersonId());
 		}	
 	}
 	
@@ -238,10 +223,10 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 				totalAmountOfPerson += amount;
 			}
 
-			String agentType = this.agentFilter.getAgentTypeFromId(personId);
+			String agentType = this.agentFilter.getAgentTypeFromId(personId);	
+			Double amountSum = agentTypeIdPrefix2AmountSum.get(agentType);
 			
-			if (agentTypeIdPrefix2AmountSum.containsKey(agentType)) {
-				double amountSum = agentTypeIdPrefix2AmountSum.get(agentType);
+			if (amountSum != null) {
 				agentTypeIdPrefix2AmountSum.put(agentType, amountSum + totalAmountOfPerson);
 
 			} else {
@@ -252,9 +237,9 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 		for (Id<Person> personId : timeBin.getEnteringAgents()) {
 
 			String agentType = this.agentFilter.getAgentTypeFromId(personId);
+			Integer counter = agentTypeIdPrefix2Counter.get(agentType);
 			
-			if (agentTypeIdPrefix2Counter.containsKey(agentType)) {
-				int counter = agentTypeIdPrefix2Counter.get(agentType);
+			if (counter != null) {
 				agentTypeIdPrefix2Counter.put(agentType, counter + 1);
 
 			} else {
@@ -268,7 +253,7 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 				
 				if (warnCounter2 <= 5) {
 					log.warn("No entering agent of type " + agentType + " in time bin " + timeBin.getTimeBinNr() + " even though there are person money events (total monetary amounts: " + agentTypeIdPrefix2AmountSum.get(agentType) + ")."
-							+ " Can't compute the average amount per time bin.");
+							+ " This happens if road segments are very long. Can't compute the average amount for that time bin and road segment.");
 					warnCounter2++;
 					if (warnCounter2 == 5) {
 						log.warn("Further log statements of this type are not printed out.");
