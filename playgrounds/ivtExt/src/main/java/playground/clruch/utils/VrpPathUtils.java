@@ -38,13 +38,4 @@ public class VrpPathUtils {
         }
         return status;
     }
-
-    @Deprecated
-    public static void assertIsConsistent(VrpPath vrpPath) { // TODO use GlobalAssert
-        if (!isConsistent(vrpPath)) {
-            System.out.println(toString(vrpPath));
-            throw new RuntimeException("path is not consistent");
-        }
-    }
-
 }

@@ -3,6 +3,7 @@ package playground.clruch.dispatcher;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Queue;
 import java.util.Set;
 
@@ -35,8 +36,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final FuturePathFactory futurePathFactory;
 
-    // TODO perhaps make it a linkedHashSet for the ordering
-    private final Set<AVRequest> pendingRequests = new HashSet<>(); // access via getAVRequests()
+    private final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
 
     private final double pickupDurationPerStop;

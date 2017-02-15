@@ -84,8 +84,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         Map<Link, Queue<AVVehicle>> map = new HashMap<>();
         for (AVVehicle avVehicle : getFunctioningVehicles())
             if (isWithoutDirective(avVehicle)) {
-                Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule(); // TODO insert directly into next line
-                AbstractTask abstractTask = Schedules.getLastTask(schedule); // <- last task
+                AbstractTask abstractTask = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
                 if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
                     new AVTaskAdapter(abstractTask) {
                         public void handle(AVStayTask avStayTask) { // <- type of task is STAY
@@ -108,7 +107,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
             if (isWithoutDirective(avVehicle)) {
                 Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
                 AbstractTask abstractTask = schedule.getCurrentTask();
-                new AVTaskAdapter(abstractTask) {
+                new AVTaskAdapter(abstractTask) { // TODO don't use abstractTask beyond this point!!! 
                     @Override
                     public void handle(AVDriveTask avDriveTask) {
                         // for empty cars the drive task is second to last task

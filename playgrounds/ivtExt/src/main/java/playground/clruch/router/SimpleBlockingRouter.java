@@ -5,6 +5,7 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
@@ -42,7 +43,7 @@ public class SimpleBlockingRouter {
         return getRouteBlocking(divLink, destLink, startTime, leastCostPathFuture, travelTime);
     }
 
-    public static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
+    static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
         try {
             Thread.sleep(0, 100000);
             while (!leastCostPathFuture.isDone())
@@ -51,8 +52,7 @@ public class SimpleBlockingRouter {
             e.printStackTrace();
         }
         VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(startLink, destLink, startTime, leastCostPathFuture.get(), travelTime);
-
-        VrpPathUtils.assertIsConsistent(vrpPathWithTravelData);
+        GlobalAssert.that(VrpPathUtils.isConsistent(vrpPathWithTravelData));
         return vrpPathWithTravelData;
     }
 

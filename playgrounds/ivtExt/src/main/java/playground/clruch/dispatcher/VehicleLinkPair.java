@@ -23,7 +23,7 @@ public class VehicleLinkPair {
     }
 
     /**
-     * TODO temporary solution
+     * TODO temporary solution, function is only called once to check if vehicle is in stayMode
      * 
      * @return null if vehicle does not have a destination
      */

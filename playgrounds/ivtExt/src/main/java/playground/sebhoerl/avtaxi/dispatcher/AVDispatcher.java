@@ -47,6 +47,8 @@ public interface AVDispatcher {
      * @param driveTask
      * @param linkTimePair
      */
+    // TODO probably can remove function since we have access to this info nevertheless
+    @Deprecated
     default void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
         // default behavior is intentionally empty
     }
