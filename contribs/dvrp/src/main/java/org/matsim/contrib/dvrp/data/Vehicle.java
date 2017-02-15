@@ -47,17 +47,20 @@ extends Identifiable<Vehicle>
 
 	// vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
 	/**
-	 * earliest time when vehicle is available (inclusive)
+	 * Earliest time when vehicle is available (inclusive)
 	 */
 	double getT0();
 
 
 	/**
-	 * earliest time when vehicle is <i>no longer</i> available
+	 * Earliest time when vehicle is <i>no longer</i> available
 	 */
 	double getT1();
 
 
+	/**
+	 * See {@link Vehicle#getT1()}
+	 */
 	void setT1(double t1);
 
 
@@ -76,5 +79,8 @@ extends Identifiable<Vehicle>
 	void setAgentLogic(VrpAgentLogic agentLogic);
 
 
+	/**
+	 * In the only existing implementation, this re-creates the Schedule object by calling a new constructor.
+	 */
 	void resetSchedule();
 }
