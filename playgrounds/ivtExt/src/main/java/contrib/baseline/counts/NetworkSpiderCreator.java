@@ -67,7 +67,7 @@ public class NetworkSpiderCreator implements LinkEnterEventHandler, VehicleAbort
 		// 			and every other link has also 100% or lower...
 		Map<String, Integer> absSpider = createAbsoluteSpider(anchorLink);
 		Map<String, Double> relSpider = new HashMap<>();
-		double maxValue = Collections.max(absSpider.values());
+		double maxValue = (double)Collections.max(absSpider.values());
 		for (String link : absSpider.keySet()) {
 			relSpider.put(link, absSpider.get(link)/maxValue);
 		}
