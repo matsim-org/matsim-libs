@@ -1,4 +1,4 @@
-package playground.gleich.contrib_av;
+package org.matsim.contrib.av.intermodal;
 
 import org.junit.Assert;
 import org.junit.Test;

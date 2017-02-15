@@ -1,4 +1,4 @@
-package playground.gleich.contrib_av;
+package org.matsim.contrib.av.intermodal;
 
 import java.util.List;
 
@@ -44,6 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  */
 public class VariableAccessTransitRouterImplTest {
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testCalcRoute(){
 		Config config = ConfigUtils.loadConfig(
@@ -51,7 +52,7 @@ public class VariableAccessTransitRouterImplTest {
 				new TaxiConfigGroup());
 		
 		config.plansCalcRoute().setBeelineDistanceFactor(1.3);
-		for(Double speed: config.plansCalcRoute().getBeelineDistanceFactors().values()){
+		for(@SuppressWarnings("unused") Double speed: config.plansCalcRoute().getBeelineDistanceFactors().values()){
 			speed = 3.0 / 3.6;
 		}
 		
