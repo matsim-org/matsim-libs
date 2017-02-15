@@ -132,25 +132,18 @@ public class VrpAgentQueryHelper
     private final class VrpSchedulePlan
         implements Plan
     {
-        private final Vehicle vehicle;
-
-        //lazily initialised - we do not visualise plans of all VRP vehicles
         private List<PlanElement> unmodifiablePlanElements;
 
 
         private VrpSchedulePlan(Vehicle vehicle)
         {
-            this.vehicle = vehicle;
+            unmodifiablePlanElements = Collections.unmodifiableList(initPlanElements(vehicle));
         }
-
-
+        
         @Override
         public List<PlanElement> getPlanElements()
         {
-            if (unmodifiablePlanElements == null) {
-                unmodifiablePlanElements = Collections.unmodifiableList(initPlanElements(vehicle));
-            }
-            return unmodifiablePlanElements;
+        	return unmodifiablePlanElements;
         }
 
 
