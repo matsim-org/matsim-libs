@@ -45,7 +45,7 @@ public class MyADClass {
 			public void install() {
 				this.addMobsimListenerBinding().toInstance(new MobsimBeforeSimStepListener(){
 					@Override public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-						for (  MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents() ) {
+						for (  MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents().values() ) {
 						}
 					}
 				});

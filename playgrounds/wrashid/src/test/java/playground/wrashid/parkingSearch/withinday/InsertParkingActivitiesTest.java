@@ -191,7 +191,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		agentSource.insertAgentsIntoMobsim(); 
 		PlanAgent agent = null;
-		for (MobsimAgent a : qSim.getAgents()) {
+		for (MobsimAgent a : qSim.getAgents().values()) {
 			agent = (PlanAgent) a;
 			break;
 		}

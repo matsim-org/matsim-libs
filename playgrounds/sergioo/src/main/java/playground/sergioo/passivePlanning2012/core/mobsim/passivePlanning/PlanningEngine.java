@@ -99,7 +99,7 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 	@Override
 	public void onPrepareSim() {
 		Map<Id<Person>, PassivePlannerDriverAgent> agents = new HashMap<Id<Person>, PassivePlannerDriverAgent>();
-		for(MobsimAgent agent:qSim.getAgents())
+		for(MobsimAgent agent:qSim.getAgents().values())
 			if(agent instanceof PassivePlannerAgendaAgent || agent instanceof PassivePlannerTransitAgendaAgent)
 				agents.put(agent.getId(), (PassivePlannerDriverAgent) agent);
 		SocialNetwork socialNetwork = ((ScenarioSocialNetwork)qSim.getScenario()).getSocialNetwork();

@@ -114,7 +114,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public OTFQueryResult query() {
-		Plan plan = simulationView.getPlans().get(this.agentId);
+		Plan plan = simulationView.getPlan(this.agentId);
 		Result result = new Result();
 		result.agentId = this.agentId.toString();
 		if (plan != null) {

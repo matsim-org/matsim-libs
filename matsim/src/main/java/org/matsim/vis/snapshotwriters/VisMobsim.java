@@ -4,8 +4,10 @@
 package org.matsim.vis.snapshotwriters;
 
 
-import java.util.Collection;
+import java.util.*;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 
@@ -25,8 +27,10 @@ public interface VisMobsim extends ObservableMobsim {
 	 * since java does not have multi-maps.  Which means that we come back to the question of what should be in here and what not.
 	 * For that reason, it is just a Collection.</li>
 	 * </ul>  kai, aug'10
+	 * 
+	 * changed to Map for that works better with queries in OTFVis 
 	 */
-	Collection<MobsimAgent> getAgents();
+	Map<Id<Person>, MobsimAgent> getAgents();
 
 	/**
 	 * Returns a view of all agents to be visualized which are not on the VisNetwork.

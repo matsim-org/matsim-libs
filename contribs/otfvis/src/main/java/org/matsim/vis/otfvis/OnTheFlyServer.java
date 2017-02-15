@@ -59,34 +59,28 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
 		@Override
-		public Map<Id<Person>, Plan> getPlans() {
-			Map<Id<Person>, Plan> plans = new HashMap<>();
+		public Collection<Id<Person>> getAllAgentIds() {
+			return visMobsim.getAgents().keySet();
+		}
+
+		@Override
+		public Plan getPlan(Id<Person> agentId) {
 			if (visMobsim != null ) {
-				Collection<MobsimAgent> agents = visMobsim.getAgents();
-				for (MobsimAgent agent : agents) {
-					if (agent instanceof PlanAgent) {
-						PlanAgent pa = (PlanAgent) agent;
-						plans.put(pa.getCurrentPlan().getPerson().getId(), pa.getCurrentPlan());
-					}
-					else if (nonPlanAgentQueryHelper != null) {
-					    Plan plan = OnTheFlyServer.this.nonPlanAgentQueryHelper.getPlan(agent);
-					    if (plan != null) {
-					        plans.put(agent.getId(), plan);
-					    }
-					}
+				MobsimAgent agent = visMobsim.getAgents().get(agentId);
+				if (agent instanceof PlanAgent) {
+					return ((PlanAgent)agent).getCurrentPlan();
 				}
-			} else {
-				for (Person person : scenario.getPopulation().getPersons().values()) {
-					Plan plan = person.getSelectedPlan();
-					plans.put(person.getId(), plan);
+				else if (nonPlanAgentQueryHelper != null) {
+				    return OnTheFlyServer.this.nonPlanAgentQueryHelper.getPlan(agent);
 				}
-			}
-			return plans;
+			} 
+			
+			return scenario.getPopulation().getPersons().get(agentId).getSelectedPlan();
 		}
 
 		@Override
 		public Activity getCurrentActivity(Id<Person> personId)	{		    
-            MobsimAgent mobsimAgent = ((QSim)visMobsim).getAgentMap().get(personId);
+            MobsimAgent mobsimAgent = visMobsim.getAgents().get(personId);
             if (mobsimAgent == null || mobsimAgent.getState() != MobsimAgent.State.ACTIVITY) {
                 return null;
             }
@@ -128,7 +122,6 @@ public class OnTheFlyServer implements OTFLiveServer {
 		public double getTime() {
 			return ((QSim) visMobsim).getSimTimer().getTimeOfDay();
 		}
-
 	}
 	
 	/**

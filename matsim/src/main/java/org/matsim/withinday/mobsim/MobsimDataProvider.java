@@ -103,7 +103,7 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	}
 
 	public final Map<Id<Person>, MobsimAgent> getAgents() {
-		return this.qSim.getAgentMap() ;
+		return this.qSim.getAgents() ;
 	}
 	
 	public final MobsimAgent getAgent(Id<Person> agentId) {

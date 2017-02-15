@@ -265,9 +265,10 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		return actPersons;
 	}
 
-	private List<Plan> getPersons(Map<Id<Person>, Plan> plans) {
+	private List<Plan> getPersonsALL() {
 		List<Plan> actPersons = new ArrayList<>();
-		for (Plan plan : plans.values()) {
+		for (Id<Person> agentId : simulationView.getAllAgentIds()) {
+			Plan plan = simulationView.getPlan(agentId);
 			List<PlanElement> actslegs = plan.getPlanElements();
 			for (PlanElement pe : actslegs) {
 				if (pe instanceof Activity) {
@@ -346,7 +347,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		result.linkIdString = this.queryLinkId.toString();
 		this.drivenLinks = new HashMap<>();
 
-		List<Plan> actPersons = nowOnly ? getPersonsNOW() : getPersons(simulationView.getPlans());
+		List<Plan> actPersons = nowOnly ? getPersonsNOW() : getPersonsALL();
 
 		if(tripOnly) collectLinksFromLeg(actPersons);
 		else collectLinks(actPersons);

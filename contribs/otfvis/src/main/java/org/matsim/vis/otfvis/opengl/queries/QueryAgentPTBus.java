@@ -182,14 +182,16 @@ public class QueryAgentPTBus extends AbstractQuery {
 		this.net = simulationView.getNetwork();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
-		Map<Id<Person>, Plan> plans = simulationView.getPlans();
-		for(Id<Person> planId : plans.keySet()) {
-			if(planId.toString().startsWith(prefix, 0)) {
-			    allIds.add(planId.toString());
+		Collection<Id<Person>> agentIds = simulationView.getAllAgentIds();
+		for(Id<Person> id : agentIds) {
+			if(id.toString().startsWith(prefix, 0)) {
+			    allIds.add(id.toString());
 			}
 		}
-		if (allIds.size()==0) return;
-		Plan plan = plans.get(Id.create(allIds.get(0), Person.class));
+		if (allIds.size()==0) {
+			return;
+		}
+		Plan plan = simulationView.getPlan(Id.create(allIds.get(0), Person.class));
 		this.result.vertex = buildRoute(plan);
 	}
 
