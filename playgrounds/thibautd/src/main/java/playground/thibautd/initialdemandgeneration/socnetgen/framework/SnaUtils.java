@@ -28,23 +28,22 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 import org.matsim.contrib.socnetsim.utils.CollectionUtils;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
+import org.matsim.core.router.priorityqueue.HasIndex;
+import org.matsim.core.router.priorityqueue.MinHeap;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.Ego;
 import playground.thibautd.initialdemandgeneration.socnetgen.analysis.SocialNetworkAsMatsimNetworkUtils;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -258,31 +257,12 @@ public class SnaUtils {
 			final Random random,
 			final int nPairs,
 			final DistanceCallback callback  ) {
-		final Network matsimNetwork = SocialNetworkAsMatsimNetworkUtils.convertToNetwork( socialNetwork );
-
-		// Fast dijkstra is approx. twice as fast here.
-		final LeastCostPathCalculator dijkstra =
-			new FastDijkstraFactory().createPathCalculator(
-				matsimNetwork,
-				new TravelDisutility() {
-					@Override
-					public double getLinkTravelDisutility(Link link,
-							double time, Person person, Vehicle vehicle) {
-						return 1;
-					}
-
-					@Override
-					public double getLinkMinimumTravelDisutility(Link link) {
-						return 1;
-					}
-				},
-				( link, time, person, vehicle ) -> 1 );
 
 		log.info( "searching for the biggest connected component..." );
-		Set<Id<Person>> biggestComponent = null;
+		List<Id<Person>> biggestComponent = null;
 		for ( Set<Id<Person>> component : SnaUtils.identifyConnectedComponents( socialNetwork ) ) {
 			if ( biggestComponent == null || biggestComponent.size() < component.size() ) {
-				biggestComponent = component;
+				biggestComponent = new ArrayList<>( component );
 			}
 		}
 
@@ -290,26 +270,87 @@ public class SnaUtils {
 		log.info( "ignoring "+( socialNetwork.getEgos().size() - biggestComponent.size() )+" agents ("+
 				( ( socialNetwork.getEgos().size() - biggestComponent.size() ) * 100d / socialNetwork.getEgos().size() )+"%)" );
 
-		final List<Node> egos = new ArrayList<>( biggestComponent.size() );
-
-		for ( Id<Person> id : biggestComponent ) {
-			egos.add( matsimNetwork.getNodes().get( Id.create( id , Node.class ) ) );
-		}
 
 		final Counter counter = new Counter( "sampling pair # " );
 		for ( int i = 0; i < nPairs; i++ ) {
 			counter.incCounter();
-			final Node ego = egos.get( random.nextInt( egos.size() ) );
-			final Node alter = egos.get( random.nextInt( egos.size() ) );
-
-			final LeastCostPathCalculator.Path path = dijkstra.calcLeastCostPath( ego, alter, 0, null, null );
+			final Id<Person> ego = biggestComponent.get( random.nextInt( biggestComponent.size() ) );
+			final Id<Person> alter = biggestComponent.get( random.nextInt( biggestComponent.size() ) );
 
 			callback.notifyDistance(
-					Id.create( ego.getId() , Person.class ) ,
-					Id.create( alter.getId() , Person.class ) ,
-					path.travelCost );
+					ego, alter ,
+					calcNHops( socialNetwork , ego , alter ) );
 		}
 		counter.printCounter();
+	}
+
+	// "two way dijkstra" directly on the social network.
+	// given the small world property, this should be much faster than standard dijkstra.
+	// this also avoids creating a matsim network to run the standard dijkstra, saving precious memory
+	// it is, in practice, roughly 50 times faster than using MATSim's dijkstra on an equivalent matsim network.
+	// No idea if this comes from the 2-way (it might be, given the small-world property) or simply the implementation...
+	private static int calcNHops( final SocialNetwork network , final Id<Person> ego, final Id<Person> alter ) {
+		// does this implementation really speeds things up? It takes quite a lot of space, as it does not resizes...
+		final MinHeap<TaggedId> queue = new BinaryMinHeap<>( network.getEgos().size() );
+		final TaggedIdPool pool = new TaggedIdPool();
+
+		queue.add( pool.getTaggedId( ego , true , 0 ) , 0 );
+		queue.add( pool.getTaggedId( alter , false , 0 ) , 0 );
+
+		while ( !queue.isEmpty() ) {
+			final TaggedId current = queue.poll();
+
+			final int newDist = current.dist + 1;
+
+			final Set<Id<Person>> currentAlters = network.getAlters( current.id );
+			for ( Id<Person> currentAlter : currentAlters ) {
+				final TaggedId taggedId = pool.getTaggedId( currentAlter , current.fromEgo , newDist );
+
+				// we joined the two trees
+				if ( taggedId.fromEgo == !current.fromEgo ) return newDist + taggedId.dist;
+				if ( taggedId.dist == newDist ) {
+					// it was newly created
+					queue.add( taggedId , taggedId.dist );
+				}
+			}
+		}
+
+		throw new RuntimeException();
+	}
+
+	private static class TaggedIdPool {
+		private int index = 0;
+
+		private final Map<Id<Person>, TaggedId> ids = new HashMap<>();
+
+		public TaggedId getTaggedId( final Id<Person> id , final boolean fromEgo , final int dist ) {
+			TaggedId taggedId = ids.get( id );
+			if ( taggedId == null ) {
+				taggedId = new TaggedId( id , index++, fromEgo, dist );
+				ids.put( id , taggedId );
+			}
+
+			return taggedId;
+		}
+	}
+	private static class TaggedId implements HasIndex {
+		final Id<Person> id;
+		final int index;
+
+		final boolean fromEgo;
+		final int dist;
+
+		private TaggedId( final Id<Person> id, final int index, final boolean fromEgo, final int dist ) {
+			this.id = id;
+			this.index = index;
+			this.fromEgo = fromEgo;
+			this.dist = dist;
+		}
+
+		@Override
+		public int getArrayIndex() {
+			return index;
+		}
 	}
 
 	@FunctionalInterface
