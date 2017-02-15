@@ -149,19 +149,13 @@ public class OptAVTestIT {
 		});
 		
 		controler2.addOverridingModule(new TaxiModule(fleet2));
-		controler2.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05)); // replace the travel time computation
-		controler2.addOverridingModule(new DynQSimModule<>(OptAVQSimProvider.class));
-		
-//		final MoneyTimeDistanceTravelDisutilityFactory factory = new MoneyTimeDistanceTravelDisutilityFactory(
-//				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler2.getConfig().planCalcScore()));		
-		
+		controler2.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+		controler2.addOverridingModule(new DynQSimModule<>(OptAVQSimProvider.class)); // replace the travel distutility which is used by taxis
+				
 		controler2.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 												
-//				// travel disutility factory
-//				this.bindCarTravelDsisutilityFactory().toInstance(factory); // only the travel disutility for taxis / av should be affected!
-				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
