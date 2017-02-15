@@ -141,7 +141,7 @@ public class FlexibleDistanceBasedVariableAccessModule implements VariableAccess
 	 */
 	private String getModeForDistance(double egressDistance, Person p) {
 		if (distanceMode.containsKey(TransportMode.walk))
-		if (egressDistance<distanceMode.get(TransportMode.walk)) return TransportMode.walk;
+		if (egressDistance<=distanceMode.get(TransportMode.walk)) return TransportMode.walk;
 		//TODO: MAke Config switch
 		List<String> possibleModes = new ArrayList<>();
 		for (Entry<String,Integer> e : this.distanceMode.entrySet()){

@@ -74,12 +74,12 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 	 * 
 	 */
 	@Inject
-	public StopBasedDRTRoutingModule(@Named(TransportMode.walk) RoutingModule walkRouter, @Named(DRTConfigGroup.DRTMODE) TransitSchedule transitSchedule, Config config, Scenario scenario) {
+	public StopBasedDRTRoutingModule(@Named(TransportMode.walk) RoutingModule walkRouter, @Named(DRTConfigGroup.DRTMODE) TransitSchedule transitSchedule, Scenario scenario) {
 			transitSchedule.getFacilities();
 			this.walkRouter = walkRouter;
 			this.stops = transitSchedule.getFacilities();
-			this.drtconfig = (DRTConfigGroup) config.getModules().get(DRTConfigGroup.GROUPNAME);
-			this.walkBeelineFactor = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
+			this.drtconfig = (DRTConfigGroup) scenario.getConfig().getModules().get(DRTConfigGroup.GROUPNAME);
+			this.walkBeelineFactor = scenario.getConfig().plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
 			this.network = scenario.getNetwork();
 			this.scenario = scenario;
 	}
@@ -90,7 +90,13 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 			Person person) {
 		List<PlanElement> legList = new ArrayList<>();
 		TransitStopFacility accessFacility = findAccessFacility(fromFacility, toFacility);
+		if (accessFacility == null){
+			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
+		}
 		TransitStopFacility egressFacility = findEgressFacility(accessFacility, toFacility);
+		if (egressFacility == null){
+			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
+		}
 		legList.addAll(walkRouter.calcRoute(fromFacility, accessFacility, departureTime, person));
 		Leg walkLeg = (Leg) legList.get(0);
 		Activity drtInt1 = scenario.getPopulation().getFactory().createActivityFromCoord(DRTStageActivityType.DRTSTAGEACTIVITY, accessFacility.getCoord());
@@ -99,12 +105,12 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 		legList.add(drtInt1);
 		
 		Route drtRoute = new GenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
-	    drtRoute.setDistance(Double.NaN);
-	    drtRoute.setTravelTime(Double.NaN);
+	    drtRoute.setDistance(drtconfig.getEstimatedBeelineDistanceFactor()*CoordUtils.calcEuclideanDistance(accessFacility.getCoord(), egressFacility.getCoord()));
+	    drtRoute.setTravelTime(drtRoute.getDistance()/drtconfig.getEstimatedSpeed());
 
 	    Leg drtLeg = PopulationUtils.createLeg(DRTConfigGroup.DRTMODE);
         drtLeg.setDepartureTime(departureTime+walkLeg.getTravelTime()+1);
-        drtLeg.setTravelTime(Double.NaN);
+        drtLeg.setTravelTime(drtRoute.getTravelTime());
         drtLeg.setRoute(drtRoute);
 		
         legList.add(drtLeg);
@@ -113,7 +119,7 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 		drtInt2.setMaximumDuration(1);
 		drtInt2.setLinkId(egressFacility.getLinkId());
 		legList.add(drtInt2);
-		legList.addAll(walkRouter.calcRoute(egressFacility, toFacility, departureTime, person));
+		legList.addAll(walkRouter.calcRoute(egressFacility, toFacility, drtLeg.getDepartureTime()+drtLeg.getTravelTime()+1, person));
 		return legList;
 	}
 

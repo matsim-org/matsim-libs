@@ -60,7 +60,7 @@ public class FlexibleDistanceBasedVariableAccessModuleTest {
 		Assert.assertTrue(leg999m.getMode().equals("walk"));
 		
 		Leg leg1000m = module.getAccessEgressModeAndTraveltime(personCarNeverAvailable, CoordUtils.createCoord(4950.00, 1050.00), CoordUtils.createCoord(3950.00, 1050.00), 8*60*60);
-//		Assert.assertTrue(leg1000m.getMode().equals("walk"));
+		Assert.assertTrue(leg1000m.getMode().equals("walk"));
 		
 		Leg leg1001m = module.getAccessEgressModeAndTraveltime(personCarNeverAvailable, CoordUtils.createCoord(4951.00, 1050.00), CoordUtils.createCoord(3950.00, 1050.00), 8*60*60);
 		Assert.assertTrue(leg1001m.getMode().equals("bike") || leg1001m.getMode().equals("av"));

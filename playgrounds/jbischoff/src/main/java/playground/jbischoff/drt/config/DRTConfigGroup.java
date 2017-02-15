@@ -42,11 +42,16 @@ public class DRTConfigGroup extends ReflectiveConfigGroup {
 	private static final String SCHEME = "operationalScheme";
 	private static final String TRANSITSCHEDULEFILE = "transitStopFile";
 	private static final String WALKDISTANCE = "maximumWalkDistance";
+	private static final String SPEEDESTIMATE = "estimatedDRTSpeed";
+	private static final String BEELINEDISTANCEESTIMATE = "estimatedBeelineDistanceFactor";
 	
 	
 	private DRTOperationalScheme operationalScheme;			
 	private String transitStopFile = null;
 	private double maximumWalkDistance;
+	private double estimatedSpeed = 25/3.6;
+	private double estimatedBeelineDistanceFactor = 1.3;
+
 	
 	public enum DRTOperationalScheme {
 				stationbased,
@@ -114,4 +119,35 @@ public class DRTConfigGroup extends ReflectiveConfigGroup {
 		this.maximumWalkDistance = maximumWalkDistance;
 	}
 
+	/**
+	 * @return the estimatedSpeed
+	 */
+	@StringGetter(SPEEDESTIMATE)
+	public double getEstimatedSpeed() {
+		return estimatedSpeed;
+	}
+	
+	/**
+	 * @param estimatedSpeed the estimatedSpeed to set
+	 */
+	@StringSetter(SPEEDESTIMATE)
+	public void setEstimatedSpeed(double estimatedSpeed) {
+		this.estimatedSpeed = estimatedSpeed;
+	}
+	
+	/**
+	 * @return the estimatedBeelineDistanceFactor
+	 */
+	@StringGetter(BEELINEDISTANCEESTIMATE)
+	public double getEstimatedBeelineDistanceFactor() {
+		return estimatedBeelineDistanceFactor;
+	}
+	
+	/**
+	 * @param estimatedBeelineDistanceFactor the estimatedBeelineDistanceFactor to set
+	 */
+	@StringSetter(BEELINEDISTANCEESTIMATE)
+	public void setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
+		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
+	}
 }
