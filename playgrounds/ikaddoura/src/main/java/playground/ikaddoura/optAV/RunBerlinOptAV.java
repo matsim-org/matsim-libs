@@ -31,6 +31,7 @@ import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModule;
@@ -40,6 +41,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
 import playground.ikaddoura.analysis.dynamicLinkDemand.DynamicLinkDemandAnalysisRun;
@@ -58,8 +60,9 @@ import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 
 public class RunBerlinOptAV {
 
-	private final static String configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_optAV_test.xml";
-			
+	private final static String configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_optAV.xml";
+	private final static boolean otfvis = false;
+
 	public static void main(String[] args) {
 		run();
 	}
@@ -69,6 +72,7 @@ public class RunBerlinOptAV {
 		Config config = ConfigUtils.loadConfig(configFile,
 				new TaxiConfigGroup(),
 				new TaxiFareConfigGroup(),
+				new OTFVisConfigGroup(),
 				new NoiseConfigGroup());
 		
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
@@ -139,6 +143,7 @@ public class RunBerlinOptAV {
 		// run
 		// #############################
 		
+		if (otfvis) controler.addOverridingModule(new OTFVisLiveModule());	
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
