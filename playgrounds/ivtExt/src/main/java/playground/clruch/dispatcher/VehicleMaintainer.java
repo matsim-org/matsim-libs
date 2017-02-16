@@ -26,12 +26,15 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
  * The purpose of VehicleMaintainer is to register {@link AVVehicle}
  * and provide the collection of available vehicles to derived class.
  * 
  * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s.
+ * path computations attached to assignments are computed in parallel
+ * {@link ParallelLeastCostPathCalculator}.
  */
 public abstract class VehicleMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;
@@ -81,8 +84,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         Map<Link, Queue<AVVehicle>> map = new HashMap<>();
         for (AVVehicle avVehicle : getFunctioningVehicles())
             if (isWithoutDirective(avVehicle)) {
-                Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule(); // TODO insert directly into next line
-                AbstractTask abstractTask = Schedules.getLastTask(schedule); // <- last task
+                AbstractTask abstractTask = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
                 if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
                     new AVTaskAdapter(abstractTask) {
                         public void handle(AVStayTask avStayTask) { // <- type of task is STAY
@@ -105,7 +107,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
             if (isWithoutDirective(avVehicle)) {
                 Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
                 AbstractTask abstractTask = schedule.getCurrentTask();
-                new AVTaskAdapter(abstractTask) {
+                new AVTaskAdapter(abstractTask) { // TODO don't use abstractTask beyond this point!!! 
                     @Override
                     public void handle(AVDriveTask avDriveTask) {
                         // for empty cars the drive task is second to last task

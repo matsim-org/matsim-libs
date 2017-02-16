@@ -38,12 +38,4 @@ public class VrpPathUtils {
         }
         return status;
     }
-
-    public static void assertIsConsistent(VrpPath vrpPath) {
-        if (!isConsistent(vrpPath)) {
-            System.out.println(toString(vrpPath));
-            throw new RuntimeException("path is not consistent");
-        }
-    }
-
 }

@@ -18,17 +18,17 @@ public class EventFileToProcessingXML {
      * reads an output events file from a matsim simulation and
      * outputs an XML file to be read by processing
      *
-     * @param folder of the project folder
+     * @param folder
+     *            of the project folder
      */
     public static void convert(final File dir) {
         File output = new File(dir, "output");
-        if (output.exists()) {
-            // TODO check if output folder exists!
+        if (output.exists()) { // check if output folder exists
+
             File directory = new File(output, "processing");
             directory.mkdir();
             File fileImport = new File(output, "output_events.xml");
 
-            // TODO move into function of class
             EventsManager events = EventsUtils.createEventsManager();
 
             // add event handlers to create waitingCustomers file

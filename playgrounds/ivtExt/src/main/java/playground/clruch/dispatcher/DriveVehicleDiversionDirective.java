@@ -10,6 +10,7 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 import playground.clruch.router.FuturePathContainer;
+import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
@@ -33,7 +34,7 @@ class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
             final int lengthOfDiversion = vrpPathWithTravelData.getLinkCount();
             OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
             onlineDriveTaskTracker.divertPath(vrpPathWithTravelData);
-            VrpPathUtils.assertIsConsistent(avDriveTask.getPath());
+            GlobalAssert.that(VrpPathUtils.isConsistent(avDriveTask.getPath()));
 
             final int lengthOfCombination = avDriveTask.getPath().getLinkCount();
             // System.out.println(String.format("[@%d of %d]", diversionLinkIndex, lengthOfCombination));

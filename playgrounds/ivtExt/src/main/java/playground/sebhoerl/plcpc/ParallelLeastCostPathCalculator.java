@@ -14,6 +14,15 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+
+import playground.sebhoerl.av.framework.AVModule;
+import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
+import playground.sebhoerl.avtaxi.routing.AVParallelRouterFactory;
+
+
 public class ParallelLeastCostPathCalculator implements MobsimAfterSimStepListener, IterationEndsListener, ShutdownListener {
     private Logger log = Logger.getLogger(ParallelLeastCostPathCalculator.class);
 
@@ -22,8 +31,14 @@ public class ParallelLeastCostPathCalculator implements MobsimAfterSimStepListen
     private SequentialLeastCostPathCalculatorWorker sequentialWorker = null;
 
     private long count = 0;
+    
+    @Provides @Singleton @Named(AVModule.AV_MODE)
+    private ParallelLeastCostPathCalculator provideParallelLeastCostPathCalculator(AVConfigGroup config, AVParallelRouterFactory factory) {
+           return new ParallelLeastCostPathCalculator((int) config.getParallelRouters(), factory);
+       }
 
     public ParallelLeastCostPathCalculator(int numberOfThreads, ParallelLeastCostPathCalculatorFactory factory) {
+
         workers = new ArrayList<>(numberOfThreads);
 
         for (int i = 0; i < numberOfThreads; i++) {
@@ -37,6 +52,7 @@ public class ParallelLeastCostPathCalculator implements MobsimAfterSimStepListen
         for (ParallelLeastCostPathCalculatorWorker worker : workers) {
             worker.start();
         }
+        // throw new RuntimeException("numberOfThreads " + numberOfThreads);
     }
 
     private LeastCostPathCalculatorWorker getNextWorker() {

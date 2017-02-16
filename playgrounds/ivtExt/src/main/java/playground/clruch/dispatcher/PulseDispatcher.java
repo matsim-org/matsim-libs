@@ -65,7 +65,7 @@ public class PulseDispatcher extends UniversalDispatcher {
                     index %= links.size();
                 }
             }
-            
+
             System.out.println(getVehicleMaintainerStatusString());
         }
     }
