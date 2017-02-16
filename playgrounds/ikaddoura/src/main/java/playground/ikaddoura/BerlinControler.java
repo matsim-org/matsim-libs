@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.Decongestion;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
@@ -245,7 +245,7 @@ public class BerlinControler {
 		
 		// analysis
 		
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		PersonTripCongestionNoiseAnalysisRun analysis = new PersonTripCongestionNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
 		MATSimVideoUtils.createLegHistogramVideo(controler.getConfig().controler().getOutputDirectory());

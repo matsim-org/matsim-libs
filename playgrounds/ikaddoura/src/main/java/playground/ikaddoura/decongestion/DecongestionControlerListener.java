@@ -53,7 +53,7 @@ import org.matsim.core.utils.charts.XYLineChart;
 
 import com.google.inject.Inject;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisRun;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.data.CongestionInfoWriter;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
@@ -330,7 +330,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		if (this.congestionInfo.getDecongestionConfigGroup().isRUN_FINAL_ANALYSIS()) {
 			log.info("Simulation is shut down. Running final analysis...");
 			
-			PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(this.outputDirectory);
+			PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(this.outputDirectory);
 			analysis.run();
 			
 			try {

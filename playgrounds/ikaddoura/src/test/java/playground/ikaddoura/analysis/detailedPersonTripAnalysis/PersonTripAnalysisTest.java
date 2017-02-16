@@ -40,7 +40,7 @@ import playground.vsp.congestion.events.CongestionEventsReader;
 
 public class PersonTripAnalysisTest {
 
-	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysisMain.class);
+	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysisRun.class);
 
 	private String outputPath;
 	

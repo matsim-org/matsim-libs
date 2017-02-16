@@ -59,7 +59,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -292,7 +292,7 @@ public class CNEMunich {
 			
 		// analysis
 		
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		PersonTripCongestionNoiseAnalysisRun analysis = new PersonTripCongestionNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
 		String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";

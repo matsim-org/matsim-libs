@@ -28,33 +28,41 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class LinkDemandAnalysisMain {
+public class LinkDemandAnalysisRun {
 	
-//	private static String OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";
-	private static String OUTPUT_BASE_DIR = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/baseCaseCtd/";
-	
+	private static String OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";
+	private String outputDirectory;
+
+	public LinkDemandAnalysisRun(String outputDirectory) {
+		this.outputDirectory = outputDirectory;
+	}
+
 	public static void main(String[] args) {
-		LinkDemandAnalysisMain anaMain = new LinkDemandAnalysisMain();
+		LinkDemandAnalysisRun anaMain = new LinkDemandAnalysisRun(OUTPUT_BASE_DIR);
 		anaMain.run();
 	}
 
-	private void run() {
+	public void run() {
+		
+		if (!outputDirectory.endsWith("/")) {
+			outputDirectory = outputDirectory + "/";
+		}
 	
-		Config config = ConfigUtils.loadConfig(OUTPUT_BASE_DIR + "output_config.xml.gz");
+		Config config = ConfigUtils.loadConfig(outputDirectory + "output_config.xml.gz");
 		config.plans().setInputFile(null);
 		config.network().setChangeEventsInputFile(null);
-		config.network().setInputFile(OUTPUT_BASE_DIR + "output_network.xml.gz");
+		config.network().setInputFile(outputDirectory + "output_network.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 				
 		LinkDemandEventHandler handler = new LinkDemandEventHandler(scenario.getNetwork());
 		events.addHandler(handler);
 		
-		String eventsFile = OUTPUT_BASE_DIR + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz";
+		String eventsFile = outputDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz";
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
-		String analysis_output_file = OUTPUT_BASE_DIR + "ITERS/it." + config.controler().getLastIteration() + "/link_dailyDemand.csv";
+		String analysis_output_file = outputDirectory + "ITERS/it." + config.controler().getLastIteration() + "/link_dailyDemand.csv";
 		handler.printResults(analysis_output_file);
 	}
 			 

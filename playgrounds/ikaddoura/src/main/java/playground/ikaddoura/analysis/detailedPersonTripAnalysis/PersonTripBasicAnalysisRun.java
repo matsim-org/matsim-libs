@@ -61,8 +61,8 @@ import playground.ikaddoura.analysis.vtts.VTTSHandler;
  * - No guarantee that monetary payments are ascribed to the right trip (money events, i.e. tolls, may be charged after the person has started the next trip).
  * 
  */
-public class PersonTripBasicAnalysisMain {
-	private static final Logger log = Logger.getLogger(PersonTripBasicAnalysisMain.class);
+public class PersonTripBasicAnalysisRun {
+	private static final Logger log = Logger.getLogger(PersonTripBasicAnalysisRun.class);
 
 	private String runDirectory;
 			
@@ -83,11 +83,11 @@ public class PersonTripBasicAnalysisMain {
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
-		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(runDirectory);
+		PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(runDirectory);
 		analysis.run();
 	}
 	
-	public PersonTripBasicAnalysisMain(String runDirectory) {
+	public PersonTripBasicAnalysisRun(String runDirectory) {
 		
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 		

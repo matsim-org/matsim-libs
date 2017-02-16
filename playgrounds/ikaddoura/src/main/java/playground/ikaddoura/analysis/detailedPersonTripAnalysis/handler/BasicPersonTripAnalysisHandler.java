@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -43,7 +42,6 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -53,8 +51,8 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -62,7 +60,7 @@ import org.matsim.vehicles.Vehicle;
  * @author ikaddoura , lkroeger
  *
  */
-public class BasicPersonTripAnalysisHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler, ActivityEndEventHandler, ActivityStartEventHandler, 
+public class BasicPersonTripAnalysisHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler, ActivityEndEventHandler, 
 PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler ,
 PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	
@@ -90,8 +88,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private final Map<Id<Person>,Map<Integer,Boolean>> personId2tripNumber2stuckAbort = new HashMap<>();
 	
 	private final Map<Id<Person>, Double> personId2totalpayments = new HashMap<>();
-	
 	private double totalPayments = 0.;
+	
 	private int warnCnt0 = 0;
 	private int warnCnt1 = 0;
 	private int warnCnt2 = 0;
@@ -112,10 +110,12 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		personId2tripNumber2legMode.clear();
 		ptVehicleId2totalDistance.clear();
 		personId2totalpayments.clear();
+		this.totalPayments = 0.;
 		personId2distanceEnterValue.clear();
 		ptDrivers.clear();
 		taxiDrivers.clear();
 		taxiVehicleId2totalDistance.clear();
+		carVehicleId2totalDistance.clear();
 	}
 	
 	@Override
@@ -189,9 +189,18 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			}
 		}
 	}
+	
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		ptDrivers.add(event.getDriverId());
+	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		
+		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
+			this.taxiDrivers.add(event.getPersonId());
+		}
 		
 		if (ptDrivers.contains(event.getPersonId()) || taxiDrivers.contains(event.getPersonId())){
 			// activities by pt or taxi drivers are not considered
@@ -245,7 +254,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			// no normal person
 			
 		} else {
-			
 			if (personId2tripNumber2legMode.containsKey(event.getPersonId())) {
 				// at least the person's second trip
 				int tripNumber = personId2currentTripNumber.get(event.getPersonId());
@@ -273,7 +281,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				tripNumber2legMode.put(1, legMode);
 				personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
 			}
-		}
+		}		
 	}
 	
 	@Override
@@ -293,7 +301,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			
 			} else if (tripNumber2legMode.get(tripNumber).equals(TaxiModule.TAXI_MODE)) {
 				distanceTravelled = (taxiVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
-			
+
 			} else if (tripNumber2legMode.get(tripNumber).equals(TransportMode.car)) {
 				distanceTravelled = (carVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId()));
 				
@@ -313,11 +321,15 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				
 		if (ptDrivers.contains(event.getPersonId())) {
 			// pt driver enters vehicle
-			ptVehicleId2totalDistance.put(event.getVehicleId(), 0.);
+			if (!ptVehicleId2totalDistance.containsKey(event.getVehicleId())) {
+				ptVehicleId2totalDistance.put(event.getVehicleId(), 0.);
+			}
 
 		} else if (taxiDrivers.contains(event.getPersonId())) {
 			// taxi driver enters vehicle
-			taxiVehicleId2totalDistance.put(event.getVehicleId(), 0.);
+			if (!taxiVehicleId2totalDistance.containsKey(event.getVehicleId())) {
+				taxiVehicleId2totalDistance.put(event.getVehicleId(), 0.);
+			}
 			
 		} else {
 			// normal person enters vehicle
@@ -330,14 +342,15 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			
 			} else if ((tripNumber2legMode.get(tripNumber)).equals(TaxiModule.TAXI_MODE)){
 				personId2distanceEnterValue.put(event.getPersonId(), taxiVehicleId2totalDistance.get(event.getVehicleId()));
-			
+
 			} else if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
 				carVehicleId2totalDistance.put(event.getVehicleId(), 0.);
 				personId2distanceEnterValue.put(event.getPersonId(), carVehicleId2totalDistance.get(event.getVehicleId()));
 			} else {
 				// other modes are not considered
 			}
-		}
+			
+		}		
 	}
 
 	@Override
@@ -489,17 +502,5 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	public Scenario getScenario() {
 		return scenario;
 	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		if (event.getActType().equals(TaxiActionCreator.STAY_ACTIVITY_TYPE)) {
-			this.taxiDrivers.add(event.getPersonId());
-		}
-	}
 	
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		ptDrivers.add(event.getDriverId());
-	}
-
 }

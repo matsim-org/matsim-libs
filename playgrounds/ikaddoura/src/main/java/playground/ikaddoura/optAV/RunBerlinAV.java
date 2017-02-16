@@ -38,9 +38,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
+import playground.ikaddoura.analysis.dynamicLinkDemand.DynamicLinkDemandAnalysisRun;
+import playground.ikaddoura.analysis.linkDemand.LinkDemandAnalysisRun;
 
 /**
 * @author ikaddoura
@@ -89,6 +92,7 @@ public class RunBerlinAV {
 		// run
 		// #############################
 
+        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
 		// #############################
@@ -111,7 +115,7 @@ public class RunBerlinAV {
 		
 		if (noiseParameters.isComputeNoiseDamages()) {
 			final String[] labels = { "damages_receiverPoint" };
-			final String[] workingDirectories = { outputFilePath + "/damages_receiverPoint/" };
+			final String[] workingDirectories = { outputFilePath + "damages_receiverPoint/" };
 
 			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
 			merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
@@ -122,9 +126,15 @@ public class RunBerlinAV {
 			merger.run();
 		}
 		
-		PersonTripNoiseAnalysisMain analysis = new PersonTripNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory(), outputFilePath + controler.getConfig().controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		analysis.run();
+		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory(), outputFilePath + controler.getConfig().controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		analysis1.run();
 		
+		DynamicLinkDemandAnalysisRun analysis2 = new DynamicLinkDemandAnalysisRun(controler.getConfig().controler().getOutputDirectory());
+		analysis2.run();
+		
+		LinkDemandAnalysisRun analysis3 = new LinkDemandAnalysisRun(controler.getConfig().controler().getOutputDirectory());
+		analysis3.run();
+	
 	}
 }
 

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.events.NoiseEventsReader;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -56,8 +57,8 @@ import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAna
  * 
  * 
  */
-public class PersonTripNoiseAnalysisMain {
-	private static final Logger log = Logger.getLogger(PersonTripNoiseAnalysisMain.class);
+public class PersonTripNoiseAnalysisRun {
+	private static final Logger log = Logger.getLogger(PersonTripNoiseAnalysisRun.class);
 
 	private final String runDirectory;
 	private final String noiseEventFile;
@@ -80,11 +81,11 @@ public class PersonTripNoiseAnalysisMain {
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
-		PersonTripNoiseAnalysisMain analysis = new PersonTripNoiseAnalysisMain(runDirectory);
+		PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(runDirectory);
 		analysis.run();
 	}
 	
-	public PersonTripNoiseAnalysisMain(String runDirectory) {
+	public PersonTripNoiseAnalysisRun(String runDirectory) {
 		
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 		
@@ -92,7 +93,7 @@ public class PersonTripNoiseAnalysisMain {
 		this.noiseEventFile = null;
 	}
 	
-	public PersonTripNoiseAnalysisMain(String runDirectory, String noiseEventsFile) {
+	public PersonTripNoiseAnalysisRun(String runDirectory, String noiseEventsFile) {
 		
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 		
@@ -177,15 +178,18 @@ public class PersonTripNoiseAnalysisMain {
 		PersonTripNoiseAnalysis analysis = new PersonTripNoiseAnalysis();
 		
 		log.info("Print trip information...");
+		analysis.printTripInformation(outputPath, TaxiModule.TAXI_MODE, basicHandler, noiseHandler);
 		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler);
 		analysis.printTripInformation(outputPath, null, basicHandler, noiseHandler);
 		log.info("Print trip information... Done.");
 
 		log.info("Print person information...");
+		analysis.printPersonInformation(outputPath, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);	
 		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);	
 		analysis.printPersonInformation(outputPath, null, personId2userBenefit, basicHandler, noiseHandler);	
 		log.info("Print person information... Done.");
-		
+
+		analysis.printAggregatedResults(outputPath, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);
 		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
 		analysis.printAggregatedResults(outputPath, null, personId2userBenefit, basicHandler, noiseHandler);
 	}

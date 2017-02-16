@@ -38,9 +38,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
+import playground.ikaddoura.analysis.dynamicLinkDemand.DynamicLinkDemandAnalysisRun;
+import playground.ikaddoura.analysis.linkDemand.LinkDemandAnalysisRun;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
@@ -55,7 +58,7 @@ import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 
 public class RunBerlinOptAV {
 
-	private final static String configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_optAV.xml";
+	private final static String configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_optAV_test.xml";
 			
 	public static void main(String[] args) {
 		run();
@@ -136,6 +139,7 @@ public class RunBerlinOptAV {
 		// run
 		// #############################
 		
+        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
 		// #############################
@@ -161,8 +165,14 @@ public class RunBerlinOptAV {
 		merger.setLabel(labels);
 		merger.run();
 		
-		PersonTripNoiseAnalysisMain analysis = new PersonTripNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
-		analysis.run();
+		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
+		analysis1.run();
+		
+		DynamicLinkDemandAnalysisRun analysis2 = new DynamicLinkDemandAnalysisRun(controler.getConfig().controler().getOutputDirectory());
+		analysis2.run();
+		
+		LinkDemandAnalysisRun analysis3 = new LinkDemandAnalysisRun(controler.getConfig().controler().getOutputDirectory());
+		analysis3.run();
 	}
 }
 

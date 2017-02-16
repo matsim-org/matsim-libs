@@ -65,8 +65,8 @@ import playground.vsp.congestion.events.CongestionEventsReader;
  * - No guarantee that monetary payments are ascribed to the right trip (money events, i.e. tolls, may be charged after the person has started the next trip).
  * 
  */
-public class PersonTripCongestionNoiseAnalysisMain {
-	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysisMain.class);
+public class PersonTripCongestionNoiseAnalysisRun {
+	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysisRun.class);
 
 	private String runDirectory;
 	private boolean analyzeCongestionEvents;
@@ -90,11 +90,11 @@ public class PersonTripCongestionNoiseAnalysisMain {
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(runDirectory);
+		PersonTripCongestionNoiseAnalysisRun analysis = new PersonTripCongestionNoiseAnalysisRun(runDirectory);
 		analysis.run();
 	}
 	
-	public PersonTripCongestionNoiseAnalysisMain(String runDirectory) {
+	public PersonTripCongestionNoiseAnalysisRun(String runDirectory) {
 		
 		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 		
