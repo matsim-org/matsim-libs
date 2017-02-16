@@ -19,27 +19,34 @@
 
 package playground.ikaddoura.optAV;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -52,7 +59,7 @@ import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
-import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
+import playground.ikaddoura.moneyTravelDisutility.*;
 
 /**
 * @author ikaddoura
@@ -125,14 +132,30 @@ public class RunBerlinOptAV {
 				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
 			}
 		});
-		controler.addOverridingModule(new TaxiModule(fleet));
+		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
-		controler.addOverridingModule(new DynQSimModule<>(OptAVQSimProvider.class));
-		
+        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
+				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+			}
+		}, TaxiOptimizer.class));
+
+		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,
+						controler.getConfig().planCalcScore()));
+
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 												
+				// travel disutility factory for DVRP
+				addTravelDisutilityFactoryBinding(VrpTravelTimeModules.DVRP_ESTIMATED)
+						.toInstance(dvrpTravelDisutilityFactory);
+				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);

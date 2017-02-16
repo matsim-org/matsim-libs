@@ -20,10 +20,15 @@
 package playground.michalm.audiAV.electric;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.benchmark.*;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
+import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -33,7 +38,9 @@ import playground.michalm.ev.data.*;
 import playground.michalm.ev.data.file.ChargerReader;
 import playground.michalm.taxi.data.file.EvrpVehicleReader;
 import playground.michalm.taxi.ev.*;
-import playground.michalm.taxi.run.*;
+import playground.michalm.taxi.optimizer.ETaxiOptimizerProvider;
+import playground.michalm.taxi.run.ETaxiBenchmarkStats;
+import playground.michalm.taxi.vrpagent.ETaxiActionCreator;
 
 
 /**
@@ -61,22 +68,35 @@ public class RunEAVBenchmark
     {
         //TODO temp
         config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
+        
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         EvConfigGroup evCfg = EvConfigGroup.get(config);
+        config.controler().setLastIteration(runs - 1);
         config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
+        
         final FleetImpl fleet = new FleetImpl();
-        new EvrpVehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
+        new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
         EvData evData = new EvDataImpl();
-        new ChargerReader(scenario.getNetwork(), evData).readFile(evCfg.getChargerFile());
+        new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
         EAVUtils.initEvData(fleet, evData);
 
-        Controler controler = RunTaxiBenchmark.createControler(scenario, fleet, runs);
+        Controler controler = new Controler(scenario);
+        controler.setModules(new TaxiBenchmarkControlerModule());
+        controler.addOverridingModule(new TaxiModule());
         controler.addOverridingModule(new EvModule(evData));
-        controler.addOverridingModule(new DynQSimModule<>(ETaxiQSimProvider.class));
+
+        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(TaxiOptimizer.class).toProvider(ETaxiOptimizerProvider.class).asEagerSingleton();
+				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+				bind(DynActionCreator.class).to(ETaxiActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+			}
+		}, TaxiOptimizer.class));
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -85,8 +105,7 @@ public class RunEAVBenchmark
                 addMobsimListenerBinding()
                         .toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
                 addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
-                //override the binding in RunTaxiBenchmark
-                bind(TaxiBenchmarkStats.class).to(ETaxiBenchmarkStats.class).asEagerSingleton();
+                addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
             }
         });
 

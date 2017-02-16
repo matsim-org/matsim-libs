@@ -23,8 +23,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.network.FixedIntervalTimeVariantLinkFactory;
@@ -55,24 +61,27 @@ public class RunTaxiBenchmark
     public static Controler createControler(Config config, int runs)
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+        config.controler().setLastIteration(runs - 1);
         config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
+
         final FleetImpl fleet = new FleetImpl();
         new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
-        return createControler(scenario, fleet, runs);
-    }
-
-
-    public static Controler createControler(Scenario scenario, Fleet fleet, int runs)
-    {
-        scenario.getConfig().controler().setLastIteration(runs - 1);
 
         Controler controler = new Controler(scenario);
         controler.setModules(new TaxiBenchmarkControlerModule());
-        controler.addOverridingModule(new TaxiModule(fleet));
-        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+        controler.addOverridingModule(new TaxiModule());
+        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
+				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+			}
+		}, TaxiOptimizer.class));
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -90,7 +99,7 @@ public class RunTaxiBenchmark
     {
         Scenario scenario = new ScenarioBuilder(config).build();
 
-        if (config.network().isTimeVariantNetwork()) {
+        if (config.network().isTimeVariantNetwork()) {// TODO use guice to choose between TimeVariantLinkFactories?
             ((Network)scenario.getNetwork()).getFactory()
                     .setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
         }

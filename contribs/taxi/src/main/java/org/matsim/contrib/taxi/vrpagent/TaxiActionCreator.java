@@ -19,59 +19,67 @@
 
 package org.matsim.contrib.taxi.vrpagent;
 
+import org.matsim.contrib.dvrp.optimizer.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.core.mobsim.qsim.QSim;
 
+import com.google.inject.Inject;
 
-public class TaxiActionCreator
-    implements VrpAgentLogic.DynActionCreator
-{
-    public static final String PICKUP_ACTIVITY_TYPE = "TaxiPickup";
-    public static final String DROPOFF_ACTIVITY_TYPE = "TaxiDropoff";
-    public static final String STAY_ACTIVITY_TYPE = "TaxiStay";
+public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
+	public static final String PICKUP_ACTIVITY_TYPE = "TaxiPickup";
+	public static final String DROPOFF_ACTIVITY_TYPE = "TaxiDropoff";
+	public static final String STAY_ACTIVITY_TYPE = "TaxiStay";
 
-    private final PassengerEngine passengerEngine;
-    private final VrpLegs.LegCreator legCreator;
-    private final double pickupDuration;
+	private final PassengerEngine passengerEngine;
+	private final VrpLegs.LegCreator legCreator;
+	private final double pickupDuration;
 
+	@Inject
+	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer, QSim qSim) {
+		this(passengerEngine,
+				taxiCfg.isOnlineVehicleTracker() ? //
+						VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking) optimizer,
+								qSim.getSimTimer())
+						: //
+						VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer()), //
+				taxiCfg.getPickupDuration());
+	}
 
-    public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator,
-            double pickupDuration)
-    {
-        this.passengerEngine = passengerEngine;
-        this.legCreator = legCreator;
-        this.pickupDuration = pickupDuration;
-    }
+	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator, double pickupDuration) {
+		this.passengerEngine = passengerEngine;
+		this.legCreator = legCreator;
+		this.pickupDuration = pickupDuration;
+	}
 
+	@Override
+	public DynAction createAction(DynAgent dynAgent, final Task task, double now) {
+		TaxiTask tt = (TaxiTask) task;
 
-    @Override
-    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
-    {
-        TaxiTask tt = (TaxiTask)task;
+		switch (tt.getTaxiTaskType()) {
+			case EMPTY_DRIVE:
+			case OCCUPIED_DRIVE:
+				return legCreator.createLeg((DriveTask) task);
 
-        switch (tt.getTaxiTaskType()) {
-            case EMPTY_DRIVE:
-            case OCCUPIED_DRIVE:
-                return legCreator.createLeg((DriveTask)task);
+			case PICKUP:
+				final TaxiPickupTask pst = (TaxiPickupTask) task;
+				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
+						pickupDuration, PICKUP_ACTIVITY_TYPE);
 
-            case PICKUP:
-                final TaxiPickupTask pst = (TaxiPickupTask)task;
-                return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
-                        pickupDuration, PICKUP_ACTIVITY_TYPE);
+			case DROPOFF:
+				final TaxiDropoffTask dst = (TaxiDropoffTask) task;
+				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(),
+						DROPOFF_ACTIVITY_TYPE);
 
-            case DROPOFF:
-                final TaxiDropoffTask dst = (TaxiDropoffTask)task;
-                return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(),
-                        DROPOFF_ACTIVITY_TYPE);
+			case STAY:
+				return new VrpActivity(STAY_ACTIVITY_TYPE, (TaxiStayTask) task);
 
-            case STAY:
-                return new VrpActivity(STAY_ACTIVITY_TYPE, (TaxiStayTask)task);
-
-            default:
-                throw new IllegalStateException();
-        }
-    }
+			default:
+				throw new IllegalStateException();
+		}
+	}
 }

@@ -20,18 +20,26 @@
 package playground.jbischoff.taxi.inclusion;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import playground.jbischoff.taxi.setup.JbTaxiModule;
+import com.google.inject.AbstractModule;
+
+import playground.jbischoff.taxi.setup.*;
 
 
 public class RunInclusionTaxiScenario
@@ -66,20 +74,23 @@ public class RunInclusionTaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        FleetImpl taxiData = new FleetImpl();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
-        return createControler(scenario, taxiData, otfvis);
-    }
+        FleetImpl fleet = new FleetImpl();
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 
-
-    public static Controler createControler(Scenario scenario, Fleet taxiData, boolean otfvis)
-    {
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new JbTaxiModule(taxiData));
+        controler.addOverridingModule(new JbTaxiModule(fleet));
         double expAveragingAlpha = 0.05;//from the AV flow paper 
         controler.addOverridingModule(
                 VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(TaxiOptimizer.class).toProvider(JbTaxiOptimizerProvider.class).asEagerSingleton();
+				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+			}
+		}, TaxiOptimizer.class));
 
         if (otfvis) {
             controler.addOverridingModule(new OTFVisLiveModule());

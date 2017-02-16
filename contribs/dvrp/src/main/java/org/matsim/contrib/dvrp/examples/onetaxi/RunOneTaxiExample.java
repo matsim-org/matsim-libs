@@ -57,7 +57,7 @@ public class RunOneTaxiExample
         new VehicleReader(scenario.getNetwork(), fleet).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new BasicVrpQSimModule(MODE, fleet, OneTaxiOptimizer.class,
+        controler.addOverridingModule(new BasicDvrpModule(MODE, fleet, OneTaxiOptimizer.class,
                 OneTaxiRequestCreator.class, OneTaxiActionCreator.class));
 
         if (otfvis) {

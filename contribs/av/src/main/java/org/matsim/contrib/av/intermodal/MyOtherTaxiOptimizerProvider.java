@@ -10,19 +10,21 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.*;
+
+import com.google.inject.Provider;
 
 /**
  * @author nagel
  *
  */
-final class MyOtherTaxiOptimizerFactory implements TaxiOptimizerFactory {
+final class MyOtherTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
+	private TaxiOptimizerContext optimContext;
+	
 	@Override
-	public TaxiOptimizer createTaxiOptimizer(final TaxiOptimizerContext optimContext, final ConfigGroup optimizerConfigGroup) {
-		
+	public TaxiOptimizer get() {
 		// what do we have in optimContext?
 		// these are matsim core:
 		Network network = optimContext.network ;

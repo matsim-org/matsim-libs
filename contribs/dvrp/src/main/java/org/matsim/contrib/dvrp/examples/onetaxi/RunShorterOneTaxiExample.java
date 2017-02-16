@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.BasicVrpQSimModule;
+import org.matsim.contrib.dvrp.run.BasicDvrpModule;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,7 +43,7 @@ public class RunShorterOneTaxiExample
         new VehicleReader(scenario.getNetwork(), fleet).readFile(VEHICLES_FILE);
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new BasicVrpQSimModule(//
+        controler.addOverridingModule(new BasicDvrpModule(//
                 "taxi", // departures of the "taxi" mode will be handled
                 fleet, // taxi fleet that will serve requests
                 OneTaxiOptimizer.class, // optimizer that dispatches taxis

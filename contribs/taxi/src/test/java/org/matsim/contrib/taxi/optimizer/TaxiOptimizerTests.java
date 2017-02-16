@@ -22,11 +22,11 @@ package org.matsim.contrib.taxi.optimizer;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.matsim.contrib.taxi.benchmark.RunTaxiMiniBenchmark;
-import org.matsim.contrib.taxi.benchmark.RunTaxiMiniBenchmark.MiniBenchmark;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerType;
+import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
+import org.matsim.core.controler.Controler;
 
 
 public class TaxiOptimizerTests
@@ -93,18 +93,18 @@ public class TaxiOptimizerTests
     {
         Map<String, String> params = new HashMap<>();
         params.put(AbstractTaxiOptimizerParams.ID, type.name());
-        params.put(DefaultTaxiOptimizerFactory.TYPE, type.name());
+        params.put(DefaultTaxiOptimizerProvider.TYPE, type.name());
         return params;
     }
 
 
-    public static class BenchmarkWithConfig
+    public static class PreloadedBenchmark
     {
         private final Config config;
-        private final MiniBenchmark miniBenchmark;
+        private final Controler controler;
 
 
-        public BenchmarkWithConfig(String plansSuffix, String taxisSuffix)
+        public PreloadedBenchmark(String plansSuffix, String taxisSuffix)
         {
             String dir = "./src/main/resources/mielec_2014_02/";
             String configFile = dir + "mielec_taxi_benchmark_config.xml";
@@ -114,15 +114,15 @@ public class TaxiOptimizerTests
 
             config.plans().setInputFile(
                     "plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
-            taxiCfg.setTaxisFile(dir + "taxis_mini_benchmark-" + taxisSuffix + ".xml");
+            taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
 
-            miniBenchmark = RunTaxiMiniBenchmark.createMiniBenchmark(config);
+            controler = RunTaxiBenchmark.createControler(config, 1);
         }
     }
 
 
     public static void runBenchmark(List<TaxiConfigVariant> variants, Map<String, String> params,
-            BenchmarkWithConfig benchmark)
+            PreloadedBenchmark benchmark)
     {
         TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
 
@@ -134,7 +134,7 @@ public class TaxiOptimizerTests
 
         for (TaxiConfigVariant v : variants) {
             v.updateTaxiConfig(taxiCfg);
-            benchmark.miniBenchmark.run(new DefaultTaxiOptimizerFactory());
+            benchmark.controler.run();
         }
     }
 }

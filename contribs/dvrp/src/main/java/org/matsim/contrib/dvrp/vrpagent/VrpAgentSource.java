@@ -32,33 +32,39 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.*;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 
 public class VrpAgentSource
     implements AgentSource
 {
+	public static final String DVRP_VEHICLE_TYPE = "dvrp_vehicle_type";
+	
+	
     private final DynActionCreator nextActionCreator;
     private final Fleet fleet;
     private final VrpOptimizer optimizer;
     private final QSim qSim;
-    private final VehicleType vehicleType;
+    
+    @Inject(optional=true)
+    private @Named(DVRP_VEHICLE_TYPE) VehicleType vehicleType;
 
 
     @Inject
     public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer,
             QSim qSim)
     {
-        this(nextActionCreator, fleet, optimizer, qSim, VehicleUtils.getDefaultVehicleType());
+        this.nextActionCreator = nextActionCreator;
+        this.fleet = fleet;
+        this.optimizer = optimizer;
+        this.qSim = qSim;
     }
 
 
     public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer,
             QSim qSim, VehicleType vehicleType)
     {
-        this.nextActionCreator = nextActionCreator;
-        this.fleet = fleet;
-        this.optimizer = optimizer;
-        this.qSim = qSim;
+        this(nextActionCreator, fleet, optimizer, qSim);
         this.vehicleType = vehicleType;
     }
 
@@ -67,6 +73,10 @@ public class VrpAgentSource
     public void insertAgentsIntoMobsim()
     {
         VehiclesFactory vehicleFactory = VehicleUtils.getFactory();
+        if (vehicleType == null) {
+        	vehicleType = VehicleUtils.getDefaultVehicleType();
+        }
+        
         for (Vehicle vrpVeh : fleet.getVehicles().values()) {
             Id<Vehicle> id = vrpVeh.getId();
             Id<Link> startLinkId = vrpVeh.getStartLink().getId();

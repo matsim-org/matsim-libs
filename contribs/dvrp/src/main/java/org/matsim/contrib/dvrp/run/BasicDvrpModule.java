@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import com.google.inject.*;
 
 
-public class BasicVrpQSimModule
+public class BasicDvrpModule
     extends AbstractModule
 {
     private final String mode;
@@ -45,7 +45,7 @@ public class BasicVrpQSimModule
     private final Class<? extends DynActionCreator> dynActionCreatorClass;
 
 
-    public BasicVrpQSimModule(String mode, Fleet fleet,
+    public BasicDvrpModule(String mode, Fleet fleet,
             Class<? extends VrpOptimizer> vrpOptimizerClass,
             Class<? extends PassengerRequestCreator> passengerRequestCreatorClass,
             Class<? extends DynActionCreator> dynActionCreatorClass)

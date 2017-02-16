@@ -19,6 +19,8 @@
 
 package playground.michalm.ev;
 
+import java.net.URL;
+
 import org.matsim.core.config.*;
 
 
@@ -87,14 +89,14 @@ public class EvConfigGroup
 
 
     @StringGetter(CHARGERS_FILE)
-    public String getChargerFile()
+    public String getChargersFile()
     {
         return chargersFile;
     }
 
 
     @StringSetter(CHARGERS_FILE)
-    public void setChargerFile(String chargersFile)
+    public void setChargersFile(String chargersFile)
     {
         this.chargersFile = chargersFile;
     }
@@ -111,5 +113,11 @@ public class EvConfigGroup
     public void setTimeProfiles(boolean timeProfiles)
     {
         this.timeProfiles = timeProfiles;
+    }
+    
+    
+    public URL getChargersFileUrl(URL context)
+    {
+        return ConfigGroup.getInputFileURL(context, this.chargersFile);
     }
 }

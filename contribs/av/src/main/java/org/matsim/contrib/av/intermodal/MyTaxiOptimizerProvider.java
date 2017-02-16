@@ -5,18 +5,19 @@ package org.matsim.contrib.av.intermodal;
 
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+
+import com.google.inject.Provider;
 
 /**
  * @author nagel
  *
  */
-final class MyTaxiOptimizerFactory implements TaxiOptimizerFactory {
+final class MyTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
-	public TaxiOptimizer createTaxiOptimizer(final TaxiOptimizerContext optimContext, final ConfigGroup optimizerConfigGroup) {
+	public TaxiOptimizer get() {
 		TaxiOptimizer optimizer = new TaxiOptimizer(){
 			@Override public void nextLinkEntered(DriveTask driveTask) {
 				// I guess this is how taxis notify of their progress to the dispatch?  kai, jan'17
@@ -37,7 +38,7 @@ final class MyTaxiOptimizerFactory implements TaxiOptimizerFactory {
 				// TODO Auto-generated method stub
 			}
 		} ;
-		return optimizer ;
+		return optimizer;
 	}
 
 }

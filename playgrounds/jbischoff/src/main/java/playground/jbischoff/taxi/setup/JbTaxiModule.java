@@ -21,7 +21,6 @@ package playground.jbischoff.taxi.setup;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerFactory;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.core.controler.AbstractModule;
@@ -58,7 +57,6 @@ public class JbTaxiModule
         addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
         bind(Fleet.class).toInstance(taxiData);
         bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
-        bind(TaxiOptimizerFactory.class).to(JbDefaultTaxiOptimizerFactory.class);
 
         //addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
         //addControlerListenerBinding().to(TaxiStatsDumper.class);

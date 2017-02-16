@@ -24,7 +24,7 @@ import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 import java.util.*;
 
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerType;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
@@ -36,7 +36,7 @@ public class TaxiOptimizerTestIT
     @Test
     public void testRuleBased()
     {
-        BenchmarkWithConfig benchmark = new BenchmarkWithConfig("3.0", "25");
+        PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 
         List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(false);
         Map<String, String> params = createAbstractOptimParams(OptimizerType.RULE_BASED);
@@ -52,7 +52,7 @@ public class TaxiOptimizerTestIT
     @Test
     public void testAssignment()
     {
-        BenchmarkWithConfig benchmark = new BenchmarkWithConfig("3.0", "25");
+        PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 
         List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
         Map<String, String> params = createAbstractOptimParams(OptimizerType.ASSIGNMENT);

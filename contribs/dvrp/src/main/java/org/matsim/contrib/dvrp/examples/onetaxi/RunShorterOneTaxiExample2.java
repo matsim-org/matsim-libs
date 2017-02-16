@@ -24,7 +24,7 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.VrpQSimModule;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
@@ -48,7 +48,7 @@ public class RunShorterOneTaxiExample2
         new VehicleReader(scenario.getNetwork(), fleet).readFile(VEHICLES_FILE);
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new VrpQSimModule("taxi", fleet, new AbstractModule() {
+        controler.addOverridingModule(new DvrpModule("taxi", fleet, new AbstractModule() {
             @Override
             protected void configure()
             {

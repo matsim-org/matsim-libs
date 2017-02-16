@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import com.google.inject.*;
 
 
-public class VrpQSimModule
+public class DvrpModule
     extends AbstractModule
 {
     private final String mode;
@@ -43,14 +43,14 @@ public class VrpQSimModule
 
 
     @SafeVarargs
-    public VrpQSimModule(String mode, Module module, Class<? extends MobsimListener>... listeners)
+    public DvrpModule(String mode, Module module, Class<? extends MobsimListener>... listeners)
     {
         this(mode, null, module, listeners);
     }
 
 
     @SafeVarargs
-    public VrpQSimModule(String mode, Fleet fleet, Module module,
+    public DvrpModule(String mode, Fleet fleet, Module module,
             Class<? extends MobsimListener>... listeners)
     {
         this.mode = mode;

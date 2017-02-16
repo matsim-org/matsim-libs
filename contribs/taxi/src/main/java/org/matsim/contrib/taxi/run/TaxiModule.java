@@ -19,9 +19,7 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.*;
@@ -36,19 +34,17 @@ public class TaxiModule
 {
     public static final String TAXI_MODE = "taxi";
 
-    private final Fleet fleet;
     private final VehicleType vehicleType;
 
 
-    public TaxiModule(Fleet fleet)
+    public TaxiModule()
     {
-        this(fleet, VehicleUtils.getDefaultVehicleType());
+        this(VehicleUtils.getDefaultVehicleType());
     }
 
 
-    public TaxiModule(Fleet fleet, VehicleType vehicleType)
+    public TaxiModule(VehicleType vehicleType)
     {
-        this.fleet = fleet;
         this.vehicleType = vehicleType;
     }
 
@@ -56,12 +52,8 @@ public class TaxiModule
     @Override
     public void install()
     {
-        addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
-        bind(Fleet.class).toInstance(fleet);
-        bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
+        bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE)).toInstance(vehicleType);
         bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
-
-        bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
 
         addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
         addControlerListenerBinding().to(TaxiStatsDumper.class);
