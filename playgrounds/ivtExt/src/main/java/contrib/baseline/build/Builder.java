@@ -310,7 +310,6 @@ public class Builder {
 		"defaultIVTConfig.xml",
 		"facilities.xml.gz",
 		"household_attributes.xml.gz",
-		"facilitiesLinks.f2l",
 		"households.xml.gz",
 		"mmNetwork.xml.gz",
 		"mmSchedule.xml.gz",
