@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.clruch.router.FuturePathContainer;
 
-abstract class VehicleDiversionDirective extends AbstractDirective {
+abstract class VehicleDiversionDirective extends FuturePathDirective {
     final VehicleLinkPair vehicleLinkPair;
     final Link destination;
 

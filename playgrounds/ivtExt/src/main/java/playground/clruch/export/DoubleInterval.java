@@ -13,7 +13,8 @@ class DoubleInterval {
      * @param value double value to be checked
      * @return boolean value
      */
-    public boolean isInside(double value) {
+    @Deprecated
+    boolean isInside(double value) {
         return start <= value && value < end;
     }
 

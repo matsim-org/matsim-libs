@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.network.Link;
  * Created by Claudio on 2/8/2017.
  */
 public class VirtualNode {
-    // only used for debugging
+    /** id is only used for debugging */
     private final String id;
     private final Set<Link> links;
 

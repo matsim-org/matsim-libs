@@ -11,6 +11,7 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.ScheduleUtils;
 import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
@@ -22,11 +23,10 @@ class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
     }
 
     @Override
-    void execute() {
+    void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
         AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
         final AVDriveTask avDriveTask = (AVDriveTask) abstractTask;
-        VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
         {
             TaskTracker taskTracker = avDriveTask.getTaskTracker();
             OnlineDriveTaskTrackerImpl onlineDriveTaskTrackerImpl = (OnlineDriveTaskTrackerImpl) taskTracker;
@@ -48,10 +48,8 @@ class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
             scheduleEndTime = avStayTask.getEndTime();
         }
         schedule.removeLastTask(); // remove stay task
-        // TODO regarding min max of begin and end time!!! when NOT to append stayTask?
-        // TODO redundant
-        if (avDriveTask.getEndTime() < scheduleEndTime)
-            schedule.addTask(new AVStayTask(avDriveTask.getEndTime(), scheduleEndTime, destination));
+        
+        ScheduleUtils.makeWhole(vehicleLinkPair.avVehicle, avDriveTask.getEndTime(), scheduleEndTime, destination);
     }
 
 }
