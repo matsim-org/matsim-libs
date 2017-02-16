@@ -56,7 +56,9 @@ public interface Task
 
 	// exclusive
 	/**
-	 * Returns the end time of the task.  Design comments:<ul>
+	 * Returns the end time of the task.  
+	 * <br/><br/>
+	 * Design comment(s):<ul>
 	 * <li> I cannot say what the difference to getTaskTracker().predictEndTime() is.  Possibly, 
 	 * getEndTime() is the time when the task actually ends, either because it is a stay task, or because the end time is
 	 * only set when it ends.   kai, feb'17
@@ -75,6 +77,10 @@ public interface Task
 	/**
 	 * Index of the task in the schedule.  Managed by ScheduleImpl
 	 * through a package-protected variable.
+	 * <br/><br/>
+	 * Design comment(s):<ul>
+	 * <li> Should we really have this in the interface?  {@link java.util.List} has an <code>indexOf(...)</code> method that is able to pull out indices (given that the same task object is never entered twice).  kai, feb'17
+	 * </ul>
 	 */
 	int getTaskIdx();
 
@@ -86,7 +92,9 @@ public interface Task
 
 
 	/**
-	 * A TaskTracker predicts the task end time.  Design notes:<ul>
+	 * A TaskTracker predicts the task end time.  
+	 * <br/><br/>
+	 * Design notes:<ul>
 	 * <li> I cannot say what the difference to getEndTime is.  kai, feb'17
 	 * </ul>
 	 */

@@ -84,6 +84,7 @@ public class OneTaxiOptimizer
                 lastTask.setEndTime(currentTime);// shorten wait task
                 break;
 
+            case PERFORMED:
             default:
                 throw new IllegalStateException();
         }
@@ -119,10 +120,10 @@ public class OneTaxiOptimizer
 
 
     @Override
-    public void nextTask(Vehicle vehicle)
+    public void nextTask(Vehicle vehicle1)
     {
         updateTimings();
-        vehicle.getSchedule().nextTask();
+        vehicle1.getSchedule().nextTask();
     }
 
 

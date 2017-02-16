@@ -49,12 +49,14 @@ extends Identifiable<Vehicle>
 	 * Earliest time when vehicle is available (inclusive)
 	 */
 	double getT0();
+	// "getServiceStartTime()"?
 
 
 	/**
 	 * Earliest time when vehicle is <i>no longer</i> available
 	 */
 	double getT1();
+	// "getServiceEndTime()"?
 
 
 	/**
