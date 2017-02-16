@@ -16,6 +16,7 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 
 public class EndTimeDiluter {
     static public void main(String[] args) {
@@ -51,7 +52,10 @@ public class EndTimeDiluter {
                 for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
                     if (pe instanceof Activity) {
                         Activity activity = (Activity) pe;
-                        activity.setEndTime(diluteEndTime(activity.getEndTime()));
+
+                        if (activity.getEndTime() != Time.UNDEFINED_TIME) {
+                            activity.setEndTime(diluteEndTime(activity.getEndTime()));
+                        }
                     }
                 }
 
@@ -64,7 +68,7 @@ public class EndTimeDiluter {
                         Activity activity = (Activity) pe;
 
                         if (previous != null) {
-                            if (previous.getEndTime() > activity.getEndTime()) {
+                            if (activity.getEndTime() != Time.UNDEFINED_TIME && previous.getEndTime() > activity.getEndTime()) {
                                 previous.setEndTime(activity.getEndTime());
                             }
                         }
