@@ -251,26 +251,23 @@ public class SnaUtils {
 			final DistanceCallback callback  ) {
 
 		log.info( "searching for the biggest connected component..." );
-		List<Id<Person>> biggestComponent = null;
+		PairRandomizer biggestComponent = null;
 		for ( Set<Id<Person>> component : SnaUtils.identifyConnectedComponents( socialNetwork ) ) {
-			if ( biggestComponent == null || biggestComponent.size() < component.size() ) {
-				biggestComponent = new ArrayList<>( component );
+			if ( biggestComponent == null || biggestComponent.ids.size() < component.size() ) {
+				biggestComponent = new PairRandomizer( random , component );
 			}
 		}
 
-		log.info( "considering only biggest component with size "+ biggestComponent.size() );
-		log.info( "ignoring "+( socialNetwork.getEgos().size() - biggestComponent.size() )+" agents ("+
-				( ( socialNetwork.getEgos().size() - biggestComponent.size() ) * 100d / socialNetwork.getEgos().size() )+"%)" );
+		log.info( "considering only biggest component with size "+ biggestComponent.ids.size() );
+		log.info( "ignoring "+( socialNetwork.getEgos().size() - biggestComponent.ids.size() )+" agents ("+
+				( ( socialNetwork.getEgos().size() - biggestComponent.ids.size() ) * 100d / socialNetwork.getEgos().size() )+"%)" );
 
 
 		final Counter counter = new Counter( "sampling pair # " );
 		for ( int i = 0; i < nPairs; i++ ) {
 			counter.incCounter();
-			final Id<Person> ego = biggestComponent.get( random.nextInt( biggestComponent.size() ) );
-			Id<Person> alter;
-			do {
-				alter = biggestComponent.get( random.nextInt( biggestComponent.size() ) );
-			} while ( alter == ego );
+			final Id<Person> ego = biggestComponent.next();
+			final Id<Person> alter = biggestComponent.next();
 
 			callback.notifyDistance(
 					ego, alter ,
@@ -351,6 +348,31 @@ public class SnaUtils {
 	@FunctionalInterface
 	public interface DistanceCallback {
 		void notifyDistance( final Id<Person> ego , final Id<Person> alter , final double distance );
+	}
+
+	private static class PairRandomizer {
+		private final List<Id<Person>> ids;
+		private int index = 0;
+		private int step = 1;
+
+		private PairRandomizer(
+				final Random random,
+				final Collection<Id<Person>> ids ) {
+			this.ids = new ArrayList<>( ids );
+			Collections.shuffle( this.ids , random );
+		}
+
+		public Id<Person> next() {
+			final Id<Person> id = ids.get( index );
+
+			index += step;
+			if ( index >= ids.size() ) {
+				index = 0;
+				step++;
+			}
+
+			return id;
+		}
 	}
 }
 
