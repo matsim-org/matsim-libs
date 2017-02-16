@@ -372,7 +372,17 @@ public class Builder {
 		List<String> command = new LinkedList<>();
 		command.add(scenarioDirectory.getAbsolutePath());
 		command.add(resourcesDirectory.getAbsolutePath());
-		command.add("1");
+
+		switch (config.getScaling()) {
+			case SCALING_1:
+				command.add("1"); break;
+			case SCALING_10:
+				command.add("10"); break;
+			case SCALING_100:
+				command.add("100"); break;
+			default:
+				throw new IllegalStateException();
+		}
 		
 		String[] arguments = new String[command.size()];
 		PreparationScript.main(command.toArray(arguments));
