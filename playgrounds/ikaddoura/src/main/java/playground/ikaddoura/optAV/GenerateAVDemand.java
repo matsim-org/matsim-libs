@@ -44,7 +44,7 @@ public class GenerateAVDemand {
 
 	private static final Logger log = Logger.getLogger(GenerateAVDemand.class);
 	
-	private static final double taxiTripShare = 0.01;
+	private static final double taxiTripShare = 0.1;
 	private static final String inputPlansFile = "/Users/ihab/Documents/workspace/public-svn/matsim/scenarios/countries/de/berlin/car-traffic-only-10pct-2016-04-21/run_194c.150.plans_selected.xml.gz";
 	private static final String outputPlansFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/run_194c.150.plans_selected_taxiTripShare_" + taxiTripShare + ".xml.gz";
 
