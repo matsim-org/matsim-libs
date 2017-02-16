@@ -71,13 +71,10 @@ public class PersonTripNoiseAnalysisRun {
 		if (args.length > 0) {
 			runDirectory = args[0];
 			log.info("Run-directory found at index 0.");
-			
+		
 		} else {
 			
-			String id = "nce_0";
-			String baiscDirectoryPath = "/Users/ihab/Desktop/ils4/kaddoura/incidents/output/2b_reroute1.0/";
-						
-			runDirectory = baiscDirectoryPath + id + "/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output_baseCase/";
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
