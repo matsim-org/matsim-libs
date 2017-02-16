@@ -8,6 +8,7 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.LinkedList;
 import java.util.List;
 
+import contrib.baseline.modification.EndTimeDiluter;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.network.Network;
@@ -387,6 +388,22 @@ public class Builder {
 		String[] arguments = new String[command.size()];
 		PreparationScript.main(command.toArray(arguments));
 		System.gc();
+
+        System.out.println("Diluting population end times ...");
+
+        new EndTimeDiluter().dilutePopulation(
+                new File(scenarioDirectory, "population.xml.gz").getAbsolutePath(),
+                new File(scenarioDirectory, "population_diluted.xml.gz").getAbsolutePath()
+        );
+
+        System.gc();
+
+        FileUtils.deleteQuietly(new File(scenarioDirectory, "population.xml.gz"));
+        FileUtils.moveFile(
+                new File(scenarioDirectory, "population_diluted.xml.gz"),
+                new File(scenarioDirectory, "population.xml.gz")
+        );
+
 		
 		System.out.println("Done creating final scenario.");
 	}
