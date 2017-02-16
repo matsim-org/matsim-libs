@@ -97,10 +97,18 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	private int nextDisableInnovativeStrategiesIteration = -1;
 	private int nextEnableInnovativeStrategiesIteration = -1;
 	
+	private String outputDirectory;
+	
 	@Inject
 	public DecongestionControlerListener(DecongestionInfo congestionInfo, DecongestionTollSetting decongestionTollSettingImpl) {
 		this.congestionInfo = congestionInfo;
 		this.tollComputation = decongestionTollSettingImpl;
+
+		this.outputDirectory = this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory();
+		if (!outputDirectory.endsWith("/")) {
+			outputDirectory = outputDirectory + "/";
+		}
+
 	}
 
 	@Override
@@ -142,8 +150,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		}
 		
 		if (event.getIteration() % this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION() == 0.) {
-			CongestionInfoWriter.writeDelays(congestionInfo, event.getIteration(), this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "ITERS/it." + event.getIteration() + "/");
-			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "ITERS/it." + event.getIteration() + "/");
+			CongestionInfoWriter.writeDelays(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/");
+			CongestionInfoWriter.writeTolls(congestionInfo, event.getIteration(), this.outputDirectory + "ITERS/it." + event.getIteration() + "/");
 		}
 	}
 
@@ -178,7 +186,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	public void notifyIterationEnds(IterationEndsEvent event) {
 				
 		// Store and write out some aggregated numbers for analysis purposes.
-		
+				
 		this.iteration2totalDelay.put(event.getIteration(), this.delayComputation.getTotalDelay());
 		this.iteration2totalTollPayments.put(event.getIteration(), this.intervalBasedTolling.getTotalTollPayments());
 		this.iteration2totalTravelTime.put(event.getIteration(), this.delayComputation.getTotalTravelTime());
@@ -194,7 +202,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 				this.iteration2totalTollPayments,
 				this.iteration2totalTravelTime,
 				this.iteration2userBenefits,
-				this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory()
+				outputDirectory
 				);
 		
 		XYLineChart chart1 = new XYLineChart("Total travel time and total delay", "Iteration", "Hours");
@@ -208,7 +216,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		}
 		chart1.addSeries("Total delay", iterations1, values1a);
 		chart1.addSeries("Total travel time", iterations1, values1b);
-		chart1.saveAsPng(this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "travelTime_delay.png", 800, 600);
+		chart1.saveAsPng(outputDirectory + "travelTime_delay.png", 800, 600);
 		
 		XYLineChart chart2 = new XYLineChart("System welfare, user benefits and toll revenues", "Iteration", "Monetary units");
 		double[] iterations2 = new double[event.getIteration() + 1];
@@ -225,7 +233,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		chart2.addSeries("System welfare", iterations2, values2a);
 		chart2.addSeries("User benefits", iterations2, values2b);
 		chart2.addSeries("Toll revenues", iterations2, values2c);
-		chart2.saveAsPng(this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory() + "systemWelfare_userBenefits_tollRevenues.png", 800, 600);
+		chart2.saveAsPng(outputDirectory + "systemWelfare_userBenefits_tollRevenues.png", 800, 600);
 		
 	}
 
@@ -322,21 +330,21 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		if (this.congestionInfo.getDecongestionConfigGroup().isRUN_FINAL_ANALYSIS()) {
 			log.info("Simulation is shut down. Running final analysis...");
 			
-			PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(event.getServices().getConfig().controler().getOutputDirectory());
+			PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(this.outputDirectory);
 			analysis.run();
 			
 			try {
-				MATSimVideoUtils.createLegHistogramVideo(event.getServices().getConfig().controler().getOutputDirectory());
+				MATSimVideoUtils.createLegHistogramVideo(this.outputDirectory);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 			try {
-				if (this.congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
+				if (this.congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) MATSimVideoUtils.createVideo(this.outputDirectory, this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "delays_perLinkAndTimeBin");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			try {
-				if (this.congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) MATSimVideoUtils.createVideo(event.getServices().getConfig().controler().getOutputDirectory(), this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
+				if (this.congestionInfo.getDecongestionConfigGroup().isWRITE_LINK_INFO_CHARTS()) MATSimVideoUtils.createVideo(this.outputDirectory, this.congestionInfo.getDecongestionConfigGroup().getWRITE_OUTPUT_ITERATION(), "toll_perLinkAndTimeBin");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
