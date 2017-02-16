@@ -94,7 +94,7 @@ public class RunBerlinOptAV {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-		decongestionSettings.setKp(-12./3600.);
+		decongestionSettings.setKp(2 * 12./3600.);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setMsa(true);
