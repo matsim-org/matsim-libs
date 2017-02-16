@@ -21,9 +21,6 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
@@ -31,12 +28,7 @@ import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.router.priorityqueue.BinaryMinHeap;
 import org.matsim.core.router.priorityqueue.HasIndex;
 import org.matsim.core.router.priorityqueue.MinHeap;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.vehicles.Vehicle;
-import playground.thibautd.initialdemandgeneration.socnetgen.analysis.SocialNetworkAsMatsimNetworkUtils;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -275,7 +267,10 @@ public class SnaUtils {
 		for ( int i = 0; i < nPairs; i++ ) {
 			counter.incCounter();
 			final Id<Person> ego = biggestComponent.get( random.nextInt( biggestComponent.size() ) );
-			final Id<Person> alter = biggestComponent.get( random.nextInt( biggestComponent.size() ) );
+			Id<Person> alter;
+			do {
+				alter = biggestComponent.get( random.nextInt( biggestComponent.size() ) );
+			} while ( alter == ego );
 
 			callback.notifyDistance(
 					ego, alter ,
