@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
@@ -150,6 +149,7 @@ public class ChainChopper {
 					Leg leg = (Leg)plan.getPlanElements().get(i-1);
 					currentPlan.addLeg(leg);
 					Activity cutActivityEnd = PopulationUtils.createActivityFromCoord("chopEnd", cCut);
+					cutActivityEnd.setFacilityId(act.getFacilityId());
 					currentPlan.addActivity(cutActivityEnd);
 					Plan segment = PopulationUtils.createPlan();
 					PopulationUtils.copyFromTo(currentPlan, segment);
@@ -159,6 +159,7 @@ public class ChainChopper {
 					 * plan. */
 					currentPlan = PopulationUtils.createPlan();
 					Activity cutActivityStart = PopulationUtils.createActivityFromCoord("chopStart", cCut);
+					cutActivityStart.setFacilityId(act.getFacilityId());
 					cutActivityStart.setEndTime(Time.parseTime("00:01:00"));
 					currentPlan.addActivity(cutActivityStart);
 					lastLocation = cCut;
@@ -190,6 +191,7 @@ public class ChainChopper {
 					 * the current plan. */
 					Activity endPortion = PopulationUtils.createActivityFromCoord(act.getType(), act.getCoord());
 					endPortion.setStartTime(startTime);
+					endPortion.setFacilityId(act.getFacilityId());
 					currentPlan.addActivity(endPortion);
 					endPortion.setMaximumDuration(Time.UNDEFINED_TIME);
 					Plan segment = PopulationUtils.createPlan();
@@ -200,6 +202,7 @@ public class ChainChopper {
 					currentPlan = PopulationUtils.createPlan();
 					Activity startPortion = PopulationUtils.createActivityFromCoord(act.getType(), act.getCoord());
 					startPortion.setEndTime(endTime - Time.MIDNIGHT);
+					startPortion.setFacilityId(act.getFacilityId());
 					currentPlan.addActivity(startPortion);
 
 					lastLocation = act.getCoord();
