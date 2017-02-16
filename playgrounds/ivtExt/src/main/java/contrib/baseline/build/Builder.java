@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import contrib.baseline.modification.EndTimeDiluter;
+import contrib.baseline.modification.FreespeedAdjustment;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.network.Network;
@@ -364,6 +365,38 @@ public class Builder {
 		
 		return valid;
 	}
+
+	private void applyModifications() throws IOException {
+        System.out.println("Diluting population end times ...");
+
+        FileUtils.moveFile(
+                new File(scenarioDirectory, "population.xml.gz"),
+                new File(scenarioDirectory, "population_original.xml.gz")
+        );
+
+        new EndTimeDiluter().dilutePopulation(
+                new File(scenarioDirectory, "population_original.xml.gz").getAbsolutePath(),
+                new File(scenarioDirectory, "population.xml.gz").getAbsolutePath()
+        );
+
+        System.gc();
+
+        FileUtils.deleteQuietly(new File(scenarioDirectory, "population_original.xml.gz"));
+
+        System.out.println("Adjusting freespeeds ...");
+
+        FileUtils.moveFile(
+                new File(scenarioDirectory, "mmNetwork.xml.gz"),
+                new File(scenarioDirectory, "mmNetwork_original.xml.gz")
+        );
+
+        new FreespeedAdjustment().adjustSpeeds(
+                new File(scenarioDirectory, "mmNetwork_original.xml.gz").getAbsolutePath(),
+                new File(scenarioDirectory, "mmNetwork.xml.gz").getAbsolutePath()
+        );
+
+        FileUtils.deleteQuietly(new File(scenarioDirectory, "mmNetwork_original.xml.gz"));
+    }
 	
 	private void createFinalScenario() throws IOException {
 		System.out.println("Creating final scenario ...");
@@ -389,22 +422,8 @@ public class Builder {
 		PreparationScript.main(command.toArray(arguments));
 		System.gc();
 
-        System.out.println("Diluting population end times ...");
+        applyModifications();
 
-        new EndTimeDiluter().dilutePopulation(
-                new File(scenarioDirectory, "population.xml.gz").getAbsolutePath(),
-                new File(scenarioDirectory, "population_diluted.xml.gz").getAbsolutePath()
-        );
-
-        System.gc();
-
-        FileUtils.deleteQuietly(new File(scenarioDirectory, "population.xml.gz"));
-        FileUtils.moveFile(
-                new File(scenarioDirectory, "population_diluted.xml.gz"),
-                new File(scenarioDirectory, "population.xml.gz")
-        );
-
-		
 		System.out.println("Done creating final scenario.");
 	}
 	
