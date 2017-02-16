@@ -137,19 +137,19 @@ public class IVTConfigCreator {
 		config.transit().setVehiclesFile(INBASE_FILES + VEHICLES);
 
 		// Set teleportation speeds (by pboesch)
-		PlansCalcRouteConfigGroup.ModeRoutingParams walkRoutingParams = config.plansCalcRoute().getModeRoutingParams().get("walk");
+		PlansCalcRouteConfigGroup.ModeRoutingParams walkRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("walk");
 		walkRoutingParams.setBeelineDistanceFactor(1.642);
 		walkRoutingParams.setTeleportedModeSpeed(4.72 * (1000.0 / 3600.0));
 
-		PlansCalcRouteConfigGroup.ModeRoutingParams walkAccessRoutingParams = config.plansCalcRoute().getModeRoutingParams().get("walk_access");
+		PlansCalcRouteConfigGroup.ModeRoutingParams walkAccessRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("walk_access");
 		walkAccessRoutingParams.setBeelineDistanceFactor(1.642);
 		walkAccessRoutingParams.setTeleportedModeSpeed(4.72 * (1000.0 / 3600.0));
 
-		PlansCalcRouteConfigGroup.ModeRoutingParams walkEgressRoutingParams = config.plansCalcRoute().getModeRoutingParams().get("walk_egress");
+		PlansCalcRouteConfigGroup.ModeRoutingParams walkEgressRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("walk_egress");
 		walkEgressRoutingParams.setBeelineDistanceFactor(1.642);
 		walkEgressRoutingParams.setTeleportedModeSpeed(4.72 * (1000.0 / 3600.0));
 
-		PlansCalcRouteConfigGroup.ModeRoutingParams bikeRoutingParams = config.plansCalcRoute().getModeRoutingParams().get("bike");
+		PlansCalcRouteConfigGroup.ModeRoutingParams bikeRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("bike");
 		bikeRoutingParams.setBeelineDistanceFactor(1.663);
 		bikeRoutingParams.setTeleportedModeSpeed(14.01 * (1000.0 / 3600.0));
     }
