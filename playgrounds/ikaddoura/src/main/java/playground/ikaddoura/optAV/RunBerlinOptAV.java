@@ -40,7 +40,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisMain;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
@@ -142,9 +142,6 @@ public class RunBerlinOptAV {
 		// analysis
 		// #############################
 		
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
-		analysis.run();
-		
 		String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		
@@ -163,6 +160,9 @@ public class RunBerlinOptAV {
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
 		merger.run();
+		
+		PersonTripNoiseAnalysisMain analysis = new PersonTripNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		analysis.run();
 	}
 }
 

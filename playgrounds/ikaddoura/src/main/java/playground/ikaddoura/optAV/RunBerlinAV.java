@@ -40,7 +40,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisMain;
 
 /**
 * @author ikaddoura
@@ -95,9 +95,6 @@ public class RunBerlinAV {
 		// analysis
 		// #############################
 		
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
-		analysis.run();
-		
 		String outputDirectory = config.controler().getOutputDirectory();
 		if (outputDirectory.endsWith("/")) {
 			// ok
@@ -126,6 +123,9 @@ public class RunBerlinAV {
 			merger.setLabel(labels);
 			merger.run();
 		}
+		
+		PersonTripNoiseAnalysisMain analysis = new PersonTripNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory(), outputFilePath + controler.getConfig().controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		analysis.run();
 		
 	}
 }
