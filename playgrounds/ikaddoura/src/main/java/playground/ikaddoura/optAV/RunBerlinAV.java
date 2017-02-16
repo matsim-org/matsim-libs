@@ -96,9 +96,7 @@ public class RunBerlinAV {
 		// #############################
 		
 		String outputDirectory = config.controler().getOutputDirectory();
-		if (outputDirectory.endsWith("/")) {
-			// ok
-		} else {
+		if (!outputDirectory.endsWith("/")) {
 			outputDirectory = outputDirectory + "/";
 		}
 		
