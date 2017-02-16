@@ -17,7 +17,7 @@ class StayVehicleDiversionDirective extends VehicleDiversionDirective {
     }
 
     @Override
-    void execute() {
+    void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
         AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
         final AVStayTask avStayTask = (AVStayTask) abstractTask;
@@ -30,7 +30,7 @@ class StayVehicleDiversionDirective extends VehicleDiversionDirective {
             System.out.println("The last task was removed for " + vehicleLinkPair.avVehicle.getId());
             throw new RuntimeException("task should be started since current!");
         }
-        VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
+//        VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
         
         final AVDriveTask avDriveTask = new AVDriveTask(vrpPathWithTravelData);
         schedule.addTask(avDriveTask);

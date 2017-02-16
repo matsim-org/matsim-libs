@@ -16,7 +16,7 @@ import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
-class AcceptRequestDirective extends AbstractDirective {
+class AcceptRequestDirective extends FuturePathDirective {
     final AVVehicle avVehicle;
     final AVRequest avRequest;
     final double getTimeNow;
@@ -32,8 +32,8 @@ class AcceptRequestDirective extends AbstractDirective {
     }
 
     @Override
-    void execute() {
-        VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
+    void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
+//        VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
 
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         final double scheduleEndTime = schedule.getEndTime();
@@ -44,7 +44,7 @@ class AcceptRequestDirective extends AbstractDirective {
 
         schedule.addTask(new AVPickupTask( //
                 getTimeNow, // start of pickup
-                futurePathContainer.startTime, // end of pickup
+                futurePathContainer.startTime, // end of pickup // TODO access is not elegant
                 avRequest.getFromLink(), // location of driving start
                 Arrays.asList(avRequest))); // serving only one request at a time
 
