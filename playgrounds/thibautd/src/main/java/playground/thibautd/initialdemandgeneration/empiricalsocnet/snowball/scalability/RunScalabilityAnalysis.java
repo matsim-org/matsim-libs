@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.ivt.utils.MonitoringUtils;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
@@ -44,8 +45,8 @@ public class RunScalabilityAnalysis {
 	public static void main( String[] args ) throws Exception {
 		//MonitoringUtils.setMemoryLoggingOnGC();
 
-		//try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
-		try {
+		try ( AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ) {
+		//try {
 			final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
 			final ScalabilityConfigGroup scalabilityConfigGroup = new ScalabilityConfigGroup();
 			final Config config =
