@@ -8,6 +8,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
 import playground.clruch.router.FuturePathContainer;
+import playground.clruch.utils.ScheduleUtils;
 import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -33,8 +34,6 @@ class AcceptRequestDirective extends FuturePathDirective {
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-//        VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
-
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         final double scheduleEndTime = schedule.getEndTime();
         {
@@ -58,10 +57,7 @@ class AcceptRequestDirective extends FuturePathDirective {
                 avRequest.getToLink(), // location of dropoff
                 Arrays.asList(avRequest)));
 
-        // TODO redundant
-        if (endDropoffTime < scheduleEndTime)
-            schedule.addTask(new AVStayTask( //
-                    endDropoffTime, scheduleEndTime, avRequest.getToLink()));
+        ScheduleUtils.makeWhole(avVehicle, endDropoffTime, scheduleEndTime, avRequest.getToLink());
 
         // jan: following computation is mandatory for the internal scoring function
         final double distance = VrpPathUtils.getDistance(vrpPathWithTravelData);

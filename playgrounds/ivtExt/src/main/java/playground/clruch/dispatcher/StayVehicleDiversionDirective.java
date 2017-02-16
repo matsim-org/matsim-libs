@@ -7,6 +7,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 import playground.clruch.router.FuturePathContainer;
+import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
@@ -30,16 +31,11 @@ class StayVehicleDiversionDirective extends VehicleDiversionDirective {
             System.out.println("The last task was removed for " + vehicleLinkPair.avVehicle.getId());
             throw new RuntimeException("task should be started since current!");
         }
-//        VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
-        
+
         final AVDriveTask avDriveTask = new AVDriveTask(vrpPathWithTravelData);
         schedule.addTask(avDriveTask);
-        final double endDriveTime = avDriveTask.getEndTime();
 
-        // TODO redundant
-        if (endDriveTime < scheduleEndTime)
-            schedule.addTask(new AVStayTask(endDriveTime, scheduleEndTime, destination));
-
+        ScheduleUtils.makeWhole(vehicleLinkPair.avVehicle, avDriveTask.getEndTime(), scheduleEndTime, destination);
     }
 
 }
