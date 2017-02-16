@@ -56,7 +56,7 @@ import java.util.stream.DoubleStream;
 public class ScalabilityStatisticsListener implements AutoCloseable {
 	private static final Logger log = Logger.getLogger( ScalabilityStatisticsListener.class );
 
-	private static final int N_DISTANCES = 500;
+	private static final int N_DISTANCES = 10000;
 	
 	private final BufferedWriter writer;
 	private final Set<Set<Ego>> cliques = new HashSet<>();
@@ -163,7 +163,7 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 
 			log.info( "write social distance statistics..." );
 			final List<Double> distances = new ArrayList<>( N_DISTANCES + 1 );
-			distances.add( 1d ); // to be sure to have the minimum
+			//distances.add( 1d ); // to be sure to have the minimum
 			SnaUtils.sampleSocialDistances(
 					sn,
 					new Random( 123 ),
