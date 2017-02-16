@@ -2,22 +2,20 @@ package playground.clruch.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
  * class obtains the path that connects two given nodes
  */
-public class SimpleBlockingRouter {
+@Deprecated
+class SimpleBlockingRouter {
     private final ParallelLeastCostPathCalculator router;
     private final TravelTime travelTime;
 
-    public SimpleBlockingRouter(ParallelLeastCostPathCalculator router, TravelTime travelTime) {
+    SimpleBlockingRouter(ParallelLeastCostPathCalculator router, TravelTime travelTime) {
         this.router = router;
         this.travelTime = travelTime;
     }
@@ -37,23 +35,10 @@ public class SimpleBlockingRouter {
      *            can be now when switching from stay task, or linkTimePair.time from driving task diversion point
      * @return
      */
-    public VrpPathWithTravelData getRoute(Link divLink, Link destLink, double startTime) {
+    VrpPathWithTravelData getRoute(Link divLink, Link destLink, double startTime) {
         LeastCostPathFuture leastCostPathFuture = getRouteFuture(divLink, destLink, startTime);
 
-        return getRouteBlocking(divLink, destLink, startTime, leastCostPathFuture, travelTime);
-    }
-
-    static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
-        try {
-            Thread.sleep(0, 100000);
-            while (!leastCostPathFuture.isDone())
-                Thread.sleep(0, 100000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(startLink, destLink, startTime, leastCostPathFuture.get(), travelTime);
-        GlobalAssert.that(VrpPathUtils.isConsistent(vrpPathWithTravelData));
-        return vrpPathWithTravelData;
+        return FuturePathContainer.getRouteBlocking(divLink, destLink, startTime, leastCostPathFuture, travelTime);
     }
 
 }

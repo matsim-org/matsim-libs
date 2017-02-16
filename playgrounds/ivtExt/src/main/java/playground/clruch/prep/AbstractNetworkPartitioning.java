@@ -7,11 +7,13 @@ import java.io.File;
 /**
  * Created by Claudio on 2/8/2017.
  */
-public abstract class AbstractNetworkPartitioning {
-    AbstractNetworkPartitioning(Network network){
+// TODO class not used yet ...
+@Deprecated
+abstract class AbstractNetworkPartitioning {
+    AbstractNetworkPartitioning(Network network) {
     }
 
-    void generate(File file){
+    void generate(File file) {
         // saves a NetworkPartitioning.xml file
     }
 

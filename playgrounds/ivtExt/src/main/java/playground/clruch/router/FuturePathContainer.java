@@ -2,8 +2,11 @@ package playground.clruch.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 
 /**
@@ -32,8 +35,21 @@ public class FuturePathContainer {
 
     public final VrpPathWithTravelData getVrpPathWithTravelData() {
         if (vrpPathWithTravelData == null)
-            vrpPathWithTravelData = SimpleBlockingRouter.getRouteBlocking( //
+            vrpPathWithTravelData = FuturePathContainer.getRouteBlocking( //
                     startLink, destLink, startTime, leastCostPathFuture, travelTime);
+        return vrpPathWithTravelData;
+    }
+
+    static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
+        try {
+            Thread.sleep(0, 100000);
+            while (!leastCostPathFuture.isDone())
+                Thread.sleep(0, 100000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        VrpPathWithTravelData vrpPathWithTravelData = VrpPaths.createPath(startLink, destLink, startTime, leastCostPathFuture.get(), travelTime);
+        GlobalAssert.that(VrpPathUtils.isConsistent(vrpPathWithTravelData));
         return vrpPathWithTravelData;
     }
 }

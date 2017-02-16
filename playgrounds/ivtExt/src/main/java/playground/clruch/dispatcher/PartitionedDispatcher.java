@@ -50,6 +50,10 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                     map.get(virtualNode).add(vehicleLinkPair);
                 });
         return map;
+        // TODO try this:
+//      return getDivertableVehicles().stream() //
+//        .parallel() //
+//       .collect(Collectors.groupingBy(vlp->virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
     }
 
     @Deprecated
@@ -73,6 +77,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                     map.get(virtualNode).add(avRequest);
                 });
         return map;
+        // TODO see getVirtualNodeAvailableVehicles()
     }
 
 }

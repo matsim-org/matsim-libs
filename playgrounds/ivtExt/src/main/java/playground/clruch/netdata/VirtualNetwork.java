@@ -112,12 +112,9 @@ public class VirtualNetwork {
                 }
             }
             return virtualNetwork;
-        } catch (IOException io) {
+        } catch (IOException | JDOMException io) {
             System.out.println(io.getMessage());
-        } catch (JDOMException jdomex) {
-            System.out.println(jdomex.getMessage());
         }
-
         return null;
     }
 
@@ -131,8 +128,7 @@ public class VirtualNetwork {
         return linkIdVNodeMap.get(link.getId());
     }
 
-
-    // TODO delete this function which was only for debugging.
+    // TODO don't delete this function but move outside into class e.g. VirtualNetworkHelper
     public void printForTesting() {
         // check the virtualNodeList
         for (String vNodeId : virtualNodeList.keySet()) {
