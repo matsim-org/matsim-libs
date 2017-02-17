@@ -1,24 +1,20 @@
-package playground.clruch.utils;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+package playground.clruch.prep;
 
 import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
+
+import java.util.Iterator;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 
 /**
  * Created by Claudio on 1/4/2017.
  */
-
 
 /**
  * Class iterates through plans in population file and replaces all trips by mode "av".
@@ -26,15 +22,13 @@ import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
  * remaining legs are replace by <leg mode="av" dep_time="prevActivityEndTime" trav_time="NextActivityStartTime-PrevActivityEndTime"> </leg>
  */
 
-
-public class PopulationTools {
+class PopulationTools {
 
     private static final Logger log = Logger.getLogger(PopulationTools.class);
 
     public static void changeModesOfTransportToAV(Population population) {
 
         log.info("All the modes of transport replaced by av");
-
 
         // iterate through population for changes
         for (Person person : population.getPersons().values()) {
@@ -48,7 +42,7 @@ public class PopulationTools {
                         if (pE instanceof Activity) {
                             Activity act = (Activity) pE;
                             // if act type = "pt_interaction" is deteceted, remove it and the next element which is a pt leg.
-                            // this ensures that public transport legs are removed and the  sequence act - leg - act - leg - act - leg is preserved.
+                            // this ensures that public transport legs are removed and the sequence act - leg - act - leg - act - leg is preserved.
                             if (act.getType().equals(TRANSIT_ACTIVITY_TYPE)) {
                                 it.remove(); // remove action pt interaction
                                 it.next(); // go to next leg

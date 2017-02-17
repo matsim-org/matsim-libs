@@ -11,7 +11,13 @@ public enum AVStatus {
 
     public final String xmlTag;
 
-    private AVStatus(String xmlTag) {
+    AVStatus(String xmlTag) {
         this.xmlTag=xmlTag;
     }
+
+    @Override
+    public String toString() {
+        return this.xmlTag;
+    }
+
 }

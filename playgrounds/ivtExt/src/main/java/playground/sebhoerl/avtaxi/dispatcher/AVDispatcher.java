@@ -1,5 +1,7 @@
 package playground.sebhoerl.avtaxi.dispatcher;
 
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.framework.AVQSimModule;
@@ -31,6 +33,25 @@ public interface AVDispatcher {
      * @param vehicle
      */
     void registerVehicle(AVVehicle vehicle);
+
+    /**
+     * Function was introduced with sebhoerl's help
+     * function is invoked from {@link AVOptimizer}
+     * whenever a vehicle moves to the next link.
+     * 
+     * However, this happens in a multi-threaded environment,
+     * so information may not be in-sync from within the dispatcher.
+     * Use with care.  
+     * 
+     * @param avVehicle
+     * @param driveTask
+     * @param linkTimePair
+     */
+    // TODO probably can remove function since we have access to this info nevertheless
+    @Deprecated
+    default void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
+        // default behavior is intentionally empty
+    }
 
     interface AVDispatcherFactory {
         AVDispatcher createDispatcher(AVDispatcherConfig config);

@@ -1,12 +1,10 @@
 package playground.clruch.export;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import java.io.File;
+
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-
-import java.io.File;
-
 
 /**
  * Comments for class EventFileToProcessingXML

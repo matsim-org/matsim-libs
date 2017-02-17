@@ -75,7 +75,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
 
     private void reoptimize(double now) {
         while (pendingRequests.size() > 0 && availableVehicles.size() > 0) {
-            System.out.println("single heuristic dispatcher is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + "  availableVehicles.size()" + availableVehicles.size());
+            //System.out.println("single heuristic dispatcher is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + "  availableVehicles.size()" + availableVehicles.size());
             AVRequest request = null;
             AVVehicle vehicle = null;
 

@@ -22,6 +22,8 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.utils.HelperPredicates;
+
 /**
  * Created by Claudio on 2/2/2017.
  */
@@ -35,7 +37,6 @@ class VehicleStatus extends AbstractExport {
         if (!vehicleStatus.containsKey(vehicle))
             vehicleStatus.put(vehicle, new TreeMap<>());
         vehicleStatus.get(vehicle).put(time, avStatus);
-        System.out.println("vehicle=" + vehicle + " time=" + time + " status=" + avStatus);
     }
 
     private void putDriveWithCustomer(PersonEntersVehicleEvent event) {
@@ -88,7 +89,7 @@ class VehicleStatus extends AbstractExport {
                 public void handleEvent(PersonEntersVehicleEvent event) {
                     final String vehicle = event.getVehicleId().toString();
                     final Id<Person> person = event.getPersonId();
-                    if (HelperFunction.isPerson(person)) {
+                    if (HelperPredicates.isHuman(person)) {
                         Set<Id<Person>> set = getCustomerSet(vehicle);
                         if (set.isEmpty()) { // if car is empty
                             firstCustomerEntersVehicleEvent.put(vehicle, event); // mark as beginning of DRIVE WITH CUSTOMER STATUS
@@ -110,7 +111,7 @@ class VehicleStatus extends AbstractExport {
                 public void handleEvent(PersonLeavesVehicleEvent event) {
                     final String vehicle = event.getVehicleId().toString();
                     final Id<Person> person = event.getPersonId();
-                    if (HelperFunction.isPerson(person)) {
+                    if (HelperPredicates.isHuman(person)) {
                         Set<Id<Person>> set = getCustomerSet(vehicle);
                         set.remove(person);
                         if (set.isEmpty()) { // last customer has left the car
@@ -138,7 +139,7 @@ class VehicleStatus extends AbstractExport {
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
                     // only departure events of avs are considered.
-                    if(HelperFunction.isAV(event.getPersonId())){
+                    if(HelperPredicates.isPersonAV(event.getPersonId())){
                         potentialEmptyDriveEvent.put(event.getPersonId().toString(), event);
                     }
                 }
@@ -187,3 +188,5 @@ class VehicleStatus extends AbstractExport {
 
     }
 }
+
+
