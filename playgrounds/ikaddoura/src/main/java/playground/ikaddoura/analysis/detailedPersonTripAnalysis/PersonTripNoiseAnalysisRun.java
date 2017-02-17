@@ -113,7 +113,7 @@ public class PersonTripNoiseAnalysisRun {
 
 		int finalIteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
-		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/person-trip-analysis_noise/";
+		String outputPath = runDirectory + "/person-trip-noise-analysis_it. " + finalIteration + "/";
 				
 		String noiseEventsFileToAnalyze;
 		if (this.noiseEventFile == null) {

@@ -50,7 +50,7 @@ import playground.ikaddoura.analysis.linkDemand.LinkDemandAnalysisRun;
 
 public class RunBerlinAV {
 
-	private final static String configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_baseCase.xml";
+	private final static String configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_baseCase_test.xml";
 	private final static boolean otfvis = false;
 	
 	public static void main(String[] args) {
@@ -119,7 +119,7 @@ public class RunBerlinAV {
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
 		noiseCalculation.run();	
 		
-		String outputFilePath = outputDirectory + "analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
+		String outputFilePath = outputDirectory + "noise-analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
 		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
 		
