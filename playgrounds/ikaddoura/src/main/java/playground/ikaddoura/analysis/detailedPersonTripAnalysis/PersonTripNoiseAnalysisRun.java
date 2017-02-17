@@ -70,12 +70,12 @@ public class PersonTripNoiseAnalysisRun {
 		
 		if (args.length > 0) {
 			runDirectory = args[0];
-			log.info("Run-directory found at index 0.");
+			log.info("Run directory: " + runDirectory);
 		
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output_baseCase/";
-			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output_optAV/";
+			log.info("Run directory " + runDirectory);
 		}
 		
 		PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(runDirectory);

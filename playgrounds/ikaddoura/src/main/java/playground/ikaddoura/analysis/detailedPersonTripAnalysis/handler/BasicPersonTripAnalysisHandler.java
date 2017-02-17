@@ -123,18 +123,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {	
-				
-		// trip
-		
-		if (this.taxiDrivers.contains(event.getPersonId()) || this.ptDrivers.contains(event.getPersonId())) {
-			if (warnCnt0 <= 5) {
-				log.warn("A person money event is thrown for a public tranist driver or taxi driver: " + event.toString());
-				if (warnCnt0 == 5) {
-					log.warn("Further warnings of this type are not printed out.");
-				}
-				warnCnt0++;
-			}
-		}
 		
 		if (event.getAmount() > 0.) {
 			if (warnCnt1 <= 5) {
@@ -148,22 +136,35 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		
 		totalPayments = totalPayments + ( -1. * event.getAmount() );
 		
-		int tripNumber = this.personId2currentTripNumber.get(event.getPersonId());
-				
-		double paymentBefore = personId2tripNumber2payment.get(event.getPersonId()).get(tripNumber);
-		double updatedPayment = paymentBefore + (-1. * event.getAmount());
-		Map<Integer,Double> tripNumber2payment = personId2tripNumber2payment.get(event.getPersonId());
-		tripNumber2payment.put(tripNumber, updatedPayment);
-		personId2tripNumber2payment.put(event.getPersonId(), tripNumber2payment);
+		// trip
 		
-		// person
-		
-		if (this.personId2totalpayments.get(event.getPersonId()) == null) {
-			this.personId2totalpayments.put(event.getPersonId(), event.getAmount() * (-1.));
+		if (this.taxiDrivers.contains(event.getPersonId()) || this.ptDrivers.contains(event.getPersonId())) {
+			if (warnCnt0 <= 5) {
+				log.warn("A person money event is thrown for a public tranist driver or taxi driver: " + event.toString());
+				if (warnCnt0 == 5) {
+					log.warn("Further warnings of this type are not printed out.");
+				}
+				warnCnt0++;
+			}
+			
 		} else {
-			double amountSoFar = this.personId2totalpayments.get(event.getPersonId());
-			double amountNew = amountSoFar + ( event.getAmount() * (-1.) );
-			this.personId2totalpayments.put(event.getPersonId(), amountNew);
+			int tripNumber = this.personId2currentTripNumber.get(event.getPersonId());
+			
+			double paymentBefore = personId2tripNumber2payment.get(event.getPersonId()).get(tripNumber);
+			double updatedPayment = paymentBefore + (-1. * event.getAmount());
+			Map<Integer,Double> tripNumber2payment = personId2tripNumber2payment.get(event.getPersonId());
+			tripNumber2payment.put(tripNumber, updatedPayment);
+			personId2tripNumber2payment.put(event.getPersonId(), tripNumber2payment);
+			
+			// person
+			
+			if (this.personId2totalpayments.get(event.getPersonId()) == null) {
+				this.personId2totalpayments.put(event.getPersonId(), event.getAmount() * (-1.));
+			} else {
+				double amountSoFar = this.personId2totalpayments.get(event.getPersonId());
+				double amountNew = amountSoFar + ( event.getAmount() * (-1.) );
+				this.personId2totalpayments.put(event.getPersonId(), amountNew);
+			}
 		}
 	}
 	
@@ -328,14 +329,14 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			// either the transit driver or a passenger enters a public transit vehicle
 			if (ptVehicleId2totalDistance.get(event.getVehicleId()) == null) {
 				ptVehicleId2totalDistance.put(event.getVehicleId(), 0.);
-				log.info("Starting vehicle distance computation for public transit vehicle " + event.getVehicleId());
+//				log.info("Starting vehicle distance computation for public transit vehicle " + event.getVehicleId());
 			}
 
 		} else if ( taxiDrivers.contains(Id.createPersonId(event.getVehicleId())) || taxiDrivers.contains(event.getPersonId()) ) {
 			// either a taxi driver or a passenger enters a transit vehicle
 			if (taxiVehicleId2totalDistance.get(event.getVehicleId()) == null) {
 				taxiVehicleId2totalDistance.put(event.getVehicleId(), 0.);
-				log.info("Starting vehicle distance computation for taxi vehicle " + event.getVehicleId());
+//				log.info("Starting vehicle distance computation for taxi vehicle " + event.getVehicleId());
 			}
 			
 		} else {
