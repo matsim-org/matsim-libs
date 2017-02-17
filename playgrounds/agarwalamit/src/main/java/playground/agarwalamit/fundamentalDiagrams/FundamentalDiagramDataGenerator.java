@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -52,6 +53,7 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -124,6 +126,9 @@ public class FundamentalDiagramDataGenerator {
 			parametricRunAccordingToDistribution();
 		} else parametricRunAccordingToGivenModalSplit();
 
+		new ConfigWriter(scenario.getConfig()).write(this.runDir+"/config.xml");
+		new NetworkWriter(scenario.getNetwork()).write(this.runDir+"/network.xml");
+
 		closeFile();
 	}
 
@@ -154,6 +159,10 @@ public class FundamentalDiagramDataGenerator {
 
 		flowUnstableWarnCount = new int [travelModes.length];
 		speedUnstableWarnCount = new int [travelModes.length];
+
+		// following is necessary, in order to achieve the data points at high density
+		if(this.travelModes.length==1 && this.travelModes[0].equals("car")) scenario.getConfig().qsim().setStuckTime(60.);
+		else  if (this.travelModes.length==1 && this.travelModes[0].equals("truck")) scenario.getConfig().qsim().setStuckTime(180.);
 	}
 
 	private void setUpConfig() {
