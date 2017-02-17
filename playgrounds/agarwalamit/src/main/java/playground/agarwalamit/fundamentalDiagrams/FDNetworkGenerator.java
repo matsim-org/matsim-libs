@@ -128,11 +128,14 @@ final class FDNetworkGenerator {
 
             if (i==0) {
                 firstLinkOfTrack = link.getId();
-            } else if (i == subdivisionFactor-1) {
+            }
+            if (i == subdivisionFactor-1) {
                 lastLinkOfBase = link.getId();
-            } else if (i ==  subdivisionFactor) {
+            }
+            if (i ==  subdivisionFactor) {
                 firstLinkOfMiddleSide = link.getId();
-            } else if (i== noOfSides * subdivisionFactor-1) {
+            }
+            if (i== noOfSides * subdivisionFactor-1) {
                 lastLinkOfTrack = link.getId();
             }
         }
