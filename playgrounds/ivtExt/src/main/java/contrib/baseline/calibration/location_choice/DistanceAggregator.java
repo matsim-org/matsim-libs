@@ -56,6 +56,28 @@ public class DistanceAggregator implements ActivityStartEventHandler, PersonEnte
         activityDistances.clear();
     }
 
+    public Map<String, Double> getMeanDistances() {
+        Map<String, Double> result = new HashMap<>();
+
+        activityDistances.forEach((activityType, values) -> result.put(
+                activityType,
+                new DescriptiveStatistics(values.stream().mapToDouble(Double::doubleValue).toArray()).getMean() / 1000.0
+        ));
+
+        return result;
+    }
+
+    public Map<String, Double> getMedianDistances() {
+        Map<String, Double> result = new HashMap<>();
+
+        activityDistances.forEach((activityType, values) -> result.put(
+                activityType,
+                new DescriptiveStatistics(values.stream().mapToDouble(Double::doubleValue).toArray()).getPercentile(0.5) / 1000.0
+        ));
+
+        return result;
+    }
+
     public void write(String targetPath) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetPath)));
 

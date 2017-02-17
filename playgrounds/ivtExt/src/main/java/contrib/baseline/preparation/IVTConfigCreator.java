@@ -63,7 +63,7 @@ public class IVTConfigCreator {
         new ConfigWriter(config).write(args[0]);
     }
 
-    protected void makeConfigIVT(Config config, final int prctScenario) {
+    public void makeConfigIVT(Config config, final int prctScenario) {
         // Set the number of iterations
 		config.controler().setLastIteration(NUMBER_OF_ITERATIONS);
 		// Correct routing algorithm
@@ -136,20 +136,20 @@ public class IVTConfigCreator {
 		config.transit().setTransitScheduleFile(INBASE_FILES + SCHEDULE);
 		config.transit().setVehiclesFile(INBASE_FILES + VEHICLES);
 
-		// Set teleportation speeds (by pboesch)
-		PlansCalcRouteConfigGroup.ModeRoutingParams walkRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("walk");
+		// Set teleportation speeds /sh (values by pb)
+		PlansCalcRouteConfigGroup.ModeRoutingParams walkRoutingParams = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk);
 		walkRoutingParams.setBeelineDistanceFactor(1.642);
 		walkRoutingParams.setTeleportedModeSpeed(4.72 * (1000.0 / 3600.0));
 
-		PlansCalcRouteConfigGroup.ModeRoutingParams walkAccessRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("walk_access");
+		PlansCalcRouteConfigGroup.ModeRoutingParams walkAccessRoutingParams = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.access_walk);
 		walkAccessRoutingParams.setBeelineDistanceFactor(1.642);
 		walkAccessRoutingParams.setTeleportedModeSpeed(4.72 * (1000.0 / 3600.0));
 
-		PlansCalcRouteConfigGroup.ModeRoutingParams walkEgressRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("walk_egress");
+		PlansCalcRouteConfigGroup.ModeRoutingParams walkEgressRoutingParams = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.egress_walk);
 		walkEgressRoutingParams.setBeelineDistanceFactor(1.642);
 		walkEgressRoutingParams.setTeleportedModeSpeed(4.72 * (1000.0 / 3600.0));
 
-		PlansCalcRouteConfigGroup.ModeRoutingParams bikeRoutingParams = config.plansCalcRoute().getOrCreateModeRoutingParams("bike");
+		PlansCalcRouteConfigGroup.ModeRoutingParams bikeRoutingParams = config.plansCalcRoute().getModeRoutingParams().get(TransportMode.bike);
 		bikeRoutingParams.setBeelineDistanceFactor(1.663);
 		bikeRoutingParams.setTeleportedModeSpeed(14.01 * (1000.0 / 3600.0));
     }
