@@ -85,6 +85,11 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 			
 			log.info("Internalizing noise damages. The default travel disutility will be replaced by a travel distuility which accounts for noise tolls...");
 			
+			if (noiseParameters.isComputeAvgNoiseCostPerLinkAndTime() == false) {
+				log.warn("The travel disutility which accounts for noise tolls requires the computation of average noise cost per link and time bin. Setting the value 'computeAvgNoiseCostPerLinkAndTime' to 'true'...");
+				noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(true);
+			}
+			
 			final NoiseTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new NoiseTollTimeDistanceTravelDisutilityFactory(
 					new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
 					this.noiseContext, controler.getConfig().planCalcScore());

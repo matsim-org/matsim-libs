@@ -348,7 +348,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 				throwNoiseEventsCaused();
 				if (printLog) log.info("Throwing noise events for the causing agents... Done.");
 				
-				if (this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
+				if (this.noiseContext.getNoiseParams().isComputeAvgNoiseCostPerLinkAndTime()) {
 					this.noiseContext.storeTimeInterval();
 				}
 			}	

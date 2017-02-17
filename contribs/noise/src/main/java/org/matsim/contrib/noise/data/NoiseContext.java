@@ -65,8 +65,7 @@ public class NoiseContext {
 	private final Map<Id<Link>, Map<Id<Vehicle>, Double>> linkId2vehicleId2lastEnterTime = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 	
-	// for routing purposes
-	
+	// for routing purposes in case the default noise travel distuility is used
 	private final Map<Double, Map<Id<Link>, NoiseLink>> timeInterval2linkId2noiseLinks = new HashMap<>();
 	
 	// time interval specific information
@@ -82,13 +81,13 @@ public class NoiseContext {
 	public NoiseContext(Scenario scenario) {
 		this.scenario = scenario;
 				
-		if ((NoiseConfigGroup) this.scenario.getConfig().getModule("noise") == null) {
+		if ((NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {
 			throw new RuntimeException("Could not find a noise config group. "
 					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
 					+ " Aborting...");
 		}
 		
-		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModule("noise");
+		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 		this.noiseParams.checkNoiseParametersForConsistency();
 		
 		this.grid = new Grid(scenario);
