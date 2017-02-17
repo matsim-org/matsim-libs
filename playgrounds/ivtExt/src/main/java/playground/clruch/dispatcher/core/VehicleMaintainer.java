@@ -1,4 +1,4 @@
-package playground.clruch.dispatcher;
+package playground.clruch.dispatcher.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +20,7 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.dispatcher.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -87,6 +88,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
                 AbstractTask abstractTask = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
                 if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
                     new AVTaskAdapter(abstractTask) {
+                        @Override
                         public void handle(AVStayTask avStayTask) { // <- type of task is STAY
                             final Link link = avStayTask.getLink();
                             if (!map.containsKey(link))

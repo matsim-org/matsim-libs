@@ -10,6 +10,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.dispatcher.core.UniversalDispatcher;
+import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;

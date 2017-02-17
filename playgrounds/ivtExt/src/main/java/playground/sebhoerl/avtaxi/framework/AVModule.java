@@ -28,6 +28,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
+import playground.clruch.dispatcher.EdgyDispatcher;
 import playground.clruch.dispatcher.LazyDispatcher;
 import playground.clruch.dispatcher.PulseDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
@@ -88,19 +89,25 @@ public class AVModule extends AbstractModule {
     }
 
 	private void configureDispatchmentStrategies() {
+        /** dispatchers by sebhoerl */
         bind(SingleFIFODispatcher.Factory.class);
         bind(SingleHeuristicDispatcher.Factory.class);
         bind(MultiODHeuristic.Factory.class);
-        bind(PulseDispatcher.Factory.class);
-        bind(LazyDispatcher.Factory.class);
-
-        // TODO: Also change identifiers of other dispatchers to class internal
-
+        
         AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.IDENTIFIER).to(PulseDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), LazyDispatcher.IDENTIFIER).to(LazyDispatcher.Factory.class);
+        
+        // ---
+        /** dispatchers for UniversalDispatcher */
+        bind(PulseDispatcher.Factory.class);
+        bind(LazyDispatcher.Factory.class);
+        bind(EdgyDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LazyDispatcher.class.getSimpleName()).to(LazyDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
+        
+        /** dispatchers for PartitionedDispatcher */
     }
 
     private void configureGeneratorStrategies() {

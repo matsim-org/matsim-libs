@@ -1,11 +1,14 @@
-package playground.clruch.dispatcher;
+package playground.clruch.dispatcher.core;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.AbstractTask;
@@ -16,6 +19,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.dispatcher.AVTaskAdapter;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.GlobalAssert;
@@ -68,6 +72,17 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     /**
+     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
+     * successive calls to the function return the identical collection.
+     * 
+     * @return list of {@link AVRequest}s grouped by link
+     */
+    protected final Map<Link, List<AVRequest>> getAVRequestsAtLinks() {
+        return getAVRequests().stream() // <- intentionally not parallel to guarantee ordering of requests
+                .collect(Collectors.groupingBy(AVRequest::getFromLink));
+    }
+
+    /**
      * Function called from derived class to match a vehicle with a request.
      * The function appends the pick-up, drive, and drop-off tasks for the car.
      * 
@@ -77,9 +92,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      *            provided by getAVRequests()
      */
     protected final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+        GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
+        
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
-        GlobalAssert.that(pendingRequests.contains(avRequest));
 
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule)); // check that current task is last task in schedule
