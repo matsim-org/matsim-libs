@@ -4,8 +4,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.AbstractTask;
@@ -65,6 +68,17 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         pendingRequests.removeAll(matchedRequests);
         matchedRequests.clear();
         return Collections.unmodifiableCollection(pendingRequests);
+    }
+
+    /**
+     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
+     * successive calls to the function return the identical collection.
+     * 
+     * @return list of {@link AVRequest}s grouped by link
+     */
+    protected final Map<Link, List<AVRequest>> getAVRequestsAtLinks() {
+        return getAVRequests().stream() // <- intentionally not parallel to guarantee ordering of requests
+                .collect(Collectors.groupingBy(AVRequest::getFromLink));
     }
 
     /**

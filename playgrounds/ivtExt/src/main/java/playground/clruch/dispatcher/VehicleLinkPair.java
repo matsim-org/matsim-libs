@@ -31,6 +31,7 @@ public class VehicleLinkPair {
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         // List<AbstractTask> tasks = schedule.getTasks();
         // if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED))
+        // TODO use handler!
         AbstractTask abstractTask = schedule.getCurrentTask();
         AVTask avTask = (AVTask) abstractTask;
         if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {

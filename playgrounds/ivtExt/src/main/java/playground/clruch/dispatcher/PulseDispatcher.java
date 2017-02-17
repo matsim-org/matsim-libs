@@ -69,6 +69,7 @@ public class PulseDispatcher extends UniversalDispatcher {
         }
     }
 
+    @Override
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
         // System.out.println("moved " + avVehicle.getId() + " -> " + linkTimePair.link.getId());
     }

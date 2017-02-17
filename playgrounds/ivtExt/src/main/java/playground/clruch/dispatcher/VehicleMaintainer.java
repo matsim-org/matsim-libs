@@ -87,6 +87,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
                 AbstractTask abstractTask = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
                 if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
                     new AVTaskAdapter(abstractTask) {
+                        @Override
                         public void handle(AVStayTask avStayTask) { // <- type of task is STAY
                             final Link link = avStayTask.getLink();
                             if (!map.containsKey(link))
