@@ -116,7 +116,7 @@ public class PersonTripNoiseAnalysisRun {
 		String outputPath = runDirectory + "/person-trip-noise-analysis_it. " + finalIteration + "/";
 				
 		String noiseEventsFileToAnalyze;
-		if (this.noiseEventFile == null) {
+		if (this.noiseEventFile == null || this.noiseEventFile == "") {
 			noiseEventsFileToAnalyze = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
 		} else {
 			noiseEventsFileToAnalyze = this.noiseEventFile;

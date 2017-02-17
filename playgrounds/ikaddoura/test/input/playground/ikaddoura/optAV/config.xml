@@ -35,7 +35,7 @@
 		<param name="tunnelLinkIDs" value="null" />
 		<param name="tunnelLinkIdFile" value="null" />
 		<param name="useActualSpeedLevel" value="false" />
-		<param name="writeOutputIteration" value="0" />
+		<param name="writeOutputIteration" value="5" />
 	</module>
 	
 	<module name="controler">

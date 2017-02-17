@@ -33,7 +33,9 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.noise.*;
+import org.matsim.contrib.noise.NoiseOfflineCalculation;
 import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
@@ -42,10 +44,14 @@ import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
+import playground.ikaddoura.analysis.dynamicLinkDemand.DynamicLinkDemandAnalysisRun;
+import playground.ikaddoura.analysis.linkDemand.LinkDemandAnalysisRun;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
 import playground.ikaddoura.moneyTravelDisutility.*;
 
@@ -84,13 +90,13 @@ public class OptAVTestIT {
 		config1.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config1.checkConsistency();
 		
-		Scenario scenario = ScenarioUtils.loadScenario(config1);
-		Controler controler1 = new Controler(scenario);
+		Scenario scenario1 = ScenarioUtils.loadScenario(config1);
+		Controler controler1 = new Controler(scenario1);
 		
 		// taxi
 
 		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg1.getTaxisFileUrl(config1.getContext()).getFile());
+		new VehicleReader(scenario1.getNetwork(), fleet).readFile(taxiCfg1.getTaxisFileUrl(config1.getContext()).getFile());
 		
 		controler1.addOverridingModule(new AbstractModule() {
 			@Override
@@ -120,7 +126,25 @@ public class OptAVTestIT {
 
 		// run
 		
+        controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		if (runBaseCase) controler1.run();
+		
+		String outputDirectory = controler1.getConfig().controler().getOutputDirectory();
+		if (!outputDirectory.endsWith("/")) {
+			outputDirectory = outputDirectory + "/";
+		}
+
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler1.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario1, outputDirectory);
+		noiseCalculation.run();	
+		
+		String outputFilePath = outputDirectory + "noise-analysis_it." + scenario1.getConfig().controler().getLastIteration() + "/";
+		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
+		process.run();
+		
+		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler1.getConfig().controler().getOutputDirectory(), outputFilePath + controler1.getConfig().controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		analysis1.run();
 		
 		// ##################################################################
 		// noise pricing
@@ -197,11 +221,19 @@ public class OptAVTestIT {
 		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
 		
 		// run
-		
+        controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler2.run();
 		
+		String outputDirectory2 = controler2.getConfig().controler().getOutputDirectory();
+		if (!outputDirectory2.endsWith("/")) {
+			outputDirectory2 = outputDirectory2 + "/";
+		}
+
+		PersonTripNoiseAnalysisRun analysis1b = new PersonTripNoiseAnalysisRun(controler2.getConfig().controler().getOutputDirectory());
+		analysis1b.run();
+
 		// print outs
-		
+					
 		System.out.println("----------------------------------");
 		System.out.println("Base case:");
 		printResults1(handler1);
