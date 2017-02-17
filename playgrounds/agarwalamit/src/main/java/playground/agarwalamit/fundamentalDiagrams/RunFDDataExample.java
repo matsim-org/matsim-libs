@@ -61,13 +61,13 @@ public class RunFDDataExample {
         {
             VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
             car.setPcuEquivalents(1.0);
-            car.setMaximumVelocity(60.0);
+            car.setMaximumVelocity(60.0/3.6);
             vehicles.addVehicleType(car);
         }
         {
             VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike",VehicleType.class));
             bike.setPcuEquivalents(0.25);
-            bike.setMaximumVelocity(15.0);
+            bike.setMaximumVelocity(15.0/3.6);
             vehicles.addVehicleType(bike);
         }
 

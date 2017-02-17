@@ -67,5 +67,4 @@ public class RaceTrackLinkProperties {
         this.numberOfLanes = numberOfLanes;
         this.allowedModes = allowedModes;
     }
-
 }

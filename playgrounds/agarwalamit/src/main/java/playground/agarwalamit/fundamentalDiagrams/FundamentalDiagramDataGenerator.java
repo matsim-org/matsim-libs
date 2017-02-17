@@ -525,6 +525,7 @@ public class FundamentalDiagramDataGenerator {
 		new File(outputDir+"/logfile.log").delete();
 		new File(outputDir+"/logfileWarningsErrors.log").delete();
 		new File(outputDir+"/scorestats.txt").delete();
+		new File(outputDir+"/modestats.txt").delete();
 		new File(outputDir+"/stopwatch.txt").delete();
 		new File(outputDir+"/traveldistancestats.txt").delete();
 	}
