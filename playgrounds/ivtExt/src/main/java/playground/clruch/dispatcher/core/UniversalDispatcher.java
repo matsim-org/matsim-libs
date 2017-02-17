@@ -92,9 +92,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      *            provided by getAVRequests()
      */
     protected final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+        GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
+        
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
-        GlobalAssert.that(pendingRequests.contains(avRequest));
 
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule)); // check that current task is last task in schedule

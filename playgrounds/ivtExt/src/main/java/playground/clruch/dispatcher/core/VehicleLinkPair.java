@@ -27,7 +27,7 @@ public class VehicleLinkPair {
      * 
      * @return null if vehicle does not have a destination
      */
-    public Link getDestination() {
+    public Link getDestination() { // TODO function name is unclear
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         // List<AbstractTask> tasks = schedule.getTasks();
         // if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED))
