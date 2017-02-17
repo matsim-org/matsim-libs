@@ -34,8 +34,6 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.vehicles.VehicleType;
-
 
 /**
  * @author ssix, amit
@@ -154,15 +152,13 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		this.delegate.handleEvent(event);
-		Id<VehicleType> transportMode = Id.create(person2Mode.get(event.getPersonId()), VehicleType.class);
-		this.travelModesFlowData.get(transportMode).handle(event);
+		this.travelModesFlowData.get(person2Mode.get(event.getPersonId())).handle(event);
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		this.delegate.handleEvent(event);
-		Id<VehicleType> transportMode = Id.create(person2Mode.get(event.getPersonId()), VehicleType.class);
-		this.travelModesFlowData.get(transportMode).handle(event);
+		this.travelModesFlowData.get(person2Mode.get(event.getPersonId())).handle(event);
 	}
 	
 	boolean isPermanent(){

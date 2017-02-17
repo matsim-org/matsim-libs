@@ -52,7 +52,7 @@ public class RunFDDataExample {
         qSimConfigGroup.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
         qSimConfigGroup.setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
         qSimConfigGroup.setEndTime(24*3600.);
-        qSimConfigGroup.setUsingFastCapacityUpdate(true);
+//        qSimConfigGroup.setUsingFastCapacityUpdate(true);
 
         scenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
         scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -73,7 +73,7 @@ public class RunFDDataExample {
 
         String myDir = FileUtils.SHARED_SVN+"/projects/mixedTraffic/triangularNetwork/runTest/holes/1lane/";
         String outFolder ="/carBikePassing_fastCapacityUpdate/";
-
+        scenario.getConfig().controler().setOutputDirectory(myDir+outFolder);
 
         // a container, used to store the link properties,
         // all sides of triangle will have these properties (identical links).
@@ -81,9 +81,8 @@ public class RunFDDataExample {
                 60.0/3.6, 1.0, new HashSet<>(mainModes));
 
         FundamentalDiagramDataGenerator fundamentalDiagramDataGenerator = new FundamentalDiagramDataGenerator(raceTrackLinkProperties, scenario);
-        fundamentalDiagramDataGenerator.setRunDirectory(myDir+outFolder);
         fundamentalDiagramDataGenerator.setModalShareInPCU(new Double [] {1.0, 1.0}); // equal modal split
-        fundamentalDiagramDataGenerator.setReduceDataPointsByFactor(10);
+        fundamentalDiagramDataGenerator.setReduceDataPointsByFactor(2);
         fundamentalDiagramDataGenerator.setIsWritingEventsFileForEachIteration(false);
         fundamentalDiagramDataGenerator.setIsPlottingDistribution(false);
         fundamentalDiagramDataGenerator.setIsUsingLiveOTFVis(false);

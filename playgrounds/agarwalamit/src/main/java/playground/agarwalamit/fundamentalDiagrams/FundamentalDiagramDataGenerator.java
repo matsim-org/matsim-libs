@@ -128,9 +128,10 @@ public class FundamentalDiagramDataGenerator {
 	}
 
 	private void consistencyCheckAndInitialize(){
-		createLogFile();
-
+		this.runDir = scenario.getConfig().controler().getOutputDirectory();
 		if(runDir==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
+
+		createLogFile();
 
 		if(reduceDataPointsByFactor != 1) {
 			LOG.info("===============");
@@ -172,10 +173,6 @@ public class FundamentalDiagramDataGenerator {
 
 	public void setModalShareInPCU(Double[] modalShareInPCU) {
 		this.modalShareInPCU = modalShareInPCU;
-	}
-
-	public void setRunDirectory(String runDir) {
-		this.runDir = runDir;
 	}
 
 	public void setReduceDataPointsByFactor(int reduceDataPointsByFactor) {
@@ -361,12 +358,9 @@ public class FundamentalDiagramDataGenerator {
 			events.addHandler(eventWriter);
 		}
 
-		this.scenario.getConfig().controler().setOutputDirectory(this.runDir);
-
 		Controler controler = new Controler( scenario ) ;
 
 		final Netsim qSim = createModifiedQSim(this.scenario, events);
-
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
