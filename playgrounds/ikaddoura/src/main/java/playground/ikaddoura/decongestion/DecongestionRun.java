@@ -35,6 +35,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisRun;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
@@ -139,7 +140,10 @@ public class DecongestionRun {
 		
 		final Controler controler = decongestion.getControler();
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        controler.run();        
+        controler.run(); 
+        
+        PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(outputDirectory);
+		analysis.run();
 	}
 }
 

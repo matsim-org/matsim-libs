@@ -330,8 +330,8 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		if (this.congestionInfo.getDecongestionConfigGroup().isRUN_FINAL_ANALYSIS()) {
 			log.info("Simulation is shut down. Running final analysis...");
 			
-			PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(this.outputDirectory);
-			analysis.run();
+//			PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(this.outputDirectory);
+//			analysis.run();
 			
 			try {
 				MATSimVideoUtils.createLegHistogramVideo(this.outputDirectory);
