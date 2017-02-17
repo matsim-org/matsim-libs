@@ -50,8 +50,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
-import playground.ikaddoura.analysis.dynamicLinkDemand.DynamicLinkDemandAnalysisRun;
-import playground.ikaddoura.analysis.linkDemand.LinkDemandAnalysisRun;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
 import playground.ikaddoura.moneyTravelDisutility.*;
 
@@ -229,8 +227,8 @@ public class OptAVTestIT {
 			outputDirectory2 = outputDirectory2 + "/";
 		}
 
-		PersonTripNoiseAnalysisRun analysis1b = new PersonTripNoiseAnalysisRun(controler2.getConfig().controler().getOutputDirectory());
-		analysis1b.run();
+		PersonTripNoiseAnalysisRun analysis2 = new PersonTripNoiseAnalysisRun(controler2.getConfig().controler().getOutputDirectory());
+		analysis2.run();
 
 		// print outs
 					
