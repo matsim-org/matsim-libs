@@ -68,7 +68,7 @@ public class NoiseOfflineCalculation {
 
 	public void run() {
 			
-		String outputFilePath = outputDirectory + "analysis_it." + this.scenario.getConfig().controler().getLastIteration() + "/";
+		String outputFilePath = outputDirectory + "noise-analysis_it." + this.scenario.getConfig().controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);
 		file.mkdirs();
 		

@@ -60,7 +60,9 @@ public class NoiseOfflineCalculationExample {
 		noiseCalculation.run();
 		
 		// some processing of the output data
-		String outputFilePath = outputDirectory + "analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
+		if (!outputDirectory.endsWith("/")) outputDirectory = outputDirectory + "/";
+		
+		String outputFilePath = outputDirectory + "noise-analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
 		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
 				
