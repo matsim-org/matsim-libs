@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import playground.clruch.dispatcher.VehicleLinkPair;
+import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class OldestRequestSelector extends AbstractRequestSelector {

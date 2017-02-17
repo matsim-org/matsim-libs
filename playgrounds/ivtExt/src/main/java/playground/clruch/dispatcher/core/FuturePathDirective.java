@@ -1,4 +1,4 @@
-package playground.clruch.dispatcher;
+package playground.clruch.dispatcher.core;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 

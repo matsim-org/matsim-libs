@@ -15,6 +15,8 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.dispatcher.core.UniversalDispatcher;
+import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
