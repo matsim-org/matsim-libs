@@ -232,6 +232,7 @@ public class CNEMunich {
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
 		noiseParameters.setScaleFactor(100.);
+		noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(false);
 
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("591881193", Link.class));

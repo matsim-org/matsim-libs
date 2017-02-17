@@ -176,6 +176,7 @@ public class CNEBerlin {
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
 		noiseParameters.setScaleFactor(10.);
+		noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(false);
 		
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("108041", Link.class));
