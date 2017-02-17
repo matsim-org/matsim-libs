@@ -26,7 +26,7 @@ public class LazyDispatcher extends UniversalDispatcher {
     public static final int DEBUG_PERIOD = 60;
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
-    public LazyDispatcher( //
+    private LazyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //

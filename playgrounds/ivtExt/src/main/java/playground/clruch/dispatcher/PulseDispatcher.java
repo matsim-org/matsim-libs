@@ -34,7 +34,7 @@ public class PulseDispatcher extends UniversalDispatcher {
 
     Random random = new Random();
 
-    public PulseDispatcher(//
+    private PulseDispatcher(//
             AVDispatcherConfig config, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
