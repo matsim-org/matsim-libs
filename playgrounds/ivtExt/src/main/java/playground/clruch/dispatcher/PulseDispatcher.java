@@ -23,7 +23,6 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class PulseDispatcher extends UniversalDispatcher {
-    public static final String IDENTIFIER = PulseDispatcher.class.getSimpleName();
     public static final int DEBUG_PERIOD = 5 * 60;
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 

@@ -21,7 +21,6 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LazyDispatcher extends UniversalDispatcher {
-    public static final String IDENTIFIER = LazyDispatcher.class.getSimpleName();
     public static final int DEBUG_PERIOD = 60;
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
