@@ -52,7 +52,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 	private final TravelModesFlowDynamicsUpdator globalFlowData;
 	private final Map<Id<Person>, String> person2Mode = new HashMap<>();
 	
-	public final static Id<Link> FLOW_DYNAMICS_UPDATE_LINK = Id.createLinkId(0);
+	public final Id<Link> flowDynamicsUpdateLink;
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private boolean permanentRegime;
@@ -62,17 +62,18 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 	 * @param lengthOfTrack
 	 * container to store static properties of vehicles and dynamic flow properties during simulation 
 	 */
-	GlobalFlowDynamicsUpdator( final Map<String, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer, final double lengthOfTrack){
+	GlobalFlowDynamicsUpdator( final Map<String, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer, final Id<Link> startLinkOfTrack, final double lengthOfTrack){
 		int totalAgents = 0;
 		this.travelModesFlowData = travelModeFlowDataContainer;
 		for (String vehTyp : travelModeFlowDataContainer.keySet()){
 			this.travelModesFlowData.get(vehTyp).initDynamicVariables();
 			totalAgents += this.travelModesFlowData.get(vehTyp).getnumberOfAgents();
 		}
-		this.globalFlowData = new TravelModesFlowDynamicsUpdator(this.travelModesFlowData.size(),  lengthOfTrack);
+		this.globalFlowData = new TravelModesFlowDynamicsUpdator(this.travelModesFlowData.size(), startLinkOfTrack,  lengthOfTrack);
 		this.globalFlowData.setnumberOfAgents(totalAgents);
 		this.globalFlowData.initDynamicVariables();
 		this.permanentRegime = false;
+		this.flowDynamicsUpdateLink = startLinkOfTrack;
 	}
 
 	@Override
@@ -100,7 +101,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 
 			//Aggregated data update
 			double nowTime = event.getTime();
-			if (event.getLinkId().equals(FLOW_DYNAMICS_UPDATE_LINK)){				
+			if (event.getLinkId().equals(flowDynamicsUpdateLink)){
 				this.globalFlowData.updateFlow900(nowTime, pcuPerson);
 				this.globalFlowData.updateSpeedTable(nowTime,personId);
 				//Waiting for all agents to be on the track before studying stability

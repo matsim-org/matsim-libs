@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.VehicleType;
@@ -66,22 +67,23 @@ class TravelModesFlowDynamicsUpdator {
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private final int noOfModes;
-
 	private final double lengthOfTrack;
+	private final Id<Link> startOfTheLink;
 
-	TravelModesFlowDynamicsUpdator(final int noOfModes, final double lengthOfTrack){
-		this(null, noOfModes, lengthOfTrack);
+	TravelModesFlowDynamicsUpdator(final int noOfModes, final Id<Link> startOfTheLink,final double lengthOfTrack){
+		this(null, noOfModes, startOfTheLink, lengthOfTrack);
 	}
 
-	TravelModesFlowDynamicsUpdator(final VehicleType vT, final int noOfModes, final double lengthOfTrack){
+	TravelModesFlowDynamicsUpdator(final VehicleType vT, final int noOfModes, final Id<Link> startOfTheLink, final double lengthOfTrack){
 		this.vehicleType = vT;
 		if(this.vehicleType != null) this.modeId = this.vehicleType.getId();
 		this.noOfModes = noOfModes;
 		this.lengthOfTrack = lengthOfTrack;
+		this.startOfTheLink = startOfTheLink;
 	}
 
 	void handle(LinkEnterEvent event){
-		if (event.getLinkId().equals(GlobalFlowDynamicsUpdator.FLOW_DYNAMICS_UPDATE_LINK)){
+		if (event.getLinkId().equals(startOfTheLink)){
 			Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 			double nowTime = event.getTime();
 

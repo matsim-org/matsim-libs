@@ -147,7 +147,8 @@ public class FundamentalDiagramDataGenerator {
 		for (int index = 0; index < travelModes.length; index++){
 			Id<VehicleType> vehicleTypeId = Id.create(travelModes[index], VehicleType.class);
 			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(vehicleTypeId);
-			mode2FlowData.put(travelModes[index], new TravelModesFlowDynamicsUpdator(vehicleType, travelModes.length, fdNetworkGenerator.getLengthOfTrack()));
+			mode2FlowData.put(travelModes[index], new TravelModesFlowDynamicsUpdator(vehicleType, travelModes.length,
+					fdNetworkGenerator.getFirstLinkIdOfTrack(), fdNetworkGenerator.getLengthOfTrack()));
 		}
 
 		flowUnstableWarnCount = new int [travelModes.length];
@@ -342,7 +343,7 @@ public class FundamentalDiagramDataGenerator {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator( this.mode2FlowData, fdNetworkGenerator.getLengthOfTrack());
+		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator( this.mode2FlowData, fdNetworkGenerator.getFirstLinkIdOfTrack() ,fdNetworkGenerator.getLengthOfTrack());
 		passingEventsUpdator  = new PassingEventsUpdator(scenario.getConfig().qsim().getSeepModes(), fdNetworkGenerator.getFirstLinkIdOfTrack(),
 				fdNetworkGenerator.getLastLinkIdOfTrack(), fdNetworkGenerator.getLengthOfTrack());
 
@@ -383,8 +384,8 @@ public class FundamentalDiagramDataGenerator {
 
 		boolean stableState = true;
 		for(int index=0;index<travelModes.length;index++){
-			Id<VehicleType> veh = Id.create(travelModes[index], VehicleType.class);
-			if(!mode2FlowData.get(travelModes[index]).isFlowStable())
+			String veh = travelModes[index];
+			if(!mode2FlowData.get(veh).isFlowStable())
 			{
 				stableState = false;
 				int existingCount = flowUnstableWarnCount[index]; existingCount++;
@@ -393,7 +394,7 @@ public class FundamentalDiagramDataGenerator {
 						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
 						+ "This is " + flowUnstableWarnCount[index]+ "th warning.");
 			}
-			if(!mode2FlowData.get(travelModes[index]).isSpeedStable())
+			if(!mode2FlowData.get(veh).isSpeedStable())
 			{
 				stableState = false;
 				int existingCount = speedUnstableWarnCount[index]; existingCount++;
@@ -471,7 +472,7 @@ public class FundamentalDiagramDataGenerator {
 		final Map<String, VehicleType> travelModesTypes = new HashMap<>();
 		for (String id : mode2FlowData.keySet()){
 			VehicleType vT = mode2FlowData.get(id).getVehicleType();
-			travelModesTypes.put(id.toString(), vT);
+			travelModesTypes.put(id, vT);
 		}
 
 		AgentSource agentSource = new AgentSource() {
@@ -488,7 +489,7 @@ public class FundamentalDiagramDataGenerator {
 					qSim.insertAgentIntoMobsim(agent);
 
 					final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), travelModesTypes.get(travelMode));
-					final Id<Link> linkId4VehicleInsertion = Id.createLinkId("home");
+					final Id<Link> linkId4VehicleInsertion = fdNetworkGenerator.getTripDepartureLinkId();
 					qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 				}
 			}
