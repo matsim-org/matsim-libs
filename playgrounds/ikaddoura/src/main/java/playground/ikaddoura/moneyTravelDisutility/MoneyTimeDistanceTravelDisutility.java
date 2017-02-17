@@ -77,7 +77,11 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 
-		double travelDisutility = this.travelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+		double travelDisutility = 0.;
+		
+		if (this.travelDisutility != null) {
+			travelDisutility = this.travelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+		}
 		
 		double logNormalRnd = 1. ;
 		if ( sigma != 0. ) {

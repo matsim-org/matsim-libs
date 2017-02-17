@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.ikaddoura.moneyTravelDisutility;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -38,6 +39,8 @@ import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
  *
  */
 public final class MoneyTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
+	private static final Logger log = Logger.getLogger(MoneyTimeDistanceTravelDisutilityFactory.class);
+
 
 	@Inject
 	private MoneyEventAnalysis moneyAnalysis;
@@ -58,15 +61,28 @@ public final class MoneyTimeDistanceTravelDisutilityFactory implements TravelDis
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		
-		randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
-		
-		return new MoneyTimeDistanceTravelDisutility(
-				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
-				this.sigma,
-				this.scenario,
-				this.moneyAnalysis,
-				this.vehicleFilter
-			);
+		if (randomizedTimeDistanceTravelDisutilityFactory == null) {
+			log.warn("Time and distance costs will not be considered in the travel disutility. Calculating a least cost path based on monetary payments only.");
+			
+			return new MoneyTimeDistanceTravelDisutility(
+					null,
+					this.sigma,
+					this.scenario,
+					this.moneyAnalysis,
+					this.vehicleFilter
+				);
+			
+		} else {
+			randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
+
+			return new MoneyTimeDistanceTravelDisutility(
+					randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
+					this.sigma,
+					this.scenario,
+					this.moneyAnalysis,
+					this.vehicleFilter
+				);
+		}
 	}
 	
 	public void setSigma ( double val ) {
