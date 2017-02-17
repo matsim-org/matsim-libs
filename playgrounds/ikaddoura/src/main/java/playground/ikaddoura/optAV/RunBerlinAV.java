@@ -19,6 +19,7 @@
 
 package playground.ikaddoura.optAV;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.robotaxi.scoring.*;
 import org.matsim.contrib.dvrp.data.FleetImpl;
@@ -49,21 +50,44 @@ import playground.ikaddoura.analysis.linkDemand.LinkDemandAnalysisRun;
 */
 
 public class RunBerlinAV {
+	
+	private static final Logger log = Logger.getLogger(RunBerlinAV.class);
 
-	private final static String configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_baseCase_test.xml";
-	private final static boolean otfvis = false;
+	private static String configFile;
+	private static String outputDirectory;
+	private static boolean otfvis;
 	
 	public static void main(String[] args) {
-		run();
+		
+		if (args.length > 0) {
+			
+			configFile = args[0];		
+			log.info("configFile: "+ configFile);
+			
+			outputDirectory = args[1];
+			log.info("outputDirectory: "+ outputDirectory);
+			
+			otfvis = false;
+			
+		} else {
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase/";
+			otfvis = true;
+		}
+		
+		RunBerlinAV runBerlinAV = new RunBerlinAV();
+		runBerlinAV.run();
 	}
 
-	private static void run() {
+	private void run() {
 		
 		Config config = ConfigUtils.loadConfig(configFile,
 				new TaxiConfigGroup(),
 				new TaxiFareConfigGroup(),
 				new OTFVisConfigGroup(),
 				new NoiseConfigGroup());
+		
+		config.controler().setOutputDirectory(outputDirectory);
 		
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
