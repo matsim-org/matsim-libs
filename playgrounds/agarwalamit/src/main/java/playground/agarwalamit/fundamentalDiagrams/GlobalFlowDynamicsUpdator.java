@@ -48,7 +48,7 @@ import org.matsim.vehicles.VehicleType;
 
 class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
-	private final Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
+	private final Map<String, TravelModesFlowDynamicsUpdator> travelModesFlowData;
 	private final TravelModesFlowDynamicsUpdator globalFlowData;
 	private final Map<Id<Person>, String> person2Mode = new HashMap<>();
 	
@@ -62,10 +62,10 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 	 * @param lengthOfTrack
 	 * container to store static properties of vehicles and dynamic flow properties during simulation 
 	 */
-	GlobalFlowDynamicsUpdator( final Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer, final double lengthOfTrack){
+	GlobalFlowDynamicsUpdator( final Map<String, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer, final double lengthOfTrack){
 		int totalAgents = 0;
 		this.travelModesFlowData = travelModeFlowDataContainer;
-		for (Id<VehicleType> vehTyp : travelModeFlowDataContainer.keySet()){
+		for (String vehTyp : travelModeFlowDataContainer.keySet()){
 			this.travelModesFlowData.get(vehTyp).initDynamicVariables();
 			totalAgents += this.travelModesFlowData.get(vehTyp).getnumberOfAgents();
 		}
@@ -77,7 +77,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 
 	@Override
 	public void reset(int iteration) {	
-		for (Id<VehicleType> vehTyp : travelModesFlowData.keySet()){
+		for (String vehTyp : travelModesFlowData.keySet()){
 			this.travelModesFlowData.get(vehTyp).reset();
 		}
 		this.globalFlowData.reset();
@@ -95,9 +95,8 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 			Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 			String travelMode = person2Mode.get(personId);
 
-			Id<VehicleType> transportMode = Id.create(travelMode, VehicleType.class);
-			this.travelModesFlowData.get(transportMode).handle(event);
-			double pcuPerson = this.travelModesFlowData.get(transportMode).getVehicleType().getPcuEquivalents();
+			this.travelModesFlowData.get(travelMode).handle(event);
+			double pcuPerson = this.travelModesFlowData.get(travelMode).getVehicleType().getPcuEquivalents();
 
 			//Aggregated data update
 			double nowTime = event.getTime();
@@ -119,7 +118,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 
 					//Checking modes stability
 					boolean modesStable = true;
-					for (Id<VehicleType> vehTyp : travelModesFlowData.keySet()){
+					for (String vehTyp : travelModesFlowData.keySet()){
 						if (this.travelModesFlowData.get(vehTyp).numberOfAgents != 0){
 							if (! this.travelModesFlowData.get(vehTyp).isSpeedStable() || ! this.travelModesFlowData.get(vehTyp).isFlowStable() ) {
 								modesStable = false;
@@ -131,7 +130,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 						//Checking global stability
 						if ( /*this.globalFlowData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
 							FundamentalDiagramDataGenerator.LOG.info("========== Global permanent regime is attained");
-							for (Id<VehicleType> vehTyp : travelModesFlowData.keySet()){
+							for (String vehTyp : travelModesFlowData.keySet()){
 								this.travelModesFlowData.get(vehTyp).saveDynamicVariables();
 							}
 							this.globalFlowData.setPermanentAverageVelocity(this.globalFlowData.getActualAverageVelocity());
