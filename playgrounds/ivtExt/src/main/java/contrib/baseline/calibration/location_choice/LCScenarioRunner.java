@@ -51,7 +51,7 @@ public class LCScenarioRunner {
         return aggregator.getMeanDistances();
     }
 
-    public Map<String, Double> runScenario(String name, int iteration, int percentage, String[] purposes, List<Double> epsilons) {
+    public Map<String, Double> runScenario(String name, int iteration, int percentage, int cores, String[] purposes, List<Double> epsilons) {
         // Set up configuraton
 
         OutputDirectoryLogging.catchLogEntries();
@@ -78,6 +78,8 @@ public class LCScenarioRunner {
 
         config.controler().setOutputDirectory("simulations/output_" + name + "_" + String.valueOf(iteration));
         config.controler().setLastIteration(0);
+        config.global().setNumberOfThreads(cores);
+        config.qsim().setNumberOfThreads(cores);
 
         // Run simulation as usual
 

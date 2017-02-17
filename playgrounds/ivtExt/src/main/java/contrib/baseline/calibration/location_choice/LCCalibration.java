@@ -34,7 +34,7 @@ public class LCCalibration {
         }
     }
 
-    void run(String name, int percentage) throws IOException {
+    void run(String name, int percentage, int cores) throws IOException {
         File statePath = new File("state_" + name + ".json");
         LCScenarioRunner scenarioRunner = new LCScenarioRunner();
 
@@ -61,7 +61,7 @@ public class LCCalibration {
                 }
             }
 
-            Map<String, Double> mappedResponses = scenarioRunner.runScenario(name, state.iteration, percentage, state.purposes, newCandidates);
+            Map<String, Double> mappedResponses = scenarioRunner.runScenario(name, state.iteration, percentage, cores, state.purposes, newCandidates);
             for (int i = 0; i < state.purposes.length; i++) newResponses[i] = mappedResponses.get(state.purposes[i]);
 
             for (int i = 0; i < state.purposes.length; i++) {
@@ -79,6 +79,6 @@ public class LCCalibration {
 
     public static void main(String[] args) throws IOException {
         LCCalibration calibration = new LCCalibration();
-        calibration.run(args[0], Integer.parseInt(args[1]));
+        calibration.run(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
     }
 }
