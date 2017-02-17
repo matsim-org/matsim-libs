@@ -21,6 +21,7 @@
 		<param name="consideredActivitiesForReceiverPointGrid" value="home,work,noise_sensitive" />
 		<param name="hgvIdPrefixes" value="lkw" />
 		<param name="internalizeNoiseDamages" value="true" />
+		<param name="computeAvgNoiseCostPerLinkAndTime" value="false" />
 		<param name="noiseAllocationApproach" value="MarginalCost" />
 		<param name="receiverPointGap" value="100.0" />
 		<param name="receiverPointsGridMaxX" value="0.0" />
