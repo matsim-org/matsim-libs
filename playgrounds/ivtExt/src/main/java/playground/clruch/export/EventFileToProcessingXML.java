@@ -17,48 +17,48 @@ import java.io.File;
  */
 public class EventFileToProcessingXML {
     /**
-     * reads an output events file from a matsim simulation and outputs an XML file to be read by
-     * processing
+     * reads an output events file from a matsim simulation and
+     * outputs an XML file to be read by processing
      *
-     * @param args the path of the project folder
+     * @param folder
+     *            of the project folder
      */
+    public static void convert(final File dir) {
+        File output = new File(dir, "output");
+        if (output.exists()) { // check if output folder exists
+
+            File directory = new File(output, "processing");
+            directory.mkdir();
+            File fileImport = new File(output, "output_events.xml");
+
+            EventsManager events = EventsUtils.createEventsManager();
+
+            // add event handlers to create waitingCustomers file
+            WaitingCustomers waitingCustomers = new WaitingCustomers();
+            waitingCustomers.initialize(events);
+
+            // add event handlers to create VehicleStatus file
+            VehicleStatus vehicleStatus = new VehicleStatus();
+            vehicleStatus.initialize(events);
+
+            // add vehicle location reader
+            VehicleLocation vehicleLocation = new VehicleLocation();
+            vehicleLocation.initialize(events);
+
+            // run the events reader
+            new MatsimEventsReader(events).readFile(fileImport.toString());
+
+            // write XML files
+            waitingCustomers.writeXML(directory);
+            vehicleStatus.writeXML(directory);
+            vehicleLocation.writeXML(directory);
+        } else
+            new RuntimeException("output directory does not exist").printStackTrace();
+
+    }
+
     public static void main(String[] args) {
-
-        // read an event output file given String[] args
-        //final File dir = new File(args[0]);
-        final File dir = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs");
-        File directory = new File(dir, "output/processing");
-        File fileImport = new File(dir, "output/output_events.xml");
-        System.out.println("Is directory?  " + dir.isDirectory());
-
-        EventsManager events = EventsUtils.createEventsManager();
-        events.addHandler(i -> System.out.println("" + i));
-
-        // add event handlers to create waitingCustomers file
-        WaitingCustomers waitingCustomers = new WaitingCustomers();
-        waitingCustomers.initialize(events);
-
-        // add event handlers to create VehicleStatus file
-        VehicleStatus vehicleStatus = new VehicleStatus();
-        vehicleStatus.initialize(events);
-
-        // add experimental file to reverse engineer XML file
-        VehicleStatusLab vehicleStatusLab = new VehicleStatusLab();
-        vehicleStatusLab.initialize(events);
-
-        // add vehicle location reader
-        VehicleLocation vehicleLocation = new VehicleLocation();
-        vehicleLocation.initialize(events);
-
-        // run the events reader
-        new MatsimEventsReader(events).readFile(fileImport.toString());
-
-        // write XML files
-        waitingCustomers.writeXML(directory);
-        vehicleStatus.writeXML(directory);
-        vehicleStatusLab.writeXML(directory);
-        vehicleLocation.writeXML(directory);
-
-        System.out.println("routine finished successfully");
+        //convert(new File(args[0]));
+        convert(new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs"));
     }
 }
