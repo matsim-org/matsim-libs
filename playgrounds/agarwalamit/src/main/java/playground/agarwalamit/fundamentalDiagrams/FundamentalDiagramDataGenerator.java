@@ -34,6 +34,7 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -54,6 +55,7 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
@@ -179,6 +181,11 @@ public class FundamentalDiagramDataGenerator {
 		// following is necessary, in order to achieve the data points at high density
 		if(this.travelModes.length==1 && this.travelModes[0].equals("car")) scenario.getConfig().qsim().setStuckTime(60.);
 		else  if (this.travelModes.length==1 && this.travelModes[0].equals("truck")) scenario.getConfig().qsim().setStuckTime(180.);
+
+		if ( scenario.getConfig().network().isTimeVariantNetwork() ) {
+			Network netImpl = scenario.getNetwork();
+			netImpl.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
+		}
 	}
 
 	public void setModalShareInPCU(Double[] modalShareInPCU) {

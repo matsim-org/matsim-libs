@@ -44,7 +44,7 @@ public class RunFDDataExample {
 
         Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 
-        List<String> mainModes = Arrays.asList("car", "bike");
+        List<String> mainModes = Arrays.asList("car","bike");
 
         // queue model parameters
         QSimConfigGroup qSimConfigGroup = scenario.getConfig().qsim();
@@ -72,7 +72,7 @@ public class RunFDDataExample {
         }
 
         String myDir = FileUtils.SHARED_SVN+"/projects/mixedTraffic/triangularNetwork/runTest/holes/1lane/";
-        String outFolder ="/carBikePassing_fastCapacityUpdate/";
+        String outFolder ="/carBikePassing/";
         scenario.getConfig().controler().setOutputDirectory(myDir+outFolder);
 
         // a container, used to store the link properties,
@@ -81,13 +81,11 @@ public class RunFDDataExample {
                 60.0/3.6, 1.0, new HashSet<>(mainModes));
 
         FundamentalDiagramDataGenerator fundamentalDiagramDataGenerator = new FundamentalDiagramDataGenerator(raceTrackLinkProperties, scenario);
-        fundamentalDiagramDataGenerator.setModalShareInPCU(new Double [] {1.0, 1.0}); // equal modal split
-        fundamentalDiagramDataGenerator.setReduceDataPointsByFactor(2);
+        fundamentalDiagramDataGenerator.setModalShareInPCU(new Double [] {1.0,1.0}); // equal modal split
+        fundamentalDiagramDataGenerator.setReduceDataPointsByFactor(1);
         fundamentalDiagramDataGenerator.setIsWritingEventsFileForEachIteration(false);
         fundamentalDiagramDataGenerator.setIsPlottingDistribution(false);
         fundamentalDiagramDataGenerator.setIsUsingLiveOTFVis(false);
         fundamentalDiagramDataGenerator.run();
-
-        System.out.println("link");
     }
 }
