@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.FDTestSetUp;
+package playground.agarwalamit.fundamentalDiagrams;
 
 import java.util.Arrays;
 import java.util.HashSet;

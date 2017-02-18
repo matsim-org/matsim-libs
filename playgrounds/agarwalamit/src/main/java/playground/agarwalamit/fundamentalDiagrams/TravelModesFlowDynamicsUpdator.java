@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.FDTestSetUp;
+package playground.agarwalamit.fundamentalDiagrams;
 
 import java.util.LinkedList;
 import java.util.List;

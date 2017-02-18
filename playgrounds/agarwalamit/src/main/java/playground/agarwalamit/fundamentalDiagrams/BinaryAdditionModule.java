@@ -1,4 +1,4 @@
-package playground.agarwalamit.mixedTraffic.FDTestSetUp;
+package playground.agarwalamit.fundamentalDiagrams;
 
 import java.util.List;
 

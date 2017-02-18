@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.FDTestSetUp;
+package playground.agarwalamit.fundamentalDiagrams;
 
 import java.io.File;
 import java.io.IOException;

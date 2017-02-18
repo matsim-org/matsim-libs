@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.FDTestSetUp.plots;
+package playground.agarwalamit.mixedTraffic.qPositionPlots;
 
 import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
@@ -26,45 +26,43 @@ import org.matsim.api.core.v01.population.Person;
 /**
  * @author amit after <code>AgentOnLinkInfo</code>
  */
-
-public final class EnteringPersonInfo {
-	
-	private final  Id<Person> personId;
-	private final 	Link link;
-	private final Double enterTime;
+public class LeavingPersonInfo {
+	private final Id<Person> personId;
+	private final Id<Link> linkId;
+	private final Double leaveTime;
 	private final String legMode;
 	
 	public static class Builder {
 		private Id<Person> personId;
-		private Link link;
-		private Double enterTime;
+		private Id<Link> linkId;
+		private Double leaveTime;
 		private String legMode;
 		
 		public Builder setAgentId(final Id<Person> personId) {
 			this.personId = personId ; return this ;
 		}
-		public Builder setLink(final Link link) {
-			this.link = link ; return this ;
+		public Builder setLinkId(final Id<Link> linkId) {
+			this.linkId = linkId ; return this ;
 		}
-		public Builder setEnterTime(final double time) {
-			this.enterTime = time ; return this ;
+		public Builder setLeaveTime(final double time) {
+			this.leaveTime = time ; return this ;
 		}
 		public Builder setLegMode(final String legMode) {
 			this.legMode = legMode ; return this ;
 		}
-		public final EnteringPersonInfo build() {
+		public final LeavingPersonInfo build() {
 			Assert.assertNotNull( personId );
-			Assert.assertNotNull( link );
-			Assert.assertNotNull( enterTime );
+			Assert.assertNotNull( linkId );
+			Assert.assertNotNull( leaveTime );
 			Assert.assertNotNull( legMode );
-			return new EnteringPersonInfo( personId, link, enterTime, legMode ) ;
+			return new LeavingPersonInfo( personId, linkId, leaveTime, legMode ) ;
 		}
 	}
 
-	public EnteringPersonInfo(final Id<Person> personId2, final Link link, final double enterTime2, final String legMode) {
+	public LeavingPersonInfo(final Id<Person> personId2, final Id<Link> linkId, final double leaveTime2, final String legMode) {
 		this.personId = personId2 ;
-		this.link = link ;
-		this.enterTime = enterTime2 ;
+		this.linkId = linkId ;
+		this.leaveTime = leaveTime2 ;
 		this.legMode = legMode;
 	}
 
@@ -72,12 +70,12 @@ public final class EnteringPersonInfo {
 		return this.personId;
 	}
 
-	public Link getLink() {
-		return this.link;
+	public Id<Link> getLinkId() {
+		return this.linkId;
 	}
 
-	public Double getLinkEnterTime() {
-		return this.enterTime;
+	public Double getLinkLeaveTime() {
+		return this.leaveTime;
 	}
 	public String getLegMode() {
 		return this.legMode ;
