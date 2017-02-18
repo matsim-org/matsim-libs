@@ -27,15 +27,21 @@ class AverageTravelTime implements TravelTime {
 		this.travelTime = travelTime;
 	}
 
-	// -------------------- IMPLEMENTATION OF TravelTime --------------------
-
-	@Override
-	public double getLinkTravelTime(final Link link, final double time, final Person person, final Vehicle vehicle) {
+	// -------------------- IMPLEMENTATION --------------------
+	
+	public double getAvgLinkTravelTime(final Link link, final Person person, final Vehicle vehicle) {
 		double sum = 0.0;
 		for (int bin = 0; bin < this.timeDiscr.getBinCnt(); bin++) {
 			sum += this.travelTime.getLinkTravelTime(link, this.timeDiscr.getBinStartTime_s(bin), person, vehicle);
 		}
-		return (sum / this.timeDiscr.getBinCnt());
+		return (sum / this.timeDiscr.getBinCnt());		
+	}
+
+	// -------------------- IMPLEMENTATION OF TravelTime --------------------
+
+	@Override
+	public double getLinkTravelTime(final Link link, final double time, final Person person, final Vehicle vehicle) {
+		return this.getAvgLinkTravelTime(link, person, vehicle);
 	}
 
 }

@@ -51,10 +51,11 @@ class DemandModel {
 	static void replanPopulation(final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final double replanProba, final String expectationFileName,
 			final String demandStatsFileName, final int maxTrials, final int maxFailures, final boolean usePTto1,
-			final boolean usePTto2, final Map<String, TravelTime> mode2travelTime) {
+			final boolean usePTto2, final Map<String, TravelTime> mode2travelTime, final double betaTravelSampers_1_h,
+			final SampersCarDelay sampersCarDelay) {
 
 		final ChoiceModel choiceModel = new ChoiceModel(sampleCnt, rnd, scenario, tripRouterProvider, mode2travelTime,
-				maxTrials, maxFailures, usePTto1, usePTto2);
+				maxTrials, maxFailures, usePTto1, usePTto2, betaTravelSampers_1_h, sampersCarDelay);
 
 		final DemandAnalyzer demandAnalyzer = new DemandAnalyzer();
 		final ResamplingTest resamplingTest = new ResamplingTest();
