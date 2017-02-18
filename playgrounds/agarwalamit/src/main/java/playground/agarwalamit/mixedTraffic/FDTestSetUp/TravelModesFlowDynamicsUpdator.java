@@ -24,39 +24,39 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.VehicleType;
-
 import playground.agarwalamit.utils.ListUtils;
 
 /**
  * @author amit after ssix
- */ 
+ */
+
 /**
  * A class intended to contain "static" mode-dependent data (vehicle type, speed etc.)
  * as well as dynamic data used in the mobsim (speed, flow of the mode)
  * as well as methods to store and update this data.
  */
 
-class TravelModesFlowDynamicsUpdator {
+final class TravelModesFlowDynamicsUpdator {
 
 	private final int NUMBER_OF_MEMORIZED_FLOWS = 10;
 	private Id<VehicleType> modeId;
 	private VehicleType vehicleType=null;//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
 	//	     So far programmed to contain also global data, i.e. data without a specific vehicleType (ssix, 30.09.13)
-	public int numberOfAgents;
+	private int numberOfAgents;
 	//private int numberOfDrivingAgents;//dynamic variable counting live agents on the track
 	private double permanentDensity;
 	private double permanentAverageVelocity;
 	private double permanentFlow;
 
-	private Map<Id<Person>,Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
+	private Map<Id<Person>, Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
 	private int speedTableSize;
 	private List<Double> speedTable;
 	private Double flowTime;
@@ -67,19 +67,23 @@ class TravelModesFlowDynamicsUpdator {
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private final int noOfModes;
+	private final double lengthOfTrack;
+	private final Id<Link> startOfTheLink;
 
-	TravelModesFlowDynamicsUpdator(int noOfModes){
-		this.noOfModes = noOfModes;
+	TravelModesFlowDynamicsUpdator(final int noOfModes, final Id<Link> startOfTheLink,final double lengthOfTrack){
+		this(null, noOfModes, startOfTheLink, lengthOfTrack);
 	}
 
-	TravelModesFlowDynamicsUpdator(VehicleType vT, int noOfModes){
+	TravelModesFlowDynamicsUpdator(final VehicleType vT, final int noOfModes, final Id<Link> startOfTheLink, final double lengthOfTrack){
 		this.vehicleType = vT;
-		this.modeId = this.vehicleType.getId();
+		if(this.vehicleType != null) this.modeId = this.vehicleType.getId();
 		this.noOfModes = noOfModes;
+		this.lengthOfTrack = lengthOfTrack;
+		this.startOfTheLink = startOfTheLink;
 	}
 
 	void handle(LinkEnterEvent event){
-		if (event.getLinkId().equals(GlobalFlowDynamicsUpdator.FLOW_DYNAMICS_UPDATE_LINK)){
+		if (event.getLinkId().equals(startOfTheLink)){
 			Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 			double nowTime = event.getTime();
 
@@ -90,7 +94,7 @@ class TravelModesFlowDynamicsUpdator {
 			//Making sure all agents are on the track before testing stability
 			//Also waiting half an hour to let the database build itself.
 
-			if ((this.getNumberOfDrivingAgents() == this.numberOfAgents) && (nowTime > InputsForFDTestSetUp.MAX_ACT_END_TIME * 2)){
+			if ((this.getNumberOfDrivingAgents() == this.numberOfAgents) && (nowTime > FundamentalDiagramDataGenerator.MAX_ACT_END_TIME * 2)){
 				if (!(this.speedStability)){
 					this.checkSpeedStability();
 				}
@@ -108,7 +112,7 @@ class TravelModesFlowDynamicsUpdator {
 	public void handle(VehicleLeavesTrafficEvent event) {
 		this.delegate.handleEvent(event);
 	}
-	
+
 	void updateFlow900(double nowTime, double pcuPerson){
 		if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
 			Double nowFlow = this.flowTable900.get(0);
@@ -144,7 +148,7 @@ class TravelModesFlowDynamicsUpdator {
 	void updateSpeedTable(double nowTime, Id<Person> personId){
 		if (this.lastSeenOnStudiedLinkEnter.containsKey(personId)){
 			double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
-			double speed = InputsForFDTestSetUp.LINK_LENGTH * 3 / (nowTime-lastSeenTime);//in m/s!!
+			double speed = this.lengthOfTrack / (nowTime-lastSeenTime);//in m/s!!
 			for (int i=speedTableSize-2; i>=0; i--){
 				this.speedTable.set(i+1, this.speedTable.get(i).doubleValue());
 			}
@@ -165,7 +169,7 @@ class TravelModesFlowDynamicsUpdator {
 		relativeDeviances /= this.noOfModes;//taking dependence on number of modes away
 		if (relativeDeviances < 0.0005){
 			this.speedStability = true;
-			GenerateFundamentalDiagramData.LOG.info("========== Reaching a certain speed stability in mode: "+modeId);
+			FundamentalDiagramDataGenerator.LOG.info("========== Reaching a certain speed stability in mode: "+modeId);
 		} else {
 			this.speedStability = false;
 		}
@@ -178,13 +182,13 @@ class TravelModesFlowDynamicsUpdator {
 //			relativeDeviances  += Math.pow( (this.lastXHourlyFlows.get(i).doubleValue() - avgFlow)/avgFlow , 2);
 //		}
 //		relativeDeviances /= this.NUMBER_OF_MEMORIZED_FLOWS;
-		
+
 		double absoluteDeviances = this.lastXHourlyFlows.get(this.lastXHourlyFlows.size()-1) - this.lastXHourlyFlows.get(0);
 		if (Math.abs(absoluteDeviances) < 1){
 //		if(relativeDeviances < 0.05){
 			this.flowStability = true;
-			if(modeId==null) GenerateFundamentalDiagramData.LOG.info("========== Reaching a certain flow stability for global flow.");
-			else GenerateFundamentalDiagramData.LOG.info("========== Reaching a certain flow stability in mode: "+modeId.toString());
+			if(modeId==null) FundamentalDiagramDataGenerator.LOG.info("========== Reaching a certain flow stability for global flow.");
+			else FundamentalDiagramDataGenerator.LOG.info("========== Reaching a certain flow stability in mode: "+modeId.toString());
 		} else {
 			this.flowStability = false;
 		}
@@ -241,11 +245,11 @@ class TravelModesFlowDynamicsUpdator {
 
 	void saveDynamicVariables(){
 		//NB: Should not be called upon a modeData without a vehicleType, as this.vehicleType will be null and will throw an exception.
-		this.permanentDensity = this.numberOfAgents / (InputsForFDTestSetUp.LINK_LENGTH*3) *1000 * this.vehicleType.getPcuEquivalents();
+		this.permanentDensity = this.numberOfAgents / (lengthOfTrack) *1000 * this.vehicleType.getPcuEquivalents();
 		this.permanentAverageVelocity = this.getActualAverageVelocity();
-		GenerateFundamentalDiagramData.LOG.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
+		FundamentalDiagramDataGenerator.LOG.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
 		this.permanentFlow = this.getSlidingAverageOfLastXHourlyFlows();
-		GenerateFundamentalDiagramData.LOG.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXHourlyFlows+"\nResult is :"+this.permanentFlow);	
+		FundamentalDiagramDataGenerator.LOG.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXHourlyFlows+"\nResult is :"+this.permanentFlow);
 	}
 
 	VehicleType getVehicleType(){
@@ -257,16 +261,16 @@ class TravelModesFlowDynamicsUpdator {
 	}
 
 	double getActualAverageVelocity(){
-		return ListUtils.doubleMean(this.speedTable); 
+		return ListUtils.doubleMean(this.speedTable);
 	}
 
 	double getCurrentHourlyFlow(){
-		double nowFlow = ListUtils.doubleSum(this.flowTable900);
+		double nowFlow = this.flowTable900.stream().mapToDouble(i->i).sum();
 		return nowFlow*4;
 	}
 
 	double getSlidingAverageOfLastXHourlyFlows(){
-		return ListUtils.doubleMean(this.lastXHourlyFlows);
+		return this.lastXHourlyFlows.stream().mapToDouble(i->i).average().orElse(0.);
 	}
 
 	boolean isSpeedStable(){
@@ -280,7 +284,7 @@ class TravelModesFlowDynamicsUpdator {
 	int getnumberOfAgents(){
 		return this.numberOfAgents ;
 	}
-	
+
 	void setnumberOfAgents(int n){
 		this.numberOfAgents = n;
 	}

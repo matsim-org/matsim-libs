@@ -26,6 +26,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -33,12 +34,13 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
@@ -53,6 +55,8 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -61,24 +65,20 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-import playground.agarwalamit.utils.FileUtils;
 
 /**
  * @author amit after ssix
  */
 
-public class GenerateFundamentalDiagramData {
+public class FundamentalDiagramDataGenerator {
 
-	static final Logger LOG = Logger.getLogger(GenerateFundamentalDiagramData.class);
+	public static final Logger LOG = Logger.getLogger(FundamentalDiagramDataGenerator.class);
+
+	static final double MAX_ACT_END_TIME = 1800.;
 
 	private String runDir ;
-	private boolean isDumpingInputFiles = true; // includes config, network
 	private boolean isWritingEventsFileForEachIteration = false;
-	
-	private String[] travelModes;	
-	private Double[] modalSplitInPCU;
-	
+
 	private boolean isUsingLiveOTFVis = false;
 	private boolean isPlottingDistribution = false;
 
@@ -87,104 +87,111 @@ public class GenerateFundamentalDiagramData {
 	private int flowUnstableWarnCount [] ;
 	private int speedUnstableWarnCount [] ;
 
-	private final InputsForFDTestSetUp inputs;
 	private PrintStream writer;
-	private final Scenario scenario;
+	private Scenario scenario;
 
-	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
+	private static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
+	private static FDNetworkGenerator fdNetworkGenerator;
+
 	private PassingEventsUpdator passingEventsUpdator;
-	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
+	private final Map<String, TravelModesFlowDynamicsUpdator> mode2FlowData = new HashMap<>();
 	private final Map<Id<Person>, String> person2Mode = new HashMap<>();
 
 	private Integer[] startingPoint;
 	private Integer [] maxAgentDistribution;
 	private Integer [] stepSize;
-	
-	
-	public GenerateFundamentalDiagramData (final InputsForFDTestSetUp inputs){
-		this.inputs = inputs;
-		this.inputs.run();
-		scenario = this.inputs.getScenario();
+
+	private String[] travelModes;
+	private Double[] modalShareInPCU;
+
+	public FundamentalDiagramDataGenerator(final RaceTrackLinkProperties raceTrackLinkProperties, final Scenario scenario){
+		this ( new FDNetworkGenerator(raceTrackLinkProperties), scenario );
 	}
 
-	public static void main(String[] args) {
-		
-		boolean isRunningOnCluster = false;
-		
-		if (args.length  > 0) isRunningOnCluster = true;
-		
-		if( ! isRunningOnCluster ) {
-			
-			args = new String [8];
-			
-			String myDir = FileUtils.SHARED_SVN+"/projects/mixedTraffic/triangularNetwork/run315/holes/1lane/";
-			String outFolder ="/carBikePassing_fastCapacityUpdate/";
-			
-			args[0] = myDir + outFolder ;
-			args[1] = "car,bike"; // travel (main) modes
-			args[2] = "1.0,1.0"; // modal split in pcu
-			args[3] = TrafficDynamics.withHoles.toString(); // isUsingHoles
-			args[4] = LinkDynamics.PassingQ.toString(); // isPassingAllowed
-			args[5] = "1"; // reduce number of data points by this factor
-			args[6] = "false"; // is plotting modal split distribution
-		}
-		
-		InputsForFDTestSetUp inputs = new InputsForFDTestSetUp();
-		inputs.setTravelModes(args[1].split(","));
-		inputs.setModalSplit(args[2].split(",")); //in pcu
-		inputs.setTrafficDynamics(TrafficDynamics.valueOf( args[3]));
-		inputs.setLinkDynamics(LinkDynamics.valueOf( args[4]));
-		
-		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData(inputs);
-		generateFDData.setRunDirectory(args[0]);
-		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[5]));
-		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[6]));
-		generateFDData.setIsUsingLiveOTFVis(false);
-		generateFDData.setIsWritingEventsFileForEachIteration(false);
-		generateFDData.run();
+	public FundamentalDiagramDataGenerator(final RaceTrackLinkProperties raceTrackLinkProperties, final int subdivisionFactor, final Scenario scenario){
+		FDNetworkGenerator fdNetworkGenerator = new FDNetworkGenerator(raceTrackLinkProperties);
+		fdNetworkGenerator.setSubdivisionFactor(subdivisionFactor);
+	}
+
+	private FundamentalDiagramDataGenerator(final FDNetworkGenerator fdNetworkGenerator, final Scenario scenario){
+		this.fdNetworkGenerator = fdNetworkGenerator;
+		this.fdNetworkGenerator.createNetwork(scenario);
+		this.scenario = scenario;
+	}
+
+	public void run(){
+		consistencyCheckAndInitialize();
+		setUpConfig();
+
+		openFileAndWriteHeader(runDir+"/data.txt");
+
+		if(isPlottingDistribution){
+			parametricRunAccordingToDistribution();
+		} else parametricRunAccordingToGivenModalSplit();
+
+		new ConfigWriter(scenario.getConfig()).write(this.runDir+"/config.xml");
+		new NetworkWriter(scenario.getNetwork()).write(this.runDir+"/network.xml");
+
+		closeFile();
 	}
 
 	private void consistencyCheckAndInitialize(){
-		if(isDumpingInputFiles) {
-			createLogFile();
-		}
-
-		if(isDumpingInputFiles && runDir==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
+		this.runDir = scenario.getConfig().controler().getOutputDirectory();
 		if(runDir==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
-		
+
+		createLogFile();
+
 		if(reduceDataPointsByFactor != 1) {
 			LOG.info("===============");
 			LOG.warn("Number of modes for each mode type in FD will be reduced by a factor of "+reduceDataPointsByFactor+". "+
 					"Make sure this is what you want because it will be more likely to have less or no points in congested regime in absence of queue model with holes.");
 			LOG.info("===============");
 		}
-		
+
 		if(isWritingEventsFileForEachIteration) Log.warn("This will write one event file corresponding to each iteration and thus ");
-	}
 
-	public void run(){
-		consistencyCheckAndInitialize();
-		travelModes = inputs.getTravelModes();
-		modalSplitInPCU = inputs.getModalSplit();
-		if(isDumpingInputFiles) inputs.dumpInputFiles(runDir);
+		Collection<String> mainModes = scenario.getConfig().qsim().getMainModes();
+		travelModes = mainModes.toArray(new String[mainModes.size()]);
 
-		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
+		for (int index = 0; index < travelModes.length; index++){
+			Id<VehicleType> vehicleTypeId = Id.create(travelModes[index], VehicleType.class);
+			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(vehicleTypeId);
+			mode2FlowData.put(travelModes[index], new TravelModesFlowDynamicsUpdator(vehicleType, travelModes.length,
+					fdNetworkGenerator.getFirstLinkIdOfTrack(), fdNetworkGenerator.getLengthOfTrack()));
+		}
+
 		flowUnstableWarnCount = new int [travelModes.length];
 		speedUnstableWarnCount = new int [travelModes.length];
-
-		openFileAndWriteHeader(runDir+"/data.txt");
-
-		if(isPlottingDistribution){
-			parametricRunAccordingToDistribution();	
-		} else parametricRunAccordingToGivenModalSplit();
-
-		closeFile();
 	}
 
-	public void setRunDirectory(String runDir) {
-		this.runDir = runDir;
+	private void setUpConfig() {
+		// required if using controler
+		PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		home.setScoringThisActivityAtAll(false);
+		scenario.getConfig().planCalcScore().addActivityParams(home);
+
+		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		work.setScoringThisActivityAtAll(false);
+		scenario.getConfig().planCalcScore().addActivityParams(work);
+
+		scenario.getConfig().controler().setLastIteration(0);
+		scenario.getConfig().controler().setCreateGraphs(false);
+		scenario.getConfig().controler().setDumpDataAtEnd(false);
+
+		// following is necessary, in order to achieve the data points at high density
+		if(this.travelModes.length==1 && this.travelModes[0].equals("car")) scenario.getConfig().qsim().setStuckTime(60.);
+		else  if (this.travelModes.length==1 && this.travelModes[0].equals("truck")) scenario.getConfig().qsim().setStuckTime(180.);
+
+		if ( scenario.getConfig().network().isTimeVariantNetwork() ) {
+			Network netImpl = scenario.getNetwork();
+			netImpl.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
+		}
 	}
-	
+
+	public void setModalShareInPCU(Double[] modalShareInPCU) {
+		this.modalShareInPCU = modalShareInPCU;
+	}
+
 	public void setReduceDataPointsByFactor(int reduceDataPointsByFactor) {
 		this.reduceDataPointsByFactor = reduceDataPointsByFactor;
 	}
@@ -201,28 +208,20 @@ public class GenerateFundamentalDiagramData {
 			boolean isWritingEventsFileForEachIteration) {
 		this.isWritingEventsFileForEachIteration = isWritingEventsFileForEachIteration;
 	}
-	
-	public void setIsDumpingInputFiles(boolean isDumpingInputFiles){
-		this.isDumpingInputFiles = isDumpingInputFiles;
-	}
-	
-	public Scenario getScenario() {
-		return scenario;
-	}
 
 	private void parametricRunAccordingToGivenModalSplit(){
-
 		//	Creating minimal configuration respecting modal split in PCU and integer agent numbers
 		List<Double> pcus = new ArrayList<>();
 		for(int index =0 ;index<travelModes.length;index++){
-			double tempPCU = MixedTrafficVehiclesUtils.getPCU(travelModes[index]);
+			double tempPCU = this.mode2FlowData.get(travelModes[index]).getVehicleType().getPcuEquivalents();
 			pcus.add(tempPCU);
 		}
 
-		List<Integer> minSteps = new ArrayList<>();
-		for (double modalSplit : Arrays.asList(modalSplitInPCU)){
-			minSteps.add(Integer.valueOf( (int) modalSplit*100) ) ;
-		}
+		List<Integer> minSteps = Arrays.asList(modalShareInPCU)
+									   .stream()
+									   .mapToDouble(modalSplit -> modalSplit)
+									   .mapToObj(modalSplit -> Integer.valueOf((int) modalSplit * 100))
+									   .collect(Collectors.toList());
 
 		int commonMultiplier = 1;
 		for (int i=0; i<travelModes.length; i++){
@@ -250,14 +249,14 @@ public class GenerateFundamentalDiagramData {
 				minSteps.set(index, minSteps.get(index)*reduceDataPointsByFactor);
 			}
 		}
-		
+
 		//set up number of Points to run.
 		double cellSizePerPCU = scenario.getNetwork().getEffectiveCellSize();
-		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
+		double networkDensity = fdNetworkGenerator.getLengthOfTrack() * fdNetworkGenerator.getLinkProperties().getNumberOfLanes() / cellSizePerPCU;
 		double sumOfPCUInEachStep = 0;
-	
+
 		for(int index=0;index<travelModes.length;index++){
-			sumOfPCUInEachStep +=  minSteps.get(index) * MixedTrafficVehiclesUtils.getPCU(travelModes[index]);
+			sumOfPCUInEachStep +=  minSteps.get(index) * this.mode2FlowData.get(travelModes[index]).getVehicleType().getPcuEquivalents();
 		}
 		int numberOfPoints = (int) Math.ceil(networkDensity/sumOfPCUInEachStep) +5;
 
@@ -294,10 +293,10 @@ public class GenerateFundamentalDiagramData {
 
 		maxAgentDistribution = new Integer [travelModes.length];
 		double cellSizePerPCU = this.scenario.getNetwork().getEffectiveCellSize();
-		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
+		double networkDensity = fdNetworkGenerator.getLengthOfTrack() * fdNetworkGenerator.getLinkProperties().getNumberOfLanes() / cellSizePerPCU;
 
 		for(int ii=0;ii<maxAgentDistribution.length;ii++){
-			double pcu = this.mode2FlowData.get(Id.create(travelModes[ii],VehicleType.class)).getVehicleType().getPcuEquivalents();
+			double pcu = this.mode2FlowData.get(travelModes[ii]).getVehicleType().getPcuEquivalents();
 			int maxNumberOfVehicle = (int) Math.floor(networkDensity/pcu)+1;
 			maxAgentDistribution[ii] = maxNumberOfVehicle;
 		}
@@ -308,20 +307,20 @@ public class GenerateFundamentalDiagramData {
 			List<Integer> pointToRun = pointsToRun.get(i);
 			double density =0;
 			for(int jj = 0; jj < travelModes.length;jj++ ){
-				double pcu = this.mode2FlowData.get(Id.create(travelModes[jj],VehicleType.class)).getVehicleType().getPcuEquivalents();
+				double pcu = this.mode2FlowData.get(travelModes[jj]).getVehicleType().getPcuEquivalents();
 				density += pcu *pointToRun.get(jj) ;
 			}
 
 			if(density <= networkDensity+5){
 				LOG.info("Going into run "+pointToRun);
 				this.singleRun(pointToRun);
-			} 
+			}
 		}
 	}
 
 	private List<List<Integer>> createPointsToRun() {
 
-		int numberOfPoints = 1; 
+		int numberOfPoints = 1;
 
 		for(int jj=0;jj<travelModes.length;jj++){
 			numberOfPoints *= (int) Math.floor((maxAgentDistribution[jj]-startingPoint[jj])/stepSize[jj])+1;
@@ -353,54 +352,58 @@ public class GenerateFundamentalDiagramData {
 				Id<Person> personId = Id.createPersonId(person2Mode.size());
 				person2Mode.put(personId,travelModes[i]);
 			}
-			
-			this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).setnumberOfAgents(pointToRun.get(i).intValue());
+
+			this.mode2FlowData.get(travelModes[i]).setnumberOfAgents(pointToRun.get(i).intValue());
 		}
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator( this.mode2FlowData);
-		passingEventsUpdator  = new PassingEventsUpdator(scenario.getConfig().qsim().getSeepModes());
+		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(
+				this.mode2FlowData,
+				fdNetworkGenerator.getFirstLinkIdOfTrack() ,
+				fdNetworkGenerator.getLengthOfTrack());
+		passingEventsUpdator  = new PassingEventsUpdator(
+				scenario.getConfig().qsim().getSeepModes(),
+				fdNetworkGenerator.getFirstLinkIdOfTrack(),
+				fdNetworkGenerator.getLastLinkIdOfTrack(),
+				fdNetworkGenerator.getLengthOfTrack());
 
 		events.addHandler(globalFlowDynamicsUpdator);
 		if(travelModes.length > 1)	events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = null;
-		
+
 		if(isWritingEventsFileForEachIteration){
 			String eventsDir = runDir+"/events/";
-			
+
 			if (! new File(eventsDir).exists() ) new File(eventsDir).mkdir();
-			
+
 			eventWriter = new EventWriterXML(eventsDir+"/events"+pointToRun.toString()+".xml");
 			events.addHandler(eventWriter);
 		}
-		
-		this.scenario.getConfig().controler().setOutputDirectory(this.runDir);
-		
-		Controler controler = new Controler( scenario ) ;
-		
-		final Netsim qSim = createModifiedQSim(this.scenario, events);
 
+		Controler controler = new Controler( scenario ) ;
+
+		final Netsim qSim = createModifiedQSim(this.scenario, events);
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				this.bindMobsim().toInstance( qSim );
 			}
 		});
-		
+
 		controler.run();
-		
-		if(! inputs.getSnapshotFormats().isEmpty()) {
+
+		if(! scenario.getConfig().controler().getSnapshotFormat().isEmpty()) {
 			//remove and renaming of the files which are generated from controler and not required.
 			updateTransimFileNameAndDir(pointToRun);
 		}
 		cleanOutputDir();
-		
+
 		boolean stableState = true;
 		for(int index=0;index<travelModes.length;index++){
-			Id<VehicleType> veh = Id.create(travelModes[index], VehicleType.class);
-			if(!mode2FlowData.get(veh).isFlowStable()) 
+			String veh = travelModes[index];
+			if(!mode2FlowData.get(veh).isFlowStable())
 			{
 				stableState = false;
 				int existingCount = flowUnstableWarnCount[index]; existingCount++;
@@ -409,7 +412,7 @@ public class GenerateFundamentalDiagramData {
 						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
 						+ "This is " + flowUnstableWarnCount[index]+ "th warning.");
 			}
-			if(!mode2FlowData.get(veh).isSpeedStable()) 
+			if(!mode2FlowData.get(veh).isSpeedStable())
 			{
 				stableState = false;
 				int existingCount = speedUnstableWarnCount[index]; existingCount++;
@@ -423,38 +426,38 @@ public class GenerateFundamentalDiagramData {
 
 		// sometimes higher density points are also executed (stuck time), to exclude them density check.
 		double cellSizePerPCU = scenario.getNetwork().getEffectiveCellSize();
-		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
+		double networkDensity = fdNetworkGenerator.getLengthOfTrack() * fdNetworkGenerator.getLinkProperties().getNumberOfLanes() / cellSizePerPCU;
 
 		if(stableState){
 			double globalLinkDensity = globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity();
-			if(globalLinkDensity > networkDensity/3+10) stableState =false; //+10; since we still need some points at max density to show zero speed.
+			if(globalLinkDensity > networkDensity / 3 + 10 ) stableState =false; //+10; since we still need some points at max density to show zero speed.
 		}
 
 		if( stableState ) {
-			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
+			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().getnumberOfAgents());
 			for (int i=0; i < travelModes.length; i++){
-				writer.format("%d\t", this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).numberOfAgents);
+				writer.format("%d\t", this.mode2FlowData.get(travelModes[i]).getnumberOfAgents());
 			}
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity());
 			for (int i=0; i < travelModes.length; i++){
-				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getPermanentDensity());
+				writer.format("%.2f\t", this.mode2FlowData.get(travelModes[i]).getPermanentDensity());
 			}
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentFlow());
 			for (int i=0; i < travelModes.length; i++){
-				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getPermanentFlow());
+				writer.format("%.2f\t", this.mode2FlowData.get(travelModes[i]).getPermanentFlow());
 			}
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentAverageVelocity());
 			for (int i=0; i < travelModes.length; i++){
-				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getPermanentAverageVelocity());
+				writer.format("%.2f\t", this.mode2FlowData.get(travelModes[i]).getPermanentAverageVelocity());
 			}
-			
+
 			if( travelModes.length > 1 ) {
 
 				writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
 
 				writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			}
-			
+
 			writer.print("\n");
 		}
 
@@ -463,7 +466,7 @@ public class GenerateFundamentalDiagramData {
 			eventWriter.closeFile();
 		}
 	}
-	
+
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
 		final QSim qSim = new QSim(sc, events);
 		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
@@ -479,32 +482,31 @@ public class GenerateFundamentalDiagramData {
 		LOG.info("Mobsim agents' are directly added to AgentSource.");
 		LOG.info("=======================");
 
-		if (this.inputs.isTimeDependentNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+		if (this.scenario.getConfig().network().isTimeVariantNetwork()) {
+			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
 		}
 
 		//modification: Mobsim needs to know the different vehicle types (and their respective physical parameters)
-		final Map<String, VehicleType> travelModesTypes = new HashMap<>();
-		for (Id<VehicleType> id : mode2FlowData.keySet()){
-			VehicleType vT = mode2FlowData.get(id).getVehicleType();
-			travelModesTypes.put(id.toString(), vT);
-		}
+		final Map<String, VehicleType> travelModesTypes =
+				mode2FlowData
+						.entrySet()
+						.stream()
+						.collect( Collectors.toMap( e -> e.getKey(), e -> e.getValue().getVehicleType()) );
 
 		AgentSource agentSource = new AgentSource() {
-
 			@Override
 			public void insertAgentsIntoMobsim() {
 
 				for ( Id<Person> personId : person2Mode.keySet()) {
 					String travelMode = person2Mode.get(personId);
 					double randDouble = MatsimRandom.getRandom().nextDouble();
-					double actEndTime = randDouble*InputsForFDTestSetUp.MAX_ACT_END_TIME;
+					double actEndTime = randDouble * MAX_ACT_END_TIME;
 
 					MobsimAgent agent = new MySimplifiedRoundAndRoundAgent(personId, actEndTime, travelMode);
 					qSim.insertAgentIntoMobsim(agent);
 
 					final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), travelModesTypes.get(travelMode));
-					final Id<Link> linkId4VehicleInsertion = Id.createLinkId("home");
+					final Id<Link> linkId4VehicleInsertion = fdNetworkGenerator.getTripDepartureLinkId();
 					qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 				}
 			}
@@ -516,29 +518,26 @@ public class GenerateFundamentalDiagramData {
 			// otfvis configuration.  There is more you can do here than via file!
 			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
-			//				otfVisConfig.setShowParking(true) ; // this does not really work
-
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, qSim);
 			OTFClientLive.run(sc.getConfig(), server);
 		}
-
 		return qSim;
 	}
-	
+
 	private void updateTransimFileNameAndDir(List<Integer> runningPoint) {
 		String outputDir = scenario.getConfig().controler().getOutputDirectory();
 		//Check if Transim veh dir exists, if not create it
 		if(! new File(outputDir+"/TransVeh/").exists() ) new File(outputDir+"/TransVeh/").mkdir();
 		//first, move T.veh.gz file
-		String sourceTVehFile = outputDir+"/ITERS/it.0/0.T.veh.gz"; 
-		String targetTVehFilen = outputDir+"/TransVeh/T_"+runningPoint.toString()+".veh.gz"; 
+		String sourceTVehFile = outputDir+"/ITERS/it.0/0.T.veh.gz";
+		String targetTVehFilen = outputDir+"/TransVeh/T_"+runningPoint.toString()+".veh.gz";
 		try {
 			Files.move(new File(sourceTVehFile).toPath(), new File(targetTVehFilen).toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			throw new RuntimeException("File not found.");
 		}
 	}
-	
+
 	private void cleanOutputDir(){
 		String outputDir = scenario.getConfig().controler().getOutputDirectory();
 		IOUtils.deleteDirectory(new File(outputDir+"/ITERS/"), false);
@@ -546,6 +545,7 @@ public class GenerateFundamentalDiagramData {
 		new File(outputDir+"/logfile.log").delete();
 		new File(outputDir+"/logfileWarningsErrors.log").delete();
 		new File(outputDir+"/scorestats.txt").delete();
+		new File(outputDir+"/modestats.txt").delete();
 		new File(outputDir+"/stopwatch.txt").delete();
 		new File(outputDir+"/traveldistancestats.txt").delete();
 	}
@@ -558,29 +558,29 @@ public class GenerateFundamentalDiagramData {
 		}
 		writer.print("n \t");
 		for (int i=0; i < travelModes.length; i++){
-			String str = this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getModeId().toString();
+			String str = this.mode2FlowData.get(travelModes[i]).getModeId().toString();
 			String strn = "n_"+str;
 			writer.print(strn+"\t");
 		}
 		writer.print("k \t");
 		for (int i=0; i < travelModes.length; i++){
-			String str = this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getModeId().toString();
+			String str = this.mode2FlowData.get(travelModes[i]).getModeId().toString();
 			String strk = "k_"+str;
 			writer.print(strk+"\t");
 		}
 		writer.print("q \t");
 		for (int i=0; i < travelModes.length; i++){
-			String str = this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getModeId().toString();
+			String str = this.mode2FlowData.get(travelModes[i]).getModeId().toString();
 			String strq = "q_"+str;
 			writer.print(strq+"\t");
 		}
 		writer.print("v \t");
 		for (int i=0; i < travelModes.length; i++){
-			String str = this.mode2FlowData.get(Id.create(travelModes[i],VehicleType.class)).getModeId().toString();
+			String str = this.mode2FlowData.get(travelModes[i]).getModeId().toString();
 			String strv = "v_"+str;
 			writer.print(strv+"\t");
 		}
-		
+
 		if( travelModes.length > 1 ) {
 			writer.print("noOfCarsPerkm \t");
 
@@ -640,12 +640,12 @@ public class GenerateFundamentalDiagramData {
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
-		private static final Id<Link> FIRST_LINK_ID_OF_MIDDEL_BRANCH_OF_TRACK = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR);
-		private static final Id<Link> LAST_LINK_ID_OF_BASE = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR-1);
-		private static final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR-1);
-		private static final Id<Link> FIRST_LINK_LINK_ID_OF_BASE = Id.createLinkId(0);
-		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
-		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+		private static final Id<Link> FIRST_LINK_ID_OF_MIDDEL_BRANCH_OF_TRACK = fdNetworkGenerator.getFirstLinkIdOfMiddleLinkOfTrack();
+		private static final Id<Link> LAST_LINK_ID_OF_BASE = fdNetworkGenerator.getLastLinkIdOfBase();
+		private static final Id<Link> LAST_LINK_ID_OF_TRACK = fdNetworkGenerator.getLastLinkIdOfTrack();
+		private static final Id<Link> FIRST_LINK_LINK_ID_OF_BASE =  fdNetworkGenerator.getFirstLinkIdOfTrack();
+		private static final Id<Link> ORIGIN_LINK_ID = fdNetworkGenerator.getTripDepartureLinkId();
+		private static final Id<Link> DESTINATION_LINK_ID = fdNetworkGenerator.getTripArrivalLinkId();
 
 		private final Id<Person> personId;
 		private final Id<Vehicle> plannedVehicleId;
@@ -654,7 +654,7 @@ public class GenerateFundamentalDiagramData {
 
 		private MobsimVehicle vehicle ;
 		public boolean isArriving= false;
-		
+
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
 			mode = travelMode;
@@ -663,9 +663,9 @@ public class GenerateFundamentalDiagramData {
 		}
 
 		private Id<Link> currentLinkId = ORIGIN_LINK_ID;
-		private State agentState= MobsimAgent.State.ACTIVITY;
+		private State agentState= State.ACTIVITY;
 
-        @Override
+		@Override
 		public Id<Link> getCurrentLinkId() {
 			return this.currentLinkId;
 		}
@@ -683,8 +683,8 @@ public class GenerateFundamentalDiagramData {
 		@Override
 		public Id<Link> chooseNextLinkId() {
 
-			if (GenerateFundamentalDiagramData.globalFlowDynamicsUpdator.isPermanent()){ 
-				isArriving = true; 
+			if (FundamentalDiagramDataGenerator.globalFlowDynamicsUpdator.isPermanent()){
+				isArriving = true;
 			}
 
 			if( LAST_LINK_ID_OF_TRACK.equals(this.currentLinkId) || ORIGIN_LINK_ID.equals(this.currentLinkId)){
@@ -699,6 +699,7 @@ public class GenerateFundamentalDiagramData {
 			}  else if (DESTINATION_LINK_ID.equals(this.currentLinkId)){
 				return null;// this will send agent for arrival
 			} else {
+				// TODO: if the link ids are not consecutive numbers, this will not work.
 				Id<Link> existingLInkId = this.currentLinkId;
 				return Id.createLinkId(Integer.valueOf(existingLInkId.toString())+1);
 			}
@@ -712,7 +713,6 @@ public class GenerateFundamentalDiagramData {
 		@Override
 		public boolean isWantingToArriveOnCurrentLink() {
 			return this.chooseNextLinkId()==null ;
-
 		}
 
 		@Override
@@ -737,7 +737,7 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public double getActivityEndTime() {
-			if(isArriving && this.agentState.equals(MobsimAgent.State.ACTIVITY)) {
+			if(isArriving && this.agentState.equals(State.ACTIVITY)) {
 				return Double.POSITIVE_INFINITY; // let agent go to sleep.
 			}
 			return this.actEndTime;
@@ -745,12 +745,12 @@ public class GenerateFundamentalDiagramData {
 
 		@Override
 		public void endActivityAndComputeNextState(double now) {
-			agentState= MobsimAgent.State.LEG;
+			agentState= State.LEG;
 		}
 
 		@Override
 		public void endLegAndComputeNextState(double now) {
-			agentState=MobsimAgent.State.ACTIVITY;
+			agentState= State.ACTIVITY;
 		}
 
 		@Override
