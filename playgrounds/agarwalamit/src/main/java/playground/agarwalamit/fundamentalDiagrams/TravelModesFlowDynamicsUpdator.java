@@ -44,19 +44,19 @@ import playground.agarwalamit.utils.ListUtils;
  * as well as methods to store and update this data.
  */
 
-class TravelModesFlowDynamicsUpdator {
+final class TravelModesFlowDynamicsUpdator {
 
 	private final int NUMBER_OF_MEMORIZED_FLOWS = 10;
 	private Id<VehicleType> modeId;
 	private VehicleType vehicleType=null;//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
 	//	     So far programmed to contain also global data, i.e. data without a specific vehicleType (ssix, 30.09.13)
-	public int numberOfAgents;
+	private int numberOfAgents;
 	//private int numberOfDrivingAgents;//dynamic variable counting live agents on the track
 	private double permanentDensity;
 	private double permanentAverageVelocity;
 	private double permanentFlow;
 
-	private Map<Id<Person>,Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
+	private Map<Id<Person>, Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
 	private int speedTableSize;
 	private List<Double> speedTable;
 	private Double flowTime;
@@ -265,12 +265,12 @@ class TravelModesFlowDynamicsUpdator {
 	}
 
 	double getCurrentHourlyFlow(){
-		double nowFlow = ListUtils.doubleSum(this.flowTable900);
+		double nowFlow = this.flowTable900.stream().mapToDouble(i->i).sum();
 		return nowFlow*4;
 	}
 
 	double getSlidingAverageOfLastXHourlyFlows(){
-		return ListUtils.doubleMean(this.lastXHourlyFlows);
+		return this.lastXHourlyFlows.stream().mapToDouble(i->i).average().orElse(0.);
 	}
 
 	boolean isSpeedStable(){

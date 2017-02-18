@@ -37,20 +37,20 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 /**
  * @author ssix, amit
- * A class supposed to go attached to the GenerateFundametalDiagramData class.
+ * A class supposed to go attached to the {@link FundamentalDiagramDataGenerator}.
  * It aims at analyzing the flow of events in order to detect:
  * The permanent regime of the system and the following searched values:
  * the permanent flow, the permanent density and the permanent average 
  * velocity for each velocity group.
  */
 
-class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+final class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
 	private final Map<String, TravelModesFlowDynamicsUpdator> travelModesFlowData;
 	private final TravelModesFlowDynamicsUpdator globalFlowData;
 	private final Map<Id<Person>, String> person2Mode = new HashMap<>();
 	
-	public final Id<Link> flowDynamicsUpdateLink;
+	private final Id<Link> flowDynamicsUpdateLink;
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private boolean permanentRegime;
@@ -103,7 +103,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 				this.globalFlowData.updateFlow900(nowTime, pcuPerson);
 				this.globalFlowData.updateSpeedTable(nowTime,personId);
 				//Waiting for all agents to be on the track before studying stability
-				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime > FundamentalDiagramDataGenerator.MAX_ACT_END_TIME * 2)){
+				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.getnumberOfAgents()) && (nowTime > FundamentalDiagramDataGenerator.MAX_ACT_END_TIME * 2)){
 					/*//Taking speed check out, as it is not reliable on the global speed table
 					 *  Maybe making a list of moving averages could be smart, 
 					 *  but there is no reliable converging process even in that case. (ssix, 25.10.13)
@@ -118,7 +118,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 					//Checking modes stability
 					boolean modesStable = true;
 					for (String vehTyp : travelModesFlowData.keySet()){
-						if (this.travelModesFlowData.get(vehTyp).numberOfAgents != 0){
+						if (this.travelModesFlowData.get(vehTyp).getnumberOfAgents() != 0){
 							if (! this.travelModesFlowData.get(vehTyp).isSpeedStable() || ! this.travelModesFlowData.get(vehTyp).isFlowStable() ) {
 								modesStable = false;
 								break;
@@ -133,11 +133,11 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 								this.travelModesFlowData.get(vehTyp).saveDynamicVariables();
 							}
 							this.globalFlowData.setPermanentAverageVelocity(this.globalFlowData.getActualAverageVelocity());
-							this.globalFlowData.setPermanentFlow(this.globalFlowData.getCurrentHourlyFlow()); 
-							double globalDensity = 0.;
-							for (TravelModesFlowDynamicsUpdator mode : this.travelModesFlowData.values()){
-								globalDensity += mode.getPermanentDensity();
-							}
+							this.globalFlowData.setPermanentFlow(this.globalFlowData.getCurrentHourlyFlow());
+							double globalDensity = this.travelModesFlowData.values()
+																		   .stream()
+																		   .mapToDouble(TravelModesFlowDynamicsUpdator::getPermanentDensity)
+																		   .sum();
 							this.globalFlowData.setPermanentDensity(globalDensity);
 							this.permanentRegime = true;
 							//How to: end simulation immediately? => solved by granting the mobsim agents access to permanentRegime

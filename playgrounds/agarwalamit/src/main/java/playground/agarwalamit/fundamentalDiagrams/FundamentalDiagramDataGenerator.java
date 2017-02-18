@@ -26,6 +26,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -159,10 +160,6 @@ public class FundamentalDiagramDataGenerator {
 
 		flowUnstableWarnCount = new int [travelModes.length];
 		speedUnstableWarnCount = new int [travelModes.length];
-
-		// following is necessary, in order to achieve the data points at high density
-		if(this.travelModes.length==1 && this.travelModes[0].equals("car")) scenario.getConfig().qsim().setStuckTime(60.);
-		else  if (this.travelModes.length==1 && this.travelModes[0].equals("truck")) scenario.getConfig().qsim().setStuckTime(180.);
 	}
 
 	private void setUpConfig() {
@@ -178,6 +175,10 @@ public class FundamentalDiagramDataGenerator {
 		scenario.getConfig().controler().setLastIteration(0);
 		scenario.getConfig().controler().setCreateGraphs(false);
 		scenario.getConfig().controler().setDumpDataAtEnd(false);
+
+		// following is necessary, in order to achieve the data points at high density
+		if(this.travelModes.length==1 && this.travelModes[0].equals("car")) scenario.getConfig().qsim().setStuckTime(60.);
+		else  if (this.travelModes.length==1 && this.travelModes[0].equals("truck")) scenario.getConfig().qsim().setStuckTime(180.);
 	}
 
 	public void setModalShareInPCU(Double[] modalShareInPCU) {
@@ -209,10 +210,11 @@ public class FundamentalDiagramDataGenerator {
 			pcus.add(tempPCU);
 		}
 
-		List<Integer> minSteps = new ArrayList<>();
-		for (double modalSplit : Arrays.asList(modalShareInPCU)){
-			minSteps.add(Integer.valueOf( (int) modalSplit*100) ) ;
-		}
+		List<Integer> minSteps = Arrays.asList(modalShareInPCU)
+									   .stream()
+									   .mapToDouble(modalSplit -> modalSplit)
+									   .mapToObj(modalSplit -> Integer.valueOf((int) modalSplit * 100))
+									   .collect(Collectors.toList());
 
 		int commonMultiplier = 1;
 		for (int i=0; i<travelModes.length; i++){
@@ -349,9 +351,15 @@ public class FundamentalDiagramDataGenerator {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator( this.mode2FlowData, fdNetworkGenerator.getFirstLinkIdOfTrack() ,fdNetworkGenerator.getLengthOfTrack());
-		passingEventsUpdator  = new PassingEventsUpdator(scenario.getConfig().qsim().getSeepModes(), fdNetworkGenerator.getFirstLinkIdOfTrack(),
-				fdNetworkGenerator.getLastLinkIdOfTrack(), fdNetworkGenerator.getLengthOfTrack());
+		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(
+				this.mode2FlowData,
+				fdNetworkGenerator.getFirstLinkIdOfTrack() ,
+				fdNetworkGenerator.getLengthOfTrack());
+		passingEventsUpdator  = new PassingEventsUpdator(
+				scenario.getConfig().qsim().getSeepModes(),
+				fdNetworkGenerator.getFirstLinkIdOfTrack(),
+				fdNetworkGenerator.getLastLinkIdOfTrack(),
+				fdNetworkGenerator.getLengthOfTrack());
 
 		events.addHandler(globalFlowDynamicsUpdator);
 		if(travelModes.length > 1)	events.addHandler(passingEventsUpdator);
@@ -419,9 +427,9 @@ public class FundamentalDiagramDataGenerator {
 		}
 
 		if( stableState ) {
-			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
+			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().getnumberOfAgents());
 			for (int i=0; i < travelModes.length; i++){
-				writer.format("%d\t", this.mode2FlowData.get(travelModes[i]).numberOfAgents);
+				writer.format("%d\t", this.mode2FlowData.get(travelModes[i]).getnumberOfAgents());
 			}
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity());
 			for (int i=0; i < travelModes.length; i++){
@@ -472,14 +480,13 @@ public class FundamentalDiagramDataGenerator {
 		}
 
 		//modification: Mobsim needs to know the different vehicle types (and their respective physical parameters)
-		final Map<String, VehicleType> travelModesTypes = new HashMap<>();
-		for (String id : mode2FlowData.keySet()){
-			VehicleType vT = mode2FlowData.get(id).getVehicleType();
-			travelModesTypes.put(id, vT);
-		}
+		final Map<String, VehicleType> travelModesTypes =
+				mode2FlowData
+						.entrySet()
+						.stream()
+						.collect( Collectors.toMap( e -> e.getKey(), e -> e.getValue().getVehicleType()) );
 
 		AgentSource agentSource = new AgentSource() {
-
 			@Override
 			public void insertAgentsIntoMobsim() {
 
@@ -504,12 +511,9 @@ public class FundamentalDiagramDataGenerator {
 			// otfvis configuration.  There is more you can do here than via file!
 			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
-			//				otfVisConfig.setShowParking(true) ; // this does not really work
-
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, qSim);
 			OTFClientLive.run(sc.getConfig(), server);
 		}
-
 		return qSim;
 	}
 

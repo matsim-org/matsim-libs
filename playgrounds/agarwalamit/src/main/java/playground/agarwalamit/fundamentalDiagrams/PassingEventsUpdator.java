@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
-import playground.agarwalamit.utils.ListUtils;
 
 /**
  * @author amit
@@ -48,8 +47,8 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	private final List<Double> carsPerKm;
 	private final Collection<String> seepModes;
 
-	private final Id<Link> TRACKING_START_LINK ;
-	private final Id<Link> TRACKING_END_LINK ;
+	private final Id<Link> trackingStartLink;
+	private final Id<Link> trackingEndLink;
 	private boolean isFirstBikeLeavingTrack = false;
 
 	private final Map<Id<Vehicle>, Id<Person>> driverAgents = new HashMap<>();
@@ -63,9 +62,9 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		this.personId2LegMode = new HashMap<>();
 		this.bikesPassedByEachCarPerKm = new ArrayList<>();
 		this.carsPerKm = new ArrayList<>();
-		TRACKING_START_LINK = trackingStartLink;
-		TRACKING_END_LINK = trackingEndLink;
-		lengthOfTrack = legnthOfTrack;
+		this.trackingStartLink = trackingStartLink;
+		this.trackingEndLink = trackingEndLink;
+		this.lengthOfTrack = legnthOfTrack;
 	}
 
 	@Override
@@ -83,7 +82,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		
 		this.personId2LinkEnterTime.put( personId, event.getTime() );
 		
-		if(event.getLinkId().equals(TRACKING_START_LINK)){
+		if(event.getLinkId().equals(trackingStartLink)){
 			this.personId2TrackEnterTime.put(personId, event.getTime());
 		}
 	}
@@ -92,7 +91,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	public void handleEvent(LinkLeaveEvent event){
 		Id<Person> personId = this.driverAgents.get(event.getVehicleId());
 
-		if (event.getLinkId().equals(TRACKING_END_LINK)){
+		if (event.getLinkId().equals(trackingEndLink)){
 			// startsAveraging when first bike leaves test track
 			if(this.personId2LegMode.get(personId).equals(TransportMode.bike) && !this.isFirstBikeLeavingTrack) this.isFirstBikeLeavingTrack = true;
 			
@@ -173,10 +172,10 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 	public double getAvgBikesPassingRate(){
-		return ListUtils.doubleMean(this.bikesPassedByEachCarPerKm);
+		return this.bikesPassedByEachCarPerKm.stream().mapToDouble(i -> i).average().orElse(0.0);
 	}
 
 	public double getNoOfCarsPerKm(){
-		return ListUtils.doubleMean(this.carsPerKm);
+		return this.carsPerKm.stream().mapToDouble(i -> i).average().orElse(0.0);
 	}
 }

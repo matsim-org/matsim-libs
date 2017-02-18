@@ -6,7 +6,7 @@ import java.util.List;
  * @author ssix
  *
  */
-class BinaryAdditionModule {
+final class BinaryAdditionModule {
 
 	private final List<Integer> maxValues;
 	private final List<Integer> steps;

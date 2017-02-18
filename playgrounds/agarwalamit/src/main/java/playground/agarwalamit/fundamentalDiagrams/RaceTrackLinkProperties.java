@@ -27,7 +27,7 @@ import java.util.Set;
  * Stores the link attributes for an equilateral triangular network.
  */
 
-public class RaceTrackLinkProperties {
+public final class RaceTrackLinkProperties {
 
     public double getLinkLength() {
         return linkLength;
