@@ -66,13 +66,13 @@ public class BenensonDynLeg extends ParkingDynLeg{
 			//}
 		}
 		else{
-			observeAndMemorizeParkingSituation();
+			boolean freeSlotOnLink = memorizeParkingSituationAndIsSomethingFree();
 			
 //			werde X LINKS vor dem Ziel aktiv und schätze wie viele Slots noch kommen, ggfs. parke
 			
 			if (this.route.getLinkIds().size() - this.currentLinkIdx == 2) {
 				this.legStage = ParkingMode.SEARCH_WHILE_APPROACH;
-				logger.error("vehicle " + this.vehicleId + " is going into PHASE2 after passing link " + this.currentLinkId);
+				logger.error("vehicle " + this.vehicleId + " is going into PHASE2 on link " + this.currentLinkId);
 			}
 			
 //			werde X SLOTS vor dem Ziel aktiv und antizipiere wie viele Slots noch kommen, ggfs. parke			
@@ -82,24 +82,33 @@ public class BenensonDynLeg extends ParkingDynLeg{
 //			}
 			
 			if(this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
-				double pUnoccupied = 0;
-				if(this.totalObservedParkingSpaces > 0){
-					pUnoccupied = this.observedFreeParkingSpaces / this.totalObservedParkingSpaces;
+				if(freeSlotOnLink){
+					double pUnoccupied = 0;
+					if(this.totalObservedParkingSpaces > 0){
+						pUnoccupied = this.observedFreeParkingSpaces / this.totalObservedParkingSpaces;
+					}
+					
+					//wantToParkHereV2 takes the probability function into account (see Benenson paper)
+					if ( ((BenensonParkingSearchLogic)this.logic).wantToParkHereV2(pUnoccupied, currentLinkId, route.getEndLinkId())){
+						logger.error("vehicle " + this.vehicleId + " würde gerne auf Link " + currentLinkId + " parken.\n "
+								+ "\t pUnoccupied = " + pUnoccupied + "\n\t totalObservedParkingSpaces = " + totalObservedParkingSpaces + "\n\t observedFreeSpaces = " + this.observedFreeParkingSpaces );
+						hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);	
+					}
 				}
-				
-				//wantToParkHereV2 takes the probability function into account (see Benenson paper)
-				if ( ((BenensonParkingSearchLogic)this.logic).wantToParkHereV2(pUnoccupied, currentLinkId, route.getEndLinkId())){
-					logger.error("vehicle " + this.vehicleId + " würde gerne auf Link " + currentLinkId + " parken.\n "
-							+ "\t pUnoccupied = " + pUnoccupied + "\n\t totalObservedParkingSpaces = " + totalObservedParkingSpaces + "\n\t observedFreeSpaces = " + this.observedFreeParkingSpaces );
-					hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
+				else{
+					logger.error("nothing free for vehicle " + vehicleId + " on link " + currentLinkId);
 				}
 			}
 		}
 	}	
-
-	private void observeAndMemorizeParkingSituation() {
+	/**
+	 * returns true if there is at least one empty slot on the current link
+	 */
+	private boolean memorizeParkingSituationAndIsSomethingFree() {
 		this.totalObservedParkingSpaces += ((FacilityBasedParkingManager) this.parkingManager).getNrOfAllParkingSpacesOnLink(currentLinkId);
-		this.observedFreeParkingSpaces += ((FacilityBasedParkingManager) this.parkingManager).getNrOfFreeParkingSpacesOnLink(currentLinkId);
+		double freespaces = ((FacilityBasedParkingManager) this.parkingManager).getNrOfFreeParkingSpacesOnLink(currentLinkId);
+		this.observedFreeParkingSpaces += freespaces;
+		return !(freespaces == 0);
 	}
 
 	/*
@@ -118,7 +127,7 @@ public class BenensonDynLeg extends ParkingDynLeg{
 		else {
 			if (hasFoundParking) {
 				// easy, we can just park where at our destination link
-				logger.error("vehicle " + this.vehicleId + " has found a parking on link " +this.currentLinkId + " after passing " + Math.abs((this.route.getLinkIds().size() - this.currentLinkIdx - 2)) + " links");
+				logger.error("vehicle " + this.vehicleId + " has found a parking on link " + this.currentLinkId + " after passing " + Math.abs((this.route.getLinkIds().size() - this.currentLinkIdx - 3)) + " links");
 				return null;
 			}
 			else {

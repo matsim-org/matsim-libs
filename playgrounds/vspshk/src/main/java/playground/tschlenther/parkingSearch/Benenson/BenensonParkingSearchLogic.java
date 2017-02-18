@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
@@ -29,14 +30,21 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	private Network network;
 	private static final double MIN_THRESHOLD_PROB_FUNCTION = 10;
 	private static final double MAX_THRESHOLD_PROB_FUNCTION = 30;
-	private static final double THRESHOLD_EXPECTED_FREE_PARKINGSPACES = 5;
-	private static final double THRESHOLD_ALL_EXPECTED_PARKINGSPACES_TO_DEST = 290/TSParkingUtils.AVGPARKINGSLOTLENGTH;
 	private static final double ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN = 30;
 	private static final double ACCEPTED_DISTANCE_MAX = 600;
 	private final Random random = MatsimRandom.getLocalInstance();
+	
+	private static final double THRESHOLD_EXPECTED_FREE_PARKINGSPACES = 5;
+	private static final double THRESHOLD_ALL_EXPECTED_PARKINGSPACES_TO_DEST = 290/TSParkingUtils.AVGPARKINGSLOTLENGTH;
+	
 
 	public BenensonParkingSearchLogic(Network network) {
 		this.network = network;
+	}
+	
+	@Override
+	public void reset() {
+
 	}
 	
 	/**
@@ -73,7 +81,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 			double dd = NetworkUtils.getEuclideanDistance(destination.getCoord(),nextNode.getCoord());
 			if( dd < distanceToDest){
 				nextLinkId = outlinkId;
-				distanceToDest = NetworkUtils.getEuclideanDistance(destination.getCoord(),nextNode.getCoord());
+				distanceToDest = dd;
 			}
 			else if(dd == distanceToDest){
 				if (Math.random() > 0.5){
@@ -84,10 +92,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		return nextLinkId;
 	}
 
-	@Override
-	public void reset() {
 
-	}
 
 	public Id<Link> getNextLinkPhase3(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay) {
 		//throw new RuntimeException("i don't want this to happen");
@@ -99,7 +104,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 			nextLink= keys.get(random.nextInt(keys.size()));	
 		}
 		while(!isDriverInAcceptableDistance(nextLink, endLinkId, firstDestLinkEnterTime, timeOfDay));
-		
+		//logger.error("vehicle " + vehicleId  + " turns on link " + nextLink + " after " + (firstDestLinkEnterTime - timeOfDay) + " secs of searching");
 		return nextLink;
 	}
 
@@ -214,7 +219,12 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		
 		//logger.error("\n Distanz zum Ziel: " + distToDest + "\n Anfang Phase 3 : " + firstDestLinkEnterTimer + "\n Jetzt: " + timeOfDay +  "\n Zeit (s) in Phase3: " + timeSpent + "\n akzeptierte Distanz: " + acceptedDistance);
 		
-		if (distToDest <= acceptedDistance) return true;		
+		if (distToDest <= acceptedDistance){
+			logger.error(" distance between link " + currentLinkId + " and destLink " + endLinkId + ": " + distToDest);
+			logger.error("accepted : " + acceptedDistance);
+			logger.error("time spent: " + timeSpent);
+			return true;		
+		}
 		
 		return false;
 	}
