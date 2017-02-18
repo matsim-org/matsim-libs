@@ -88,12 +88,11 @@ public class FundamentalDiagramDataGenerator {
 	private int speedUnstableWarnCount [] ;
 
 	private PrintStream writer;
-	private Scenario scenario;
+	private final Scenario scenario;
 
 	private static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 	private static FDNetworkGenerator fdNetworkGenerator;
 
-	private PassingEventsUpdator passingEventsUpdator;
 	private final Map<String, TravelModesFlowDynamicsUpdator> mode2FlowData = new HashMap<>();
 	private final Map<Id<Person>, String> person2Mode = new HashMap<>();
 
@@ -105,17 +104,13 @@ public class FundamentalDiagramDataGenerator {
 	private Double[] modalShareInPCU;
 
 	public FundamentalDiagramDataGenerator(final RaceTrackLinkProperties raceTrackLinkProperties, final Scenario scenario){
-		this ( new FDNetworkGenerator(raceTrackLinkProperties), scenario );
+		this ( raceTrackLinkProperties, 1, scenario );
 	}
 
 	public FundamentalDiagramDataGenerator(final RaceTrackLinkProperties raceTrackLinkProperties, final int subdivisionFactor, final Scenario scenario){
-		FDNetworkGenerator fdNetworkGenerator = new FDNetworkGenerator(raceTrackLinkProperties);
+		fdNetworkGenerator = new FDNetworkGenerator(raceTrackLinkProperties);
 		fdNetworkGenerator.setSubdivisionFactor(subdivisionFactor);
-	}
-
-	private FundamentalDiagramDataGenerator(final FDNetworkGenerator fdNetworkGenerator, final Scenario scenario){
-		this.fdNetworkGenerator = fdNetworkGenerator;
-		this.fdNetworkGenerator.createNetwork(scenario);
+		fdNetworkGenerator.createNetwork(scenario);
 		this.scenario = scenario;
 	}
 
@@ -153,10 +148,10 @@ public class FundamentalDiagramDataGenerator {
 		Collection<String> mainModes = scenario.getConfig().qsim().getMainModes();
 		travelModes = mainModes.toArray(new String[mainModes.size()]);
 
-		for (int index = 0; index < travelModes.length; index++){
-			Id<VehicleType> vehicleTypeId = Id.create(travelModes[index], VehicleType.class);
+		for (String travelMode : travelModes) {
+			Id<VehicleType> vehicleTypeId = Id.create(travelMode, VehicleType.class);
 			VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get(vehicleTypeId);
-			mode2FlowData.put(travelModes[index], new TravelModesFlowDynamicsUpdator(vehicleType, travelModes.length,
+			mode2FlowData.put(travelMode, new TravelModesFlowDynamicsUpdator(vehicleType, travelModes.length,
 					fdNetworkGenerator.getFirstLinkIdOfTrack(), fdNetworkGenerator.getLengthOfTrack()));
 		}
 
@@ -211,14 +206,14 @@ public class FundamentalDiagramDataGenerator {
 
 	private void parametricRunAccordingToGivenModalSplit(){
 		//	Creating minimal configuration respecting modal split in PCU and integer agent numbers
-		List<Double> pcus = new ArrayList<>();
-		for(int index =0 ;index<travelModes.length;index++){
-			double tempPCU = this.mode2FlowData.get(travelModes[index]).getVehicleType().getPcuEquivalents();
-			pcus.add(tempPCU);
-		}
+		List<Double> pcus = Arrays.stream(travelModes)
+								  .mapToDouble(travelMode -> this.mode2FlowData.get(travelMode)
+																			   .getVehicleType()
+																			   .getPcuEquivalents())
+								  .boxed()
+								  .collect(Collectors.toList());
 
-		List<Integer> minSteps = Arrays.asList(modalShareInPCU)
-									   .stream()
+		List<Integer> minSteps = Arrays.stream(modalShareInPCU)
 									   .mapToDouble(modalSplit -> modalSplit)
 									   .mapToObj(modalSplit -> Integer.valueOf((int) modalSplit * 100))
 									   .collect(Collectors.toList());
@@ -303,16 +298,15 @@ public class FundamentalDiagramDataGenerator {
 
 		List<List<Integer>> pointsToRun = this.createPointsToRun();
 
-		for ( int i=0; i<pointsToRun.size(); i++){
-			List<Integer> pointToRun = pointsToRun.get(i);
-			double density =0;
-			for(int jj = 0; jj < travelModes.length;jj++ ){
+		for (List<Integer> pointToRun : pointsToRun) {
+			double density = 0;
+			for (int jj = 0; jj < travelModes.length; jj++) {
 				double pcu = this.mode2FlowData.get(travelModes[jj]).getVehicleType().getPcuEquivalents();
-				density += pcu *pointToRun.get(jj) ;
+				density += pcu * pointToRun.get(jj);
 			}
 
-			if(density <= networkDensity+5){
-				LOG.info("Going into run "+pointToRun);
+			if (density <= networkDensity + 5) {
+				LOG.info("Going into run " + pointToRun);
 				this.singleRun(pointToRun);
 			}
 		}
@@ -362,7 +356,7 @@ public class FundamentalDiagramDataGenerator {
 				this.mode2FlowData,
 				fdNetworkGenerator.getFirstLinkIdOfTrack() ,
 				fdNetworkGenerator.getLengthOfTrack());
-		passingEventsUpdator  = new PassingEventsUpdator(
+		PassingEventsUpdator passingEventsUpdator = new PassingEventsUpdator(
 				scenario.getConfig().qsim().getSeepModes(),
 				fdNetworkGenerator.getFirstLinkIdOfTrack(),
 				fdNetworkGenerator.getLastLinkIdOfTrack(),
@@ -408,7 +402,7 @@ public class FundamentalDiagramDataGenerator {
 				stableState = false;
 				int existingCount = flowUnstableWarnCount[index]; existingCount++;
 				flowUnstableWarnCount[index] = existingCount;
-				LOG.warn("Flow stability is not reached for travel mode "+veh.toString()
+				LOG.warn("Flow stability is not reached for travel mode "+ veh
 						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
 						+ "This is " + flowUnstableWarnCount[index]+ "th warning.");
 			}
@@ -417,7 +411,7 @@ public class FundamentalDiagramDataGenerator {
 				stableState = false;
 				int existingCount = speedUnstableWarnCount[index]; existingCount++;
 				speedUnstableWarnCount[index] = existingCount;
-				LOG.warn("Speed stability is not reached for travel mode "+veh.toString()
+				LOG.warn("Speed stability is not reached for travel mode "+ veh
 						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
 						+ "This is " + speedUnstableWarnCount[index]+ "th warning.");
 			}
@@ -435,20 +429,20 @@ public class FundamentalDiagramDataGenerator {
 
 		if( stableState ) {
 			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().getnumberOfAgents());
-			for (int i=0; i < travelModes.length; i++){
-				writer.format("%d\t", this.mode2FlowData.get(travelModes[i]).getnumberOfAgents());
+			for (String travelMode : travelModes) {
+				writer.format("%d\t", this.mode2FlowData.get(travelMode).getnumberOfAgents());
 			}
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity());
-			for (int i=0; i < travelModes.length; i++){
-				writer.format("%.2f\t", this.mode2FlowData.get(travelModes[i]).getPermanentDensity());
+			for (String travelMode : travelModes) {
+				writer.format("%.2f\t", this.mode2FlowData.get(travelMode).getPermanentDensity());
 			}
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentFlow());
-			for (int i=0; i < travelModes.length; i++){
-				writer.format("%.2f\t", this.mode2FlowData.get(travelModes[i]).getPermanentFlow());
+			for (String travelMode : travelModes) {
+				writer.format("%.2f\t", this.mode2FlowData.get(travelMode).getPermanentFlow());
 			}
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentAverageVelocity());
-			for (int i=0; i < travelModes.length; i++){
-				writer.format("%.2f\t", this.mode2FlowData.get(travelModes[i]).getPermanentAverageVelocity());
+			for (String travelMode : travelModes) {
+				writer.format("%.2f\t", this.mode2FlowData.get(travelMode).getPermanentAverageVelocity());
 			}
 
 			if( travelModes.length > 1 ) {
@@ -491,7 +485,7 @@ public class FundamentalDiagramDataGenerator {
 				mode2FlowData
 						.entrySet()
 						.stream()
-						.collect( Collectors.toMap( e -> e.getKey(), e -> e.getValue().getVehicleType()) );
+						.collect( Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getVehicleType()) );
 
 		AgentSource agentSource = new AgentSource() {
 			@Override
@@ -557,28 +551,28 @@ public class FundamentalDiagramDataGenerator {
 			throw new RuntimeException(e);
 		}
 		writer.print("n \t");
-		for (int i=0; i < travelModes.length; i++){
-			String str = this.mode2FlowData.get(travelModes[i]).getModeId().toString();
-			String strn = "n_"+str;
-			writer.print(strn+"\t");
+		for (String travelMode : travelModes) {
+			String str = this.mode2FlowData.get(travelMode).getModeId().toString();
+			String strn = "n_" + str;
+			writer.print(strn + "\t");
 		}
 		writer.print("k \t");
-		for (int i=0; i < travelModes.length; i++){
-			String str = this.mode2FlowData.get(travelModes[i]).getModeId().toString();
-			String strk = "k_"+str;
-			writer.print(strk+"\t");
+		for (String travelMode : travelModes) {
+			String str = this.mode2FlowData.get(travelMode).getModeId().toString();
+			String strk = "k_" + str;
+			writer.print(strk + "\t");
 		}
 		writer.print("q \t");
-		for (int i=0; i < travelModes.length; i++){
-			String str = this.mode2FlowData.get(travelModes[i]).getModeId().toString();
-			String strq = "q_"+str;
-			writer.print(strq+"\t");
+		for (String travelMode : travelModes) {
+			String str = this.mode2FlowData.get(travelMode).getModeId().toString();
+			String strq = "q_" + str;
+			writer.print(strq + "\t");
 		}
 		writer.print("v \t");
-		for (int i=0; i < travelModes.length; i++){
-			String str = this.mode2FlowData.get(travelModes[i]).getModeId().toString();
-			String strv = "v_"+str;
-			writer.print(strv+"\t");
+		for (String travelMode : travelModes) {
+			String str = this.mode2FlowData.get(travelMode).getModeId().toString();
+			String strv = "v_" + str;
+			writer.print(strv + "\t");
 		}
 
 		if( travelModes.length > 1 ) {
@@ -597,8 +591,8 @@ public class FundamentalDiagramDataGenerator {
 	private static String arraytostring(Integer[] list){
 		int n = list.length;
 		String str = "";
-		for (int i=0; i<n; i++){
-			str += list[i].intValue();
+		for (Integer aList : list) {
+			str += aList.intValue();
 			str += " ";
 		}
 		return str;

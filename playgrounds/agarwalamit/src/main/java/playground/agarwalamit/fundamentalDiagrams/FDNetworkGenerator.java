@@ -37,8 +37,8 @@ final class FDNetworkGenerator {
 	private int subdivisionFactor = 1; //all sides of the triangle will be divided into subdivisionFactor
 	private boolean isLocked = false;
 
-	private Id<Link> startLinkId = Id.createLinkId("home");
-	private Id<Link> endLinkId = Id.createLinkId("work");
+	private final Id<Link> startLinkId = Id.createLinkId("home");
+	private final Id<Link> endLinkId = Id.createLinkId("work");
 
 	private Id<Link> firstLinkOfTrack; // base link
 	private Id<Link> lastLinkOfBase; // same as firstLinkOfTrack if subdivision==1
@@ -68,7 +68,7 @@ final class FDNetworkGenerator {
 
 		//nodes of the equilateral triangle base starting, left node at (0,0)
 		for (int i = 0; i < subdivisionFactor + 1; i++) {
-			double x = 0, y = 0;
+			double x=0., y = 0.;
 			x = (linkProperties.getLinkLength() / subdivisionFactor) * i;
 			Coord coord = new Coord(x, y);
 			Id<Node> id = Id.createNodeId(i);
@@ -173,10 +173,6 @@ final class FDNetworkGenerator {
 
 	public RaceTrackLinkProperties getLinkProperties(){
 		return this.linkProperties;
-	}
-
-	public int getSubdivisionFactor() {
-		return subdivisionFactor;
 	}
 
 	public double getLengthOfTrack(){

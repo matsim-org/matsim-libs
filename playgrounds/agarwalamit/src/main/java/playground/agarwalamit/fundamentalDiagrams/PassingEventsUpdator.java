@@ -31,7 +31,7 @@ import org.matsim.vehicles.Vehicle;
  * @author amit
  */
 
-public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final Map<Id<Person>, Double> personId2TrackEnterTime;
 

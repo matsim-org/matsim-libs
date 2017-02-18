@@ -36,9 +36,7 @@ import playground.agarwalamit.utils.ListUtils;
 
 /**
  * @author amit after ssix
- */
-
-/**
+ *
  * A class intended to contain "static" mode-dependent data (vehicle type, speed etc.)
  * as well as dynamic data used in the mobsim (speed, flow of the mode)
  * as well as methods to store and update this data.
