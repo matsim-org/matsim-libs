@@ -39,7 +39,7 @@ public class RunBenensonParking {
 		Config config = ConfigUtils.loadConfig(inputDir + "config.xml");
 		config.plans().setInputFile(inputDir + "population10_verteilteActivities_workNames_1bis4.xml");
 		config.facilities().setInputFile(inputDir + "parkingFacilities_full_workNames.xml");
-		config.controler().setOutputDirectory("C:/Users/Work/Bachelor Arbeit/RUNS/BenensonParking/ZwischenPräsi/verteilteAktiviteaten_workNames_Grenzen_1_3/");
+		config.controler().setOutputDirectory("C:/Users/Work/Bachelor Arbeit/RUNS/BenensonParking/ZwischenPräsi/KontrolleVonVideo1/");
 		config.network().setInputFile("C:/Users/Work/Bachelor Arbeit/input/grid_network_length200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		if (otfvis) {
