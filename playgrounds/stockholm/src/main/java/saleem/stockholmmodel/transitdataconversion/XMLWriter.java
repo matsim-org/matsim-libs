@@ -15,9 +15,10 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import saleem.stockholmmodel.utils.StockholmTransformationFactory;
 
+//This class writes loaded (translated from excel reports) transit schedule and vehicles into TransitSchedule.xml and Vehicles.xml file.
 public class XMLWriter {
-	//To convert from WGS84 into RT90, as recommended in Matsim specifications to avoid using spherical coordinates. 
-	CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_SWEREF99);
+	//To convert from WGS84 into SWEREF99, as recommended in Matsim specifications to avoid using spherical coordinates. 
+	private CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_SWEREF99);
 	public Document createDocument(String rootname){
 		Element element = new Element(rootname);
 		Document doc = new Document();
@@ -35,24 +36,11 @@ public class XMLWriter {
 		Element stopFacility  = new Element("stopFacility");
 		stopFacility.setAttribute(new Attribute("isBlocking", Boolean.toString(stop.getIsBlocking())));
 		stopFacility.setAttribute(new Attribute("name",stop.getName() ));
-		//stopFacility.setAttribute(new Attribute("linkRefId",""));//Temporarily no link reference ID
-		//stopFacility.setAttribute(new Attribute("linkRefId",stop.getLinkRefId()));
 		Coord coord = stop.getCoord();
 		coord = ct.transform(coord);
-		//System.out.println(".........."  + coord.getX() + "............" +  coord.getY());
-		//coord=DataConversion.deg2UTM(coord);
 		stopFacility.setAttribute(new Attribute("x",Double.toString(coord.getX())));
 		stopFacility.setAttribute(new Attribute("y",Double.toString(coord.getY())));
 		stopFacility.setAttribute(new Attribute("id",stop.getId()));
-		
-		//The line following this comment is used for arranging stops in GTFS folders according to its mode
-		
-		//stopFacility.setAttribute(new Attribute("mode",stop.getTransportMode()));
-		//System.out.println(".........."  + coord.getX() + "............" +  coord.getY());
-		//System.out.println(".........."  + coord.getX() + "............" +  coord.getY());
-		//coord = new CoordImpl(Double.parseDouble(row.getCell(10).getStringCellValue()), Double.parseDouble(row.getCell(8).getStringCellValue()));
-		//CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM29N);
-		//coord = ct.transform(coord);
 		tstops.addContent(stopFacility);
 	}
 	public void addStop(Element transitRoute, Stop st ){
@@ -66,7 +54,6 @@ public class XMLWriter {
 	public void addLink(Element route, Link link ){
 		Element link_element  = new Element("link");
 		link_element.setAttribute(new Attribute("refId", ""));//Temporarily for teleportation
-		//link_element.setAttribute(new Attribute("refId", link.getRefID()));
 		route.addContent(link_element);
 	}
 	public void addDeparture(Element departures_element, Departure departure ){
@@ -160,7 +147,7 @@ public class XMLWriter {
 		vehicletype_element.addContent(pce);
 		doc.addContent(vehicletype_element);
 	}
-	public void createVehiclesXML(TransitSchedule transit){
+	public void createVehiclesXML(TransitSchedule transit, String path){
 		try {
 			ExcelReportsReader ex = new ExcelReportsReader();
 			List<VehicleType> vehicletypes = transit.getVehicleTypes();
@@ -173,13 +160,13 @@ public class XMLWriter {
 			for(int i=0; i<vehicles.size();i++){
 				addVehicle(doc.getRootElement(), vehicles.get(i));
 			}
-			writeDocument(doc, "H:\\Matsim\\vehicles.xml");
+			writeDocument(doc, path);
 			// new XMLOutputter().output(doc, System.out);
 		  } catch (IOException io) {
 			System.out.println(io.getMessage());
 		  }
 	}
-	public void createTransitSchedule(TransitSchedule transit){
+	public void createTransitSchedule(TransitSchedule transit, String path){
 		try {
 			ExcelReportsReader ex = new ExcelReportsReader();
 			List<Stop> stops = transit.getStops();
@@ -194,7 +181,7 @@ public class XMLWriter {
 			for(int i=0; i<lines.size();i++){
 				addTransitLine(doc.getRootElement(), lines.get(i));
 			}
-			writeDocument(doc, "H:\\Matsim\\transitSchedule.xml");
+			writeDocument(doc, path);
 			// new XMLOutputter().output(doc, System.out);
 		  } catch (IOException io) {
 			System.out.println(io.getMessage());

@@ -14,7 +14,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.EventsToScore;
 
-//This event handler is used to calculates different relevant stats about stockholm scenario
+//This event handler class is used to calculates different relevant statistics about stockholm scenario
 public class StockholmScenarioStatisticsCalculator implements PersonDepartureEventHandler, PersonArrivalEventHandler{//first order second order effects of P0
 	private Map<Id<Person>, Double> times = new HashMap<>();
 	private Map<Id<Person>, ? extends Person> persons = new HashMap<>();
@@ -53,7 +53,7 @@ public class StockholmScenarioStatisticsCalculator implements PersonDepartureEve
 		System.out.println("Average Travel Time: " + totaltime/totaltrips);
 		return totaltime/totaltrips;
 	}
-	public double getTotalrips(){//get travel time
+	public double getTotalrips(){//get total trips
 		System.out.println("Total Trips: " + totaltrips);
 		return totaltrips;
 	}

@@ -4,6 +4,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/** This class consists of neccessary information about Transit Routes, 
+ * and is used in conversion of Excel based transit data into MatSim readable transit schedule data structure.
+ */
 public class TransitRoute {
 	private String id;
 	private String transportmode;
@@ -51,9 +54,9 @@ public class TransitRoute {
 	}
 	public String toString() {
 		String str = "";
-		Iterator iter = routeprofile.iterator();
+		Iterator<Stop> iter = routeprofile.iterator();
 		while(iter.hasNext()){
-			Stop stop = (Stop)iter.next();
+			Stop stop = iter.next();
 			str=str+stop.getId();
 		}
 		return str;

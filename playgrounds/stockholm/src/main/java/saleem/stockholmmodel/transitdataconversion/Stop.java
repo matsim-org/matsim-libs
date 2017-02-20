@@ -1,5 +1,8 @@
 package saleem.stockholmmodel.transitdataconversion;
 
+/** A PT stop object used in converting Excel based Stop data into MatSim based transit schedule 
+ * data structure, consisting of neccessary information about stops.
+ */
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,16 +10,16 @@ import java.util.Date;
 import org.matsim.api.core.v01.Coord;
 
 public class Stop {
-	Coord coord;
-	String name;
-	String id;
-	String transportmode;
-	Boolean isblocking = false;
-	Boolean awaitdeparture = false;
-	String linkRefId = "11_1";
-	String departureoffset = "00:00:00";
-	String arrivaloffset = "00:00:00";
-	String departuretime = "";
+	private Coord coord;
+	private String name;
+	private String id;
+	private String transportmode;
+	private Boolean isblocking = false;
+	private Boolean awaitdeparture = false;
+	private String linkRefId = "11_1";
+	private String departureoffset = "00:00:00";
+	private String arrivaloffset = "00:00:00";
+	private String departuretime = "";
 	Stop(String name, Coord coord, String id){
 		this.coord = coord;
 		this.name = name;
@@ -47,23 +50,10 @@ public class Stop {
 	public String getDepartureTime(){
 		return departuretime;
 	}
+	
+	//Trimming the long departure time format in Excel files into short format usable in MatSim transit schedule. 
 	public void setDepartureTime(String departuretime){
-		if(departuretime.startsWith("2015-05-09")){
-			departuretime=departuretime.replaceFirst("2015-05-09", "");
-			departuretime=departuretime.trim();
-			int hours=Integer.parseInt(departuretime.substring(0, 2))+24;
-			departuretime=hours+departuretime.substring(2, departuretime.length());
-		}else if(departuretime.startsWith("2015-05-08")){
-			departuretime=departuretime.replaceFirst("2015-05-08", "");
-			departuretime=departuretime.trim();
-		}else if(departuretime.startsWith("2015-06-03")){
-			departuretime=departuretime.replaceFirst("2015-06-03", "");
-			departuretime=departuretime.trim();
-		}else if(departuretime.startsWith("2015-06-04")){
-			departuretime=departuretime.replaceFirst("2015-06-04", "");
-			departuretime=departuretime.trim();
-		}
-		this.departuretime=departuretime;
+		this.departuretime=departuretime.substring(departuretime.length()-8, departuretime.length());
 	}
 	public String getId(){
 		return id;
@@ -83,6 +73,8 @@ public class Stop {
 	public void setDepartureOffset(String departureoffset){
 		this.departureoffset = departureoffset;
 	}
+	
+	//Should be changed into a dictionary object; converts transportmode into MatSim form
 	public void setTransportMode(String transportmode){
 		if(transportmode.equals("FERRYBER")){
 			this.transportmode = "FERRY";
@@ -106,6 +98,9 @@ public class Stop {
 	public String getArrivalOffset(){
 		return arrivaloffset;
 	}
+	/**Calculate departure offset based on departing time from previous station and arriving at current. 
+	   Both times are in "yyyy-MM-dd kk:mm:ss" format.*/
+	
 	public String calculateDepartureOffset(String time1, String time2){
 		SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
 		try{

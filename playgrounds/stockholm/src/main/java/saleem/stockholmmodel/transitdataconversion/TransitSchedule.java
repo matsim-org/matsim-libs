@@ -4,6 +4,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Transit Schedule data structure used for writing Excel based transit data 
+ * into MatSim form. One could also use the built in MatSIm Transit Schedule.
+ */
+
 public class TransitSchedule {
 	List<Stop> stops = new LinkedList<Stop>();
 	List<VehicleType> vehicletypes = new LinkedList<VehicleType>();

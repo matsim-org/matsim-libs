@@ -1,5 +1,8 @@
 package gunnar.ihop2.regent;
 
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.regent.demandreading.Zone;
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.LinkedHashSet;
@@ -18,12 +21,10 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.matrices.MatsimMatricesReader;
 
+import saleem.stockholmmodel.utils.StockholmTransformationFactory;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
-
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.regent.demandreading.Zone;
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 /**
  * 

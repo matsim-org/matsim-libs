@@ -1,5 +1,9 @@
 package saleem.stockholmmodel.transitdataconversion;
 
+/** This class is used in converting Excel based data into MatSim based transit schedule 
+ * data structure, consisting of neccessary attributes for stops and lines.
+ * Departure class contain Departure attributes for route departures**/
+
 public class Departure {
 	private String id;
 	private String departuretime;

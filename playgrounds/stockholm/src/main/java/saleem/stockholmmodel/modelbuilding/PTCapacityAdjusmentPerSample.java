@@ -10,14 +10,13 @@ import org.matsim.vehicles.Vehicles;
 
 import saleem.stockholmmodel.utils.CollectionUtil;
 
+//Scale capacity of vehicles 
 public class PTCapacityAdjusmentPerSample {
 	public void adjustStoarageAndFlowCapacity(Scenario scenario, double samplesize){
 
 		// Changing vehicle and road capacity according to sample size
 		Vehicles vehicles = scenario.getTransitVehicles();
-		CollectionUtil<VehicleType> cutil = new CollectionUtil<VehicleType>();
-		ArrayList<VehicleType> vehcilestypes = cutil.toArrayList(vehicles.getVehicleTypes().values().iterator());
-		Iterator<VehicleType> vehtypes = vehcilestypes.iterator();
+		Iterator<VehicleType> vehtypes = vehicles.getVehicleTypes().values().iterator();
 		while(vehtypes.hasNext()){//Set flow and storage capacities according to sample size
 			VehicleType vt = (VehicleType)vehtypes.next();
 			VehicleCapacity cap = vt.getCapacity();
@@ -25,7 +24,6 @@ public class PTCapacityAdjusmentPerSample {
 			cap.setStandingRoom((int)Math.ceil(cap.getStandingRoom()*samplesize));
 			vt.setCapacity(cap);
 			vt.setPcuEquivalents(vt.getPcuEquivalents()*samplesize);
-			System.out.println("Sample Size is: " + samplesize);
 		}
 	}
 }

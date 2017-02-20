@@ -28,6 +28,7 @@ import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCri
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 
+//An execution class for PT Optimisation
 public class OptimisePT {
 	@SuppressWarnings({ "rawtypes", "unused" })
 	public static void main(String[] args) {

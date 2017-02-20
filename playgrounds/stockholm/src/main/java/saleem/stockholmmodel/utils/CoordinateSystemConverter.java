@@ -3,7 +3,7 @@ package saleem.stockholmmodel.utils;
 import org.matsim.api.core.v01.Coord;
 
 
-//copied from project StockholmPT...Converts WSG84 to UTM System
+//Converts WSG84 to UTM System
 public class CoordinateSystemConverter {
 	public static Coord deg2UTM(Coord coord)
     {

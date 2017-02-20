@@ -1,6 +1,7 @@
 package saleem.stockholmmodel.utils;
 
-public class DistanceCalculation {//To calculate distance between two points in different coordinates
+//To calculate distance between two points in different coordinate systems
+public class DistanceCalculation {
 	public final static double AVERAGE_RADIUS_OF_EARTH = 6371;
 	public static double calculateDistanceLatLon(double userLat, double userLng, double venueLat, double venueLng) {
 

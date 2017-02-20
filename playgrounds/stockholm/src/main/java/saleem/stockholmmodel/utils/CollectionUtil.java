@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+//A class to convert a list to array
 public class CollectionUtil<Type> {
 	public ArrayList<Type> toArrayList(Iterator<Type> iter){
 		ArrayList<Type> arraylist = new ArrayList<Type>();
@@ -18,16 +19,6 @@ public class CollectionUtil<Type> {
 		int i=0;
 		while(iter.hasNext()){
 			array[i]=iter.next();
-			i++;
-		}
-		return array;
-	}
-	public double[] toArrayDelays(ArrayList<Double> alist){//Converting a list to array and reducing the slope
-		double[] array = new double[alist.size()];
-		Iterator<Double> iter = alist.iterator();
-		int i=0;
-		while(iter.hasNext()){
-			array[i]=iter.next()/10;
 			i++;
 		}
 		return array;

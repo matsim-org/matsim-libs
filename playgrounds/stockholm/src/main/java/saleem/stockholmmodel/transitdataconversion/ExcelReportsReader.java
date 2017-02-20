@@ -11,8 +11,11 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.matsim.api.core.v01.Coord;
 
+//This is a class to convert Excel files of transit trips, transit stops, vehicles and transit  schedule into a MatSim readable XML Format. 
+// A complex transit schedule data structure is constructed based on the excel files.
 public class ExcelReportsReader {
-	public void readVehicleTypes(TransitSchedule transit, String path){//Reads Stoppstallen.xls and adds data about transit Stops to TransitSchedule object
+	
+	public void readVehicleTypes(TransitSchedule transit, String path){//Reads vehicle-types excel file and adds data about transit Stops to TransitSchedule object
 		try {
 			HSSFRow row;
 			HSSFCell cell;
@@ -72,8 +75,6 @@ public class ExcelReportsReader {
 					stop.setTransportMode(row.getCell(13).getStringCellValue());
 					if(!ids.contains(id)){
 						transit.addStop(stop);
-					}else{
-						System.out.println(stop.id);
 					}
 					ids.add(id);
 				}
@@ -82,7 +83,8 @@ public class ExcelReportsReader {
 				ioe.printStackTrace();
 			}
 	}
-	public void readExcelReports(TransitSchedule transit, String path){//Reads Tidtabell - Stoppst�llenummer1.xls files and adds data about lines, routes, route profiles and departures to transit schedule object
+	public void readExcelReports(TransitSchedule transit, String path){//Reads Tidtabell - Stoppstallenummer.xls files 
+																		//and adds data about lines, routes, route profiles and departures to transit schedule object
 		try {
 			HSSFRow row;
 			HSSFCell cell;
@@ -128,7 +130,6 @@ public class ExcelReportsReader {
 								troute.addStop(stop);//get the stop with the particular id and add it to route profile
 								troute.addLink(link);
 								troute.setID(troute.getFirstStop().getId() + "to" + troute.getLastStop().getId());
-								//System.out.println(troute.getFirstStop().getDepartureTime());
 								if(r == rows-1){//for last row, add the transit route into the line
 									if(row.getCell(6).getStringCellValue().equals("1")){
 										int index = line.indexOfTransitRoute(troute);
@@ -198,8 +199,8 @@ public class ExcelReportsReader {
 									}
 								}
 							}
-							else if (!row.getCell(7).getStringCellValue().equals(tag)){//When tag turner is different, it is a different route or the same route at a different time
-								//System.out.println(troute.getFirstStop().getDepartureTime());
+							else if (!row.getCell(7).getStringCellValue().equals(tag)){
+								//When tag turner is different, it is a different route or the same route at a different time
 								troute.setID(troute.getFirstStop().getId() + "to" + troute.getLastStop().getId());
 								// Set the departure offset of last stop to "00:00:00"
 								Stop st = troute.getLastStop();

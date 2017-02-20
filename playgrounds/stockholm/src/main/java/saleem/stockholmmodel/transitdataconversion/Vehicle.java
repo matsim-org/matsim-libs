@@ -1,8 +1,11 @@
 package saleem.stockholmmodel.transitdataconversion;
 
+/**
+ * Class representing a vehicle instance within transit schedule
+ */
 public class Vehicle {
-	public String id;
-	public String type;
+	private String id;
+	private String type;
 	public void setID(String id ){
 		this.id=id;
 	}

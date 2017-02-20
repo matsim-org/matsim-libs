@@ -20,7 +20,7 @@ import saleem.ptoptimisation.decisionvariables.TransitScheduleAdapter;
 public class StockholmScenarioSimulation {
 public static void main(String[] args) {
 	
-/*	Before running the simulation, this function reads the Config file, gets the storage capacity factor to calculate the sample size, and then sets the sitting capacity, 
+/*	Execution class for StockholmPTCar model. Before running the simulation, this function reads the Config file, gets the storage capacity factor to calculate the sample size, and then sets the sitting capacity, 
  * standing capacity and passenger car equivalents of the vehicle types based on the sample size. This is done to balance out the effect of setting storage capacity 
  * factor and flow capacity factor (in the Config file) on the PT links.
 */
@@ -30,9 +30,7 @@ public static void main(String[] args) {
     Config config = ConfigUtils.loadConfig(path);
     final Scenario scenario = ScenarioUtils.loadScenario(config);
 	Controler controler = new Controler(scenario);
-    double samplesize = 0.1;
-	
-	// Changing vehicle and road capacity according to sample size
+    double samplesize = config.qsim().getStorageCapFactor();	// Changing vehicle and road capacity according to sample size
 	PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
 	capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
 

@@ -10,9 +10,9 @@ import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKTOURM
 import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKZONE_ATTRIBUTE;
 import static gunnar.ihop2.regent.demandreading.ShapeUtils.drawPointFromGeometry;
 import static org.matsim.utils.objectattributes.ObjectAttributeUtils2.allObjectKeys;
-import static saleem.stockholmscenario.utils.StockholmTransformationFactory.WGS84_EPSG3857;
-import static saleem.stockholmscenario.utils.StockholmTransformationFactory.WGS84_SWEREF99;
-import static saleem.stockholmscenario.utils.StockholmTransformationFactory.getCoordinateTransformation;
+import static saleem.stockholmmodel.utils.StockholmTransformationFactory.WGS84_EPSG3857;
+import static saleem.stockholmmodel.utils.StockholmTransformationFactory.WGS84_SWEREF99;
+import static saleem.stockholmmodel.utils.StockholmTransformationFactory.getCoordinateTransformation;
 
 import java.io.FileNotFoundException;
 import java.util.Collections;
@@ -42,7 +42,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import floetteroed.utilities.math.MathHelpers;
 import gunnar.ihop2.utils.FractionalIterable;
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+import saleem.stockholmmodel.utils.StockholmTransformationFactory;
 
 /**
  * 
