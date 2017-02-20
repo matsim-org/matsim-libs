@@ -84,6 +84,9 @@ public class RunBerlinOptAV {
 			outputDirectory = args[1];
 			log.info("outputDirectory: "+ outputDirectory);
 			
+			kP = Double.parseDouble(args[2]);
+			log.info("kP: "+ kP);
+			
 			otfvis = false;
 			
 		} else {
