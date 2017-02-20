@@ -21,10 +21,8 @@ public class StockholmP0Controller {
 
 	public static void main(String[] args) {
 		
-//		String path = "./ihop2/matsim-input/config - P0.xml";
 		String path = "./ihop2/matsim-input/configSingleJunction.xml";
 
-//		String path = "H:\\Mike Work\\input\\config.xml";
 		Config config = ConfigUtils.loadConfig(path);
 		config.network().setTimeVariantNetwork(true);
 	    final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -37,11 +35,9 @@ public class StockholmP0Controller {
 		
 		Network network = (Network)scenario.getNetwork();
 		StockholmP0Helper sth = new StockholmP0Helper(network);
-//		String nodesfile = "./ihop2/matsim-input/Nodes.csv";
 		String nodesfile = "./ihop2/matsim-input/NodesSingleJunction.csv";
 
 		List<String> timednodes = sth.getPretimedNodes(nodesfile);
-//		List<String> timednodes = sth.getPretimedNodes("H:\\Mike Work\\input\\Nodes2Junctions.csv");
 		
 		Map<String, List<Link>> incominglinks = sth.getInLinksForJunctions(timednodes, network);
 		Map<String, List<Link>> outgoinglinks = sth.getOutLinksForJunctions(timednodes, network);

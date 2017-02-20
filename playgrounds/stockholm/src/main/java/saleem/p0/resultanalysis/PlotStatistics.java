@@ -1,4 +1,4 @@
-package saleem.p0;
+package saleem.p0.resultanalysis;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

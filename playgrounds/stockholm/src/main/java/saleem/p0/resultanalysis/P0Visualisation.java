@@ -1,4 +1,4 @@
-package saleem.p0.stockholm;
+package saleem.p0.resultanalysis;
 
 import java.io.FileWriter;
 import java.util.Iterator;

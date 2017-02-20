@@ -1,4 +1,4 @@
-package saleem.p0;
+package saleem.p0.populationgenerator;
 
 
 import org.matsim.api.core.v01.Coord;

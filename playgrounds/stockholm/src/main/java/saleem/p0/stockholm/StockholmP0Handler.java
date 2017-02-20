@@ -21,8 +21,8 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.vehicles.Vehicle;
 
-import saleem.p0.PlotStatistics;
-import saleem.p0.TextReaderWriter;
+import saleem.p0.policy.TextReaderWriter;
+import saleem.p0.resultanalysis.PlotStatistics;
 import saleem.stockholmmodel.utils.CollectionUtil;
 
 //For Generic Junctions
