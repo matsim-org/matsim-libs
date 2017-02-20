@@ -74,12 +74,15 @@ public class PersonTripNoiseAnalysisRun {
 		
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output_optAV/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output_baseCase/";
 			log.info("Run directory " + runDirectory);
 		}
 		
-		PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(runDirectory);
-		analysis.run();
+//		PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(runDirectory);
+//		analysis.run();
+		
+		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(runDirectory, "/Users/ihab/Documents/workspace/runs-svn/optAV/output_baseCase/analysis_it.10/10.events_NoiseImmission_Offline.xml.gz");
+		analysis1.run();
 	}
 	
 	public PersonTripNoiseAnalysisRun(String runDirectory) {
@@ -113,7 +116,7 @@ public class PersonTripNoiseAnalysisRun {
 
 		int finalIteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
-		String outputPath = runDirectory + "/person-trip-noise-analysis_it. " + finalIteration + "/";
+		String outputPath = runDirectory + "person-trip-noise-analysis_it." + finalIteration + "/";
 				
 		String noiseEventsFileToAnalyze;
 		if (this.noiseEventFile == null || this.noiseEventFile == "") {

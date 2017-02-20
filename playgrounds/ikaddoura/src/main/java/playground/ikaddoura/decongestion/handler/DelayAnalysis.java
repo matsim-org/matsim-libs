@@ -67,8 +67,8 @@ public class DelayAnalysis implements LinkEnterEventHandler, LinkLeaveEventHandl
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
-		if (this.vehicleId2enterTime.containsKey(event.getVehicleId())) {
-							
+		if (this.vehicleId2enterTime.get(event.getVehicleId()) != null) {
+			
 			// compute the travel time
 			double traveltimeThisAgent = event.getTime() - this.vehicleId2enterTime.get(event.getVehicleId());			
 			double freespeedTravelTime = 1 + Math.ceil(this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength() / this.scenario.getNetwork().getLinks().get(event.getLinkId()).getFreespeed());

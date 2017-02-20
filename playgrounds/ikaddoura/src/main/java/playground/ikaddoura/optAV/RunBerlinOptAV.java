@@ -73,6 +73,7 @@ public class RunBerlinOptAV {
 	private static String configFile;
 	private static String outputDirectory;
 	private static boolean otfvis;
+	private static double kP;
 	
 	public static void main(String[] args) {
 		if (args.length > 0) {
@@ -83,12 +84,17 @@ public class RunBerlinOptAV {
 			outputDirectory = args[1];
 			log.info("outputDirectory: "+ outputDirectory);
 			
+			kP = Double.parseDouble(args[2]);
+			log.info("kP: "+ kP);
+			
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV/";
-			otfvis = true;
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_test/";
+			otfvis = false;
+			kP = 2 * 12./3600.;
+//			kP = 999999999.;
 		}
 		
 		RunBerlinOptAV runBerlinOptAV = new RunBerlinOptAV();
@@ -115,7 +121,10 @@ public class RunBerlinOptAV {
 		// #############################
 		// noise pricing
 		// #############################
-
+		
+		NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+		log.info(noiseParams.toString());
+		
 		controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
 		
 		// #############################
@@ -124,12 +133,13 @@ public class RunBerlinOptAV {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-		decongestionSettings.setKp(2 * 12./3600.);
+		decongestionSettings.setKp(kP);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKd(0.);
-		decongestionSettings.setMsa(true);
+		decongestionSettings.setMsa(false);
 		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+		log.info(decongestionSettings.toString());
 		
 		final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
 		final DecongestionTollSetting tollSettingApproach = new DecongestionTollingPID(info);	
@@ -200,8 +210,6 @@ public class RunBerlinOptAV {
 		String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		
-		NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-
 		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, noiseParams.getReceiverPointGap());
 		processNoiseImmissions.run();
 		
