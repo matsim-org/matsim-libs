@@ -74,15 +74,15 @@ public class PersonTripNoiseAnalysisRun {
 		
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output_baseCase/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_av-trip-share-0.01_av-20000_kp999999/";
 			log.info("Run directory " + runDirectory);
 		}
 		
-//		PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(runDirectory);
-//		analysis.run();
+		PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(runDirectory);
+		analysis.run();
 		
-		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(runDirectory, "/Users/ihab/Documents/workspace/runs-svn/optAV/output_baseCase/analysis_it.10/10.events_NoiseImmission_Offline.xml.gz");
-		analysis1.run();
+//		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(runDirectory, "/Users/ihab/Documents/workspace/runs-svn/optAV/output_baseCase/analysis_it.10/10.events_NoiseImmission_Offline.xml.gz");
+//		analysis1.run();
 	}
 	
 	public PersonTripNoiseAnalysisRun(String runDirectory) {
