@@ -74,7 +74,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 		
 				// 2) integral term
 				double totalDelay = 0.;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2value().containsKey(intervalNr)) {
+				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr) != null) {
 					// artificial reset to zero if congestion is eliminated
 					if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
 						totalDelay = 0.0;
@@ -90,7 +90,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 
 				// 3) derivative term
 				double previousDelay = 0.;
-				if (this.linkId2infoPreviousTollComputation.containsKey(linkId) && this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().containsKey(intervalNr)) {
+				if (this.linkId2infoPreviousTollComputation.get(linkId) != null && this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr) != null) {
 					previousDelay = this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);
 				}
 			
@@ -105,7 +105,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				// 5) smoothen the tolls
 				
 				double previousToll = Double.NEGATIVE_INFINITY;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
+				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
 					previousToll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr);
 				}
 
