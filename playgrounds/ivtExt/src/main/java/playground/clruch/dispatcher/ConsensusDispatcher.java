@@ -1,38 +1,37 @@
 package playground.clruch.dispatcher;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
-
+import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.dispatcher.utils.AbstractRequestSelector;
-import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
+import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
+import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-import playground.clruch.netdata.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class ConsensusDispatcher extends PartitionedDispatcher {
     public static final int REBALANCING_PERIOD = 5 * 60; // TODO
@@ -53,9 +52,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                                 AbstractRequestSelector abstractRequestSelector, //
                                 AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
                                 File linkWeightFile
-    )
-
-    {
+    ) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         this.abstractVirtualNodeDest = abstractVirtualNodeDest;
         this.abstractRequestSelector = abstractRequestSelector;
@@ -91,6 +88,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             }
         }
 
+
         // for available vhicles, perform a rebalancing computation after REBALANCING_PERIOD seconds.
         if (seconds % REBALANCING_PERIOD == 0) {
             // 0 get available vehicles and requests per virtual node
@@ -105,6 +103,15 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                     int imbalanceFrom = requests.get(vlink.getFrom()).size() - availableVehicles.get(vlink.getFrom()).size();
                     int imbalanceTo = requests.get(vlink.getTo()).size() - availableVehicles.get(vlink.getTo()).size();
 
+                    // DEBUGGING
+                    System.out.println("RebalancingPeriod "+ REBALANCING_PERIOD);
+                    System.out.println("linkWeights.get(vlink) "+ linkWeights.get(vlink));
+                    System.out.println("imbalanceTo "+ (double) imbalanceTo);
+                    System.out.println("imbalanceFrom "+ (double) imbalanceFrom);
+                    System.out.println("rebalanceFloating.get(vlink) "+ rebalanceFloating.get(vlink));
+
+
+
                     // compute the rebalancing vehicles
                     double vehicles_From_to_To =  //
                             REBALANCING_PERIOD * linkWeights.get(vlink) * ((double) imbalanceTo - (double) imbalanceFrom) +  //
@@ -114,11 +121,8 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                     // only consider the results which are >= 0. This assumes an undirected graph.
                     if (vehicles_From_to_To >= 0) {
                         rebalanceCount.put(vlink, (int) Math.floor(vehicles_From_to_To));
-                        rebalanceFloating.put(vlink, vehicles_From_to_To - (int) Math.floor(vehicles_From_to_To));
-
-                    } else {
-                        rebalanceCount.put(vlink, 0);
                     }
+                    rebalanceFloating.put(vlink, vehicles_From_to_To - (int) Math.floor(vehicles_From_to_To));
                 }
             }
 
@@ -222,4 +226,54 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             e.printStackTrace();
         }
     }
+
+    public static class Factory implements AVDispatcherFactory {
+        @Inject
+        @Named(AVModule.AV_MODE)
+        private ParallelLeastCostPathCalculator router;
+
+        @Inject
+        @Named(AVModule.AV_MODE)
+        private TravelTime travelTime;
+
+        @Inject
+        private EventsManager eventsManager;
+
+        @Override
+        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+
+            //intstatiate a ConsensusDispatcher for testing
+            AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
+            AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
+            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new NativeVehicleDestMatcher();
+            // TODO relate to general directory given in argument of main function
+            File dir = new File("C:/Users/Claudio/Documents/matsim_Simulations/2017_01_04_Sioux_onlyUnitCapacityAVs/");
+            File linkWeightFile = new File(dir + "/consensusWeights.xml");
+            File configFile = new File(dir + "/av_config.xml");
+            Config Simconfig = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup());
+            Scenario scenario = ScenarioUtils.loadScenario(Simconfig);
+            Network network = scenario.getNetwork();
+            File virtualnetworkXML = new File(dir + "/virtualNetwork.xml");
+            VirtualNetwork virtualNetwork = VirtualNetwork.loadFromXML(network, virtualnetworkXML);
+
+
+            // TODO:
+
+            return new ConsensusDispatcher(
+                    config,
+                    travelTime,
+                    router,
+                    eventsManager,
+                    virtualNetwork,
+                    abstractVirtualNodeDest,
+                    abstractRequestSelector,
+                    abstractVehicleDestMatcher,
+                    linkWeightFile
+            );
+        }
+    }
+
+
 }
+
+

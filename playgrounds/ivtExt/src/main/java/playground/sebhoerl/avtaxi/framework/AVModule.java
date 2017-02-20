@@ -28,6 +28,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
+import playground.clruch.dispatcher.ConsensusDispatcher;
 import playground.clruch.dispatcher.EdgyDispatcher;
 import playground.clruch.dispatcher.LazyDispatcher;
 import playground.clruch.dispatcher.PulseDispatcher;
@@ -106,6 +107,7 @@ public class AVModule extends AbstractModule {
         AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LazyDispatcher.class.getSimpleName()).to(LazyDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcher.class.getSimpleName()).to(ConsensusDispatcher.Factory.class);
         
         /** dispatchers for PartitionedDispatcher */
     }

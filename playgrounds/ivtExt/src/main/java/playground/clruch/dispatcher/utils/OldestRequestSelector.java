@@ -20,6 +20,7 @@ public class OldestRequestSelector extends AbstractRequestSelector {
             public int compare(AVRequest o1, AVRequest o2) {
                 return Double.compare(o1.getSubmissionTime(), o2.getSubmissionTime());
             }
+
         };
         return avRequests.stream().sorted(comparator).limit(size).collect(Collectors.toList());
     }
