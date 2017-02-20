@@ -589,7 +589,6 @@ public class FundamentalDiagramDataGenerator {
 	}
 
 	private static String arraytostring(Integer[] list){
-		int n = list.length;
 		String str = "";
 		for (Integer aList : list) {
 			str += aList.intValue();
@@ -647,9 +646,9 @@ public class FundamentalDiagramDataGenerator {
 		private final double actEndTime;
 
 		private MobsimVehicle vehicle ;
-		public boolean isArriving= false;
+		private boolean isArriving= false;
 
-		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
+		MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
 			mode = travelMode;
 			this.actEndTime = actEndTime;
