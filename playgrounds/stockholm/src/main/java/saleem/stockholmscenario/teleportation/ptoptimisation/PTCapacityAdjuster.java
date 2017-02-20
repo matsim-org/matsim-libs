@@ -31,22 +31,25 @@ public class PTCapacityAdjuster {
 							Departure departure = departures.next();
 							if(inPeakHour(departure.getDepartureTime())){
 								Vehicle veh = vehicleinstances.get(departure.getVehicleId());
-								if(!veh.getType().getId().toString().startsWith("L")){//If capacity not already increased
-									vehicles.removeVehicle(veh.getId());
+								if(!veh.getType().getId().toString().startsWith("L") && !veh.getType().getId().toString().startsWith("S")){//If capacity not already decreased/increased
 									VehicleType vtype = vehicles.getVehicleTypes().get(Id.create("L"+veh.getType().getId().toString(), VehicleType.class));
-									veh = new VehicleImpl(veh.getId(), vtype);
-									vehicles.addVehicle(veh);
-
+									if(vtype!=null){
+										vehicles.removeVehicle(veh.getId());
+										veh = new VehicleImpl(veh.getId(), vtype);
+										vehicles.addVehicle(veh);
+									}
 								}
 								
 								
 							}else{
 								Vehicle veh = vehicleinstances.get(departure.getVehicleId());
-								if(!veh.getType().getId().toString().startsWith("S")){
-									vehicles.removeVehicle(veh.getId());
+								if(!veh.getType().getId().toString().startsWith("S") && !veh.getType().getId().toString().startsWith("L")){
 									VehicleType vtype = vehicles.getVehicleTypes().get(Id.create("S"+veh.getType().getId().toString(), VehicleType.class));
-									veh = new VehicleImpl(veh.getId(), vtype);
-									vehicles.addVehicle(veh);
+									if(vtype!=null){
+										vehicles.removeVehicle(veh.getId());
+										veh = new VehicleImpl(veh.getId(), vtype);
+										vehicles.addVehicle(veh);
+									}
 
 								}
 							}
@@ -58,6 +61,6 @@ public class PTCapacityAdjuster {
 		}
 	}
 	public boolean inPeakHour(double time){
-		return (time>=25200 && time<=32400) || (time>=59400 && time<=66600);
+		return (time>=25200 && time<=34200) || (time>=57600 && time<=66600);
 	}
 }

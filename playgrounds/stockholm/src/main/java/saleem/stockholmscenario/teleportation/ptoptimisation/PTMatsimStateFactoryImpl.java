@@ -13,14 +13,17 @@ import floetteroed.utilities.math.Vector;
 public class PTMatsimStateFactoryImpl<U extends DecisionVariable> implements
 MATSimStateFactory<U> {
 	Scenario scenario;
-	public PTMatsimStateFactoryImpl(Scenario scenario) {
+	final double occupancyScale;
+	public PTMatsimStateFactoryImpl(Scenario scenario, final double occupancyScale) {
 		 this.scenario = scenario;
+		 this.occupancyScale=occupancyScale;
 	}
 
 	@Override
 	public MATSimState newState(final Population population,
 		final Vector stateVector, final U decisionVariable) {
-		return new PTMatsimState(population, stateVector, scenario, (PTSchedule)decisionVariable);
+		return new PTMatsimState(population, stateVector, scenario, (PTSchedule)decisionVariable, occupancyScale);
+		
 	}
 
 	@Override

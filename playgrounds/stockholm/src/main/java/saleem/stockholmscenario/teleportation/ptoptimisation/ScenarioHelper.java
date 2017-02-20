@@ -1,8 +1,11 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -240,6 +243,16 @@ public class ScenarioHelper {
 	
 		return unusedvehs;
 	}
+	public void writePlausibilityStatistics(Scenario scenario, int iteration){
+		PlausibilityStatistics plc = new PlausibilityStatistics(scenario);
+		if(iteration==0){
+			plc.accumulateStatistics();
+			plc.writeStatistics();
+			return;
+		}
+		plc.accumulateStatistics();
+	}
+	
 	public class CollectionUtil<Type> {
 		public ArrayList<Type> toArrayList(Iterator<Type> iter){
 			ArrayList<Type> arraylist = new ArrayList<Type>();

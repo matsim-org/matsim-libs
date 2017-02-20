@@ -42,32 +42,18 @@ public class PTObjectiveFunction implements ObjectiveFunction {
 		ScenarioHelper helper = new ScenarioHelper();
 		int unusedvehs = helper.getUnusedVehs(scenario.getTransitSchedule());
 		int added = currenttotal-totalVeh-unusedvehs;
+		result /= ptstate.getPersonIdView().size();
 		if(added>0){
 			for(int i=0; i<added; i++){
-				result = result + 4.0;//Thats an adverse effect on total score
+				result = result + 0.00045;//Thats an adverse effect on total score
 			}
 		}
 		else if (added<0){
 			added=Math.abs(added);
 			for(int i=0; i<added;i++){
-				result = result - 4.0;//Thats a positive effect due to deleting vehicles
+				result = result - 0.00045;//Thats a positive effect due to deleting vehicles
 			}
 		}
-		int vehs = currenttotal-unusedvehs;
-		result /= ptstate.getPersonIdView().size();
-		str = str + result	+ "\t" + vehs + "\n";
-		writeToTextFile(str, "scores.txt");
 		return result;
-	}
-	public void writeToTextFile(String str, String path){
-		try { 
-			File file=new File(path);
-			FileOutputStream fileOutputStream=new FileOutputStream(file);
-		    fileOutputStream.write(str.getBytes());
-		    fileOutputStream.close();
-	       
-	    } catch(Exception ex) {
-	        //catch logic here
-	    }
 	}
 }

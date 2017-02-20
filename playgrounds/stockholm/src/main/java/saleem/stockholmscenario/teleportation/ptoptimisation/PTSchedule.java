@@ -52,14 +52,15 @@ public class PTSchedule implements DecisionVariable{
 		ScenarioHelper helper = new ScenarioHelper();
 		TransitSchedule copiedschedule = helper.deepCopyTransitSchedule(schedule);
 		Vehicles copiedvehicles = helper.deepCopyVehicles(vehicles);
+		helper.writePlausibilityStatistics(scenario, iteration);
 		if(this.iteration>0){
 			helper.removeEntireScheduleAndVehicles(scenario);//Removes all vehicle types, vehicles, stop facilities and transit lines from a transit schedule
-//			removeAllNodesAndLinks();
-//			addNodesAndLinks(network);
 			helper.addVehicles(scenario, copiedvehicles);//Adds all vehicle types and vehicles from an updated stand alone vehicles object into the current scenario vehicles object
 			helper.addTransitSchedule(scenario, copiedschedule);//Add all stop facilities and transit lines from a stand alone updated transit schedule into the current scenario transit schedule
+			System.out.println(scenario.getTransitVehicles().getVehicles().size());
 		}
 		this.iteration++;
+		
 	
 	}
 

@@ -66,6 +66,13 @@ public class VehicleAdder {
 					Id<Vehicle> vehid= Id.create("VehAdded"+(int)Math.floor(1000000 * Math.random()), Vehicle.class);
 					if(!(vehicles.getVehicles().containsKey(vehid))){//If same vehicle has not been added before
 						double time = departures.get(i).getDepartureTime();
+//						double rand = Math.random();
+//						double time = rand*86400;
+//						if(rand<0.3){
+//							time = Math.random()*9000 + 25200;
+//						}else if(rand<0.6){
+//							time = Math.random()*9000 + 57600;
+//						}
 						time = dtm.adjustTimeDepartureAdded(departures, i);//Adjust time for the departure too be added
 //						double time = Math.ceil(86400 * Math.random());//Random time with in 24 hours
 						Departure departure = schedule.getFactory().createDeparture(Id.create("DepAdded"+(int)Math.floor(1000000 * Math.random()), Departure.class), time);
@@ -74,13 +81,18 @@ public class VehicleAdder {
 							depadded.add(departure.getId());
 							if(!troute.getDepartures().containsKey(departure.getId())){//If not already added a departure with the same id
 								troute.addDeparture(departure);
-								System.out.println("Added Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
+//								System.out.println("Added Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
 								Vehicle vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
 								//To remove the chances of null pointer exception
-								while(vehicle==null)vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
+								Iterator<Id<Departure>> iter = troute.getDepartures().keySet().iterator();
+								while(vehicle==null){
+									vehicle = vehicleinstances.get(troute.getDepartures().get(iter.next()).getVehicleId());
+								}
 								VehicleType vtype = vehicle.getType();
 								Vehicle veh = new VehicleImpl(vehid, vtype);
 								vehicles.addVehicle(veh);
+//								System.out.println("Added Vehicle To Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
+
 							}
 						}
 						

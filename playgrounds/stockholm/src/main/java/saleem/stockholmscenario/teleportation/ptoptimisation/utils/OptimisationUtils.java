@@ -3,6 +3,17 @@ package saleem.stockholmscenario.teleportation.ptoptimisation.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicle;
 
 public class OptimisationUtils {
 	public ArrayList<Double> sortTimes(ArrayList<Double> times){
@@ -13,6 +24,39 @@ public class OptimisationUtils {
 	        }
 	    });
 		return times;
+	}
+	public boolean isBusLine(TransitLine tline, Map<Id<Vehicle>, Vehicle> vehicles){
+		TransitRoute route = tline.getRoutes().values().iterator().next();//Get first route to check its mode
+		Vehicle vehicle = vehicles.get(route.getDepartures().values().iterator().next().getVehicleId());
+		if(vehicle.getType().getId().toString().equals("BUS")){
+			return true;
+		}
+		return false;
+	}
+	public double getAverageLengthOfBusRoute(Scenario scenario){//With 10 % chance of selecting a line, and 10% chance of removing each of its route.
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		Network network = scenario.getNetwork();
+		Map<Id<Vehicle>, Vehicle> vehicles = scenario.getTransitVehicles().getVehicles();
+		double avglength=0;int totalbusroutes=0;
+		Map<Id<Link>, ? extends Link> links = network.getLinks();
+		Iterator<TransitLine> lines = schedule.getTransitLines().values().iterator();
+		while(lines.hasNext()) {
+			TransitLine tline = lines.next();
+			if(isBusLine(tline, vehicles)){
+				Iterator<TransitRoute> routes = tline.getRoutes().values().iterator();
+				while(routes.hasNext()) {
+					TransitRoute route = routes.next();
+					Iterator<Id<Link>> linkids = route.getRoute().getLinkIds().iterator();
+					while(linkids.hasNext()){
+						avglength+=links.get(linkids.next()).getLength();
+					}
+					totalbusroutes++;
+				}
+			}
+			
+		}
+		avglength/=totalbusroutes;
+		return avglength;
 	}
 //	public ArrayList<Double> getRatioOfTimes(ArrayList<Double> times){//Returns a ratio of departure times
 //		times=sortTimes(times);

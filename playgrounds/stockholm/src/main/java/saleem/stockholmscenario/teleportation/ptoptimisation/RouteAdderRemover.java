@@ -101,9 +101,11 @@ public class RouteAdderRemover {
 						if(Math.random()<=factorroute && !(troute.getDepartures().values()
 								.iterator().next().getDepartureTime()==115200 && troute.getDepartures().size()==1)){//With factorroute*100 percent probability
 							TransitRoute route = createTransiteRoute(scenario, schedule, tschedulefact, troute, stops);//Create a new Transit Route, with same origin as troute
-							if(route==null)return;
-							addDeparturestoRoute(tschedulefact, route, vehicles, type);
-							tline.addRoute(route);
+							if(route!=null){
+								addDeparturestoRoute(tschedulefact, route, vehicles, type);
+								tline.addRoute(route);
+
+							}
 						}
 					}
 				}
@@ -147,14 +149,14 @@ public class RouteAdderRemover {
 	public void addDeparturestoRoute(TransitScheduleFactory tschedulefact, TransitRoute route, Vehicles vehicles, VehicleType vtype ){//Creates and adds 
 																																	 //random departures to the newly created route
 		
-		int numpeakmorning = (int)(Math.ceil(2*Math.random()));//Peakhour departures
-		int numpeakevening = (int)(Math.ceil(2*Math.random()));
-		int numrandominday = (int)(Math.ceil(4*Math.random()));//Overall day departures
+		int numpeakmorning = (int)(Math.ceil(6*Math.random()));//Peakhour departures
+		int numpeakevening = (int)(Math.ceil(6*Math.random()));
+		int numrandominday = (int)(Math.ceil(6*Math.random()));//Overall day departures
 		Map<Id<Vehicle>, Vehicle> vehinstances = vehicles.getVehicles();
 		for(int i=0;i<numpeakmorning; i++){
 			Id<Vehicle> vehid= Id.create("VehAdded"+(int)Math.floor(10000000 * Math.random()), Vehicle.class);
 			if(!(vehinstances.containsKey(vehid))){//If same vehicle has not been added before
-				double time = 25200 + 7200*Math.random();//Morning Peak
+				double time = 21600 + 14400*Math.random();//Morning Peak
 				Departure departure = tschedulefact.createDeparture(Id.create("DepAdded"+(int)Math.floor(10000000 * Math.random()), Departure.class), time);
 				departure.setVehicleId(vehid);
 				Vehicle veh = new VehicleImpl(vehid, vtype);
@@ -167,7 +169,7 @@ public class RouteAdderRemover {
 		for(int i=0;i<numpeakevening; i++){
 			Id<Vehicle> vehid= Id.create("VehAdded"+(int)Math.floor(10000000 * Math.random()), Vehicle.class);
 			if(!(vehinstances.containsKey(vehid))){//If same vehicle has not been added before
-				double time = 59400 + 7200*Math.random();//Evening Peak
+				double time = 57600 + 14400*Math.random();//Evening Peak
 				Departure departure = tschedulefact.createDeparture(Id.create("DepAdded"+(int)Math.floor(10000000 * Math.random()), Departure.class), time);
 				departure.setVehicleId(vehid);
 				Vehicle veh = new VehicleImpl(vehid, vtype);

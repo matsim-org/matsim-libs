@@ -28,6 +28,8 @@ public class PTMatsimState extends MATSimState {
 	
 	private final Scenario scenario;
 	
+	private final double occupancyScale;
+	
 	
 	// -------------------- CONSTRUCTION --------------------
 
@@ -42,24 +44,30 @@ public class PTMatsimState extends MATSimState {
 	 *            state.
 	 */
 	public PTMatsimState(final Population population,
-			final Vector vectorRepresentation, final Scenario scenario, final PTSchedule ptscehedule) {
+			final Vector vectorRepresentation, final Scenario scenario, final PTSchedule ptscehedule, double occupancyScale) {
 		super(population,vectorRepresentation);
 		this.scenario=scenario;
 		ScenarioHelper helper = new ScenarioHelper();
 		this.schedule=helper.deepCopyTransitSchedule(ptscehedule.getPreSchedule());
 		this.vehicles=helper.deepCopyVehicles(ptscehedule.getPreVehicles());
+		this.occupancyScale=occupancyScale;
+	}
+	@Override
+	public Vector getReferenceToVectorRepresentation() {
+		final Vector occupancies = super.getReferenceToVectorRepresentation()
+				.copy();
+		occupancies.mult(this.occupancyScale);
+		return occupancies;
 	}
 
 	// -------------------- HELPERS AND INTERNALS --------------------
 
 	public void implementInSimulation() {
 		ScenarioHelper helper = new ScenarioHelper();
-//		System.out.println("Statistics:\t" + helper.getNumberOfRoutes(scenario.getTransitSchedule())+ "\t" + (scenario.getTransitVehicles().getVehicles().size()-helper.getUnusedVehs(scenario.getTransitSchedule())));
 		helper.removeEntireScheduleAndVehicles(scenario);//Removes all vehicle types, vehicles, stop facilities and transit lines from a transit schedule
 		helper.addVehicles(scenario, vehicles);//Adds all vehicle types and vehicles from an updated stand alone vehicles object into the current scenario vehicles object
 		helper.addTransitSchedule(scenario, schedule);//Add all stop facilities and transit lines from a stand alone updated transit schedule into the current scenario transit schedule
 		super.implementInSimulation();
-//		System.out.println("Statistics:\t" + helper.getNumberOfRoutes(scenario.getTransitSchedule())+ "\t" + (scenario.getTransitVehicles().getVehicles().size()-helper.getUnusedVehs(scenario.getTransitSchedule())));
 	
 	}
 }
