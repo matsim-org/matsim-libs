@@ -41,6 +41,8 @@ import org.matsim.core.router.util.TravelTime;
  * <pre>
  * addTravelDistuilityBinding(mode).toProvider( new TravelDisutilityProvider(mode) ) ;
  * </pre>
+ * However, MZ says that there are also instances that pass non-standard TravelTime objects into the standard TravelDisutiity, and 
+ * such a behavior would be difficult to express when extension point would be the TravelDisutility, and not its factory.  kai, feb'17
  * </ul>
  * 
  * @author dgrether
