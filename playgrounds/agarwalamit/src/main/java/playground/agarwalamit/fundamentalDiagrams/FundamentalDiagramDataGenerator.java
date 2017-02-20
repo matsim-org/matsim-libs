@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
@@ -138,8 +139,8 @@ public class FundamentalDiagramDataGenerator {
 
 		if(reduceDataPointsByFactor != 1) {
 			LOG.info("===============");
-			LOG.warn("Number of modes for each mode type in FD will be reduced by a factor of "+reduceDataPointsByFactor+". "+
-					"Make sure this is what you want because it will be more likely to have less or no points in congested regime in absence of queue model with holes.");
+			LOG.warn("Number of modes for each mode type in FD will be reduced by a factor of "+reduceDataPointsByFactor+". This will not change the traffic dynamics.");
+			if (scenario.getConfig().qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.queue) LOG.warn("Make sure this is what you want because it will be more likely to have less or no points in congested regime in absence of queue model with holes.");
 			LOG.info("===============");
 		}
 
@@ -157,6 +158,14 @@ public class FundamentalDiagramDataGenerator {
 
 		flowUnstableWarnCount = new int [travelModes.length];
 		speedUnstableWarnCount = new int [travelModes.length];
+
+		if (this.modalShareInPCU==null) {
+			LOG.warn("No modal split is provided for mode(s) : " + Arrays.toString(this.travelModes)+". Using equla modal split in PCU.");
+			this.modalShareInPCU = new Double[this.travelModes.length];
+			for (int index = 0; index< this.travelModes.length; index++){
+				this.modalShareInPCU[index] = 1.0;
+			}
+		}
 	}
 
 	private void setUpConfig() {
@@ -215,7 +224,7 @@ public class FundamentalDiagramDataGenerator {
 
 		List<Integer> minSteps = Arrays.stream(modalShareInPCU)
 									   .mapToDouble(modalSplit -> modalSplit)
-									   .mapToObj(modalSplit -> Integer.valueOf((int) modalSplit * 100))
+									   .mapToObj(modalSplit -> ((int) modalSplit * 100))
 									   .collect(Collectors.toList());
 
 		int commonMultiplier = 1;
