@@ -9,7 +9,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
+import saleem.stockholmmodel.modelbuilding.PTCapacityAdjusmentPerSample;
 
 public class PretimedNodesCoordinateCreator {
 	public static void main(String[] args){

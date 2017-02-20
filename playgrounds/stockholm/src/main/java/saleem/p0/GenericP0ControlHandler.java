@@ -21,7 +21,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.vehicles.Vehicle;
 
-import saleem.stockholmscenario.utils.CollectionUtil;
+import saleem.stockholmmodel.utils.CollectionUtil;
 
 //For Generic Junctions
 

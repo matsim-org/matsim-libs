@@ -20,7 +20,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
-import saleem.stockholmscenario.utils.CollectionUtil;
+import saleem.stockholmmodel.utils.CollectionUtil;
 
 public class P0ControlHandler implements BasicEventHandler{
 	Link link2, link4, link5;

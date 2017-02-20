@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import saleem.stockholmscenario.utils.CollectionUtil;
+import saleem.stockholmmodel.utils.CollectionUtil;
 
 public class PlotStatistics {
 	public void PlotCapacities(int iter, ArrayList<Double> times, ArrayList<Double> capacitieslink2, ArrayList<Double> capacitieslink4, ArrayList<Double> initialcapacitiesLink2, ArrayList<Double> initialcapacitiesLink4 ){

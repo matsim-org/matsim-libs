@@ -21,7 +21,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.io.PopulationReader;
@@ -30,7 +29,7 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import saleem.stockholmscenario.utils.CollectionUtil;
+import saleem.stockholmmodel.utils.CollectionUtil;
 
 public class NetworkAnalysis {
 	public static void main(String[] args){

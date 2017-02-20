@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+import saleem.stockholmmodel.utils.StockholmTransformationFactory;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class StockholmP0Helper {

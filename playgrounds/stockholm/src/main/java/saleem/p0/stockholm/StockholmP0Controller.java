@@ -2,6 +2,7 @@ package saleem.p0.stockholm;
 
 import java.util.List;
 import java.util.Map;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -12,7 +13,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
+
+import saleem.stockholmmodel.modelbuilding.PTCapacityAdjusmentPerSample;
 
 
 public class StockholmP0Controller {

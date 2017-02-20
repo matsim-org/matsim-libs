@@ -23,7 +23,7 @@ import org.matsim.vehicles.Vehicle;
 
 import saleem.p0.PlotStatistics;
 import saleem.p0.TextReaderWriter;
-import saleem.stockholmscenario.utils.CollectionUtil;
+import saleem.stockholmmodel.utils.CollectionUtil;
 
 //For Generic Junctions
 
