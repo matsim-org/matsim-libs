@@ -90,13 +90,6 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                     int imbalanceFrom = requests.get(vlink.getFrom()).size() - availableVehicles.get(vlink.getFrom()).size();
                     int imbalanceTo = requests.get(vlink.getTo()).size() - availableVehicles.get(vlink.getTo()).size();
 
-                    // DEBUGGING
-                    System.out.println("RebalancingPeriod " + REBALANCING_PERIOD);
-                    System.out.println("linkWeights.get(vlink) " + linkWeights.get(vlink));
-                    System.out.println("imbalanceTo " + (double) imbalanceTo);
-                    System.out.println("imbalanceFrom " + (double) imbalanceFrom);
-                    System.out.println("rebalanceFloating.get(vlink) " + rebalanceFloating.get(vlink));
-
 
                     // compute the rebalancing vehicles
                     double vehicles_From_to_To =  //
@@ -105,12 +98,31 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
 
                     // assign integer number to rebalance vehicles and store float for next iteration
                     // only consider the results which are >= 0. This assumes an undirected graph.
+                    // TODO see if this is possible without searching for the virtualLink in the opposite direction
                     if (vehicles_From_to_To >= 0) {
-                        rebalanceCount.put(vlink, (int) Math.floor(vehicles_From_to_To));
+                        // calculate the integer number of vehicles to actually be sent
+                        int rebalanceNmbr = Math.min((int) Math.floor(vehicles_From_to_To),//
+                                availableVehicles.get(vlink.getFrom()).size());
+                        double leftover = vehicles_From_to_To - rebalanceNmbr;
+                        // assign rebalanceCount and leftover for positive edge
+                        rebalanceCount.put(vlink, rebalanceNmbr);
+                        rebalanceFloating.put(vlink, leftover);
+
+                        // look for edge in opposite direction and set leftover
+                        VirtualLink oppositeLink = virtualNetwork.getVirtualLinks().stream().filter(v-> (v.getFrom().equals(vlink.getTo()) && v.getTo().equals(vlink.getFrom()) ) ).findFirst().get();
+                        rebalanceCount.put(oppositeLink,0);
+                        rebalanceFloating.put(oppositeLink,-leftover);
+
                     }
-                    rebalanceFloating.put(vlink, vehicles_From_to_To - (int) Math.floor(vehicles_From_to_To));
                 }
             }
+
+
+            // Debugging, print nonzero rebalancing orders
+            System.out.println("Print nonzero rebalancing: ");
+            rebalanceCount.values().stream().filter(v->v>0).forEach(v-> System.out.println("value is " +v));
+
+
 
 
             // 2 generate routing instructions for vehicles
