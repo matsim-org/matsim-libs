@@ -94,9 +94,9 @@ public class TripAnalyzerV2Extended {
 
 	
 	public static void main(String[] args) {
-		double aggregateWeightOfTripsWithNonNegativeTimesAndDurations = 0;
-		double numberOfTripsWithCalculableSpeedBeeline = 0;
-		double numberOfTripsWithCalculableSpeedRouted = 0;
+		double aggregateWeightOfTripsWithNonNegativeTimesAndDurations;
+		double numberOfTripsWithCalculableSpeedBeeline;
+		double numberOfTripsWithCalculableSpeedRouted;
 		
 		adaptOutputDirectory();
 	    
@@ -118,7 +118,7 @@ public class TripAnalyzerV2Extended {
 	    
 		AnalysisFileWriter writer = new AnalysisFileWriter();
 
-		if (useAgeFilter == true) {
+		if (useAgeFilter) {
 	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
 	    	CemdapPersonInputFileReader cemdapPersonInputFileReader = new CemdapPersonInputFileReader();
 		 	cemdapPersonInputFileReader.parse(cemdapPersonsInputFile);
@@ -187,7 +187,7 @@ public class TripAnalyzerV2Extended {
 	}
 	
 	
-	static void doBeelineCaluclations(List<Trip> trips, int binWidthDistance_km, Network network) {
+	private static void doBeelineCaluclations(List<Trip> trips, int binWidthDistance_km, Network network) {
 		Map<Integer, Double> tripDistanceBeelineMap = new TreeMap<>();
 		for (Trip trip : trips) {
 			double tripDistanceRouted_km = trip.getDistanceRoutedByCalculation_m(network) / 1000.;
@@ -227,7 +227,6 @@ public class TripAnalyzerV2Extended {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		outputDirectory = outputDirectory;
 		new File(outputDirectory).mkdir();
 	}
 	
