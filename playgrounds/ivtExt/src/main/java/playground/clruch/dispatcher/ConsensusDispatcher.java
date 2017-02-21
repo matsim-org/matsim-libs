@@ -51,44 +51,27 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                                 AbstractVirtualNodeDest abstractVirtualNodeDest, //
                                 AbstractRequestSelector abstractRequestSelector, //
                                 AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-                                File linkWeightFile
+                                Map<VirtualLink, Double> linkWeightsIn
     ) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         this.abstractVirtualNodeDest = abstractVirtualNodeDest;
         this.abstractRequestSelector = abstractRequestSelector;
         this.abstractVehicleDestMatcher = abstractVehicleDestMatcher;
         rebalanceFloating = new HashMap<>();
-        for(VirtualLink virtualLink : virtualNetwork.getVirtualLinks()){
-            rebalanceFloating.put(virtualLink,0.0);
+        for (VirtualLink virtualLink : virtualNetwork.getVirtualLinks()) {
+            rebalanceFloating.put(virtualLink, 0.0);
         }
-        linkWeights = new HashMap<>();
-        fillLinkWeights(linkWeightFile);
+        linkWeights = linkWeightsIn;
     }
 
     @Override
     public void redispatch(double now) {
+
         // match requests and vehicles if they are at t
         // he same link
         int seconds = (int) Math.round(now);
         {
-            // TODO also send vehicles within node in a smart way... or is this done later in 2.4?
-            Map<Link, Queue<AVVehicle>> map = getStayVehicles(); // link -> stayed vehicles
-            Collection<AVRequest> collection = getAVRequests(); // all requests
-            if (!map.isEmpty() && !collection.isEmpty()) { // has stay vehicles and has requests
-                // System.out.println(now + " @ " + map.size() + " <-> " + collection.size());
-                for (AVRequest avRequest : collection) {
-                    Link link = avRequest.getFromLink();
-                    if (map.containsKey(link)) {
-                        Queue<AVVehicle> queue = map.get(link);
-                        if (queue.isEmpty()) {
-                            // unmatched.add(link);
-                        } else {
-                            AVVehicle avVehicle = queue.poll();
-                            setAcceptRequest(avVehicle, avRequest); // PICKUP+DRIVE+DROPOFF
-                        }
-                    }
-                }
-            }
+            MatchRequestsWithStayVehicles.inOrderOfArrival(this);
         }
 
 
@@ -103,16 +86,16 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             {
                 for (VirtualLink vlink : virtualNetwork.getVirtualLinks()) {
                     //compute imbalance on nodes of link
+                    //if(availableVehicles.containsKey(vlink))
                     int imbalanceFrom = requests.get(vlink.getFrom()).size() - availableVehicles.get(vlink.getFrom()).size();
                     int imbalanceTo = requests.get(vlink.getTo()).size() - availableVehicles.get(vlink.getTo()).size();
 
                     // DEBUGGING
-                    System.out.println("RebalancingPeriod "+ REBALANCING_PERIOD);
-                    System.out.println("linkWeights.get(vlink) "+ linkWeights.get(vlink));
-                    System.out.println("imbalanceTo "+ (double) imbalanceTo);
-                    System.out.println("imbalanceFrom "+ (double) imbalanceFrom);
-                    System.out.println("rebalanceFloating.get(vlink) "+ rebalanceFloating.get(vlink));
-
+                    System.out.println("RebalancingPeriod " + REBALANCING_PERIOD);
+                    System.out.println("linkWeights.get(vlink) " + linkWeights.get(vlink));
+                    System.out.println("imbalanceTo " + (double) imbalanceTo);
+                    System.out.println("imbalanceFrom " + (double) imbalanceFrom);
+                    System.out.println("rebalanceFloating.get(vlink) " + rebalanceFloating.get(vlink));
 
 
                     // compute the rebalancing vehicles
@@ -199,36 +182,9 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                 }
             }
         }
+
     }
 
-    private void fillLinkWeights(File file) {
-        // open the linkWeightFile and parse the parameter values
-        SAXBuilder builder = new SAXBuilder();
-        try {
-            Document document = (Document) builder.build(file);
-            Element rootNode = document.getRootElement();
-            Element virtualNodesXML = rootNode.getChild("weights");
-            List<Element> virtualLinkXML = virtualNodesXML.getChildren("virtuallink");
-            for (Element vLinkelem : virtualLinkXML) {
-                String vlinkID = vLinkelem.getAttributeValue("id");
-                Double weight = Double.parseDouble(vLinkelem.getAttributeValue("weight"));
-
-
-                // find the virtual link with the corresponding ID and assign the weight to it.
-                linkWeights.put((virtualNetwork.getVirtualLinks()).stream()
-                                .filter(vl -> vl.getId().toString().equals(vlinkID))
-                                .findFirst()
-                                .get(),
-                        weight);
-            }
-
-
-        } catch (JDOMException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static class Factory implements AVDispatcherFactory {
         @Inject
@@ -245,6 +201,9 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         @Inject
         private Network network;
 
+        public static VirtualNetwork virtualNetwork;
+        public static Map<VirtualLink, Double> linkWeights;
+
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config) {
 
@@ -253,11 +212,6 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new NativeVehicleDestMatcher();
             // TODO relate to general directory given in argument of main function
-            File dir = new File("C:/Users/Claudio/Documents/matsim_Simulations/2017_01_04_Sioux_onlyUnitCapacityAVs/");
-            File linkWeightFile = new File(dir + "/consensusWeights.xml");
-            File virtualnetworkXML = new File(dir + "/virtualNetwork.xml");
-            VirtualNetwork virtualNetwork = VirtualNetwork.loadFromXML(network, virtualnetworkXML);
-            virtualNetwork.printForTesting();
 
 
             // TODO:
@@ -271,7 +225,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                     abstractVirtualNodeDest,
                     abstractRequestSelector,
                     abstractVehicleDestMatcher,
-                    linkWeightFile
+                    linkWeights
             );
         }
     }

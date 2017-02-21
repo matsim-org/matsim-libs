@@ -87,7 +87,6 @@ public class VirtualNetwork {
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
                     for (Link link : virtualNode.getLinks()) {
                         virtualNetwork.linkIdVNodeMap.put(link, virtualNode);
-
                     }
                 }
 
@@ -125,8 +124,11 @@ public class VirtualNetwork {
      * @return virtual node belonging to link
      */
     public VirtualNode getVirtualNode(Link link) {
-        return linkIdVNodeMap.get(link.getId());
+        return linkIdVNodeMap.get(link);
     }
+
+
+
 
     // TODO don't delete this function but move outside into class e.g. VirtualNetworkHelper
     public void printForTesting() {

@@ -11,6 +11,8 @@ import playground.clruch.dispatcher.ConsensusDispatcher;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.netdata.LinkWeights;
+import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
@@ -19,6 +21,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.Map;
 
 /**
  * Created by Claudio on 2/9/2017.
@@ -49,6 +52,8 @@ public class RunVirtualNetworkConsensusDispatcherTest {
             AbstractRequestSelector abstractRequestSelector = null;
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = null;
             File linkWeightFile = new File(dir + "/consensusWeights.xml");
+            final Map<VirtualLink, Double> linkWeights;
+            linkWeights = LinkWeights.fillLinkWeights(linkWeightFile,virtualNetwork);
 
             ConsensusDispatcher consensusDispatcher = new ConsensusDispatcher(
                     AVDconfig,
@@ -59,7 +64,7 @@ public class RunVirtualNetworkConsensusDispatcherTest {
                     abstractVirtualNodeDest,
                     abstractRequestSelector,
                     abstractVehicleDestMatcher,
-                    linkWeightFile
+                    linkWeights
             );
         } else {
             System.out.println("no virutalNetwork.xml file");
