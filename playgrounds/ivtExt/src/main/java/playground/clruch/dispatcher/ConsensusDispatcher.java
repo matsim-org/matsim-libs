@@ -57,9 +57,12 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         this.abstractVirtualNodeDest = abstractVirtualNodeDest;
         this.abstractRequestSelector = abstractRequestSelector;
         this.abstractVehicleDestMatcher = abstractVehicleDestMatcher;
-        this.rebalanceFloating = new HashMap<>();
-        this.linkWeights = new HashMap<>();
-        this.fillLinkWeights(linkWeightFile);
+        rebalanceFloating = new HashMap<>();
+        for(VirtualLink virtualLink : virtualNetwork.getVirtualLinks()){
+            rebalanceFloating.put(virtualLink,0.0);
+        }
+        linkWeights = new HashMap<>();
+        fillLinkWeights(linkWeightFile);
     }
 
     @Override
@@ -255,6 +258,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             Network network = scenario.getNetwork();
             File virtualnetworkXML = new File(dir + "/virtualNetwork.xml");
             VirtualNetwork virtualNetwork = VirtualNetwork.loadFromXML(network, virtualnetworkXML);
+            virtualNetwork.printForTesting();
 
 
             // TODO:

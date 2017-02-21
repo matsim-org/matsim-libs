@@ -49,6 +49,10 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                 .forEach(vehicleLinkPair -> {
                     Link link = vehicleLinkPair.getDivertableLocation();
                     VirtualNode virtualNode = virtualNetwork.getVirtualNode(link);
+                    if(virtualNode == null) {
+                        System.out.println("non id " + link);
+//                        System.out.println(virtualNode.toString());
+                    } else
                     map.get(virtualNode).add(vehicleLinkPair);
                 });
         return map;
