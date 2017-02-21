@@ -16,6 +16,7 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.utils.MatchRequestsWithStayVehicles;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -42,22 +43,8 @@ public class EdgyDispatcher extends UniversalDispatcher {
             int num_matchedRequests = 0;
             int num_abortTrip = 0;
             int num_driveOrder = 0;
-            { // match requests with stay vehicles
-                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
-                Map<Link, Queue<AVVehicle>> stayVehicles = getStayVehicles();
-
-                for (Entry<Link, List<AVRequest>> entry : requests.entrySet()) {
-                    final Link link = entry.getKey();
-                    if (stayVehicles.containsKey(link)) {
-                        Iterator<AVRequest> requestIterator = entry.getValue().iterator();
-                        Queue<AVVehicle> vehicleQueue = stayVehicles.get(link);
-                        while (!vehicleQueue.isEmpty() && requestIterator.hasNext()) {
-                            setAcceptRequest(vehicleQueue.poll(), requestIterator.next());
-                            ++num_matchedRequests;
-                        }
-                    }
-                }
-            }
+            
+            num_matchedRequests = MatchRequestsWithStayVehicles.inOrderOfArrival(this);
 
             { // see if any car is driving by a request. if so, then stay there to be matched!
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks(); // TODO lazy implementation
