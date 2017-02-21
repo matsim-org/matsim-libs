@@ -82,8 +82,6 @@ public class VirtualNetworkLoader {
                     String virtualLinkfrom = virtualLinkXML.getAttributeValue("from");
                     String virtualLinkto = virtualLinkXML.getAttributeValue("to");
 
-//                    VirtualLink virtualLink = new VirtualLink( 
-//                            );
                     virtualNetwork.addVirtualLink(virtualLinkId, //
                             virtualNodeList.get(virtualLinkfrom), //
                             virtualNodeList.get(virtualLinkto)); //
