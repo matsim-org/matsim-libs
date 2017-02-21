@@ -163,7 +163,7 @@ public class CreateNetwork {
 	}
 	
 	
-	public static void createNetwork(InputStream osmInputStream, String networkFile, String inputCRS, String outputCRS) {
+	public static Network createNetwork(InputStream osmInputStream, String inputCRS, String outputCRS) {
 //		LogToOutputSaver.setOutputDirectory(outputBase);
 		LOG.info("Input CRS is " + inputCRS + "; output CRS is " + outputCRS);
 		
@@ -242,7 +242,8 @@ public class CreateNetwork {
 
 		osmNetworkReader.parse(osmInputStream); 
 		new NetworkCleaner().run(network);
-		networkWriter.write(networkFile);
-		LOG.info("Network file written to " + networkFile);
+//		networkWriter.write(networkFile);
+//		LOG.info("Network file written to " + networkFile);
+		return network;
 	}
 }

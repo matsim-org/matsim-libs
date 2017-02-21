@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,7 +27,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.FacilityTypes;
@@ -39,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
@@ -79,65 +79,41 @@ public class AccessibilityComputationKiberaTest {
 //		
 //		config.facilities().setInputFile(folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml");
 	
-		//-----------------------------------------------------------------------------------------
 		// Network file (directly from OSM)
 		// TODO simplify this; eventually get rid of storing the files
-		String tmpFolder = "tmp/";
-		new File(tmpFolder).mkdir();
+//		String tmpFolder = "tmp/";
+//		new File(tmpFolder).mkdir();
 
-		String osmFile = tmpFolder + "kibera.osm";
+//		String osmFile = tmpFolder + "kibera.osm";
 		
-		String networkFile = tmpFolder + "network_kibera_paths_detailed.xml";
-		String facilityFile = tmpFolder + "facilities.xml";
-		String attributeFile = tmpFolder + "facilitiy_attributes.xml";
+//		String networkFile = tmpFolder + "network_kibera_paths_detailed.xml";
+//		String facilityFile = tmpFolder + "facilities.xml";
+//		String attributeFile = tmpFolder + "facilitiy_attributes.xml";
 		double buildingTypeFromVicinityRange = 0.;
 		
 		String inputCRS = "EPSG:4326"; // EPSG:4326 = WGS84		
 		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
 		// Create script to download OSM
-		String regionName = tmpFolder + "kibera.osm";
+//		String regionName = tmpFolder + "kibera.osm";
 		String minLon = "36.7715";
 		String minLat = "-1.3198";
 		String maxLon = "36.8014";
 		String maxLat = "-1.3055";
 		
-		//-----------------------------------
 		URL osm = new URL("http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat);
 		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
-		//-----------------------------------
-		
-//		File osmDownloadScript = AccessibilityUtils.createOSMDownloadScript(tmpFolder + "kibera.osm", "36.7715", "-1.3198", "36.8014", "-1.3055");
-//	    try {
-////	        ProcessBuilder pb = new ProcessBuilder("bash", osmDownloadScript.toString());
-//	        ProcessBuilder pb = new ProcessBuilder("bash", "-c", "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"");
-////	        /usr/local/bin/wget -O tmp/kibera.osm "http://api.openstreetmap.org/api/0.6/map?bbox=36.7715,-1.3198,36.8014,-1.3055"
-//	        pb.inheritIO();
-//	        System.out.println("----- directory = " + pb.directory());
-//	        System.out.println("----- environment = " + pb.environment());
-//	        Process subProcess = pb.start();
-//	        subProcess.waitFor();
-//	        
-//			// Input stream closed, subProcess disconnected
-//		    //----------
-//			
-//	    } catch (Exception e) {
-//			LOG.error(e.getMessage());
-//			throw new RuntimeException("execute command failed") ;
-//		}
-	    
-	    
+		HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO Might be more elegant without downloading this twice
 		
 	    // Create network and facility files
 //	    CreateNetwork.createNetwork(osmFile, tmpFolder, networkFile, inputCRS, outputCRS);
-	    CreateNetwork.createNetwork(connection.getInputStream(), networkFile, inputCRS, outputCRS);
+	    Network network = CreateNetwork.createNetwork(connection.getInputStream(), inputCRS, outputCRS);
 	    
 //		RunCombinedOsmReaderKibera.createFacilites(osmFile, tmpFolder, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
-		RunCombinedOsmReaderKibera.createFacilites(connection.getInputStream(), facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
+		ActivityFacilities facilities = RunCombinedOsmReaderKibera.createFacilites(connection2.getInputStream(), outputCRS, buildingTypeFromVicinityRange);
 		
-		config.network().setInputFile(tmpFolder + "network_kibera_paths_detailed.xml");
-		config.facilities().setInputFile(tmpFolder + "facilities.xml");
-		//-----------------------------------------------------------------------------------------
+//		config.network().setInputFile(tmpFolder + "network_kibera_paths_detailed.xml");
+//		config.facilities().setInputFile(tmpFolder + "facilities.xml");
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -153,7 +129,12 @@ public class AccessibilityComputationKiberaTest {
 		
 		ConfigUtils.setVspDefaults(config);
 		
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
+//		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+		// ----
+		scenario.setNetwork(network);
+		scenario.setActivityFacilities(facilities);
+		// ----
 		
 		// Activity types
 		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.DRINKING_WATER, FacilityTypes.CLINIC});
