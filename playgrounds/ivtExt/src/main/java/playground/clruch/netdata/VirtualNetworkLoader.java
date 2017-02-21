@@ -64,9 +64,10 @@ public class VirtualNetworkLoader {
                             throw new RuntimeException("link key from not found in network");
                         }
                     }
-                    final VirtualNode virtualNode = new VirtualNode(virtualNodeId, linkSet);
+                    final VirtualNode virtualNode = virtualNetwork.addVirtualNode(virtualNodeId, linkSet);
+                    // new VirtualNode();
                     virtualNodeList.put(virtualNodeId, virtualNode);
-                    virtualNetwork.addVirtualNode(virtualNode);
+
                 }
 
             }
@@ -81,11 +82,11 @@ public class VirtualNetworkLoader {
                     String virtualLinkfrom = virtualLinkXML.getAttributeValue("from");
                     String virtualLinkto = virtualLinkXML.getAttributeValue("to");
 
-                    VirtualLink virtualLink = new VirtualLink( //
-                            virtualLinkId, //
+//                    VirtualLink virtualLink = new VirtualLink( 
+//                            );
+                    virtualNetwork.addVirtualLink(virtualLinkId, //
                             virtualNodeList.get(virtualLinkfrom), //
-                            virtualNodeList.get(virtualLinkto));
-                    virtualNetwork.addVirtualLink(virtualLink); //
+                            virtualNodeList.get(virtualLinkto)); //
                 }
             }
             return virtualNetwork;

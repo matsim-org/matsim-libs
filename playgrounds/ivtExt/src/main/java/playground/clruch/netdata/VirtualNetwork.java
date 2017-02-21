@@ -1,9 +1,9 @@
 package playground.clruch.netdata;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,21 +15,21 @@ import org.matsim.api.core.v01.network.Network;
  */
 public class VirtualNetwork {
 
-    private final Set<VirtualNode> virtualNodeSet = new LinkedHashSet<>();
-    private final Set<VirtualLink> virtualLinkSet = new LinkedHashSet<>();
+    private final List<VirtualNode> virtualNodes = new ArrayList<>();
+    private final List<VirtualLink> virtualLinks = new ArrayList<>();
     private final Map<Link, VirtualNode> linkVNodeMap = new HashMap<>();
 
     /* package */ VirtualNetwork() {
     }
 
     // get the collection of virtual nodes
-    public Collection<VirtualNode> getVirtualNodes() {
-        return Collections.unmodifiableCollection(virtualNodeSet);
+    public List<VirtualNode> getVirtualNodes() {
+        return Collections.unmodifiableList(virtualNodes);
     }
 
     // get the collection of virtual links
-    public Collection<VirtualLink> getVirtualLinks() {
-        return Collections.unmodifiableCollection(virtualLinkSet);
+    public List<VirtualLink> getVirtualLinks() {
+        return Collections.unmodifiableList(virtualLinks);
     }
 
     /**
@@ -43,14 +43,17 @@ public class VirtualNetwork {
         return linkVNodeMap.get(link);
     }
 
-    /* package */ void addVirtualNode(VirtualNode virtualNode) {
-        virtualNodeSet.add(virtualNode);
+    /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn) {
+        VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn);
+        virtualNodes.add(virtualNode);
         for (Link link : virtualNode.getLinks())
             linkVNodeMap.put(link, virtualNode);
+        return virtualNode;
     }
 
-    /* package */ void addVirtualLink(VirtualLink virtualLink) {
-        virtualLinkSet.add(virtualLink);
+    /* package */ void addVirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn) {
+        VirtualLink virtualLink = new VirtualLink(virtualLinks.size(), idIn, fromIn, toIn);
+        virtualLinks.add(virtualLink);
     }
 
     // TODO don't delete this function but move outside into class e.g. VirtualNetworkHelper
@@ -74,7 +77,7 @@ public class VirtualNetwork {
         // // check the virtualLinkList
         for (VirtualLink virtualLink : getVirtualLinks()) {
             System.out.println("vLink " + virtualLink.getId() + " " + //
-                    virtualLink.getFrom().getId() + " to " + // 
+                    virtualLink.getFrom().getId() + " to " + //
                     virtualLink.getTo().getId());
             // System.out.println("virtual link " + vLinkId + " has the id " + (virtualLinkList.get(vLinkId)).getId() + " and goes from");
             // System.out.println("virtual node " + virtualLinkList.get(vLinkId).getFrom().getId() + " to " + virtualLinkList.get(vLinkId).getTo().getId());
