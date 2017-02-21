@@ -136,18 +136,18 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                 }
 
                 // not enough available vehicles
-                if(availableVehicles.get(virtualNode).size() < totRebVehicles){
+                if (availableVehicles.get(virtualNode).size() < totRebVehicles) {
                     // calculate by how much to shrink
-                    double shrinkingFactor  = ((double)availableVehicles.get(virtualNode).size())/((double)totRebVehicles);
+                    double shrinkingFactor = ((double) availableVehicles.get(virtualNode).size()) / ((double) totRebVehicles);
                     // remove rebalancing vehicles
-                    for(VirtualLink virtualLink : vLinkShareFromvNode.get(virtualNode)){
-                        if(rebalanceCount.get(virtualLink)>0){
-                            double newRebCountTot = rebalanceCount.get(virtualLink)*shrinkingFactor;
+                    for (VirtualLink virtualLink : vLinkShareFromvNode.get(virtualNode)) {
+                        if (rebalanceCount.get(virtualLink) > 0) {
+                            double newRebCountTot = rebalanceCount.get(virtualLink) * shrinkingFactor;
                             int newIntRebCount = (int) Math.floor(newRebCountTot);
-                            int newLeftOver = rebalanceCount.get(virtualLink)-newIntRebCount;
+                            int newLeftOver = rebalanceCount.get(virtualLink) - newIntRebCount;
 
-                            rebalanceCount.put(virtualLink,newIntRebCount);
-                            rebalanceFloating.put(virtualLink,rebalanceFloating.get(virtualLink) + newLeftOver);
+                            rebalanceCount.put(virtualLink, newIntRebCount);
+                            rebalanceFloating.put(virtualLink, rebalanceFloating.get(virtualLink) + newLeftOver);
                             VirtualLink oppositeLink = virtualNetwork.getVirtualLinks().stream().filter(v -> (v.getFrom().equals(virtualLink.getTo()) && v.getTo().equals(virtualLink.getFrom()))).findFirst().get();
                             rebalanceCount.put(oppositeLink, 0);
                             rebalanceFloating.put(oppositeLink, rebalanceFloating.get(oppositeLink) - newLeftOver);
@@ -155,7 +155,6 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                     }
                 }
             }
-
 
 
             // 2 generate routing instructions for vehicles
@@ -173,7 +172,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                 // Link origin = fromNode.getLinks().iterator().next(); //
                 VirtualNode toNode = virtualLink.getTo();
 
-                Set<Link> rebalanceTargets = abstractVirtualNodeDest.selectLinkSet(toNode, size);
+                List<Link> rebalanceTargets = abstractVirtualNodeDest.selectLinkSet(toNode, size);
 
                 destinationLinks.get(fromNode).addAll(rebalanceTargets);
             }
@@ -206,17 +205,36 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
 
             // 2.4 fill extra destinations for left over vehicles
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+
+                //Debugging
+                if(virtualNode.getId().toString().equals("vNode_0022")){
+                    System.out.println(virtualNode.getId().toString());
+                }
+                System.out.println("Available Vehicles: " + availableVehicles.get(virtualNode).size());
+                System.out.println("Destination Links: " + destinationLinks.get(virtualNode).size());
+
+
                 // number of vehicles that can be matched to requests
                 int size = availableVehicles.get(virtualNode).size() - destinationLinks.get(virtualNode).size(); //
 
                 // TODO maybe not final API; may cause excessive diving
-                Set<Link> localTargets = abstractVirtualNodeDest.selectLinkSet(virtualNode, size);
+                List<Link> localTargets = abstractVirtualNodeDest.selectLinkSet(virtualNode, size);
                 destinationLinks.get(virtualNode).addAll(localTargets);
+
+                System.out.println("Available Vehicles: " + availableVehicles.get(virtualNode).size());
+                System.out.println("Destination Links: " + destinationLinks.get(virtualNode).size());
 
             }
 
             // 2.5 assign destinations to the available vehicles
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+
+                // Debugging
+                if (availableVehicles.get(virtualNode).size() != destinationLinks.get(virtualNode).size()) {
+                    System.out.println("availablevehicles: " + availableVehicles.get(virtualNode).size());
+                    System.out.println("destinationLinks: " + destinationLinks.get(virtualNode).size());
+                }
+
 
                 Map<VehicleLinkPair, Link> map = abstractVehicleDestMatcher.match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
                 for (Entry<VehicleLinkPair, Link> entry : map.entrySet()) {
