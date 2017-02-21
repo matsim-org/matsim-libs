@@ -42,7 +42,7 @@ public class RunAVScenario {
 
         ConsensusDispatcher.Factory.virtualNetwork.printForTesting(scenario.getNetwork());
 
-        System.exit(0);
+
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
