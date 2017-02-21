@@ -146,6 +146,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         };
     }
 
+    @Override
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
         // default implementation: for now, do nothing
     }
