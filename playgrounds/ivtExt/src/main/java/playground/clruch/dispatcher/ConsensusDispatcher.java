@@ -125,30 +125,21 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
 
             // create a Map that contains all the outgoing vLinks for a vNode
             Map<VirtualNode, List<VirtualLink>> vLinkShareFromvNode = virtualNetwork.getVirtualLinks().stream().collect(Collectors.groupingBy(VirtualLink::getFrom));
-            // ensure that not more vehicles are sent away than there are
+
+            // ensure that not more vehicles are sent away than available
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-
-                if(virtualNode.getId().toString().equals("vNode_0005")){
-                    System.out.println(virtualNode.getId().toString());
-                }
-
 
                 // count outgoing vehicles from this node:
                 int totRebVehicles = 0;
                 for (VirtualLink vLink : vLinkShareFromvNode.get(virtualNode)) {
                     totRebVehicles = totRebVehicles + rebalanceCount.get(vLink);
-                    System.out.println("Sending " + rebalanceCount.get(vLink)+" on vLink "+ vLink.getId());
                 }
-                System.out.println("The total number of rebalancing vehicles is " + totRebVehicles);
-                System.out.println("Available vehicles" + availableVehicles.get(virtualNode).size());
 
-
+                // not enough available vehicles
                 if(availableVehicles.get(virtualNode).size() < totRebVehicles){
-
-                    System.out.println("resizing rebalancing command by "+(totRebVehicles - availableVehicles.get(virtualNode).size()));
+                    // calculate by how much to shrink
                     double shrinkingFactor  = ((double)availableVehicles.get(virtualNode).size())/((double)totRebVehicles);
-                    System.out.println("Removing per vLink " + shrinkingFactor);
-
+                    // remove rebalancing vehicles
                     for(VirtualLink virtualLink : vLinkShareFromvNode.get(virtualNode)){
                         if(rebalanceCount.get(virtualLink)>0){
                             double newRebCountTot = rebalanceCount.get(virtualLink)*shrinkingFactor;
@@ -163,40 +154,8 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                         }
                     }
                 }
-
-
-                totRebVehicles = 0;
-                for (VirtualLink vLink : vLinkShareFromvNode.get(virtualNode)) {
-                    totRebVehicles = totRebVehicles + rebalanceCount.get(vLink);
-                    System.out.println("Sending " + rebalanceCount.get(vLink)+" on vLink "+ vLink.getId());
-                }
-                System.out.println("The total number of rebalancing vehicles is " + totRebVehicles);
-                System.out.println("Available vehicles" + availableVehicles.get(virtualNode).size());
-
-
-
-                System.out.println("The following links go from node " + virtualNode.getId().toString());
-                for (VirtualLink vLink : vLinkShareFromvNode.get(virtualNode)) {
-                    System.out.println("link " + vLink.getId().toString() + " from " + vLink.getFrom().getId().toString() + " to " + vLink.getTo().getId().toString());
-                }
-
-                System.out.print("end");
-
-                /*
-                return getAVRequests().stream() // <- intentionally not parallel to guarantee ordering of requests
-                        .collect(Collectors.groupingBy(AVRequest::getFromLink));
-                */
-                // sum all the rebalancing commands
-
-                // if too many scale appropriately and put remaining number into rebalanceFloating
-
-
             }
 
-
-            // Debugging, print nonzero rebalancing orders
-            System.out.println("Print nonzero rebalancing: ");
-            rebalanceCount.values().stream().filter(v -> v > 0).forEach(v -> System.out.println("value is " + v));
 
 
             // 2 generate routing instructions for vehicles
@@ -206,7 +165,6 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                 destinationLinks.put(virtualNode, new ArrayList<>());
 
             // 2.2 fill rebalancing destinations
-
             // TODO size negative?
             for (Entry<VirtualLink, Integer> entry : rebalanceCount.entrySet()) {
                 final VirtualLink virtualLink = entry.getKey();
