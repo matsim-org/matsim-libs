@@ -96,6 +96,11 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                             REBALANCING_PERIOD * linkWeights.get(vlink) * ((double) imbalanceTo - (double) imbalanceFrom) +  //
                                     rebalanceFloating.get(vlink);
 
+                    // Debugging
+                    if(vehicles_From_to_To > 0){
+                        System.out.println("rebalancing vehicles " + vehicles_From_to_To);
+                    }
+
                     // assign integer number to rebalance vehicles and store float for next iteration
                     // only consider the results which are >= 0. This assumes an undirected graph.
                     // TODO see if this is possible without searching for the virtualLink in the opposite direction
