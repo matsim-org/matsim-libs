@@ -59,7 +59,6 @@ import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
-import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
@@ -171,11 +170,11 @@ public class RunBerlinOptAV {
 				this.bind(DecongestionInfo.class).toInstance(info);
 				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
 
-				this.bind(IntervalBasedTolling.class).asEagerSingleton();
+				this.bind(AVIntervalBasedTolling.class).asEagerSingleton();
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
 								
-				this.addEventHandlerBinding().to(IntervalBasedTolling.class);
+				this.addEventHandlerBinding().to(AVIntervalBasedTolling.class);
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
