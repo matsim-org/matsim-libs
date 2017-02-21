@@ -1,9 +1,6 @@
 package playground.clruch.dispatcher;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -22,11 +19,11 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
 
     public PartitionedDispatcher( //
-            AVDispatcherConfig config, //
-            TravelTime travelTime, //
-            ParallelLeastCostPathCalculator router, //
-            EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork) {
+                                  AVDispatcherConfig config, //
+                                  TravelTime travelTime, //
+                                  ParallelLeastCostPathCalculator router, //
+                                  EventsManager eventsManager, //
+                                  VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
     }
@@ -41,21 +38,17 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     }
 
     protected Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableVehicles() {
-        Map<VirtualNode, List<VehicleLinkPair>> map = new HashMap<>();
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-            map.put(virtualNode, new ArrayList<>());
-        getDivertableVehicles().stream() //
-                .parallel() //
-                .forEach(vehicleLinkPair -> {
-                    Link link = vehicleLinkPair.getDivertableLocation();
-                    VirtualNode virtualNode = virtualNetwork.getVirtualNode(link);
-                    map.get(virtualNode).add(vehicleLinkPair);
-                });
-        return map;
-        // TODO try this:
-//      return getDivertableVehicles().stream() //
-//        .parallel() //
-//       .collect(Collectors.groupingBy(vlp->virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
+        Map<VirtualNode, List<VehicleLinkPair>> returnMap =
+                getDivertableVehicles().stream() //
+                        .parallel() //
+                        .collect(Collectors.groupingBy(vlp -> virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
+
+        for(VirtualNode virtualNode : virtualNetwork.getVirtualNodes()){
+            if(!returnMap.containsKey(virtualNode)){
+                returnMap.put(virtualNode, Collections.emptyList());
+            }
+        }
+        return returnMap;
     }
 
     @Deprecated
@@ -68,18 +61,16 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     }
 
     protected Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {
-        Map<VirtualNode, List<AVRequest>> map = new HashMap<>();
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-            map.put(virtualNode, new ArrayList<>());
-        getAVRequests().stream() //
+        Map<VirtualNode, List<AVRequest>> returnMap = getAVRequests().stream() //
                 .parallel() //
-                .forEach(avRequest -> {
-                    Link link = avRequest.getFromLink();
-                    VirtualNode virtualNode = virtualNetwork.getVirtualNode(link);
-                    map.get(virtualNode).add(avRequest);
-                });
-        return map;
-        // TODO see getVirtualNodeAvailableVehicles()
+                .collect(Collectors.groupingBy(req -> virtualNetwork.getVirtualNode(req.getFromLink())));
+
+        for(VirtualNode virtualNode : virtualNetwork.getVirtualNodes()){
+            if(!returnMap.containsKey(virtualNode)){
+                returnMap.put(virtualNode, Collections.emptyList());
+            }
+        }
+        return returnMap;
     }
 
 }

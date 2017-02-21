@@ -1,13 +1,15 @@
 package playground.clruch.dispatcher;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -16,8 +18,8 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.utils.MatchRequestsWithStayVehicles;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -26,38 +28,50 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public class EdgyDispatcher extends UniversalDispatcher {
     public static final int DEBUG_PERIOD = 30;
 
+    final Network network; // DEBUG ONLY
+    final Collection<Link> LINKREFS; // DEBUG ONLY
+
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-            EventsManager eventsManager) {
+            EventsManager eventsManager, //
+            Network network) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+        this.network = network;
+        LINKREFS = new HashSet<>(network.getLinks().values());
+    }
+
+    /**
+     * verify that link references are present in the network
+     * 
+     */
+    private void verifyReferences() {
+        // Collection<Link> links =
+        List<Link> testset = getDivertableVehicles().stream() //
+                .map(VehicleLinkPair::getDestination) //
+                .filter(Objects::nonNull) //
+                .collect(Collectors.toList());
+        if (!LINKREFS.containsAll(testset))
+            throw new RuntimeException("network change 1");
+        if (!LINKREFS.containsAll(network.getLinks().values()))
+            throw new RuntimeException("network change 2");
+        if (0 < testset.size())
+            System.out.println("network " + LINKREFS.size() + " contains all " + testset.size());
     }
 
     @Override
     public void redispatch(double now) {
+        verifyReferences();
+
         final long round_now = Math.round(now);
         if (round_now % DEBUG_PERIOD == 0 && now < 100000) {
 
             int num_matchedRequests = 0;
             int num_abortTrip = 0;
             int num_driveOrder = 0;
-            { // match requests with stay vehicles
-                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
-                Map<Link, Queue<AVVehicle>> stayVehicles = getStayVehicles();
 
-                for (Entry<Link, List<AVRequest>> entry : requests.entrySet()) {
-                    final Link link = entry.getKey();
-                    if (stayVehicles.containsKey(link)) {
-                        Iterator<AVRequest> requestIterator = entry.getValue().iterator();
-                        Queue<AVVehicle> vehicleQueue = stayVehicles.get(link);
-                        while (!vehicleQueue.isEmpty() && requestIterator.hasNext()) {
-                            setAcceptRequest(vehicleQueue.poll(), requestIterator.next());
-                            ++num_matchedRequests;
-                        }
-                    }
-                }
-            }
+            num_matchedRequests = MatchRequestsWithStayVehicles.inOrderOfArrival(this);
 
             { // see if any car is driving by a request. if so, then stay there to be matched!
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks(); // TODO lazy implementation
@@ -114,10 +128,13 @@ public class EdgyDispatcher extends UniversalDispatcher {
         @Inject
         private EventsManager eventsManager;
 
+        @Inject
+        private Network network;
+
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config) {
             return new EdgyDispatcher( //
-                    config, travelTime, router, eventsManager);
+                    config, travelTime, router, eventsManager, network);
         }
     }
 }

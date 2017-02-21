@@ -81,7 +81,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
      * 
      * @return collection of all vehicles that currently are in the last task, which is of type STAY
      */
-    protected final Map<Link, Queue<AVVehicle>> getStayVehicles() {
+    public final Map<Link, Queue<AVVehicle>> getStayVehicles() {
         Map<Link, Queue<AVVehicle>> map = new HashMap<>();
         for (AVVehicle avVehicle : getFunctioningVehicles())
             if (isWithoutDirective(avVehicle)) {
