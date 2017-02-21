@@ -54,13 +54,14 @@ import com.google.inject.AbstractModule;
 public class RunRWPTComboFleetsizeDetermination {
 public static void main(String[] args) {
 	
-		if (args.length!=3){
+		if (args.length!=4){
 			throw new RuntimeException("Wrong arguments");
 		}
 		String configfile = args[0];
 		String RUNID = args[1];
 		String taxisFile = args[2];
-	
+		int avfactor = Integer.parseInt(args[3]);
+		
 		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup());
 		config.controler().setRunId(RUNID);
 		String outPutDir = config.controler().getOutputDirectory()+"/"+RUNID+"/"; 
@@ -73,13 +74,12 @@ public static void main(String[] args) {
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		
 		
-		walk.setDistance(1000);
+		walk.setDistance(500);
 		walk.setTeleported(true);
 		walk.setMode("walk");
 		
 		config.global().setNumberOfThreads(4);
 
-	
 		
 		VariableAccessModeConfigGroup taxi = new VariableAccessModeConfigGroup();
 		taxi.setDistance(200000);
@@ -91,7 +91,7 @@ public static void main(String[] args) {
 		vacfg.setAccessModeGroup(walk);
 		
 		config.addModule(vacfg);
-		config.transitRouter().setSearchRadius(3000);
+		config.transitRouter().setSearchRadius(5000);
 		config.transitRouter().setExtensionRadius(0);
 		
 	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
@@ -106,7 +106,7 @@ public static void main(String[] args) {
        Controler controler = new Controler(scenario);
 
        VehicleType avVehType = new VehicleTypeImpl(Id.create("avVehicleType", VehicleType.class));
-       avVehType.setFlowEfficiencyFactor(2);
+       avVehType.setFlowEfficiencyFactor(avfactor);
        controler.addOverridingModule(new TaxiModule(avVehType));
 
        double expAveragingAlpha = 0.05;//from the AV flow paper 
