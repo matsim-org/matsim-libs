@@ -26,9 +26,16 @@ package org.matsim.contrib.accessibility.osm;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,8 +48,15 @@ import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.openstreetmap.osmosis.core.OsmosisRuntimeException;
 import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
+import org.openstreetmap.osmosis.xml.v0_6.impl.OsmHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import org.openstreetmap.osmosis.xml.common.CompressionActivator;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 
 
 /**
@@ -132,6 +146,95 @@ public class CombinedOsmReader {
 		this.facilities = combinedOsmSink.getFacilities();
 		this.facilityAttributes = combinedOsmSink.getFacilityAttributes();		
 	}
+	
+	
+	//-----------------------------------
+	public void parseFile(InputStream osmInputStream) {
+//		File file = null;
+//		try {
+//			file = stream2File(osmInputStream);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		File file = new File(osmInputStream);
+//		if(!file.exists()){
+//			throw new FileNotFoundException("Could not find OSM file " + osmFile);
+//		}
+		CombinedOsmSink combinedOsmSink = new CombinedOsmSink(this.outputCRS,
+				this.osmLandUseToMatsimTypeMap, this.osmBuildingToMatsimTypeMap,
+				this.osmAmenityToMatsimTypeMap,	this.osmLeisureToMatsimTypeMap,
+				this.osmTourismToMatsimTypeMap, this.unmannedEntitiesList,
+				this.buildingTypeFromVicinityRange);
+		combinedOsmSink.setIdPrefix(idPrefix);
+		org.matsim.contrib.accessibility.osm.XmlReader xmlReader = new org.matsim.contrib.accessibility.osm.XmlReader(osmInputStream, false, CompressionMethod.None);
+		xmlReader.setSink(combinedOsmSink);
+		xmlReader.run();
+//		runBla(combinedOsmSink, osmInputStream, CompressionMethod.None);
+		
+		this.facilities = combinedOsmSink.getFacilities();
+		this.facilityAttributes = combinedOsmSink.getFacilityAttributes();		
+	}
+	//-----------------------------------
+	
+	
+//	public void runBla(CombinedOsmSink sink, InputStream inputStream, CompressionMethod compressionMethod) {
+//		
+//		
+//		try {
+//			SAXParser parser = null;
+//			
+//			sink.initialize(Collections.<String, Object>emptyMap());
+//		
+//
+//			SAXParserFactory factory = SAXParserFactory.newInstance();
+//			try {
+//				parser = factory.newSAXParser();
+//			} catch (ParserConfigurationException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			inputStream =
+//					new CompressionActivator(compressionMethod).
+//						createCompressionInputStream(inputStream);
+//			
+//			try {
+//				parser.parse(inputStream, new OsmHandler(sink, true));
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//			sink.complete();
+//			
+//		} catch (SAXParseException e) {
+//
+//		} catch (SAXException e) {
+//			throw new OsmosisRuntimeException("Unable to parse XML.", e);
+//		} finally {
+//			
+//			if (inputStream != null) {
+//				try {
+//					inputStream.close();
+//				} catch (IOException e) {
+//				}
+//				inputStream = null;
+//			}
+//		}
+//	}
+	
+
+//    public static File stream2File (InputStream in) throws IOException {
+//    	String PREFIX = "stream2file";
+//        String SUFFIX = ".tmp";
+//        final File tempFile = File.createTempFile(PREFIX, SUFFIX);
+////        tempFile.deleteOnExit();
+//        try (FileOutputStream out = new FileOutputStream(tempFile)) {
+//        	org.apache.commons.compress.utils.IOUtils.copy(in, out);
+//        }
+//        return tempFile;
+//    }
 
 	
 	/**

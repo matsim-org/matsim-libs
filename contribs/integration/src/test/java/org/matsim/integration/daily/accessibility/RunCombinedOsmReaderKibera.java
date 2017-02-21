@@ -20,6 +20,8 @@
 package org.matsim.integration.daily.accessibility;
 
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -65,11 +67,11 @@ public class RunCombinedOsmReaderKibera {
 		// the type of land use of the area which the build belongs to.
 		double buildingTypeFromVicinityRange = 0.;
 		
-		createFacilites(osmFile, outputBase, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
+		createFacilites(osmFile, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
 	}
 	
 		
-	public static void createFacilites(String osmFile, String outputBase, String facilityFile, String attributeFile,
+	public static void createFacilites(String osmFile, String facilityFile, String attributeFile,
 			String outputCRS, double buildingTypeFromVicinityRange) {
 //		LogToOutputSaver.setOutputDirectory(outputBase);
 		LOG.info("Parsing land use from OpenStreetMap.");
@@ -88,6 +90,29 @@ public class RunCombinedOsmReaderKibera {
 		}
 		LOG.info("Output will be wirtten to " + facilityFile);
 	}
+	
+	
+	//-----------------------------------
+	public static void createFacilites(InputStream osmInputStream, String facilityFile, String attributeFile,
+			String outputCRS, double buildingTypeFromVicinityRange) {
+//		LogToOutputSaver.setOutputDirectory(outputBase);
+		LOG.info("Parsing land use from OpenStreetMap.");
+
+		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
+				buildOsmLandUseToMatsimTypeMap(), buildOsmBuildingToMatsimTypeMap(),
+				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
+				buildOsmTourismToMatsimTypeMap(), buildUnmannedEntitiesList(),
+				buildingTypeFromVicinityRange);
+		try {
+			combinedOsmReader.parseFile(osmInputStream);
+			combinedOsmReader.writeFacilities(facilityFile);
+			combinedOsmReader.writeFacilityAttributes(attributeFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LOG.info("Output will be wirtten to " + facilityFile);
+	}
+	//-----------------------------------
 	
 	
 	private static Map<String, String> buildOsmLandUseToMatsimTypeMap(){
