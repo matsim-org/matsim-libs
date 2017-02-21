@@ -3,7 +3,7 @@ package playground.clruch.netdata;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,7 +52,7 @@ public class VirtualNetworkLoader {
                     // get the links associated to the node from the XML
                     Element links = virtualNodeElement.getChild("links");
                     List<Element> linkList = links.getChildren("link");
-                    Set<Link> linkSet = new HashSet<>();
+                    Set<Link> linkSet = new LinkedHashSet<>(); // keep the ordering as in the XML file
 
                     for (Element linkElement : linkList) {
                         // add the links to the virtual node
@@ -64,9 +64,10 @@ public class VirtualNetworkLoader {
                             throw new RuntimeException("link key from not found in network");
                         }
                     }
-                    final VirtualNode virtualNode = new VirtualNode(virtualNodeId, linkSet);
+                    final VirtualNode virtualNode = virtualNetwork.addVirtualNode(virtualNodeId, linkSet);
+                    // new VirtualNode();
                     virtualNodeList.put(virtualNodeId, virtualNode);
-                    virtualNetwork.addVirtualNode(virtualNode);
+
                 }
 
             }
@@ -81,11 +82,9 @@ public class VirtualNetworkLoader {
                     String virtualLinkfrom = virtualLinkXML.getAttributeValue("from");
                     String virtualLinkto = virtualLinkXML.getAttributeValue("to");
 
-                    VirtualLink virtualLink = new VirtualLink( //
-                            virtualLinkId, //
+                    virtualNetwork.addVirtualLink(virtualLinkId, //
                             virtualNodeList.get(virtualLinkfrom), //
-                            virtualNodeList.get(virtualLinkto));
-                    virtualNetwork.addVirtualLink(virtualLink); //
+                            virtualNodeList.get(virtualLinkto)); //
                 }
             }
             return virtualNetwork;
