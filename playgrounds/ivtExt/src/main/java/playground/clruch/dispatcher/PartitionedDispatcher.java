@@ -80,7 +80,11 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                 .forEach(avRequest -> {
                     Link link = avRequest.getFromLink();
                     VirtualNode virtualNode = virtualNetwork.getVirtualNode(link);
-                    map.get(virtualNode).add(avRequest);
+                    if(virtualNode == null) {
+                        System.out.println("non id " + link);
+//                        System.out.println(virtualNode.toString());
+                    } else
+                        map.get(virtualNode).add(avRequest);
                 });
         return map;
         // TODO see getVirtualNodeAvailableVehicles()

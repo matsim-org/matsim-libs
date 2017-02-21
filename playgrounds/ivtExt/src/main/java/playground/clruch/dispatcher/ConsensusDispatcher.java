@@ -242,6 +242,9 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         @Inject
         private EventsManager eventsManager;
 
+        @Inject
+        private Network network;
+
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config) {
 
@@ -252,10 +255,6 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             // TODO relate to general directory given in argument of main function
             File dir = new File("C:/Users/Claudio/Documents/matsim_Simulations/2017_01_04_Sioux_onlyUnitCapacityAVs/");
             File linkWeightFile = new File(dir + "/consensusWeights.xml");
-            File configFile = new File(dir + "/av_config.xml");
-            Config Simconfig = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup());
-            Scenario scenario = ScenarioUtils.loadScenario(Simconfig);
-            Network network = scenario.getNetwork();
             File virtualnetworkXML = new File(dir + "/virtualNetwork.xml");
             VirtualNetwork virtualNetwork = VirtualNetwork.loadFromXML(network, virtualnetworkXML);
             virtualNetwork.printForTesting();
