@@ -191,6 +191,7 @@ public class PersonTripNoiseAnalysis {
 					+ "in-vehicle time (trip) [sec];"
 					+ "waiting time (for taxi/pt) (trip) [sec];"
 					+ "travel distance (trip) [m];"
+					+ "toll payments (trip) [monetary units];"
 					+ "approximate caused noise cost (trip) [monetary units]"); // TODO make this accurate?!
 			
 			bw.newLine();
@@ -250,9 +251,14 @@ public class PersonTripNoiseAnalysis {
 							travelDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip));
 						}
 						
-						double causedNoiseCost = 0.;
+						String tollPayment = "unknown";
+						if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
+							tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
+						}
+						
+						String causedNoiseCost = "unknown";
 						if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
-							causedNoiseCost = noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip);
+							causedNoiseCost = String.valueOf(noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip));
 						}
 						
 						bw.write(id + ";"
@@ -267,6 +273,7 @@ public class PersonTripNoiseAnalysis {
 						+ inVehTime + ";"
 						+ waitingTime + ";"
 						+ travelDistance + ";"
+						+ tollPayment + ";"
 						+ causedNoiseCost
 						);
 						bw.newLine();						
