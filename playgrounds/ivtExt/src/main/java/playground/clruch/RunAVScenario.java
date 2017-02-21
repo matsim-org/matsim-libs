@@ -14,7 +14,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.dispatcher.ConsensusDispatcher;
 import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.netdata.LinkWeights;
-import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkLoader;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -37,7 +37,7 @@ public class RunAVScenario {
 
         File linkWeightFile = new File(dir + "/consensusWeights.xml");
         File virtualnetworkXML = new File(dir + "/virtualNetwork.xml");
-        ConsensusDispatcher.Factory.virtualNetwork = VirtualNetwork.loadFromXML(scenario.getNetwork(), virtualnetworkXML);
+        ConsensusDispatcher.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
         ConsensusDispatcher.Factory.linkWeights = LinkWeights.fillLinkWeights(linkWeightFile,ConsensusDispatcher.Factory.virtualNetwork);
 
 
