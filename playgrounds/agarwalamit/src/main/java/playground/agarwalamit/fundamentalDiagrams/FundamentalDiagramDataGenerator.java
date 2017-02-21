@@ -105,14 +105,24 @@ public class FundamentalDiagramDataGenerator {
 	private Double[] modalShareInPCU;
 
 	public FundamentalDiagramDataGenerator(final RaceTrackLinkProperties raceTrackLinkProperties, final Scenario scenario){
-		this ( raceTrackLinkProperties, 1, scenario );
-	}
-
-	public FundamentalDiagramDataGenerator(final RaceTrackLinkProperties raceTrackLinkProperties, final int subdivisionFactor, final Scenario scenario){
 		fdNetworkGenerator = new FDNetworkGenerator(raceTrackLinkProperties);
-		fdNetworkGenerator.setSubdivisionFactor(subdivisionFactor);
 		fdNetworkGenerator.createNetwork(scenario);
 		this.scenario = scenario;
+	}
+
+	/**
+	 * A constructor to use the default values for the race track network.
+	 * @param scenario
+	 */
+	public FundamentalDiagramDataGenerator(final Scenario scenario){
+		this(new RaceTrackLinkProperties(
+				1000.0,
+				1600.0,
+				60.0/3.6,
+				1.0,
+				new HashSet<>(
+						scenario.getConfig().qsim().getMainModes())),
+				scenario);
 	}
 
 	public void run(){

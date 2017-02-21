@@ -52,7 +52,7 @@ public class RunFDDataExample {
         qSimConfigGroup.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
         qSimConfigGroup.setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
         qSimConfigGroup.setEndTime(24*3600.);
-//        qSimConfigGroup.setUsingFastCapacityUpdate(true);
+        qSimConfigGroup.setUsingFastCapacityUpdate(true);
 
         scenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
         scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -77,9 +77,11 @@ public class RunFDDataExample {
 
         // a container, used to store the link properties,
         // all sides of triangle will have these properties (identical links).
+
         RaceTrackLinkProperties raceTrackLinkProperties = new RaceTrackLinkProperties(1000.0, 1600.0,
                 60.0/3.6, 1.0, new HashSet<>(mainModes));
 
+//        FundamentalDiagramDataGenerator fundamentalDiagramDataGenerator = new FundamentalDiagramDataGenerator( scenario );
         FundamentalDiagramDataGenerator fundamentalDiagramDataGenerator = new FundamentalDiagramDataGenerator(raceTrackLinkProperties, scenario);
         fundamentalDiagramDataGenerator.setModalShareInPCU(new Double [] {1.0,1.0}); // equal modal split
         fundamentalDiagramDataGenerator.setReduceDataPointsByFactor(1);
