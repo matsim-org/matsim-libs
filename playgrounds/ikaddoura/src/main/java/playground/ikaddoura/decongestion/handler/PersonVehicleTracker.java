@@ -31,6 +31,8 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
  * 
  * Keeps track of which vehicle is used by which person.
  * 
+ * Assumes the taxi driver to be the last one enters the vehicle.
+ * 
  * @author ikaddoura
  */
 
@@ -38,10 +40,6 @@ public class PersonVehicleTracker implements PersonEntersVehicleEventHandler {
 
 	@Inject
 	private DecongestionInfo congestionInfo;
-	
-//	public PersonVehicleTracker(DecongestionInfo congestionInfo) {
-//		this.congestionInfo = congestionInfo;
-//	}
 
 	@Override
 	public void reset(int iteration) {
