@@ -97,7 +97,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                                     rebalanceFloating.get(vlink);
 
                     // Debugging
-                    if(vehicles_From_to_To > 0){
+                    if (vehicles_From_to_To > 0) {
                         System.out.println("rebalancing vehicles " + vehicles_From_to_To);
                     }
 
@@ -114,20 +114,89 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                         rebalanceFloating.put(vlink, leftover);
 
                         // look for edge in opposite direction and set leftover
-                        VirtualLink oppositeLink = virtualNetwork.getVirtualLinks().stream().filter(v-> (v.getFrom().equals(vlink.getTo()) && v.getTo().equals(vlink.getFrom()) ) ).findFirst().get();
-                        rebalanceCount.put(oppositeLink,0);
-                        rebalanceFloating.put(oppositeLink,-leftover);
+                        VirtualLink oppositeLink = virtualNetwork.getVirtualLinks().stream().filter(v -> (v.getFrom().equals(vlink.getTo()) && v.getTo().equals(vlink.getFrom()))).findFirst().get();
+                        rebalanceCount.put(oppositeLink, 0);
+                        rebalanceFloating.put(oppositeLink, -leftover);
 
                     }
                 }
             }
 
 
+            // create a Map that contains all the outgoing vLinks for a vNode
+            Map<VirtualNode, List<VirtualLink>> vLinkShareFromvNode = virtualNetwork.getVirtualLinks().stream().collect(Collectors.groupingBy(VirtualLink::getFrom));
+            // ensure that not more vehicles are sent away than there are
+            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+
+                if(virtualNode.getId().toString().equals("vNode_0005")){
+                    System.out.println(virtualNode.getId().toString());
+                }
+
+
+                // count outgoing vehicles from this node:
+                int totRebVehicles = 0;
+                for (VirtualLink vLink : vLinkShareFromvNode.get(virtualNode)) {
+                    totRebVehicles = totRebVehicles + rebalanceCount.get(vLink);
+                    System.out.println("Sending " + rebalanceCount.get(vLink)+" on vLink "+ vLink.getId());
+                }
+                System.out.println("The total number of rebalancing vehicles is " + totRebVehicles);
+                System.out.println("Available vehicles" + availableVehicles.get(virtualNode).size());
+
+
+                if(availableVehicles.get(virtualNode).size() < totRebVehicles){
+
+                    System.out.println("resizing rebalancing command by "+(totRebVehicles - availableVehicles.get(virtualNode).size()));
+                    double shrinkingFactor  = ((double)availableVehicles.get(virtualNode).size())/((double)totRebVehicles);
+                    System.out.println("Removing per vLink " + shrinkingFactor);
+
+                    for(VirtualLink virtualLink : vLinkShareFromvNode.get(virtualNode)){
+                        if(rebalanceCount.get(virtualLink)>0){
+                            double newRebCountTot = rebalanceCount.get(virtualLink)*shrinkingFactor;
+                            int newIntRebCount = (int) Math.floor(newRebCountTot);
+                            int newLeftOver = rebalanceCount.get(virtualLink)-newIntRebCount;
+
+                            rebalanceCount.put(virtualLink,newIntRebCount);
+                            rebalanceFloating.put(virtualLink,rebalanceFloating.get(virtualLink) + newLeftOver);
+                            VirtualLink oppositeLink = virtualNetwork.getVirtualLinks().stream().filter(v -> (v.getFrom().equals(virtualLink.getTo()) && v.getTo().equals(virtualLink.getFrom()))).findFirst().get();
+                            rebalanceCount.put(oppositeLink, 0);
+                            rebalanceFloating.put(oppositeLink, rebalanceFloating.get(oppositeLink) - newLeftOver);
+                        }
+                    }
+                }
+
+
+                totRebVehicles = 0;
+                for (VirtualLink vLink : vLinkShareFromvNode.get(virtualNode)) {
+                    totRebVehicles = totRebVehicles + rebalanceCount.get(vLink);
+                    System.out.println("Sending " + rebalanceCount.get(vLink)+" on vLink "+ vLink.getId());
+                }
+                System.out.println("The total number of rebalancing vehicles is " + totRebVehicles);
+                System.out.println("Available vehicles" + availableVehicles.get(virtualNode).size());
+
+
+
+                System.out.println("The following links go from node " + virtualNode.getId().toString());
+                for (VirtualLink vLink : vLinkShareFromvNode.get(virtualNode)) {
+                    System.out.println("link " + vLink.getId().toString() + " from " + vLink.getFrom().getId().toString() + " to " + vLink.getTo().getId().toString());
+                }
+
+                System.out.print("end");
+
+                /*
+                return getAVRequests().stream() // <- intentionally not parallel to guarantee ordering of requests
+                        .collect(Collectors.groupingBy(AVRequest::getFromLink));
+                */
+                // sum all the rebalancing commands
+
+                // if too many scale appropriately and put remaining number into rebalanceFloating
+
+
+            }
+
+
             // Debugging, print nonzero rebalancing orders
             System.out.println("Print nonzero rebalancing: ");
-            rebalanceCount.values().stream().filter(v->v>0).forEach(v-> System.out.println("value is " +v));
-
-
+            rebalanceCount.values().stream().filter(v -> v > 0).forEach(v -> System.out.println("value is " + v));
 
 
             // 2 generate routing instructions for vehicles
