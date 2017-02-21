@@ -29,6 +29,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
     public static final int DEBUG_PERIOD = 30;
 
     final Network network; // DEBUG ONLY
+    final Collection<Link> LINKREFS; // DEBUG ONLY
 
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -38,6 +39,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
             Network network) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         this.network = network;
+        LINKREFS = new HashSet<>(network.getLinks().values());
     }
 
     /**
@@ -45,15 +47,17 @@ public class EdgyDispatcher extends UniversalDispatcher {
      * 
      */
     private void verifyReferences() {
-        Collection<Link> links = new HashSet<>(network.getLinks().values());
+        // Collection<Link> links =
         List<Link> testset = getDivertableVehicles().stream() //
                 .map(VehicleLinkPair::getDestination) //
                 .filter(Objects::nonNull) //
                 .collect(Collectors.toList());
-        if (!links.containsAll(testset))
-            throw new RuntimeException();
+        if (!LINKREFS.containsAll(testset))
+            throw new RuntimeException("network change 1");
+        if (!LINKREFS.containsAll(network.getLinks().values()))
+            throw new RuntimeException("network change 2");
         if (0 < testset.size())
-            System.out.println("network " + links.size() + " contains all " + testset.size());
+            System.out.println("network " + LINKREFS.size() + " contains all " + testset.size());
     }
 
     @Override
