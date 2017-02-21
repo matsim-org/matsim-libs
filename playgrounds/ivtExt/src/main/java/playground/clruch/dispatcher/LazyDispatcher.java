@@ -12,6 +12,8 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.dispatcher.core.UniversalDispatcher;
+import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -20,12 +22,15 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+/**
+ * class is superseded by {@link EdgyDispatcher}
+ */
+@Deprecated
 public class LazyDispatcher extends UniversalDispatcher {
-    public static final String IDENTIFIER = LazyDispatcher.class.getSimpleName();
     public static final int DEBUG_PERIOD = 60;
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
-    public LazyDispatcher( //
+    private LazyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //

@@ -1,4 +1,4 @@
-package playground.clruch.dispatcher;
+package playground.clruch.dispatcher.core;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.AbstractTask;
@@ -27,10 +27,11 @@ public class VehicleLinkPair {
      * 
      * @return null if vehicle does not have a destination
      */
-    public Link getDestination() {
+    public Link getDestination() { // TODO function name is unclear
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         // List<AbstractTask> tasks = schedule.getTasks();
         // if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED))
+        // TODO use handler!
         AbstractTask abstractTask = schedule.getCurrentTask();
         AVTask avTask = (AVTask) abstractTask;
         if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {

@@ -2,7 +2,7 @@ package playground.clruch.dispatcher.utils;
 
 import java.util.Collection;
 
-import playground.clruch.dispatcher.VehicleLinkPair;
+import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public abstract class AbstractRequestSelector {

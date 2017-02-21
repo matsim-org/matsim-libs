@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.clruch.dispatcher.VehicleLinkPair;
+import playground.clruch.dispatcher.core.VehicleLinkPair;
 
 public abstract class AbstractVehicleDestMatcher {
     public final Map<VehicleLinkPair, Link> match( //

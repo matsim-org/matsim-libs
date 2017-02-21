@@ -2,7 +2,7 @@ package playground.sebhoerl.avtaxi.dispatcher;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.clruch.dispatcher.UniversalDispatcher;
+import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.utils.SingleRideAppender;
 
