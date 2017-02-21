@@ -28,7 +28,7 @@ public class VirtualNetworkLoader {
      * @return
      */
     public static VirtualNetwork fromXML(Network network, File file) {
-        VirtualNetwork virtualNetwork = new VirtualNetwork(network);
+        VirtualNetwork virtualNetwork = new VirtualNetwork();
 
         // save all the links from the network in the linkMap and create a string-Id<Link> map for lookup purposes
         Map<String, Link> stringLinkIdMap = new HashMap<>();
@@ -39,38 +39,34 @@ public class VirtualNetworkLoader {
         // from the XML fill the list of virtual nodes and the link to virtual node map
         SAXBuilder builder = new SAXBuilder();
         try {
+            final Map<String, VirtualNode> virtualNodeList = new HashMap<>(); // has unique references
             {
                 // from the XML fill the list of virtual links
                 Document document = (Document) builder.build(file);
                 Element rootNode = document.getRootElement();
                 Element virtualNodesXML = rootNode.getChild("virtualNodes");
                 List<Element> virtualNodes = virtualNodesXML.getChildren("virtualNode");
-                for (Element virtualNode : virtualNodes) {
+                for (Element virtualNodeElement : virtualNodes) {
                     // get the virtual node and save it
-                    String virtualNodeId = virtualNode.getAttributeValue("id");
+                    String virtualNodeId = virtualNodeElement.getAttributeValue("id");
                     // get the links associated to the node from the XML
-                    Element links = virtualNode.getChild("links");
+                    Element links = virtualNodeElement.getChild("links");
                     List<Element> linkList = links.getChildren("link");
-                    Set<Link> linkIDs = new HashSet<>();
+                    Set<Link> linkSet = new HashSet<>();
 
-                    for (Element link : linkList) {
+                    for (Element linkElement : linkList) {
                         // add the links to the virtual node
-                        String linkkey = link.getAttributeValue("id");
+                        String linkkey = linkElement.getAttributeValue("id");
                         if (stringLinkIdMap.containsKey(linkkey)) {
                             Link correspondingLink = stringLinkIdMap.get(linkkey);
-                            linkIDs.add(correspondingLink);
+                            linkSet.add(correspondingLink);
                         } else {
                             throw new RuntimeException("link key from not found in network");
                         }
                     }
-                    virtualNetwork.virtualNodeList_put(virtualNodeId, new VirtualNode(virtualNodeId, linkIDs));
-                }
-
-                // generate a list that associates every network link to a virtual node
-                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-                    for (Link link : virtualNode.getLinks()) {
-                        virtualNetwork.linkIdVNodeMap_put(link, virtualNode);
-                    }
+                    final VirtualNode virtualNode = new VirtualNode(virtualNodeId, linkSet);
+                    virtualNodeList.put(virtualNodeId, virtualNode);
+                    virtualNetwork.addVirtualNode(virtualNode);
                 }
 
             }
@@ -85,11 +81,11 @@ public class VirtualNetworkLoader {
                     String virtualLinkfrom = virtualLinkXML.getAttributeValue("from");
                     String virtualLinkto = virtualLinkXML.getAttributeValue("to");
 
-                    virtualNetwork.virtualLinkList_put(virtualLinkId, //
-                            new VirtualLink( //
-                                    virtualLinkId, //
-                                    virtualNetwork.virtualNodeList_get(virtualLinkfrom), //
-                                    virtualNetwork.virtualNodeList_get(virtualLinkto)));
+                    VirtualLink virtualLink = new VirtualLink( //
+                            virtualLinkId, //
+                            virtualNodeList.get(virtualLinkfrom), //
+                            virtualNodeList.get(virtualLinkto));
+                    virtualNetwork.addVirtualLink(virtualLink); //
                 }
             }
             return virtualNetwork;

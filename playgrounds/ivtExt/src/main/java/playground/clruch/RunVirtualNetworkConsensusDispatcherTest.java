@@ -42,7 +42,7 @@ public class RunVirtualNetworkConsensusDispatcherTest {
             // instantiate a virtual network for testing
             System.out.println("now creating VirtualNetwork based on XML file.");
             VirtualNetwork virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkXML);
-            virtualNetwork.printForTesting();
+            virtualNetwork.printForTesting(network);
 
             //intstatiate a ConsensusDispatcher for testing
             AVDispatcherConfig AVDconfig = null;
