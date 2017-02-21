@@ -18,11 +18,10 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -103,51 +102,38 @@ public class AccessibilityComputationKiberaTest {
 		String maxLon = "36.8014";
 		String maxLat = "-1.3055";
 		
+		//-----------------------------------
+		URL osm = new URL("http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat);
+		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
+		//-----------------------------------
+		
 //		File osmDownloadScript = AccessibilityUtils.createOSMDownloadScript(tmpFolder + "kibera.osm", "36.7715", "-1.3198", "36.8014", "-1.3055");
-	    try {
-//	        ProcessBuilder pb = new ProcessBuilder("bash", osmDownloadScript.toString());
-	        ProcessBuilder pb = new ProcessBuilder("bash", "-c", "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"");
-//	        /usr/local/bin/wget -O tmp/kibera.osm "http://api.openstreetmap.org/api/0.6/map?bbox=36.7715,-1.3198,36.8014,-1.3055"
-	        pb.inheritIO();
-	        System.out.println("----- directory = " + pb.directory());
-	        System.out.println("----- environment = " + pb.environment());
-	        Process subProcess = pb.start();
-	        subProcess.waitFor();
-	        
-	        //----------
-		    InputStream inputStream = subProcess.getInputStream(); 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-			String line;
-
-			InputStream errorStream = subProcess.getErrorStream(); 
-			BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
-			String errorLine = null;
-
-			while ( (line=reader.readLine())!=null 
-					|| (errorLine=errorReader.readLine())!=null 
-					) {
-				if ( line!=null ) {
-					LOG.info(line);
-				}
-				else if ( errorLine!=null ) {
-					LOG.warn(errorLine);
-				} else {
-					throw new RuntimeException("should not happen") ;
-				}
-			}
-			// Input stream closed, subProcess disconnected
-		    //----------
-			
-	    } catch (Exception e) {
-			LOG.error(e.getMessage());
-			throw new RuntimeException("execute command failed") ;
-		}
+//	    try {
+////	        ProcessBuilder pb = new ProcessBuilder("bash", osmDownloadScript.toString());
+//	        ProcessBuilder pb = new ProcessBuilder("bash", "-c", "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"");
+////	        /usr/local/bin/wget -O tmp/kibera.osm "http://api.openstreetmap.org/api/0.6/map?bbox=36.7715,-1.3198,36.8014,-1.3055"
+//	        pb.inheritIO();
+//	        System.out.println("----- directory = " + pb.directory());
+//	        System.out.println("----- environment = " + pb.environment());
+//	        Process subProcess = pb.start();
+//	        subProcess.waitFor();
+//	        
+//			// Input stream closed, subProcess disconnected
+//		    //----------
+//			
+//	    } catch (Exception e) {
+//			LOG.error(e.getMessage());
+//			throw new RuntimeException("execute command failed") ;
+//		}
 	    
 	    
 		
 	    // Create network and facility files
-	    CreateNetwork.createNetwork(osmFile, tmpFolder, networkFile, inputCRS, outputCRS);
-		RunCombinedOsmReaderKibera.createFacilites(osmFile, tmpFolder, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
+//	    CreateNetwork.createNetwork(osmFile, tmpFolder, networkFile, inputCRS, outputCRS);
+	    CreateNetwork.createNetwork(connection.getInputStream(), networkFile, inputCRS, outputCRS);
+	    
+//		RunCombinedOsmReaderKibera.createFacilites(osmFile, tmpFolder, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
+		RunCombinedOsmReaderKibera.createFacilites(connection.getInputStream(), facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
 		
 		config.network().setInputFile(tmpFolder + "network_kibera_paths_detailed.xml");
 		config.facilities().setInputFile(tmpFolder + "facilities.xml");
