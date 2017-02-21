@@ -74,7 +74,6 @@ public class RunCombinedOsmReaderKibera {
 		
 	public static void createFacilites(String osmFile, String facilityFile, String attributeFile,
 			String outputCRS, double buildingTypeFromVicinityRange) {
-//		LogToOutputSaver.setOutputDirectory(outputBase);
 		LOG.info("Parsing land use from OpenStreetMap.");
 
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
@@ -93,9 +92,7 @@ public class RunCombinedOsmReaderKibera {
 	}
 	
 	
-	//-----------------------------------
 	public static ActivityFacilities createFacilites(InputStream osmInputStream, String outputCRS, double buildingTypeFromVicinityRange) {
-//		LogToOutputSaver.setOutputDirectory(outputBase);
 		LOG.info("Parsing land use from OpenStreetMap.");
 
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
@@ -103,18 +100,11 @@ public class RunCombinedOsmReaderKibera {
 				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
 				buildOsmTourismToMatsimTypeMap(), buildUnmannedEntitiesList(),
 				buildingTypeFromVicinityRange);
-//		try {
 			combinedOsmReader.parseFile(osmInputStream);
 			ActivityFacilities facilities = combinedOsmReader.getActivityFacilities();
-//			combinedOsmReader.writeFacilities(facilityFile);
-//			combinedOsmReader.writeFacilityAttributes(attributeFile);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		LOG.info("Output will be wirtten to " + facilityFile);
+
 			return facilities;
 	}
-	//-----------------------------------
 	
 	
 	private static Map<String, String> buildOsmLandUseToMatsimTypeMap(){

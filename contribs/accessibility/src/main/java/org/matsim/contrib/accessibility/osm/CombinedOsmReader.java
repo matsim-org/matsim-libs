@@ -127,7 +127,6 @@ public class CombinedOsmReader {
 	 * @param osmFile the {@code *.osm} file to parse for land use
 	 * @throws FileNotFoundException 
 	 */
-	// public void parseLandUseAndBuildings(String file) throws FileNotFoundException{
 	public void parseFile(String osmFile) throws FileNotFoundException{
 		File file = new File(osmFile);
 		if(!file.exists()){
@@ -148,19 +147,7 @@ public class CombinedOsmReader {
 	}
 	
 	
-	//-----------------------------------
 	public void parseFile(InputStream osmInputStream) {
-//		File file = null;
-//		try {
-//			file = stream2File(osmInputStream);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		File file = new File(osmInputStream);
-//		if(!file.exists()){
-//			throw new FileNotFoundException("Could not find OSM file " + osmFile);
-//		}
 		CombinedOsmSink combinedOsmSink = new CombinedOsmSink(this.outputCRS,
 				this.osmLandUseToMatsimTypeMap, this.osmBuildingToMatsimTypeMap,
 				this.osmAmenityToMatsimTypeMap,	this.osmLeisureToMatsimTypeMap,
@@ -170,71 +157,9 @@ public class CombinedOsmReader {
 		org.matsim.contrib.accessibility.osm.XmlReader xmlReader = new org.matsim.contrib.accessibility.osm.XmlReader(osmInputStream, false, CompressionMethod.None);
 		xmlReader.setSink(combinedOsmSink);
 		xmlReader.run();
-//		runBla(combinedOsmSink, osmInputStream, CompressionMethod.None);
-		
 		this.facilities = combinedOsmSink.getFacilities();
 		this.facilityAttributes = combinedOsmSink.getFacilityAttributes();		
 	}
-	//-----------------------------------
-	
-	
-//	public void runBla(CombinedOsmSink sink, InputStream inputStream, CompressionMethod compressionMethod) {
-//		
-//		
-//		try {
-//			SAXParser parser = null;
-//			
-//			sink.initialize(Collections.<String, Object>emptyMap());
-//		
-//
-//			SAXParserFactory factory = SAXParserFactory.newInstance();
-//			try {
-//				parser = factory.newSAXParser();
-//			} catch (ParserConfigurationException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-//			inputStream =
-//					new CompressionActivator(compressionMethod).
-//						createCompressionInputStream(inputStream);
-//			
-//			try {
-//				parser.parse(inputStream, new OsmHandler(sink, true));
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			
-//			sink.complete();
-//			
-//		} catch (SAXParseException e) {
-//
-//		} catch (SAXException e) {
-//			throw new OsmosisRuntimeException("Unable to parse XML.", e);
-//		} finally {
-//			
-//			if (inputStream != null) {
-//				try {
-//					inputStream.close();
-//				} catch (IOException e) {
-//				}
-//				inputStream = null;
-//			}
-//		}
-//	}
-	
-
-//    public static File stream2File (InputStream in) throws IOException {
-//    	String PREFIX = "stream2file";
-//        String SUFFIX = ".tmp";
-//        final File tempFile = File.createTempFile(PREFIX, SUFFIX);
-////        tempFile.deleteOnExit();
-//        try (FileOutputStream out = new FileOutputStream(tempFile)) {
-//        	org.apache.commons.compress.utils.IOUtils.copy(in, out);
-//        }
-//        return tempFile;
-//    }
 
 	
 	/**
