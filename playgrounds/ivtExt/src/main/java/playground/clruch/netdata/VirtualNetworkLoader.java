@@ -3,7 +3,7 @@ package playground.clruch.netdata;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,7 +52,7 @@ public class VirtualNetworkLoader {
                     // get the links associated to the node from the XML
                     Element links = virtualNodeElement.getChild("links");
                     List<Element> linkList = links.getChildren("link");
-                    Set<Link> linkSet = new HashSet<>();
+                    Set<Link> linkSet = new LinkedHashSet<>(); // keep the ordering as in the XML file
 
                     for (Element linkElement : linkList) {
                         // add the links to the virtual node
