@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
+import com.google.inject.Inject;
+
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
 
@@ -39,7 +41,9 @@ import playground.ikaddoura.decongestion.data.LinkInfo;
 public class DecongestionTollingPID implements DecongestionTollSetting {
 	private static final Logger log = Logger.getLogger(DecongestionTollingPID.class);
 	
-	private final DecongestionInfo congestionInfo;
+	@Inject
+	private DecongestionInfo congestionInfo;
+	
 	private Map<Id<Link>, LinkInfo> linkId2infoPreviousTollComputation = new HashMap<>();
 	
 	private double K_p = Double.NaN;
@@ -49,7 +53,6 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 	private int tollUpdateCounter = 0;
 	
 	public DecongestionTollingPID(DecongestionInfo congestionInfo) {
-		this.congestionInfo = congestionInfo;
 		K_p = congestionInfo.getDecongestionConfigGroup().getKp();
 		K_i = congestionInfo.getDecongestionConfigGroup().getKi();
 		K_d = congestionInfo.getDecongestionConfigGroup().getKd();

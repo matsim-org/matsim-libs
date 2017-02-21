@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,6 +39,11 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 
 /**
  * 
@@ -52,7 +58,7 @@ public class DecongestionPricingTestIT {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void test0() {
+	public final void test0a() {
 		
 		System.out.println(testUtils.getPackageInputDirectory());
 		
@@ -64,17 +70,80 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		
+		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
+		
 		Config config = ConfigUtils.loadConfig(configFile);
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		config.controler().setOutputDirectory(outputDirectory);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
-		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-		final Decongestion decongestion = new Decongestion(new Controler(scenario), info);
+		Controler controler = new Controler(scenario);
+
+		// decongestion pricing
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				
+				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
+
+				this.bind(IntervalBasedTolling.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTolling.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+			}
+		});
 		
-		final Controler controler = decongestion.getControler();
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        controler.run();   
+		
+        double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
+        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
+        
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 150.5, tt1, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt2, MatsimTestUtils.EPSILON);
+				
+		final int index = config.controler().getLastIteration() - config.controler().getFirstIteration();
+		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
+		Assert.assertEquals("Wrong average executed score. The tolls seem to have changed.", -285.81916666666666, avgScore, MatsimTestUtils.EPSILON);		
+	}
+	
+	@Test
+	public final void test0b() {
+		
+		System.out.println(testUtils.getPackageInputDirectory());
+		
+		final String configFile = testUtils.getPackageInputDirectory() + "/config0.xml";
+		
+		Config config = ConfigUtils.loadConfig(configFile);
+
+		String outputDirectory = testUtils.getOutputDirectory() + "/";
+		config.controler().setOutputDirectory(outputDirectory);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+				
+		Controler controler = new Controler(scenario);
+
+		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		
+		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		Decongestion decongestion = new Decongestion(controler, info);
+		controler = decongestion.getControler();
+		
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         controler.run();   
 		
         double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
@@ -108,16 +177,38 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		
+		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
+		
 		Config config = ConfigUtils.loadConfig(configFile);
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		config.controler().setOutputDirectory(outputDirectory);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
-		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-		final Decongestion decongestion = new Decongestion(new Controler(scenario), info);
+		Controler controler = new Controler(scenario);
+
+		// decongestion pricing
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				
+				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
+
+				this.bind(IntervalBasedTolling.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTolling.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+			}
+		});
 		
-		final Controler controler = decongestion.getControler();
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         controler.run();   
 		
@@ -156,16 +247,38 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		
+		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
+		
 		Config config = ConfigUtils.loadConfig(configFile);
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		config.controler().setOutputDirectory(outputDirectory);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
-		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-		final Decongestion decongestion = new Decongestion(new Controler(scenario), info);
+		Controler controler = new Controler(scenario);
+
+		// decongestion pricing
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				
+				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
+
+				this.bind(IntervalBasedTolling.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTolling.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+			}
+		});
 		
-		final Controler controler = decongestion.getControler();
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         controler.run();   
 		

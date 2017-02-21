@@ -182,7 +182,7 @@ public class BerlinControler {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			
-			final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
+			final DecongestionInfo info = new DecongestionInfo(decongestionSettings);
 			final Decongestion decongestion = new Decongestion(controler, info);
 			decongestion.setSigma(sigma);
 			controler = decongestion.getControler();

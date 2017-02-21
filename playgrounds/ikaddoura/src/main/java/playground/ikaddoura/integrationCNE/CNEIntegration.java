@@ -46,6 +46,9 @@ import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
@@ -220,15 +223,26 @@ public class CNEIntegration {
 				decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 				decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 				
-				final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
-				final DecongestionTollSetting tollSettingApproach = new DecongestionTollingPID(info);	
+				DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+				DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
 				
-				// decongestion pricing
-				final DecongestionControlerListener decongestion = new DecongestionControlerListener(info, tollSettingApproach);		
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
-						this.addControlerListenerBinding().toInstance(decongestion);
+						
+						this.bind(DecongestionInfo.class).toInstance(info);
+						this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
+
+						this.bind(IntervalBasedTolling.class).asEagerSingleton();
+						this.bind(DelayAnalysis.class).asEagerSingleton();
+						this.bind(PersonVehicleTracker.class).asEagerSingleton();
+										
+						this.addEventHandlerBinding().to(IntervalBasedTolling.class);
+						this.addEventHandlerBinding().to(DelayAnalysis.class);
+						this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+						
+						this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
 					}
 				});
 				

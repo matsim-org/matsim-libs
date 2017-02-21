@@ -59,7 +59,6 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
-import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 
 
@@ -87,10 +86,16 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	private final SortedMap<Integer, Double> iteration2totalTravelTime = new TreeMap<>();
 	private final SortedMap<Integer, Double> iteration2userBenefits = new TreeMap<>();
 	
-	private final DecongestionInfo congestionInfo;
-	private final DecongestionTollSetting tollComputation;
+	@Inject
+	private DecongestionInfo congestionInfo;
 	
+	@Inject
+	private DecongestionTollSetting tollComputation;
+	
+	@Inject
 	private IntervalBasedTolling intervalBasedTolling;
+	
+	@Inject
 	private DelayAnalysis delayComputation;
 	
 	private int nextDisableInnovativeStrategiesIteration = -1;
@@ -98,31 +103,16 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	
 	private String outputDirectory;
 	
-	@Inject
-	public DecongestionControlerListener(DecongestionInfo congestionInfo, DecongestionTollSetting decongestionTollSettingImpl) {
-		this.congestionInfo = congestionInfo;
-		this.tollComputation = decongestionTollSettingImpl;
-
-		this.outputDirectory = this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory();
-		if (!outputDirectory.endsWith("/")) {
-			outputDirectory = outputDirectory + "/";
-		}
-
-	}
-
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
 		log.info("decongestion settings: " + congestionInfo.getDecongestionConfigGroup().toString());
 		
-		// required by the pricing approach:
-		this.intervalBasedTolling = new IntervalBasedTolling(congestionInfo, event.getServices().getEvents());
-		event.getServices().getEvents().addHandler(this.intervalBasedTolling);
-		event.getServices().getEvents().addHandler(new PersonVehicleTracker(congestionInfo));
-		
-		// for analysis purposes only:
-		this.delayComputation = new DelayAnalysis(this.congestionInfo.getScenario());
-		event.getServices().getEvents().addHandler(delayComputation);
+		this.outputDirectory = this.congestionInfo.getScenario().getConfig().controler().getOutputDirectory();
+		if (!outputDirectory.endsWith("/")) {
+			log.info("Adjusting output directory.");
+			outputDirectory = outputDirectory + "/";
+		}		
 	}
 
 	@Override

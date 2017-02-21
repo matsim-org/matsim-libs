@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import com.google.inject.Inject;
+
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
@@ -35,14 +37,18 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 public class IntervalBasedTolling implements LinkLeaveEventHandler {
 
-	private final EventsManager eventsManager;
-	private final DecongestionInfo decongestionInfo;
+	@Inject
+	private EventsManager eventsManager;
+	
+	@Inject
+	private DecongestionInfo decongestionInfo;
+	
 	private double totalTollPayments;
 
-	public IntervalBasedTolling(DecongestionInfo congestionInfo, EventsManager events) {
-		this.decongestionInfo = congestionInfo;
-		this.eventsManager = events;
-	}
+//	public IntervalBasedTolling(DecongestionInfo congestionInfo, EventsManager events) {
+//		this.decongestionInfo = congestionInfo;
+//		this.eventsManager = events;
+//	}
 
 	@Override
 	public void reset(int iteration) {

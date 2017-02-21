@@ -20,7 +20,8 @@
 package playground.ikaddoura.optAV;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
@@ -35,7 +36,8 @@ import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -50,16 +52,19 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
-import playground.ikaddoura.analysis.dynamicLinkDemand.DynamicLinkDemandAnalysisRun;
-import playground.ikaddoura.analysis.linkDemand.LinkDemandAnalysisRun;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
-import playground.ikaddoura.moneyTravelDisutility.*;
+import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
+import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
 
 /**
 * @author ikaddoura
@@ -71,6 +76,9 @@ public class RunBerlinOptAV {
 
 	private static String configFile;
 	private static String outputDirectory;
+	
+	private static boolean internalizeNoise;
+	
 	private static boolean otfvis;
 	private static double kP;
 	
@@ -86,14 +94,16 @@ public class RunBerlinOptAV {
 			kP = Double.parseDouble(args[2]);
 			log.info("kP: "+ kP);
 			
+			internalizeNoise = Boolean.getBoolean(args[3]);
+			log.info("internalizeNoise: "+ internalizeNoise);
+			
 			otfvis = false;
 			
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_test/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
 			otfvis = false;
 			kP = 2 * 12./3600.;
-//			kP = 999999999.;
 		}
 		
 		RunBerlinOptAV runBerlinOptAV = new RunBerlinOptAV();
@@ -119,15 +129,20 @@ public class RunBerlinOptAV {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-				
+
+		AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
+		controler = aa.prepareControler(false);
+		
 		// #############################
 		// noise pricing
 		// #############################
 		
-		NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-		log.info(noiseParams.toString());
-		
-		controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
+		if (internalizeNoise) {
+			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+			log.info(noiseParams.toString());
+			
+			controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
+		}
 		
 		// #############################
 		// congestion pricing
@@ -138,19 +153,34 @@ public class RunBerlinOptAV {
 		decongestionSettings.setKp(kP);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKd(0.);
+		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setMsa(false);
 		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 		log.info(decongestionSettings.toString());
+			
+		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
 		
-		final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
-		final DecongestionTollSetting tollSettingApproach = new DecongestionTollingPID(info);	
-		
-		final DecongestionControlerListener decongestion = new DecongestionControlerListener(info, tollSettingApproach);		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.addControlerListenerBinding().toInstance(decongestion);
+				
+				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
+
+				this.bind(IntervalBasedTolling.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTolling.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
 			}
 		});
 		
@@ -208,31 +238,29 @@ public class RunBerlinOptAV {
 		// analysis
 		// #############################
 		
-		String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
-		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
-		
-		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, noiseParams.getReceiverPointGap());
-		processNoiseImmissions.run();
-		
-		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
-		final String[] workingDirectories = { controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/consideredAgentUnits/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration()  + "/damages_receiverPoint/" };
-
-		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-		merger.setReceiverPointsFile(receiverPointsFile);
-		merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
-		merger.setTimeBinSize(noiseParams.getTimeBinSizeNoiseComputation());
-		merger.setWorkingDirectory(workingDirectories);
-		merger.setLabel(labels);
-		merger.run();
+		if (internalizeNoise) {
+			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+			
+			String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
+			String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
+			
+			ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, noiseParams.getReceiverPointGap());
+			processNoiseImmissions.run();
+			
+			final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
+			final String[] workingDirectories = { controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/consideredAgentUnits/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration()  + "/damages_receiverPoint/" };
+	
+			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+			merger.setReceiverPointsFile(receiverPointsFile);
+			merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
+			merger.setTimeBinSize(noiseParams.getTimeBinSizeNoiseComputation());
+			merger.setWorkingDirectory(workingDirectories);
+			merger.setLabel(labels);
+			merger.run();	
+		}
 		
 		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
 		analysis1.run();
-		
-		DynamicLinkDemandAnalysisRun analysis2 = new DynamicLinkDemandAnalysisRun(controler.getConfig().controler().getOutputDirectory());
-		analysis2.run();
-		
-		LinkDemandAnalysisRun analysis3 = new LinkDemandAnalysisRun(controler.getConfig().controler().getOutputDirectory());
-		analysis3.run();
 	}
 }
 
