@@ -29,6 +29,55 @@ import java.util.Set;
 
 public final class RaceTrackLinkProperties {
 
+    private final double linkLength;
+    private final double linkCapacity;
+    private final double linkFreeSpeedMPS;
+    private final double numberOfLanes;
+    private final Set<String> allowedModes;
+
+    private final int subDivisionalFactor; //all sides of the triangle will be divided into subdivisionFactor
+
+    /**
+     * A container to use the link properties to generate the triangular network.
+     * @param linkLength link length wihout sub-division
+     * @param linkCapacity
+     * @param linkSpeedMPS
+     * @param numberOfLanes
+     * @param allowedModes could be same as the "mainModes" in {@link org.matsim.core.config.groups.QSimConfigGroup}
+     * @param subDivisionalFactor
+     */
+    public RaceTrackLinkProperties(final double linkLength,
+                                   final double linkCapacity,
+                                   final double linkSpeedMPS,
+                                   final double numberOfLanes,
+                                   final Set<String> allowedModes,
+                                   final int subDivisionalFactor ){
+
+        this.linkLength = linkLength;
+        this.linkCapacity = linkCapacity;
+        this.linkFreeSpeedMPS = linkSpeedMPS;
+        this.numberOfLanes = numberOfLanes;
+        this.allowedModes = allowedModes;
+        this.subDivisionalFactor = subDivisionalFactor;
+    }
+
+    /**
+     * With this constructor, no sub-division of the links is used.
+     * @param linkLength
+     * @param linkCapacity
+     * @param linkSpeedMPS
+     * @param numberOfLanes
+     * @param allowedModes
+     */
+    public RaceTrackLinkProperties(final double linkLength,
+                                   final double linkCapacity,
+                                   final double linkSpeedMPS,
+                                   final double numberOfLanes,
+                                   final Set<String> allowedModes
+                                   ){
+        this(linkLength, linkCapacity, linkSpeedMPS, numberOfLanes, allowedModes, 1);
+    }
+
     public double getLinkLength() {
         return linkLength;
     }
@@ -37,8 +86,8 @@ public final class RaceTrackLinkProperties {
         return linkCapacity;
     }
 
-    public double getFreespeedMPS() {
-        return linkSpeedMPS;
+    public double getLinkFreeSpeedMPS() {
+        return linkFreeSpeedMPS;
     }
 
     public double getNumberOfLanes() {
@@ -49,22 +98,7 @@ public final class RaceTrackLinkProperties {
         return allowedModes;
     }
 
-    private final double linkLength;
-    private final double linkCapacity;
-    private final double linkSpeedMPS;
-    private final double numberOfLanes;
-    private final Set<String> allowedModes;
-
-    public RaceTrackLinkProperties(final double linkLength,
-                                   final double linkCapacity,
-                                   final double linkSpeedMPS,
-                                   final double numberOfLanes,
-                                   final Set<String> allowedModes){
-
-        this.linkLength = linkLength;
-        this.linkCapacity = linkCapacity;
-        this.linkSpeedMPS = linkSpeedMPS;
-        this.numberOfLanes = numberOfLanes;
-        this.allowedModes = allowedModes;
+    public int getSubDivisionalFactor() {
+        return subDivisionalFactor;
     }
 }

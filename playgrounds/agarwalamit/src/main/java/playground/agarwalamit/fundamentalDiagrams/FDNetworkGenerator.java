@@ -33,10 +33,6 @@ import org.matsim.api.core.v01.network.Node;
 final class FDNetworkGenerator {
 
 	private final int noOfSides = 3;
-
-	private int subdivisionFactor = 1; //all sides of the triangle will be divided into subdivisionFactor
-	private boolean isLocked = false;
-
 	private final Id<Link> startLinkId = Id.createLinkId("home");
 	private final Id<Link> endLinkId = Id.createLinkId("work");
 
@@ -56,7 +52,6 @@ final class FDNetworkGenerator {
 
 	public void createNetwork(final Scenario scenario) {
 		createTriangularNetwork(scenario);
-		isLocked = true;
 	}
 
 	/**
@@ -65,11 +60,13 @@ final class FDNetworkGenerator {
 	 */
 	private void createTriangularNetwork(final Scenario scenario) {
 		Network network = scenario.getNetwork();
+		int subdivisionFactor = linkProperties.getSubDivisionalFactor();
+		double linkLength = linkProperties.getLinkLength();
 
 		//nodes of the equilateral triangle base starting, left node at (0,0)
 		for (int i = 0; i < subdivisionFactor + 1; i++) {
 			double x=0., y = 0.;
-			x = (linkProperties.getLinkLength() / subdivisionFactor) * i;
+			x = (linkLength / subdivisionFactor) * i;
 			Coord coord = new Coord(x, y);
 			Id<Node> id = Id.createNodeId(i);
 
@@ -78,8 +75,8 @@ final class FDNetworkGenerator {
 		}
 		//nodes of the triangle right side
 		for (int i = 0; i < subdivisionFactor; i++) {
-			double x = linkProperties.getLinkLength() - ((linkProperties.getLinkLength() / subdivisionFactor)) * Math.cos(Math.PI / 3) * (i + 1);
-			double y = (linkProperties.getLinkLength() / subdivisionFactor) * Math.sin(Math.PI / 3) * (i + 1);
+			double x = linkLength - ((linkLength / subdivisionFactor)) * Math.cos(Math.PI / 3) * (i + 1);
+			double y = (linkLength / subdivisionFactor) * Math.sin(Math.PI / 3) * (i + 1);
 			Coord coord = new Coord(x, y);
 			Id<Node> id = Id.createNodeId(subdivisionFactor + i + 1);
 
@@ -88,7 +85,7 @@ final class FDNetworkGenerator {
 		}
 		//nodes of the triangle left side
 		for (int i = 0; i < subdivisionFactor - 1; i++) {
-			double x = linkProperties.getLinkLength() / 2 - (linkProperties.getLinkLength() / subdivisionFactor) * Math.cos(Math.PI / 3) * (i + 1);
+			double x = linkLength / 2 - (linkLength / subdivisionFactor) * Math.cos(Math.PI / 3) * (i + 1);
 			double y = Math.tan(Math.PI / 3) * x;
 			Coord coord = new Coord(x, y);
 			Id<Node> id = Id.createNodeId(2 * subdivisionFactor + i + 1);
@@ -102,7 +99,7 @@ final class FDNetworkGenerator {
 		Node startNode = scenario.getNetwork().getFactory().createNode(Id.createNodeId("home"), coord);
 		network.addNode(startNode);
 
-		coord = new Coord(linkProperties.getLinkLength() + 50.0, 0.0);
+		coord = new Coord(linkLength + 50.0, 0.0);
 		Id<Node> endNodeId = Id.createNodeId("work");
 		Node endNode = scenario.getNetwork().getFactory().createNode(endNodeId, coord);
 		network.addNode(endNode);
@@ -120,7 +117,7 @@ final class FDNetworkGenerator {
 
 			Link link = scenario.getNetwork().getFactory().createLink(Id.createLinkId(i+1), from, to);
 			link.setCapacity(linkProperties.getLinkCapacity());
-			link.setFreespeed(linkProperties.getFreespeedMPS());
+			link.setFreespeed(linkProperties.getLinkFreeSpeedMPS());
 			link.setLength(linkProperties.getLinkLength());
 			link.setNumberOfLanes(linkProperties.getNumberOfLanes());
 			link.setAllowedModes(linkProperties.getAllowedModes());
@@ -147,7 +144,7 @@ final class FDNetworkGenerator {
 										 startNode,
 										 scenario.getNetwork().getNodes().get(Id.createNodeId(0)));
 		startLink.setCapacity(10 * linkProperties.getLinkCapacity());
-		startLink.setFreespeed(linkProperties.getFreespeedMPS());
+		startLink.setFreespeed(linkProperties.getLinkFreeSpeedMPS());
 		startLink.setLength(25.);
 		startLink.setNumberOfLanes(1.);
 		startLink.setAllowedModes(linkProperties.getAllowedModes());
@@ -158,17 +155,11 @@ final class FDNetworkGenerator {
 							   .createLink(endLinkId, scenario.getNetwork().getNodes().get(Id.createNodeId(
 									   subdivisionFactor)), endNode);
 		endLink.setCapacity(10 * linkProperties.getLinkCapacity());
-		endLink.setFreespeed(linkProperties.getFreespeedMPS());
+		endLink.setFreespeed(linkProperties.getLinkFreeSpeedMPS());
 		endLink.setLength(25.);
 		endLink.setNumberOfLanes(1.);
 		endLink.setAllowedModes(linkProperties.getAllowedModes());
 		network.addLink(endLink);
-	}
-
-	public void setSubdivisionFactor(int subdivisionFactor) {
-		if ( isLocked ) FundamentalDiagramDataGenerator.LOG.warn("Network is already created, this will not have any effect on the network." +
-				"In order to divide the links, setter must be used before creating network.");
-		this.subdivisionFactor = subdivisionFactor;
 	}
 
 	public RaceTrackLinkProperties getLinkProperties(){
