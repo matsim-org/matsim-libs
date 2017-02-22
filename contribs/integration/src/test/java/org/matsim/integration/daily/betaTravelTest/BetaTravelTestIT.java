@@ -84,7 +84,7 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class BetaTravelTest extends MatsimTestCase {
+public class BetaTravelTestIT extends MatsimTestCase {
 
 	/* This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
@@ -122,8 +122,8 @@ public class BetaTravelTest extends MatsimTestCase {
 	 *  @author mrieser
 	 */
 	public void testBetaTravel_6() {
-		Config config = loadConfig("../../examples/scenarios/equil/config.xml");
-		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
+		Config config = loadConfig("../../examples/scenarios/equil/config.xml"); // default config
+		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml"); // specific setting for this test
 		config.controler().setWritePlansInterval(0);	
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		/*
