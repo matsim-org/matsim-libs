@@ -83,7 +83,7 @@
 			<param name="constant" value="-0.0" />
 			<param name="marginalUtilityOfDistance_util_m" value="-0.01" />
 			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
-			<param name="mode" value="dvrp_estimated" />
+			<param name="mode" value="taxi_optimizer" />
 			<param name="monetaryDistanceRate" value="0.0" />
 			
 		</parameterset>

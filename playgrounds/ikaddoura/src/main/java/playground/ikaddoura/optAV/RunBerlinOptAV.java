@@ -21,14 +21,14 @@ package playground.ikaddoura.optAV;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
@@ -59,8 +59,8 @@ import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
-import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
@@ -210,8 +210,8 @@ public class RunBerlinOptAV {
 			}
 		}, TaxiOptimizer.class));
 
-        final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory2 = new MoneyTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(VrpTravelTimeModules.DVRP_ESTIMATED,
+        final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
+				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
 						controler.getConfig().planCalcScore()));
 		
 		controler.addOverridingModule(new AbstractModule(){

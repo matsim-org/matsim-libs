@@ -142,12 +142,12 @@ public class RunBerlinAV {
 		}, TaxiOptimizer.class));
         
         final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = 
-        		new RandomizingTimeDistanceTravelDisutilityFactory(VrpTravelTimeModules.DVRP_ESTIMATED, controler.getConfig().planCalcScore());
+        		new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler.getConfig().planCalcScore());
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				addTravelDisutilityFactoryBinding(VrpTravelTimeModules.DVRP_ESTIMATED).toInstance(dvrpTravelDisutilityFactory);
+				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 			}
 		});
 
