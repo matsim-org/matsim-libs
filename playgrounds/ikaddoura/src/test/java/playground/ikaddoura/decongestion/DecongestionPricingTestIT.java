@@ -40,6 +40,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
@@ -89,6 +90,8 @@ public class DecongestionPricingTestIT {
 				this.bind(DecongestionInfo.class).toInstance(info);
 				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
 
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				
 				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();

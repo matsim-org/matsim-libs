@@ -109,7 +109,7 @@ public class MoneyEventAnalysisTest {
 				
 		// add a fake iteration
 		
-		moneyAnalysis.reset(0);
+		moneyAnalysis.reset(1);
 		
 		moneyAnalysis.handleEvent(new PersonEntersVehicleEvent(0., personId1, vehicleId1));
 		moneyAnalysis.handleEvent(new PersonEntersVehicleEvent(0., personId2, vehicleId2));
@@ -134,7 +134,7 @@ public class MoneyEventAnalysisTest {
 		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(3661., personId2, linkId3, -123., 3661.));
 		moneyAnalysis.handleEvent(new PersonLinkMoneyEvent(3662., personId3, linkId3, -8., 3662.));
 
-		moneyAnalysis.notifyIterationEnds(new IterationEndsEvent(controler, 0));
+		moneyAnalysis.notifyIterationEnds(new IterationEndsEvent(controler, 1));
 		
 		// test null intervals for linkId1
 		Assert.assertNotNull("time bin should not be null", moneyAnalysis.getLinkId2info().get(linkId1).getTimeBinNr2timeBin().get(0));

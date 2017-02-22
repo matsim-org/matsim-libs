@@ -303,7 +303,13 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 					// smoothening the average amount
 					if (tollUpdateCounter > 0) {
 						double blendFactor = 1.0 / (double) this.tollUpdateCounter;
-						smoothenedAmount = averageAmount * blendFactor + agentTypeId2avgAmountPreviousIteration.get(agentType) * (1 - blendFactor);
+						
+						double avgAmountPreviousIteration = 0.;
+						if (agentTypeId2avgAmountPreviousIteration.get(agentType) != null) {
+							avgAmountPreviousIteration = agentTypeId2avgAmountPreviousIteration.get(agentType);
+						}
+						
+						smoothenedAmount = averageAmount * blendFactor + avgAmountPreviousIteration * (1 - blendFactor);
 					} else {
 						smoothenedAmount = averageAmount;
 					}
