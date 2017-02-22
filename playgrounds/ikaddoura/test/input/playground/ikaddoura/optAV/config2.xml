@@ -3,39 +3,11 @@
 <config>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="network.xml" />
+		<param name="inputNetworkFile" value="network2.xml" />
 	</module>
 	
 	<module name="plans" >
-		 <param name="inputPlansFile" value="population.xml" />
-	</module>
-	
-	<module name="noise" >
-		<param name="allowForSpeedsOutsideTheValidRange" value="false" />
-		<param name="annualCostRate" value="100000.0" />
-		<param name="busIdIdentifier" value="" />
-		<param name="computeCausingAgents" value="true" />
-		<param name="computeNoiseDamages" value="true" />
-		<param name="computePopulationUnits" value="true" />
-		<param name="consideredActivitiesForDamageCalculation" value="noise_sensitive" />
-		<param name="consideredActivitiesForReceiverPointGrid" value="home,work,noise_sensitive" />
-		<param name="hgvIdPrefixes" value="lkw" />
-		<param name="internalizeNoiseDamages" value="true" />
-		<param name="noiseAllocationApproach" value="MarginalCost" />
-		<param name="receiverPointGap" value="100.0" />
-		<param name="receiverPointsGridMaxX" value="0.0" />
-		<param name="receiverPointsGridMaxY" value="0.0" />
-		<param name="receiverPointsGridMinX" value="0.0" />
-		<param name="receiverPointsGridMinY" value="0.0" />
-		<param name="relevantRadius" value="500.0" />
-		<param name="scaleFactor" value="1000.0" />
-		<param name="throwNoiseEventsAffected" value="true" />
-		<param name="throwNoiseEventsCaused" value="true" />
-		<param name="timeBinSizeNoiseComputation" value="3600." />
-		<param name="tunnelLinkIDs" value="null" />
-		<param name="tunnelLinkIdFile" value="null" />
-		<param name="useActualSpeedLevel" value="false" />
-		<param name="writeOutputIteration" value="5" />
+		 <param name="inputPlansFile" value="population-car+taxi.xml" />
 	</module>
 	
 	<module name="controler">
@@ -46,7 +18,7 @@
 		<param name="lastIteration" value="5" />
 		<param name="snapshotFormat" value="otfvis" />
 		<param name="writeSnapshotsInterval" value="0" />
-		<param name="writeEventsInterval" value="5" />
+		<param name="writeEventsInterval" value="1" />
 		<param name="writePlansInterval" value="0" />
 	</module>
 	
@@ -65,19 +37,18 @@
 	
 		<parameterset type="strategysettings">
 			<param name="strategyName" value="BestScore" />
-			<param name="weight" value="1.0" />
+			<param name="weight" value="0.9" />
 		</parameterset>
 		
 		<parameterset type="strategysettings">
 			<param name="strategyName" value="ReRoute" />
-			<param name="weight" value="0.0" />
+			<param name="weight" value="0.1" />
 		</parameterset>
 	
 	</module>
 	
 	<module name="planCalcScore">
 	
-		<param name="monetaryDistanceRateCar" value="0.0" />
 		<param name="performing" value="6.0" />
 
 		<parameterset type="activityParams">
@@ -104,14 +75,14 @@
 		<parameterset type="modeParams">
 					
 			<param name="constant" value="-0.0" />
-			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
-			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+			<param name="marginalUtilityOfDistance_util_m" value="-0.01" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
 			<param name="mode" value="car" />
 			<param name="monetaryDistanceRate" value="0.0" />
 			
 			<param name="constant" value="-0.0" />
-			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
-			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+			<param name="marginalUtilityOfDistance_util_m" value="-0.01" />
+			<param name="marginalUtilityOfTraveling_util_hr" value="0.0" />
 			<param name="mode" value="dvrp_estimated" />
 			<param name="monetaryDistanceRate" value="0.0" />
 			
@@ -122,16 +93,16 @@
 	<module name="taxifare">
 
 		<!-- Basefare per Trip (fare = positive value) -->
-		<param name="basefare" value="0.5" />
+		<param name="basefare" value="0.0" />
 
 		<!-- Daily subscription fee (fee = positive value) -->
 		<param name="dailySubscriptionFee" value="0.0" />
 
 		<!-- taxi fare per meter (fee = positive value) -->
-		<param name="distanceFare_m" value="0.0002" />
+		<param name="distanceFare_m" value="0.0" />
 
 		<!-- taxi fare per hour (fee = positive value) -->
-		<param name="timeFare_h" value="3.6" />
+		<param name="timeFare_h" value="0.0" />
 	</module>
 	
 	<module name="taxi">

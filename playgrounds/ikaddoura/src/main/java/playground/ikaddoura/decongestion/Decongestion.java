@@ -28,6 +28,7 @@ import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
@@ -82,11 +83,13 @@ public class Decongestion {
 				this.bind(DecongestionInfo.class).toInstance(info);
 				this.bind(DecongestionTollSetting.class).toInstance(tollSettingApproach);
 
-				this.bind(IntervalBasedTolling.class).asEagerSingleton();
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				
+				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
 								
-				this.addEventHandlerBinding().to(IntervalBasedTolling.class);
+				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.decongestion.handler;
+package playground.ikaddoura.optAV;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
 * @author ikaddoura
 */
 
-public interface IntervalBasedTolling {
+public class AVAgentFilter implements AgentFilter {
 
-	public double getTotalTollPayments();
+	private String[] vehicleTypeIdPrefixes = {"taxi", "rt"};
+
+	@Override
+	public String getAgentTypeFromId(Id<Person> id) {
+		
+		for (String prefix : vehicleTypeIdPrefixes) {
+			if (id.toString().startsWith(prefix)) {
+				return prefix;
+			}
+		}
+		return "other";
+	}
 
 }
 

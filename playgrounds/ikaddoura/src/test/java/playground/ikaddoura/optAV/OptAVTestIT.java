@@ -22,35 +22,55 @@
  */
 package playground.ikaddoura.optAV;
 
-import org.junit.*;
-import org.matsim.api.core.v01.*;
-import org.matsim.contrib.av.robotaxi.scoring.*;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
+import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.noise.*;
+import org.matsim.contrib.noise.NoiseCalculationOnline;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
-import playground.ikaddoura.moneyTravelDisutility.*;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
+import playground.ikaddoura.decongestion.DecongestionControlerListener;
+import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
+import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
+import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
 
 /**
  * @author ikaddoura
@@ -62,14 +82,13 @@ public class OptAVTestIT {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	/**
-	 *
+	 * only taxi trips
 	 */
 	@Test
 	public final void test1(){
 
 		String configFile = testUtils.getPackageInputDirectory() + "config.xml";
 		final boolean otfvis = false;
-		final boolean runBaseCase = true;
 		 
 		// ##################################################################
 		// baseCase
@@ -82,7 +101,7 @@ public class OptAVTestIT {
 				new TaxiFareConfigGroup(),
 				new NoiseConfigGroup());
 		
-		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc");
+		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc1");
 
 		DvrpConfigGroup.get(config1).setMode(TaxiModule.TAXI_MODE);
 
@@ -114,6 +133,16 @@ public class OptAVTestIT {
 				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
 			}
 		}, TaxiOptimizer.class));
+        
+        final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory1 =
+        		new RandomizingTimeDistanceTravelDisutilityFactory(VrpTravelTimeModules.DVRP_ESTIMATED, controler1.getConfig().planCalcScore());
+		
+		controler1.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				addTravelDisutilityFactoryBinding(VrpTravelTimeModules.DVRP_ESTIMATED).toInstance(dvrpTravelDisutilityFactory1);
+			}
+		}); 
 				
 		// analysis
 		
@@ -126,7 +155,7 @@ public class OptAVTestIT {
 		// run
 		
         controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		if (runBaseCase) controler1.run();
+        controler1.run();
 		
 		String outputDirectory = controler1.getConfig().controler().getOutputDirectory();
 		if (!outputDirectory.endsWith("/")) {
@@ -190,8 +219,8 @@ public class OptAVTestIT {
 			}
 		}, TaxiOptimizer.class));
 		
-		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,
+		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory2 = new MoneyTimeDistanceTravelDisutilityFactory(
+				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
 						controler2.getConfig().planCalcScore()));
 		
 		controler2.addOverridingModule(new AbstractModule(){
@@ -247,9 +276,222 @@ public class OptAVTestIT {
 		Assert.assertEquals(true, getNoiseSensitiveRouteDemand(handler2) < getNoiseSensitiveRouteDemand(handler1));
 	}
 	
+	/**
+	 * car + taxi trips
+	 */
+	@Test
+	public final void test2(){
+
+		String configFile = testUtils.getPackageInputDirectory() + "config2.xml";
+		final boolean otfvis = false;
+		 
+		// ##################################################################
+		// baseCase
+		// ##################################################################
+		
+		Config config1 = ConfigUtils.loadConfig(configFile,
+				new TaxiConfigGroup(),
+				new OTFVisConfigGroup(),
+				new TaxiFareConfigGroup(),
+				new NoiseConfigGroup());
+		
+		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc2");
+
+		TaxiConfigGroup taxiCfg1 = TaxiConfigGroup.get(config1);
+		config1.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		config1.checkConsistency();
+		
+		Scenario scenario1 = ScenarioUtils.loadScenario(config1);
+		Controler controler1 = new Controler(scenario1);
+		
+		// taxi
+
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(scenario1.getNetwork(), fleet).readFile(taxiCfg1.getTaxisFileUrl(config1.getContext()).getFile());
+		
+		controler1.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
+			}
+		});
+		controler1.addOverridingModule(new TaxiModule());
+		controler1.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+        controler1.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
+				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+			}
+		}, TaxiOptimizer.class));
+				
+        final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory =
+        		new RandomizingTimeDistanceTravelDisutilityFactory(VrpTravelTimeModules.DVRP_ESTIMATED, controler1.getConfig().planCalcScore());
+		
+		controler1.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				// travel disutility factory for DVRP
+				addTravelDisutilityFactoryBinding(VrpTravelTimeModules.DVRP_ESTIMATED).toInstance(dvrpTravelDisutilityFactory);
+			}
+		}); 
+		
+		// analysis
+		
+		if (otfvis) controler1.addOverridingModule(new OTFVisLiveModule());	
+		
+		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
+		controler1.getEvents().addHandler(handler1);
+		controler1.getConfig().controler().setCreateGraphs(false);
+
+		// run
+		
+        controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler1.run();
+				
+		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler1.getConfig().controler().getOutputDirectory());
+		analysis1.run();
+		
+		// ##################################################################
+		// congestion pricing
+		// ##################################################################
+
+		Config config2 = ConfigUtils.loadConfig(configFile,
+				new TaxiConfigGroup(),
+				new OTFVisConfigGroup(),
+				new TaxiFareConfigGroup());
+		
+		config2.controler().setOutputDirectory(testUtils.getOutputDirectory() + "c");
+		
+		TaxiConfigGroup taxiCfg2 = TaxiConfigGroup.get(config2);
+		config2.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		config2.checkConsistency();
+		
+		Scenario scenario2 = ScenarioUtils.loadScenario(config2);
+		Controler controler2 = new Controler(scenario2);
+		
+		// congestion pricing
+		
+		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setMsa(true);
+		decongestionSettings.setTOLL_BLEND_FACTOR(0.);
+		decongestionSettings.setKd(0.);
+		decongestionSettings.setKi(0.);
+		decongestionSettings.setKp(999.);
+		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
+		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+		
+		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
+		
+		controler2.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				
+				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
+				
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
+
+				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+			}
+		});
+		
+		// taxi
+
+		FleetImpl fleet2 = new FleetImpl();
+		new VehicleReader(scenario2.getNetwork(), fleet2).readFile(taxiCfg2.getTaxisFileUrl(config2.getContext()).getFile());
+		
+		controler2.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
+			}
+		});
+		
+		controler2.addOverridingModule(new TaxiModule());
+		controler2.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05)); // replace the travel time computation
+        controler2.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
+				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+			}
+		}, TaxiOptimizer.class));
+		
+		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory2 = new MoneyTimeDistanceTravelDisutilityFactory(
+				new RandomizingTimeDistanceTravelDisutilityFactory(VrpTravelTimeModules.DVRP_ESTIMATED, controler2.getConfig().planCalcScore())
+				);
+		
+		controler2.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+												
+				// travel disutility factory for DVRP
+				addTravelDisutilityFactoryBinding(VrpTravelTimeModules.DVRP_ESTIMATED).toInstance(dvrpTravelDisutilityFactory2);
+
+//				this.bind(AgentFilter.class).to(AVAgentFilter.class); // TODO: add once person is not null
+				
+				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
+				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
+				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
+			}
+		}); 
+		
+		// analysis
+		
+		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
+		controler2.getEvents().addHandler(handler2);
+		controler2.getConfig().controler().setCreateGraphs(false);
+        
+		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
+		
+		// run
+        controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler2.run();
+		
+		String outputDirectory2 = controler2.getConfig().controler().getOutputDirectory();
+		if (!outputDirectory2.endsWith("/")) {
+			outputDirectory2 = outputDirectory2 + "/";
+		}
+
+		PersonTripNoiseAnalysisRun analysis2 = new PersonTripNoiseAnalysisRun(controler2.getConfig().controler().getOutputDirectory());
+		analysis2.run();
+
+		// print outs
+					
+		System.out.println("----------------------------------");
+		System.out.println("Base case:");
+		printResults1(handler1);
+	
+		System.out.println("----------------------------------");
+		System.out.println("Congestion pricing:");
+		printResults1(handler2);
+		
+		// the demand on the congested route should go down in case of congestion pricing
+		Assert.assertEquals(true, getNoiseSensitiveRouteDemand(handler2) < getNoiseSensitiveRouteDemand(handler1));
+	}
+	
 	private void printResults1(LinkDemandEventHandler handler) {
-		System.out.println("long but uncongested, low noise cost: " + getLongUncongestedDemand(handler));
-		System.out.println("high noise cost: " + (getNoiseSensitiveRouteDemand(handler)));
+		System.out.println("long but uncongested: " + getLongUncongestedDemand(handler));
+		System.out.println("high congestion cost: " + (getNoiseSensitiveRouteDemand(handler)));
 	}
 	
 	private int getNoiseSensitiveRouteDemand(LinkDemandEventHandler handler) {

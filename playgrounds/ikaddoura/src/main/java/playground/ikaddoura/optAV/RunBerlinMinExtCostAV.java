@@ -58,6 +58,9 @@ import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
@@ -163,11 +166,13 @@ public class RunBerlinMinExtCostAV {
 				this.bind(DecongestionInfo.class).toInstance(info);
 				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
 
-				this.bind(AVIntervalBasedTolling.class).asEagerSingleton();
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
+
+				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
 								
-				this.addEventHandlerBinding().to(AVIntervalBasedTolling.class);
+				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
@@ -207,8 +212,7 @@ public class RunBerlinMinExtCostAV {
 			public void install() {
 												
 				// travel disutility factory for DVRP
-				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
-						.toInstance(dvrpTravelDisutilityFactory);
+				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);

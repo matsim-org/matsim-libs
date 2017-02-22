@@ -46,6 +46,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -139,6 +140,16 @@ public class RunBerlinAV {
 				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
 			}
 		}, TaxiOptimizer.class));
+        
+        final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = 
+        		new RandomizingTimeDistanceTravelDisutilityFactory(VrpTravelTimeModules.DVRP_ESTIMATED, controler.getConfig().planCalcScore());
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				addTravelDisutilityFactoryBinding(VrpTravelTimeModules.DVRP_ESTIMATED).toInstance(dvrpTravelDisutilityFactory);
+			}
+		});
 
 		// #############################
 		// run

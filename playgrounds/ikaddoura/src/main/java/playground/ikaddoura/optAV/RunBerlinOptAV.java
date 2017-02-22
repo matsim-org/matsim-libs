@@ -60,6 +60,7 @@ import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
@@ -99,8 +100,8 @@ public class RunBerlinOptAV {
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000_test/";
 			otfvis = false;
 			kP = 2 * 12./3600.;
 		}
@@ -170,11 +171,13 @@ public class RunBerlinOptAV {
 				this.bind(DecongestionInfo.class).toInstance(info);
 				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
 
-				this.bind(AVIntervalBasedTolling.class).asEagerSingleton();
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
+
+				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
 								
-				this.addEventHandlerBinding().to(AVIntervalBasedTolling.class);
+				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
@@ -207,10 +210,10 @@ public class RunBerlinOptAV {
 			}
 		}, TaxiOptimizer.class));
 
-		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,
+        final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory2 = new MoneyTimeDistanceTravelDisutilityFactory(
+				new RandomizingTimeDistanceTravelDisutilityFactory(VrpTravelTimeModules.DVRP_ESTIMATED,
 						controler.getConfig().planCalcScore()));
-
+		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
