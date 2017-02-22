@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.onetaxi;
+package org.matsim.contrib.taxi.run.examples;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.AbstractModule;
+public class RunTaxiExample {
+	private static final String CONFIG_FILE = "mielec_2014_02/mielec_taxi_config.xml";
 
-public class RunShorterOneTaxiExample2 {
-	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/shorter_one_taxi_config.xml";
-	private static final String VEHICLES_FILE = "./src/main/resources/one_taxi/one_taxi_vehicles.xml";
+	public static void run(boolean otfvis, int lastIteration) {
+		// load config
+		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new TaxiConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		config.controler().setLastIteration(lastIteration);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		config.checkConsistency();
 
-	public static void main(String... args) {
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DvrpConfigGroup());
+		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).readFile(VEHICLES_FILE);
+		// load fleet
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 
+		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(fleet, new AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
-				bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
-			}
-		}));
+		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet)); // taxi optimiser
+		controler.addOverridingModule(new TaxiOutputModule()); // taxi output (can be commented out)
 
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
+		}
+
+		// run simulation
 		controler.run();
+	}
+
+	public static void main(String[] args) {
+		RunTaxiExample.run(false, 0); // switch to 'false' to turn off visualisation
 	}
 }

@@ -17,13 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.onetaxi;
+package org.matsim.contrib.taxi.run.examples;
 
 import org.junit.Test;
 
-public class RunOneTaxiExampleTest {
+public class RunTaxiExampleTestIT {
 	@Test
 	public void testRun() {
-		RunOneTaxiExample.run(false, 2);
+		RunTaxiExample.run(false, 0);
 	}
 }

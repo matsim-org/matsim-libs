@@ -27,6 +27,7 @@ import org.matsim.core.config.*;
 public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "taxi";
 
+	@SuppressWarnings("deprecation")
 	public static TaxiConfigGroup get(Config config) {
 		return (TaxiConfigGroup) config.getModule(GROUP_NAME);
 		// yy this will fail if the module is not in the config. Is this intended? If not, use
