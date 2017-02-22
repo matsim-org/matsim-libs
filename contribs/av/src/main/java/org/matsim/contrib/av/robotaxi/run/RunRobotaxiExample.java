@@ -79,17 +79,9 @@ public class RunRobotaxiExample {
 				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
 			}
 		});
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new TaxiOutputModule());
 
-        controler.addOverridingModule(new DvrpModule(fleet, new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		}, TaxiOptimizer.class));
+        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

@@ -80,7 +80,7 @@ public static void main(String[] args) {
 		config.transitRouter().setSearchRadius(3000);
 		config.transitRouter().setExtensionRadius(0);
 		
-		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
+		DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
 	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
@@ -89,7 +89,7 @@ public static void main(String[] args) {
        FleetImpl fleet = new FleetImpl();
        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
-       controler.addOverridingModule(new TaxiModule());
+       controler.addOverridingModule(new TaxiOutputModule());
        
        controler.addOverridingModule(new AbstractModule() {
 		@Override
@@ -98,15 +98,7 @@ public static void main(String[] args) {
 		}
 	});
        
-       controler.addOverridingModule(new DvrpModule(fleet, new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		}, TaxiOptimizer.class));
+       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
 //       controler.addOverridingModule(new OTFVisLiveModule());

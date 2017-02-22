@@ -54,17 +54,8 @@ public class RunTaxiScenario {
 		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new TaxiModule());
-
-		controler.addOverridingModule(new DvrpModule(fleet, new AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		}, TaxiOptimizer.class));
+		controler.addOverridingModule(new TaxiOutputModule());
+        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

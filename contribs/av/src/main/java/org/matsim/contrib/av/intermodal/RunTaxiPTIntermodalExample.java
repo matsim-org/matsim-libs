@@ -106,7 +106,7 @@ public class RunTaxiPTIntermodalExample {
 		// ---
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new TaxiOutputModule());
 
 //				// to replace by own dispatch module:
 //				controler.addOverridingModule( new AbstractModule(){
@@ -116,16 +116,7 @@ public class RunTaxiPTIntermodalExample {
 //					}
 //				} ) ;
 
-		
-        controler.addOverridingModule(new DvrpModule(fleet, new AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		}, TaxiOptimizer.class));
+        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 		
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -77,7 +77,7 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 	    
 	    @Override
 	    public void handleEvent(PersonDepartureEvent event){
-	        if (!event.getLegMode().equals(TaxiModule.TAXI_MODE))
+	        if (!event.getLegMode().equals(TaxiOptimizerModules.TAXI_MODE))
 	            return;
 	        String zoneId = getZoneForLinkId(event.getLinkId());
 	        if (zoneId!=null){

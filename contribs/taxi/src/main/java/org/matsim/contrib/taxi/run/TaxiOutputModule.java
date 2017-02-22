@@ -26,9 +26,7 @@ import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
 
-public class TaxiModule extends AbstractModule {
-	public static final String TAXI_MODE = "taxi";
-
+public class TaxiOutputModule extends AbstractModule {
 	@Inject
 	private TaxiConfigGroup taxiCfg;
 

@@ -52,7 +52,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -336,7 +336,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			if (tripNumber2legMode.get(tripNumber).equals(TransportMode.pt)) {
 				distanceTravelled = (ptVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
 			
-			} else if (tripNumber2legMode.get(tripNumber).equals(TaxiModule.TAXI_MODE)) {
+			} else if (tripNumber2legMode.get(tripNumber).equals(TaxiOptimizerModules.TAXI_MODE)) {
 				distanceTravelled = (taxiVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
 
 			} else if (tripNumber2legMode.get(tripNumber).equals(TransportMode.car)) {
@@ -414,7 +414,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.pt)){
 				personId2distanceEnterValue.put(event.getPersonId(), ptVehicleId2totalDistance.get(event.getVehicleId()));
 			
-			} else if ((tripNumber2legMode.get(tripNumber)).equals(TaxiModule.TAXI_MODE)){
+			} else if ((tripNumber2legMode.get(tripNumber)).equals(TaxiOptimizerModules.TAXI_MODE)){
 				personId2distanceEnterValue.put(event.getPersonId(), taxiVehicleId2totalDistance.get(event.getVehicleId()));
 
 			} else if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){

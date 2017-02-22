@@ -30,7 +30,8 @@ public class EvConfigGroup
     public static final String GROUP_NAME = "ev";
 
 
-    public static EvConfigGroup get(Config config)
+    @SuppressWarnings("deprecation")
+	public static EvConfigGroup get(Config config)
     {
         return (EvConfigGroup)config.getModule(GROUP_NAME);
     }

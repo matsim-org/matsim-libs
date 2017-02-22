@@ -66,16 +66,8 @@ public class RunTaxiBenchmark {
 
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new TaxiModule());
-		controler.addOverridingModule(new DvrpBenchmarkModule(fleet, new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		}, TaxiOptimizer.class));
+		controler.addOverridingModule(new TaxiOutputModule());
+		controler.addOverridingModule(TaxiOptimizerModules.createBenchmarkModule(fleet));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

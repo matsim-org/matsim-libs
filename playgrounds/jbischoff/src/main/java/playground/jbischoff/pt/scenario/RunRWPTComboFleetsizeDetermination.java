@@ -104,17 +104,9 @@ public static void main(String[] args) {
        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
        controler.addOverridingModule(new AvIncreasedCapacityModule(avfactor));
-       controler.addOverridingModule(new TaxiModule());
+       controler.addOverridingModule(new TaxiOutputModule());
 
-       controler.addOverridingModule(new DvrpModule(fleet, new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		}, TaxiOptimizer.class));
+       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
