@@ -7,9 +7,10 @@ import org.matsim.core.config.Config;
  * @author thibautd
  * @author michaz
  */
-public final class PtMatrixAccessibilityContributionCalculator {
+public final class PtMatrixAccessibilityUtils {
+	private PtMatrixAccessibilityUtils(){} ; // do not instantiate
 
-	public static AccessibilityContributionCalculator create(
+	public static AccessibilityContributionCalculator createPtMatrixAccessibilityCalculator(
 			final PtMatrix ptMatrix,
 			final Config config) {
 		return new LeastCostPathCalculatorAccessibilityContributionCalculator(
