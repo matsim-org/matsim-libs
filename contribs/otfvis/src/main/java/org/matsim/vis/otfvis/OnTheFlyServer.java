@@ -59,28 +59,24 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
 		@Override
-		public Collection<Id<Person>> getAllAgentIds() {
-			return visMobsim.getAgents().keySet();
+		public Map<Id<Person>, MobsimAgent> getMobsimAgents() {
+			return visMobsim.getAgents();
 		}
 
 		@Override
-		public Plan getPlan(Id<Person> agentId) {
-			if (visMobsim != null ) {
-				MobsimAgent agent = visMobsim.getAgents().get(agentId);
-				if (agent instanceof PlanAgent) {
-					return ((PlanAgent)agent).getCurrentPlan();
-				}
-				else if (nonPlanAgentQueryHelper != null) {
-				    return OnTheFlyServer.this.nonPlanAgentQueryHelper.getPlan(agent);
-				}
-			} 
-			
-			return scenario.getPopulation().getPersons().get(agentId).getSelectedPlan();
+		public Plan getPlan(MobsimAgent agent) {
+			if (agent instanceof PlanAgent) {
+				return ((PlanAgent) agent).getCurrentPlan();
+			} else if (nonPlanAgentQueryHelper != null) {
+				return OnTheFlyServer.this.nonPlanAgentQueryHelper.getPlan(agent);
+			}
+			else {
+				return null;
+			}
 		}
 
 		@Override
-		public Activity getCurrentActivity(Id<Person> personId)	{		    
-            MobsimAgent mobsimAgent = visMobsim.getAgents().get(personId);
+		public Activity getCurrentActivity(MobsimAgent mobsimAgent)	{		    
             if (mobsimAgent == null || mobsimAgent.getState() != MobsimAgent.State.ACTIVITY) {
                 return null;
             }

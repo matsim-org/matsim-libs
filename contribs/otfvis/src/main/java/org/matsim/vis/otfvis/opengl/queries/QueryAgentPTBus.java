@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -182,7 +183,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 		this.net = simulationView.getNetwork();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
-		Collection<Id<Person>> agentIds = simulationView.getAllAgentIds();
+		Collection<Id<Person>> agentIds = simulationView.getMobsimAgents().keySet();
 		for(Id<Person> id : agentIds) {
 			if(id.toString().startsWith(prefix, 0)) {
 			    allIds.add(id.toString());
@@ -191,7 +192,8 @@ public class QueryAgentPTBus extends AbstractQuery {
 		if (allIds.size()==0) {
 			return;
 		}
-		Plan plan = simulationView.getPlan(Id.create(allIds.get(0), Person.class));
+		MobsimAgent firstAgent = simulationView.getMobsimAgents().get(Id.create(allIds.get(0), Person.class));
+		Plan plan = simulationView.getPlan(firstAgent);
 		this.result.vertex = buildRoute(plan);
 	}
 

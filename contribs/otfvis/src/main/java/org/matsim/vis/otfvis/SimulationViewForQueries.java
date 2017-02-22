@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisNetwork;
@@ -19,11 +20,11 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  */
 public interface SimulationViewForQueries {
 	
-	Collection<Id<Person>> getAllAgentIds();
+	Map<Id<Person>, MobsimAgent> getMobsimAgents();
 	
-	Plan getPlan(Id<Person> agentId);
+	Plan getPlan(MobsimAgent agent);
 
-	Activity getCurrentActivity(Id<Person> agentId);
+	Activity getCurrentActivity(MobsimAgent agent);
 	
 	Network getNetwork();
 

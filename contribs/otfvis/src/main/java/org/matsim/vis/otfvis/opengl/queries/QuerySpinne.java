@@ -50,7 +50,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -267,8 +267,8 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 	private List<Plan> getPersonsALL() {
 		List<Plan> actPersons = new ArrayList<>();
-		for (Id<Person> agentId : simulationView.getAllAgentIds()) {
-			Plan plan = simulationView.getPlan(agentId);
+		for (MobsimAgent agent : simulationView.getMobsimAgents().values()) {
+			Plan plan = simulationView.getPlan(agent);
 			List<PlanElement> actslegs = plan.getPlanElements();
 			for (PlanElement pe : actslegs) {
 				if (pe instanceof Activity) {
