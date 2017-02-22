@@ -58,6 +58,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -111,6 +112,13 @@ public class FundamentalDiagramDataGenerator {
 	}
 
 	/**
+	 * All default values will be used.
+	 */
+	public FundamentalDiagramDataGenerator(){
+		this (ScenarioUtils.loadScenario(ConfigUtils.createConfig()));
+	}
+
+	/**
 	 * A constructor to use the default values for the race track network.
 	 * @param scenario
 	 */
@@ -126,7 +134,7 @@ public class FundamentalDiagramDataGenerator {
 	}
 
 	public void run(){
-		consistencyCheckAndInitialize();
+		checkForConsistencyAndInitialize();
 		setUpConfig();
 
 		openFileAndWriteHeader(runDir+"/data.txt");
@@ -141,7 +149,7 @@ public class FundamentalDiagramDataGenerator {
 		closeFile();
 	}
 
-	private void consistencyCheckAndInitialize(){
+	private void checkForConsistencyAndInitialize(){
 		this.runDir = scenario.getConfig().controler().getOutputDirectory();
 		if(runDir==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
 
@@ -158,6 +166,21 @@ public class FundamentalDiagramDataGenerator {
 
 		Collection<String> mainModes = scenario.getConfig().qsim().getMainModes();
 		travelModes = mainModes.toArray(new String[mainModes.size()]);
+
+		if (scenario.getVehicles().getVehicleTypes().isEmpty()) {
+			if (travelModes.length==1 && travelModes [0].equals("car")) {
+				LOG.warn("No vehicle information is provided for "+this.travelModes[0]+". Using default vehicle (i.e. car) with maximum speed same as" +
+						"allowed speed on the link.");
+
+				VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
+            	car.setPcuEquivalents(1.0);
+            	car.setMaximumVelocity( fdNetworkGenerator.getLinkProperties().getLinkFreeSpeedMPS() );
+            	scenario.getVehicles().addVehicleType(car);
+
+			} else {
+				throw new RuntimeException("Vehicle type information for modes "+ Arrays.toString(travelModes)+" is not provided. Aborting...");
+			}
+		}
 
 		for (String travelMode : travelModes) {
 			Id<VehicleType> vehicleTypeId = Id.create(travelMode, VehicleType.class);
