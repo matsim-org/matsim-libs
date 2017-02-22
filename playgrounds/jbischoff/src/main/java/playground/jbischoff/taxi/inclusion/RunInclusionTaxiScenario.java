@@ -24,11 +24,10 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
@@ -56,10 +55,11 @@ public class RunInclusionTaxiScenario
     {
     	for (int i = 50; i<=1000; i=i+50){
     	
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());
         config.controler().setOutputDirectory("D:/runs-svn/barrierFreeTaxi/1500_run_"+i+"/");
         config.controler().setRunId("taxis_"+i);
+        DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
         TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
         taxi.setTaxisFile("hc_vehicles"+i+".xml.gz");
         createControler(config, false).run();
@@ -79,10 +79,7 @@ public class RunInclusionTaxiScenario
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new JbTaxiModule(fleet));
-        double expAveragingAlpha = 0.05;//from the AV flow paper 
-        controler.addOverridingModule(
-                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new AbstractModule() {
+        controler.addOverridingModule(new DvrpModule(fleet, new AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TaxiOptimizer.class).toProvider(JbTaxiOptimizerProvider.class).asEagerSingleton();

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.taxi.benchmark;
 
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dynagent.run.DynRoutingModule;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import com.google.inject.Inject;
+import com.google.inject.*;
 
-public class TaxiModule extends AbstractModule {
-	public static final String TAXI_MODE = "taxi";
-
+/**
+ * Behaves like DvrpModule except that VrpTravelTimeEstimator is not bound (install() is overridden)
+ * 
+ * @author michalm
+ *
+ */
+public class DvrpBenchmarkModule extends DvrpModule {
 	@Inject
-	private TaxiConfigGroup taxiCfg;
+	private DvrpConfigGroup dvrpCfg;
+
+	private final Fleet fleet;
+
+	@SafeVarargs
+	public DvrpBenchmarkModule(Fleet fleet, Module module, Class<? extends MobsimListener>... listeners) {
+		super(fleet, module, listeners);
+		this.fleet = fleet;
+	}
 
 	@Override
 	public void install() {
-		bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
-
-		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-		addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-			// add more time profiles if necessary
-		}
+		String mode = dvrpCfg.getMode();
+		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
+		bind(Fleet.class).toInstance(fleet);
+		install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
 	}
 }

@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.*;
@@ -59,9 +59,11 @@ public static void main(String[] args) {
 		}
 		String configfile = args[0];
 		
-		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new VariableAccessConfigGroup(), new TaxiFareConfigGroup());
+		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new DvrpConfigGroup(), new  VariableAccessConfigGroup(), new TaxiFareConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
+
 			
 	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
@@ -72,11 +74,8 @@ public static void main(String[] args) {
        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
        controler.addOverridingModule(new TaxiModule());
-       double expAveragingAlpha = 0.05;//from the AV flow paper 
 
-       controler.addOverridingModule(
-               VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-       controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+       controler.addOverridingModule(new DvrpModule(fleet, new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();

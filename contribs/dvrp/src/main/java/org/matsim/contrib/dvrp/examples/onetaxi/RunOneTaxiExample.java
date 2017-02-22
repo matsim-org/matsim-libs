@@ -32,9 +32,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunOneTaxiExample
 {
-    private static final String MODE = "taxi";
-    private static final String ONE_TAXI_GROUP_NAME = "one_taxi";
-    private static final String TAXIS_FILE = "taxisFile";
+    private static final String TAXIS_FILE = "./src/main/resources/one_taxi/one_taxi_vehicles.xml";
 
 
     public static void run(boolean otfvis, int lastIteration)
@@ -46,18 +44,17 @@ public class RunOneTaxiExample
 
     public static void run(String configFile, boolean otfvis, int lastIteration)
     {
-        ConfigGroup oneTaxiCfg = new ConfigGroup(ONE_TAXI_GROUP_NAME) {};
-        Config config = ConfigUtils.loadConfig(configFile, new OTFVisConfigGroup(), oneTaxiCfg);
+        Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new OTFVisConfigGroup());
         config.controler().setLastIteration(lastIteration);
-        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final FleetImpl fleet = new FleetImpl();
-        new VehicleReader(scenario.getNetwork(), fleet).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(TAXIS_FILE);
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new BasicDvrpModule(MODE, fleet, OneTaxiOptimizer.class,
+        controler.addOverridingModule(new DvrpModule(fleet, OneTaxiOptimizer.class,
                 OneTaxiRequestCreator.class, OneTaxiActionCreator.class));
 
         if (otfvis) {

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.av.flow;
 
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.vehicles.*;
 
-import com.google.inject.Inject;
+import com.google.inject.name.Names;
 
-public class TaxiModule extends AbstractModule {
-	public static final String TAXI_MODE = "taxi";
+public class AvIncreasedCapacityModule extends AbstractModule {
+	private final double flowEfficiencyFactor;
 
-	@Inject
-	private TaxiConfigGroup taxiCfg;
+	public AvIncreasedCapacityModule(double flowEfficiencyFactor) {
+		this.flowEfficiencyFactor = flowEfficiencyFactor;
+	}
 
 	@Override
 	public void install() {
-		bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
-
-		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-		addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-			// add more time profiles if necessary
-		}
+		VehicleType avType = new VehicleTypeImpl(Id.create("autonomousVehicleType", VehicleType.class));
+		avType.setFlowEfficiencyFactor(flowEfficiencyFactor);
+		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE)).toInstance(avType);
 	}
 }

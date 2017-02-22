@@ -24,7 +24,7 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
@@ -32,33 +32,27 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import com.google.inject.AbstractModule;
 
+public class RunShorterOneTaxiExample2 {
+	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/shorter_one_taxi_config.xml";
+	private static final String VEHICLES_FILE = "./src/main/resources/one_taxi/one_taxi_vehicles.xml";
 
-public class RunShorterOneTaxiExample2
-{
-    private static final String CONFIG_FILE = "./src/main/resources/one_taxi/shorter_one_taxi_config.xml";
-    private static final String VEHICLES_FILE = "./src/main/resources/one_taxi/one_taxi_vehicles.xml";
+	public static void main(String... args) {
+		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DvrpConfigGroup());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		final FleetImpl fleet = new FleetImpl();
+		new VehicleReader(scenario.getNetwork(), fleet).readFile(VEHICLES_FILE);
 
-    public static void main(String... args)
-    {
-        Config config = ConfigUtils.loadConfig(CONFIG_FILE);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new DvrpModule(fleet, new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
+				bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
+			}
+		}));
 
-        final FleetImpl fleet = new FleetImpl();
-        new VehicleReader(scenario.getNetwork(), fleet).readFile(VEHICLES_FILE);
-
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new DvrpModule("taxi", fleet, new AbstractModule() {
-            @Override
-            protected void configure()
-            {
-                bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
-                bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class)
-                        .asEagerSingleton();
-                bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
-            }
-        }));
-
-        controler.run();
-    }
+		controler.run();
+	}
 }

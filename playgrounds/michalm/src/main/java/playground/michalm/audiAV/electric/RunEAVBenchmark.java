@@ -42,53 +42,46 @@ import playground.michalm.taxi.optimizer.ETaxiOptimizerProvider;
 import playground.michalm.taxi.run.ETaxiBenchmarkStats;
 import playground.michalm.taxi.vrpagent.ETaxiActionCreator;
 
-
 /**
- * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel
- * times are deterministic. To simulate this property, we remove (1) all other traffic, and (2) link
- * capacity constraints (e.g. by increasing the capacities by 100+ times), as a result all vehicles
- * move with the free-flow speed (which is the effective speed).
+ * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
+ * deterministic. To simulate this property, we remove (1) all other traffic, and (2) link capacity constraints (e.g. by
+ * increasing the capacities by 100+ times), as a result all vehicles move with the free-flow speed (which is the
+ * effective speed).
  * <p>
  * </p>
- * To model the impact of traffic, we can use a time-variant network, where we specify different
- * free-flow speeds for each link over time. The default approach is to specify free-flow speeds in
- * each time interval (usually 15 minutes).
+ * To model the impact of traffic, we can use a time-variant network, where we specify different free-flow speeds for
+ * each link over time. The default approach is to specify free-flow speeds in each time interval (usually 15 minutes).
  */
-public class RunEAVBenchmark
-{
-    public static void run(String configFile, int runs)
-    {
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
-                new EvConfigGroup());
-        createControler(config, runs).run();
-    }
+public class RunEAVBenchmark {
+	public static void run(String configFile, int runs) {
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new EvConfigGroup());
+		createControler(config, runs).run();
+	}
 
+	public static Controler createControler(Config config, int runs) {
+		// TODO temp
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-    public static Controler createControler(Config config, int runs)
-    {
-        //TODO temp
-        config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-        
-        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-        EvConfigGroup evCfg = EvConfigGroup.get(config);
-        config.controler().setLastIteration(runs - 1);
-        config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
-        config.checkConsistency();
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		EvConfigGroup evCfg = EvConfigGroup.get(config);
+		config.controler().setLastIteration(runs - 1);
+		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
+		config.checkConsistency();
 
-        Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
-        
-        final FleetImpl fleet = new FleetImpl();
-        new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
-        EvData evData = new EvDataImpl();
-        new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
-        EAVUtils.initEvData(fleet, evData);
+		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
-        Controler controler = new Controler(scenario);
-        controler.setModules(new TaxiBenchmarkControlerModule());
-        controler.addOverridingModule(new TaxiModule());
-        controler.addOverridingModule(new EvModule(evData));
+		final FleetImpl fleet = new FleetImpl();
+		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+		EvData evData = new EvDataImpl();
+		new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
+		EAVUtils.initEvData(fleet, evData);
 
-        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+		Controler controler = new Controler(scenario);
+		controler.setModules(new DvrpBenchmarkControlerModule());
+		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new EvModule(evData));
+
+		controler.addOverridingModule(new DvrpBenchmarkModule(fleet, new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TaxiOptimizer.class).toProvider(ETaxiOptimizerProvider.class).asEagerSingleton();
@@ -98,24 +91,20 @@ public class RunEAVBenchmark
 			}
 		}, TaxiOptimizer.class));
 
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install()
-            {
-                addMobsimListenerBinding()
-                        .toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
-                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
-                addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
-            }
-        });
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
+				addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
+			}
+		});
 
-        return controler;
-    }
+		return controler;
+	}
 
-
-    public static void main(String[] args)
-    {
-        String cfg = "../../../runs-svn/avsim_time_variant_network/" + args[0];
-        run(cfg, 1);
-    }
+	public static void main(String[] args) {
+		String cfg = "../../../runs-svn/avsim_time_variant_network/" + args[0];
+		run(cfg, 1);
+	}
 }

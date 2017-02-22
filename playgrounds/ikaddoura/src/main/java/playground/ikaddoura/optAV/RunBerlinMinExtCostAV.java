@@ -27,8 +27,7 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
@@ -100,11 +99,14 @@ public class RunBerlinMinExtCostAV {
 		
 		Config config = ConfigUtils.loadConfig(configFile,
 				new TaxiConfigGroup(),
+				new DvrpConfigGroup(),
 				new TaxiFareConfigGroup(),
 				new OTFVisConfigGroup(),
 				new NoiseConfigGroup());
 		
 		config.controler().setOutputDirectory(outputDirectory);
+		
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
 		
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
@@ -157,8 +159,7 @@ public class RunBerlinMinExtCostAV {
 			}
 		});
 		controler.addOverridingModule(new TaxiModule());
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
-        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+        controler.addOverridingModule(new DvrpModule(fleet, new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
@@ -175,7 +176,7 @@ public class RunBerlinMinExtCostAV {
 			public void install() {
 												
 				// travel disutility factory for DVRP
-				addTravelDisutilityFactoryBinding(VrpTravelTimeModules.DVRP_ESTIMATED)
+				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
 						.toInstance(dvrpTravelDisutilityFactory);
 				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();

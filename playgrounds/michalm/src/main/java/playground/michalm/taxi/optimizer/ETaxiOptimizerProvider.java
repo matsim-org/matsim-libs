@@ -24,10 +24,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
+import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 
 import com.google.inject.*;
@@ -41,8 +42,8 @@ import playground.michalm.taxi.scheduler.ETaxiScheduler;
 public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	public static final String TYPE = "type";
 
-	public enum OptimizerType {
-		ASSIGNMENT, FIFO, RULE_BASED, ZONAL;
+	public enum EOptimizerType {
+		E_RULE_BASED, E_ASSIGNMENT;
 	}
 
 	private final TaxiConfigGroup taxiCfg;
@@ -51,6 +52,9 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelTime travelTime;
 	private final QSim qSim;
 	private final EvData evData;
+
+	@Inject(optional = true)
+	private @Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
 
 	@Inject
 	public ETaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Scenario scenario, Fleet fleet,
@@ -66,7 +70,10 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	@Override
 	public TaxiOptimizer get() {
 		TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(taxiCfg);
-		TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
+
+		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
+				: travelDisutilityFactory.createTravelDisutility(travelTime);
+
 		ETaxiScheduler scheduler = new ETaxiScheduler(scenario, fleet, qSim.getSimTimer(), schedulerParams, travelTime,
 				travelDisutility);
 
@@ -75,12 +82,12 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 		Configuration optimizerConfig = new MapConfiguration(taxiCfg.getOptimizerConfigGroup().getParams());
 
-		String type = optimizerConfig.getString("type");
+		EOptimizerType type = EOptimizerType.valueOf(optimizerConfig.getString(TYPE));
 		switch (type) {
-			case "E_RULE_BASED":
+			case E_RULE_BASED:
 				return new RuleBasedETaxiOptimizer(optimContext, new RuleBasedETaxiOptimizerParams(optimizerConfig));
 
-			case "E_ASSIGNMENT":
+			case E_ASSIGNMENT:
 				return new AssignmentETaxiOptimizer(optimContext, new AssignmentETaxiOptimizerParams(optimizerConfig));
 
 			default:

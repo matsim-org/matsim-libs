@@ -29,8 +29,7 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.noise.*;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
@@ -78,11 +77,14 @@ public class OptAVTestIT {
 		
 		Config config1 = ConfigUtils.loadConfig(configFile,
 				new TaxiConfigGroup(),
+				new DvrpConfigGroup(),
 				new OTFVisConfigGroup(),
 				new TaxiFareConfigGroup(),
 				new NoiseConfigGroup());
 		
 		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc");
+
+		DvrpConfigGroup.get(config1).setMode(TaxiModule.TAXI_MODE);
 
 		TaxiConfigGroup taxiCfg1 = TaxiConfigGroup.get(config1);
 		config1.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
@@ -103,8 +105,7 @@ public class OptAVTestIT {
 			}
 		});
 		controler1.addOverridingModule(new TaxiModule());
-		controler1.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
-        controler1.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+        controler1.addOverridingModule(new DvrpModule(fleet, new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
@@ -150,12 +151,15 @@ public class OptAVTestIT {
 
 		Config config2 = ConfigUtils.loadConfig(configFile,
 				new TaxiConfigGroup(),
+				new DvrpConfigGroup(),
 				new OTFVisConfigGroup(),
 				new TaxiFareConfigGroup(),
 				new NoiseConfigGroup());
 		
 		config2.controler().setOutputDirectory(testUtils.getOutputDirectory() + "n");
-		
+
+		DvrpConfigGroup.get(config2).setMode(TaxiModule.TAXI_MODE);
+
 		TaxiConfigGroup taxiCfg2 = TaxiConfigGroup.get(config2);
 		config2.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config2.checkConsistency();
@@ -176,8 +180,7 @@ public class OptAVTestIT {
 		});
 		
 		controler2.addOverridingModule(new TaxiModule());
-		controler2.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05)); // replace the travel time computation
-        controler2.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+        controler2.addOverridingModule(new DvrpModule(fleet, new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
@@ -196,7 +199,7 @@ public class OptAVTestIT {
 			public void install() {
 												
 				// travel disutility factory for DVRP
-				addTravelDisutilityFactoryBinding(VrpTravelTimeModules.DVRP_ESTIMATED)
+				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
 						.toInstance(dvrpTravelDisutilityFactory);
 				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();

@@ -36,7 +36,7 @@ public class PrtModule {
 		PrtTripRouterFactoryImpl factory = new PrtTripRouterFactoryImpl(vrpData, controler.getScenario(), ttime, tdis, prtData);
 		controler.setTripRouterFactory(factory);
 
-        controler.addOverridingModule(new DvrpModule(PrtRequestCreator.MODE, new AbstractModule() {
+        controler.addOverridingModule(new DvrpModule(null, new AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();

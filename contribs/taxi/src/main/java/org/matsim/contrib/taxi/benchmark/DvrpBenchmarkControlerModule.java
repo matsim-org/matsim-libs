@@ -22,7 +22,6 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
@@ -32,33 +31,26 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scoring.ExperiencedPlansModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 
-
-public class TaxiBenchmarkControlerModule
-    extends AbstractModule
-{
-    @Override
-    public void install()
-    {
-        install(new EventsManagerModule());
-        install(new DefaultMobsimModule());
-        //install(new TravelTimeCalculatorModule());
-        install(new TravelDisutilityModule());
-        install(new CharyparNagelScoringFunctionModule());
-        install(new ExperiencedPlansModule());
-        install(new TripRouterModule());
-        install(new StrategyManagerModule());
-        //install(new LinkStatsModule());
-        //install(new VolumesAnalyzerModule());
-        //install(new LegHistogramModule());
-        //install(new LegTimesModule());
-        //install(new TravelDistanceStatsModule());
-        //install(new ScoreStatsModule());
-        //install(new CountsModule());
-        //install(new PtCountsModule());
-        //install(new VspPlansCleanerModule());
-        //install(new SnapshotWritersModule());
-
-        //instead of TravelTimeCalculatorModule
-        install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
-    }
+public class DvrpBenchmarkControlerModule extends AbstractModule {
+	@Override
+	public void install() {
+		install(new EventsManagerModule());
+		install(new DefaultMobsimModule());
+		// install(new TravelTimeCalculatorModule());
+		install(new TravelDisutilityModule());
+		install(new CharyparNagelScoringFunctionModule());
+		install(new ExperiencedPlansModule());
+		install(new TripRouterModule());
+		install(new StrategyManagerModule());
+		// install(new LinkStatsModule());
+		// install(new VolumesAnalyzerModule());
+		// install(new LegHistogramModule());
+		// install(new LegTimesModule());
+		// install(new TravelDistanceStatsModule());
+		// install(new ScoreStatsModule());
+		// install(new CountsModule());
+		// install(new PtCountsModule());
+		// install(new VspPlansCleanerModule());
+		// install(new SnapshotWritersModule());
+	}
 }
