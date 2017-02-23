@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.*;
@@ -52,7 +52,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunRWPTComboExample {
 public static void main(String[] args) {
 	
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/config.xml", new TaxiConfigGroup());
+		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/config.xml", new TaxiConfigGroup(), new DvrpConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		walk.setDistance(1000);
@@ -80,6 +80,7 @@ public static void main(String[] args) {
 		config.transitRouter().setSearchRadius(3000);
 		config.transitRouter().setExtensionRadius(0);
 		
+		DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
 	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
@@ -88,8 +89,7 @@ public static void main(String[] args) {
        FleetImpl fleet = new FleetImpl();
        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
-       controler.addOverridingModule(new TaxiModule());
-       double expAveragingAlpha = 0.05;//from the AV flow paper 
+       controler.addOverridingModule(new TaxiOutputModule());
        
        controler.addOverridingModule(new AbstractModule() {
 		@Override
@@ -98,17 +98,7 @@ public static void main(String[] args) {
 		}
 	});
        
-       controler.addOverridingModule(
-               VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-       controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		}, TaxiOptimizer.class));
+       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
 //       controler.addOverridingModule(new OTFVisLiveModule());

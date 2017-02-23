@@ -22,6 +22,7 @@ package playground.ikaddoura.moneyTravelDisutility;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
@@ -30,10 +31,11 @@ import playground.ikaddoura.moneyTravelDisutility.data.LinkInfo;
 import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
 
 /**
- * 
- * TODO: Add a blendfactor?
- * TODO: Add MSA?
- * 
+* 
+* A travel disutility which adds a term for monetary payments to the disutility which is passed into the constructor.
+* The monetary payments are estimated based on time, link- and agent-specific {@link PersonLinkMoneyEvent}s in the previous iteration(s)
+* that are caught and analyzed by {@link MoneyEventAnalysis}.
+* 
 * @author ikaddoura
 */
 

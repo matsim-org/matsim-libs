@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -73,7 +74,6 @@ public class RunCombinedOsmReaderKibera {
 		
 	public static void createFacilites(String osmFile, String facilityFile, String attributeFile,
 			String outputCRS, double buildingTypeFromVicinityRange) {
-//		LogToOutputSaver.setOutputDirectory(outputBase);
 		LOG.info("Parsing land use from OpenStreetMap.");
 
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
@@ -92,10 +92,7 @@ public class RunCombinedOsmReaderKibera {
 	}
 	
 	
-	//-----------------------------------
-	public static void createFacilites(InputStream osmInputStream, String facilityFile, String attributeFile,
-			String outputCRS, double buildingTypeFromVicinityRange) {
-//		LogToOutputSaver.setOutputDirectory(outputBase);
+	public static ActivityFacilities createFacilites(InputStream osmInputStream, String outputCRS, double buildingTypeFromVicinityRange) {
 		LOG.info("Parsing land use from OpenStreetMap.");
 
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
@@ -103,16 +100,11 @@ public class RunCombinedOsmReaderKibera {
 				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
 				buildOsmTourismToMatsimTypeMap(), buildUnmannedEntitiesList(),
 				buildingTypeFromVicinityRange);
-		try {
 			combinedOsmReader.parseFile(osmInputStream);
-			combinedOsmReader.writeFacilities(facilityFile);
-			combinedOsmReader.writeFacilityAttributes(attributeFile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		LOG.info("Output will be wirtten to " + facilityFile);
+			ActivityFacilities facilities = combinedOsmReader.getActivityFacilities();
+
+			return facilities;
 	}
-	//-----------------------------------
 	
 	
 	private static Map<String, String> buildOsmLandUseToMatsimTypeMap(){

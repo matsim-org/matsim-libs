@@ -142,7 +142,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 			assertEquals(0, this.arp.getActivityEndingAgents(0.0).size());		// no agent ends an activity
 			
 			QSim sim = (QSim) e.getQueueSimulation();
-			for (MobsimAgent agent : sim.getAgents()) this.agents.put(agent.getId(), agent);
+			for (MobsimAgent agent : sim.getAgents().values()) this.agents.put(agent.getId(), agent);
 		}
 
 		@Override

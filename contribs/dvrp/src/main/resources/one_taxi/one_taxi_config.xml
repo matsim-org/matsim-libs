@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
-	<module name="one_taxi">
-		<param name="taxisFile" value="src/main/resources/one_taxi/one_taxi_vehicles.xml" />
+	<module name="dvrp">
+		<param name="mode" value="taxi" />
 	</module>
 
 	<module name="network">

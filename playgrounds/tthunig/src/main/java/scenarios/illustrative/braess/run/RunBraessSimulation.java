@@ -402,7 +402,7 @@ public final class RunBraessSimulation {
 			decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 			decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
 			decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
+			final DecongestionInfo info = new DecongestionInfo(decongestionSettings);
 			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
 			controler = decongestion.getControler();
 			

@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.inject.Inject;
+
 /**
  * 
  * Computes the total delay and travel time.
@@ -46,6 +48,8 @@ public class DelayAnalysis implements LinkEnterEventHandler, LinkLeaveEventHandl
 	private static final Logger log = Logger.getLogger(DelayAnalysis.class);
 
 	private Map<Id<Vehicle>, Double> vehicleId2enterTime = new HashMap<>();
+	
+	@Inject
 	private Scenario scenario;
 	
 	// some aggregated numbers for analysis purposes
@@ -53,7 +57,7 @@ public class DelayAnalysis implements LinkEnterEventHandler, LinkLeaveEventHandl
 	private double totalTravelTimePerDay_sec = 0.;
 	private int warnCnt = 0;
 
-	public DelayAnalysis(Scenario scenario) {
+	public void setScenario(Scenario scenario) {
 		this.scenario = scenario;
 	}
 

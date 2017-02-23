@@ -46,7 +46,12 @@ public class AgentSpecificOpeningIntervalCalculator implements OpeningIntervalCa
 		int activityCounter = this.actCounter.getActivityCounter(person.getId());
 		
 		// get the original start/end times from survey / initial demand which is written in the person attributes
-		String activityOpeningIntervals = (String) person.getAttributes().getAttribute("OpeningClosingTimes");	
+		String activityOpeningIntervals = (String) person.getAttributes().getAttribute("OpeningClosingTimes");
+		
+		if (activityOpeningIntervals == null || activityOpeningIntervals == "") {
+			throw new RuntimeException("Person " + person.getId().toString() + " doesn't have any opening / closing times in the person attributes. Aborting...");
+		}
+		
 		String activityOpeningTimes[] = activityOpeningIntervals.split(";");
 	
 		double openingTime = Double.valueOf(activityOpeningTimes[activityCounter * 2]) - tolerance;

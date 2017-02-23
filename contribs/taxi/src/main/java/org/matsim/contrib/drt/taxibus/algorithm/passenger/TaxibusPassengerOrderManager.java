@@ -62,10 +62,10 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 		if (event.getActType().startsWith("pt"))
 			return;
 		Id<MobsimAgent> mid = Id.create(event.getPersonId(), MobsimAgent.class);
-		if (qSim.getAgentMap().containsKey(mid))
+		if (qSim.getAgents().containsKey(mid))
 		// to filter out drivers without an agent plan
 		{
-			MobsimAgent mobsimAgent = qSim.getAgentMap().get(mid);
+			MobsimAgent mobsimAgent = qSim.getAgents().get(mid);
 			if (mobsimAgent instanceof PlanAgent) {
 				if (mobsimAgent.getState().equals(State.LEG))
 					return;
@@ -98,7 +98,7 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
 
 		this.qSim = (QSim) e.getQueueSimulation();
-		Collection<MobsimAgent> agents = qSim.getAgents();
+		Collection<MobsimAgent> agents = qSim.getAgents().values();
 
 		for (MobsimAgent mobsimAgent : agents) {
 			if (mobsimAgent instanceof PlanAgent) {

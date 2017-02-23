@@ -65,9 +65,13 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2driverIdToBeCharged = new HashMap<>();
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
 	
-	private static int warnCounter2 = 0;
-	private static int warnCounter3 = 0;
-	private static int warnCounter4 = 0;
+	private final boolean tollMSA = true;
+	
+	private int warnCounter2 = 0;
+	private int warnCounter3 = 0;
+	private int warnCounter4 = 0;
+	
+	private int tollUpdateCounter = 0;
 
 	@Override
 	public void reset(int iteration) {
@@ -190,30 +194,59 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		log.info("+++++ Iteration ends. Processing the data in the previous iteration...");
+		log.info("+++++ Iteration ends. Processing the data...");
 		
 		for (LinkInfo linkInfo : this.linkId2info.values()) {
 			
 			for (TimeBin timeBin : linkInfo.getTimeBinNr2timeBin().values()) {
 			
-				// resetting averages from previous iteration
+				// storing the average from the previous iteration
+				final double averageAmountPreviousIteration = timeBin.getAverageAmount();
+				
+				// resetting average from previous iteration
 				timeBin.setAverageAmount(0.);
-				timeBin.getAgentTypeId2avgAmount().clear();
 				
-				// compute averages for the current iteration
-				
-				// average amount
+				// compute average for the current iteration				
 				double averageAmount = computeAverageAmount(timeBin);
-				timeBin.setAverageAmount(averageAmount);
+				
+				double smoothenedAverageAmount;
+				if (tollMSA) {
+					// smoothening the average amount
+					if (tollUpdateCounter > 0) {
+						double blendFactor = 1.0 / (double) this.tollUpdateCounter;
+						smoothenedAverageAmount = averageAmount * blendFactor + averageAmountPreviousIteration * (1 - blendFactor);
+					} else {
+						smoothenedAverageAmount = averageAmount;
+					}
+				} else {
+					smoothenedAverageAmount = averageAmount;
+				}
+				
+				// set smoothened average
+				timeBin.setAverageAmount(smoothenedAverageAmount);
 				
 				// average amount per agent type
-				if (this.agentFilter != null) computeAverageAmountPerAgentType(timeBin);
+				if (this.agentFilter != null) {
+					
+					// storing the average from the previous iteration
+					final Map<String, Double> agentTypeId2avgAmountPreviousIteration = new HashMap<>();
+					for (String agentType : timeBin.getAgentTypeId2avgAmount().keySet()) {
+						agentTypeId2avgAmountPreviousIteration.put(agentType, timeBin.getAgentTypeId2avgAmount().get(agentType));
+					}
+					
+					// resetting averages from previous iteration
+					timeBin.getAgentTypeId2avgAmount().clear();
+					
+					// compute averages for the current iteration and set smoothened averages
+					computeAverageAmountPerAgentType(timeBin, agentTypeId2avgAmountPreviousIteration);
+				}
 			}
 		}
-		log.info("+++++ Iteration ends. Processing the data in the previous iteration... Done.");
+		log.info("+++++ Iteration ends. Processing the data... Done.");
+		tollUpdateCounter++;
 	}
 
-	private void computeAverageAmountPerAgentType(TimeBin timeBin) {
+	private void computeAverageAmountPerAgentType(TimeBin timeBin, Map<String, Double> agentTypeId2avgAmountPreviousIteration) {
 		final Map<String, Double> agentTypeIdPrefix2AmountSum = new HashMap<>();
 		final Map<String, Integer> agentTypeIdPrefix2Counter = new HashMap<>();
 				
@@ -265,7 +298,28 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 				double counter = agentTypeIdPrefix2Counter.get(agentType);
 				double averageAmount = amountSum / counter;
 				
-				if (averageAmount != 0.) timeBin.getAgentTypeId2avgAmount().put(agentType, averageAmount);
+				double smoothenedAmount;
+				if (tollMSA) {
+					// smoothening the average amount
+					if (tollUpdateCounter > 0) {
+						double blendFactor = 1.0 / (double) this.tollUpdateCounter;
+						
+						double avgAmountPreviousIteration = 0.;
+						if (agentTypeId2avgAmountPreviousIteration.get(agentType) != null) {
+							avgAmountPreviousIteration = agentTypeId2avgAmountPreviousIteration.get(agentType);
+						}
+						
+						smoothenedAmount = averageAmount * blendFactor + avgAmountPreviousIteration * (1 - blendFactor);
+					} else {
+						smoothenedAmount = averageAmount;
+					}
+				} else {
+					smoothenedAmount = averageAmount;
+				}
+
+				smoothenedAmount = averageAmount;
+				
+				if (smoothenedAmount != 0.) timeBin.getAgentTypeId2avgAmount().put(agentType, smoothenedAmount);
 			}
 		}
 	}

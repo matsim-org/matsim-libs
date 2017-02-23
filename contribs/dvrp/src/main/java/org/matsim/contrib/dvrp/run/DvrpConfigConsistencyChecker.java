@@ -24,10 +24,10 @@ import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 
 
-public class VrpQSimConfigConsistencyChecker
+public class DvrpConfigConsistencyChecker
     extends DynQSimConfigConsistencyChecker
 {
-    private static final Logger log = Logger.getLogger(VrpQSimConfigConsistencyChecker.class);
+    private static final Logger log = Logger.getLogger(DvrpConfigConsistencyChecker.class);
 
 
     @Override
@@ -48,6 +48,12 @@ public class VrpQSimConfigConsistencyChecker
 
         if (config.qsim().isRemoveStuckVehicles()) {
             throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
+        }
+        
+        DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
+        double alpha = dvrpCfg.getTravelTimeEstimationAlpha();
+        if (alpha > 1 || alpha <= 0) {
+        	throw new RuntimeException("travelTimeEstimationAlpha must be in (0,1]");
         }
     }
 }

@@ -87,7 +87,6 @@ public class CreateNetwork {
 		boolean includeLowHierarchyWays = true;
 		boolean onlyBiggerRoads = false; // "thinner" network; do not use this together with "includeLowHierarchyWays"
 		LOG.info("Settings: includeLowHierarchyWays = " + includeLowHierarchyWays + "; keepPaths = " + keepPaths);
-
 		
 		// Infrastructure
 		Config config = ConfigUtils.createConfig();
@@ -101,7 +100,6 @@ public class CreateNetwork {
 			osmNetworkReader = new OsmNetworkReader(network, coordinateTransformation, true);
 		}
 		NetworkWriter networkWriter = new NetworkWriter(network);
-
 		
 		// Keeping the path means that links are not straightened between intersection nodes, but that also pure geometry-describing
 		// nodes are kept. This makes the file (for the Nairobi case) three times as big (22.4MB vs. 8.7MB)
@@ -109,8 +107,7 @@ public class CreateNetwork {
 			LOG.info("Detailed geometry of paths is kept.");
 			osmNetworkReader.setKeepPaths(true);
 		}
-		
-		
+				
 		// This block is for the low hierarchy roads
 		if (includeLowHierarchyWays == true) {
 			LOG.info("Low hierarchy ways are included.");
@@ -134,8 +131,7 @@ public class CreateNetwork {
 			osmNetworkReader.setHighwayDefaults(7, "steps", 1, 15/3.6, 1.0, 0);
 			osmNetworkReader.setHighwayDefaults(7, "path", 1, 15/3.6, 1.0, 0);
 		}		
-		
-		
+				
 		// This block is to use only bigger roads
 		// This makes the file (for the Maryland case) only a 14th as big (77.8MB vs. 1.04GB)
 		if (onlyBiggerRoads == true) {
@@ -163,29 +159,23 @@ public class CreateNetwork {
 	}
 	
 	
-	public static void createNetwork(InputStream osmInputStream, String networkFile, String inputCRS, String outputCRS) {
-//		LogToOutputSaver.setOutputDirectory(outputBase);
-		LOG.info("Input CRS is " + inputCRS + "; output CRS is " + outputCRS);
-		
+	public static Network createNetwork(InputStream osmInputStream, String outputCRS) {		
 		boolean keepPaths = true;
 		boolean includeLowHierarchyWays = true;
 		boolean onlyBiggerRoads = false; // "thinner" network; do not use this together with "includeLowHierarchyWays"
 		LOG.info("Settings: includeLowHierarchyWays = " + includeLowHierarchyWays + "; keepPaths = " + keepPaths);
-
 		
 		// Infrastructure
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:4326", outputCRS);
 		OsmNetworkReader osmNetworkReader = null;
 		if (onlyBiggerRoads == true) {
 			osmNetworkReader = new OsmNetworkReader(network, coordinateTransformation, false);
 		} else {
 			osmNetworkReader = new OsmNetworkReader(network, coordinateTransformation, true);
 		}
-		NetworkWriter networkWriter = new NetworkWriter(network);
-
 		
 		// Keeping the path means that links are not straightened between intersection nodes, but that also pure geometry-describing
 		// nodes are kept. This makes the file (for the Nairobi case) three times as big (22.4MB vs. 8.7MB)
@@ -193,8 +183,7 @@ public class CreateNetwork {
 			LOG.info("Detailed geometry of paths is kept.");
 			osmNetworkReader.setKeepPaths(true);
 		}
-		
-		
+				
 		// This block is for the low hierarchy roads
 		if (includeLowHierarchyWays == true) {
 			LOG.info("Low hierarchy ways are included.");
@@ -218,8 +207,7 @@ public class CreateNetwork {
 			osmNetworkReader.setHighwayDefaults(7, "steps", 1, 15/3.6, 1.0, 0);
 			osmNetworkReader.setHighwayDefaults(7, "path", 1, 15/3.6, 1.0, 0);
 		}		
-		
-		
+				
 		// This block is to use only bigger roads
 		// This makes the file (for the Maryland case) only a 14th as big (77.8MB vs. 1.04GB)
 		if (onlyBiggerRoads == true) {
@@ -242,7 +230,6 @@ public class CreateNetwork {
 
 		osmNetworkReader.parse(osmInputStream); 
 		new NetworkCleaner().run(network);
-		networkWriter.write(networkFile);
-		LOG.info("Network file written to " + networkFile);
+		return network;
 	}
 }

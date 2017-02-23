@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.daily.betaTravelTest;
+package org.matsim.integration.betaTravelTest;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,7 +84,7 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class BetaTravelTest extends MatsimTestCase {
+public class BetaTravelTestIT extends MatsimTestCase {
 
 	/* This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
@@ -122,8 +122,8 @@ public class BetaTravelTest extends MatsimTestCase {
 	 *  @author mrieser
 	 */
 	public void testBetaTravel_6() {
-		Config config = loadConfig("../../examples/scenarios/equil/config.xml");
-		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
+		Config config = loadConfig("../examples/scenarios/equil/config.xml"); // default config
+		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml"); // specific setting for this test
 		config.controler().setWritePlansInterval(0);	
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		/*
@@ -153,7 +153,7 @@ public class BetaTravelTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testBetaTravel_66() {
-		Config config = loadConfig("../../examples/scenarios/equil/config.xml");
+		Config config = loadConfig("../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);
 		// ---
@@ -395,22 +395,41 @@ public class BetaTravelTest extends MatsimTestCase {
 				 */
 				if (beta_travel == -6.0) {
 					System.out.println("checking results for case `beta_travel = -6'...");
-					assertEquals(18710.0, this.la.firstCarEnter, 0.0);
+					System.out.println("firstCarEnter=" + this.la.firstCarEnter + "; lastCarEnter=" + this.la.lastCarEnter + "; firstCarLeave=" + this.la.firstCarLeave +
+							"; lastCarLeave=" + this.la.lastCarLeave + "; maxCarsOnLink=" + this.la.maxCarsOnLink + "; maxCarsOnLinkTime=" + this.la.maxCarsOnLinkTime ) ;
+					assertEquals(18534.0, this.la.firstCarEnter, 0.0);
 					assertEquals(21961.0, this.la.lastCarEnter, 0.0);
-					assertEquals(18890.0, this.la.firstCarLeave, 0.0);
+					assertEquals(18714.0, this.la.firstCarLeave, 0.0);
 					assertEquals(22141.0, this.la.lastCarLeave, 0.0);
-					assertEquals(59, this.la.maxCarsOnLink);
-					assertEquals(19589.0, this.la.maxCarsOnLinkTime, 0.0);
+					assertEquals(54, this.la.maxCarsOnLink);
+					assertEquals(19563.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
+					
+					// The results changed after Michał's change of the QueueWithBuffer slow capacity update.  See 4dda004a8db98d9a2e757b1896cd3250d4e84ba5 .
+					// The old results were (only where we had changes):
+//					assertEquals(18710.0, this.la.firstCarEnter, 0.0);
+//					assertEquals(18890.0, this.la.firstCarLeave, 0.0);
+//					assertEquals(59, this.la.maxCarsOnLink);
+//					assertEquals(19589.0, this.la.maxCarsOnLinkTime, 0.0);
+					
 				} else if (beta_travel == -66.0) {
 					System.out.println("checking results for case `beta_travel = -66'...");
-					assertEquals(13590.0, this.la.firstCarEnter, 0.0);
+					System.out.println("firstCarEnter=" + this.la.firstCarEnter + "; lastCarEnter=" + this.la.lastCarEnter + "; firstCarLeave=" + this.la.firstCarLeave +
+							"; lastCarLeave=" + this.la.lastCarLeave + "; maxCarsOnLink=" + this.la.maxCarsOnLink + "; maxCarsOnLinkTime=" + this.la.maxCarsOnLinkTime ) ;
+					assertEquals(14895.0, this.la.firstCarEnter, 0.0);
 					assertEquals(21961.0, this.la.lastCarEnter, 0.0);
-					assertEquals(13770.0, this.la.firstCarLeave, 0.0);
+					assertEquals(15075.0, this.la.firstCarLeave, 0.0);
 					assertEquals(22141.0, this.la.lastCarLeave, 0.0);
-					assertEquals(8, this.la.maxCarsOnLink);
-					assertEquals(15904.0, this.la.maxCarsOnLinkTime, 0.0);
+					assertEquals(9, this.la.maxCarsOnLink);
+					assertEquals(18415.0, this.la.maxCarsOnLinkTime, 0.0);
 					System.out.println("all checks passed!");
+
+					// The results changed after Michał's change of the QueueWithBuffer slow capacity update.  See 4dda004a8db98d9a2e757b1896cd3250d4e84ba5 .
+					// The old results were (only where we had changes):
+//					assertEquals(13590.0, this.la.firstCarEnter, 0.0);
+//					assertEquals(13770.0, this.la.firstCarLeave, 0.0);
+//					assertEquals(8, this.la.maxCarsOnLink);
+//					assertEquals(15904.0, this.la.maxCarsOnLinkTime, 0.0);
 				}
 				/* *************************************************************** */
 			}

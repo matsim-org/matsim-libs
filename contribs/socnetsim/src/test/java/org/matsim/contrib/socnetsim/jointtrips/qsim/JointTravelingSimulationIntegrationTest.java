@@ -278,7 +278,7 @@ public class JointTravelingSimulationIntegrationTest {
 	}
 
 	private static void logFinalQSimState(final QSim qsim) {
-		for ( MobsimAgent agent : qsim.getAgents() ) {
+		for ( MobsimAgent agent : qsim.getAgents().values() ) {
 			log.info( "agent state at end: "+agent );
 		}
 	}

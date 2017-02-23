@@ -25,7 +25,7 @@ import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -58,8 +58,8 @@ public class RunRobotaxiExample {
 	}
 
 	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new OTFVisConfigGroup(),
-				new TaxiFareConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
+				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
 		createControler(config, otfvis).run();
 	}
 
@@ -79,20 +79,9 @@ public class RunRobotaxiExample {
 				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
 			}
 		});
-		controler.addOverridingModule(new TaxiModule());
-        double expAveragingAlpha = 0.05;//from the AV flow paper 
-        controler.addOverridingModule(
-                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
+		controler.addOverridingModule(new TaxiOutputModule());
 
-        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(DefaultTaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-			}
-		}, TaxiOptimizer.class));
+        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

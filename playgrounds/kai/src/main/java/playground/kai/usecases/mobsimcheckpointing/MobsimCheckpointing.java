@@ -64,7 +64,7 @@ public class MobsimCheckpointing {
 					ll.getAllVehicles() ;
 				}
 
-				for ( MobsimAgent ag : qsim.getAgents() ) {
+				for ( MobsimAgent ag : qsim.getAgents().values() ) {
 					switch( ag.getState() ) {
 					case ABORT:
 						// can this happen at all?

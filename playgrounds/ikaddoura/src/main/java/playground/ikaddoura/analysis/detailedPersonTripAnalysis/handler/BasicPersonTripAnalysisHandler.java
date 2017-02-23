@@ -52,7 +52,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -83,8 +83,12 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	// analysis information to be stored
 	private final Map<Id<Person>,Map<Integer,String>> personId2tripNumber2legMode = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2departureTime = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2enterVehicleTime = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2arrivalTime = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2leaveVehicleTime = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2travelTime = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2waitingTime = new HashMap<>();
+	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2inVehicleTime = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2tripDistance = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2payment = new HashMap<>();
 	private final Map<Id<Person>,Map<Integer,Boolean>> personId2tripNumber2stuckAbort = new HashMap<>();
@@ -110,9 +114,13 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		personId2tripNumber2payment.clear();
 		personId2tripNumber2stuckAbort.clear();
 		personId2tripNumber2legMode.clear();
+		personId2tripNumber2enterVehicleTime.clear();
+		personId2tripNumber2leaveVehicleTime.clear();
+		personId2tripNumber2inVehicleTime.clear();
+		personId2tripNumber2waitingTime.clear();
 		ptVehicleId2totalDistance.clear();
 		personId2totalpayments.clear();
-		this.totalPayments = 0.;
+		totalPayments = 0.;
 		personId2distanceEnterValue.clear();
 		ptDrivers.clear();
 		ptVehicles.clear();
@@ -297,6 +305,30 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			
 		} else {
 			int tripNumber = personId2currentTripNumber.get(event.getPersonId());
+			
+			// leave vehicle time
+			
+			Map<Integer, Double> tripNr2leaveTime = null;
+			if (this.personId2tripNumber2leaveVehicleTime.containsKey(event.getPersonId())) {
+				tripNr2leaveTime = this.personId2tripNumber2leaveVehicleTime.get(event.getPersonId());
+			} else {
+				tripNr2leaveTime = new HashMap<>();
+			}
+			tripNr2leaveTime.put(tripNumber, event.getTime());
+			this.personId2tripNumber2leaveVehicleTime.put(event.getPersonId(), tripNr2leaveTime);
+			
+			Map<Integer, Double> tripNr2inVehTime = null;
+			if (this.personId2tripNumber2inVehicleTime.containsKey(event.getPersonId())) {
+				tripNr2inVehTime = this.personId2tripNumber2inVehicleTime.get(event.getPersonId());
+			} else {
+				tripNr2inVehTime = new HashMap<>();
+			}
+			double inVehTime = event.getTime() - this.personId2tripNumber2enterVehicleTime.get(event.getPersonId()).get(tripNumber);
+			tripNr2inVehTime.put(tripNumber, inVehTime);
+			this.personId2tripNumber2inVehicleTime.put(event.getPersonId(), tripNr2inVehTime);
+			
+			// distance
+			
 			Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
 			
 			double distanceTravelled = 0.;
@@ -304,7 +336,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			if (tripNumber2legMode.get(tripNumber).equals(TransportMode.pt)) {
 				distanceTravelled = (ptVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
 			
-			} else if (tripNumber2legMode.get(tripNumber).equals(TaxiModule.TAXI_MODE)) {
+			} else if (tripNumber2legMode.get(tripNumber).equals(TaxiOptimizerModules.TAXI_MODE)) {
 				distanceTravelled = (taxiVehicleId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
 
 			} else if (tripNumber2legMode.get(tripNumber).equals(TransportMode.car)) {
@@ -347,17 +379,42 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			}
 		}
 		
+		// ###################################################
+		
 		if (ptDrivers.contains(event.getPersonId()) || taxiDrivers.contains(event.getPersonId())) {
 			// no normal person
 		} else {
 			
 			int tripNumber = personId2currentTripNumber.get(event.getPersonId());
+
+			// entering time
+			Map<Integer, Double> tripNr2enterTime = null;
+			if (this.personId2tripNumber2enterVehicleTime.containsKey(event.getPersonId())) {
+				tripNr2enterTime = this.personId2tripNumber2enterVehicleTime.get(event.getPersonId());
+			} else {
+				tripNr2enterTime = new HashMap<>();
+			}
+			tripNr2enterTime.put(tripNumber, event.getTime());
+			this.personId2tripNumber2enterVehicleTime.put(event.getPersonId(), tripNr2enterTime);			
+			
+			Map<Integer, Double> tripNr2waitingTime = null;
+			if (this.personId2tripNumber2waitingTime.containsKey(event.getPersonId())) {
+				tripNr2waitingTime = this.personId2tripNumber2waitingTime.get(event.getPersonId());
+			} else {
+				tripNr2waitingTime = new HashMap<>();
+			}
+			double waitingTime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(tripNumber);
+			tripNr2waitingTime.put(tripNumber, waitingTime);
+			this.personId2tripNumber2waitingTime.put(event.getPersonId(), tripNr2waitingTime);
+			
+			// distance
+			
 			Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
 			
 			if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.pt)){
 				personId2distanceEnterValue.put(event.getPersonId(), ptVehicleId2totalDistance.get(event.getVehicleId()));
 			
-			} else if ((tripNumber2legMode.get(tripNumber)).equals(TaxiModule.TAXI_MODE)){
+			} else if ((tripNumber2legMode.get(tripNumber)).equals(TaxiOptimizerModules.TAXI_MODE)){
 				personId2distanceEnterValue.put(event.getPersonId(), taxiVehicleId2totalDistance.get(event.getVehicleId()));
 
 			} else if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
@@ -379,7 +436,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());
 			
 			// travel time
-			
 			Map<Integer, Double> tripNumber2travelTime;
 			if (this.personId2tripNumber2travelTime.containsKey(event.getPersonId())) {
 				tripNumber2travelTime = this.personId2tripNumber2travelTime.get(event.getPersonId());
@@ -387,12 +443,10 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			} else {
 				tripNumber2travelTime = new HashMap<Integer, Double>();
 			}
-			
 			tripNumber2travelTime.put(currentTripNumber, event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber));
 			this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
 			
 			 // arrival time
-			
 			Map<Integer, Double> tripNumber2arrivalTime;
 			if (this.personId2tripNumber2arrivalTime.containsKey(event.getPersonId())) {
 				tripNumber2arrivalTime = this.personId2tripNumber2arrivalTime.get(event.getPersonId());
@@ -400,7 +454,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			} else {
 				tripNumber2arrivalTime = new HashMap<Integer, Double>();
 			}
-			
 			tripNumber2arrivalTime.put(currentTripNumber, event.getTime());
 			personId2tripNumber2arrivalTime.put(event.getPersonId(), tripNumber2arrivalTime);
 		}
@@ -517,6 +570,22 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 	public Scenario getScenario() {
 		return scenario;
+	}
+
+	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2enterVehicleTime() {
+		return personId2tripNumber2enterVehicleTime;
+	}
+
+	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2leaveVehicleTime() {
+		return personId2tripNumber2leaveVehicleTime;
+	}
+
+	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2waitingTime() {
+		return personId2tripNumber2waitingTime;
+	}
+
+	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2inVehicleTime() {
+		return personId2tripNumber2inVehicleTime;
 	}
 	
 }

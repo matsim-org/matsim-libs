@@ -53,7 +53,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 public class InitialPlansConsistencyCheck {
-	public static final Logger LOG = Logger.getLogger(InitialPlansConsistencyCheck.class);
+	private static final Logger LOG = Logger.getLogger(InitialPlansConsistencyCheck.class);
 	private final Scenario sc;
 	private final Map<Person, List<String>> person2ActivityType = new HashMap<>();
 	private final Map<Person, List<String>> person2Legs = new HashMap<>();
@@ -64,9 +64,9 @@ public class InitialPlansConsistencyCheck {
 	private final String configFile ;
 	private final String outputDir;
 
-	public InitialPlansConsistencyCheck(String initialPlans, String outputFile, String configFile) {
+	public InitialPlansConsistencyCheck(String initialPlans, String outputDir, String configFile) {
 		this.configFile = configFile;
-		this.outputDir = outputFile;
+		this.outputDir = outputDir;
 		this.sc = LoadMyScenarios.loadScenarioFromPlans(initialPlans);
 	}
 
