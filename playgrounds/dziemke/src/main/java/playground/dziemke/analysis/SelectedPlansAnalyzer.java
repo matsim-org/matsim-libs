@@ -23,10 +23,9 @@ import java.util.Map;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-//	private static final  String runId = "run_194b"; // <----------
-	private static final  String runId = "be_102"; // <----------
-	private static final  int numberOfIterations = 150; // <----------
-	private static final  int plansFileInterval = 150; // <----------
+	private static final  String runId = "be_110"; // <----------
+	private static final  int numberOfIterations = 300; // <----------
+	private static final  int plansFileInterval = 300; // <----------
 	private static final  boolean useInterimPlans = false;
 	private static final  boolean useOutputPlans = true;
 	
