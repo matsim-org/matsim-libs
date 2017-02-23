@@ -21,6 +21,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.ConstantSpeedAccessibilityExpContributionCalculator;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -114,74 +115,16 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		Controler ctrl = new Controler(scenario);
 		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
-
-		//pt not used in this test
-		final PtMatrix ptMatrix = null;
-
-
 		{
-			//create a bounding box with 9 measuring points (one for each node)
-			double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
-			final double minX = boundary[0]-resolution/2;
-			final double minY = boundary[1]-resolution/2;
-			final double maxX = boundary[2]+resolution/2;
-			final double maxY = boundary[3]+resolution/2;
 
 			//initialize opportunities for accessibility computation
 			final ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-			opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
+			opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord(200, 100));
+			
+			AccessibilityModule module = new AccessibilityModule() ;
+			module.addSpatialGridDataExchangeListener(this);
+			ctrl.addOverridingModule(module);
 
-			ctrl.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-						@Inject Map<String, TravelTime> travelTimes;
-						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-						@Inject Network network ;
-
-						@Override
-						public ControlerListener get() {
-							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
-							ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution) ;
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-							AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
-							for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
-								AccessibilityContributionCalculator calc = null ;
-								switch( mode ) {
-								case bike:
-									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
-									break;
-								case car: {
-									final TravelTime travelTime = travelTimes.get(mode.name());
-									Gbl.assertNotNull(travelTime);
-									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-									calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
-									break; }
-								case freespeed: {
-									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
-									Gbl.assertNotNull(travelDisutilityFactory);
-									calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
-									break; }
-								case pt:
-									throw new RuntimeException("currently not implemented") ;
-								case walk:
-									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
-									break;
-								default:
-									throw new RuntimeException("not implemented") ;
-								}
-								accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
-							}
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, minX, minY, maxX, maxY, resolution);
-
-							//add grid data exchange listener to get accessibilities
-							listener.addSpatialGridDataExchangeListener(AccessibilityTest.this);
-							return listener;
-						}
-					});
-
-				}
-			});
 		}
 		ctrl.run();
 
@@ -243,7 +186,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 
 		//initialize opportunities for accessibility computation
 		final ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
+		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord(200, 100));
 
 		final ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
 		final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints) ;
@@ -276,8 +219,6 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 								Gbl.assertNotNull(travelDisutilityFactory);
 								calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
 								break; }
-							case pt:
-								throw new RuntimeException("currently not implemented") ;
 							case walk:
 								calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 								break;
@@ -323,7 +264,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 			accessibilities = new double[9][4];
 
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			if ( mode != Modes4Accessibility.pt ) {
+			if ( mode != Modes4Accessibility.pt && mode != Modes4Accessibility.matrixBasedPt ) {
 				final SpatialGrid spatialGrid = spatialGrids.get(mode);
 				if ( spatialGrid != null ) {
 					getAccessibilities( spatialGrid, mode.ordinal() ) ;
@@ -356,11 +297,11 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		}
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
-		if(measurePoint.getCoord().equals(new Coord((double) 100, (double) 0))){
+		if(measurePoint.getCoord().equals(new Coord(100, 0))){
 			log.warn("accepting as HZ");
 			accessibilitiesHomeZone = accessibilities1 ;
 		}
-		if(measurePoint.getCoord().equals(new Coord((double) 200, (double) 100))){
+		if(measurePoint.getCoord().equals(new Coord(200, 100))){
 			log.warn("accepting as WZ");
 			accessibilitiesWorkZone = accessibilities1 ;
 		}
