@@ -1,4 +1,4 @@
-package playground.clruch.dispatcher.utils;
+package playground.clruch.utils;
 
 import java.util.Arrays;
 

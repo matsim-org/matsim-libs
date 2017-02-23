@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.HungarianAlgorithm;
 
 import java.util.*;
 
