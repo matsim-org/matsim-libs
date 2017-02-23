@@ -42,7 +42,8 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
     private Double private_now = null;
-    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
+    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = // 
+            Collections.synchronizedMap(new LinkedHashMap<>());
     private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
 
     protected VehicleMaintainer(EventsManager eventsManager) {
