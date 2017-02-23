@@ -79,8 +79,10 @@ public class RunBerlinMinExtCostAV {
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/minExtCostAV/";
+			kP = 2 * 12./3600.;
+			internalizeNoise = false;
 			otfvis = false;
 		}
 		
@@ -129,7 +131,7 @@ public class RunBerlinMinExtCostAV {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-		decongestionSettings.setKp(2 * 12./3600.);
+		decongestionSettings.setKp(kP);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setMsa(true);

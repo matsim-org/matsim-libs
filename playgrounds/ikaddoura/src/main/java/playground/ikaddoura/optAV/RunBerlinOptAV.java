@@ -83,9 +83,9 @@ public class RunBerlinOptAV {
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
-			otfvis = false;
-			internalizeNoise = false;
 			kP = 2 * 12./3600.;
+			internalizeNoise = false;
+			otfvis = false;
 		}
 		
 		RunBerlinOptAV runBerlinOptAV = new RunBerlinOptAV();

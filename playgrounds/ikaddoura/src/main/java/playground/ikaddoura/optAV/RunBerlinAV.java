@@ -72,7 +72,7 @@ public class RunBerlinAV {
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_berlinArea_av-trip-share-0.1_av-20000/";
-			analyzeNoise = false;
+			analyzeNoise = true;
 			otfvis = false;
 		}
 		
