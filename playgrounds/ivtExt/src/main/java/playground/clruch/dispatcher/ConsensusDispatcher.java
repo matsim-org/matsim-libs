@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 
 public class ConsensusDispatcher extends PartitionedDispatcher {
     public static final int REBALANCING_PERIOD = 5 * 60; // TODO
+    public static final int LAST_REDISPATCH_ITER = 100000; // //TODO
     final AbstractVirtualNodeDest abstractVirtualNodeDest;
     final AbstractRequestSelector abstractRequestSelector;
     final AbstractVehicleDestMatcher abstractVehicleDestMatcher;
@@ -66,10 +67,12 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
 
     @Override
     public void redispatch(double now) {
-
+        // do not execute the redispatching method at the end of the horizon // TODO find more elegant way to solve this
+        if (now>LAST_REDISPATCH_ITER) return;
         // match requests and vehicles if they are at t
         // he same link
         int seconds = (int) Math.round(now);
+
         {
             MatchRequestsWithStayVehicles.inOrderOfArrival(this);
         }
@@ -96,10 +99,6 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                             REBALANCING_PERIOD * linkWeights.get(vlink) * ((double) imbalanceTo - (double) imbalanceFrom) +  //
                                     rebalanceFloating.get(vlink);
 
-                    // Debugging
-                    if (vehicles_From_to_To > 0) {
-                        System.out.println("rebalancing vehicles " + vehicles_From_to_To);
-                    }
 
                     // assign integer number to rebalance vehicles and store float for next iteration
                     // only consider the results which are >= 0. This assumes an undirected graph.
@@ -157,6 +156,8 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             }
 
 
+
+
             // 2 generate routing instructions for vehicles
             // 2.1 gather the destination links
             Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
@@ -206,13 +207,6 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             // 2.4 fill extra destinations for left over vehicles
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
 
-                //Debugging
-                if(virtualNode.getId().toString().equals("vNode_0022")){
-                    System.out.println(virtualNode.getId().toString());
-                }
-                System.out.println("Available Vehicles: " + availableVehicles.get(virtualNode).size());
-                System.out.println("Destination Links: " + destinationLinks.get(virtualNode).size());
-
 
                 // number of vehicles that can be matched to requests
                 int size = availableVehicles.get(virtualNode).size() - destinationLinks.get(virtualNode).size(); //
@@ -220,21 +214,10 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                 // TODO maybe not final API; may cause excessive diving
                 List<Link> localTargets = abstractVirtualNodeDest.selectLinkSet(virtualNode, size);
                 destinationLinks.get(virtualNode).addAll(localTargets);
-
-                System.out.println("Available Vehicles: " + availableVehicles.get(virtualNode).size());
-                System.out.println("Destination Links: " + destinationLinks.get(virtualNode).size());
-
             }
 
             // 2.5 assign destinations to the available vehicles
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-
-                // Debugging
-                if (availableVehicles.get(virtualNode).size() != destinationLinks.get(virtualNode).size()) {
-                    System.out.println("availablevehicles: " + availableVehicles.get(virtualNode).size());
-                    System.out.println("destinationLinks: " + destinationLinks.get(virtualNode).size());
-                }
-
 
                 Map<VehicleLinkPair, Link> map = abstractVehicleDestMatcher.match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
                 for (Entry<VehicleLinkPair, Link> entry : map.entrySet()) {
