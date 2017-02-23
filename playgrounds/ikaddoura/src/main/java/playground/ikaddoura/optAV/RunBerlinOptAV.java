@@ -19,6 +19,9 @@
 
 package playground.ikaddoura.optAV;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.robotaxi.scoring.*;
@@ -29,10 +32,10 @@ import org.matsim.contrib.noise.*;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.utils.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-//github.com/matsim-org/matsim.git
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -83,8 +86,9 @@ public class RunBerlinOptAV {
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
-			kP = 2 * 12./3600.;
-			internalizeNoise = false;
+//			kP = 2 * 12./3600.;
+			kP = 0.;
+			internalizeNoise = true;
 			otfvis = false;
 		}
 		
@@ -122,8 +126,17 @@ public class RunBerlinOptAV {
 		if (internalizeNoise) {
 			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 			noiseParams.setInternalizeNoiseDamages(true);
-			log.info(noiseParams.toString());
 			
+			List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
+			for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
+				if (!params.getActivityType().contains("interaction")) {
+					consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
+				}
+			}
+			String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
+			noiseParams.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));			
+			
+			log.info(noiseParams.toString());
 			controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
 		}
 		
@@ -193,9 +206,7 @@ public class RunBerlinOptAV {
 			@Override
 			public void install() {
 												
-				// travel disutility factory for DVRP
-				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
-						.toInstance(dvrpTravelDisutilityFactory);
+				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);

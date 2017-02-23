@@ -19,6 +19,9 @@
 
 package playground.ikaddoura.optAV;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.robotaxi.scoring.*;
@@ -31,6 +34,7 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -146,8 +150,19 @@ public class RunBerlinAV {
 		}
 		
 		if (analyzeNoise) {
-			NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
+			NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 			noiseParameters.setInternalizeNoiseDamages(false);
+			
+			List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
+			for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
+				if (!params.getActivityType().contains("interaction")) {
+					consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
+				}
+			}
+			String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
+			noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));			
+			
+			log.info(noiseParameters.toString());
 			
 			NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
 			noiseCalculation.run();	
