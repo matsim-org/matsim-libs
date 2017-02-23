@@ -119,7 +119,7 @@ public class RunBerlinAV {
 		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
         
         final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = 
-        		new RandomizingTimeDistanceTravelDisutilityFactory(TaxiOptimizerModules.TAXI_MODE, controler.getConfig().planCalcScore());
+        		new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler.getConfig().planCalcScore());
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override

@@ -81,9 +81,10 @@ public class RunBerlinOptAV {
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000_test/";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
 			otfvis = false;
+			internalizeNoise = true;
 			kP = 2 * 12./3600.;
 		}
 		
@@ -184,7 +185,7 @@ public class RunBerlinOptAV {
         controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
         final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TaxiOptimizerModules.TAXI_MODE,
+				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
 						controler.getConfig().planCalcScore()));
 		
 		controler.addOverridingModule(new AbstractModule(){
