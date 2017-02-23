@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.util.otfvis.OTFVisLiveModuleWithVrpAgentVisualisation;
 import org.matsim.contrib.dynagent.run.*;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -69,7 +69,7 @@ public class RunOneTaxiExample
         controler.addOverridingModule(new DynQSimModule<>(OneTaxiQSimProvider.class));
 
         if (otfvis) {
-            controler.addOverridingModule(new OTFVisLiveModuleWithVrpAgentVisualisation());
+            controler.addOverridingModule(new OTFVisLiveModule());
         }
 
         controler.run();

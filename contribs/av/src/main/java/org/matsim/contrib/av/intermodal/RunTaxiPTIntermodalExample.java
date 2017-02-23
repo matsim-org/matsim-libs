@@ -28,8 +28,8 @@ import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dvrp.util.otfvis.OTFVisLiveModuleWithVrpAgentVisualisation;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -118,7 +118,7 @@ public class RunTaxiPTIntermodalExample {
 		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {
-			controler.addOverridingModule(new OTFVisLiveModuleWithVrpAgentVisualisation());
+			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		// ---
 		controler.run();
