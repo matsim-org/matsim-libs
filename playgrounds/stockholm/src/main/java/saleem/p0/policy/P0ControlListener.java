@@ -12,7 +12,11 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkUtils;
-
+/**
+ * To set up P0 for a single two junction 
+ * 
+ * @author Mohammad Saleem
+ */
 public class P0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener, ShutdownListener {
 	public Network network;
 	P0ControlHandler handler;

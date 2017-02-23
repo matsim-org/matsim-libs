@@ -20,16 +20,18 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * 
- * Creates a sample Population of one Person and writes it to a file.
+ * Creates Population for the simple single or two junction networks, to test P0 over simple networks.
  * 
- * @author michaz
+ * @author Mohammad Saleem
  *
  */
 public class PopulationGenerator {
+	//Creates Population for the simple four link single junction networks
 	public void generatePopulationForFourLinkJunction(){
 		/*
 		 * We enter coordinates in the WGS84 reference system, but we want them to appear in the population file
-		 * projected to UTM33N, because we also generated the network in UTM33N.
+		 * projected to UTM33N, because we also generated the network in UTM33N. 
+		 * Depending on which coordinate system the network is in.
 		 */
 		CoordinateTransformation ct = 
 			 TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
@@ -39,7 +41,6 @@ public class PopulationGenerator {
 		 */
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
-		generatePopulationForTwoLinkPaperJunction();
 		/*
 		 * Pick the Network and the Population out of the Scenario for convenience. 
 		 */
@@ -102,6 +103,8 @@ public class PopulationGenerator {
 		popWriter.write("H:\\Mike Work\\input\\population-4inlinks-gen.xml");
 
 	}
+	//Creates Population for the simple two junction network.
+
 	public void generatePopulationForTwoJunctionNetwork(){
 		/*
 		 * We enter coordinates in the WGS84 reference system, but we want them to appear in the population file
@@ -115,7 +118,6 @@ public class PopulationGenerator {
 		 */
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
-		generatePopulationForTwoLinkPaperJunction();
 		/*
 		 * Pick the Network and the Population out of the Scenario for convenience. 
 		 */
@@ -289,13 +291,11 @@ public class PopulationGenerator {
 		popWriter.write("H:\\Mike Work\\input\\population-2junctions.xml");
 
 	}
-	public void generatePopulationForTwoLinkPaperJunction(){
-		
-	}
 	public static void main(String[] args) {
 		PopulationGenerator pgen = new PopulationGenerator();
 		pgen.generatePopulationForFourLinkJunction();
 	}
+	//Time in 00:00:00 format
 	public static String claculateTime(double timeInSeconds){
 		int hours = (int) timeInSeconds / 3600;
 	    int remainder = (int) timeInSeconds - hours * 3600;

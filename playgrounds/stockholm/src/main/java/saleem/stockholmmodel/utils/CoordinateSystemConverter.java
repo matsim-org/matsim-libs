@@ -2,8 +2,11 @@ package saleem.stockholmmodel.utils;
 
 import org.matsim.api.core.v01.Coord;
 
-
-//Converts WSG84 to UTM System
+/**
+ * Class for conversion from WSG84 to UTM System
+ * 
+ * @author Mohammad Saleem
+ */
 public class CoordinateSystemConverter {
 	public static Coord deg2UTM(Coord coord)
     {

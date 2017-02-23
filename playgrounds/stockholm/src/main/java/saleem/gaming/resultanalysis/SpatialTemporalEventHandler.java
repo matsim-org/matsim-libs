@@ -33,7 +33,13 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.vehicles.Vehicle;
 
-
+/**
+ * A event handling class used to calculate accessibility measure for gaming scenarios, 
+ * based on average all day utility of travellers performing an activity in,
+ * or travelling through a certain area, with in a certain time window, using a certain mode.
+ * 
+ * @author Mohammad Saleem
+ */
 public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, 
 	PersonDepartureEventHandler, PersonEntersVehicleEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 	
@@ -46,7 +52,7 @@ public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnter
 	private double totime=0;
 	private String mode;//Mode can be "car", "pt" or "both"
 	
-	//Boundingbox
+	//Boundingbox around the centre of area of interest
 	double xmin=0;
 	double xmax=0;
 	double ymin=0;
@@ -64,7 +70,7 @@ public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnter
 		this.allpersons=scenario.getPopulation().getPersons();
 		this.mode = mode;
 		
-		//Boundingbox for the focussed area
+		//Boundingbox for the focussed area, A grid of gridsize X gridsize
 		this.xmin=origin.getX()-gridsize;
 		this.xmax=origin.getX()+gridsize;
 		this.ymin=origin.getY()-gridsize;
@@ -78,7 +84,8 @@ public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnter
 	}
 	
 	@Override
-	public void handleEvent(LinkLeaveEvent event) {//If the event occurs with in the area of focus and with in the considered time
+	public void handleEvent(LinkLeaveEvent event) {
+		//If the event occurs with in the area of focus and with in the considered time
 		double time = event.getTime();
 		if(time >=fromtime && time<=totime && inBounds(links.get(event.getLinkId()).getCoord())){
 			relevantpersons.add(vehicletoperson.get(event.getVehicleId()));
@@ -87,6 +94,7 @@ public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnter
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		//If the event occurs with in the area of focus and with in the considered time
 		double time = event.getTime();
 		Id<Vehicle> vehid = event.getVehicleId();
 		if(time>=fromtime && time<=totime && inBounds(links.get(event.getLinkId()).getCoord())){
@@ -97,6 +105,7 @@ public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnter
 	
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
+		//If the event occurs with in the area of focus and with in the considered time
 		double time = event.getTime();
 		if(time>=fromtime && time<=totime && inBounds(links.get(event.getLinkId()).getCoord())){
 			relevantpersons.add(event.getPersonId());
@@ -105,6 +114,7 @@ public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnter
 	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
+		//If the event occurs with in the area of focus and with in the considered time
 		double time = event.getTime();
 		if(time>=fromtime && time<=totime && inBounds(links.get(event.getLinkId()).getCoord())){
 			relevantpersons.add(event.getPersonId());
@@ -117,7 +127,8 @@ public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnter
 		
 	}
 	
-	public Set<Person> getRelevantPersons(){//Returns persosn travelling through or performing activity in the  focussed area in the considered time with the given mode.
+	public Set<Person> getRelevantPersons(){
+		//Returns persosn travelling through or performing activity in the  focussed area in the considered time with the given mode.
 		
 		Set<Person> filteredpersons = new HashSet<>();//Further filtered by mode
 		Iterator<Id<Person>> relpersonsiter = this.relevantpersons.iterator();
@@ -178,7 +189,7 @@ public class SpatialTemporalEventHandler implements BasicEventHandler, LinkEnter
 		scoring.handleEvent(event);
 
 	}
-	
+	//Is the activity with the grid of ineterest?
 	public Boolean inBounds(Coord coord){
 		if(coord.getX()>=xmin && coord.getX()<=xmax && coord.getY()>=ymin && coord.getY()<=ymax){
 				return true;

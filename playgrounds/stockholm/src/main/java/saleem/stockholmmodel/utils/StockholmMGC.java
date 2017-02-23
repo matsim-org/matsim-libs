@@ -12,7 +12,12 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
-
+/**
+ * Converter factory for various conversion from Geotools to MATSim and vice versa.
+ *
+ * @author Mohammad Saleem
+ *
+ */
 public class StockholmMGC extends MGC{
 	private final static Logger log = Logger.getLogger(MGC.class);
 

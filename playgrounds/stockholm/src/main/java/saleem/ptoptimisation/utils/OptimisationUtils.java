@@ -14,7 +14,11 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
-
+/**
+ * This class is a helper class for PT Optimisation
+ * 
+ * @author Mohammad Saleem
+ */
 public class OptimisationUtils {
 	public ArrayList<Double> sortTimes(ArrayList<Double> times){
 		Collections.sort(times, new Comparator<Double>() {
@@ -25,6 +29,7 @@ public class OptimisationUtils {
 	    });
 		return times;
 	}
+	//Is tline a bus line?
 	public boolean isBusLine(TransitLine tline, Map<Id<Vehicle>, Vehicle> vehicles){
 		TransitRoute route = tline.getRoutes().values().iterator().next();//Get first route to check its mode
 		Vehicle vehicle = vehicles.get(route.getDepartures().values().iterator().next().getVehicleId());
@@ -33,7 +38,8 @@ public class OptimisationUtils {
 		}
 		return false;
 	}
-	public double getAverageLengthOfBusRoute(Scenario scenario){//With 10 % chance of selecting a line, and 10% chance of removing each of its route.
+	//Calculate actual length of te route i.e. not Euclidean length. The actual length may be used to calculate average speed over a route etc.
+	public double getAverageLengthOfBusRoute(Scenario scenario){
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		Network network = scenario.getNetwork();
 		Map<Id<Vehicle>, Vehicle> vehicles = scenario.getTransitVehicles().getVehicles();
@@ -58,6 +64,9 @@ public class OptimisationUtils {
 		avglength/=totalbusroutes;
 		return avglength;
 	}
+	
+//The following code was initially used in adjusting departure times, but later a different approach was used hence it is commented out.
+	
 //	public ArrayList<Double> getRatioOfTimes(ArrayList<Double> times){//Returns a ratio of departure times
 //		times=sortTimes(times);
 //		int i = 0;ArrayList<Double> ratios = new ArrayList<Double>();

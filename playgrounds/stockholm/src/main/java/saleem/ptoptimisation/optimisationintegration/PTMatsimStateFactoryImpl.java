@@ -10,9 +10,15 @@ import org.matsim.core.controler.Controler;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
 
+/**
+ * A factory class to create PTMatSimState objects.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class PTMatsimStateFactoryImpl<U extends DecisionVariable> implements
 MATSimStateFactory<U> {
-	Scenario scenario;
+	private Scenario scenario;
 	final double occupancyScale;
 	public PTMatsimStateFactoryImpl(Scenario scenario, final double occupancyScale) {
 		 this.scenario = scenario;

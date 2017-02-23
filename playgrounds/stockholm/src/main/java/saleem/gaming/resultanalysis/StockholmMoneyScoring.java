@@ -6,6 +6,11 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import saleem.gaming.scenariobuilding.GamingConstants;
 
+/**
+ * A  class to score monetary events, and map money to utility.
+ * 
+ * @author Mohammad Saleem
+ */
 public final class StockholmMoneyScoring implements SumScoringFunction.MoneyScoring {
 
 	private double score;

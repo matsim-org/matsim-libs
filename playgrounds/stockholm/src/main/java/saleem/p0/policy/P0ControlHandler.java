@@ -22,7 +22,11 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 import saleem.p0.resultanalysis.PlotStatistics;
 import saleem.stockholmmodel.utils.CollectionUtil;
-
+/**
+ * Deprecated P0 policy, just for two link junction
+ * 
+ * @author Mohammad Saleem
+ */
 public class P0ControlHandler implements BasicEventHandler{
 	Link link2, link4, link5;
 	Network network;

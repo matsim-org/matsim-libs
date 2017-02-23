@@ -13,7 +13,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.charts.XYLineChart;
 
 import saleem.stockholmmodel.utils.CollectionUtil;
-
+/**
+ * A utility class to plot different P0 related quantities, like absolute pressures, capacities etc.
+ * 
+ * @author Mohammad Saleem
+ */
 public class PlotStatistics {
 	public void PlotCapacities(int iter, ArrayList<Double> times, ArrayList<Double> capacitieslink2, ArrayList<Double> capacitieslink4, ArrayList<Double> initialcapacitiesLink2, ArrayList<Double> initialcapacitiesLink4 ){
 		 XYLineChart chart = new XYLineChart("Capacities Statistics", "Time", "Capacity");

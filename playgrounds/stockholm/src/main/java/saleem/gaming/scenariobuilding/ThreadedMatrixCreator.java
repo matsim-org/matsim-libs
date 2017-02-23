@@ -25,6 +25,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 /**
+ * A class to create a matrix of travel distances and travel times between PT stops,
+ * which is used in accessibility calculations.
+ * 
  * @author dziemke, gthunig
  */
 class ThreadedMatrixCreator implements Runnable {

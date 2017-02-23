@@ -32,13 +32,18 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 import saleem.stockholmmodel.utils.CollectionUtil;
+/**
+ * A class for adding and removing routes to/from existing lines, or creating reverse routes based on existing route.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class RouteAdderRemover {
 	private CollectionUtil<Node> cutil = new CollectionUtil<Node>(); 
-//	final CoordinateTransformation coordinateTransform = StockholmTransformationFactory
-//			.getCoordinateTransformation(
-//					StockholmTransformationFactory.WGS84_SWEREF99,
-//					StockholmTransformationFactory.WGS84);
-	public void deleteRandomRoutes(TransitSchedule schedule, Vehicles vehicles, double factorline, double factorroute){//With 10 % chance of selecting a line, and 10% chance of removing each of its route. 
+	/*With factorline *100 % probability of selecting a line for route removal, 
+	 * and factorroute*100 % probability of removing each route of the selected line
+	 */
+	public void deleteRandomRoutes(TransitSchedule schedule, Vehicles vehicles, double factorline, double factorroute){
 		CollectionUtil<TransitLine> cutilforlines = new CollectionUtil<TransitLine>();
 		CollectionUtil<TransitRoute> cutilforroutes = new CollectionUtil<TransitRoute>();
 		ArrayList<TransitLine> lines = cutilforlines.toArrayList(schedule.getTransitLines().values().iterator());
@@ -61,7 +66,7 @@ public class RouteAdderRemover {
 								Departure departure=departures.get(k);
 								troute.removeDeparture(departure);
 								if(troute.getDepartures().size()==0){
-									double time = 115200;//Hypothetical departure after end time; delete all other departures; effectively a route that doesn't exist.
+									double time = 115200;//Hypothetical departure after end time; delete all other departures; effectively the route doesn't exist.
 									Departure hypodeparture = tschedulefact.createDeparture(Id.create("DepHypo"+(int)Math.floor(10000000 * Math.random()), Departure.class), time);
 									hypodeparture.setVehicleId(departure.getVehicleId());
 									troute.addDeparture(hypodeparture);
@@ -71,14 +76,16 @@ public class RouteAdderRemover {
 								}
 
 							}
-							
-//							tline.removeRoute(troute);
 						}
 					}
 				}
 			}
 		}
 	}
+	/*With factorline *100 % probability of selecting a line for route addition, 
+	 * and factorroute*100 % probability of selecting each of its route for route addition
+	 * Based on each selected route,  a new independent and different route is added to the selected line.
+	 */
 	public void addRandomRoutes(Scenario scenario, TransitSchedule schedule, Vehicles vehicles, double factorline, double factorroute){
 		TransitScheduleFactory tschedulefact = schedule.getFactory();
 		CollectionUtil<TransitLine> cutilforlines = new CollectionUtil<TransitLine>();
@@ -112,6 +119,7 @@ public class RouteAdderRemover {
 			}
 		}
 	}
+	//Create a map linking links to PT stops on those links with in the PT network
 	public Map<Id<Link>, TransitRouteStop> mapStops2Links(TransitSchedule schedule){//Maps links to transit stops
 		Map<Id<Link>, TransitRouteStop> link2stop = new LinkedHashMap<Id<Link>, TransitRouteStop>();
 		Iterator<TransitLine> lines = schedule.getTransitLines().values().iterator();
@@ -129,7 +137,8 @@ public class RouteAdderRemover {
 		}
 		return link2stop;
 	}
-	public Map<Id<TransitStopFacility>, TransitRouteStop> getTransitStops(TransitSchedule schedule){//returns a map of all transit route stops maped against id of the facility they represent
+	//returns a map of all transit route stops mapped against id of the facility they represent
+	public Map<Id<TransitStopFacility>, TransitRouteStop> getTransitStops(TransitSchedule schedule){
 		Map<Id<TransitStopFacility>, TransitRouteStop> stops = new LinkedHashMap<Id<TransitStopFacility>, TransitRouteStop>();
 		Iterator<TransitLine> lines = schedule.getTransitLines().values().iterator();
 		while(lines.hasNext()) {
@@ -146,8 +155,8 @@ public class RouteAdderRemover {
 		}
 		return stops;
 	}
-	public void addDeparturestoRoute(TransitScheduleFactory tschedulefact, TransitRoute route, Vehicles vehicles, VehicleType vtype ){//Creates and adds 
-																																	 //random departures to the newly created route
+	public void addDeparturestoRoute(TransitScheduleFactory tschedulefact, TransitRoute route, 
+			Vehicles vehicles, VehicleType vtype ){//Creates and adds random departures to the newly created route
 		
 		int numpeakmorning = (int)(Math.ceil(6*Math.random()));//Peakhour departures
 		int numpeakevening = (int)(Math.ceil(6*Math.random()));
@@ -193,22 +202,27 @@ public class RouteAdderRemover {
 			}
 		}
 	}
-	public TransitRoute createTransiteRoute(Scenario scenario, TransitSchedule schedule, TransitScheduleFactory tschedulefact, TransitRoute troute, Map<Id<TransitStopFacility>, TransitRouteStop> stops){
+	//This function creates a new transit route
+	public TransitRoute createTransiteRoute(Scenario scenario, TransitSchedule schedule, 
+			TransitScheduleFactory tschedulefact, TransitRoute troute, Map<Id<TransitStopFacility>, TransitRouteStop> stops){
 		TransitRouteStop origin = troute.getStops().get(0);
 		List<TransitRouteStop> transitstopsfornewroute = new ArrayList<TransitRouteStop>();
 		List<Id<Link>> linksfornewroute = new ArrayList<Id<Link>>();
-		createDestination(scenario, schedule, stops, transitstopsfornewroute,linksfornewroute, origin);//Changes transitstopsfornewroute 
-																											//and networkroutelinks within the function
-		if(transitstopsfornewroute.size()<2){
+		createDestination(scenario, schedule, stops, transitstopsfornewroute,linksfornewroute, origin);//Calculates/creates destination stop, routeprofile 
+																									   //and list of links to travel for the new transit route
+																									   //transitstopsfornewroute is changed by reference
+		if(transitstopsfornewroute.size()<2){//If a single stop route 
 			return null;
 		}
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(linksfornewroute.get(0),linksfornewroute.subList(1, linksfornewroute.size()-1), linksfornewroute.get(linksfornewroute.size()-1));
+		NetworkRoute networkRoute = new LinkNetworkRouteImpl(linksfornewroute.get(0),linksfornewroute.subList
+				(1, linksfornewroute.size()-1), linksfornewroute.get(linksfornewroute.size()-1));//Creates networkroute based on the list of links to traverse
 		Id<TransitRoute> id = Id.create(origin.getStopFacility().getId().toString()+"to"+transitstopsfornewroute.get
 				(transitstopsfornewroute.size()-1).getStopFacility().getId()+"added"+(100000*Math.random()), TransitRoute.class);
 		TransitRoute route = tschedulefact.createTransitRoute(id, networkRoute, transitstopsfornewroute, "pt");
 		return route;
 		
 	}
+	//Create a reverse route, based on an existing route
 	public TransitRoute createReverseTransiteRoute(Scenario scenario, TransitSchedule schedule, TransitScheduleFactory tschedulefact, TransitRoute forward){
 		List<TransitRouteStop> transitstopsfornewroute = new ArrayList<TransitRouteStop>();
 		NetworkFactory factory = scenario.getNetwork().getFactory();
@@ -231,7 +245,7 @@ public class RouteAdderRemover {
 		Id<Link> previouslink = transitstopsfornewroute.get(0).getStopFacility().getLinkId();
 		Id<Link> destlink = transitstopsfornewroute.get(transitstopsfornewroute.size()-1).getStopFacility().getLinkId();
 		
-		for(int j=1;j<transitstopsfornewroute.size();j++){
+		for(int j=1;j<transitstopsfornewroute.size();j++){//Adding corresponding links to the network, required for reverse traversal
 			Node from = links.get(previouslink).getToNode();
 			Node to = links.get(transitstopsfornewroute.get(j).getStopFacility().getLinkId()).getFromNode();
 			Link link = factory.createLink(Id.createLinkId("LinkAdded"+from.getId().toString()+"to"+to.getId().toString()), from, to);
@@ -240,7 +254,7 @@ public class RouteAdderRemover {
 			link.setAllowedModes(modes);
 			link.setLength(NetworkUtils.getEuclideanDistance(from.getCoord(), to.getCoord()));//Length from from node to to node
 			link.setNumberOfLanes(1.0);
-			if(!network.getLinks().containsKey(link.getId())){
+			if(!network.getLinks().containsKey(link.getId())){//If does not exist already
 				network.addLink(link);
 			}
 			linksfornewroute.add(link.getId());
@@ -258,6 +272,7 @@ public class RouteAdderRemover {
 		return route;
 		
 	}
+	//Find next node to serve, accessible by PT, and increasing route's Euclidean length to avoid weird detours
 	public Node getNextNode(double distancefromorigin, Coord origincords, Collection<Node> nodes){
 		double distance = -1;
 		ArrayList<Node> neighboringnodes = this.cutil.toArrayList(nodes.iterator());
@@ -279,9 +294,10 @@ public class RouteAdderRemover {
 			}
 		}
 	}
-	//Create Destination Link, and creates list of stops until the destination link, returns the link, changes stopsfornewroute by reference
-	public void createDestination(Scenario scenario, TransitSchedule schedule,  Map<Id<TransitStopFacility>, TransitRouteStop> stops, List<TransitRouteStop> stopsfornewroute,
-								List<Id<Link>> linksfornewroute, TransitRouteStop origin){
+	//Create destination link, and creates list of stops until the destination link, returns the link, changes stopsfornewroute by reference
+	public void createDestination(Scenario scenario, TransitSchedule schedule,  Map<Id<TransitStopFacility>, 
+			TransitRouteStop> stops, List<TransitRouteStop> stopsfornewroute,
+					List<Id<Link>> linksfornewroute, TransitRouteStop origin){
 		List<Id<TransitStopFacility>> stopsfornewrouteids = new ArrayList<Id<TransitStopFacility>>();
 		NetworkFactory factory = scenario.getNetwork().getFactory();
 		Network network = scenario.getNetwork();
@@ -307,8 +323,8 @@ public class RouteAdderRemover {
 		int i=0;
 		while(i++<numofstops){
 			Collection<Node> nodes = NetworkUtils.getNearestNodes(network, fromnode.getCoord(), 2000);//Nodes within a 1000 meters
-			tonode = getNextNode(distancefromorigin, origincords, nodes);//Get next node to the current node out of the neighboring nodes
-																	  //such that the overall distance to the node from origin keeps increasing to avoid weird detours
+			tonode = getNextNode(distancefromorigin, origincords, nodes);//Get next node to the current node out of the neighboring nodes such that the
+																	  // overall Euclidean distance to the node from origin keeps increasing (to avoid weird detours)
 			distancefromorigin = NetworkUtils.getEuclideanDistance(origincords, tonode.getCoord());
 			String idstr = tonode.getId().toString().substring(3, tonode.getId().toString().length());//Removing the tr_ prefix
 			TransitRouteStop tstop = stops.get(Id.create(idstr, TransitStopFacility.class));
@@ -316,6 +332,7 @@ public class RouteAdderRemover {
 				stopsfornewroute.add(tstop);
 				stopsfornewrouteids.add(tstop.getStopFacility().getId());
 				if(linksfornewroute.size()>0){//For linking the stop link to next stop link, if not already linked
+											  ////Adding corresponding links to the network, required for traversal
 					Node from = links.get(linksfornewroute.get(linksfornewroute.size()-1)).getToNode();
 					Node to = links.get(tstop.getStopFacility().getLinkId()).getFromNode();
 					Link link = factory.createLink(Id.createLinkId("LinkAdded"+from.getId().toString()+"to"+to.getId().toString()), from, to);

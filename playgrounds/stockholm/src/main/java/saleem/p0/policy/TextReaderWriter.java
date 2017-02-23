@@ -5,7 +5,11 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
-
+/**
+ * A class to read from and write to text files
+ * 
+ * @author Mohammad Saleem
+ */
 public class TextReaderWriter {
 	public void writeToTextFile(ArrayList<Double> values, String path){
 		Iterator<Double> iter = values.iterator();

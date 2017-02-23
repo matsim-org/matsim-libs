@@ -1,7 +1,10 @@
 package saleem.stockholmmodel.transitdataconversion;
 
 /**
- * Class representing a vehicle instance within transit schedule
+ * Class specifying a vehicle instance within transit schedule
+ * 
+ * 
+ * @author Mohammad Saleem
  */
 public class Vehicle {
 	private String id;

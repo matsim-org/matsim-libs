@@ -11,8 +11,14 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.matsim.api.core.v01.Coord;
 
-//This is a class to convert Excel files of transit trips, transit stops, vehicles and transit  schedule into a MatSim readable XML Format. 
-// A complex transit schedule data structure is constructed based on the excel files.
+/**
+ * A class to convert Excel files of transit trips, transit stops, 
+ * vehicles and transit  schedule into a MatSim readable XML Format. 
+ * A complex transit schedule data structure is constructed based on the excel files.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class ExcelReportsReader {
 	
 	public void readVehicleTypes(TransitSchedule transit, String path){//Reads vehicle-types excel file and adds data about transit Stops to TransitSchedule object

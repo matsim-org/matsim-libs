@@ -28,7 +28,12 @@ import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCri
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 
-//An execution class for PT Optimisation
+/**
+ * An execution class for PT Optimisation.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class OptimisePT {
 	@SuppressWarnings({ "rawtypes", "unused" })
 	public static void main(String[] args) {
@@ -38,7 +43,8 @@ public class OptimisePT {
         Config config = ConfigUtils.loadConfig(path);
         MatsimServices controler = new Controler(config);
         final Scenario scenario = ScenarioUtils.loadScenario(config);
-        double samplesize = 0.05;
+        double samplesize = 0.05;//One can get this directly from Config file too through config.qsim().getStorageCapFactor()
+        						 //Hardcoded since the car network is scaled 1.5 times that of PT for this particulat scenario.
 		final String originalOutputDirectory = scenario.getConfig().controler()
 				.getOutputDirectory(); // gets otherwise overwritten in config
 		final AbstractModule module = new ControlerDefaultsModule();
@@ -74,11 +80,7 @@ public class OptimisePT {
 		@SuppressWarnings("unchecked")		
 		final MATSimSimulator<PTSchedule> matsimSimulator = new MATSimSimulator(
 				new PTMatsimStateFactoryImpl<>(scenario, occupancyScale),
-//				new PTStateFactory(timeDiscretization, occupancyScale), 
-				scenario, timeDiscretization //,
-				// null, relevantStopIds,  
-//				module
-				);
+				scenario, timeDiscretization);
 		matsimSimulator.setReplacingModules(module);
 		final RandomSearch<PTSchedule> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer, ptschedule,

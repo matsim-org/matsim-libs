@@ -17,7 +17,7 @@ import floetteroed.utilities.math.Vector;
  * process. This state consists of the plan choice sets of all agents, including
  * scores and information about the selected plan.
  * 
- * @author Gunnar Flötteröd
+ * @author Mohammad Saleem
  * 
  * @see SimulatorState
  */
@@ -43,6 +43,12 @@ public class PTMatsimState extends MATSimState {
 	 * @param vectorRepresentation
 	 *            a real-valued vector representation of the current MATSim
 	 *            state.
+	 * @param scenario
+	 *     The simulation scenario being executed, containing all relevant details.
+	 	 * @param ptscehedule
+	 *            The decision variable representing a variation of transit schedule.
+	  * @param occupancyScale
+	 *            Generally kept at 1.
 	 */
 	public PTMatsimState(final Population population,
 			final Vector vectorRepresentation, final Scenario scenario, final PTSchedule ptscehedule, double occupancyScale) {
@@ -65,6 +71,7 @@ public class PTMatsimState extends MATSimState {
 
 	public void implementInSimulation() {
 		ScenarioHelper helper = new ScenarioHelper();
+		//The following code enables switching among decision variables and states.
 		helper.removeEntireScheduleAndVehicles(scenario);//Removes all vehicle types, vehicles, stop facilities and transit lines from a transit schedule
 		helper.addVehicles(scenario, vehicles);//Adds all vehicle types and vehicles from an updated stand alone vehicles object into the current scenario vehicles object
 		helper.addTransitSchedule(scenario, schedule);//Add all stop facilities and transit lines from a stand alone updated transit schedule into the current scenario transit schedule

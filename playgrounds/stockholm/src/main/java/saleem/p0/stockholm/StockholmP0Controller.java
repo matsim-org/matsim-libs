@@ -15,7 +15,12 @@ import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import saleem.stockholmmodel.modelbuilding.PTCapacityAdjusmentPerSample;
-
+/**
+ * A class to run P0 for Stockholm.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 
 public class StockholmP0Controller {
 

@@ -19,17 +19,21 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 
-/**This class is to extract and return statistics which are used as a sanity check on
- *optimisation.
+/**
+ * This class is to extract and return statistics,
+ *  which are used as a sanity check on PT optimisation.
+ *  
+ * @author Mohammad Saleem
  */
 public class PlausibilityStatistics {
 	private final Scenario scenario;
-	private static  String stats="Iteration" + "\t" + "Avg. Utility" + "\t" + "Avg. PT Utility" + "\t" + "PT Total" + "\t" + "Avg. Car Utility"
+	private static  String stats = "Iteration" + "\t" + "Avg. Utility" + "\t" + "Avg. PT Utility" + "\t" + "PT Total" + "\t" + "Avg. Car Utility"
 			 + "\t" + "Car Total" + "\t" + "Number of Departures" + "\t" +"Number Of Routes" + "\t" + "Number of Lines" + "\t" + "Total Capacity" + "\n";
 	private static int totaliterations=0;
 	public PlausibilityStatistics(Scenario scenario){
 		this.scenario=scenario;
 	}
+	//Accumulates plausibility statistics for one iteration.
 	public void accumulateStatistics(){
 		if(totaliterations>0){
 			stats=stats + totaliterations + "\t";
@@ -39,6 +43,9 @@ public class PlausibilityStatistics {
 		}
 		totaliterations++;
 	}
+	/*Writes plausibility statistics to a text file. 
+	 * Called usually every time a new decision variable is selected as the best decision variable by Optimisation algorithm.
+	 */
 	public void writeStatistics(){
 		String path = scenario.getConfig().controler().getOutputDirectory();
 		path=path.substring(0, path.lastIndexOf('/'))+"/plausibilitychecks.txt";
@@ -49,10 +56,11 @@ public class PlausibilityStatistics {
 		    fileOutputStream.close();
 	       
 	    } catch(Exception ex) {
-	        //catch logic here
+	        //catch logic here.
 	    }
 	}
-	public String getUtilityStatistics(){//Returns average utility for general population, PT users and Car users
+	//Returns average utility for general population, PT users and Car users
+	public String getUtilityStatistics(){
 		Iterator<? extends Person> personiter = scenario.getPopulation().getPersons().
 				values().iterator();
 		int total=0, totalPT=0,totalCar=0;
@@ -78,7 +86,8 @@ public class PlausibilityStatistics {
 		String str = avgUtility + "\t" + avgPTUtility + "\t" +  totalPT + "\t" + avgsCarUtility + "\t" + totalCar;
 		return str;
 	}
-	public double getTotalCapacity(){//Returns total seats and standing room in transit system
+	//Returns total number of seats and standing room (capacity statistics) in the transit system.
+	public double getTotalCapacity(){
 		int totalCap=0;
 		Iterator<Vehicle> vehiter = scenario.getTransitVehicles().getVehicles().values().iterator();
 		while(vehiter.hasNext()){
@@ -88,7 +97,8 @@ public class PlausibilityStatistics {
 		}
 		return totalCap;	
 	}
-	public String getNumberOfDeparturesRoutesLines(){// return number of departures, numb er of routes, number of lines in the transit systemm
+	// return the number of departures, number of routes and number of lines in the transit system
+	public String getNumberOfDeparturesRoutesLines(){
 		int numlines=0, numroutes=0, numdepartures=0;
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		Map<Id<TransitLine>, TransitLine> lines = schedule.getTransitLines();
@@ -100,8 +110,8 @@ public class PlausibilityStatistics {
 			Iterator<TransitRoute> routesiterator =  routes.values().iterator();
 			while(routesiterator.hasNext()){
 				TransitRoute troute = routesiterator.next();
-				if(!(troute.getDepartures().values()
-						.iterator().next().getDepartureTime()==115200 && troute.getDepartures().size()==1)){////Excluding routes with no departures between 00:00 and 30:00
+				if(!(troute.getDepartures().values().iterator().next().getDepartureTime()==115200 && 
+						troute.getDepartures().size()==1)){////Excluding routes with no departures between 00:00 and 30:00
 					emptyline=false;
 					numdepartures+=troute.getDepartures().size();
 					numroutes+=1;
