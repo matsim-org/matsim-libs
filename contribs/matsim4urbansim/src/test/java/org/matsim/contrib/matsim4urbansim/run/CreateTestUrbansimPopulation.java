@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4urbansim.utils;
+package org.matsim.contrib.matsim4urbansim.run;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -10,7 +10,7 @@ public class CreateTestUrbansimPopulation {
 	
 //	@Test // I don' think this is a test ... since it actually does not "test" anything.  Rather, it is a helper method for
 	// other test classes. kai
-	public static void createUrbanSimTestPopulation(String path, int nPersons){
+	static void createUrbanSimTestPopulation(String path, int nPersons){
 		
 		createPersons(path, nPersons);
 		

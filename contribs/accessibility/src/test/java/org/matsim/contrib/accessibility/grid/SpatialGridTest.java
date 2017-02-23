@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4urbansim.grid;
+package org.matsim.contrib.accessibility.grid;
 
 import org.junit.Assert;
 import org.junit.Test;

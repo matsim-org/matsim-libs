@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestUrbansimPopulation;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriter;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimPersonCSVWriter;
 import org.matsim.testcases.MatsimTestUtils;
