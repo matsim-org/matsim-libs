@@ -26,6 +26,7 @@ import org.matsim.core.config.*;
 public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "dvrp";
 
+	@SuppressWarnings("deprecation")
 	public static DvrpConfigGroup get(Config config) {
 		return (DvrpConfigGroup) config.getModule(GROUP_NAME);// will fail if not in the config
 	}

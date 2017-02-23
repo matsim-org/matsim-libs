@@ -22,7 +22,7 @@ package org.matsim.vis.otfvis.opengl.queries;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 import com.jogamp.opengl.GL;
@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -182,11 +183,17 @@ public class QueryAgentPTBus extends AbstractQuery {
 		this.net = simulationView.getNetwork();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
-		for(Id<Person> planId : simulationView.getPlans().keySet()) {
-			if(planId.toString().startsWith(prefix, 0)) allIds.add(planId.toString());
+		Collection<Id<Person>> agentIds = simulationView.getMobsimAgents().keySet();
+		for(Id<Person> id : agentIds) {
+			if(id.toString().startsWith(prefix, 0)) {
+			    allIds.add(id.toString());
+			}
 		}
-		if (allIds.size()==0) return;
-		Plan plan = simulationView.getPlans().get(Id.create(allIds.get(0), Person.class));
+		if (allIds.size()==0) {
+			return;
+		}
+		MobsimAgent firstAgent = simulationView.getMobsimAgents().get(Id.create(allIds.get(0), Person.class));
+		Plan plan = simulationView.getPlan(firstAgent);
 		this.result.vertex = buildRoute(plan);
 	}
 

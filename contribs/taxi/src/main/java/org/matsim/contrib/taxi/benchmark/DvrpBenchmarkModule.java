@@ -22,8 +22,10 @@ package org.matsim.contrib.taxi.benchmark;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.*;
 
@@ -50,6 +52,11 @@ public class DvrpBenchmarkModule extends DvrpModule {
 		String mode = dvrpCfg.getMode();
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
 		bind(Fleet.class).toInstance(fleet);
+		
+		//Visualisation of schedules for DVRP DynAgents
+		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
+		
+		//Fixed free-speed TT
 		install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
 	}
 }
