@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -144,6 +145,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     assignDirective(vehicleLinkPair.avVehicle, new EmptyDirective());
             }
         };
+    }
+    
+    protected final void setVehicleDiversion(final Entry<VehicleLinkPair,Link> entry) {
+        setVehicleDiversion(entry.getKey(), entry.getValue());
     }
 
     @Override

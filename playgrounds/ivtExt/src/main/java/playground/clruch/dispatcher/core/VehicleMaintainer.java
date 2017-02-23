@@ -32,7 +32,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 /**
  * The purpose of VehicleMaintainer is to register {@link AVVehicle}
  * and provide the collection of available vehicles to derived class.
- * 
+ * <p>
  * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s.
  * path computations attached to assignments are computed in parallel
  * {@link ParallelLeastCostPathCalculator}.
@@ -42,7 +42,8 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
     private Double private_now = null;
-    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
+    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = // 
+            Collections.synchronizedMap(new LinkedHashMap<>());
     private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
 
     protected VehicleMaintainer(EventsManager eventsManager) {
@@ -51,7 +52,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     /**
      * maps given {@link AVVehicle} to given {@link AbstractDirective}
-     * 
+     *
      * @param avVehicle
      * @param abstractDirective
      */
@@ -61,7 +62,6 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
-     * 
      * @param avVehicle
      * @return true if given {@link AVVehicle} doesn't have a {@link AbstractDirective} assigned to it
      */
@@ -78,7 +78,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     /**
      * function call leaves the state of the {@link UniversalDispatcher} unchanged.
      * successive calls to the function return the identical collection.
-     * 
+     *
      * @return collection of all vehicles that currently are in the last task, which is of type STAY
      */
     public final Map<Link, Queue<AVVehicle>> getStayVehicles() {
@@ -148,7 +148,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         redispatch(now);
         private_now = null; // <- time unavailable
         long tic = System.nanoTime();
-        private_vehicleDirectives.values().stream() //
+        private_vehicleDirectives.values().stream()
                 .parallel() //
                 .forEach(AbstractDirective::execute);
         routingTimeNano += System.nanoTime() - tic;
@@ -157,9 +157,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     /**
      * @return time of current re-dispatching iteration step
-     * 
-     * @throws NullPointerException
-     *             if dispatching has not started yet
+     * @throws NullPointerException if dispatching has not started yet
      */
     protected final double getTimeNow() {
         return private_now;
