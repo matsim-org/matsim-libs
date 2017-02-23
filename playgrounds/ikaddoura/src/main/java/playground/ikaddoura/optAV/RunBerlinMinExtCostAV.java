@@ -117,6 +117,7 @@ public class RunBerlinMinExtCostAV {
 
 		if (internalizeNoise) {
 			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+			noiseParams.setInternalizeNoiseDamages(true);
 			log.info(noiseParams.toString());
 			
 			controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));

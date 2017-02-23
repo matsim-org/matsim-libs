@@ -84,7 +84,7 @@ public class RunBerlinOptAV {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
 			otfvis = false;
-			internalizeNoise = true;
+			internalizeNoise = false;
 			kP = 2 * 12./3600.;
 		}
 		
@@ -121,6 +121,7 @@ public class RunBerlinOptAV {
 		
 		if (internalizeNoise) {
 			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+			noiseParams.setInternalizeNoiseDamages(true);
 			log.info(noiseParams.toString());
 			
 			controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
