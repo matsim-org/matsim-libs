@@ -15,13 +15,17 @@ abstract class FuturePathDirective extends AbstractDirective {
     FuturePathDirective(FuturePathContainer futurePathContainer) {
         this.futurePathContainer = futurePathContainer;
     }
-    
+
     @Override
     final void execute() {
         VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
         executeWithPath(vrpPathWithTravelData);
     }
-    
+
     abstract void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData);
+
+    protected void reportExecutionBypass(double excess) {
+        System.out.println(" \\- bypass " + getClass().getSimpleName() + ", exceeds EndTime by " + excess + " sec");
+    }
 
 }

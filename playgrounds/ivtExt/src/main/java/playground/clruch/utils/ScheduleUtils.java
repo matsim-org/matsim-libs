@@ -33,17 +33,22 @@ public class ScheduleUtils {
         Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         return toString(schedule);
     }
-    
+
+    /**
+     * @param avVehicle
+     * @param taskEndTime
+     *            has to be strictly less than scheduleEndTime
+     * @param scheduleEndTime
+     * @param destination
+     */
     public static void makeWhole( //
             AVVehicle avVehicle, double taskEndTime, double scheduleEndTime, Link destination) {
-        
-        // TODO regarding min max of begin and end time!!! when NOT to append stayTask?
-
         if (taskEndTime < scheduleEndTime) {
             Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
             schedule.addTask(new AVStayTask(taskEndTime, scheduleEndTime, destination));
-         
+        } else {
+            throw new IllegalArgumentException("taskEndTime " + taskEndTime + " > scheduleEndTime " + scheduleEndTime);
         }
-        
+
     }
 }

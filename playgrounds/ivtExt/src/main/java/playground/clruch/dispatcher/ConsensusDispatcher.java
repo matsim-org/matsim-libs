@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class ConsensusDispatcher extends PartitionedDispatcher {
     public static final int REBALANCING_PERIOD = 5 * 60; // TODO
-    public static final int LAST_REDISPATCH_ITER = 100000; // //TODO
+    // public static final int LAST_REDISPATCH_ITER = 100000; // //TODO
     final AbstractVirtualNodeDest abstractVirtualNodeDest;
     final AbstractRequestSelector abstractRequestSelector;
     final AbstractVehicleDestMatcher abstractVehicleDestMatcher;
@@ -56,7 +56,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
     @Override
     public void redispatch(double now) {
         // do not execute the redispatching method at the end of the horizon // TODO find more elegant way to solve this
-        if (now>LAST_REDISPATCH_ITER) return;
+        // if (now>LAST_REDISPATCH_ITER) return; // not needed anymore, notification will be given instead
         // match requests and vehicles if they are at t
         // he same link
         int seconds = (int) Math.round(now);

@@ -42,10 +42,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         LINKREFS = new HashSet<>(network.getLinks().values());
     }
 
-    /**
-     * verify that link references are present in the network
-     * 
-     */
+    /** verify that link references are present in the network */
     private void verifyReferences() {
         // Collection<Link> links =
         List<Link> testset = getDivertableVehicles().stream() //
@@ -62,10 +59,10 @@ public class EdgyDispatcher extends UniversalDispatcher {
 
     @Override
     public void redispatch(double now) {
-        verifyReferences();
+        // verifyReferences();
 
         final long round_now = Math.round(now);
-        if (round_now % DEBUG_PERIOD == 0 && now < 100000) {
+        if (round_now % DEBUG_PERIOD == 0 || round_now > 107800) {
 
             int num_matchedRequests = 0;
             int num_abortTrip = 0;
