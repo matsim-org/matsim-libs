@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4urbansim.accessibility;
+package org.matsim.contrib.accessibility.run;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -54,6 +54,11 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+/**
+ * I can't say how similar or different to {@link AccessibilityIntegrationTest} this one here is.  kai, feb'17
+ *
+ * @author nagel
+ */
 public class AccessibilityTest implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
 	private static Logger log = Logger.getLogger( AccessibilityTest.class ) ;
 	
