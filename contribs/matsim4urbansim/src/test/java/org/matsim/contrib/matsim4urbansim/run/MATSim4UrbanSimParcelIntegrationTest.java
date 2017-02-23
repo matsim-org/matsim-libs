@@ -63,7 +63,7 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		writer.write( networkFilename);
 		
 		CreateTestM4UConfig creator = new CreateTestM4UConfig(path, networkFilename ) ;
-		String filename = creator.generateConfigV3() ;
+		String filename = creator.generateM4UConfigV3() ;
 		
 		String[] args = { filename } ;
 		MATSim4UrbanSimParcel.main( args ); 

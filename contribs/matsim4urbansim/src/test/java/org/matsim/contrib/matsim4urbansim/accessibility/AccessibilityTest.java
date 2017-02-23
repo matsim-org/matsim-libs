@@ -16,14 +16,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.ConstantSpeedAccessibilityExpContributionCalculator;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeAccessibilityExpContributionCalculator;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
@@ -31,20 +30,21 @@ import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
-import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
-import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
@@ -83,37 +83,32 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	 * The test result should be that the accessibility of the measuring point at (200,100) is higher than the accessibility at
 	 * any other measuring point.
 	 */
-
 	@Test
 	public void testGridBasedAccessibilityMeasure(){
-
-		//create local temp directory
-		String path = utils.getOutputDirectory();
-
-		//create test network with 9 nodes and 8 links and write it into the temp directory
+		
+		//create test network with 9 nodes and 8 links:
 		final Network net = CreateTestNetwork.createTestNetwork();
-		new NetworkWriter(net).write(path+"network.xml");
-
-		//create matsim config file and write it into the temp director<
-		String configLocation = new CreateTestM4UConfig(path, path+"network.xml").generateConfigV3();
 
 		//create a test population of n persons
 		Population population = CreateTestPopulation.createTestPopulation(nPersons);
+		
+		// ---
 
-		//get the config file and initialize it
-		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
-		connector.init();
-		final Config config = connector.getConfig();
-		Assert.assertTrue(config!=null) ;
+		Config config = AccessibilityTest.generateConfigV3() ;
+		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
+		
+		// ---
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		//add the generated test population to the scenario
 		((MutableScenario)scenario).setPopulation(population);
+		((MutableScenario)scenario).setNetwork(net);
+		
+		// ---
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
-		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		{
 
@@ -147,30 +142,27 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	@Test
 	public void testZoneBasedAccessibilityMeasure(){
 
-		//create local temp directory
 		final String path = utils.getOutputDirectory();
 
 		//create test network with 9 nodes and 8 links and write it into the temp directory
 		Network net = CreateTestNetwork.createTestNetwork();
-		new NetworkWriter(net).write(path+"network.xml");
-
-		//create matsim config file and write it into the temp director<
-		CreateTestM4UConfig ctmc = new CreateTestM4UConfig(path, path+"network.xml");
-		String configLocation = ctmc.generateConfigV3();
 
 		//create a test population of n persons
 		Population population = CreateTestPopulation.createTestPopulation(nPersons);
 
-		//get the config file and initialize it
-		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
-		connector.init();
-		final Config config = connector.getConfig();
-		Assert.assertTrue(config!=null) ;
+		// ---
+		
+		final Config config = AccessibilityTest.generateConfigV3() ;
+		
+		// ---
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		//add the generated test population to the scenario
+		//add the generated test data to the scenario
+		((MutableScenario)scenario).setNetwork(net);
 		((MutableScenario)scenario).setPopulation(population);
+		
+		// ---
 
 		//create a new controler for the simulation
 		final Controler ctrl = new Controler(scenario);
@@ -312,5 +304,47 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	public void finish() {
 
 	}
+
+
+	/**
+		 * Starting from a copy of {@link CreateTestM4UConfig#generateM4UConfigV3()} and then modifying it so that it generates a matsim config.
+		 */
+		public final static Config generateConfigV3(){
+			
+			Config config = ConfigUtils.createConfig() ;
+			
+			AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ) ;
+			accConfig.setCellSizeCellBasedAccessibility(100);
+			accConfig.setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation.fromNetwork );
+	
+	//		config.network().setInputFile(this.networkInputFileName);
+	
+			{
+				ActivityParams params = new ActivityParams("home") ;
+				params.setTypicalDuration(43200);
+				config.planCalcScore().addActivityParams(params);
+			}
+			{
+				ActivityParams params = new ActivityParams("work") ;
+				params.setTypicalDuration(28800);
+				params.setOpeningTime(25200);
+				params.setLatestStartTime(32400);
+				config.planCalcScore().addActivityParams(params);
+			}
+	
+			config.controler().setFirstIteration(0);
+			config.controler().setLastIteration(1);
+			
+			// there are default strategies set by M4UConfigUtils; now I need to set them here explicitly.
+			// I don't think that they are ever used, but the injector fails if not at least one of them is there.
+			{
+				StrategySettings changeExpBeta = new StrategySettings();
+				changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+				changeExpBeta.setWeight( 0.8 ) ;
+				config.strategy().addStrategySettings(changeExpBeta);
+			}
+	
+			return config ;
+		}
 
 }

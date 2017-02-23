@@ -90,7 +90,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 
 		CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path);
 		//			String configLocation = testConfig.generateMinimalConfig();
-		String configLocation = testConfig.generateConfigV3();
+		String configLocation = testConfig.generateM4UConfigV3();
 
 		log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 		if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
@@ -155,7 +155,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 
 			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path);
-			String configLocation = testConfig.generateConfigV3();
+			String configLocation = testConfig.generateM4UConfigV3();
 
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
@@ -203,7 +203,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 
 		// this creates a MATSim4UrbanSim configuration
 		CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path, externalConfigLocation);
-		String configLocation = testConfig.generateConfigV3();
+		String configLocation = testConfig.generateM4UConfigV3();
 
 		// This converts the MATSim4UrbanSim configuration into MATSim format, 
 		// i.e. puts the settings into the MATSim config groups or adds new MATSim modules
@@ -401,11 +401,11 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			*/
 		}
 
-		ActivityParams homeActivity = config.planCalcScore().getActivityParams(testConfig.activityType_0);
-		ActivityParams workActivity = config.planCalcScore().getActivityParams(testConfig.activityType_1);
-		Assert.assertTrue(homeActivity.getActivityType().equalsIgnoreCase( testConfig.activityType_0 ));
+		ActivityParams homeActivity = config.planCalcScore().getActivityParams(testConfig.homeActivity);
+		ActivityParams workActivity = config.planCalcScore().getActivityParams(testConfig.workActivity);
+		Assert.assertTrue(homeActivity.getActivityType().equalsIgnoreCase( testConfig.homeActivity ));
 		Assert.assertTrue(homeActivity.getTypicalDuration() == testConfig.homeActivityTypicalDuration.intValue());
-		Assert.assertTrue(workActivity.getActivityType().equalsIgnoreCase( testConfig.activityType_1 ));
+		Assert.assertTrue(workActivity.getActivityType().equalsIgnoreCase( testConfig.workActivity ));
 		Assert.assertTrue(workActivity.getOpeningTime() == testConfig.workActivityOpeningTime.intValue());
 		Assert.assertTrue(workActivity.getLatestStartTime() == testConfig.workActivityLatestStartTime.intValue());
 	}

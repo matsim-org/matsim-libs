@@ -91,7 +91,7 @@ public class AccessibilityComputationCapeTownTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setOutputCrs(TransformationFactory.WGS84_SA_Albers);
 		
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromNetwork.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromNetwork);
 		// Network bounds to determine envelope
 //		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
 //		Envelope networkEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());

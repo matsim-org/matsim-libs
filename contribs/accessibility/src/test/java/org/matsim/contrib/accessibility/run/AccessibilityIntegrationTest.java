@@ -114,7 +114,7 @@ public class AccessibilityIntegrationTest {
 		double max = 200.;
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
 		acg.setBoundingBoxBottom(min);
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
@@ -184,7 +184,7 @@ public class AccessibilityIntegrationTest {
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setCellSizeCellBasedAccessibility(100);
 		// set area by shapefile in this test
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile);
 		//		acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
 		acg.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
 
@@ -219,7 +219,7 @@ public class AccessibilityIntegrationTest {
 		}
 		
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFile.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFile);
 		acg.setMeasuringPointsFile(f.getAbsolutePath());
 		
 		final Scenario sc = createTestScenario(config);
