@@ -25,13 +25,14 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourcePlugin;
 import org.matsim.contrib.dynagent.run.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.*;
 
@@ -76,6 +77,11 @@ public class DvrpModule extends AbstractModule {
 		String mode = dvrpCfg.getMode();
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
 		bind(Fleet.class).toInstance(fleet);// TODO add vehFile into DvrpConfig?
+		
+		//Visualisation of schedules for DVRP DynAgents
+		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
+		
+		//VrpTravelTimeEstimator
 		install(VrpTravelTimeModules.createTravelTimeEstimatorModule(dvrpCfg.getTravelTimeEstimationAlpha()));
 	}
 
