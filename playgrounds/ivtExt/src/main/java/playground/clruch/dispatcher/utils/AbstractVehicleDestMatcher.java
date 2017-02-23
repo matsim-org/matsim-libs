@@ -11,13 +11,11 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 
 public abstract class AbstractVehicleDestMatcher {
     public final Map<VehicleLinkPair, Link> match( //
-            Collection<VehicleLinkPair> vehicleLinkPairs, //
-            List<Link> links) {
+            Collection<VehicleLinkPair> vehicleLinkPairs, List<Link> links) {
         if (vehicleLinkPairs.size() != links.size())
-            throw new RuntimeException("set of vehicles and links inconsistent size");
-        if(vehicleLinkPairs.isEmpty()){
-            return Collections.emptyMap();
-        }
+            throw new RuntimeException("set of vehicles and links have inconsistent size");
+        if (vehicleLinkPairs.isEmpty()) 
+            return Collections.emptyMap();        
         return protected_match(vehicleLinkPairs, links);
     }
 

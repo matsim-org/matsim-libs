@@ -9,48 +9,50 @@ import playground.clruch.utils.GlobalAssert;
 import java.util.*;
 
 /**
- * array matching without meaningful criteria
+ * array matching with Euclidean distance as criteria
+ * 
+ * TODO suitable for n < ?
  */
-
-
 public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
     @Override
-    public Map<VehicleLinkPair, Link> protected_match(Collection<VehicleLinkPair> vehicleLinkPairs, List<Link> links) {
+    protected Map<VehicleLinkPair, Link> protected_match(Collection<VehicleLinkPair> vehicleLinkPairs, List<Link> links) {
 
-
+        // since Collection::iterator does not make guarantees about the order
+        List<VehicleLinkPair> ordered_vehicleLinkPairs = new ArrayList<>(vehicleLinkPairs);
         // ensure that the number of vehicles is the same as the number of
-        GlobalAssert.that(vehicleLinkPairs.size() == links.size());
+        GlobalAssert.that(ordered_vehicleLinkPairs.size() == links.size());
 
         // cost of assigning vehicle i to dest j, i.e. distance from vehicle i to destination j
-        int n = vehicleLinkPairs.size();
-        double distancematrix[][] = new double[n][n];
+        final int n = ordered_vehicleLinkPairs.size();
+        GlobalAssert.that(0 < n);
+        
+        final double distancematrix[][] = new double[n][n];
 
         int i = -1;
-        for (VehicleLinkPair vehicleLinkPair : vehicleLinkPairs) {
-            i = i + 1;
+        for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
+            ++i;
             Coord vehCoord = vehicleLinkPair.linkTimePair.link.getFromNode().getCoord();
             int j = -1;
             for (Link dest : links) {
-                j = j + 1;
+                ++j;
                 Coord destCoord = dest.getCoord();
-                distancematrix[i][j] = Math.hypot((vehCoord.getX() - destCoord.getX()),(vehCoord.getY() - destCoord.getY()));
+                distancematrix[i][j] = Math.hypot( //
+                        vehCoord.getX() - destCoord.getX(), //
+                        vehCoord.getY() - destCoord.getY());
             }
         }
 
         HungarianAlgorithm hungarianAlgorithm = new HungarianAlgorithm(distancematrix);
 
         // vehicle at position i is assigned to destination matchinghungarianAlgorithm[j]
-        int matchinghungarianAlgorithm[] = hungarianAlgorithm.execute();
-
-
+        int matchinghungarianAlgorithm[] = hungarianAlgorithm.execute(); // O(n^3)
 
         // do the assignment according to the Hungarian algorithm
         Map<VehicleLinkPair, Link> map = new HashMap<>();
         i = -1;
-        for (VehicleLinkPair vehicleLinkPair : vehicleLinkPairs) {
-            i = i + 1;
+        for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
+            ++i;
             map.put(vehicleLinkPair, (Link) links.get(matchinghungarianAlgorithm[i]));
-
         }
         return map;
 

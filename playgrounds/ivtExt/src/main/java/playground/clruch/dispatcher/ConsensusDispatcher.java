@@ -25,8 +25,8 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
     public static final int REBALANCING_PERIOD = 5 * 60; // TODO
     // public static final int LAST_REDISPATCH_ITER = 100000; // //TODO
     final AbstractVirtualNodeDest abstractVirtualNodeDest;
-    final AbstractRequestSelector abstractRequestSelector;
-    final AbstractVehicleDestMatcher abstractVehicleDestMatcher;
+    final AbstractRequestSelector abstractRequestSelector; // TODO rename variable name to "requestSelector"
+    final AbstractVehicleDestMatcher abstractVehicleDestMatcher; // TODO rename variable-name to "vehicleDestMatcher"
     final Map<VirtualLink, Double> linkWeights;
     Map<VirtualLink, Double> rebalanceFloating;
 
@@ -207,12 +207,15 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             // 2.5 assign destinations to the available vehicles
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
 
-                Map<VehicleLinkPair, Link> map = abstractVehicleDestMatcher.match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
-                for (Entry<VehicleLinkPair, Link> entry : map.entrySet()) {
-                    VehicleLinkPair vehicleLinkPair = entry.getKey();
-                    Link link = entry.getValue();
-                    setVehicleDiversion(vehicleLinkPair, link);
-                }
+                final Map<VehicleLinkPair, Link> map = abstractVehicleDestMatcher.match( //
+                        availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
+                map.entrySet().stream() //
+                    .forEach(entry -> setVehicleDiversion(entry.getKey(), entry.getValue()));
+//                for (Entry<VehicleLinkPair, Link> entry : map.entrySet()) {
+//                    final VehicleLinkPair vehicleLinkPair = entry.getKey();
+//                    final Link link = entry.getValue();
+//                    setVehicleDiversion(vehicleLinkPair, link);
+//                }
             }
         }
 
