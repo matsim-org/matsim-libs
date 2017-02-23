@@ -9,13 +9,14 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.michalm.taxi.data.*;
 
-public class PrtData extends TaxiDataWithRanks {
+public class PrtData extends TaxiRankDataImpl {
 	
 	private Collection<TaxiRank> vehicleRanks;
 	private static QuadTree<TaxiRank> quadTreeRanks;
 	
-	public PrtData(Network network, TaxiDataWithRanks data){
-		this.vehicleRanks = data.getTaxiRanks().values();
+	@SuppressWarnings("unchecked")
+    public PrtData(Network network, TaxiRankDataImpl data){
+		this.vehicleRanks = (Collection<TaxiRank>)data.getTaxiRanks().values();
 		double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
 		this.initRankQuadTree(bb[0], bb[1], bb[2], bb[3]);
 	}
@@ -46,11 +47,4 @@ public class PrtData extends TaxiDataWithRanks {
     public TaxiRank getNearestRank(Link link){
     	return quadTreeRanks.getClosest(link.getCoord().getX(), link.getCoord().getY());
     }
-    
-    @SuppressWarnings("unchecked")
-    private static <S, T> List<T> convertList(List<S> list)
-    {
-        return (List<T>)list;
-    }
-
 }

@@ -70,7 +70,7 @@ public class AgentSpecificActivityScheduling {
 		this.controler = controler;
 	}
 
-	public Controler prepareControler() {
+	public Controler prepareControler(boolean adjustPopulation) {
 		
 		Controler controler = null;
 		
@@ -85,17 +85,18 @@ public class AgentSpecificActivityScheduling {
 			controler = this.controler;
 		}
 		
-		
-		log.info("Preparing the population...");
+		if (adjustPopulation) {
+			log.info("Adjusting the population...");
 
-		PopulationTools.setScoresToZero(controler.getScenario().getPopulation());
-		PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(controler.getScenario().getPopulation(), activityDurationBin);			
-		PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(controler.getScenario().getPopulation());
-		PopulationTools.analyze(controler.getScenario().getPopulation());
-			
-		if (removeNetworkSpecificInformation) PopulationTools.removeNetworkSpecificInformation(controler.getScenario().getPopulation());
+			PopulationTools.setScoresToZero(controler.getScenario().getPopulation());
+			PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(controler.getScenario().getPopulation(), activityDurationBin);			
+			PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(controler.getScenario().getPopulation());
+			PopulationTools.analyze(controler.getScenario().getPopulation());
+				
+			if (removeNetworkSpecificInformation) PopulationTools.removeNetworkSpecificInformation(controler.getScenario().getPopulation());
 
-		log.info("Preparing the population... Done.");					
+			log.info("Adjusting the population... Done.");
+		}					
 		
 		// adjust config
 		log.info("Adding duration-specific activity types to config...");

@@ -35,7 +35,7 @@ public class VrpAgentLogic
 
     public interface DynActionCreator
     {
-        DynAction createAction(Task task, double now);
+        DynAction createAction(DynAgent dynAgent, Task task, double now);
     }
 
 
@@ -51,7 +51,6 @@ public class VrpAgentLogic
         this.dynActionCreator = dynActionCreator;
 
         this.vehicle = vehicle;
-        this.vehicle.setAgentLogic(this);
     }
 
 
@@ -70,23 +69,17 @@ public class VrpAgentLogic
     }
 
 
-    public Vehicle getVehicle()
-    {
-        return vehicle;
-    }
-
-
     @Override
     public DynAction computeNextAction(DynAction oldAction, double now)
     {
-        Schedule<?> schedule = vehicle.getSchedule();
+        Schedule schedule = vehicle.getSchedule();
 
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
         // else: PLANNED or STARTED
 
-        optimizer.nextTask(schedule);
+        optimizer.nextTask(vehicle);
         // remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
 
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
@@ -94,7 +87,7 @@ public class VrpAgentLogic
         }
 
         Task task = schedule.getCurrentTask();
-        DynAction action = dynActionCreator.createAction(task, now);
+        DynAction action = dynActionCreator.createAction(agent, task, now);
 
         return action;
     }
@@ -105,7 +98,7 @@ public class VrpAgentLogic
         return new AbstractDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE) {
             public double getEndTime()
             {
-                Schedule<?> s = vehicle.getSchedule();
+                Schedule s = vehicle.getSchedule();
 
                 switch (s.getStatus()) {
                     case PLANNED:
@@ -123,5 +116,11 @@ public class VrpAgentLogic
     private DynActivity createAfterScheduleActivity()
     {
         return new StaticDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
+    }
+    
+    
+    Vehicle getVehicle()
+    {
+    	return vehicle;
     }
 }

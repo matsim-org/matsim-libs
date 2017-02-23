@@ -24,24 +24,20 @@ package org.matsim.contrib.av.intermodal;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
+import org.matsim.contrib.av.intermodal.router.config.*;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import com.google.inject.AbstractModule;
 
 /**
  * @author  jbischoff
@@ -58,7 +54,7 @@ public class RunTaxiPTIntermodalExample {
 	public void run(boolean OTFVis) {
 		Config config = ConfigUtils.loadConfig(
 				"./src/main/resources/intermodal/config.xml",
-				new TaxiConfigGroup());
+				new TaxiConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -96,13 +92,13 @@ public class RunTaxiPTIntermodalExample {
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		TaxiData taxiData = new TaxiData();
+		FleetImpl fleet = new FleetImpl();
 		String taxiFileName = TaxiConfigGroup.get(config).getTaxisFileUrl(config.getContext()).getFile();
-		new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiFileName);
+		new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiFileName);
 		// ---
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new TaxiModule(taxiData));
+		controler.addOverridingModule(new TaxiOutputModule());
 
 //				// to replace by own dispatch module:
 //				controler.addOverridingModule( new AbstractModule(){
@@ -112,10 +108,8 @@ public class RunTaxiPTIntermodalExample {
 //					}
 //				} ) ;
 
-		// yyyy can't we put the following into TaxiModule?  One can always override them anyways. kai, jan'17
-		double expAveragingAlpha = 0.05;
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+		
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

@@ -26,19 +26,29 @@ import org.matsim.api.core.v01.Identifiable;
  * @author michalm
  */
 public interface Request
-    extends Identifiable<Request>
+extends Identifiable<Request>
 {
-    double getQuantity();
+	double getQuantity();
 
 
-    double getT0();// earliest start time
+	/**
+	 * Design comments:<ul>
+	 * <li> Rename to <code>getEarliestStartTime()</code>?  kai, feb'17
+	 * </ul>
+	 */
+	double getT0();// earliest start time
 
 
-    double getT1();// latest start time
+	/**
+	 * Design comments:<ul>
+	 * <li> Rename to <code>getLatestStartTime()</code>?  kai, feb'17
+	 * </ul>
+	 */
+	double getT1();// latest start time
 
 
-    double getSubmissionTime();
+	double getSubmissionTime();
 
 
-    boolean isRejected();
+	boolean isRejected();
 }

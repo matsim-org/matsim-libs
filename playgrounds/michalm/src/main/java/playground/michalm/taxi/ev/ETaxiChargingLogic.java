@@ -26,9 +26,7 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.michalm.ev.charging.FixedSpeedChargingWithQueueingLogic;
 import playground.michalm.ev.data.*;
-import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.data.EvrpVehicle.Ev;
-import playground.michalm.taxi.vrpagent.ETaxiAtChargerActivity;
 
 
 public class ETaxiChargingLogic
@@ -72,31 +70,24 @@ public class ETaxiChargingLogic
     }
 
 
-    private ETaxiAtChargerActivity getActivity(ElectricVehicle ev)
-    {
-        EvrpVehicle evrpVehicle = ((Ev)ev).getEvrpVehicle();
-        return (ETaxiAtChargerActivity)evrpVehicle.getAgentLogic().getDynAgent().getCurrentAction();
-    }
-
-
     @Override
     protected void notifyVehicleQueued(ElectricVehicle ev, double now)
     {
-        getActivity(ev).vehicleQueued(now);
+    	((Ev)ev).getAtChargerActivity().vehicleQueued(now);
     }
 
 
     @Override
     protected void notifyChargingStarted(ElectricVehicle ev, double now)
     {
-        getActivity(ev).chargingStarted(now);
+    	((Ev)ev).getAtChargerActivity().chargingStarted(now);
     }
 
 
     @Override
     protected void notifyChargingEnded(ElectricVehicle ev, double now)
     {
-        getActivity(ev).chargingEnded(now);
+    	((Ev)ev).getAtChargerActivity().chargingEnded(now);
     }
 
 

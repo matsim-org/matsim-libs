@@ -1,8 +1,9 @@
 package playground.michalm.taxi.run;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.benchmark.TaxiBenchmarkStats;
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
@@ -23,9 +24,10 @@ public class ETaxiBenchmarkStats
 
 
     @Inject
-    public ETaxiBenchmarkStats(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
+    public ETaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
+            OutputDirectoryHierarchy controlerIO)
     {
-        super(taxiData, controlerIO);
+        super(fleet, requestCollector, controlerIO);
     }
 
 
@@ -33,7 +35,7 @@ public class ETaxiBenchmarkStats
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
         super.notifyAfterMobsim(event);
-        ETaxiStats singleRunEStats = new ETaxiStatsCalculator(taxiData.getVehicles().values())
+        ETaxiStats singleRunEStats = new ETaxiStatsCalculator(fleet.getVehicles().values())
                 .getDailyEStats();
         queuedTimeRatio.addValue(singleRunEStats.getFleetQueuedTimeRatio());
     }

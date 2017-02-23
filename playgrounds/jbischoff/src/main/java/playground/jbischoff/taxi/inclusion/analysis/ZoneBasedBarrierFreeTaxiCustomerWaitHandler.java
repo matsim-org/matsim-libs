@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -52,6 +52,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 	private Map<String,int[]> zoneDepartures = new TreeMap<>();
 	private final boolean onlyBarrierFreeRequests;
 	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, "EPSG:25833");
+	private double overallAverageWaitTime = 0;
 	
 		public ZoneBasedBarrierFreeTaxiCustomerWaitHandler(Network network,Map<String,Geometry> zones, boolean onlyBarrierFreeRequests) {
 			this.numberOfTrips = 0;
@@ -79,7 +80,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 	    @Override
 	    public void handleEvent(PersonDepartureEvent event){
 	    	
-	        if (!event.getLegMode().equals(TaxiModule.TAXI_MODE))
+	        if (!event.getLegMode().equals(TaxiOptimizerModules.TAXI_MODE))
 	            return;
 	        if (onlyBarrierFreeRequests){
 	        	if (!event.getPersonId().toString().startsWith("hc_")){
@@ -149,7 +150,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 			DecimalFormat df = new DecimalFormat( "####0.00" );
 			try {
 				bw.write("Zone;");
-				for (int i = 0; i<24; i++){
+				for (int i = 3; i<24; i++){
 				bw.write(i+" trips;"+i+" avWt;");	
 				}
 				bw.write("total;averageWait");
@@ -161,7 +162,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 					bw.write(e.getKey()+";");
 					double allTrips = 0.;
 					double allWait = 0.;
-					for (int i = 0; i<24; i++){
+					for (int i = 6; i<24; i++){
 						double waitTime = waitTimes[i];
 						int trips = e.getValue()[i];
 						double averageWaitTime = waitTime/trips;
@@ -169,8 +170,8 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 						bw.write(trips+";"+df.format(averageWaitTime)+";");
 						allTrips+=trips;
 						allWait+=waitTime;
-						totalWait[i]+=allWait;
-						totalTrips[i]+=allTrips;
+						totalWait[i]+=waitTime;
+						totalTrips[i]+=trips;
 						
 					} 
 					
@@ -181,18 +182,23 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 					
 				}
 				bw.write("allZones;");
-				for (int i = 0; i<24; i++){
+				double allHoursCustomers = 0;
+				double allHoursWait = 0;
+				for (int i = 6; i<24; i++){
 					double waitTime = totalWait[i];
 					int trips = totalTrips[i];
 					double averageWaitTime = waitTime/trips;
 					if (trips == 0) averageWaitTime = 0;
+					allHoursWait += waitTime;
+					allHoursCustomers += trips;
 					bw.write(trips+";"+df.format(averageWaitTime)+";");
 					} 
+				this.overallAverageWaitTime = allHoursWait/allHoursCustomers;
 				bw.flush();
 				bw.close();
 				BufferedWriter csvt = IOUtils.getBufferedWriter(filename+"t");
 				csvt.write("\"String\"");
-				for (int i = 0; i<50;i++) csvt.write(",\"Real\"");
+				for (int i = 0; i<21;i++) csvt.write(",\"Real\"");
 				csvt.flush();
 				csvt.close();
 				
@@ -213,5 +219,12 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 	    	return null;
 	    	
 	    }
+		
+		/**
+		 * @return the overallAverageWaitTime
+		 */
+		public double getOverallAverageWaitTime() {
+			return overallAverageWaitTime;
+		}
 	    
 }

@@ -88,42 +88,48 @@ public class NoiseAnalysisHandler implements NoiseEventCausedHandler, NoiseEvent
 		
 		// trip-specific noise cost
 		
-		// get the right trip no. based on the emergence time
-		
-		int tripNumber = 0;
-		double maxDepTime = 0.;
-		
-		for (int tripNr : basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).keySet()) {
-			if (event.getEmergenceTime() >= basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr)) {
-				if (basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr) >= maxDepTime) {
-					tripNumber = tripNr;
+		if (basicHandler.getTaxiDrivers().contains(event.getCausingAgentId())) {
+			// skip the trip-specific noise cost analysis for taxi drivers
+				
+		} else {
+
+			// get the right trip no. based on the emergence time
+
+			int tripNumber = 0;
+			double maxDepTime = 0.;
+			
+			for (int tripNr : basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).keySet()) {
+				if (event.getTimeBinEndTime() >= basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr)) {
+					if (basicHandler.getPersonId2tripNumber2departureTime().get(event.getCausingAgentId()).get(tripNr) >= maxDepTime) {
+						tripNumber = tripNr;
+					}
 				}
 			}
-		}
-		
-		if (personId2tripNumber2causedNoiseCost.containsKey(event.getCausingAgentId())) {
 			
-			if (personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId()).containsKey(tripNumber)) {
+			if (personId2tripNumber2causedNoiseCost.containsKey(event.getCausingAgentId())) {
 				
-				double causedAmountBefore = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId()).get(tripNumber);
-				double causedAmountUpdated = causedAmountBefore + event.getAmount();
-				
-				Map<Integer,Double> tripNumber2causedAmount = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId());
-				tripNumber2causedAmount.put(tripNumber, causedAmountUpdated);
-				personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedAmount);
+				if (personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId()).containsKey(tripNumber)) {
+					
+					double causedAmountBefore = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId()).get(tripNumber);
+					double causedAmountUpdated = causedAmountBefore + event.getAmount();
+					
+					Map<Integer,Double> tripNumber2causedAmount = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId());
+					tripNumber2causedAmount.put(tripNumber, causedAmountUpdated);
+					personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedAmount);
+					
+				} else {
+					Map<Integer,Double> tripNumber2causedDelay = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId());
+					tripNumber2causedDelay.put(tripNumber, event.getAmount());
+					personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedDelay);
+				}
 				
 			} else {
-				Map<Integer,Double> tripNumber2causedDelay = personId2tripNumber2causedNoiseCost.get(event.getCausingAgentId());
+				
+				Map<Integer,Double> tripNumber2causedDelay = new HashMap<>();
 				tripNumber2causedDelay.put(tripNumber, event.getAmount());
 				personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedDelay);
 			}
-			
-		} else {
-			
-			Map<Integer,Double> tripNumber2causedDelay = new HashMap<>();
-			tripNumber2causedDelay.put(tripNumber, event.getAmount());
-			personId2tripNumber2causedNoiseCost.put(event.getCausingAgentId(), tripNumber2causedDelay);
-		}		
+		}
 	}
 
 	@Override

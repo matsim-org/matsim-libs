@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
 import org.matsim.core.controler.events.IterationEndsEvent;
 
@@ -34,11 +35,11 @@ public class PrtRankAndPassengerStatsHandler
     protected Map<Id<TaxiRank>, List<Id<Person>>> rankId2WaitingPassengersList = new HashMap<Id<TaxiRank>, List<Id<Person>>>();
 
     protected PrtData data;
-    private VrpData vrpData;
+    private Fleet vrpData;
     private Scenario scenario;
 
 
-    public PrtRankAndPassengerStatsHandler(VrpData vrpData, Scenario scenario, PrtData data)
+    public PrtRankAndPassengerStatsHandler(Fleet vrpData, Scenario scenario, PrtData data)
     {
         this.vrpData = vrpData;
         this.scenario = scenario;
@@ -76,8 +77,7 @@ public class PrtRankAndPassengerStatsHandler
                 }
             }
 
-            Link link = this.scenario.getNetwork().getLinks()
-                    .get(vehicle.getAgentLogic().getDynAgent().getCurrentLinkId());
+            Link link = ((StayTask)vehicle.getSchedule().getCurrentTask()).getLink();
             TaxiRank rank = this.data.getNearestRank(link);
 
             if (!this.rankIds2NumberOfBoardingPassengers.containsKey(rank.getId())) {
@@ -139,8 +139,7 @@ public class PrtRankAndPassengerStatsHandler
                 }
             }
 
-            Link link = this.scenario.getNetwork().getLinks()
-                    .get(vehicle.getAgentLogic().getDynAgent().getCurrentLinkId());
+            Link link = ((StayTask)vehicle.getSchedule().getCurrentTask()).getLink();
             TaxiRank rank = this.data.getNearestRank(link);
 
             if (!this.rankIds2NumberOfAlightingPassengers.containsKey(rank.getId())) {

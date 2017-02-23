@@ -38,21 +38,21 @@ public final class NoiseEventAffected extends Event {
 
 	public final static String EVENT_TYPE = "noiseEventAffected";
 	
-	public final static String ATTRIBUTE_EMERGENCE_TIME = "emergenceTime";
+	public final static String ATTRIBUTE_TIME_BIN = "timeBinEndTime";
 	public final static String ATTRIBUTE_AGENT_ID = "affectedAgentId";
 	public final static String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
 	public final static String ATTRIBUTE_RECEIVERPOINT_ID = "receiverPointId";
 	public final static String ATTRIBUTE_ACTIVTITY_TYPE = "activityType";
 	
-	private final double emergenceTime;
+	private final double timeBinEndTime;
 	private final Id<Person> affectedAgentId;
 	private final double amount;
 	private final Id<ReceiverPoint> receiverPointId;
 	private final String actType;
 	
-	public NoiseEventAffected(double time, double emergenceTime, Id<Person> affectedAgentId , double amount , Id<ReceiverPoint> receiverPointId , String actType) {
+	public NoiseEventAffected(double time, double timeBinEndTime, Id<Person> affectedAgentId , double amount , Id<ReceiverPoint> receiverPointId , String actType) {
 		super(time);
-		this.emergenceTime = emergenceTime;
+		this.timeBinEndTime = timeBinEndTime;
 		this.affectedAgentId = affectedAgentId;
 		this.amount = amount;
 		this.receiverPointId = receiverPointId;
@@ -75,8 +75,8 @@ public final class NoiseEventAffected extends Event {
 		return actType;
 	}
 	
-	public double getEmergenceTime() {
-		return emergenceTime;
+	public double getTimeBinEndTime() {
+		return timeBinEndTime;
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public final class NoiseEventAffected extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attrs = super.getAttributes();
-		attrs.put(ATTRIBUTE_EMERGENCE_TIME, Double.toString(this.emergenceTime));
+		attrs.put(ATTRIBUTE_TIME_BIN, Double.toString(this.timeBinEndTime));
 		attrs.put(ATTRIBUTE_AGENT_ID, this.affectedAgentId.toString());
 		attrs.put(ATTRIBUTE_AMOUNT_DOUBLE, Double.toString(this.amount));
 		attrs.put(ATTRIBUTE_RECEIVERPOINT_ID , this.receiverPointId.toString());

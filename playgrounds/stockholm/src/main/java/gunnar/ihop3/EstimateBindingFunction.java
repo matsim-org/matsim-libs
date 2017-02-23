@@ -1,5 +1,13 @@
 package gunnar.ihop3;
 
+import gunnar.ihop2.integration.MATSimDummy;
+import gunnar.ihop2.regent.costwriting.HalfTourCostMatrices;
+import gunnar.ihop2.regent.costwriting.LinkTravelDistanceInKilometers;
+import gunnar.ihop2.regent.costwriting.LinkTravelTimeInMinutes;
+import gunnar.ihop2.regent.costwriting.TripCostMatrices;
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.utils.LexicographicallyOrderedPositiveNumberStrings;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,14 +36,7 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesReaderMatsimV1;
 import org.matsim.vehicles.Vehicle;
 
-import gunnar.ihop2.integration.MATSimDummy;
-import gunnar.ihop2.regent.costwriting.HalfTourCostMatrices;
-import gunnar.ihop2.regent.costwriting.LinkTravelDistanceInKilometers;
-import gunnar.ihop2.regent.costwriting.LinkTravelTimeInMinutes;
-import gunnar.ihop2.regent.costwriting.TripCostMatrices;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.utils.LexicographicallyOrderedPositiveNumberStrings;
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+import saleem.stockholmmodel.utils.StockholmTransformationFactory;
 
 /**
  * 

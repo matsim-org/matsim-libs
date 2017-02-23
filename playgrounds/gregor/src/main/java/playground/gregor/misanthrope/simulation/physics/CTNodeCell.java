@@ -32,6 +32,7 @@ import playground.gregor.misanthrope.simulation.CTEvent;
 
 import java.util.*;
 
+
 /**
  * Created by laemmel on 12/10/15.
  */
@@ -76,7 +77,7 @@ public class CTNodeCell extends CTCell {
 			return;
 		}
 		this.next = nextJumper;
-		double x = CTLink.WIDTH / 0.1;
+		double x = width / 0.1;
 		minJumpTime = Math.min(minJumpTime, x);
 
 		this.nextCellJumpTime = now + minJumpTime;
@@ -92,11 +93,11 @@ public class CTNodeCell extends CTCell {
 			Link usLink = ((CTLink) nbp).getUsLink();
 			Link dsLink = ((CTLink) nbp).getDsLink();
 			if (usLink != null && ped.getNextLinkId() == usLink.getId()) {
-				return 2 * this.width / CTLink.WIDTH;
+				return 2 * this.width / width;
 			}
 			else {
 				if (ped.getNextLinkId() == dsLink.getId()) {
-					return 2 * this.width / CTLink.WIDTH;
+					return 2 * this.width / width;
 				}
 			}
 		}
@@ -198,16 +199,16 @@ public class CTNodeCell extends CTCell {
 		maxCap = Math.min(maxCap, 26.6);
 
 		double width = (maxCap / 1.33);
-		if (width < CTLink.WIDTH) {
-			width = CTLink.WIDTH;
+		if (width < this.width) {
+			width = this.width;
 		}
 		double area = width * width;
-		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1
-				&& ((CTNode) this.getParent()).getNode().getInLinks().size() == 1
-				&& ((CTNode) this.getParent()).getNode().getOutLinks().values().iterator().next().getToNode()
-				== ((CTNode) this.getParent()).getNode().getInLinks().values().iterator().next().getFromNode()) {
-			area = width * mxLength;
-		}
+//		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1
+//				&& ((CTNode) this.getParent()).getNode().getInLinks().size() == 1
+//				&& ((CTNode) this.getParent()).getNode().getOutLinks().values().iterator().next().getToNode()
+//				== ((CTNode) this.getParent()).getNode().getInLinks().values().iterator().next().getFromNode()) {
+//			area = width * mxLength;
+//		}
 
 
 		setArea(area);

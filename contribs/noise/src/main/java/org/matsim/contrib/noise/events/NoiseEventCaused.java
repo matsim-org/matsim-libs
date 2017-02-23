@@ -39,29 +39,32 @@ public final class NoiseEventCaused extends Event {
 
 	public final static String EVENT_TYPE = "noiseEventCaused";
 
-	public final static String ATTRIBUTE_EMERGENCE_TIME = "emergenceTime";
+	public final static String ATTRIBUTE_TIME_BIN = "timeBinEndTime";
+	public final static String ATTRIBUTE_ENTERING_TIME = "linkEnteringTime";
 	public final static String ATTRIBUTE_LINK_ID = "linkId";
 	public final static String ATTRIBUTE_VEHICLE_ID = "causingVehicleId";
 	public final static String ATTRIBUTE_AGENT_ID = "causingAgentId";
 	public final static String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
 	
-	private final double emergenceTime;
+	private final double timeBinEndTime;
+	private final double linkEnteringTime;
 	private final Id<Person> causingAgentId;
 	private final Id<Vehicle> causingVehicleId;
 	private final double amount;
 	private final Id<Link> linkId;
 	
-	public NoiseEventCaused(double time, double emergenceTime, Id<Person> causingAgentId , Id<Vehicle> causingVehicleId , double amount , Id<Link> linkId) {
+	public NoiseEventCaused(double time, double timeBinEndTime, double linkEnteringTime, Id<Person> causingAgentId , Id<Vehicle> causingVehicleId , double amount , Id<Link> linkId) {
 		super(time);
-		this.emergenceTime = emergenceTime;
+		this.timeBinEndTime = timeBinEndTime;
+		this.linkEnteringTime = linkEnteringTime;
 		this.causingAgentId = causingAgentId;
 		this.causingVehicleId = causingVehicleId;
 		this.amount = amount;
 		this.linkId = linkId;
 	}
 	
-	public double getEmergenceTime() {
-		return emergenceTime;
+	public double getTimeBinEndTime() {
+		return timeBinEndTime;
 	}
 	
 	public Id<Link> getLinkId() {
@@ -80,10 +83,15 @@ public final class NoiseEventCaused extends Event {
 		return amount;
 	}
 	
+	public double getLinkEnteringTime() {
+		return linkEnteringTime;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attrs = super.getAttributes();
-		attrs.put(ATTRIBUTE_EMERGENCE_TIME, Double.toString(this.emergenceTime));
+		attrs.put(ATTRIBUTE_TIME_BIN, Double.toString(this.timeBinEndTime));
+		attrs.put(ATTRIBUTE_ENTERING_TIME, Double.toString(this.linkEnteringTime));
 		attrs.put(ATTRIBUTE_AGENT_ID, this.causingAgentId.toString());
 		attrs.put(ATTRIBUTE_VEHICLE_ID, this.causingVehicleId.toString());
 		attrs.put(ATTRIBUTE_AMOUNT_DOUBLE, Double.toString(this.amount));

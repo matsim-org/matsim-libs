@@ -81,7 +81,7 @@ public class InclusionRuleBasedTaxiOptimizer
     {
         int idleCount = idleTaxiRegistry.getVehicleCount();
 
-        Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+        Iterator<TaxiRequest> reqIter = getUnplannedRequests().iterator();
         while (reqIter.hasNext() && idleCount > 0) {
             TaxiRequest req = reqIter.next();
             boolean barrierFreeRequest = req.getPassenger().getId().toString().startsWith(params.INCLUSION_CUSTOMER_PREFIX)? true : false;
@@ -94,7 +94,7 @@ public class InclusionRuleBasedTaxiOptimizer
             BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
                     .findBestVehicleForRequest(req, selectedVehs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+            getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
             reqIter.remove();
             unplannedRequestRegistry.removeRequest(req);
@@ -115,17 +115,18 @@ public class InclusionRuleBasedTaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Vehicle vehicle)
     {
-        super.nextTask(schedule);
+        super.nextTask(vehicle);
 
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(schedule);
             if (lastTask.getBeginTime() < schedule.getVehicle().getT1()) {
                 idleTaxiRegistry.removeVehicle(schedule.getVehicle());
             }
         }
-        else if (optimContext.scheduler.isIdle(schedule.getVehicle())) {
+        else if (getOptimContext().scheduler.isIdle(schedule.getVehicle())) {
             idleTaxiRegistry.addVehicle(schedule.getVehicle());
         }
         else {

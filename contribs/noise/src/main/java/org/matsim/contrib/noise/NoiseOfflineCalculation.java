@@ -54,7 +54,11 @@ public class NoiseOfflineCalculation {
 		this.scenario = scenario;
 		this.outputDirectory = analysisOutputDirectory;
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModule("noise");
+		if (!outputDirectory.endsWith("/")) {
+			outputDirectory = outputDirectory + "/";
+		}
+		
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 		if (noiseParameters.isInternalizeNoiseDamages()) {
 			log.warn("If you intend to internalize noise damages, please run the online noise computation."
 					+ " This is an offline noise calculation which can only be used for analysis purposes.");
@@ -63,17 +67,17 @@ public class NoiseOfflineCalculation {
 	}
 
 	public void run() {
+			
+		String outputFilePath = outputDirectory + "noise-analysis_it." + this.scenario.getConfig().controler().getLastIteration() + "/";
+		File file = new File(outputFilePath);
+		file.mkdirs();
 		
 		OutputDirectoryLogging.catchLogEntries();
 		try {
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputFilePath);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-			
-		String outputFilePath = outputDirectory + "analysis_it." + this.scenario.getConfig().controler().getLastIteration() + "/";
-		File file = new File(outputFilePath);
-		file.mkdirs();
 					
 		noiseContext = new NoiseContext(scenario);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);

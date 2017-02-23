@@ -209,12 +209,12 @@ public class RunExample {
 				net.addLink(l0);
 				l0.setCapacity(width / someNodes.size());
 				l0.setLength(length * 2);//?check!!
-				if (cnt++ % 2 != 0) {
+//				if (cnt++ % 2 != 0) {
 					Link l0Rev = fac.createLink(Id.createLinkId(id++), n, n1);
 					net.addLink(l0Rev);
 					l0Rev.setCapacity(width / someNodes.size());
 					l0Rev.setLength(length * 2);
-				}
+//				}
 			}
 
 			{

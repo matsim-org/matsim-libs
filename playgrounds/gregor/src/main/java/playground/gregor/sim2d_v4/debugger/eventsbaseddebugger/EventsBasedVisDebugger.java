@@ -30,7 +30,9 @@ import processing.core.PVector;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class EventsBasedVisDebugger extends PApplet {
@@ -66,9 +68,9 @@ public class EventsBasedVisDebugger extends PApplet {
 		computeOffsets(sc);
 		this.fr = new JFrame();
 		// this.fr.setSize(1024,788);
-		this.fr.setSize(1024, 788);
-		// this.fr.setSize(1280,740);
-		// this.fr.setSize(720,740);
+//		this.fr.setSize(1024, 788);
+        this.fr.setSize(1280, 740);
+        // this.fr.setSize(720,740);
 		JPanel compositePanel = new JPanel();
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
 
@@ -119,9 +121,9 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	@Override
 	public void setup() {
-		size(1024, 768);
-		// size(1280,720);
-		// size(720,720);
+//		size(1024, 768);
+        size(1280, 720);
+        // size(720,720);
 		background(0);
 
 	}

@@ -17,7 +17,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 
-import saleem.p0.GenericP0ControlHandler;
+import saleem.p0.policy.GenericP0ControlHandler;
 
 // For Generic Junctions
 

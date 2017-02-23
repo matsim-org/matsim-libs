@@ -2,7 +2,7 @@ package org.matsim.core.controler;
 
 import org.matsim.analysis.IterationStopWatch;
 
-public class NewControlerModule extends AbstractModule {
+public final class NewControlerModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(ControlerI.class).to(NewControler.class).asEagerSingleton();

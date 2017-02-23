@@ -35,7 +35,7 @@ public class AggregateRideAppender {
     public void schedule(AggregatedRequest request, AVVehicle vehicle, double now) {
         AVTimingParameters timing = config.getParent().getTimingParameters();
 
-        Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
+        Schedule schedule = vehicle.getSchedule();
         AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
 
         double startTime = 0.0;

@@ -178,7 +178,7 @@ public class TestExposurePricing {
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
 				bind(EmissionModule.class).toInstance(emissionModule);
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
-				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
@@ -235,10 +235,7 @@ public class TestExposurePricing {
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt);
 //		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, sc.getConfig().planCalcScore());
         final playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory(
-                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-                emissionModule,
-                emissionCostModule,
-                controler.getConfig().planCalcScore()
+                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore())
         );
 		controler.addOverridingModule(new AbstractModule() {
 
@@ -248,7 +245,7 @@ public class TestExposurePricing {
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
 				bind(EmissionModule.class).toInstance(emissionModule);
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
-				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});

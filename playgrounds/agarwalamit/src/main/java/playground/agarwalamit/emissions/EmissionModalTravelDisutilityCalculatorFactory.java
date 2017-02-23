@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.agarwalamit.emissions;
 
+import java.util.Set;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -28,8 +30,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
-import java.util.Set;
-
 
 /**
  * @author benjamin
@@ -37,17 +37,10 @@ import java.util.Set;
  */
 public class EmissionModalTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
-	private final EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
+	@Inject  private EmissionModule emissionModule;
+	@Inject  private EmissionCostModule emissionCostModule;
 	private Set<Id<Link>> hotspotLinks;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
-
-	public EmissionModalTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule,
-                                                     PlanCalcScoreConfigGroup cnScoringGroup) {
-		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
-		this.cnScoringGroup = cnScoringGroup;
-	}
+	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){

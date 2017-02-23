@@ -83,7 +83,7 @@ public class CadytsEquilControllerBasedOnDistributions {
 			config.strategy().addStrategySettings(strategySettings);
 		}{				
 			StrategySettings strategySettings = new StrategySettings() ;
-			strategySettings.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
+			strategySettings.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
 			strategySettings.setWeight(0.9);
 			config.strategy().addStrategySettings(strategySettings);
 		}

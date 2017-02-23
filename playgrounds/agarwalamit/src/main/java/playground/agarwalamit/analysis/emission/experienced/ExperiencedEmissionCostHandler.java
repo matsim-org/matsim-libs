@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -58,12 +59,11 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 	private final Map<Id<Vehicle>, Double> vehicleId2ColdEmissCosts = new HashMap<>();
 	private final Map<Id<Vehicle>, Double> vehicleId2WarmEmissCosts = new HashMap<>();
 
-	private final EmissionResponsibilityCostModule emissionCostModule;
-	private final PersonFilter pf  ;
+	@Inject
+	private EmissionResponsibilityCostModule emissionCostModule;
+	@Inject(optional=true) private PersonFilter pf  ;
 
-	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule) {
-		this(emissionCostModule, null);
-	}
+	public ExperiencedEmissionCostHandler(){}
 
 	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule, final PersonFilter pf) {
 		this.emissionCostModule = emissionCostModule;

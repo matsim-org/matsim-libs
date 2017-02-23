@@ -24,7 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
@@ -38,11 +38,10 @@ public class PassengerEngine
 {
     private final String mode;
 
-    protected EventsManager eventsManager;
+    private EventsManager eventsManager;
     private InternalInterface internalInterface;
     private final PassengerRequestCreator requestCreator;
     private final VrpOptimizer optimizer;
-    private final VrpData vrpData;
     private final Network network;
 
     private final AdvanceRequestStorage advanceRequestStorage;
@@ -50,14 +49,12 @@ public class PassengerEngine
 
 
     public PassengerEngine(String mode, EventsManager eventsManager,
-            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, VrpData vrpData,
-            Network network)
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network)
     {
         this.mode = mode;
         this.eventsManager = eventsManager;
         this.requestCreator = requestCreator;
         this.optimizer = optimizer;
-        this.vrpData = vrpData;
         this.network = network;
 
         advanceRequestStorage = new AdvanceRequestStorage();
@@ -165,7 +162,6 @@ public class PassengerEngine
 
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);
-        vrpData.addRequest(request);
         return request;
     }
 

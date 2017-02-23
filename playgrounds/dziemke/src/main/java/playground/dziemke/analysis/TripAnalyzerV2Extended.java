@@ -32,13 +32,14 @@ public class TripAnalyzerV2Extended {
 	public static final Logger log = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
 	/* Parameters */
-	private static final String runId = "run_200";	// <----------
+//	private static final String runId = "run_200";	// <----------
+	private static final String runId = "be_117";	// <----------
 	private static final String usedIteration = "300"; // most frequently used value: 150 // <----------
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
 
-	private static final boolean onlySpecificMode = true; // "car"; should be used for runs with ChangeLegMode enabled
+	private static final boolean onlySpecificMode = false; // "car"; should be used for runs with ChangeLegMode enabled
 	private static final String specificMode = TransportMode.car;
 	
 	private static final boolean onlyInterior = false; // "int"
@@ -66,12 +67,15 @@ public class TripAnalyzerV2Extended {
 	/* Input and output */
 	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml"; // <----------
 //	private static final String networkFile = "../../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz"; // <----------
-	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
-			"/" + runId + "." + usedIteration + ".events.xml.gz";
+//	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
+//			"/" + runId + "." + usedIteration + ".events.xml.gz";
+	private static final String eventsFile = "../../../runs-svn/berlin_scenario_2016/" + runId + "/" + runId + ".output_events.xml.gz";
 	private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + 
 			cemdapPersonsInputFileId + "/persons1.dat";
-	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
-	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+//	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
+	private static final String planningAreaShapeFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/Berlin_DHDN_GK4.shp";
+//	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";	// <----------
+	private static String outputDirectory = "../../../runs-svn/berlin_scenario_2016/" + runId + "/analysis";	// <----------
 	
 	private static String gnuplotScriptName = "plot_rel_path_run.gnu";
 
@@ -90,9 +94,9 @@ public class TripAnalyzerV2Extended {
 
 	
 	public static void main(String[] args) {
-		double aggregateWeightOfTripsWithNonNegativeTimesAndDurations = 0;
-		double numberOfTripsWithCalculableSpeedBeeline = 0;
-		double numberOfTripsWithCalculableSpeedRouted = 0;
+		double aggregateWeightOfTripsWithNonNegativeTimesAndDurations;
+		double numberOfTripsWithCalculableSpeedBeeline;
+		double numberOfTripsWithCalculableSpeedRouted;
 		
 		adaptOutputDirectory();
 	    
@@ -114,7 +118,7 @@ public class TripAnalyzerV2Extended {
 	    
 		AnalysisFileWriter writer = new AnalysisFileWriter();
 
-		if (useAgeFilter == true) {
+		if (useAgeFilter) {
 	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
 	    	CemdapPersonInputFileReader cemdapPersonInputFileReader = new CemdapPersonInputFileReader();
 		 	cemdapPersonInputFileReader.parse(cemdapPersonsInputFile);
@@ -183,7 +187,7 @@ public class TripAnalyzerV2Extended {
 	}
 	
 	
-	static void doBeelineCaluclations(List<Trip> trips, int binWidthDistance_km, Network network) {
+	private static void doBeelineCaluclations(List<Trip> trips, int binWidthDistance_km, Network network) {
 		Map<Integer, Double> tripDistanceBeelineMap = new TreeMap<>();
 		for (Trip trip : trips) {
 			double tripDistanceRouted_km = trip.getDistanceRoutedByCalculation_m(network) / 1000.;
@@ -202,7 +206,7 @@ public class TripAnalyzerV2Extended {
 	private static void adaptOutputDirectory() {
 		outputDirectory = outputDirectory + "_" + usedIteration;
 	    if (onlySpecificMode) {
-			outputDirectory = outputDirectory + specificMode;
+			outputDirectory = outputDirectory + "_" + specificMode;
 		}
 	    if (onlyInterior) {
 			outputDirectory = outputDirectory + "_int";
@@ -223,7 +227,6 @@ public class TripAnalyzerV2Extended {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		outputDirectory = outputDirectory + "_2";
 		new File(outputDirectory).mkdir();
 	}
 	

@@ -55,7 +55,6 @@ public class CTLinkCell extends CTCell {
 		if (dsList.size() > 0) {
 			double j = chooseNextCellAndReturnJ(dsList.peek());
 			if (!Double.isNaN(j)) {
-//				double j = getJ(dsList.peek().getTentativeNextCell());
 				double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
 				double meanJumpTime = 1. / (this.getDirectionalProportion(dsList.peek()) * j);
 				double nxtJumpTime = meanJumpTime * rnd;
@@ -71,7 +70,6 @@ public class CTLinkCell extends CTCell {
 		if (usList.size() > 0) {
 			double j = chooseNextCellAndReturnJ(usList.peek());
 			if (!Double.isNaN(j)) {
-//				double j = getJ(usList.peek().getTentativeNextCell());
 				double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
 				double meanJumpTime = 1. / (this.getDirectionalProportion(usList.peek()) * j);
 				double nxtJumpTime = meanJumpTime * rnd;
@@ -87,19 +85,8 @@ public class CTLinkCell extends CTCell {
 		}
 		this.next = nextJumper;
 
-//		double j = getJ(nextJumper.getTentativeNextCell());///(Math.sqrt(3)/2);
-//		double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
-//		double meanJumpTime = 1. / j;
-////		log.info(meanJumpTime);
-//		double nextJumpTime = now + rnd * meanJumpTime;
-
-//		if (this.l)
-
-		double x = CTLink.WIDTH / 0.1;
+		double x = width / 0.1;
 		minJumpTime = Math.min(minJumpTime, x);
-//		if (minJumpTime > 1000) {
-//			log.info(minJumpTime);
-//		}
 
 		this.nextCellJumpTime = now + minJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);
@@ -109,9 +96,6 @@ public class CTLinkCell extends CTCell {
 
 	@Override
 	double getFHHi(CTPed ped, CTCellFace face) {
-//		if (ped.getDesiredDir()*face.h_i < 0 && face.nb.getParent() instanceof CTNode) {
-//			return 0;
-//		}
 		double diff = ped.getDesiredDir() - face.h_i;
 		Double d = cosLookup.get(diff);
 		if (d == null) {

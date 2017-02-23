@@ -26,6 +26,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import com.google.inject.Provider;
 
 import matsimintegration.TimeDiscretizationInjection;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 
@@ -40,6 +41,11 @@ public class Main {
 	 * ============================================================
 	 */
 
+	static final double betaTravelSampers_1_h = -12.0;
+
+	static final boolean usePTto1 = true; // true in base case
+	static final boolean usePTto2 = false; // false in base case
+
 	static final int outerIts = 10;
 	static final int popSize = 1000;
 	static final double replanProba = 1.0;
@@ -47,7 +53,8 @@ public class Main {
 	static final String experienceFilePrefix = "./output/cba/toynet/experience-after-it";
 	static final String demandStatsFilePrefix = "./output/cba/toynet/demandStats-in-it";
 
-	static final int resampleCnt = 1000;
+	static final int resampleCnt = 10000; // resample cnt 1 yields "plain
+											// sampers"; 10000 yields "corrected"
 	static final Random rnd = new Random();
 
 	static final int maxTrials = 10;
@@ -64,7 +71,7 @@ public class Main {
 	// private static AverageTravelTime avgTravelTimes = null;
 
 	private static AverageTravelTimeAcrossRuns avgTTsAcrossRuns = null;
-	
+
 	private static void runDemandModel(final Scenario scenario, final int outerIt) {
 
 		if (outerIt == 1) {
@@ -102,9 +109,14 @@ public class Main {
 		final Map<String, TravelTime> mode2tt = new LinkedHashMap<>();
 		mode2tt.put("car", carTravelTime);
 
+		final SampersCarDelay sampersCarDelay = new SampersCarDelay(new TimeDiscretization(6 * 3600, 3600, 16),
+				carTravelTime, scenario.getNetwork());
+		// TimeDiscretizationFactory.newInstance(scenario.getConfig()),
+		// carTravelTime, scenario.getNetwork());
+
 		DemandModel.replanPopulation(resampleCnt, rnd, scenario, factory, outerIt == 1 ? 1.0 : replanProba,
 				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
-				maxFailures, mode2tt);
+				maxFailures, usePTto1, usePTto2, mode2tt, betaTravelSampers_1_h, sampersCarDelay);
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write("./input/cba/toynet/population.xml");

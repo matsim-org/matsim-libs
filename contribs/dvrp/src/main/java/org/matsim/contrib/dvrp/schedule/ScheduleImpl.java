@@ -27,16 +27,17 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 
 
-public class ScheduleImpl<T extends AbstractTask>
-    implements Schedule<T>
+public class ScheduleImpl
+    implements Schedule
 {
     private final Vehicle vehicle;
 
-    private final List<T> tasks = new ArrayList<>();
-    private final List<T> unmodifiableTasks = Collections.unmodifiableList(tasks);
+    private final List<AbstractTask> tasks = new ArrayList<>();
+    private final List<? extends Task> unmodifiableTasks = (List<? extends Task>)Collections
+            .unmodifiableList(tasks);
 
     private ScheduleStatus status = ScheduleStatus.UNPLANNED;
-    private T currentTask = null;
+    private AbstractTask currentTask = null;
 
 
     public ScheduleImpl(Vehicle vehicle)
@@ -53,7 +54,7 @@ public class ScheduleImpl<T extends AbstractTask>
 
 
     @Override
-    public List<T> getTasks()
+    public List<? extends Task> getTasks()
     {
         return unmodifiableTasks;
     }
@@ -66,13 +67,13 @@ public class ScheduleImpl<T extends AbstractTask>
     }
 
 
-    public void addTask(T task)
+    public void addTask(Task task)
     {
         addTask(tasks.size(), task);
     }
 
 
-    public void addTask(int taskIdx, T task)
+    public void addTask(int taskIdx, Task task)
     {
         validateArgsBeforeAddingTask(taskIdx, task);
 
@@ -80,10 +81,11 @@ public class ScheduleImpl<T extends AbstractTask>
             status = ScheduleStatus.PLANNED;
         }
 
-        tasks.add(taskIdx, task);
-        task.schedule = this;
-        task.taskIdx = taskIdx;
-        task.status = TaskStatus.PLANNED;
+        AbstractTask t = (AbstractTask)task;
+        tasks.add(taskIdx, t);
+        t.schedule = this;
+        t.taskIdx = taskIdx;
+        t.status = TaskStatus.PLANNED;
 
         // update idx of the existing tasks
         for (int i = taskIdx + 1; i < tasks.size(); i++) {
@@ -121,7 +123,9 @@ public class ScheduleImpl<T extends AbstractTask>
             }
 
             if (Tasks.getEndLink(previousTask) != beginLink) {
-            	Logger.getLogger(getClass()).error("Last task End link: "+Tasks.getEndLink(previousTask).getId()+ " ; next Task start link: "+ beginLink.getId());
+                Logger.getLogger(getClass())
+                        .error("Last task End link: " + Tasks.getEndLink(previousTask).getId()
+                                + " ; next Task start link: " + beginLink.getId());
                 throw new IllegalArgumentException();
             }
         }
@@ -153,7 +157,7 @@ public class ScheduleImpl<T extends AbstractTask>
 
 
     @Override
-    public void removeTask(T task)
+    public void removeTask(Task task)
     {
         removeTaskImpl(task.getTaskIdx());
     }
@@ -183,7 +187,7 @@ public class ScheduleImpl<T extends AbstractTask>
 
 
     @Override
-    public T getCurrentTask()
+    public Task getCurrentTask()
     {
         failIfNotStarted();//status != ScheduleStatus.STARTED
         return currentTask;
@@ -191,7 +195,7 @@ public class ScheduleImpl<T extends AbstractTask>
 
 
     @Override
-    public T nextTask()
+    public Task nextTask()
     {
         failIfUnplanned();
         failIfCompleted();

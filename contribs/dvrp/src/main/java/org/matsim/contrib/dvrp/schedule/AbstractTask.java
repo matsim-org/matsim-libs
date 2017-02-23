@@ -26,7 +26,7 @@ public abstract class AbstractTask
     implements Task
 {
     // ==== BEGIN: fields managed by ScheduleImpl
-    Schedule<? extends AbstractTask> schedule;
+    Schedule schedule;
     int taskIdx;
 
     TaskStatus status;
@@ -64,7 +64,7 @@ public abstract class AbstractTask
 
 
     @Override
-    public final Schedule<? extends AbstractTask> getSchedule()
+    public final Schedule getSchedule()
     {
         return schedule;
     }
@@ -118,7 +118,7 @@ public abstract class AbstractTask
 
 
     @Override
-    public void initTaskTracker(TaskTracker taskTracker)
+    public void initTaskTracker(TaskTracker taskTracker1)
     {
         if (this.taskTracker != null) {
             throw new IllegalStateException("Tracking already initialized");
@@ -128,7 +128,7 @@ public abstract class AbstractTask
             throw new IllegalStateException("Allowed only for STARTED tasks");
         }
 
-        this.taskTracker = taskTracker;
+        this.taskTracker = taskTracker1;
     }
 
 

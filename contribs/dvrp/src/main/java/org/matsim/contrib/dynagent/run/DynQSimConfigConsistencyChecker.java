@@ -25,27 +25,23 @@ import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
+public class DynQSimConfigConsistencyChecker implements ConfigConsistencyChecker {
+	private static final Logger log = Logger.getLogger(DynQSimConfigConsistencyChecker.class);
 
-public class DynQSimConfigConsistencyChecker
-    implements ConfigConsistencyChecker
-{
-    private static final Logger log = Logger.getLogger(DynQSimConfigConsistencyChecker.class);
+	@Override
+	public void checkConsistency(Config config) {
+		QSimConfigGroup qSimConfig = config.qsim();
 
+		if (qSimConfig.getStartTime() != 0 && qSimConfig.getStartTime() != Time.UNDEFINED_TIME) {
+			log.warn("Simulation should start from time 0. This is what DynAgent assumes");
+		}
 
-    @Override
-    public void checkConsistency(Config config)
-    {
-        QSimConfigGroup qSimConfig = config.qsim();
-
-        if (qSimConfig.getStartTime() != 0 && qSimConfig.getStartTime() != Time.UNDEFINED_TIME) {
-            log.warn("Simulation should start from time 0. "
-                    + "This is what a typical DynAgent assumes");
-        }
-
-        if (qSimConfig.getSimStarttimeInterpretation() != //
-        QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime) {
-            throw new RuntimeException("DynAgents require simulation from the very beginning,"
-                    + "preferably sec-by-sec from time 0. Please set \'simStarttimeInterpretation\' in the qSim config module to  \'onlyUseStarttime\' and set the start time to 00:00:00.");
-        }
-    }
+		if (qSimConfig.getSimStarttimeInterpretation() != //
+		QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime) {
+			throw new RuntimeException(
+					"DynAgents require simulation from the very beginning, preferably sec-by-sec from time 0."
+							+ " Please set \'simStarttimeInterpretation\' in the qSim config module to  \'onlyUseStarttime\'"
+							+ " and set the start time to 00:00:00.");
+		}
+	}
 }

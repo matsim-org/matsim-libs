@@ -46,6 +46,9 @@ public class ResponsibilityGridTools {
 	private final int noOfXCells;
 	private final int noOfYCells;
 
+	private final int maxWarnCount = 2;
+	private int warnCount = 0;
+
 	/* TODO : adding this switch to inform the user to use first interval handler with normal events file
 	 * and provide activity durations and then estiamtes the air pollution exposure costs. This switch should go away after
 	 * https://matsim.atlassian.net/browse/MATSIM-634
@@ -69,7 +72,7 @@ public class ResponsibilityGridTools {
 
 	public Double getFactorForLink(Id<Link> linkId, double time) {
 
-		if (! isDurationsStored) {
+		if (! isDurationsStored && warnCount++ <= maxWarnCount) {
 			LOGGER.warn("Make sure, you have stored activity durations by using "+ IntervalHandler.class.getSimpleName()
 					+" along with normal events and pass it to the "+ResponsibilityGridTools.class.getSimpleName());
 		}

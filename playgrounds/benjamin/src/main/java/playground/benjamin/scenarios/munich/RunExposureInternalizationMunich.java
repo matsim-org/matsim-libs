@@ -105,7 +105,7 @@ public class RunExposureInternalizationMunich {
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
 				bind(EmissionModule.class).toInstance(emissionModule);
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
-				bind(InternalizeEmissionResponsibilityControlerListener.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});

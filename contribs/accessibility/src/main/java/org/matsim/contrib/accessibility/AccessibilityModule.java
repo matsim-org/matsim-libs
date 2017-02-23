@@ -164,13 +164,17 @@ public final class AccessibilityModule extends AbstractModule {
 						Gbl.assertNotNull(travelDisutilityFactory);
 						calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
 						break; }
-					case pt:
-						throw new RuntimeException("currently not implemented") ;
 					case walk:
 						calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 						break;
+					case matrixBasedPt:
+						calc = new LeastCostPathCalculatorAccessibilityContributionCalculator(
+								config.planCalcScore(),
+								ptMatrix.asPathCalculator(config.planCalcScore()));
+						break;
+						//$CASES-OMITTED$
 					default:
-						throw new RuntimeException("not implemented") ;
+						calc = new TripRouterAccessibilityContributionCalculator(mode.toString()) ;
 					}
 					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
 				}

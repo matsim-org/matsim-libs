@@ -29,7 +29,7 @@ public class AVLoader implements BeforeMobsimListener {
         for (Vehicle vehicle : data.getVehicles().values()) {
             vehicle.resetSchedule();
 
-            Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
+            Schedule schedule = vehicle.getSchedule();
             schedule.addTask(new AVStayTask(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink()));
         }
     }

@@ -380,11 +380,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 */
 	private boolean moveWaitToRoad(final double now) {
 		boolean movedWaitToRoad = false;
-		while (this.firstLaneQueue.isAcceptingFromWait()) {
-			QVehicle veh = this.getWaitingList().poll();
-			if (veh == null) {
-				return movedWaitToRoad;
-			}
+		while (!getWaitingList().isEmpty()) {
+		    if (!firstLaneQueue.isAcceptingFromWait()) {
+		        return movedWaitToRoad;
+		    }
+		    QVehicle veh = this.getWaitingList().poll();
+
 			movedWaitToRoad = true;
 			context .getEventsManager() .processEvent(
 							new VehicleEntersTrafficEvent(now, veh.getDriver().getId(),

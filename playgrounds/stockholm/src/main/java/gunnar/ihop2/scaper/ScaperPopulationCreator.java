@@ -1,5 +1,9 @@
 package gunnar.ihop2.scaper;
 
+import floetteroed.utilities.Time;
+import gunnar.ihop2.regent.demandreading.ShapeUtils;
+import gunnar.ihop2.regent.demandreading.Zone;
+
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -18,10 +22,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 
-import floetteroed.utilities.Time;
-import gunnar.ihop2.regent.demandreading.ShapeUtils;
-import gunnar.ihop2.regent.demandreading.Zone;
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+import saleem.stockholmmodel.utils.StockholmTransformationFactory;
 
 /**
  * 

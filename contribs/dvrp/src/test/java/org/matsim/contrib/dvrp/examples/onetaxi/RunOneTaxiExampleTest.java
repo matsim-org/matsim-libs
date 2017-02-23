@@ -21,12 +21,9 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.junit.Test;
 
-
-public class RunOneTaxiExampleTest
-{
-    @Test
-    public void testRun()
-    {
-        RunOneTaxiExample.run(false, 3);
-    }
+public class RunOneTaxiExampleTest {
+	@Test
+	public void testRun() {
+		RunOneTaxiExample.run(false, 2);
+	}
 }
