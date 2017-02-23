@@ -48,7 +48,7 @@ import org.matsim.contrib.accessibility.ConstantSpeedAccessibilityExpContributio
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeAccessibilityExpContributionCalculator;
-import org.matsim.contrib.accessibility.PtMatrixAccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.PtMatrixAccessibilityUtils;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -406,7 +406,7 @@ class MATSim4UrbanSimParcel{
 									break; }
 								case pt:
 									if ( ptMatrix != null ) {
-										calc = PtMatrixAccessibilityContributionCalculator.create(ptMatrix, config) ;
+										calc = PtMatrixAccessibilityUtils.createPtMatrixAccessibilityCalculator(ptMatrix, config) ;
 									} else {
 										continue ;
 									}
@@ -494,7 +494,7 @@ class MATSim4UrbanSimParcel{
 									break; }
 								case pt:
 									if ( ptMatrix != null ) {
-										calc = PtMatrixAccessibilityContributionCalculator.create(ptMatrix, config) ;
+										calc = PtMatrixAccessibilityUtils.createPtMatrixAccessibilityCalculator(ptMatrix, config) ;
 									} else {
 										continue ;
 									}

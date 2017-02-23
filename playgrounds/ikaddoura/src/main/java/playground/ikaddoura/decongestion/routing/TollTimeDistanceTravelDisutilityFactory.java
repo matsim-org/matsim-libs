@@ -20,10 +20,12 @@
 package playground.ikaddoura.decongestion.routing;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Inject;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
@@ -36,18 +38,20 @@ public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisu
 	private static final Logger log = Logger.getLogger(TollTimeDistanceTravelDisutilityFactory.class);
 
 	private double sigma = 0. ;
-	private DecongestionInfo info;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	
-	public TollTimeDistanceTravelDisutilityFactory(DecongestionInfo info, PlanCalcScoreConfigGroup cnScoringGroup) {
-		this.info = info ;
-		this.cnScoringGroup = cnScoringGroup;
+	@Inject
+	private Scenario scenario;
+	
+	@Inject
+	private DecongestionInfo info;
+		
+	public TollTimeDistanceTravelDisutilityFactory() {
 		log.info("Using the toll-adjusted travel disutility factory in the decongestion package.");
 	}
 
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new TollTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma, info);
+		return new TollTimeDistanceTravelDisutility(timeCalculator, scenario.getConfig().planCalcScore(), this.sigma, info);
 	}
 	
 	public void setSigma ( double val ) {

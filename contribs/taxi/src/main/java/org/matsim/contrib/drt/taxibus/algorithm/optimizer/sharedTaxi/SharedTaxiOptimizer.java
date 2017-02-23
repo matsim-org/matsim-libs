@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer.sharedTaxi;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.tasks.DrtTask;
 import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
@@ -64,7 +63,6 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 
 	private TaxibusDispatch findBestVehicleForRequest(TaxibusRequest req) {
 		TaxibusDispatch bestPath = null;
-		Link fromLink = req.getFromLink();
 		Set<Vehicle> idleVehicles = new HashSet<>();
 		Set<Vehicle> busyVehicles = new HashSet<>();
 		for (Vehicle veh : this.getOptimContext().vrpData.getVehicles().values()){

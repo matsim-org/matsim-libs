@@ -134,11 +134,12 @@ public class DecongestionRun {
 		
 		config.controler().setOutputDirectory(outputDirectory + "/");
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
-		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-		final Decongestion decongestion = new Decongestion(new Controler(scenario), info);
+		Controler controler = new Controler(scenario);
+
+		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		Decongestion decongestion = new Decongestion(controler, info);
+		controler = decongestion.getControler();
 		
-		final Controler controler = decongestion.getControler();
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
         controler.run(); 
         

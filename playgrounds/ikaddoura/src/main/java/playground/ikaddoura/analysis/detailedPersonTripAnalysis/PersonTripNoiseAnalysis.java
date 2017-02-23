@@ -64,6 +64,8 @@ public class PersonTripNoiseAnalysis {
 					+ "number of " + mode + " trips;"
 					+ "at least one stuck and abort " + mode + " trip (yes/no);"
 					+ mode + " total travel time (day) [sec];"
+					+ mode + " total in-vehicle time (day) [sec];"
+					+ mode + " total waiting time (for taxi/pt) (day) [sec];"
 					+ mode + " total travel distance (day) [m];"
 					
 					+ "travel related user benefits (based on the selected plans score) [monetary units];"
@@ -82,6 +84,8 @@ public class PersonTripNoiseAnalysis {
 				int mode_trips = 0;
 				String mode_stuckAbort = "no";
 				double mode_travelTime = 0.;
+				double mode_inVehTime = 0.;
+				double mode_waitingTime = 0.;
 				double mode_travelDistance = 0.;
 				
 				double tollPayments = 0.;
@@ -117,6 +121,14 @@ public class PersonTripNoiseAnalysis {
 								mode_travelTime = mode_travelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
 							}
 							
+							if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+								mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
+							}
+							
+							if (basicHandler.getPersonId2tripNumber2waitingTime().containsKey(id) && basicHandler.getPersonId2tripNumber2waitingTime().get(id).containsKey(trip)) {
+								mode_waitingTime = mode_waitingTime + basicHandler.getPersonId2tripNumber2waitingTime().get(id).get(trip);
+							}
+							
 							if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
 								mode_travelDistance = mode_travelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
 							}			
@@ -128,6 +140,8 @@ public class PersonTripNoiseAnalysis {
 						+ mode_trips + ";"
 						+ mode_stuckAbort + ";"
 						+ mode_travelTime + ";"
+						+ mode_inVehTime + ";"
+						+ mode_waitingTime + ";"
 						+ mode_travelDistance + ";"
 						
 						+ userBenefit + ";"
@@ -170,9 +184,14 @@ public class PersonTripNoiseAnalysis {
 					+ "mode;"
 					+ "stuck and abort trip (yes/no);"
 					+ "departure time (trip) [sec];"
+					+ "enter vehicle time (trip) [sec];"
+					+ "leave vehicle time (trip) [sec];"
 					+ "arrival time (trip) [sec];"
 					+ "travel time (trip) [sec];"
+					+ "in-vehicle time (trip) [sec];"
+					+ "waiting time (for taxi/pt) (trip) [sec];"
 					+ "travel distance (trip) [m];"
+					+ "toll payments (trip) [monetary units];"
 					+ "approximate caused noise cost (trip) [monetary units]"); // TODO make this accurate?!
 			
 			bw.newLine();
@@ -197,6 +216,16 @@ public class PersonTripNoiseAnalysis {
 							departureTime = String.valueOf(basicHandler.getPersonId2tripNumber2departureTime().get(id).get(trip));
 						}
 						
+						String enterVehicleTime = "unknown";
+						if (basicHandler.getPersonId2tripNumber2enterVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2enterVehicleTime().get(id).containsKey(trip)) {
+							enterVehicleTime = String.valueOf(basicHandler.getPersonId2tripNumber2enterVehicleTime().get(id).get(trip));
+						}
+						
+						String leaveVehicleTime = "unknown";
+						if (basicHandler.getPersonId2tripNumber2leaveVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2leaveVehicleTime().get(id).containsKey(trip)) {
+							leaveVehicleTime = String.valueOf(basicHandler.getPersonId2tripNumber2leaveVehicleTime().get(id).get(trip));
+						}
+						
 						String arrivalTime = "unknown";
 						if (basicHandler.getPersonId2tripNumber2arrivalTime().containsKey(id) && basicHandler.getPersonId2tripNumber2arrivalTime().get(id).containsKey(trip)){
 							arrivalTime = String.valueOf(basicHandler.getPersonId2tripNumber2arrivalTime().get(id).get(trip));
@@ -207,14 +236,29 @@ public class PersonTripNoiseAnalysis {
 							travelTime = String.valueOf(basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip));
 						}
 						
+						String inVehTime = "unknown";
+						if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+							inVehTime = String.valueOf(basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip));
+						}
+						
+						String waitingTime = "unknown";
+						if (basicHandler.getPersonId2tripNumber2waitingTime().containsKey(id) && basicHandler.getPersonId2tripNumber2waitingTime().get(id).containsKey(trip)) {
+							waitingTime = String.valueOf(basicHandler.getPersonId2tripNumber2waitingTime().get(id).get(trip));
+						}
+						
 						String travelDistance = "unknown";
 						if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
 							travelDistance = String.valueOf(basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip));
 						}
 						
-						double causedNoiseCost = 0.;
+						String tollPayment = "unknown";
+						if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
+							tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
+						}
+						
+						String causedNoiseCost = "unknown";
 						if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
-							causedNoiseCost = noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip);
+							causedNoiseCost = String.valueOf(noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip));
 						}
 						
 						bw.write(id + ";"
@@ -222,9 +266,14 @@ public class PersonTripNoiseAnalysis {
 						+ transportModeThisTrip + ";"
 						+ stuckAbort + ";"
 						+ departureTime + ";"
+						+ enterVehicleTime + ";"
+						+ leaveVehicleTime + ";"
 						+ arrivalTime + ";"
 						+ travelTime + ";"
+						+ inVehTime + ";"
+						+ waitingTime + ";"
 						+ travelDistance + ";"
+						+ tollPayment + ";"
 						+ causedNoiseCost
 						);
 						bw.newLine();						
@@ -266,6 +315,8 @@ public class PersonTripNoiseAnalysis {
 			int mode_trips = 0;
 			int mode_StuckAndAbortTrips = 0;
 			double mode_TravelTime = 0.;
+			double mode_inVehTime = 0.;
+			double mode_waitingTime = 0.;
 			double mode_TravelDistance = 0.;
 			
 			int allTrips = 0;
@@ -318,6 +369,14 @@ public class PersonTripNoiseAnalysis {
 								mode_TravelTime = mode_TravelTime + basicHandler.getPersonId2tripNumber2travelTime().get(id).get(trip);
 							}
 							
+							if (basicHandler.getPersonId2tripNumber2inVehicleTime().containsKey(id) && basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).containsKey(trip)) {
+								mode_inVehTime = mode_inVehTime + basicHandler.getPersonId2tripNumber2inVehicleTime().get(id).get(trip);
+							}
+							
+							if (basicHandler.getPersonId2tripNumber2waitingTime().containsKey(id) && basicHandler.getPersonId2tripNumber2waitingTime().get(id).containsKey(trip)) {
+								mode_waitingTime = mode_waitingTime + basicHandler.getPersonId2tripNumber2waitingTime().get(id).get(trip);
+							}
+							
 							if (basicHandler.getPersonId2tripNumber2tripDistance().containsKey(id) && basicHandler.getPersonId2tripNumber2tripDistance().get(id).containsKey(trip)) {
 								mode_TravelDistance = mode_TravelDistance + basicHandler.getPersonId2tripNumber2tripDistance().get(id).get(trip);
 							}		
@@ -343,6 +402,12 @@ public class PersonTripNoiseAnalysis {
 			bw.newLine();
 			
 			bw.write(mode + " travel time (sample size) [hours];" + mode_TravelTime / 3600.);
+			bw.newLine();
+			
+			bw.write(mode + " in-vehicle time (sample size) [hours];" + mode_inVehTime / 3600.);
+			bw.newLine();
+			
+			bw.write(mode + " waiting time (for taxi/pt) (sample size) [hours];" + mode_waitingTime / 3600.);
 			bw.newLine();
 			
 			bw.newLine();

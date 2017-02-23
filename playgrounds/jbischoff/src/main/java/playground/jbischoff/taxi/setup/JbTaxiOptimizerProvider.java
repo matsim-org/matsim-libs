@@ -25,9 +25,6 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.optimizer.assignment.*;
-import org.matsim.contrib.taxi.optimizer.fifo.*;
-import org.matsim.contrib.taxi.optimizer.rules.*;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -46,10 +43,6 @@ public class JbTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final Fleet fleet;
 	private final TravelTime travelTime;
 	private final QSim qSim;
-
-	public enum OptimizerType {
-		ASSIGNMENT, FIFO, RULE_BASED, ZONAL, INCLUSION;
-	}
 
 	public JbTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Scenario scenario, Fleet fleet,
 			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
@@ -71,26 +64,7 @@ public class JbTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 				travelTime, travelDisutility, scheduler);
 
 		Configuration optimizerConfig = new MapConfiguration(taxiCfg.getOptimizerConfigGroup().getParams());
-		OptimizerType type = OptimizerType.valueOf(optimizerConfig.getString(TYPE));
-
-		switch (type) {
-			case ASSIGNMENT:
-				return new AssignmentTaxiOptimizer(optimContext, new AssignmentTaxiOptimizerParams(optimizerConfig));
-
-			case FIFO:
-				return new FifoTaxiOptimizer(optimContext, new FifoTaxiOptimizerParams(optimizerConfig));
-
-			case RULE_BASED:
-				return new RuleBasedTaxiOptimizer(optimContext, new RuleBasedTaxiOptimizerParams(optimizerConfig));
-
-			case INCLUSION:
-				return new InclusionRuleBasedTaxiOptimizer(optimContext,
-						new InclusionRuleBasedTaxiOptimizerParams(optimizerConfig));
-
-			case ZONAL:
-				return new RuleBasedTaxiOptimizer(optimContext, new RuleBasedTaxiOptimizerParams(optimizerConfig));
-			default:
-				throw new IllegalStateException();
-		}
+		return new InclusionRuleBasedTaxiOptimizer(optimContext,
+				new InclusionRuleBasedTaxiOptimizerParams(optimizerConfig));
 	}
 }

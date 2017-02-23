@@ -54,7 +54,6 @@ public class JbTaxiModule
     @Override
     public void install()
     {
-        addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
         bind(Fleet.class).toInstance(taxiData);
         bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
 

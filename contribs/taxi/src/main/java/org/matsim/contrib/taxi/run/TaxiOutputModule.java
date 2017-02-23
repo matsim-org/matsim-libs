@@ -19,48 +19,27 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.vehicles.*;
 
-import com.google.inject.name.Names;
+import com.google.inject.Inject;
 
+public class TaxiOutputModule extends AbstractModule {
+	@Inject
+	private TaxiConfigGroup taxiCfg;
 
-public class TaxiModule
-    extends AbstractModule
-{
-    public static final String TAXI_MODE = "taxi";
+	@Override
+	public void install() {
+		bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
 
-    private final VehicleType vehicleType;
+		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
+		addControlerListenerBinding().to(TaxiStatsDumper.class);
 
-
-    public TaxiModule()
-    {
-        this(VehicleUtils.getDefaultVehicleType());
-    }
-
-
-    public TaxiModule(VehicleType vehicleType)
-    {
-        this.vehicleType = vehicleType;
-    }
-
-
-    @Override
-    public void install()
-    {
-        bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE)).toInstance(vehicleType);
-        bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
-
-        addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-        addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-        if (TaxiConfigGroup.get(getConfig()).getTimeProfiles()) {
-            addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-            //add more time profiles if necessary
-        }
-    }
+		if (taxiCfg.getTimeProfiles()) {
+			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
+			// add more time profiles if necessary
+		}
+	}
 }

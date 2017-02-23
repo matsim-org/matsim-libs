@@ -21,14 +21,8 @@ package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
-import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -40,74 +34,50 @@ import playground.michalm.ev.data.*;
 import playground.michalm.ev.data.file.ChargerReader;
 import playground.michalm.taxi.data.file.EvrpVehicleReader;
 import playground.michalm.taxi.ev.*;
-import playground.michalm.taxi.optimizer.ETaxiOptimizerProvider;
-import playground.michalm.taxi.vrpagent.ETaxiActionCreator;
 
+public class RunETaxiScenario {
+	public static void run(String configFile, boolean otfvis) {
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup(), new EvConfigGroup());
+		createControler(config, otfvis).run();
+	}
 
-public class RunETaxiScenario
-{
-    public static void run(String configFile, boolean otfvis)
-    {
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
-                new OTFVisConfigGroup(), new EvConfigGroup());
-        createControler(config, otfvis).run();
-    }
+	public static Controler createControler(Config config, boolean otfvis) {
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		EvConfigGroup evCfg = EvConfigGroup.get(config);
+		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		config.checkConsistency();
 
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		FleetImpl fleet = new FleetImpl();
+		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+		EvData evData = new EvDataImpl();
+		new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
+		ETaxiUtils.initEvData(fleet, evData);
 
-    public static Controler createControler(Config config, boolean otfvis)
-    {
-        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-        EvConfigGroup evCfg = EvConfigGroup.get(config);
-        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-        config.checkConsistency();
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new TaxiOutputModule());
+		controler.addOverridingModule(new EvModule(evData));
+		controler.addOverridingModule(ETaxiOptimizerModules.createDefaultModule(fleet));
 
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        FleetImpl fleet = new FleetImpl();
-        new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
-        EvData evData = new EvDataImpl();
-        new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
-        ETaxiUtils.initEvData(fleet, evData);
-
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TaxiModule());
-        double expAveragingAlpha = 0.05;//from the AV flow paper 
-        controler.addOverridingModule(
-                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-
-        controler.addOverridingModule(new EvModule(evData));
-        controler.addOverridingModule(new DvrpModule(TaxiModule.TAXI_MODE, fleet, new com.google.inject.AbstractModule() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(ETaxiOptimizerProvider.class).asEagerSingleton();
-				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
-				bind(DynActionCreator.class).to(ETaxiActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+			public void install() {
+				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
+				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
 			}
-		}, TaxiOptimizer.class));
+		});
 
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
+		}
 
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install()
-            {
-                addMobsimListenerBinding()
-                        .toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
-                addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
-            }
-        });
+		return controler;
+	}
 
-        if (otfvis) {
-            controler.addOverridingModule(new OTFVisLiveModule());
-        }
-
-        return controler;
-    }
-
-
-    public static void main(String[] args)
-    {
-        //String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
-        String configFile = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_config.xml";
-        RunETaxiScenario.run(configFile, false);
-    }
+	public static void main(String[] args) {
+		// String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
+		String configFile = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_config.xml";
+		RunETaxiScenario.run(configFile, false);
+	}
 }

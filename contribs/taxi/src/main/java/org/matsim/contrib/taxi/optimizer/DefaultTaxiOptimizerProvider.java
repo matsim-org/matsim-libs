@@ -37,6 +37,7 @@ import com.google.inject.*;
 import com.google.inject.name.Named;
 
 public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
+	public static final String TAXI_OPTIMIZER = "taxi_optimizer";
 	public static final String TYPE = "type";
 
 	public enum OptimizerType {
@@ -50,7 +51,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final QSim qSim;
 
 	@Inject(optional = true)
-	private @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelDisutilityFactory travelDisutilityFactory;
+	private @Named(TAXI_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
 
 	@Inject
 	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Scenario scenario, Fleet fleet,
