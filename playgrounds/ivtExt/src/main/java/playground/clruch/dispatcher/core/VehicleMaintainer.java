@@ -107,16 +107,15 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         for (AVVehicle avVehicle : getFunctioningVehicles())
             if (isWithoutDirective(avVehicle)) {
                 Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-                AbstractTask abstractTask = schedule.getCurrentTask();
-                new AVTaskAdapter(abstractTask) { // TODO don't use abstractTask beyond this point!!!
+                new AVTaskAdapter(schedule.getCurrentTask()) {
                     @Override
                     public void handle(AVDriveTask avDriveTask) {
                         // for empty cars the drive task is second to last task
-                        if (Schedules.isNextToLastTask(abstractTask)) {
+                        if (Schedules.isNextToLastTask(avDriveTask)) {
                             TaskTracker taskTracker = avDriveTask.getTaskTracker();
                             OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
                             LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
-                            if (linkTimePair != null) // TODO treat null case ?
+                            if (linkTimePair != null)
                                 collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
                         }
                     }
@@ -124,11 +123,11 @@ public abstract class VehicleMaintainer implements AVDispatcher {
                     @Override
                     public void handle(AVStayTask avStayTask) {
                         // for empty vehicles the current task has to be the last task
-                        if (Schedules.isLastTask(abstractTask))
-                            if (avStayTask.getBeginTime() <= getTimeNow()) { // TODO comment on condition
-                                LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
-                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
-                            }
+                        if (Schedules.isLastTask(avStayTask)) {
+                            GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self evident?
+                            LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
+                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                        }
                     }
                 };
             }

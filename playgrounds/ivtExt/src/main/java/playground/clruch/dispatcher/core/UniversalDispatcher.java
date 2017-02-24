@@ -111,10 +111,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return null;
     }
 
-//    protected final void setAcceptRequest(Entry<AVVehicle, AVRequest> entry) {
-//        setAcceptRequest(entry.getKey(), entry.getValue());
-//    }
-
     /**
      * assigns new destination to vehicle.
      * if vehicle is already located at destination, nothing happens.

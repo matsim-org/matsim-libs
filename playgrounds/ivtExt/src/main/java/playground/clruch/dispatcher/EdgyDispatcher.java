@@ -50,7 +50,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
     @SuppressWarnings("unused") // for verifying link references
     private void verifyLinkReferencesInvariant() {
         List<Link> testset = getDivertableVehicles().stream() //
-                .map(VehicleLinkPair::getDestination) //
+                .map(VehicleLinkPair::getCurrentDriveDestination) //
                 .filter(Objects::nonNull) //
                 .collect(Collectors.toList());
         if (!linkReferences.containsAll(testset))
@@ -76,7 +76,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
             int num_driveOrder = 0;
 
             { // see if any car is driving by a request. if so, then stay there to be matched!
-                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks(); // TODO lazy implementation
+                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
                 for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
@@ -97,7 +97,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
                 for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-                    Link dest = vehicleLinkPair.getDestination();
+                    Link dest = vehicleLinkPair.getCurrentDriveDestination();
                     if (dest == null) { // vehicle in stay task
                         if (requestIterator.hasNext()) {
                             Link link = requestIterator.next().getFromLink();

@@ -16,11 +16,11 @@ import playground.sebhoerl.plcpc.LeastCostPathFuture;
  * {@link VrpPathWithTravelData}
  * at a later point in time.
  */
-public class FuturePathContainer {
-    public final Link startLink;
-    public final Link destLink;
-    public final double startTime;
-    public final LeastCostPathFuture leastCostPathFuture;
+public final class FuturePathContainer {
+    private final Link startLink;
+    private final Link destLink;
+    private final double startTime;
+    private final LeastCostPathFuture leastCostPathFuture;
 
     private final TravelTime travelTime; // reference for convenience
     private VrpPathWithTravelData vrpPathWithTravelData = null; // <- always private!
@@ -31,6 +31,10 @@ public class FuturePathContainer {
         this.startTime = startTime;
         this.leastCostPathFuture = leastCostPathFuture;
         this.travelTime = travelTime;
+    }
+    
+    public double getStartTime() {
+        return startTime;
     }
 
     public final VrpPathWithTravelData getVrpPathWithTravelData() {

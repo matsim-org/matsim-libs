@@ -13,7 +13,6 @@ public class RandomVirtualNodeDest extends AbstractVirtualNodeDest {
     Random random = new Random();
     @Override
     public List<Link> selectLinkSet(VirtualNode virtualNode, int size) {
-        // TODO implementation is not efficient!!!
         List<Link> links = virtualNode.getLinks().stream().collect(Collectors.toList());
         List<Link> ret = new ArrayList<>();
         //IntStream.range(0,size).forEach(i->ret.add(links.get(random.nextInt(links.size()))));
