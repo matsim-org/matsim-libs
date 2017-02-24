@@ -77,17 +77,18 @@ public class RunBerlinOptAV {
 			kP = Double.parseDouble(args[2]);
 			log.info("kP: "+ kP);
 			
-			internalizeNoise = Boolean.getBoolean(args[3]);
+			internalizeNoise = Boolean.parseBoolean(args[3]);
 			log.info("internalizeNoise: "+ internalizeNoise);
 			
-			agentBasedActivityScheduling = Boolean.getBoolean(args[4]);
+			agentBasedActivityScheduling = Boolean.parseBoolean(args[4]);
 			log.info("agentBasedActivityScheduling: "+ agentBasedActivityScheduling);
 			
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
+//			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_test/";
 			kP = 2 * 12./3600.;
 			internalizeNoise = true;
 			agentBasedActivityScheduling = true;

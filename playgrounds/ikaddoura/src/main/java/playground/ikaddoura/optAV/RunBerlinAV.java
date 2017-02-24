@@ -83,19 +83,20 @@ public class RunBerlinAV {
 			outputDirectory = args[1];
 			log.info("outputDirectory: "+ outputDirectory);
 			
-			analyzeNoise = Boolean.getBoolean(args[2]);
+			analyzeNoise = Boolean.parseBoolean(args[2]);
 			log.info("analyzeNoise: "+ analyzeNoise);
 			
-			agentBasedActivityScheduling = Boolean.getBoolean(args[3]);
+			agentBasedActivityScheduling = Boolean.parseBoolean(args[3]);
 			log.info("agentBasedActivityScheduling: "+ agentBasedActivityScheduling);
 			
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_berlinArea_av-trip-share-0.1_av-20000/";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
+//			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_berlinArea_av-trip-share-0.1_av-20000/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_test3/";
 			analyzeNoise = true;
-			agentBasedActivityScheduling = true;
+			agentBasedActivityScheduling = false;
 			otfvis = false;
 		}
 		
@@ -175,9 +176,14 @@ public class RunBerlinAV {
 		controler.addOverridingModule(new TaxiOutputModule());
 		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
         
-		 final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
-					new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
-							controler.getConfig().planCalcScore()));
+//		 final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
+//					new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
+//							controler.getConfig().planCalcScore()));
+		
+		final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory(
+				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
+				controler.getConfig().planCalcScore()
+				);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override

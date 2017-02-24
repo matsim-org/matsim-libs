@@ -76,10 +76,10 @@ public class RunBerlinMinExtCostAV {
 			kP = Double.parseDouble(args[2]);
 			log.info("kP: "+ kP);
 			
-			internalizeNoise = Boolean.getBoolean(args[3]);
+			internalizeNoise = Boolean.parseBoolean(args[3]);
 			log.info("internalizeNoise: "+ internalizeNoise);
 			
-			agentBasedActivityScheduling = Boolean.getBoolean(args[4]);
+			agentBasedActivityScheduling = Boolean.parseBoolean(args[4]);
 			log.info("agentBasedActivityScheduling: "+ agentBasedActivityScheduling);
 			
 			otfvis = false;
