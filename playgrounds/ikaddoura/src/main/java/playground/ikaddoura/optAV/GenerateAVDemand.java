@@ -48,17 +48,18 @@ public class GenerateAVDemand {
 	private static final String inputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin-dz-time/input/input_0.1sample/";
 	private static final String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/";
 	
-	private static final String inputPlansFile = "run_194c.150.plans.selected-1000it.route.time.output.plans.selected.xml.gz";
+	private static final String inputPlansFile = "run_194c.150.plans_selected.xml.gz";
 	
-	private static final double taxiTripShare = 0.5;
+	private static final double taxiTripShare = 0.1;
 	
 	private static final boolean specificArea = true;
 	private static final double minX = 4554761.;
 	private static final double minY = 5793603.;
 	private static final double maxX = 4631345.;
 	private static final double maxY = 5846740.;
-	
-	private static final String[] attributes = {"OpeningClosingTimes"};
+
+	private static final String[] attributes = {};
+//	private static final String[] attributes = {"OpeningClosingTimes"};
 	
 	// ####################################################################
 		
