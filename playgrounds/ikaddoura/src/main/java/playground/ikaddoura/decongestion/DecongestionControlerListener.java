@@ -89,10 +89,10 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Inject
 	private DecongestionInfo congestionInfo;
 	
-	@Inject
+	@Inject(optional=true)
 	private DecongestionTollSetting tollComputation;
 	
-	@Inject
+	@Inject(optional=true)
 	private IntervalBasedTolling intervalBasedTolling;
 	
 	@Inject
@@ -133,8 +133,10 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 			if (iterationCounter < this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT() * totalNumberOfIterations
 					&& iterationCounter > this.congestionInfo.getDecongestionConfigGroup().getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT() * totalNumberOfIterations) {
 				
-				log.info("+++ Iteration " + event.getIteration() + ". Update tolls per link and time bin.");
-				tollComputation.updateTolls();
+				if (tollComputation != null) {
+					log.info("+++ Iteration " + event.getIteration() + ". Update tolls per link and time bin.");
+					tollComputation.updateTolls();
+				}
 			}
 		}
 		
@@ -177,7 +179,9 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 		// Store and write out some aggregated numbers for analysis purposes.
 				
 		this.iteration2totalDelay.put(event.getIteration(), this.delayComputation.getTotalDelay());
-		this.iteration2totalTollPayments.put(event.getIteration(), this.intervalBasedTolling.getTotalTollPayments());
+		double totalPayments = 0.;
+		if (this.intervalBasedTolling != null) totalPayments = this.intervalBasedTolling.getTotalTollPayments();
+		this.iteration2totalTollPayments.put(event.getIteration(), totalPayments);
 		this.iteration2totalTravelTime.put(event.getIteration(), this.delayComputation.getTotalTravelTime());
 		
 		double monetizedUserBenefits = 0.;
