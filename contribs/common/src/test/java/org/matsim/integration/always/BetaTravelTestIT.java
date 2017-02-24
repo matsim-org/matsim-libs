@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.betaTravelTest;
+package org.matsim.integration.always;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,7 +122,7 @@ public class BetaTravelTestIT extends MatsimTestCase {
 	 *  @author mrieser
 	 */
 	public void testBetaTravel_6() {
-		Config config = loadConfig("../examples/scenarios/equil/config.xml"); // default config
+		Config config = loadConfig("../../examples/scenarios/equil/config.xml"); // default config
 		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml"); // specific setting for this test
 		config.controler().setWritePlansInterval(0);	
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
@@ -153,7 +153,7 @@ public class BetaTravelTestIT extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testBetaTravel_66() {
-		Config config = loadConfig("../examples/scenarios/equil/config.xml");
+		Config config = loadConfig("../../examples/scenarios/equil/config.xml");
 		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);
 		// ---

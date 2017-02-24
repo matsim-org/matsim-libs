@@ -169,8 +169,8 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		NetworkUtils.setType(node,atts.getValue("type"));
 		// (did not have a null check when I found it.  kai, jul'16) 
 
-		if (atts.getValue("origid") != null) {
-			NetworkUtils.setOrigId( node, atts.getValue("origid") ) ;
+		if (atts.getValue(NetworkUtils.ORIGID) != null) {
+			NetworkUtils.setOrigId( node, atts.getValue(NetworkUtils.ORIGID) ) ;
 		}
 
 		currentAttributes = node.getAttributes();
@@ -206,9 +206,9 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		l.setNumberOfLanes(Double.parseDouble(atts.getValue("permlanes")));
 		this.network.addLink(l);
 
-		NetworkUtils.setOrigId( (l), atts.getValue("origid") ) ;
+		NetworkUtils.setOrigId( (l), atts.getValue(NetworkUtils.ORIGID) ) ;
 		{
-			final String value = atts.getValue("type");
+			final String value = atts.getValue(NetworkUtils.TYPE);
 			if ( value != null ) {
 				NetworkUtils.setType( (l), value); // will now put it into the attributes. kai, dec'16
 			}
