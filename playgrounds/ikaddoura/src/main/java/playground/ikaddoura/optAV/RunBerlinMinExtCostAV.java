@@ -58,11 +58,11 @@ public class RunBerlinMinExtCostAV {
 	private static final Logger log = Logger.getLogger(RunBerlinMinExtCostAV.class);
 
 	private static String configFile;
-	private static String outputDirectory;
-	
+	private static String outputDirectory;	
 	private static double kP;	
 	private static boolean internalizeNoise;
-	
+	private static boolean agentBasedActivityScheduling;
+
 	private static boolean otfvis;
 	
 	public static void main(String[] args) {
@@ -80,6 +80,9 @@ public class RunBerlinMinExtCostAV {
 			internalizeNoise = Boolean.getBoolean(args[3]);
 			log.info("internalizeNoise: "+ internalizeNoise);
 			
+			agentBasedActivityScheduling = Boolean.getBoolean(args[4]);
+			log.info("agentBasedActivityScheduling: "+ agentBasedActivityScheduling);
+			
 			otfvis = false;
 			
 		} else {
@@ -87,6 +90,7 @@ public class RunBerlinMinExtCostAV {
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/minExtCostAV/";
 			kP = 2 * 12./3600.;
 			internalizeNoise = false;
+			agentBasedActivityScheduling = false;
 			otfvis = false;
 		}
 		
@@ -114,8 +118,10 @@ public class RunBerlinMinExtCostAV {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
-		AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-		controler = aa.prepareControler(false);
+		if (agentBasedActivityScheduling) {
+			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
+			controler = aa.prepareControler(false);
+		}
 				
 		// #############################
 		// noise pricing
@@ -125,17 +131,18 @@ public class RunBerlinMinExtCostAV {
 			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 			noiseParams.setInternalizeNoiseDamages(true);
 			
-			List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
-			for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
-				if (!params.getActivityType().contains("interaction")) {
-					consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
+			if (agentBasedActivityScheduling) {
+				List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
+				for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
+					if (!params.getActivityType().contains("interaction")) {
+						consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
+					}
 				}
+				String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
+				noiseParams.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));
 			}
-			String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
-			noiseParams.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));			
 			
 			log.info(noiseParams.toString());
-			
 			controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
 		}
 		

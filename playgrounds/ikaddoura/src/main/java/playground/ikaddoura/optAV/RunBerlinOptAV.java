@@ -60,11 +60,11 @@ public class RunBerlinOptAV {
 
 	private static String configFile;
 	private static String outputDirectory;
-	
+	private static double kP;	
 	private static boolean internalizeNoise;
+	private static boolean agentBasedActivityScheduling;
 	
 	private static boolean otfvis;
-	private static double kP;
 	
 	public static void main(String[] args) {
 		if (args.length > 0) {
@@ -81,14 +81,17 @@ public class RunBerlinOptAV {
 			internalizeNoise = Boolean.getBoolean(args[3]);
 			log.info("internalizeNoise: "+ internalizeNoise);
 			
+			agentBasedActivityScheduling = Boolean.getBoolean(args[4]);
+			log.info("agentBasedActivityScheduling: "+ agentBasedActivityScheduling);
+			
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
-//			kP = 2 * 12./3600.;
-			kP = 0.;
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000_test/";
+			kP = 2 * 12./3600.;
 			internalizeNoise = true;
+			agentBasedActivityScheduling = false;
 			otfvis = false;
 		}
 		
@@ -116,8 +119,10 @@ public class RunBerlinOptAV {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
-		AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-		controler = aa.prepareControler(false);
+		if (agentBasedActivityScheduling) {
+			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
+			controler = aa.prepareControler(false);
+		}
 		
 		// #############################
 		// noise pricing
@@ -127,15 +132,17 @@ public class RunBerlinOptAV {
 			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 			noiseParams.setInternalizeNoiseDamages(true);
 			
-			List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
-			for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
-				if (!params.getActivityType().contains("interaction")) {
-					consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
+			if (agentBasedActivityScheduling) {
+				List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
+				for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
+					if (!params.getActivityType().contains("interaction")) {
+						consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
+					}
 				}
+				String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
+				noiseParams.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));			
 			}
-			String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
-			noiseParams.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));			
-			
+
 			log.info(noiseParams.toString());
 			controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
 		}
@@ -247,8 +254,8 @@ public class RunBerlinOptAV {
 			merger.run();	
 		}
 		
-		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
-		analysis1.run();
+		PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
+		analysis.run();
 	}
 }
 
