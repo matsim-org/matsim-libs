@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.dispatcher.core.RebalanceEvent;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.netdata.VirtualNetwork;
@@ -26,6 +27,13 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                                   VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
+    }
+    
+    // TODO call this function instead of  "setVehicleDiversion"  whenever the cause for rerouting is "rebalance"
+    // <- not final code design
+    protected final void setVehicleRebalance(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+        setVehicleDiversion(vehicleLinkPair, destination);
+        eventsManager.processEvent(new RebalanceEvent(destination, vehicleLinkPair.avVehicle, getTimeNow()));
     }
 
     @Deprecated
