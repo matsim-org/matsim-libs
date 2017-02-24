@@ -205,8 +205,12 @@ public final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 		l.setCapacity(Double.parseDouble(atts.getValue("capacity")));
 		l.setNumberOfLanes(Double.parseDouble(atts.getValue("permlanes")));
 		this.network.addLink(l);
-
-		NetworkUtils.setOrigId( (l), atts.getValue(NetworkUtils.ORIGID) ) ;
+		{
+			String value = atts.getValue(NetworkUtils.ORIGID);
+			if ( value != null ) {
+				NetworkUtils.setOrigId( (l), value ) ; // will now put it into the attributes. kai, dec'16
+			}
+		}
 		{
 			final String value = atts.getValue(NetworkUtils.TYPE);
 			if ( value != null ) {
