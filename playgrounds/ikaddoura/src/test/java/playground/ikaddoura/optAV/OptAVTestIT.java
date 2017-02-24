@@ -44,7 +44,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
 import playground.ikaddoura.decongestion.*;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.*;
 import playground.ikaddoura.decongestion.tollSetting.*;
@@ -339,7 +338,6 @@ public class OptAVTestIT {
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKp(999.);
-		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
@@ -347,15 +345,14 @@ public class OptAVTestIT {
 		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 		
 		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
 		
 		controler2.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
 				this.bind(DecongestionInfo.class).toInstance(info);
-				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
 				
+				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);			
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
 
 				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();

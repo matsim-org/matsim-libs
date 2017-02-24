@@ -25,6 +25,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
+import com.google.inject.Inject;
+
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 /**
@@ -38,11 +40,9 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
 public class DecongestionTollingBangBang implements DecongestionTollSetting {
 	
 	private static final Logger log = Logger.getLogger(DecongestionTollingBangBang.class);
-	private final DecongestionInfo congestionInfo;
 	
-	public DecongestionTollingBangBang(DecongestionInfo congestionInfo) {
-		this.congestionInfo = congestionInfo;		
-	}
+	@Inject
+	private DecongestionInfo congestionInfo;
 
 	@Override
 	public void updateTolls() {

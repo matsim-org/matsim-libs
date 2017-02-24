@@ -232,7 +232,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		
+				
 		if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controler().getFirstIteration()) {
 			
 			this.nextDisableInnovativeStrategiesIteration = (int) (congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL());

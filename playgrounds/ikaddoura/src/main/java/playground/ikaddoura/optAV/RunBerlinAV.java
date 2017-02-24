@@ -52,7 +52,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
@@ -133,7 +132,6 @@ public class RunBerlinAV {
 		// #############################
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setTOLLING_APPROACH(TollingApproach.NoPricing);
 		decongestionSettings.setKp(0.);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKd(0.);

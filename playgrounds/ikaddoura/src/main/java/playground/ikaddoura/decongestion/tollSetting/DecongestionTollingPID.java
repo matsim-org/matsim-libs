@@ -46,20 +46,14 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 	
 	private Map<Id<Link>, LinkInfo> linkId2infoPreviousTollComputation = new HashMap<>();
 	
-	private double K_p = Double.NaN;
-	private double K_i = Double.NaN;
-	private double K_d = Double.NaN;
-	
 	private int tollUpdateCounter = 0;
-	
-	public DecongestionTollingPID(DecongestionInfo congestionInfo) {
-		K_p = congestionInfo.getDecongestionConfigGroup().getKp();
-		K_i = congestionInfo.getDecongestionConfigGroup().getKi();
-		K_d = congestionInfo.getDecongestionConfigGroup().getKd();
-	}
 
 	@Override
 	public void updateTolls() {
+		
+		double K_p = congestionInfo.getDecongestionConfigGroup().getKp();
+		double K_i = congestionInfo.getDecongestionConfigGroup().getKi();
+		double K_d = congestionInfo.getDecongestionConfigGroup().getKd();
 	
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
 			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
@@ -73,7 +67,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				double toll = 0.;
 				
 				// 1) proportional term
-				toll += this.K_p * averageDelay;
+				toll += K_p * averageDelay;
 		
 				// 2) integral term
 				double totalDelay = 0.;
@@ -89,7 +83,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 					totalDelay = averageDelay;
 					this.congestionInfo.getlinkInfos().get(linkId).getTime2value().put(intervalNr, totalDelay);
 				}
-				toll += this.K_i * totalDelay;
+				toll += K_i * totalDelay;
 
 				// 3) derivative term
 				double previousDelay = 0.;
@@ -98,7 +92,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				}
 			
 				double deltaDelay = averageDelay - previousDelay;
-				toll += this.K_d * deltaDelay;
+				toll += K_d * deltaDelay;
 				
 				// 4) prevent negative tolls
 				if (toll < 0) {

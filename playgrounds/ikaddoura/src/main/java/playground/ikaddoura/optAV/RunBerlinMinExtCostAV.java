@@ -43,7 +43,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
 import playground.ikaddoura.decongestion.*;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.*;
 import playground.ikaddoura.decongestion.tollSetting.*;
@@ -151,7 +150,6 @@ public class RunBerlinMinExtCostAV {
 		// #############################
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 		decongestionSettings.setKp(kP);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKd(0.);
@@ -160,15 +158,13 @@ public class RunBerlinMinExtCostAV {
 		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 		
 		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
 				this.bind(DecongestionInfo.class).toInstance(info);
-				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
-
+				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
 
 				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
