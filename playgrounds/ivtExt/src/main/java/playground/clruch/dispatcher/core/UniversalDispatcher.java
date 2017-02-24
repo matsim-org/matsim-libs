@@ -66,7 +66,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * 
      * @return collection of all requests that have not been matched
      */
-    protected final Collection<AVRequest> getAVRequests() {
+    protected synchronized final Collection<AVRequest> getAVRequests() {
         pendingRequests.removeAll(matchedRequests);
         matchedRequests.clear();
         return Collections.unmodifiableCollection(pendingRequests);
@@ -92,9 +92,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest
      *            provided by getAVRequests()
      */
-    public final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+    // TODO should be 'protected'
+    public synchronized final Void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
-        
+
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
 
@@ -107,7 +108,12 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         assignDirective(avVehicle, new AcceptRequestDirective( //
                 avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
+        return null;
     }
+
+//    protected final void setAcceptRequest(Entry<AVVehicle, AVRequest> entry) {
+//        setAcceptRequest(entry.getKey(), entry.getValue());
+//    }
 
     /**
      * assigns new destination to vehicle.
@@ -146,8 +152,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             }
         };
     }
-    
-    protected final void setVehicleDiversion(final Entry<VehicleLinkPair,Link> entry) {
+
+    protected final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {
         setVehicleDiversion(entry.getKey(), entry.getValue());
     }
 

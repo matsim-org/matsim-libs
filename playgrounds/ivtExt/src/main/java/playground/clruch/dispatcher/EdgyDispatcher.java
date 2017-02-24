@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -18,8 +19,10 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.dispatcher.utils.MatchRequestsWithStayVehicles;
+import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
+import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -31,6 +34,8 @@ public class EdgyDispatcher extends UniversalDispatcher {
     final Network network; // <- for verifying link references
     final Collection<Link> linkReferences; // <- for verifying link references
 
+    final AbstractVehicleRequestMatcher vehicleRequestMatcher;
+
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
@@ -40,11 +45,12 @@ public class EdgyDispatcher extends UniversalDispatcher {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
+        vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
     }
 
     /** verify that link references are present in the network */
     @SuppressWarnings("unused") // for verifying link references
-    private void verifyLinkReferencesInvariant() { 
+    private void verifyLinkReferencesInvariant() {
         List<Link> testset = getDivertableVehicles().stream() //
                 .map(VehicleLinkPair::getDestination) //
                 .filter(Objects::nonNull) //
@@ -68,7 +74,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
             int num_abortTrip = 0;
             int num_driveOrder = 0;
 
-            num_matchedRequests = MatchRequestsWithStayVehicles.inOrderOfArrival(this);
+            num_matchedRequests = vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
 
             { // see if any car is driving by a request. if so, then stay there to be matched!
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks(); // TODO lazy implementation

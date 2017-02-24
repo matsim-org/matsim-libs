@@ -12,7 +12,8 @@ import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-public class MatchRequestsWithStayVehicles {
+@Deprecated
+public class MatchRequestsWithStayVehicles { // TODO remove
 
     /**
      * if a vehicle is in stay more and there is a request at the link of where the car is
@@ -26,6 +27,8 @@ public class MatchRequestsWithStayVehicles {
      * @param universalDispatcher
      * @return
      */
+    // TODO make functions protected once this is removed
+    @Deprecated
     public static int inOrderOfArrival(UniversalDispatcher universalDispatcher) {
         int num_matchedRequests = 0;
         // match requests with stay vehicles
@@ -46,5 +49,4 @@ public class MatchRequestsWithStayVehicles {
 
         return num_matchedRequests;
     }
-
 }
