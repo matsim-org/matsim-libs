@@ -86,11 +86,11 @@ public class RunBerlinOptAV {
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000_test/";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
 			kP = 2 * 12./3600.;
 			internalizeNoise = true;
-			agentBasedActivityScheduling = false;
+			agentBasedActivityScheduling = true;
 			otfvis = false;
 		}
 		
