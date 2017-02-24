@@ -11,7 +11,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import saleem.p0.stockholm.StockholmP0Helper;
 import saleem.stockholmmodel.modelbuilding.PTCapacityAdjusmentPerSample;
-
+/**
+ * A class to calculate coordinates of signalised junctions using existing utility classes
+ * 
+ * @author Mohammad Saleem
+ */
 public class PretimedNodesCoordinateCreator {
 	public static void main(String[] args){
 		String path = "./ihop2/matsim-input/config - P0.xml";

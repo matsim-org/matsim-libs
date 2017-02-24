@@ -1,16 +1,17 @@
 package saleem.stockholmmodel.modelbuilding;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-
-import saleem.stockholmmodel.utils.CollectionUtil;
-
-//Scale capacity of vehicles 
+/**
+ * A class to scale capacity of vehicles as per sample size.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class PTCapacityAdjusmentPerSample {
 	public void adjustStoarageAndFlowCapacity(Scenario scenario, double samplesize){
 

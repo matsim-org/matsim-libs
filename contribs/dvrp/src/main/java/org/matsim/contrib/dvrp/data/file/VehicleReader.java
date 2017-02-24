@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.data.file;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.utils.io.MatsimXmlParser;

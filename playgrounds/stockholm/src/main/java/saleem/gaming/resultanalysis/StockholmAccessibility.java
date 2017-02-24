@@ -1,6 +1,12 @@
 package saleem.gaming.resultanalysis;
 
-
+/**
+ * A class to calculate accessibility measure for gaming scenarios.
+ * The idea was later dropped since, the accessibility functionality was available for Car traffic only.
+ * 
+ * 
+ * @author Mohammad Saleem
+ */
 public class StockholmAccessibility {
 //	private static final Logger log = Logger.getLogger(RunAccessibilityExample.class);
 //	public static void main(String[] args) {

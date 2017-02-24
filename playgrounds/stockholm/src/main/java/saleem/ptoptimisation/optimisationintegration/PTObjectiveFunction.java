@@ -14,18 +14,17 @@ import saleem.ptoptimisation.utils.ScenarioHelper;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 
-
 /**
- * Returns the negative sum of the scores of the selected plans of all agents,
- * excluding toll.
+ * Returns the negative sum of the scores of the selected plans of all agents, 
+ * while balancing for the cost of added vehicles or removed vehicles.
  * 
- * @author Gunnar Flötteröd
+ * @author Mohammad Saleem
  *
  */
 public class PTObjectiveFunction implements ObjectiveFunction {
-	String str = "";
-	int totalVeh = 36813;
-	Scenario scenario;
+	private String str = "";
+	private int totalVeh = 36813;
+	private Scenario scenario;
 	public PTObjectiveFunction(Scenario scenario){
 		this.scenario=scenario;
 	}
@@ -41,18 +40,18 @@ public class PTObjectiveFunction implements ObjectiveFunction {
 		}
 		int currenttotal = scenario.getTransitVehicles().getVehicles().size();
 		ScenarioHelper helper = new ScenarioHelper();
-		int unusedvehs = helper.getUnusedVehs(scenario.getTransitSchedule());
+		int unusedvehs = helper.getUnusedVehs(scenario.getTransitSchedule());//Vehicles that are not in use, alloted to routes which have been deleted.
 		int added = currenttotal-totalVeh-unusedvehs;
 		result /= ptstate.getPersonIdView().size();
 		if(added>0){
 			for(int i=0; i<added; i++){
-				result = result + 0.00045;//Thats an adverse effect on total score
+				result = result + 0.00045;//Added vehicles have an adverse effect on total neg score
 			}
 		}
 		else if (added<0){
 			added=Math.abs(added);
 			for(int i=0; i<added;i++){
-				result = result - 0.00045;//Thats a positive effect due to deleting vehicles
+				result = result - 0.00045;//Removed vehicles have a positive (neg score minimising) effect.
 			}
 		}
 		return result;

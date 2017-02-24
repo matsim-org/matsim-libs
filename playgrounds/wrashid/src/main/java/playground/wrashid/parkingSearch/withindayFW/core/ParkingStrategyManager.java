@@ -55,7 +55,7 @@ public class ParkingStrategyManager implements BeforeMobsimListener, MobsimIniti
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
+		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents().values()) {
 			this.agents.put(agent.getId(), (PersonDriverAgentImpl) agent);
 		}
 

@@ -96,7 +96,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		config.strategy().addStrategySettings(modeChoice);
 
 		StrategySettings expChangeBeta = new StrategySettings();
-		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		expChangeBeta.setWeight(0.9);
 		config.strategy().addStrategySettings(expChangeBeta);
 

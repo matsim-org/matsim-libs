@@ -25,13 +25,22 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
+/**
+ * A class to move additional people into selected areas,where housing developments are planned.
+ * Additional person to add: Arstafaltet:15000, Alvsjo:5000, Farsta Centrum: 16800
+ * Hagastaden:12600, Gullmarsplan:15000
+ *
+ * @author Mohammad Saleem
+ */
 public class PopulationModifier {
 	public static void main(String[] args){
 		String path = "./ihop2/matsim-input/config.xml";
 	    Config config = ConfigUtils.loadConfig(path);
 	    final Scenario scenario = ScenarioUtils.loadScenario(config);
-	    int numberppl = 1500; //Additional person to add, for Alvsjo 5000
-	    Coord origincords = new Coord(672930, 6576324);
+	    
+	    int numberppl = 1500; // 10% demand simulated so 1500 for Arstafaltet
+	    
+	    Coord origincords = new Coord(672930, 6576324);//Arstafaltet area
 	    PopulationModifier popmod = new PopulationModifier();
 	    
 //	    ArrayList<Person> sortedpersons = popmod.sortPersonsPerDistance(scenario, origincords, numberppl);
@@ -42,12 +51,12 @@ public class PopulationModifier {
 //	    popmod.printSortedPersonsCoordinates(origincords, "./ihop2/matsim-input/10mFarstaCentrum.xy", sortedpersons, numberppl);
 //	    popmod.writePopulation(scenario, "./ihop2/demand-output/10mFarstaCentrum.xml");
 	
-	    //For Arsta
+	    //For Arstafaltet
 	    ArrayList<Person> addedpersons = popmod.duplicatePersonsArsta(scenario.getNetwork(), scenario.getPopulation(), sortedpersons.subList(0, numberppl));
 	    popmod.printSortedPersonsCoordinates(origincords, "./ihop2/matsim-input/10uArstafaltet.xy", addedpersons, numberppl);
 	    popmod.writePopulation(scenario, "./ihop2/demand-output/10uArstafaltet.xml");
 	}
-	public Boolean employed(Person person){
+	public Boolean employed(Person person){//Is the person employed?
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 		for (PlanElement planelement : planElements) {
     		if (planelement instanceof Activity) {
@@ -59,6 +68,9 @@ public class PopulationModifier {
 		}
 		return false;
 	}
+	/* Sort employed people over distance from the given coordinate representing centre of the area we are densifying. 
+	 * To move employed people, we clone numofppl employed people living closest to the given coordinate.
+	 */
 	public ArrayList<Person> sortEmployedPersonsPerDistance(Scenario scenario, Coord cords, int numofppl){
 		Population population = scenario.getPopulation();
 	    Map<Id<Person>, ? extends Person> persons = population.getPersons();
@@ -83,6 +95,10 @@ public class PopulationModifier {
 		}
 		return  sortedpersons;
 	}
+	/* Sort unemployed people over distance from the given coordinate representing centre of the area we are densifying. 
+	 * To move unemployed people, we clone numofppl unemployed people living closest to the given coordinate.
+	 */
+
 	public ArrayList<Person> sortUnEmployedPersonsPerDistance(Scenario scenario, Coord cords, int numofppl){
 		Population population = scenario.getPopulation();
 	    Map<Id<Person>, ? extends Person> persons = population.getPersons();
@@ -107,17 +123,20 @@ public class PopulationModifier {
 		}
 		return  sortedpersons;
 	}
-	
+	// Remove everyone from the population.
 	public void removeAllPersons( Population population, ArrayList<Person> sortedpersons){
 		Iterator<Person> sortedpersonsiter = sortedpersons.iterator();
 		
 		while(sortedpersonsiter.hasNext()){
 			Person person = sortedpersonsiter.next();
-//			population.getPersons().remove(person.getId(), person);
 			population.getPersons().remove(person.getId() );
 			// I changed this to make the code compile.  kai, 9/sep/16
 		}
 	}
+	/* Sort mixed (employed and unemployed) people over distance from the given coordinate representing centre of the area we are densifying. 
+	 * To move mixed people, we clone numofppl mixed people living closest to the given coordinate.
+	 */
+
 	public ArrayList<Person> sortPersonsPerDistance(Scenario scenario, Coord cords, int numofppl){
 		Population population = scenario.getPopulation();
 	    Map<Id<Person>, ? extends Person> persons = population.getPersons();
@@ -139,6 +158,7 @@ public class PopulationModifier {
 		}
 		return  sortedpersons;
 	}
+	// Print all people to move. For debugging purposes
 	public void printSortedPersons(Coord cords, ArrayList<Person> sortedpersons){
 		Iterator<Person> sortedpersonsiter = sortedpersons.iterator();
 		while(sortedpersonsiter.hasNext()){
@@ -148,6 +168,7 @@ public class PopulationModifier {
 			System.out.println("Person: " + person.getId()  + " Coord: " + homecords.getX() + " ; " + homecords.getY() + " Distance: " + distance);
 		}
 	}
+	// Write newly moving people to a file.
 	public void printSortedPersonsCoordinates(Coord cords, String filepath, ArrayList<Person> sortedpersons, int number){
 		Iterator<Person> sortedpersonsiter = sortedpersons.iterator();
 		String str = "";int count = 0;
@@ -165,6 +186,7 @@ public class PopulationModifier {
 	    		//catch logic here
 	    	}
 	}
+	// Clone selected closest living people, effectively moving new people to the area.
 	public void duplicatePersons(Population population, List<Person> sortedpersons){
 		for (Person person: sortedpersons){
 			Person newPerson = population.getFactory().createPerson(Id.createPersonId(person.getId().toString()+"a"));
@@ -177,6 +199,12 @@ public class PopulationModifier {
 			population.addPerson(newPerson);
 		}
 	}
+	/* Clone selected closest living people, effectively moving new people to the area.
+	 * Also re-allocate cloned people to Arstafaltet field, a grid of 1000X1000 meters.
+	 * It is because construction is done in the field, and since the field is empty so far,
+	 * most likely the closest cloned people are from out of the field area. 
+
+	 */
 	public ArrayList<Person>  duplicatePersonsArsta(Network network, Population population, List<Person> sortedpersons){
 		ArrayList<Person> addedpersons = new ArrayList<Person>();
 		for (Person person: sortedpersons){
@@ -190,7 +218,7 @@ public class PopulationModifier {
 				Coord coord = new Coord(672930 + xrad, 6576324 + yrad);
 				PopulationUtils.getFirstActivity(toPlan).setCoord(coord);
 				PopulationUtils.getLastActivity(toPlan).setCoord(coord);
-				Link link = NetworkUtils.getNearestLink(network, coord);
+				Link link = NetworkUtils.getNearestLink(network, coord);//get nearestt link to the cooordinate
 				PopulationUtils.getFirstActivity(toPlan).setLinkId(link.getId());
 				PopulationUtils.getLastActivity(toPlan).setLinkId(link.getId());
 				newPerson.addPlan(toPlan);

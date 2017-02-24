@@ -45,33 +45,62 @@ public class GenerateAVDemand {
 
 	private static final Logger log = Logger.getLogger(GenerateAVDemand.class);
 	
-	private static final double taxiTripShare = 0.1;
-	private static final String inputPlansFile = "/Users/ihab/Documents/workspace/runs-svn/berlin-dz-time/input/input_0.1sample/run_194c.150.plans.selected-1000it.route.time.output.plans-selected.xml.gz";
-	private static final String outputPlansFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/run_194c.150.plans.selected-1000it.route.time.output.plans-selected_BerlinArea_taxiTripShare_" + taxiTripShare + ".xml.gz";
-//	private static final String outputPlansFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/run_194c.150.plans_selected_taxiTripShare_" + taxiTripShare + ".xml.gz";
+	private static final String inputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin-dz-time/input/input_0.1sample/";
+	private static final String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/";
 	
+	private static final String inputPlansFile = "run_194c.150.plans.selected-1000it.route.time.output.plans.selected.xml.gz";
+	
+	private static final double taxiTripShare = 0.5;
+	
+	private static final boolean specificArea = true;
 	private static final double minX = 4554761.;
 	private static final double minY = 5793603.;
 	private static final double maxX = 4631345.;
 	private static final double maxY = 5846740.;
 	
-	private static int counterTaxiTrips = 0;
-	private static int counterCarTrips = 0;
+	private static final String[] attributes = {"OpeningClosingTimes"};
 	
+	// ####################################################################
+		
+	private static String inputPlans;
+	private static String outputPlans; 
+	
+	private static int counterTaxiTrips = 0;
+	private static int counterCarTrips = 0;	
+
 	private static Random random = MatsimRandom.getLocalInstance();
 	
-	public static void main(String[] args) {
-			
+	public static void main(String[] args) {			
+		
+		inputPlans = inputDirectory + inputPlansFile;
+		
+		String inputPlansFileName = inputPlansFile;
+		if (inputPlansFile.endsWith(".xml.gz")) {
+			inputPlansFileName = inputPlansFileName.replaceAll(".xml.gz", "");
+		} else if (inputPlansFileName.endsWith(".xml")) {
+			inputPlansFileName = inputPlansFileName.replaceAll(".xml", "");
+		} else {
+			throw new RuntimeException("plans file " + inputPlansFile + " should end with .xml or .xml.gz. Aborting...");
+		}
+		outputPlans = outputDirectory + inputPlansFileName + ".avTripShare" + taxiTripShare + ".specificArea-" + specificArea + ".xml.gz";
+		
 		GenerateAVDemand generateAVDemand = new GenerateAVDemand();
-//		generateAVDemand.createTaxiTripsForAllAgents();	
-		generateAVDemand.createTaxiTripsForAgentsWithAllTripsInSpecificArea();
+		generateAVDemand.run();
+	}
+
+	private void run() {
+		if (specificArea) {
+			createTaxiTripsForAgentsWithAllTripsInSpecificArea();
+		} else {
+			createTaxiTripsForAllAgents();	
+		}
 	}
 
 	private void createTaxiTripsForAgentsWithAllTripsInSpecificArea() {
 		log.info("taxi trip share: " + taxiTripShare);
 
 		Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(inputPlansFile);
+		config.plans().setInputFile(inputPlans);
 		Scenario scenarioInput = ScenarioUtils.loadScenario(config);
 		
 		Scenario scenarioOutput = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
@@ -81,6 +110,9 @@ public class GenerateAVDemand {
 			
 			PopulationFactory factory = populationOutput.getFactory();
 			Person personClone = factory.createPerson(person.getId());
+			for (String attribute : attributes) {
+				personClone.getAttributes().putAttribute(attribute, person.getAttributes().getAttribute(attribute));
+			}
 			populationOutput.addPerson(personClone);
 			personClone.addPlan(person.getSelectedPlan());
 			
@@ -121,7 +153,7 @@ public class GenerateAVDemand {
 			}
 		}
 		
-		new PopulationWriter(scenarioOutput.getPopulation()).write(outputPlansFile);
+		new PopulationWriter(scenarioOutput.getPopulation()).write(outputPlans);
 		log.info("Number of car trips: " + counterCarTrips);
 		log.info("Number of taxi trips: " + counterTaxiTrips);
 		log.info("Share of taxi trips: " + counterTaxiTrips / (double) (counterCarTrips + counterTaxiTrips) );
@@ -132,7 +164,7 @@ public class GenerateAVDemand {
 		log.info("taxi trip share: " + taxiTripShare);
 
 		Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(inputPlansFile);
+		config.plans().setInputFile(inputPlans);
 		Scenario scenarioInput = ScenarioUtils.loadScenario(config);
 		
 		Scenario scenarioOutput = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
@@ -142,6 +174,9 @@ public class GenerateAVDemand {
 			
 			PopulationFactory factory = populationOutput.getFactory();
 			Person personClone = factory.createPerson(person.getId());
+			for (String attribute : attributes) {
+				personClone.getAttributes().putAttribute(attribute, person.getAttributes().getAttribute(attribute));
+			}
 			populationOutput.addPerson(personClone);
 			personClone.addPlan(person.getSelectedPlan());
 			
@@ -166,7 +201,7 @@ public class GenerateAVDemand {
 			}
 		}
 		
-		new PopulationWriter(scenarioOutput.getPopulation()).write(outputPlansFile);
+		new PopulationWriter(scenarioOutput.getPopulation()).write(outputPlans);
 		log.info("Number of car trips: " + counterCarTrips);
 		log.info("Number of taxi trips: " + counterTaxiTrips);
 		log.info("Share of taxi trips: " + counterTaxiTrips / (double) (counterCarTrips + counterTaxiTrips) );

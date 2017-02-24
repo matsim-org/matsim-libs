@@ -2,6 +2,8 @@ package saleem.stockholmmodel.transitdataconversion;
 
 /** A Line object used in converting Excel based data into MatSim based transit schedule 
  * data structure, consisting of neccessary attributes for stops and lines.
+ * 
+ * @author Mohammad Saleem
  */
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -20,7 +20,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vehicles.Vehicle;
-
+/**
+ * An event handling class to help in collecting link data for visualizing congestion benefits of P0
+ * 
+ * @author Mohammad Saleem
+ */
 public class VisualisationHandler implements BasicEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler{
 	List<String> inlinks;
 	double hour = 0;

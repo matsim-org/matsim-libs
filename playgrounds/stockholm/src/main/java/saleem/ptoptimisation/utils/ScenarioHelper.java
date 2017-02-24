@@ -23,10 +23,16 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-
+/**
+ * This class is an important helper class for keeping copies of different attributes of the current scenario, 
+ * or updating them to variations of them.
+ * It is mainly used in switching between PT MatSim states and decision variables during PT Optimisation .
+ * 
+ * @author Mohammad Saleem
+ */
 public class ScenarioHelper {
-	/*This is a function to create a deep copy of transit schedule. The deep copy is not fully deep and may also copy references. All those components 
-	of the transit schedule which are expected to be randomised for optimisation are deep copied. 
+	/*This is a function to create a deep copy of transit schedule. The deep copy is not fully deep and may also copy references. 
+	 * All those components of the transit schedule which are expected to be randomly adapted for PT optimisation are deep copied. 
 	*/ 
 	public TransitSchedule deepCopyTransitSchedule(TransitSchedule schedule){
 		TransitScheduleFactoryImpl tschedulefact = new TransitScheduleFactoryImpl();
@@ -38,7 +44,7 @@ public class ScenarioHelper {
 			TransitStopFacility stopfacility = stopfacilities.get(stopsiterator.next());
 			newschedule.addStopFacility(stopfacility);
 		}
-		//Deep copy and add all lines
+		//Deep copy all lines and add all them to new transit schedule
 		Map<Id<TransitLine>, TransitLine> lines = schedule.getTransitLines();
 		Iterator<Id<TransitLine>> linesiterator =  lines.keySet().iterator();
 		while(linesiterator.hasNext()){
@@ -48,7 +54,8 @@ public class ScenarioHelper {
 			Iterator<Id<TransitRoute>> routesiterator =  routes.keySet().iterator();
 			while(routesiterator.hasNext()){
 				TransitRoute troute = routes.get(routesiterator.next());
-				TransitRoute newroute = tschedulefact.createTransitRoute(Id.create(troute.getId().toString(), TransitRoute.class), troute.getRoute(), troute.getStops(), troute.getTransportMode());
+				TransitRoute newroute = tschedulefact.createTransitRoute
+						(Id.create(troute.getId().toString(), TransitRoute.class), troute.getRoute(), troute.getStops(), troute.getTransportMode());
 				Map<Id<Departure>, Departure> departures = troute.getDepartures();
 				Iterator<Id<Departure>> depsiterator =  departures.keySet().iterator();
 				while(depsiterator.hasNext()){
@@ -82,7 +89,10 @@ public class ScenarioHelper {
 		}
 		return newvehicles;
 	}
-	
+	/*Remove all nodes and links from the network. 
+	 * This may create problems if called within a running simulation, 
+	 * as removing links from the network may not be allowed.
+	 */
 	public void removeAllNodesAndLinks(Scenario scenario){
 		CollectionUtil<Id<Node>> cutil = new CollectionUtil<Id<Node>>();
 		Network network = scenario.getNetwork();
@@ -100,8 +110,8 @@ public class ScenarioHelper {
 		while(linkidsiter.hasNext()){
 			links.remove(linkidsiter.next());
 		}
-		
 	}
+	//Add all nodes and links to the network from another new network. 
 	public void addNodesAndLinks(Scenario scenario, Network newnetwork){
 		Network network = scenario.getNetwork();
 		Map<Id<Node>, ? extends Node> nodes = newnetwork.getNodes();
@@ -118,6 +128,7 @@ public class ScenarioHelper {
 			links.remove(linkidsiter.next());
 		}
 	}
+	//Calculate number of routes in transit schedule
 	public int getNumberOfRoutes(TransitSchedule schedule){
 		int numofroutes=0;
 		Map<Id<TransitLine>, TransitLine> lines = schedule.getTransitLines();
@@ -133,15 +144,15 @@ public class ScenarioHelper {
 	public void removeEntireScheduleAndVehicles(Scenario scenario){
 		
 		Vehicles vehicles = scenario.getTransitVehicles();
-		//Add all vehicle types
 		
+		//Remove all vehicle instances and types
 		CollectionUtil<Id<Vehicle>> cutil = new CollectionUtil<Id<Vehicle>>();
 		 ArrayList<Id<Vehicle>> list = cutil.toArrayList(vehicles.getVehicles().keySet().iterator());//Converted to array list in order to avoid concurrent modification issues.
 	        int i=0;int size = list.size();
 	        while(i<size){
 	        	vehicles.removeVehicle(list.get(i));i++;
 	        }
-	        //Vehicles must be removed before removing the vehicle types
+	        //Vehicles instances must be removed before removing the vehicle types
 	        CollectionUtil<Id<VehicleType>> cutilt = new CollectionUtil<Id<VehicleType>>();
 	        Map<Id<VehicleType>, VehicleType> vehtypes = vehicles.getVehicleTypes();
 	        ArrayList<Id<VehicleType>> vtlist = cutilt.toArrayList(vehtypes.keySet().iterator());
@@ -154,10 +165,12 @@ public class ScenarioHelper {
 	        Map<Id<TransitStopFacility>, TransitStopFacility> stopfacilities = schedule.getFacilities();
 	        ArrayList<Id<TransitStopFacility>> sflist =  cutilsf.toArrayList(stopfacilities.keySet().iterator());
 	        i=0;size = sflist.size();
+	      //Remove all PT stops
 			while(i<size){
 				TransitStopFacility stopfacility = stopfacilities.get(sflist.get(i));
 				if(stopfacility!=null)schedule.removeStopFacility(stopfacility);i++;
 			}
+			//Remove all transit lines
 	        CollectionUtil<Id<TransitLine>> cutiltr = new CollectionUtil<Id<TransitLine>>();
 	        ArrayList<Id<TransitLine>> lines = cutiltr.toArrayList(schedule.getTransitLines().keySet().iterator());
 	        i=0;size=lines.size();
@@ -166,7 +179,9 @@ public class ScenarioHelper {
 	        	if(tline!=null)schedule.removeTransitLine(tline);i++;
 	        }
 	}
-	//Adds all stop facilities and transit lines from a stand alone updated transit schedule into the current scenario transit schedule
+	/*Deep copy and add all stop facilities and transit lines from a stand alone updated transit schedule 
+	 * into the current scenario's transit schedule.
+	 */
 	public void addTransitSchedule(Scenario scenario, TransitSchedule copiedschedule){
 		TransitSchedule tschedule = scenario.getTransitSchedule();
 		TransitScheduleFactoryImpl tschedulefact = new TransitScheduleFactoryImpl();
@@ -177,7 +192,7 @@ public class ScenarioHelper {
 			tschedule.addStopFacility(stopfacility);
 		}
 		
-		//Deep copy and add all lines
+		//Deep copy and add all lines into current scenario
 		Map<Id<TransitLine>, TransitLine> lines = copiedschedule.getTransitLines();
 		Iterator<Id<TransitLine>> linesiterator =  lines.keySet().iterator();
 		while(linesiterator.hasNext()){
@@ -201,7 +216,9 @@ public class ScenarioHelper {
 			tschedule.addTransitLine(newline);
 		}
 	}
-	//Adds all vehicle types and vehicles from an updated stand alone vehicles object into the current scenario vehicles object
+	/*Add all vehicle types and vehicles from an updated stand alone vehicles object 
+	 * into the current scenario's vehicles object. Vehicles not deep copied.
+	 */
 	
 	public void addVehicles(Scenario scenario, Vehicles copiedvehicles){
 		Vehicles tvehicles = scenario.getTransitVehicles();
@@ -220,6 +237,10 @@ public class ScenarioHelper {
 			tvehicles.addVehicle(veh);
 		}
 	}
+	/*Vehicles not serving any line, and allocated to after-simulation-end-time hypothetical departures.
+	 * One hypothetical after-simulation-end-time  departure must exist in empty routes, 
+	 * as totally empty route is not allowed in MatSIm by design. 
+	 */
 	public int getUnusedVehs(TransitSchedule schedule){//Vehicles after simulation end time
 		int unusedvehs=0;
 		Map<Id<TransitLine>, TransitLine> lines = schedule.getTransitLines();
@@ -234,7 +255,7 @@ public class ScenarioHelper {
 				Iterator<Id<Departure>> depsiterator =  departures.keySet().iterator();
 				while(depsiterator.hasNext()){
 					Departure departure = departures.get(depsiterator.next());
-					if(departure.getDepartureTime()==115200){
+					if(departure.getDepartureTime()==115200){//Post simulation end time of 30:00
 						unusedvehs++;
 					}
 				}
@@ -243,6 +264,7 @@ public class ScenarioHelper {
 	
 		return unusedvehs;
 	}
+	//Write relevant stats for checking that PT Optimisation is behaving plausibly.
 	public void writePlausibilityStatistics(Scenario scenario, int iteration){
 		PlausibilityStatistics plc = new PlausibilityStatistics(scenario);
 		if(iteration==0){
@@ -253,6 +275,7 @@ public class ScenarioHelper {
 		plc.accumulateStatistics();
 	}
 	
+	//Create an Arraylist from an iterator.
 	public class CollectionUtil<Type> {
 		public ArrayList<Type> toArrayList(Iterator<Type> iter){
 			ArrayList<Type> arraylist = new ArrayList<Type>();

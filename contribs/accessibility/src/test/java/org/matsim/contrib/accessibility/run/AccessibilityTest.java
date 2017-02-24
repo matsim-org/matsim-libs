@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4urbansim.accessibility;
+package org.matsim.contrib.accessibility.run;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,13 +16,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.ConstantSpeedAccessibilityExpContributionCalculator;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeAccessibilityExpContributionCalculator;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
@@ -30,20 +30,21 @@ import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
-import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
-import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
@@ -53,6 +54,11 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+/**
+ * I can't say how similar or different to {@link AccessibilityIntegrationTest} this one here is.  kai, feb'17
+ *
+ * @author nagel
+ */
 public class AccessibilityTest implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
 	private static Logger log = Logger.getLogger( AccessibilityTest.class ) ;
 	
@@ -82,106 +88,43 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	 * The test result should be that the accessibility of the measuring point at (200,100) is higher than the accessibility at
 	 * any other measuring point.
 	 */
-
 	@Test
 	public void testGridBasedAccessibilityMeasure(){
-
-		//create local temp directory
-		String path = utils.getOutputDirectory();
-
-		//create test network with 9 nodes and 8 links and write it into the temp directory
+		
+		//create test network with 9 nodes and 8 links:
 		final Network net = CreateTestNetwork.createTestNetwork();
-		new NetworkWriter(net).write(path+"network.xml");
-
-		//create matsim config file and write it into the temp director<
-		String configLocation = new CreateTestM4UConfig(path, path+"network.xml").generateConfigV3();
 
 		//create a test population of n persons
 		Population population = CreateTestPopulation.createTestPopulation(nPersons);
+		
+		// ---
 
-		//get the config file and initialize it
-		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
-		connector.init();
-		final Config config = connector.getConfig();
-		Assert.assertTrue(config!=null) ;
+		Config config = AccessibilityTest.generateConfigV3() ;
+		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
+		
+		// ---
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		//add the generated test population to the scenario
 		((MutableScenario)scenario).setPopulation(population);
+		((MutableScenario)scenario).setNetwork(net);
+		
+		// ---
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
-		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-
-
-		//pt not used in this test
-		final PtMatrix ptMatrix = null;
-
 
 		{
-			//create a bounding box with 9 measuring points (one for each node)
-			double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
-			final double minX = boundary[0]-resolution/2;
-			final double minY = boundary[1]-resolution/2;
-			final double maxX = boundary[2]+resolution/2;
-			final double maxY = boundary[3]+resolution/2;
 
 			//initialize opportunities for accessibility computation
 			final ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-			opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
+			opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord(200, 100));
+			
+			AccessibilityModule module = new AccessibilityModule() ;
+			module.addSpatialGridDataExchangeListener(this);
+			ctrl.addOverridingModule(module);
 
-			ctrl.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-						@Inject Map<String, TravelTime> travelTimes;
-						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-						@Inject Network network ;
-
-						@Override
-						public ControlerListener get() {
-							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
-							ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution) ;
-							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-							AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
-							for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
-								AccessibilityContributionCalculator calc = null ;
-								switch( mode ) {
-								case bike:
-									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
-									break;
-								case car: {
-									final TravelTime travelTime = travelTimes.get(mode.name());
-									Gbl.assertNotNull(travelTime);
-									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-									calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
-									break; }
-								case freespeed: {
-									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
-									Gbl.assertNotNull(travelDisutilityFactory);
-									calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
-									break; }
-								case pt:
-									throw new RuntimeException("currently not implemented") ;
-								case walk:
-									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
-									break;
-								default:
-									throw new RuntimeException("not implemented") ;
-								}
-								accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
-							}
-							GridBasedAccessibilityShutdownListenerV3 listener = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, minX, minY, maxX, maxY, resolution);
-
-							//add grid data exchange listener to get accessibilities
-							listener.addSpatialGridDataExchangeListener(AccessibilityTest.this);
-							return listener;
-						}
-					});
-
-				}
-			});
 		}
 		ctrl.run();
 
@@ -204,30 +147,27 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	@Test
 	public void testZoneBasedAccessibilityMeasure(){
 
-		//create local temp directory
 		final String path = utils.getOutputDirectory();
 
 		//create test network with 9 nodes and 8 links and write it into the temp directory
 		Network net = CreateTestNetwork.createTestNetwork();
-		new NetworkWriter(net).write(path+"network.xml");
-
-		//create matsim config file and write it into the temp director<
-		CreateTestM4UConfig ctmc = new CreateTestM4UConfig(path, path+"network.xml");
-		String configLocation = ctmc.generateConfigV3();
 
 		//create a test population of n persons
 		Population population = CreateTestPopulation.createTestPopulation(nPersons);
 
-		//get the config file and initialize it
-		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
-		connector.init();
-		final Config config = connector.getConfig();
-		Assert.assertTrue(config!=null) ;
+		// ---
+		
+		final Config config = AccessibilityTest.generateConfigV3() ;
+		
+		// ---
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		//add the generated test population to the scenario
+		//add the generated test data to the scenario
+		((MutableScenario)scenario).setNetwork(net);
 		((MutableScenario)scenario).setPopulation(population);
+		
+		// ---
 
 		//create a new controler for the simulation
 		final Controler ctrl = new Controler(scenario);
@@ -243,7 +183,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 
 		//initialize opportunities for accessibility computation
 		final ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
+		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord(200, 100));
 
 		final ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
 		final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints) ;
@@ -276,8 +216,6 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 								Gbl.assertNotNull(travelDisutilityFactory);
 								calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
 								break; }
-							case pt:
-								throw new RuntimeException("currently not implemented") ;
 							case walk:
 								calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 								break;
@@ -323,7 +261,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 			accessibilities = new double[9][4];
 
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			if ( mode != Modes4Accessibility.pt ) {
+			if ( mode != Modes4Accessibility.pt && mode != Modes4Accessibility.matrixBasedPt ) {
 				final SpatialGrid spatialGrid = spatialGrids.get(mode);
 				if ( spatialGrid != null ) {
 					getAccessibilities( spatialGrid, mode.ordinal() ) ;
@@ -356,11 +294,11 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		}
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
-		if(measurePoint.getCoord().equals(new Coord((double) 100, (double) 0))){
+		if(measurePoint.getCoord().equals(new Coord(100, 0))){
 			log.warn("accepting as HZ");
 			accessibilitiesHomeZone = accessibilities1 ;
 		}
-		if(measurePoint.getCoord().equals(new Coord((double) 200, (double) 100))){
+		if(measurePoint.getCoord().equals(new Coord(200, 100))){
 			log.warn("accepting as WZ");
 			accessibilitiesWorkZone = accessibilities1 ;
 		}
@@ -371,5 +309,47 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	public void finish() {
 
 	}
+
+
+	/**
+		 * Starting from a copy of {@link CreateTestM4UConfig#generateM4UConfigV3()} and then modifying it so that it generates a matsim config.
+		 */
+		public final static Config generateConfigV3(){
+			
+			Config config = ConfigUtils.createConfig() ;
+			
+			AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class ) ;
+			accConfig.setCellSizeCellBasedAccessibility(100);
+			accConfig.setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation.fromNetwork );
+	
+	//		config.network().setInputFile(this.networkInputFileName);
+	
+			{
+				ActivityParams params = new ActivityParams("home") ;
+				params.setTypicalDuration(43200);
+				config.planCalcScore().addActivityParams(params);
+			}
+			{
+				ActivityParams params = new ActivityParams("work") ;
+				params.setTypicalDuration(28800);
+				params.setOpeningTime(25200);
+				params.setLatestStartTime(32400);
+				config.planCalcScore().addActivityParams(params);
+			}
+	
+			config.controler().setFirstIteration(0);
+			config.controler().setLastIteration(1);
+			
+			// there are default strategies set by M4UConfigUtils; now I need to set them here explicitly.
+			// I don't think that they are ever used, but the injector fails if not at least one of them is there.
+			{
+				StrategySettings changeExpBeta = new StrategySettings();
+				changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+				changeExpBeta.setWeight( 0.8 ) ;
+				config.strategy().addStrategySettings(changeExpBeta);
+			}
+	
+			return config ;
+		}
 
 }

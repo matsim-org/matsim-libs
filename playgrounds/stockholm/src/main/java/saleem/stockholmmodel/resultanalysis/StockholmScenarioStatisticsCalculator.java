@@ -13,8 +13,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.EventsToScore;
-
-//This event handler class is used to calculates different relevant statistics about stockholm scenario
+/**
+ * This event handler class is used to calculates different relevant statistics about Stockholm scenario.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class StockholmScenarioStatisticsCalculator implements PersonDepartureEventHandler, PersonArrivalEventHandler{//first order second order effects of P0
 	private Map<Id<Person>, Double> times = new HashMap<>();
 	private Map<Id<Person>, ? extends Person> persons = new HashMap<>();

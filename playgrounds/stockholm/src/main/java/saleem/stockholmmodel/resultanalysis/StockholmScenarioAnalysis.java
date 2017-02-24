@@ -7,8 +7,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
-//This class calculates different relevant statistics about stockholm scenario, based on an event file
+/**
+ * This class calculates different relevant statistics about Stockholm scenario,
+ * based on an event file.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class StockholmScenarioAnalysis {
 	public static void main(String[] args){
 		String path = "./ihop2/matsim-input/configoptimisationcarpt.xml";

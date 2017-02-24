@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -53,10 +54,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class CreatePeoplemoverStops {
 	public static void main(String[] args) {
 
-		String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-feb.xml";
-		String networkModeDesignator = "vw";
+		String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av.xml";
+		String networkModeDesignator = "av";
 		double averageStopDistance_meters = 300;
-		String transitStopsOutputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/stops.xml";
+		String transitStopsOutputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/stopsWRS_"+Math.round(averageStopDistance_meters)+"m.xml";
 		
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);
@@ -65,8 +66,11 @@ public class CreatePeoplemoverStops {
 			
 			@Override
 			public boolean judgeLink(Link l) {
-				if (l.getAllowedModes().contains(networkModeDesignator)) return true;
-				else
+				if (l.getAllowedModes().contains(networkModeDesignator)){
+					if ((l.getFreespeed()>7)&&l.getFreespeed()<20&&l.getLength()>15)
+					return true;
+					}
+				
 				return false;
 			}
 		});
@@ -76,18 +80,33 @@ public class CreatePeoplemoverStops {
 		int stopNumber = estimateStopNumbers(stopNetwork, averageStopDistance_meters);
 		TransitScheduleFactory f = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = f.createTransitSchedule();
-		List<Link> allLinks = new ArrayList<>();
-		allLinks.addAll(stopNetwork.getLinks().values());
 		Random r = MatsimRandom.getRandom();
-		Collections.shuffle(allLinks, r);
-		for (int i = 0; i< stopNumber; i++)
+		WeightedRandomSelection<Link> wrs = new WeightedRandomSelection<>();
+		for (Link l : stopNetwork.getLinks().values())
 		{
-			int draw = r.nextInt(allLinks.size());
-			Link l = allLinks.remove(draw);
-			TransitStopFacility stop = f.createTransitStopFacility(Id.create(l.getId().toString()+"_stop", TransitStopFacility.class), ParkingUtils.getRandomPointAlongLink(r, l), false);
-			stop.setLinkId(l.getId());
-			schedule.addStopFacility(stop);
+			wrs.add(l, l.getLength());
 		}
+		
+		for (int i = 0; i<stopNumber; i++)
+		{
+			Link l = wrs.select();
+			TransitStopFacility stop = f.createTransitStopFacility(Id.create(l.getId().toString()+"_stop", TransitStopFacility.class), ParkingUtils.getRandomPointAlongLink(r, l), false);
+			int ii = 0;
+			boolean added = false;
+			while (!added)
+			{
+				stop = f.createTransitStopFacility(Id.create(l.getId().toString()+"_stop_"+ii, TransitStopFacility.class), stop.getCoord(), false);
+				ii++;
+				try {
+				schedule.addStopFacility(stop);
+				added = true;
+				}
+				catch (IllegalArgumentException e)
+				{}
+			}
+		}	
+	
+		
 		new TransitScheduleWriter(schedule).writeFile(transitStopsOutputFile);
 		
 		

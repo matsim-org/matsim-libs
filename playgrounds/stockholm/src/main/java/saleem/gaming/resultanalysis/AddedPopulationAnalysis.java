@@ -20,7 +20,13 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import saleem.stockholmmodel.utils.CollectionUtil;
-
+/**
+ * A class to do basic plausibility checks and result analysis over the executed gaming simulation scenarios, 
+ * before the results were provided to ProtoWorld to be used in interactive gaming.
+ * E.g. trip distances, trip durations, scores etc. are checked.
+ * 
+ * @author Mohammad Saleem
+ */
 public class AddedPopulationAnalysis {
 	public static void main(String[] args){
 		

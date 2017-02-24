@@ -72,7 +72,7 @@ public class RunBerlinAV {
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_berlinArea_av-trip-share-0.1_av-20000/";
-			analyzeNoise = true;
+			analyzeNoise = false;
 			otfvis = false;
 		}
 		
@@ -119,7 +119,7 @@ public class RunBerlinAV {
 		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
         
         final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = 
-        		new RandomizingTimeDistanceTravelDisutilityFactory(TaxiOptimizerModules.TAXI_MODE, controler.getConfig().planCalcScore());
+        		new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler.getConfig().planCalcScore());
 		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
@@ -147,6 +147,7 @@ public class RunBerlinAV {
 		
 		if (analyzeNoise) {
 			NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
+			noiseParameters.setInternalizeNoiseDamages(false);
 			
 			NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
 			noiseCalculation.run();	

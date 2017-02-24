@@ -23,7 +23,7 @@ import saleem.gaming.scenariobuilding.GamingConstants;
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
  * modular approach.
- * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
+ * 
  * @author rashid_waraich
  */
 public class StockholmLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {

@@ -117,4 +117,10 @@ public class VrpAgentLogic
     {
         return new StaticDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
     }
+    
+    
+    Vehicle getVehicle()
+    {
+    	return vehicle;
+    }
 }

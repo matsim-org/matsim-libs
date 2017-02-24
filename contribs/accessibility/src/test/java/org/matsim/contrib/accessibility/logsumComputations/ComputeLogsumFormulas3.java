@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4urbansim.accessibility;
+package org.matsim.contrib.accessibility.logsumComputations;
 
 import org.junit.Assert;
 import org.junit.Test;

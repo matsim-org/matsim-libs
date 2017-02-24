@@ -23,7 +23,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vehicles.Vehicle;
-
+/**
+ * An event handling class to help collect statitics about delays, 
+ * number of agents on incoming links of vehicles on junctions, 
+ * number of vehicles passing through junctions etc.
+ * For comparisons between policies.
+ * 
+ * @author Mohammad Saleem
+ */
 public class EventsHandler implements BasicEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, VehicleLeavesTrafficEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler{
 	List<String> inlinks;
 	double delay = 0;
@@ -62,21 +69,16 @@ public class EventsHandler implements BasicEventHandler, LinkLeaveEventHandler, 
 	public void handleEvent(LinkLeaveEvent event) {
 		
 		if(inlinks.contains(event.getLinkId().toString())){
-//			if(event.getTime()>107000)
-//			System.out.println(event.getTime());
 			if(entries.get(event.getVehicleId())!=null){
 				double del = event.getTime()-entries.get(event.getVehicleId())
 						- freetraveltimes.get(event.getLinkId().toString());
 				if(del<10000){
 					delay = delay + del;
 					numveh++;
-
-//					System.out.println(del + "..." + event.getLinkId().toString());
 				}
 				entries.remove(event.getVehicleId());
 			}
 		}
-		// TODO Auto-generated method stub
 		
 	}
 	@Override
@@ -84,7 +86,6 @@ public class EventsHandler implements BasicEventHandler, LinkLeaveEventHandler, 
 		if(inlinks.contains(event.getLinkId().toString())){
 			entries.put(event.getVehicleId(), event.getTime());
 		}
-		// TODO Auto-generated method stub
 		
 	}
 	public ArrayList<Double> getDelays(){
@@ -101,7 +102,6 @@ public class EventsHandler implements BasicEventHandler, LinkLeaveEventHandler, 
 	}
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		// TODO Auto-generated method stub
 		if(inlinks.contains(event.getLinkId().toString())){
 			entries.remove(event.getVehicleId());
 		}
@@ -109,20 +109,15 @@ public class EventsHandler implements BasicEventHandler, LinkLeaveEventHandler, 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		entries.remove(persontoveh.get(event.getPersonId()));
-		// TODO Auto-generated method stub
-		
 	}
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		persontoveh.put(event.getPersonId(), event.getVehicleId());
-
-		// TODO Auto-generated method stub
 		
 	}
 	@Override
 	public void handleEvent(Event event) {
 		if(event.getTime()-time>=3600) {
-//			System.out.println(event.getTime());
 			if(numveh==0)numveh=1;
 			delays.add(delay/numveh);
 			times.add((double)Math.round(event.getTime()/3600));
@@ -131,7 +126,6 @@ public class EventsHandler implements BasicEventHandler, LinkLeaveEventHandler, 
 			delay=0;numveh = 0;
 			time=(double)Math.round(event.getTime()/3600)*3600;
 		}
-		// TODO Auto-generated method stub
 		
 	}
 }

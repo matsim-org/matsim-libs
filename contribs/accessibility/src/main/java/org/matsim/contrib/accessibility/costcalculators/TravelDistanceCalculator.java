@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.matsim4urbansim.matsim4urbansim.costcalculators;
+package org.matsim.contrib.accessibility.costcalculators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;

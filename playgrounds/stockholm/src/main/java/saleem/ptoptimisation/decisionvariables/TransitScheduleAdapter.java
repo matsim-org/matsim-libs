@@ -11,32 +11,18 @@ import org.matsim.vehicles.Vehicles;
 
 import saleem.ptoptimisation.optimisationintegration.PTSchedule;
 import saleem.stockholmmodel.utils.CollectionUtil;
-
+/**
+ * A helper class to create variations of transit schedule.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class TransitScheduleAdapter {
-	/*With 5% chance of selecting a line, and 50% chance of randomly adding and vehicles to it 
-	 * and 50% chance of randomly deleting vehicles from it, and adjusting departure times.
+	/*With factorline*100 % probability of selecting a line, 
+	 * and factordeparture*100 % probability for selecting each departure serving the line for addition
+	 * For each selected departure, a new independent departure is added to corresponding route of the line.
 	 */
-	public TransitSchedule updateSchedule(Vehicles vehicles, TransitSchedule schedule){
-		CollectionUtil<TransitLine> cutil = new CollectionUtil<TransitLine>();
-		VehicleRemover vehremover = new VehicleRemover(vehicles, schedule);
-		VehicleAdder vehadder = new VehicleAdder(vehicles, schedule);
-		ArrayList<TransitLine> lines = cutil.toArrayList(schedule.getTransitLines().values().iterator());
-		int size = lines.size();
-		for(int i=0;i<size;i++) {
-			TransitLine tline = lines.get(i);
-			if(Math.random()<=0.05){//With 5% probability
-				if(Math.random()<=0.5){//With 50% probability
-					vehadder.addDeparturesToLine(tline, 0.1);//Adds 10 % departures and corresponding vehicles from tline
-				}
-				else {
-					vehremover.removeDeparturesFromLine(tline, 0.1);//Removes  10 % departures and corresponding vehicles from tline
-				}
-			}
-		}
-		return schedule;
-	}
-	//With 5% chance of selecting a line, and 50% chance of randomly adding vehicles to it and adjusting departure times.
-	public PTSchedule updateScheduleAdd(Scenario scenario, Vehicles vehicles, TransitSchedule schedule, double factorline, double factorroute){
+	public PTSchedule updateScheduleAddDepartures(Scenario scenario, Vehicles vehicles, TransitSchedule schedule, double factorline, double factordeparture){
 		CollectionUtil<TransitLine> cutil = new CollectionUtil<TransitLine>();
 		VehicleAdder vehadder = new VehicleAdder(vehicles, schedule);
 		ArrayList<TransitLine> lines = cutil.toArrayList(schedule.getTransitLines().values().iterator());
@@ -44,13 +30,16 @@ public class TransitScheduleAdapter {
 		for(int i=0;i<size;i++) {
 			TransitLine tline = lines.get(i);
 			if(Math.random()<=factorline){//With 10% probability
-			vehadder.addDeparturesToLine(tline, factorroute);//Adds 10 % departures and corresponding vehicles from tline
+			vehadder.addDeparturesToLine(tline, factordeparture);//Adds 10 % departures and corresponding vehicles from tline
 			}
 		}
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
-	//With 5% chance of selecting a line, and 50% chance of randomly deleting vehicles from it and adjusting departure times.
-	public PTSchedule updateScheduleRemove(Scenario scenario, Vehicles vehicles, TransitSchedule schedule, double factorline, double factorroute){
+	/*With factorline*100 % probability of selecting a line, 
+	 * and factordeparture*100 % probability for selecting each departure serving the line for deletion
+	 * selected departures are deleted from corresponding routes of the line.
+	 */
+	public PTSchedule updateScheduleRemoveDepartures(Scenario scenario, Vehicles vehicles, TransitSchedule schedule, double factorline, double factordeparture){
 		CollectionUtil<TransitLine> cutil = new CollectionUtil<TransitLine>();
 		VehicleRemover vehremover = new VehicleRemover(vehicles, schedule);
 		ArrayList<TransitLine> lines = cutil.toArrayList(schedule.getTransitLines().values().iterator());
@@ -58,44 +47,43 @@ public class TransitScheduleAdapter {
 		for(int i=0;i<size;i++) {
 			TransitLine tline = lines.get(i);
 			if(Math.random()<=factorline){//With 5% probability
-				vehremover.removeDeparturesFromLine(tline, factorroute);//Removes  10 % departures and corresponding vehicles from tline
+				vehremover.removeDeparturesFromLine(tline, factordeparture);//Removes  10 % departures and corresponding vehicles from tline
 			}
 		}
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
 	
-	//With factorline *100 % chance of selecting a line, and factorroute*100 % chance of removing each of its route for removal
+	//With factorline *100 % probability of selecting a line, and factorroute*100 % probability of removing each route of a selected line
 	public PTSchedule updateScheduleDeleteRoute(Scenario scenario, Vehicles vehicles, TransitSchedule schedule, double factorline, double factorroute){
 		RouteAdderRemover routeremover = new RouteAdderRemover();
 		routeremover.deleteRandomRoutes(schedule, vehicles, factorline, factorroute);
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
-	/*With factorline *100 % chance of selecting a line, and factorroute*100 % chance of adding a new route for each route. 
-	 * It is called with 2X probablity as compared to removing a route.  One X for balancing the deleted routes, one X for 
-	 * creating  a variation with added routes. 
-	 * It should be called with vehicles and transit schedule objects that have already been varied by removing routes. 
-	 * We have to work like this due to the way plans are memorised in the optimisation process.
-	 */
+	/*With factorline *100 % chance of selecting a line, and factorroute*100 % chance of adding a new route for each route in the selected line. */
 	public PTSchedule updateScheduleAddRoute(Scenario scenario, Vehicles vehicles, TransitSchedule schedule, double factorline, double factorroute){
 		RouteAdderRemover routeadder = new RouteAdderRemover();
 		routeadder.addRandomRoutes(scenario, schedule, vehicles, factorline, factorroute);
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
-	//Increase capacity of vehicles in Peakhour, decrease in quiet hours
-	//Make sure to change the small and large bus capacity when running with a 10% population
+	/*With factorline*100 % probability of selecting a line, 
+	 * and factorroute*100 % probability for selecting each of its routes
+	 * Increase capacity of vehicles in Peakhour, decrease in quiet hours, in the selected routes.
+	 */
 	public PTSchedule updateScheduleChangeCapacity(Scenario scenario, Vehicles vehicles, TransitSchedule schedule, double factorline, double factorroute){
 		PTCapacityAdjuster capadj = new PTCapacityAdjuster();
 		capadj.adjustCapacity(vehicles, schedule, factorline, factorroute);
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
 	
-	//With factorline *100 % chance of selecting a line, and factorroute*100 % chance of removing each of its route for removal
+	//Each line is selected with factorline *100 % probability of deletion
 	public PTSchedule updateScheduleDeleteLines(Scenario scenario, TransitSchedule schedule, Vehicles vehicles, double factorline){
 		LineAdderRemover lar = new LineAdderRemover();
 		lar.deleteRandomLines(schedule, vehicles, factorline);
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
-	//With factorline *100 % chance of selecting a line, and factorroute*100 % chance of removing each of its route for removal
+	/*Each line is selected with factorline *100 % probability for addition
+	*   For each selected line, a new independent line is added
+	**/
 	public PTSchedule updateScheduleAddLines(Scenario scenario, TransitSchedule schedule, Vehicles vehicles, double factorline){
 		LineAdderRemover lar = new LineAdderRemover();
 		lar.addRandomLines(scenario, schedule, vehicles, factorline);

@@ -32,7 +32,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class SelectedPlansFilter {
 
-	public static final Logger LOG = Logger.getLogger(SelectedPlansFilter.class);
+	private static final Logger LOG = Logger.getLogger(SelectedPlansFilter.class);
 
 	private final static String RUN_DIR = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/";
 	private final static String INPUT_PLANS = RUN_DIR + "/population_1pct_v2_baseCaseOutputPlans.xml.gz";

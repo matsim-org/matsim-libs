@@ -19,7 +19,11 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import java.util.ArrayList;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.population.routes.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -95,5 +99,31 @@ public class VrpPaths
     public static double getLastLinkTT(Link lastLink, double time)
     {
         return lastLink.getLength() / lastLink.getFreespeed(time);
+    }
+    
+    /**
+     * Used for OTFVis. Does not contain info on timing, distance and cost. Can be extended...
+     * @param path
+     * @param routeFactories
+     * @return
+     */
+    public static NetworkRoute createNetworkRoute(VrpPath path, RouteFactories routeFactories)
+    {
+        Id<Link> fromLinkId = path.getFromLink().getId();
+        Id<Link> toLinkId = path.getToLink().getId();
+        NetworkRoute route = routeFactories.createRoute(
+                NetworkRoute.class, fromLinkId, toLinkId);
+
+        int length = path.getLinkCount();
+        if (length >= 2) {// means: fromLink != toLink
+            // all except the first and last ones (== fromLink and toLink)
+            ArrayList<Id<Link>> linkIdList = new ArrayList<>(length - 2);
+            for (int i = 1; i < length - 1; i++) {
+                linkIdList.add(path.getLink(i).getId());
+            }
+            route.setLinkIds(fromLinkId, linkIdList, toLinkId);
+        }
+
+        return route;
     }
 }

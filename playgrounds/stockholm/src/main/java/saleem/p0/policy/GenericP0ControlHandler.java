@@ -24,7 +24,11 @@ import org.matsim.vehicles.Vehicle;
 import saleem.p0.resultanalysis.PlotStatistics;
 import saleem.stockholmmodel.utils.CollectionUtil;
 
-//For Generic Junctions
+/**
+ * P0 policy for generic (any number of links) junctions
+ * 
+ * @author Mohammad Saleem
+ */
 
 public class GenericP0ControlHandler implements BasicEventHandler{
 	Network network;int iteration;double bintime=0;double totalincap=0;

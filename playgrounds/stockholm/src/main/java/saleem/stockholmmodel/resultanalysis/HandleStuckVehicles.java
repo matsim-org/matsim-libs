@@ -4,8 +4,12 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-
-//Stuck persons and vehicle analysis
+/**
+ * A class for stuck persons and vehicles analysis.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class HandleStuckVehicles implements PersonStuckEventHandler, TransitDriverStartsEventHandler{
 	int count = 0;int countveh=0;
 	String persons="Stuck Persons Are: ";

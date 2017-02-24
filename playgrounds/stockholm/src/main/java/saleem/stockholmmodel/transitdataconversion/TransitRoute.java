@@ -6,6 +6,8 @@ import java.util.List;
 
 /** This class consists of neccessary information about Transit Routes, 
  * and is used in conversion of Excel based transit data into MatSim readable transit schedule data structure.
+ * 
+ * @author Mohammad Saleem
  */
 public class TransitRoute {
 	private String id;
