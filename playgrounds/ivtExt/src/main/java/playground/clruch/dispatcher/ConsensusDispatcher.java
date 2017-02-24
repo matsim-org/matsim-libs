@@ -237,7 +237,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config) {
 
             //intstatiate a ConsensusDispatcher for testing
-            AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
+            AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
             // TODO relate to general directory given in argument of main function
