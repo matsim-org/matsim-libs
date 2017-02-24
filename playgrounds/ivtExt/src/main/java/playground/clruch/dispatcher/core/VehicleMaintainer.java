@@ -42,8 +42,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
     private Double private_now = null;
-    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = // 
-            Collections.synchronizedMap(new LinkedHashMap<>());
+    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
 
     protected VehicleMaintainer(EventsManager eventsManager) {
@@ -56,7 +55,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
      * @param avVehicle
      * @param abstractDirective
      */
-    /* package */ void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
+    /* package */ synchronized void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective(avVehicle));
         private_vehicleDirectives.put(avVehicle, abstractDirective);
     }
@@ -65,7 +64,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
      * @param avVehicle
      * @return true if given {@link AVVehicle} doesn't have a {@link AbstractDirective} assigned to it
      */
-    private boolean isWithoutDirective(AVVehicle avVehicle) {
+    private synchronized boolean isWithoutDirective(AVVehicle avVehicle) {
         return !private_vehicleDirectives.containsKey(avVehicle);
     }
 
@@ -109,7 +108,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
             if (isWithoutDirective(avVehicle)) {
                 Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
                 AbstractTask abstractTask = schedule.getCurrentTask();
-                new AVTaskAdapter(abstractTask) { // TODO don't use abstractTask beyond this point!!! 
+                new AVTaskAdapter(abstractTask) { // TODO don't use abstractTask beyond this point!!!
                     @Override
                     public void handle(AVDriveTask avDriveTask) {
                         // for empty cars the drive task is second to last task
@@ -148,7 +147,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
         redispatch(now);
         private_now = null; // <- time unavailable
         long tic = System.nanoTime();
-        private_vehicleDirectives.values().stream()
+        private_vehicleDirectives.values().stream() //
                 .parallel() //
                 .forEach(AbstractDirective::execute);
         routingTimeNano += System.nanoTime() - tic;
@@ -157,7 +156,8 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     /**
      * @return time of current re-dispatching iteration step
-     * @throws NullPointerException if dispatching has not started yet
+     * @throws NullPointerException
+     *             if dispatching has not started yet
      */
     protected final double getTimeNow() {
         return private_now;
@@ -165,7 +165,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     public abstract void redispatch(double now);
 
-    public String getVehicleMaintainerStatusString() { // TODO still needs to evaluate
+    public synchronized String getVehicleMaintainerStatusString() { // TODO still needs to evaluate
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#directives " + private_vehicleDirectives.size() + ", ");
         stringBuilder.append("total routingTime=" + (routingTimeNano * 1e-9) + " sec");

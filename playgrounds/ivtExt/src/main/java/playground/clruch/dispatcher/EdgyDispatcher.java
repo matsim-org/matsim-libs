@@ -26,10 +26,10 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class EdgyDispatcher extends UniversalDispatcher {
-    public static final int DEBUG_PERIOD = 30;
+    private static final int DISPATCH_PERIOD = 30;
 
-    final Network network; // DEBUG ONLY
-    final Collection<Link> LINKREFS; // DEBUG ONLY
+    final Network network; // <- for verifying link references
+    final Collection<Link> linkReferences; // <- for verifying link references
 
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -39,30 +39,30 @@ public class EdgyDispatcher extends UniversalDispatcher {
             Network network) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         this.network = network;
-        LINKREFS = new HashSet<>(network.getLinks().values());
+        linkReferences = new HashSet<>(network.getLinks().values());
     }
 
     /** verify that link references are present in the network */
-    private void verifyReferences() {
-        // Collection<Link> links =
+    @SuppressWarnings("unused") // for verifying link references
+    private void verifyLinkReferencesInvariant() { 
         List<Link> testset = getDivertableVehicles().stream() //
                 .map(VehicleLinkPair::getDestination) //
                 .filter(Objects::nonNull) //
                 .collect(Collectors.toList());
-        if (!LINKREFS.containsAll(testset))
+        if (!linkReferences.containsAll(testset))
             throw new RuntimeException("network change 1");
-        if (!LINKREFS.containsAll(network.getLinks().values()))
+        if (!linkReferences.containsAll(network.getLinks().values()))
             throw new RuntimeException("network change 2");
         if (0 < testset.size())
-            System.out.println("network " + LINKREFS.size() + " contains all " + testset.size());
+            System.out.println("network " + linkReferences.size() + " contains all " + testset.size());
     }
 
     @Override
     public void redispatch(double now) {
-        // verifyReferences();
+        // verifyReferences(); // <- debugging only
 
         final long round_now = Math.round(now);
-        if (round_now % DEBUG_PERIOD == 0 || round_now > 107800) {
+        if (round_now % DISPATCH_PERIOD == 0) {
 
             int num_matchedRequests = 0;
             int num_abortTrip = 0;

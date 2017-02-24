@@ -11,6 +11,7 @@ import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
+import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
@@ -58,8 +59,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
     public void redispatch(double now) {
         // do not execute the redispatching method at the end of the horizon // TODO find more elegant way to solve this
         // if (now>LAST_REDISPATCH_ITER) return; // not needed anymore, notification will be given instead
-        // match requests and vehicles if they are at t
-        // he same link
+        // match requests and vehicles if they are at the same link
         int seconds = (int) Math.round(now);
         
         total_matchedRequests += MatchRequestsWithStayVehicles.inOrderOfArrival(this);
@@ -103,11 +103,9 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                         VirtualLink oppositeLink = virtualNetwork.getVirtualLinks().stream().filter(v -> (v.getFrom().equals(vlink.getTo()) && v.getTo().equals(vlink.getFrom()))).findFirst().get();
                         rebalanceCount.put(oppositeLink, 0);
                         rebalanceFloating.put(oppositeLink, -leftover);
-
                     }
                 }
             }
-
 
             // create a Map that contains all the outgoing vLinks for a vNode
             Map<VirtualNode, List<VirtualLink>> vLinkShareFromvNode = virtualNetwork.getVirtualLinks().stream().collect(Collectors.groupingBy(VirtualLink::getFrom));
@@ -141,9 +139,6 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                     }
                 }
             }
-
-
-
 
             // 2 generate routing instructions for vehicles
             // 2.1 gather the destination links
@@ -205,7 +200,10 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
 
             // 2.5 assign destinations to the available vehicles
             {
-                long tic = System.nanoTime(); // DO NOT PUT PARALLEL anywhere in this loop !
+                GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
+                GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
+                
+                long tic = System.nanoTime(); // DO NOT PUT PARALLEL anywhere in this loop !                
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
                     vehicleDestMatcher //
                             .match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode)) //
@@ -215,9 +213,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
 
             }
         }
-
     }
-
 
     public static class Factory implements AVDispatcherFactory {
         @Inject

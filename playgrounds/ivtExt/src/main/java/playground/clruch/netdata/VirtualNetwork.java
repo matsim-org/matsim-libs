@@ -1,6 +1,7 @@
 package playground.clruch.netdata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,12 +28,12 @@ public class VirtualNetwork {
     }
 
     // get the collection of virtual nodes
-    public List<VirtualNode> getVirtualNodes() {
+    public Collection<VirtualNode> getVirtualNodes() {
         return Collections.unmodifiableList(virtualNodes);
     }
 
     // get the collection of virtual links
-    public List<VirtualLink> getVirtualLinks() {
+    public Collection<VirtualLink> getVirtualLinks() {
         return Collections.unmodifiableList(virtualLinks);
     }
 
