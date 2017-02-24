@@ -23,19 +23,14 @@ public class VehicleLinkPair {
     }
 
     /**
-     * TODO temporary solution, function is only called once to check if vehicle is in stayMode
-     * 
-     * @return null if vehicle does not have a destination
+     * @return null if vehicle is currently not driving, else
+     *         the final {@link Link} of the path that the vehicles is currently driving on
      */
-    public Link getDestination() { // TODO function name is unclear
-        Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-        // List<AbstractTask> tasks = schedule.getTasks();
-        // if (!tasks.isEmpty() && schedule.getStatus().equals(Schedule.ScheduleStatus.STARTED))
-        // TODO use handler!
-        AbstractTask abstractTask = schedule.getCurrentTask();
-        AVTask avTask = (AVTask) abstractTask;
+    public Link getCurrentDriveDestination() {
+        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
+        final AVTask avTask = (AVTask) schedule.getCurrentTask();
         if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {
-            AVDriveTask avDriveTask = (AVDriveTask) avTask;
+            final AVDriveTask avDriveTask = (AVDriveTask) avTask;
             return avDriveTask.getPath().getToLink();
         }
         return null;

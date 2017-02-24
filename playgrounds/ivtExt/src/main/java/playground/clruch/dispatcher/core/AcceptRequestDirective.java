@@ -42,12 +42,13 @@ class AcceptRequestDirective extends FuturePathDirective {
     }
 
     @Override
-    void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
+    void executeWithPath(final VrpPathWithTravelData vrpPathWithTravelData) {
         final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
         final AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
         final double scheduleEndTime = avStayTask.getEndTime();
         GlobalAssert.that(scheduleEndTime == schedule.getEndTime());
-        final double endDropoffTime = vrpPathWithTravelData.getArrivalTime() + dropoffDurationPerStop;
+        final double begDropoffTime = vrpPathWithTravelData.getArrivalTime();
+        final double endDropoffTime = begDropoffTime + dropoffDurationPerStop;
 
         if (endDropoffTime < scheduleEndTime) {
             
@@ -55,7 +56,7 @@ class AcceptRequestDirective extends FuturePathDirective {
 
             schedule.addTask(new AVPickupTask( //
                     getTimeNow, // start of pickup
-                    futurePathContainer.startTime, // end of pickup // TODO access is not elegant
+                    futurePathContainer.getStartTime(), // end of pickup
                     avRequest.getFromLink(), // location of driving start
                     Arrays.asList(avRequest))); // serving only one request at a time
 
@@ -64,7 +65,7 @@ class AcceptRequestDirective extends FuturePathDirective {
 
             // final double endDropoffTime = vrpPathWithTravelData.getArrivalTime() + dropoffDurationPerStop;
             schedule.addTask(new AVDropoffTask( //
-                    vrpPathWithTravelData.getArrivalTime(), // start of dropoff // TODO function call redundant
+                    begDropoffTime, // start of dropoff
                     endDropoffTime, // end of dropoff
                     avRequest.getToLink(), // location of dropoff
                     Arrays.asList(avRequest)));
