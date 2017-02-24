@@ -134,7 +134,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	private void moveWaitToRoad() {
 		while (!getWaitingList().isEmpty()) {
-			if (!qlane.isAcceptingFromWait()) {
+			if (!qlane.isAcceptingFromWait(this.getWaitingList().peek())) {
 				return;
 			}
             QVehicle veh = this.getWaitingList().poll();
