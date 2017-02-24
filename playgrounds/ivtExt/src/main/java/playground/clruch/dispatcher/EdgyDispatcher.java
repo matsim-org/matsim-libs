@@ -18,7 +18,8 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.dispatcher.utils.MatchRequestsWithStayVehicles;
+import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
+import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
@@ -31,6 +32,8 @@ public class EdgyDispatcher extends UniversalDispatcher {
     final Network network; // <- for verifying link references
     final Collection<Link> linkReferences; // <- for verifying link references
 
+    final AbstractVehicleRequestMatcher vehicleRequestMatcher;
+
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
@@ -40,11 +43,12 @@ public class EdgyDispatcher extends UniversalDispatcher {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
+        vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
     }
 
     /** verify that link references are present in the network */
     @SuppressWarnings("unused") // for verifying link references
-    private void verifyLinkReferencesInvariant() { 
+    private void verifyLinkReferencesInvariant() {
         List<Link> testset = getDivertableVehicles().stream() //
                 .map(VehicleLinkPair::getDestination) //
                 .filter(Objects::nonNull) //
@@ -57,18 +61,19 @@ public class EdgyDispatcher extends UniversalDispatcher {
             System.out.println("network " + linkReferences.size() + " contains all " + testset.size());
     }
 
+    int total_matchedRequests = 0;
+
     @Override
     public void redispatch(double now) {
         // verifyReferences(); // <- debugging only
 
+        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+
         final long round_now = Math.round(now);
         if (round_now % DISPATCH_PERIOD == 0) {
 
-            int num_matchedRequests = 0;
             int num_abortTrip = 0;
             int num_driveOrder = 0;
-
-            num_matchedRequests = MatchRequestsWithStayVehicles.inOrderOfArrival(this);
 
             { // see if any car is driving by a request. if so, then stay there to be matched!
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks(); // TODO lazy implementation
@@ -104,9 +109,9 @@ public class EdgyDispatcher extends UniversalDispatcher {
                 }
             }
 
-            System.out.println(String.format("@%6d   mr=%4d     at=%4d     do=%4d", //
+            System.out.println(String.format("@%6d   MR=%6d   at=%6d   do=%6d", //
                     round_now, //
-                    num_matchedRequests, //
+                    total_matchedRequests, //
                     num_abortTrip, //
                     num_driveOrder));
         }
