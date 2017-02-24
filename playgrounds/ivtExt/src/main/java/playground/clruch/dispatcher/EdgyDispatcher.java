@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -22,7 +21,6 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -63,18 +61,19 @@ public class EdgyDispatcher extends UniversalDispatcher {
             System.out.println("network " + linkReferences.size() + " contains all " + testset.size());
     }
 
+    int total_matchedRequests = 0;
+
     @Override
     public void redispatch(double now) {
         // verifyReferences(); // <- debugging only
 
+        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+
         final long round_now = Math.round(now);
         if (round_now % DISPATCH_PERIOD == 0) {
 
-            int num_matchedRequests = 0;
             int num_abortTrip = 0;
             int num_driveOrder = 0;
-
-            num_matchedRequests = vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
 
             { // see if any car is driving by a request. if so, then stay there to be matched!
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks(); // TODO lazy implementation
@@ -110,9 +109,9 @@ public class EdgyDispatcher extends UniversalDispatcher {
                 }
             }
 
-            System.out.println(String.format("@%6d   mr=%4d     at=%4d     do=%4d", //
+            System.out.println(String.format("@%6d   MR=%6d   at=%6d   do=%6d", //
                     round_now, //
-                    num_matchedRequests, //
+                    total_matchedRequests, //
                     num_abortTrip, //
                     num_driveOrder));
         }
