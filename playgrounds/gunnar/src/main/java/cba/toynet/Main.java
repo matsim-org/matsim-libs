@@ -41,6 +41,7 @@ public class Main {
 	 * ============================================================
 	 */
 
+	static final double sampersLogitScale = 0.1;
 	static final double betaTravelSampers_1_h = -12.0;
 
 	static final boolean usePTto1 = true; // true in base case
@@ -54,7 +55,8 @@ public class Main {
 	static final String demandStatsFilePrefix = "./output/cba/toynet/demandStats-in-it";
 
 	static final int resampleCnt = 10000; // resample cnt 1 yields "plain
-											// sampers"; 10000 yields "corrected"
+											// sampers"; 10000 yields
+											// "corrected"
 	static final Random rnd = new Random();
 
 	static final int maxTrials = 10;
@@ -116,7 +118,7 @@ public class Main {
 
 		DemandModel.replanPopulation(resampleCnt, rnd, scenario, factory, outerIt == 1 ? 1.0 : replanProba,
 				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
-				maxFailures, usePTto1, usePTto2, mode2tt, betaTravelSampers_1_h, sampersCarDelay);
+				maxFailures, usePTto1, usePTto2, mode2tt, betaTravelSampers_1_h, sampersCarDelay, sampersLogitScale);
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write("./input/cba/toynet/population.xml");

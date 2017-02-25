@@ -77,4 +77,16 @@ class PlanForResampling implements Alternative {
 	public double getMATSimTimeScore() {
 		return this.matsimTimeScore;
 	}
+
+	@Override
+	public double getSampersEpsilonRealization() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setSampersEpsilonRealization(double eps) {
+		// TODO Auto-generated method stub
+		
+	}
 }

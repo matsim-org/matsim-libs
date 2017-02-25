@@ -26,6 +26,8 @@ class PlanForResampling implements Alternative {
 
 	private final EpsilonDistribution epsDistr;
 
+	private double epsilonRealization = 0.0;
+
 	private Double matsimChoiceProba = null;
 
 	private TourSequence tourSequence = null;
@@ -86,5 +88,15 @@ class PlanForResampling implements Alternative {
 	@Override
 	public double getMATSimTimeScore() {
 		return this.congestedTravelTimeUtility;
+	}
+
+	@Override
+	public double getSampersEpsilonRealization() {
+		return this.epsilonRealization;
+	}
+
+	@Override
+	public void setSampersEpsilonRealization(double eps) {
+		this.epsilonRealization = eps;
 	}
 }

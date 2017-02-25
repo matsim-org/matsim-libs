@@ -24,9 +24,11 @@ import floetteroed.utilities.math.MultinomialLogit;
  * @author Gunnar Flötteröd
  *
  */
-class ChoiceModel {
+class ChoiceRunner implements Runnable {
 
-	// -------------------- MEMBERS --------------------
+	// -------------------- CONSTANTS --------------------
+
+	private final Person person;
 
 	private final int sampleCnt;
 
@@ -54,14 +56,19 @@ class ChoiceModel {
 
 	private final double sampersLogitScale;
 
-	private String lastUtilitiesToString = null;
+	// -------------------- MEMBERS --------------------
+
+	// private String lastUtilitiesToString = null;
+
+	private Set<PlanForResampling> result = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	ChoiceModel(final int sampleCnt, final Random rnd, final Scenario scenario,
+	ChoiceRunner(final Person person, final int sampleCnt, final Random rnd, final Scenario scenario,
 			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
 			final int maxTrials, final int maxFailures, final boolean usePTto1, final boolean usePTto2,
 			final double betaTravelSampers_1_h, final SampersCarDelay sampersCarDelay, final double sampersLogitScale) {
+		this.person = person;
 		this.sampleCnt = sampleCnt;
 		this.rnd = rnd;
 		this.scenario = scenario;
@@ -79,21 +86,25 @@ class ChoiceModel {
 			final TourSequence tourSeq = new TourSequence(type);
 			this.tourSeqAlts.add(tourSeq);
 		}
+
 	}
 
-	// -------------------- IMPLEMENTATION --------------------
+	// -------------------- RESULT ACCESS --------------------
 
-	ChoiceRunner newChoiceRunner(final Person person) {
-		return new ChoiceRunner(person, this.sampleCnt, this.rnd, this.scenario, this.tripRouterProvider,
-				this.mode2travelTime, this.maxTrials, this.maxFailures, this.usePTto1, this.usePTto2,
-				this.betaTravelSampers_1_h, this.sampersCarDelay, this.sampersLogitScale);
+	Set<PlanForResampling> getResult() {
+		return this.result;
 	}
 
-	Set<PlanForResampling> choosePlans(final Person person) {
+	// -------------------- IMPLEMENTATION OF Runnable --------------------
+
+	@Override
+	public void run() {
+
+		System.out.println("Sampling choice set for " + person.getId());
 
 		final List<Plan> planAlts = new ArrayList<>(this.tourSeqAlts.size());
 		for (TourSequence tourSeq : this.tourSeqAlts) {
-			planAlts.add(tourSeq.asPlan(this.scenario, person));
+			planAlts.add(tourSeq.asPlan(this.scenario, this.person));
 		}
 
 		final MultinomialLogit teleportationBasedMNL = new MultinomialLogit(TourSequence.Type.values().length, 1);
@@ -144,10 +155,7 @@ class ChoiceModel {
 				plansForResampling.put(planIndex, planForResampling);
 			}
 		}
-		return new LinkedHashSet<>(plansForResampling.values());
-	}
 
-	String getLastUtilitiesToString() {
-		return this.lastUtilitiesToString;
+		this.result = new LinkedHashSet<>(plansForResampling.values());
 	}
 }
