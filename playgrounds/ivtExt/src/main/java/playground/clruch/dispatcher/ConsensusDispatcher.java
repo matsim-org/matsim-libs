@@ -52,7 +52,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         }
         linkWeights = linkWeightsIn;
     }
-    
+
     private int total_matchedRequests = 0;
 
     @Override
@@ -61,12 +61,12 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         // if (now>LAST_REDISPATCH_ITER) return; // not needed anymore, notification will be given instead
         // match requests and vehicles if they are at the same link
         int seconds = (int) Math.round(now);
-        
+
         total_matchedRequests += MatchRequestsWithStayVehicles.inOrderOfArrival(this);
-        
+
         // for available vhicles, perform a rebalancing computation after REBALANCING_PERIOD seconds.
         if (seconds % REBALANCING_PERIOD == 0) {
-            System.out.println("@"+seconds+" mr = " + total_matchedRequests);
+            System.out.println("@" + seconds + " mr = " + total_matchedRequests);
             // 0 get available vehicles and requests per virtual node
             Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableVehicles();
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
@@ -202,7 +202,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             {
                 GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
                 GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
-                
+
                 long tic = System.nanoTime(); // DO NOT PUT PARALLEL anywhere in this loop !                
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
                     vehicleDestMatcher //

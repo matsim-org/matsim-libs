@@ -30,6 +30,7 @@ import com.google.inject.name.Names;
 
 import playground.clruch.dispatcher.ConsensusDispatcher;
 import playground.clruch.dispatcher.EdgyDispatcher;
+import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
 import playground.clruch.dispatcher.PulseDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
@@ -104,9 +105,13 @@ public class AVModule extends AbstractModule {
         bind(EdgyDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcher.class.getSimpleName()).to(ConsensusDispatcher.Factory.class);
+
         
         /** dispatchers for PartitionedDispatcher */
+        bind(ConsensusDispatcher.Factory.class);
+        bind(LPFeedbackLIPDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcher.class.getSimpleName()).to(ConsensusDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
     }
 
     private void configureGeneratorStrategies() {

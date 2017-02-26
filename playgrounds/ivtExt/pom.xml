@@ -102,12 +102,23 @@
 		  <artifactId>elki</artifactId>
 		  <version>0.7.1</version>
 	  </dependency>
+	  <dependency>
+		  <groupId>org.gnu.glpk</groupId>
+		  <artifactId>glpk-java</artifactId>
+		  <version>1.8.0</version>
+	  </dependency>
   </dependencies>
 
 	<repositories>
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
+		</repository>
+		<repository>
+			<id>XypronRelease</id>
+			<name>Xypron Release</name>
+			<url>https://www.xypron.de/repository</url>
+			<layout>default</layout>
 		</repository>
 	</repositories>
 
