@@ -227,11 +227,15 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         int n = this.virtualNetwork.getVirtualNodes().size();
         Map<VirtualLink, Integer> rebalanceOrder = new HashMap<>();
 
-        // update LP
+        // update LP // TODO make this more elegant
         int eq = 0;
         for (VirtualNode virtualNode : vi_excess.keySet()) {
-            eq = eq + 1;
-            GLPK.glp_set_row_bnds(lp, eq, GLPKConstants.GLP_LO, (double) (vi_desired.get(virtualNode) - vi_excess.get(virtualNode)), 0.0);
+            for(int key : num_vNodeMap.keySet()){
+                if(num_vNodeMap.get(key).equals(virtualNode)){
+                    eq = key;
+                    GLPK.glp_set_row_bnds(lp, eq, GLPKConstants.GLP_LO, (double) (vi_desired.get(virtualNode) - vi_excess.get(virtualNode)), 0.0);
+                }
+            }
         }
 
         // Solve model
