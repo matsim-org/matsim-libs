@@ -54,7 +54,6 @@ import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivit
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
 * @author ikaddoura
@@ -91,9 +90,8 @@ public class RunBerlinAV {
 			
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
-//			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_berlinArea_av-trip-share-0.1_av-20000/";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_test4/";
-			analyzeNoise = true;
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_test_2taxiTrips/";
+			analyzeNoise = false;
 			agentBasedActivityScheduling = false;
 			otfvis = false;
 		}
@@ -165,6 +163,10 @@ public class RunBerlinAV {
 		controler.addOverridingModule(new TaxiOutputModule());
 		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
         
+        // #############################
+        // travel disutility
+        // #############################
+		
 		 final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
 					new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
 							controler.getConfig().planCalcScore()));
@@ -175,7 +177,7 @@ public class RunBerlinAV {
 													
 					addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 
-					this.bind(AgentFilter.class).to(AVAgentFilter.class);
+//					this.bind(AgentFilter.class).to(AVAgentFilter.class);
 
 					this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 					this.addControlerListenerBinding().to(MoneyEventAnalysis.class);

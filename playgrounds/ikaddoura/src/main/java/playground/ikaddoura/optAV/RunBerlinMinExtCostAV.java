@@ -55,12 +55,12 @@ import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
 * @author ikaddoura
@@ -179,18 +179,19 @@ public class RunBerlinMinExtCostAV {
 				
 				this.bind(DecongestionInfo.class).toInstance(info);
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
 				
-				this.bind(AgentFilter.class).to(AVAgentFilter.class);
-
-				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
-				this.bind(PersonVehicleTracker.class).asEagerSingleton();
-								
-				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
+//				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
+//				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
+//				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
+				
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+				
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();								
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
 				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
 			}
 		});
 		
@@ -210,6 +211,10 @@ public class RunBerlinMinExtCostAV {
 		controler.addOverridingModule(new TaxiOutputModule());
         controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
+        // #############################
+        // travel disutility
+        // #############################
+
 		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(null);
 
 		controler.addOverridingModule(new AbstractModule(){
@@ -218,6 +223,8 @@ public class RunBerlinMinExtCostAV {
 												
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 				
+//				this.bind(AgentFilter.class).to(AVAgentFilter.class);
+
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);

@@ -56,12 +56,12 @@ import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
 * @author ikaddoura
@@ -101,11 +101,10 @@ public class RunBerlinOptAV {
 			
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
-//			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_berlinArea_av-trip-share-0.1_av-20000/";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_test/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_test_2taxiTrips/";
 			kP = 2 * 12./3600.;
-			internalizeNoise = true;
-			agentBasedActivityScheduling = true;
+			internalizeNoise = false;
+			agentBasedActivityScheduling = false;
 			otfvis = false;
 		}
 		
@@ -184,18 +183,20 @@ public class RunBerlinOptAV {
 			public void install() {
 				
 				this.bind(DecongestionInfo.class).toInstance(info);
-				
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
+				
+//				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
+//				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
+//				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
+				
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
 
-				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
-								
-				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
 				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
 			}
 		});
 		
@@ -214,6 +215,10 @@ public class RunBerlinOptAV {
 		});
 		controler.addOverridingModule(new TaxiOutputModule());
         controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+        
+        // #############################
+        // travel disutility
+        // #############################
 
         final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
@@ -225,7 +230,7 @@ public class RunBerlinOptAV {
 												
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 				
-				this.bind(AgentFilter.class).to(AVAgentFilter.class);
+//				this.bind(AgentFilter.class).to(AVAgentFilter.class);
 				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
