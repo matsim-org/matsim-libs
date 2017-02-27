@@ -49,6 +49,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     int ret;
     Map<Integer, String> numij_vLinkMap = new LinkedHashMap<>(); // LinkedHashMap chosen as the ordering should remain the same for iterating several times over the keyset.
     Map<Integer, VirtualNode> num_vNodeMap = new LinkedHashMap<>();
+    int numberOfAVs = 0;
 
 
     public LPFeedbackLIPDispatcher( //
@@ -73,6 +74,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         travelTimes = travelTimesIn;
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         this.initiateLP();
+        numberOfAVs = Integer.parseInt(config.getParams().get("numberOfVehicles"));
     }
 
 
@@ -195,19 +197,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                         collection.stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
             }
 
-            // 2.4 fill extra destinations for left over vehicles
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
 
-
-                // number of vehicles that can be matched to requests
-                int size = availableVehicles.get(virtualNode).size() - destinationLinks.get(virtualNode).size(); //
-
-                // TODO maybe not final API; may cause excessive diving
-                List<Link> localTargets = virtualNodeDest.selectLinkSet(virtualNode, size);
-                destinationLinks.get(virtualNode).addAll(localTargets);
-            }
-
-            // 2.5 assign destinations to the available vehicles
+            // 2.4 assign destinations to the available vehicles
             {
                 GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
                 GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
@@ -219,6 +210,10 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                             .entrySet().stream().forEach(this::setVehicleDiversion);
                 long dur = System.nanoTime() - tic;
             }
+
+            // 2.5 define action for leftover vehicles
+            // no action taken here, possible to send leftover vehicles to new destination in
+            // virtual node where they currently stay.
         }
     }
 
