@@ -88,7 +88,7 @@ public class IdleTaxiZonalRegistry
     }
 
 
-    public Iterable<Vehicle> findNearestVehicles(Node node, int minCount)
+    public List<Vehicle> findNearestVehicles(Node node, int minCount)
     {
         if (minCount >= vehicles.size()) {
             return getVehicles();
@@ -117,9 +117,11 @@ public class IdleTaxiZonalRegistry
     }
 
 
-    public Iterable<Vehicle> getVehicles()
+    public List<Vehicle> getVehicles()
     {
-        return Iterables.filter(vehicles.values(), isIdle);
+        List<Vehicle> vehs = new ArrayList<>();
+        Iterables.addAll(vehs, Iterables.filter(vehicles.values(), isIdle));
+        return vehs;
     }
 
 

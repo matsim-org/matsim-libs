@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 
 import playground.michalm.ev.data.*;
+import playground.michalm.taxi.vrpagent.ETaxiAtChargerActivity;
 
 
 public class EvrpVehicle
@@ -32,6 +33,8 @@ public class EvrpVehicle
     public class Ev
         extends ElectricVehicleImpl
     {
+    	private ETaxiAtChargerActivity atChargerActivity;
+    	
         public Ev(Id<Vehicle> id, Battery battery)
         {
             super(Id.createVehicleId(id), battery);
@@ -42,6 +45,18 @@ public class EvrpVehicle
         {
             return EvrpVehicle.this;
         }
+        
+        
+        public ETaxiAtChargerActivity getAtChargerActivity()
+        {
+			return atChargerActivity;
+		}
+        
+        
+        public void setAtChargerActivity(ETaxiAtChargerActivity atChargerActivity)
+        {
+			this.atChargerActivity = atChargerActivity;
+		}
     }
 
 

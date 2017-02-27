@@ -74,7 +74,8 @@ public class NoiseEventsReader extends MatsimXmlParser{
 
 		if (NoiseEventCaused.EVENT_TYPE.equals(eventType)){
 			Double time = 0.0;
-			Double emergenceTime = 0.0;
+			Double timeBinEndTime = 0.0;
+			Double linkEnteringTime = 0.0;
 			Id<Person> causingAgentId = null;
 			Id<Vehicle> causingVehicleId = null;
 			Double amount = 0.0;
@@ -87,9 +88,12 @@ public class NoiseEventsReader extends MatsimXmlParser{
 				else if(attributes.getQName(i).equals("type")){
 					eventType = attributes.getValue(i);
 				}
-				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_EMERGENCE_TIME)){
-					emergenceTime = Double.parseDouble(attributes.getValue(i));
-				}	
+				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_TIME_BIN)){
+					timeBinEndTime = Double.parseDouble(attributes.getValue(i));
+				}
+				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_ENTERING_TIME)){
+					linkEnteringTime = Double.parseDouble(attributes.getValue(i));
+				}
 				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_AGENT_ID)){
 					causingAgentId = Id.create((attributes.getValue(i)), Person.class);
 				}
@@ -107,12 +111,12 @@ public class NoiseEventsReader extends MatsimXmlParser{
 //					throw new RuntimeException("Unknown event attribute. Aborting... " + attributes.getQName(i));
 //				}
 			}
-			this.eventsManager.processEvent(new NoiseEventCaused(time, emergenceTime, causingAgentId, causingVehicleId, amount, linkId));
+			this.eventsManager.processEvent(new NoiseEventCaused(time, timeBinEndTime, linkEnteringTime, causingAgentId, causingVehicleId, amount, linkId));
 		}
 		
 		else if (NoiseEventAffected.EVENT_TYPE.equals(eventType)){
 			Double time = 0.0;
-			Double emergenceTime = 0.0;
+			Double timeBinEndTime = 0.0;
 			Id<Person> affectedAgentId = null;
 			Double amount = 0.0;
 			Id<ReceiverPoint> receiverPointId = null;
@@ -125,8 +129,8 @@ public class NoiseEventsReader extends MatsimXmlParser{
 				else if(attributes.getQName(i).equals("type")){
 					eventType = attributes.getValue(i);
 				}
-				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_EMERGENCE_TIME)){
-					emergenceTime = Double.parseDouble(attributes.getValue(i));
+				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_TIME_BIN)){
+					timeBinEndTime = Double.parseDouble(attributes.getValue(i));
 				}	
 				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_AGENT_ID)){
 					affectedAgentId = Id.create((attributes.getValue(i)), Person.class);
@@ -144,7 +148,7 @@ public class NoiseEventsReader extends MatsimXmlParser{
 					throw new RuntimeException("Unknown event attribute. Aborting... " + attributes.getQName(i));
 				}
 			}
-			this.eventsManager.processEvent(new NoiseEventAffected(time, emergenceTime, affectedAgentId, amount, receiverPointId, activityType));
+			this.eventsManager.processEvent(new NoiseEventAffected(time, timeBinEndTime, affectedAgentId, amount, receiverPointId, activityType));
 		}
 	}
 }

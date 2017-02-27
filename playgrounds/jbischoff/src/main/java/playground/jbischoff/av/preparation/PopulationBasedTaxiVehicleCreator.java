@@ -65,9 +65,10 @@ public class PopulationBasedTaxiVehicleCreator
 //	private String populationData = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/pop.csv";
 //	
     
-	private String networkFile = "../../../shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/network.final10pct_car.xml.gz";
+//	private String networkFile = "../../../shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/network.final10pct_car.xml.gz";
+	private String networkFile = "C:/Users/Joschka/Documents/public-svn/matsim/scenarios/countries/de/berlin/car-traffic-only-10pct-2016-04-21/network.xml.gz";
 	private String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
-	private String vehiclesFilePrefix = "../../../shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/vehicles/v";
+	private String vehiclesFilePrefix = "../../../shared-svn/studies/jbischoff/berlin-internalisation/vehicles/v";
 	private String populationData = "../../../shared-svn/projects/audi_av/shp/bevoelkerung.txt";
 	
 	
@@ -80,7 +81,7 @@ public class PopulationBasedTaxiVehicleCreator
 
 	
 	public static void main(String[] args) {
-		for (int i = 4500; i<=5400 ; i=i+100 ){
+		for (int i = 2000; i<=21000 ; i=i+1000 ){
 			PopulationBasedTaxiVehicleCreator tvc = new PopulationBasedTaxiVehicleCreator();
 			System.out.println(i);
 			tvc.run(i);
@@ -124,7 +125,7 @@ public class PopulationBasedTaxiVehicleCreator
 		Point p = TaxiDemandWriter.getRandomPointInFeature(random, geometry.get(wrs.select()));
 		link = NetworkUtils.getNearestLinkExactly(((Network) scenario.getNetwork()),ct.transform( MGC.point2Coord(p)));
 		
-        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(36*3600));
+        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(30*3600));
         vehicles.add(v);
 
 		}

@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
-	<module name="one_taxi">
-		<param name="taxisFile" value="src/main/resources/one_taxi/one_taxi_vehicles.xml" />
+	<module name="dvrp">
+		<param name="mode" value="taxi" />
 	</module>
 
 	<module name="network">
@@ -22,13 +22,15 @@
 	<module name="otfvis">
 		<param name="coloringScheme" value="taxicab" />
 		<param name="drawNonMovingItems" value="true" />
+		<param name="agentSize" value="400" />
+		<param name="linkWidth" value="10" />
 	</module>
 
 	<module name="controler">
 		<param name="outputDirectory" value="test/output/one_taxi" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="2" />
+		<param name="lastIteration" value="0" />
 	</module>
 
 	<module name="planCalcScore">

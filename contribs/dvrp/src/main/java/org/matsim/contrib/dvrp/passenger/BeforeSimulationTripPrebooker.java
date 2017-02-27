@@ -55,7 +55,7 @@ public class BeforeSimulationTripPrebooker
     @Override
     public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e)
     {
-        Collection<MobsimAgent> agents = ((QSim)e.getQueueSimulation()).getAgents();
+        Collection<MobsimAgent> agents = ((QSim)e.getQueueSimulation()).getAgents().values();
         String mode = passengerEngine.getMode();
 
         for (MobsimAgent mobsimAgent : agents) {

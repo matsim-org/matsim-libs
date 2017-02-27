@@ -12,22 +12,21 @@ public class NPersonsPickupActivity implements PassengerPickupActivity {
 
 	private final List<TaxiRequest> requests;
 	private final PassengerEngine passengerEngine;
-    private final StayTask pickupTask;
+    private final DynAgent driver;
     private final double pickupDuration;
 	
 	private double endTime;
 	private boolean passengerAboard = false;
 	private double maxT0;
 	
-	public NPersonsPickupActivity(PassengerEngine passengerEngine,
+	public NPersonsPickupActivity(PassengerEngine passengerEngine, DynAgent driver,
 			StayTask pickupTask, List<TaxiRequest> requests, double pickupDuration) {
 		this.requests = requests;
 		this.passengerEngine = passengerEngine;
-		this.pickupTask = pickupTask;
+		this.driver = driver;
 		this.pickupDuration = pickupDuration;
 		
 		double now = pickupTask.getBeginTime();
-		DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
 		int n = 0;
 		maxT0 = 0;
 		
@@ -62,8 +61,6 @@ public class NPersonsPickupActivity implements PassengerPickupActivity {
 	@Override
     public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now)
     {
-		
-		DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
 		
 		endTime = now;
 		

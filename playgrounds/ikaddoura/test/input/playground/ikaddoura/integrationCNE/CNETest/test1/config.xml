@@ -21,6 +21,7 @@
 		<param name="consideredActivitiesForReceiverPointGrid" value="home,work,noise_sensitive" />
 		<param name="hgvIdPrefixes" value="lkw" />
 		<param name="internalizeNoiseDamages" value="true" />
+		<param name="computeAvgNoiseCostPerLinkAndTime" value="false" />
 		<param name="noiseAllocationApproach" value="MarginalCost" />
 		<param name="receiverPointGap" value="100.0" />
 		<param name="receiverPointsGridMaxX" value="0.0" />
@@ -46,10 +47,10 @@
 		<param name="lastIteration" value="5" />
 		<param name="snapshotFormat" value="otfvis" />
 		<param name="writeSnapshotsInterval" value="0" />
-		<param name="writeEventsInterval" value="0" />
+		<param name="writeEventsInterval" value="5" />
 		<param name="writePlansInterval" value="0" />
 	</module>
-
+	
 	<module name="qsim">
 		<param name="startTime" value="06:00:00" />
 		<param name="endTime" value="12:00:00" />

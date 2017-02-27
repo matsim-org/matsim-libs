@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.data.file;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -37,13 +37,13 @@ public class VehicleReader
     private static final double DEFAULT_T_0 = 0;
     private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
-    private VrpData data;
+    private FleetImpl fleet;
     private Map<Id<Link>, ? extends Link> links;
 
 
-    public VehicleReader(Network network, VrpData data)
+    public VehicleReader(Network network, FleetImpl fleet)
     {
-        this.data = data;
+        this.fleet = fleet;
         links = network.getLinks();
     }
 
@@ -52,7 +52,7 @@ public class VehicleReader
     public void startTag(String name, Attributes atts, Stack<String> context)
     {
         if (VEHICLE.equals(name)) {
-            data.addVehicle(createVehicle(atts));
+            fleet.addVehicle(createVehicle(atts));
         }
     }
 

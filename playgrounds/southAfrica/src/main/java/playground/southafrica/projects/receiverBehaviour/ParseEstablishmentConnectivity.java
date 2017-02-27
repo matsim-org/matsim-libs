@@ -45,10 +45,12 @@ public class ParseEstablishmentConnectivity {
 		nr.readFile(networkFile);
 		PathDependentNetwork network = nr.getPathDependentNetwork();
 
-		int[] vertices = {39371, 39324, 35418, 36506, 39890};
+		int[] vertices = {11660, 12366, 11580}; /* Cluster parameters 10_10 */
+//		int[] vertices = {39371, 39324, 35418, 36506, 39890}; /* Cluster parameters 15_15 */
+//		int[] vertices = {6066}; /* Cluster parameters 10_10 */
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(rFile);
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.HARTEBEESTHOEK94_LO29, "WGS84");
 		try{
 			/* Write the header. */
 			bw.write("id,ox,oy,olong,olat,dx,dy,dlong,dlat,weight");

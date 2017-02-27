@@ -2,6 +2,7 @@ package playground.clruch.dispatcher;
 
 import org.matsim.contrib.dvrp.schedule.AbstractTask;
 
+import org.matsim.contrib.dvrp.schedule.Task;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
@@ -10,7 +11,7 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 
 public class AVTaskAdapter implements AVTaskListener {
 
-    public AVTaskAdapter(AbstractTask abstractTask) {
+    public AVTaskAdapter(Task abstractTask) {
         AVTask avTask = (AVTask) abstractTask;
         switch (avTask.getAVTaskType()) {
         case PICKUP: {

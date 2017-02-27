@@ -18,17 +18,17 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 	@Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        if (requiresReoptimization) {
+        if (isRequiresReoptimization()) {
             scheduleUnplannedRequests();
-            if(this.unplannedRequests.size() < 1){
-                requiresReoptimization = false;
+            if(this.getUnplannedRequests().size() < 1){
+                setRequiresReoptimization(false);
             }
         }
     }
 
 	protected void scheduleUnplannedRequests() {
 		
-		new NPersonsProblem(optimContext).scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
+		new NPersonsProblem(getOptimContext()).scheduleUnplannedRequests((Queue<TaxiRequest>)getUnplannedRequests());
 		
 	}
 

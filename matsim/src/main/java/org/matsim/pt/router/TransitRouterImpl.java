@@ -128,7 +128,7 @@ public class TransitRouterImpl implements TransitRouter {
 
 		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(transitNetwork, travelDisutility, travelTime,
 				wrappedFromNodes, wrappedToNodes, person);
-		// This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
+		// yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
 
 		// find routes between start and end stop
 		Path p = tree.getPath(wrappedToNodes);

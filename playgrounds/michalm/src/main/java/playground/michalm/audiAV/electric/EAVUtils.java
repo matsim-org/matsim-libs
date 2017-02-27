@@ -20,11 +20,10 @@
 package playground.michalm.audiAV.electric;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.discharging.*;
@@ -36,7 +35,7 @@ import playground.michalm.taxi.ev.ETaxiChargingLogic;
 
 public class EAVUtils
 {
-    public static void initEvData(TaxiData taxiData, EvData evData)
+    public static void initEvData(Fleet fleet, EvData evData)
     {
         TemperatureProvider tempProvider = () -> 20;// aux power about 1 kW at 20oC
         double chargingSpeedFactor = 1.; //full speed
@@ -45,7 +44,7 @@ public class EAVUtils
             new ETaxiChargingLogic(c, chargingSpeedFactor);
         }
 
-        for (Vehicle v : taxiData.getVehicles().values()) {
+        for (Vehicle v : fleet.getVehicles().values()) {
             Ev ev = ((EvrpVehicle)v).getEv();
             ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
             ev.setAuxEnergyConsumption(new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider,
@@ -57,13 +56,12 @@ public class EAVUtils
 
     private static boolean isServingCustomer(ElectricVehicle ev)
     {
-        Schedule<TaxiTask> schedule = TaxiSchedules
-                .asTaxiSchedule( ((Ev)ev).getEvrpVehicle().getSchedule());
+        Schedule schedule = ((Ev)ev).getEvrpVehicle().getSchedule();
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
 
-        switch (schedule.getCurrentTask().getTaxiTaskType()) {
+        switch ( ((TaxiTask)schedule.getCurrentTask()).getTaxiTaskType()) {
             case PICKUP:
             case OCCUPIED_DRIVE:
             case DROPOFF:

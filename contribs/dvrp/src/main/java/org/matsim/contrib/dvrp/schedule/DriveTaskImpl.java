@@ -37,13 +37,6 @@ public class DriveTaskImpl
 
 
     @Override
-    public TaskType getType()
-    {
-        return TaskType.DRIVE;
-    }
-
-
-    @Override
     public VrpPath getPath()
     {
         return path;

@@ -43,7 +43,7 @@ import org.matsim.vehicles.Vehicle;
 public class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler{
 
 	private final NoiseContext noiseContext;
-	Map<Id<Vehicle>, Double> vehicleId2enterTime = new HashMap<>();
+	private Map<Id<Vehicle>, Double> vehicleId2enterTime = new HashMap<>();
 
 	public LinkSpeedCalculation(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;

@@ -16,28 +16,27 @@ import org.matsim.vehicles.Vehicle;
 import playground.gregor.misanthrope.run.CTRunner;
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.LineSegment;
-import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.events.debug.TextEvent;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
+import static playground.gregor.misanthrope.simulation.physics.CTCell.MAX_CELL_WIDTH;
+import static playground.gregor.misanthrope.simulation.physics.CTCell.MIN_CELL_WIDTH;
+
 
 public class CTLink implements CTNetworkEntity {
 
 
     private static final Logger log = Logger.getLogger(CTLink.class);
     private static final double EPSILON = 0.00001;
-    private static double LENGTH;
-    //    private static double MX_LENGTH = ;
+    public static double DESIRED_WIDTH_IN_CELLS = 2;
+    private static int EL_WRN_CNT = 0;
 
     private static int LENGTH_WRN_CNT = 0;
 
-    static {
-        LENGTH = 3 * Math.sqrt(3) / 2 * WIDTH;
-    }
+
 
     private final CTNetwork network;
     private final CTNode dsNode;
@@ -48,6 +47,9 @@ public class CTLink implements CTNetworkEntity {
     private EventsManager em;
     private CTLinkCell dsJumpOn;
     private CTLinkCell usJumpOn;
+    private Set<CTCell> dsJumpOns;
+    private Set<CTCell> usJumpOns;
+    private double cellWidth;
 
     public CTLink(Link l, Link rev, EventsManager em, CTNetwork ctNetwork, CTNode from, CTNode to) {
         this.dsLink = l;
@@ -62,39 +64,50 @@ public class CTLink implements CTNetworkEntity {
     @Override
     public void init() {
 
-
         LineSegment ls = LineSegment.createFromLink(this.dsLink);
 
+        if (this.dsLink.getId().toString().contains("el")) {
+            if (EL_WRN_CNT++ < 10) {
+                log.warn("evacuation link needs to have unlimited flow cap! this is not implemented yet. Setting width to 50m, should be ok for most scenarios");
+                if (EL_WRN_CNT == 10) {
+                    log.warn(Gbl.FUTURE_SUPPRESSED);
+                }
+            }
+            ls.x1 = ls.x0 += 20 * ls.dx;
+            ls.y1 = ls.y0 += 20 * ls.dy;
+            ls.length = 20;
+            ls.width = 50;
+        }
+
+
+        double tmp = ls.width / DESIRED_WIDTH_IN_CELLS;
+        if (tmp < MIN_CELL_WIDTH) {
+            tmp = ls.width;
+        } else if (tmp > MAX_CELL_WIDTH) {
+            int nrCells = (int) (ls.width / MAX_CELL_WIDTH) + 1;
+            tmp = ls.width / nrCells;
+        }
+
+        this.cellWidth = tmp;
+        double minLength = 3 * Math.sqrt(3) / 2 * this.cellWidth;
         pruneEnds(ls);
 
-
-//        double length = this.dsLink.getLength();
-//        double length = projLength;
         double length = ls.length;
-        if (length < LENGTH) {
+        if (length < minLength) {
             if (LENGTH_WRN_CNT++ < 10) {
-                log.warn("Length of link: " + this.dsLink.getId() + " is too small. Increasing it from: " + length + " to: " + LENGTH);
+                log.warn("Length of link: " + this.dsLink.getId() + " is too small. Increasing it from: " + length + " to: " + minLength);
                 if (LENGTH_WRN_CNT == 10) {
                     log.warn(Gbl.FUTURE_SUPPRESSED);
                 }
             }
-            length = LENGTH;
+            length = minLength;
         }
 
 
         if (Math.abs(ls.dy) < EPSILON) { //fixes a numerical issue
             ls.dy = 0;
         }
-        double width = this.dsLink.getCapacity() / 1.33;
-
-
-        //wrong! el nodes/links need special params ...
-        if (this.dsLink.getId().toString().contains("el")) {
-//            length = LENGTH;
-//            width = 100;
-            log.warn("evacuation link needs to have unlimited flow cap! this is not implemented yet");
-        }
-
+        double width = ls.width;
 
         Coordinate[] bounds = new Coordinate[5];
         bounds[0] = new Coordinate(ls.x0 - ls.dy * width / 2,
@@ -119,12 +132,9 @@ public class CTLink implements CTNetworkEntity {
         Map<ProtoCell, CTCell> cellsMap = new HashMap<>();
         Map<ProtoCell, Geometry> geoMap = new HashMap<>();
         int id = 0;
-        double area = (1.5 * Math.sqrt(3) * (WIDTH / 2) * (WIDTH / 2));
+        double area = (1.5 * Math.sqrt(3) * (cellWidth / 2) * (cellWidth / 2));
         for (ProtoCell pt : cells) {
-//			double area = (1.5 * Math.sqrt(3) * (WIDTH / 2) * (WIDTH / 2));
-            CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, WIDTH / 2, area);
-
-
+            CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, cellWidth / 2, area);
             cellsMap.put(pt, c);
             Coordinate[] coords = new Coordinate[pt.edges.size() * 2];
             int idx = 0;
@@ -149,7 +159,7 @@ public class CTLink implements CTNetworkEntity {
                 this.cells.add(cell);
                 qt.put(cell.getX(), cell.getY(), cell);
                 for (GraphEdge ge : pt.edges) {
-//					debugGe(ge);
+                    cell.addGe(ge);
                     ProtoCell protoNeighbor = pt.nb.get(ge);
                     Geometry nCh = geoMap.get(protoNeighbor);
                     CTCell neighbor = null;
@@ -181,14 +191,13 @@ public class CTLink implements CTNetworkEntity {
 
 
         //identify cells
-        Set<CTCell> dsJumpOns = new HashSet<>();
-        Set<CTCell> usJumpOns = new HashSet<>();
-        for (double incr = 0; incr <= width; incr += WIDTH / 2.) {
-            double dsX = bounds[1].x + ls.dy * incr - WIDTH * ls.dx / 2.;
-            double dsY = bounds[1].y - ls.dx * incr - WIDTH * ls.dy / 2.;
-            double usX = bounds[0].x + ls.dy * incr + WIDTH * ls.dx / 2.;
-            double usY = bounds[0].y - ls.dx * incr + WIDTH * ls.dy / 2.;
-//			debugEntrances(dsX, usX, dsY, usY);
+        this.dsJumpOns = new HashSet<>();
+        this.usJumpOns = new HashSet<>();
+        for (double incr = 0; incr <= width; incr += cellWidth / 8.) {
+            double dsX = bounds[1].x + ls.dy * incr - cellWidth * ls.dx / 2.;
+            double dsY = bounds[1].y - ls.dx * incr - cellWidth * ls.dy / 2.;
+            double usX = bounds[0].x + ls.dy * incr + cellWidth * ls.dx / 2.;
+            double usY = bounds[0].y - ls.dx * incr + cellWidth * ls.dy / 2.;
             CTCell dsJumpOn = qt.getClosest(dsX, dsY);
 
             dsJumpOns.add(dsJumpOn);
@@ -200,7 +209,7 @@ public class CTLink implements CTNetworkEntity {
 
 
         //create pseudo cells
-        this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, WIDTH * 2, area);// * width);
+        this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, cellWidth * 2, area);// * width);
         double dir = Math.PI / 2.;
         for (CTCell ctCell : dsJumpOns) {
             CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
@@ -208,7 +217,7 @@ public class CTLink implements CTNetworkEntity {
             this.dsJumpOn.addNeighbor(ctCell);
             ctCell.addNeighbor(this.dsJumpOn);
         }
-        this.usJumpOn = new CTLinkCell(0, 0, this.network, this, WIDTH * 2, area);// * width);
+        this.usJumpOn = new CTLinkCell(0, 0, this.network, this, cellWidth * 2, area);// * width);
         dir = -Math.PI / 2.;
         for (CTCell ctCell : usJumpOns) {
             CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
@@ -216,54 +225,28 @@ public class CTLink implements CTNetworkEntity {
             this.usJumpOn.addNeighbor(ctCell);
             ctCell.addNeighbor(this.usJumpOn);
         }
-
-        //append cells
-        if (CTRunner.DEBUG) {
-            debugBound(bounds);
-        }
-
-
-//		if (CTRunner.DEBUG) {
-//			for (CTCell c : dsJumpOns) {
-//				c.g = 255;
-//				c.debug(this.em);
-//			}
-//
-//			for (CTCell c : usJumpOns) {
-//				c.r = 255;
-//				c.g = 0;
-//				c.b = 0;
-//				c.debug(this.em);
-//			}
-//		}
     }
 
     private void pruneEnds(LineSegment ls) {
         List<LineSegment> usAdjacent = this.usNode.getNode().getOutLinks().values().stream().filter(l -> l != this.dsLink).map(LineSegment::createFromLink).collect(Collectors.toList());
         if (usAdjacent.size() > 0) {
-            double amount = getPruneAmmountUs(ls, usAdjacent);
-            if (amount > 0) {
-                ls.x0 = ls.x0 + ls.dx * amount;
-                ls.y0 = ls.y0 + ls.dy * amount;
-                ls.length -= amount;
-            }
+            prune(ls, usAdjacent);
+
         }
         List<LineSegment> dsAdjacent = this.dsNode.getNode().getInLinks().values().stream().filter(l -> l != this.dsLink).map(LineSegment::createFromLink).map(LineSegment::getInverse).collect(Collectors.toList());
         if (dsAdjacent.size() > 0) {
-            double amount = getPruneAmmountUs(ls.getInverse(), dsAdjacent);
-            if (amount > 0) {
-                ls.x1 = ls.x1 - ls.dx * amount;
-                ls.y1 = ls.y1 - ls.dy * amount;
-                ls.length -= amount;
-            }
+            LineSegment tmp = ls.getInverse();
+            prune(tmp, dsAdjacent);
+
+            ls.x1 = tmp.x0;
+            ls.y1 = tmp.y0;
+            ls.length = tmp.length;
         }
     }
 
-    private double getPruneAmmountUs(LineSegment ls, List<LineSegment> usAdjacent) {
-
+    private void prune(LineSegment ls, List<LineSegment> usAdjacent) {
         usAdjacent.add(ls);
         TreeMap<Double, LineSegment> sorted = usAdjacent.stream().collect(Collectors.toMap(LineSegment::getPseudoAngle, Function.identity(), (e1, e2) -> e1, TreeMap::new));
-
 
         LineSegment nb1, nb2;
 
@@ -277,67 +260,45 @@ public class CTLink implements CTNetworkEntity {
             nb1 = sorted.lowerEntry(ls.getPseudoAngle()).getValue();
             nb2 = sorted.higherEntry(ls.getPseudoAngle()).getValue();
         }
-
-        double amount1 = pruneUpStream(ls, nb1);
-        double amount2 = pruneUpStream(ls, nb2);
-
-        double amount = amount1 > amount2 ? amount1 : amount2;
-
-        return amount;
-//        System.out.println("Wow");
-
+        CGAL.pruneIntersectingLineSegments(ls, nb1);
+        CGAL.pruneIntersectingLineSegments(ls, nb2);
     }
 
-    private double pruneUpStream(LineSegment ls, LineSegment n) {
-
-        LineSegment ls1 = LineSegment.createFromCoords(ls.x0 + ls.dy * ls.width / 2, ls.y0 - ls.dx * ls.width / 2, ls.x1 + ls.dy * ls.width / 2, ls.y1 - ls.dx * ls.width / 2);
-        LineSegment ls2 = LineSegment.createFromCoords(ls.x0 - ls.dy * ls.width / 2, ls.y0 + ls.dx * ls.width / 2, ls.x1 - ls.dy * ls.width / 2, ls.y1 + ls.dx * ls.width / 2);
-
-        LineSegment n1 = LineSegment.createFromCoords(n.x0 + n.dy * n.width / 2, n.y0 - n.dx * n.width / 2, n.x1 + n.dy * n.width / 2, n.y1 - n.dx * n.width / 2);
-        LineSegment n2 = LineSegment.createFromCoords(n.x0 - n.dy * n.width / 2, n.y0 + n.dx * n.width / 2, n.x1 - n.dy * n.width / 2, n.y1 + n.dx * n.width / 2);
-
-        double coeff1 = CGAL.intersectCoeff(ls1, n1);
-        double coeff2 = CGAL.intersectCoeff(ls1, n2);
-        double coeff3 = CGAL.intersectCoeff(ls2, n1);
-        double coeff4 = CGAL.intersectCoeff(ls2, n2);
-
-        return Math.max(Math.max(coeff1, coeff2), Math.max(coeff3, coeff4));
-
-    }
-
-//    private LineSegment createLS() {
-//
-//    }
 
     public void debug() {
         if (CTRunner.DEBUG) {
 
             for (CTCell c : this.cells) {
-                c.debug(this.em);
                 TextEvent textEvent = new TextEvent(0, c.id + "", c.getX(), c.getY());
                 this.em.processEvent(textEvent);
+
+                if (dsJumpOns.contains(c) || usJumpOns.contains(c)) {
+                    c.debugFill(em, 0, 136, 43, 255);
+                } else {
+                    c.debugFill(em, 230, 242, 255, 255);
+                }
             }
+
         }
     }
 
     private double getAngle(double frX, double frY, double toX1, double toY1, double toX2, double toY2) {
 
-        final double l1 = Math.sqrt(3) / 4 * WIDTH;
+        final double l1 = Math.sqrt(3) / 4 * cellWidth;
         double cosAlpha = ((toX1 - frX) * (toX2 - frX) + (toY1 - frY) * (toY2 - frY)) / l1;
         double alpha = Math.acos(cosAlpha);
         if (CGAL.isLeftOfLine(toX1, toY1, frX, frY, toX2, toY2) < 0) {
             alpha -= Math.PI;
             alpha = -(Math.PI + alpha);
         }
-//        debugAngle(alpha,frX,frY,toX1,toY1);
         return alpha;
     }
 
     private List<ProtoCell> computeProtoCells(double dx, double dy, double width, double length, LineSegment ls) {
         List<ProtoCell> cells = new ArrayList<>();
 
-        double w = width + WIDTH - WIDTH / 20;
-        double l = length + WIDTH * Math.sqrt(3) / 2;
+        double w = width + cellWidth - cellWidth / 20;
+        double l = length + cellWidth * Math.sqrt(3) / 2;
 
 
         Voronoi v = new Voronoi(0.0001);
@@ -346,18 +307,18 @@ public class CTLink implements CTNetworkEntity {
         List<Double> xl = new ArrayList<>();
         List<Double> yl = new ArrayList<>();
         boolean even = true;
-        for (double yIncr = -WIDTH * Math.sqrt(3) / 4; yIncr < l; yIncr += WIDTH * Math.sqrt(3) / 4) {
+        for (double yIncr = -cellWidth * Math.sqrt(3) / 4; yIncr < l; yIncr += cellWidth * Math.sqrt(3) / 4) {
 
 
             double xIncr = 0;
             if (even) {
-                xIncr += WIDTH * 0.75;
+                xIncr += cellWidth * 0.75;
             }
             even = !even;
             int idx = 0;
-            for (; xIncr < w; xIncr += WIDTH * 1.5) {
-                double x = ls.x0 - dy * w / 2 + dy * WIDTH * Math.sqrt(3) / 8 + dx * yIncr + dy * xIncr;
-                double y = ls.y0 + dx * w / 2 - dx * WIDTH * Math.sqrt(3) / 8 + dy * yIncr - dx * xIncr;
+            for (; xIncr < w; xIncr += cellWidth * 1.5) {
+                double x = ls.x0 - dy * w / 2 + dy * cellWidth * Math.sqrt(3) / 8 + dx * yIncr + dy * xIncr;
+                double y = ls.y0 + dx * w / 2 - dx * cellWidth * Math.sqrt(3) / 8 + dy * yIncr - dx * xIncr;
 
                 //				double x = x0 + xIncr*ldx;
                 yl.add(y);
@@ -397,14 +358,8 @@ public class CTLink implements CTNetworkEntity {
         double maxY = y1 > y0 ? y1 : y0;
         maxY = maxY > y2 ? maxY : y2;
         maxY = maxY > y3 ? maxY : y3;
-        List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - WIDTH, maxX + WIDTH, minY - WIDTH, maxY + WIDTH);
+        List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - cellWidth, maxX + cellWidth, minY - cellWidth, maxY + cellWidth);
         for (GraphEdge ge : edges) {
-//			debugGe(ge);
-//			double aa = ge.x1-ge.x2;
-//			double bb = ge.y1-ge.y2;
-//			double cc = Math.sqrt(aa*aa+bb*bb);
-//			log.info(cc);
-
             ProtoCell c0 = cells.get(ge.site1);
             c0.edges.add(ge);
             ProtoCell c1 = cells.get(ge.site2);
@@ -416,100 +371,6 @@ public class CTLink implements CTNetworkEntity {
         return cells;
     }
 
-    private void debugBound(Coordinate[] bounds) {
-        if (!CTRunner.DEBUG) {
-            return;
-        }
-
-        GeometryFactory geofac = new GeometryFactory();
-
-
-        Optional<Geometry> g = this.cells.parallelStream().flatMap(ctCell -> ctCell.getFaces().stream()).map(f -> (Geometry) geofac.createMultiPoint(new Coordinate[]{new Coordinate(f.x0, f.y0), new Coordinate(f.x1, f.y1)})).reduce(Geometry::union);
-        if (g.isPresent()) {
-            Geometry hull = g.get().convexHull();
-            Coordinate[] coords = hull.getCoordinates();
-            for (int i = 1; i < coords.length; i++) {
-                LineSegment s = new LineSegment();
-                s.x0 = coords[i - 1].x;
-                s.y0 = coords[i - 1].y;
-                s.x1 = coords[i].x;
-                s.y1 = coords[i].y;
-                LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
-                em.processEvent(le);
-            }
-        }
-//        {
-//            LineSegment s = new LineSegment();
-//            s.x0 = bounds[0].x;
-//            s.y0 = bounds[0].y;
-//            s.x1 = bounds[1].x;
-//            s.y1 = bounds[1].y;
-//            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
-//            em.processEvent(le);
-//        }
-//        {
-//            LineSegment s = new LineSegment();
-//            s.x0 = bounds[1].x;
-//            s.y0 = bounds[1].y;
-//            s.x1 = bounds[2].x;
-//            s.y1 = bounds[2].y;
-//            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
-//            em.processEvent(le);
-//        }
-//        {
-//            LineSegment s = new LineSegment();
-//            s.x0 = bounds[2].x;
-//            s.y0 = bounds[2].y;
-//            s.x1 = bounds[3].x;
-//            s.y1 = bounds[3].y;
-//            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
-//            em.processEvent(le);
-//        }
-//        {
-//            LineSegment s = new LineSegment();
-//            s.x0 = bounds[3].x;
-//            s.y0 = bounds[3].y;
-//            s.x1 = bounds[0].x;
-//            s.y1 = bounds[0].y;
-//            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
-//            em.processEvent(le);
-//        }
-
-    }
-
-    private void debugGe(GraphEdge ge) {
-        if (!CTRunner.DEBUG) {
-            return;
-        }
-        LineSegment s = new LineSegment();
-        s.x0 = ge.x1;
-        s.x1 = ge.x2;
-        s.y0 = ge.y1;
-        s.y1 = ge.y2;
-        LineEvent le = new LineEvent(0, s, true, 128, 128, 128, 255, 10, 0.1, 0.2);
-        em.processEvent(le);
-    }
-
-    private void debugEntrances(double dsX, double usX, double dsY, double usY) {
-        {
-            LineSegment s = new LineSegment();
-            s.x0 = dsX;
-            s.y0 = dsY;
-            s.x1 = dsX + 0.1;
-            s.y1 = dsY + 0.1;
-            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
-            em.processEvent(le);
-        }
-        {
-            LineSegment s = new LineSegment();
-            s.x0 = usX;
-            s.y0 = usY;
-            s.x1 = usX + 0.1;
-            s.y1 = usY + 0.1;
-            LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
-            em.processEvent(le);
-        }
-    }
 
     public Link getDsLink() {
         return this.dsLink;
@@ -519,55 +380,11 @@ public class CTLink implements CTNetworkEntity {
         return this.usLink;
     }
 
-    private void debugAngle(double alpha, double frX, double frY, double toX1, double toY1) {
-        if (!CTRunner.DEBUG) {
-            return;
-        }
-        int sect = (int) Math.round(10 * (Math.PI / alpha));
-        LineSegment ls = new LineSegment();
-        ls.x0 = frX;
-        ls.y0 = frY;
-        ls.x1 = toX1;
-        ls.y1 = toY1;
-        if (sect == 60) {
-            LineEvent le = new LineEvent(0, ls, true, 192, 0, 0, 255, 0);
-            em.processEvent(le);
-        } else {
-            if (sect == 20) {
-                LineEvent le = new LineEvent(0, ls, true, 192, 192, 0, 255, 0);
-                em.processEvent(le);
-            } else {
-                if (sect == 12) {
-                    LineEvent le = new LineEvent(0, ls, true, 0, 192, 0, 255, 0);
-                    em.processEvent(le);
-                } else {
-                    if (sect == -12) {
-                        LineEvent le = new LineEvent(0, ls, true, 0, 192, 192, 255, 0);
-                        em.processEvent(le);
-                    } else {
-                        if (sect == -20) {
-                            LineEvent le = new LineEvent(0, ls, true, 0, 0, 192, 255, 0);
-                            em.processEvent(le);
-                        } else {
-                            if (sect == -60) {
-                                LineEvent le = new LineEvent(0, ls, true, 192, 0, 192, 255, 0);
-                                em.processEvent(le);
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
-    }
 
     public List<CTCell> getCells() {
         return cells;
     }
-
-//    public void letAgentDepart(CTVehicle veh, double now) {
-//
-//    }
 
     public void letAgentDepart(MobsimDriverAgent agent, CTLink link, double now) {
 
@@ -605,8 +422,5 @@ public class CTLink implements CTNetworkEntity {
         }
     }
 
-//    private static final class LineSegment {
-//        double frX,frY,toX,toY;
-//    }
 
 }

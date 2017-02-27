@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
@@ -51,7 +51,7 @@ public class WobPlansFilter {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()){
 				if (pe instanceof Leg){
-					if (((Leg) pe).getMode().equals(TaxiModule.TAXI_MODE)){
+					if (((Leg) pe).getMode().equals(TaxiOptimizerModules.TAXI_MODE)){
 						copyPerson = true;
 					}
 				}

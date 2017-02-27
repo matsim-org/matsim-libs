@@ -35,9 +35,9 @@ import org.matsim.contrib.zone.*;
 public class RuleBasedTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    protected final BestDispatchFinder dispatchFinder;
+    private final BestDispatchFinder dispatchFinder;
 
-    protected final IdleTaxiZonalRegistry idleTaxiRegistry;
+    private final IdleTaxiZonalRegistry idleTaxiRegistry;
     private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
     private final RuleBasedTaxiOptimizerParams params;
@@ -58,6 +58,7 @@ public class RuleBasedTaxiOptimizer
         this.params = params;
 
         if (optimContext.scheduler.getParams().vehicleDiversion) {
+            //hmmmm, change into warning?? or even allow it (e.g. for empty taxi relocaton)??
             throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
         }
 
@@ -95,8 +96,8 @@ public class RuleBasedTaxiOptimizer
                 return false;
 
             case DEMAND_SUPPLY_EQUIL:
-                int awaitingReqCount = Requests.countRequests(unplannedRequests,
-                        new Requests.IsUrgentPredicate(optimContext.timer.getTimeOfDay()));
+                int awaitingReqCount = Requests.countRequests(getUnplannedRequests(),
+                        new Requests.IsUrgentPredicate(getOptimContext().timer.getTimeOfDay()));
 
                 return awaitingReqCount > idleTaxiRegistry.getVehicleCount();
 
@@ -111,19 +112,30 @@ public class RuleBasedTaxiOptimizer
     {
         int idleCount = idleTaxiRegistry.getVehicleCount();
 
-        Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+        Iterator<TaxiRequest> reqIter = getUnplannedRequests().iterator();
         while (reqIter.hasNext() && idleCount > 0) {
             TaxiRequest req = reqIter.next();
 
-            Iterable<Vehicle> selectedVehs = idleCount > params.nearestVehiclesLimit // we do not want to visit more than a quarter of zones
+            List<Vehicle> selectedVehs = idleCount > params.nearestVehiclesLimit // we do not want to visit more than a quarter of zones
                     ? idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(),
                             params.nearestVehiclesLimit)
                     : idleTaxiRegistry.getVehicles();
 
+            if (selectedVehs.isEmpty()) {
+                //no vehicle in the registry is idle ==> return
+                //Some vehicles may be not idle because they have been assigned another customer,
+                //while for others the time window ends (t1)
+                //
+                //Their statuses will be updated in this time step (we are just before the sim step,
+                //triggered by a MobsimBeforeSimStepEvent). Consequently, they will be
+                //removed from this registry, but till then they are there.
+                return;
+            }
+
             BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
                     .findBestVehicleForRequest(req, selectedVehs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+            getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
             reqIter.remove();
             unplannedRequestRegistry.removeRequest(req);
@@ -136,22 +148,22 @@ public class RuleBasedTaxiOptimizer
     private void scheduleIdleVehiclesImpl()
     {
         Iterator<Vehicle> vehIter = idleTaxiRegistry.getVehicles().iterator();
-        while (vehIter.hasNext() && !unplannedRequests.isEmpty()) {
+        while (vehIter.hasNext() && !getUnplannedRequests().isEmpty()) {
             Vehicle veh = vehIter.next();
 
             Link link = ((TaxiStayTask)veh.getSchedule().getCurrentTask()).getLink();
-            Iterable<TaxiRequest> selectedReqs = unplannedRequests
+            Iterable<TaxiRequest> selectedReqs = getUnplannedRequests()
                     .size() > params.nearestRequestsLimit
                             ? unplannedRequestRegistry.findNearestRequests(link.getToNode(),
                                     params.nearestRequestsLimit)
-                            : unplannedRequests;
+                            : getUnplannedRequests();
 
             BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
                     .findBestRequestForVehicle(veh, selectedReqs);
 
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+            getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
-            unplannedRequests.remove(best.destination);
+            getUnplannedRequests().remove(best.destination);
             unplannedRequestRegistry.removeRequest(best.destination);
         }
     }
@@ -166,17 +178,18 @@ public class RuleBasedTaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Vehicle vehicle)
     {
-        super.nextTask(schedule);
+        super.nextTask(vehicle);
 
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(schedule);
             if (lastTask.getBeginTime() < schedule.getVehicle().getT1()) {
                 idleTaxiRegistry.removeVehicle(schedule.getVehicle());
             }
         }
-        else if (optimContext.scheduler.isIdle(schedule.getVehicle())) {
+        else if (getOptimContext().scheduler.isIdle(schedule.getVehicle())) {
             idleTaxiRegistry.addVehicle(schedule.getVehicle());
         }
         else {
@@ -201,4 +214,14 @@ public class RuleBasedTaxiOptimizer
     {
         return task.getTaxiTaskType() == TaxiTaskType.STAY;
     }
+
+
+protected BestDispatchFinder getDispatchFinder() {
+	return dispatchFinder;
+}
+
+
+protected IdleTaxiZonalRegistry getIdleTaxiRegistry() {
+	return idleTaxiRegistry;
+}
 }

@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
+import com.google.inject.Inject;
+
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
 
@@ -39,7 +41,9 @@ import playground.ikaddoura.decongestion.data.LinkInfo;
 public class DecongestionTollingPID implements DecongestionTollSetting {
 	private static final Logger log = Logger.getLogger(DecongestionTollingPID.class);
 	
-	private final DecongestionInfo congestionInfo;
+	@Inject
+	private DecongestionInfo congestionInfo;
+	
 	private Map<Id<Link>, LinkInfo> linkId2infoPreviousTollComputation = new HashMap<>();
 	
 	private double K_p = Double.NaN;
@@ -49,7 +53,6 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 	private int tollUpdateCounter = 0;
 	
 	public DecongestionTollingPID(DecongestionInfo congestionInfo) {
-		this.congestionInfo = congestionInfo;
 		K_p = congestionInfo.getDecongestionConfigGroup().getKp();
 		K_i = congestionInfo.getDecongestionConfigGroup().getKi();
 		K_d = congestionInfo.getDecongestionConfigGroup().getKd();
@@ -74,7 +77,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 		
 				// 2) integral term
 				double totalDelay = 0.;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2value().containsKey(intervalNr)) {
+				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr) != null) {
 					// artificial reset to zero if congestion is eliminated
 					if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
 						totalDelay = 0.0;
@@ -90,7 +93,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 
 				// 3) derivative term
 				double previousDelay = 0.;
-				if (this.linkId2infoPreviousTollComputation.containsKey(linkId) && this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().containsKey(intervalNr)) {
+				if (this.linkId2infoPreviousTollComputation.get(linkId) != null && this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr) != null) {
 					previousDelay = this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);
 				}
 			
@@ -105,7 +108,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				// 5) smoothen the tolls
 				
 				double previousToll = Double.NEGATIVE_INFINITY;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
+				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
 					previousToll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr);
 				}
 
@@ -128,8 +131,8 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				}
 								
 				// 6) store the updated toll
-				Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-				time2toll.put(intervalNr, smoothedToll);
+				if (smoothedToll > 0.) this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, smoothedToll);
+				
 				
 //				if (intervalNr == 117) {
 //					log.warn("link: " + linkId + " / time interval: " + intervalNr);

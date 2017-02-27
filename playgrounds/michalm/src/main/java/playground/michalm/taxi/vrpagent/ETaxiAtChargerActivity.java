@@ -79,6 +79,7 @@ public class ETaxiAtChargerActivity
         Ev ev = chargingTask.getEv();
 
         logic.removeAssignedVehicle(ev);
+        ev.setAtChargerActivity(this);
         logic.addVehicle(ev, now);
     }
 
@@ -114,5 +115,11 @@ public class ETaxiAtChargerActivity
     {
         endTime = now;
         state = State.unplugged;
+    }
+    
+    
+    @Override
+    public void finalizeAction(double now){
+        chargingTask.getEv().setAtChargerActivity(null);
     }
 }

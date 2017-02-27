@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.PlanStrategy;
@@ -93,13 +94,17 @@ public final class StrategyManagerPopsConfigLoader {
 				// --- begin new ---
 				if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
 					boolean innovative = true ;
-					for ( DefaultSelector sel : DefaultPlanStrategiesModule.DefaultSelector.values() ) {
-						System.out.flush();
-						if ( moduleName.equals( sel.toString() ) ) {
-							innovative = false ;
-							break ;
-						}
+					if (true ) {
+						throw new RuntimeException(Gbl.COPY_PASTE_FROM_CORE_NO_LONGER_WORKING) ;
 					}
+//					for ( DefaultSelector sel : DefaultPlanStrategiesModule.DefaultSelector.values() ) {
+//						
+//						System.out.flush();
+//						if ( moduleName.equals( sel.toString() ) ) {
+//							innovative = false ;
+//							break ;
+//						}
+//					}
 					if ( innovative ) {
 						maxIter = globalInnovationDisableAfter ;
 					}

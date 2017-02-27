@@ -36,10 +36,10 @@ class DemandAnalyzer {
 		assert tourSequence != null;
 		this.personCnt++;
 		this.add(tourSequence.type, 1.0, this.tourSeqType2cnt);
-		this.add(tourSequence.type, planForResampling.getSampersOnlyScore() + planForResampling.getSampersTimeScore(),
-				this.tourSeqType2sampersUtl);
-		this.add(tourSequence.type, planForResampling.getSampersOnlyScore() + planForResampling.getMATSimTimeScore(),
-				this.tourSeqType2matsimUtl);
+		this.add(tourSequence.type, planForResampling.getSampersOnlyScore() + planForResampling.getSampersEpsilonRealization()
+				+ planForResampling.getSampersTimeScore(), this.tourSeqType2sampersUtl);
+		this.add(tourSequence.type, planForResampling.getSampersOnlyScore() + planForResampling.getSampersEpsilonRealization()
+				+ planForResampling.getMATSimTimeScore(), this.tourSeqType2matsimUtl);
 	}
 
 	private double null2zero(Double val) {

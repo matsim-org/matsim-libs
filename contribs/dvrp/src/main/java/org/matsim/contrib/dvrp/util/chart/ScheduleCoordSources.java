@@ -57,7 +57,7 @@ public class ScheduleCoordSources
 
 
     // Schedule -> n DriveTasks -> n+1 Links
-    public static CoordSource createCoordSource(Schedule<?> schedule)
+    public static CoordSource createCoordSource(Schedule schedule)
     {
         List<DriveTask> driveTasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
         return ScheduleCoordSources.createCoordSource(driveTasks);

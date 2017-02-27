@@ -20,11 +20,10 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.data.TaxiRequests;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
@@ -35,21 +34,21 @@ import com.google.common.collect.Iterables;
 
 public class TaxiTimeProfiles
 {
-    public static ProfileCalculator createIdleVehicleCounter(final VrpData taxiData,
+    public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet,
             final TaxiScheduleInquiry scheduleInquiry)
     {
         return new TimeProfiles.SingleValueProfileCalculator("Idle") {
             @Override
             public String calcValue()
             {
-                return Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
+                return Iterables.size(Iterables.filter(fleet.getVehicles().values(),
                         TaxiSchedulerUtils.createIsIdle(scheduleInquiry))) + "";
             }
         };
     }
 
 
-    public static ProfileCalculator createCurrentTaxiTaskOfTypeCounter(final VrpData taxiData)
+    public static ProfileCalculator createCurrentTaxiTaskOfTypeCounter(final Fleet fleet)
     {
         String[] header = TimeProfiles.combineValues((Object[])TaxiTaskType.values());
         return new TimeProfiles.MultiValueProfileCalculator(header) {
@@ -58,11 +57,10 @@ public class TaxiTimeProfiles
             {
                 LongEnumAdder<TaxiTaskType> counter = new LongEnumAdder<>(TaxiTaskType.class);
 
-                for (Vehicle veh : taxiData.getVehicles().values()) {
+                for (Vehicle veh : fleet.getVehicles().values()) {
                     if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-                        Schedule<TaxiTask> schedule = TaxiSchedules
-                                .asTaxiSchedule(veh.getSchedule());
-                        counter.increment(schedule.getCurrentTask().getTaxiTaskType());
+                        TaxiTask currentTask = (TaxiTask)veh.getSchedule().getCurrentTask();
+                        counter.increment(currentTask.getTaxiTaskType());
                     }
                 }
 
@@ -76,15 +74,14 @@ public class TaxiTimeProfiles
     }
 
 
-    public static ProfileCalculator createRequestsWithStatusCounter(final TaxiData taxiData,
-            final TaxiRequestStatus requestStatus)
+    public static ProfileCalculator createRequestsWithStatusCounter(
+            final Iterable<? extends Request> requests, final TaxiRequestStatus requestStatus)
     {
         return new TimeProfiles.SingleValueProfileCalculator(requestStatus.name()) {
             @Override
             public String calcValue()
             {
-                return TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                        requestStatus) + "";
+                return TaxiRequests.countRequestsWithStatus(requests, requestStatus) + "";
             }
         };
     }

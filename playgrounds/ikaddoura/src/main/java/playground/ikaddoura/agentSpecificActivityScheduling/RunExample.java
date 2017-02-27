@@ -45,7 +45,7 @@ public class RunExample {
 		Controler controler = new Controler(scenario);
 		
 		AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-		controler = aa.prepareControler();
+		controler = aa.prepareControler(true);
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();

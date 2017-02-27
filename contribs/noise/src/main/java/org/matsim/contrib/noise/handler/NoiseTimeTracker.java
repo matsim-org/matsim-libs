@@ -31,8 +31,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -58,9 +60,10 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 
-public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverStartsEventHandler {
+public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
+	private static final boolean printLog = false;
 	
 	private final NoiseContext noiseContext;
 	private final String outputDirectoryBasic;
@@ -84,8 +87,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 		this.events = events;	
 	}
 	
-	int cWarn1 = 0;
-	int cWarn2 = 0;
+	private int cWarn1 = 0;
+	private int cWarn2 = 0;
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -119,6 +122,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 							+ "This message is only given once");
 					cWarn2++;
 				}
+				this.noiseContext.getNotConsideredTransitVehicleIDs().add(event.getVehicleId());
 			}
 		}
 	}
@@ -138,6 +142,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 		
 		this.noiseContext.getNoiseLinks().clear();
 		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
+		this.noiseContext.getLinkId2vehicleId2lastEnterTime().clear();
 		this.noiseContext.setCurrentTimeBinEndTime(this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 		
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
@@ -179,9 +184,9 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	
 	private void processTimeBin() {
 		
-		log.info("##############################################");
-		log.info("# Computing noise for time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
-		log.info("##############################################");
+		if (printLog) log.info("##############################################");
+		if (printLog) log.info("# Computing noise for time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
+		if (printLog) log.info("##############################################");
 
 		updateActivityInformation(); // Remove activities that were completed in the previous time interval.
 		computeNoiseForCurrentTimeInterval(); // Compute noise emissions, immissions, affected agent units and damages for the current time interval.			
@@ -204,27 +209,27 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 
 	private void computeNoiseForCurrentTimeInterval() {
 		
-		log.info("Calculating noise emissions...");
+		if (printLog) log.info("Calculating noise emissions...");
 		calculateNoiseEmission();
 		if (writeOutput()) NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseContext, outputDirectory, useCompression);
-		log.info("Calculating noise emissions... Done.");
+		if (printLog) log.info("Calculating noise emissions... Done.");
 		
-		log.info("Calculating noise immissions...");
+		if (printLog) log.info("Calculating noise immissions...");
 		calculateNoiseImmission();
 		if (writeOutput()) NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
-		log.info("Calculating noise immissions... Done.");
+		if (printLog) log.info("Calculating noise immissions... Done.");
 	
 		if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
-			log.info("Calculating the number of affected agent units...");
+			if (printLog) log.info("Calculating the number of affected agent units...");
 			calculateAffectedAgentUnits();
 			if (writeOutput()) NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
-			log.info("Calculating the number of affected agent units... Done.");
+			if (printLog) log.info("Calculating the number of affected agent units... Done.");
 		}
 	
 		if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
-			log.info("Calculating noise damage costs...");
+			if (printLog) log.info("Calculating noise damage costs...");
 			calculateNoiseDamageCosts();
-			log.info("Calculating noise damage costs... Done.");
+			if (printLog) log.info("Calculating noise damage costs... Done.");
 		}
 			
 	}
@@ -267,9 +272,19 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	public void handleEvent(LinkEnterEvent event) {
 		checkTime(event.getTime());
 
-		if (this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getVehicleId())
-				|| this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
-			// car, lkw or bus
+		if (this.noiseContext.getNotConsideredTransitVehicleIDs().contains(event.getVehicleId())) {
+			// not considered transit vehicle
+		} else {
+			// car, lkw or a considered transit vehicle (e.g. bus)
+					
+			if (this.noiseContext.getLinkId2vehicleId2lastEnterTime().containsKey(event.getLinkId())) {
+				this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(event.getLinkId()).put(event.getVehicleId(), event.getTime());
+				
+			} else {
+				Map<Id<Vehicle>, Double> vehicleId2enterTime = new HashMap<>();
+				vehicleId2enterTime.put(event.getVehicleId(), event.getTime());
+				this.noiseContext.getLinkId2vehicleId2lastEnterTime().put(event.getLinkId(), vehicleId2enterTime);
+			}
 			
 			if (this.noiseContext.getNoiseLinks().containsKey(event.getLinkId())) {
 				this.noiseContext.getNoiseLinks().get(event.getLinkId()).getEnteringVehicleIds().add(event.getVehicleId());
@@ -305,25 +320,22 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCarAgentsEntering();
 				cars++;
 				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCarAgentsEntering(cars);			
-			}
-			
-		} else {
-			// a transit vehicle which is not considered
+			}		
 		}
 	}
 	
 	private void calculateNoiseDamageCosts() {
 		
-		log.info("Calculating noise damage costs for each receiver point...");
+		if (printLog) log.info("Calculating noise damage costs for each receiver point...");
 		calculateDamagePerReceiverPoint();
 		if (writeOutput()) NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory);
-		log.info("Calculating noise damage costs for each receiver point... Done.");
+		if (printLog) log.info("Calculating noise damage costs for each receiver point... Done.");
 
 		if (this.noiseContext.getNoiseParams().isThrowNoiseEventsAffected()) {
 			
-			log.info("Throwing noise events for the affected agents...");
+			if (printLog) log.info("Throwing noise events for the affected agents...");
 			throwNoiseEventsAffected();
-			log.info("Throwing noise events for the affected agents... Done.");
+			if (printLog) log.info("Throwing noise events for the affected agents... Done.");
 		}
 		
 		if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
@@ -332,11 +344,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			computeMarginalDamageCost();
 			
 			if (this.noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
-				log.info("Throwing noise events for the causing agents...");
+				if (printLog) log.info("Throwing noise events for the causing agents...");
 				throwNoiseEventsCaused();
-				log.info("Throwing noise events for the causing agents... Done.");
+				if (printLog) log.info("Throwing noise events for the causing agents... Done.");
 				
-				if (this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
+				if (this.noiseContext.getNoiseParams().isComputeAvgNoiseCostPerLinkAndTime()) {
 					this.noiseContext.storeTimeInterval();
 				}
 			}	
@@ -366,15 +378,15 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	 */
 	private void computeAverageDamageCost() {
 		
-		log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
+		if (printLog) log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
 		calculateCostSharesPerLinkPerTimeInterval();
 		if (writeOutput()) NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
-		log.info("Allocating the total damage cost (per receiver point) to the relevant links... Done.");
-		log.info("Allocating the damage cost per link to the vehicle categories and vehicles...");
+		if (printLog) log.info("Allocating the total damage cost (per receiver point) to the relevant links... Done.");
+		if (printLog) log.info("Allocating the damage cost per link to the vehicle categories and vehicles...");
 		calculateCostsPerVehiclePerLinkPerTimeInterval();
 		if (writeOutput()) NoiseWriter.writeLinkAvgCarDamageInfoPerHour(noiseContext, outputDirectory);
 		if (writeOutput()) NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
-		log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
+		if (printLog) log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
 	}
 
 	/*
@@ -503,11 +515,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 		// MarginalCostCar_linkB = damageCost(resultingImmission) - damageCost(Y)
 		// Y = computeResultingImmission(Immission_linkA(n), Immission_linkB(n-1), Immission_linkC(n), ...)		
 		
-		log.info("Computing the marginal damage cost for each link and receiver point...");
+		if (printLog) log.info("Computing the marginal damage cost for each link and receiver point...");
 		calculateMarginalDamageCost();
 		if (writeOutput()) NoiseWriter.writeLinkMarginalCarDamageInfoPerHour(noiseContext, outputDirectory);
 		if (writeOutput()) NoiseWriter.writeLinkMarginalHgvDamageInfoPerHour(noiseContext, outputDirectory);
-		log.info("Computing the marginal damage cost for each link and receiver point... Done.");
+		if (printLog) log.info("Computing the marginal damage cost for each link and receiver point... Done.");
 	}
 	
 	/*
@@ -601,8 +613,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 					
 					if (amount != 0.) {
 						
-						// The person Id is assumed to be equal to the vehicle Id.
-						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getEventTime(), this.noiseContext.getCurrentTimeBinEndTime(), Id.create(vehicleId, Person.class), vehicleId, amount, linkId);
+						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getEventTime(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId), this.noiseContext.getVehicleId2PersonId().get(vehicleId), vehicleId, amount, linkId);
 						events.processEvent(noiseEvent);
 						
 						if (this.collectNoiseEvents) {
@@ -898,6 +909,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 
 	public final void setUseCompression(boolean useCompression) {
 		this.useCompression = useCompression;
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		this.noiseContext.getVehicleId2PersonId().put(event.getVehicleId(), event.getPersonId());
 	}
 	
 }

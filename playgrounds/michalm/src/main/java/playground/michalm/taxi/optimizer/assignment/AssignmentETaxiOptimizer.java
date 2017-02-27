@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
@@ -89,8 +89,8 @@ public class AssignmentETaxiOptimizer
             throw new RuntimeException("charge-scheduling must be followed up by req-scheduling");
         }
 
-        eAssignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, router,
-                backwardRouter);
+        eAssignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, getRouter(),
+                getBackwardRouter());
 
         eAssignmentCostProvider = new ETaxiToPlugAssignmentCostProvider(params);
 
@@ -113,7 +113,7 @@ public class AssignmentETaxiOptimizer
                 unscheduleAwaitingRequests();
             }
             scheduleCharging();
-            requiresReoptimization = true;
+            setRequiresReoptimization(true);
         }
 
         super.notifyMobsimBeforeSimStep(e);
@@ -136,7 +136,7 @@ public class AssignmentETaxiOptimizer
     //if socCheckTimeStep is too small --> small number of idle plugs --> poorer assignments
     protected void scheduleCharging()
     {
-        AssignmentChargerPlugData pData = new AssignmentChargerPlugData(optimContext,
+        AssignmentChargerPlugData pData = new AssignmentChargerPlugData(getOptimContext(),
                 evData.getChargers().values());
         if (pData.getSize() == 0) {
             return;
@@ -161,8 +161,9 @@ public class AssignmentETaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Vehicle vehicle)
     {
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.STARTED) {
             if (schedule.getCurrentTask() instanceof ETaxiChargingTask) {
                 if (scheduledForCharging.remove(schedule.getVehicle().getId()) == null) {
@@ -171,19 +172,19 @@ public class AssignmentETaxiOptimizer
             }
         }
 
-        super.nextTask(schedule);
+        super.nextTask(vehicle);
     }
 
 
     private VehicleData initVehicleDataForCharging(AssignmentChargerPlugData pData)
     {
-        Iterable<Vehicle> vehiclesBelowMinSocLevel = Iterables.filter(
-                optimContext.taxiData.getVehicles().values(), this::doNeedChargingScheduling);
+        Iterable<? extends Vehicle> vehiclesBelowMinSocLevel = Iterables
+                .filter(getOptimContext().fleet.getVehicles().values(), this::doNeedChargingScheduling);
 
         //XXX if chargers are heavily used then shorten the planning horizon;
         //(like with undersupply of taxis)
         double chargingPlanningHorizon = 10 * 60;//10 minutes (should be longer than socCheckTimeStep)
-        VehicleData vData = new VehicleData(optimContext, vehiclesBelowMinSocLevel,
+        VehicleData vData = new VehicleData(getOptimContext(), vehiclesBelowMinSocLevel,
                 chargingPlanningHorizon);
 
         //filter least charged vehicles

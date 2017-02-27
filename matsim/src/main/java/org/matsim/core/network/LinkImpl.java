@@ -63,7 +63,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 //	private String type = null;
 
-	private String origid = null;
+//	private String origid = null;
 
 	private final Network network;
 
@@ -180,10 +180,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return true;
 	}
 
-	/*deliberately package*/ final String getOrigId2() {
-		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
-		return this.origid ;
-	}
+//	/*deliberately package*/ final String getOrigId2() {
+//		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
+//		return this.origid ;
+//	}
 
 //	/*deliberately package*/ final String getType2() {
 //		// yyyyyy should now be possible to solve this with Attributable. kai, nov'16
@@ -287,9 +287,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.allowedModes = HashSetCache.get(modes);
 	}
 
-	/*deliberately package*/ final void setOrigId2(final String id) {
-		this.origid = id;
-	}
+//	/*deliberately package*/ final void setOrigId2(final String id) {
+//		this.origid = id;
+//	}
+	
 	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
 		ois.defaultReadObject();
 		this.from.addOutLink(this);

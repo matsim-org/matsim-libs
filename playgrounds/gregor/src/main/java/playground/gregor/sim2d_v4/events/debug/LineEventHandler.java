@@ -24,6 +24,6 @@ import org.matsim.core.events.handler.EventHandler;
 
 public interface LineEventHandler extends EventHandler {
 
-	public void handleEvent(LineEvent e);
-	
+    void handleEvent(LineEvent e);
+
 }

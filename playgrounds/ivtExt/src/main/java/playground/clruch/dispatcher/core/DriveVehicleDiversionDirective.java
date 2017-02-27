@@ -30,7 +30,7 @@ class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
+        final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
         // AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
         final AVDriveTask avDriveTask = (AVDriveTask) schedule.getCurrentTask();
         AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);

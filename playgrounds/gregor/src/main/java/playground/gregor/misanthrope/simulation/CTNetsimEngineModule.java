@@ -30,8 +30,6 @@ public final class CTNetsimEngineModule {
 
 		CTNetsimEngine cae = new CTNetsimEngine(qSim, fac);
 		if (qSim.getScenario().getConfig().network().isTimeVariantNetwork()) {
-//			CANetworkChangeEventsEngine change = new CANetworkChangeEventsEngine(cae);
-//			qSim.addMobsimEngine(change);
 			throw new RuntimeException("not yet implemented!");
 		}
 		qSim.addMobsimEngine(cae);

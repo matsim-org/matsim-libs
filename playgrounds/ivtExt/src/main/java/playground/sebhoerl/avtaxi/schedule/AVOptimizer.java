@@ -1,5 +1,6 @@
 package playground.sebhoerl.avtaxi.schedule;
 
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +8,11 @@ import java.util.List;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.matsim.contrib.dvrp.data.*;
+
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -15,9 +21,6 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -46,7 +49,8 @@ public class AVOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefore
     }
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule) {
+    public void nextTask(Vehicle vehicle) {
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
             schedule.nextTask();
             return;
@@ -55,19 +59,19 @@ public class AVOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefore
         Task currentTask = schedule.getCurrentTask();
         currentTask.setEndTime(now);
 
-        List<AVTask> tasks = ((Schedule<AVTask>) schedule).getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         int index = currentTask.getTaskIdx() + 1;
         AVTask nextTask = null;
 
         if (index < tasks.size()) {
-            nextTask = tasks.get(index);
+            nextTask = (AVTask)tasks.get(index);
         }
 
         double startTime = now;
 
         AVTask indexTask;
         while (index < tasks.size()) {
-            indexTask = tasks.get(index);
+            indexTask = (AVTask)tasks.get(index);
 
             if (indexTask.getAVTaskType() == AVTask.AVTaskType.STAY) {
                 if (indexTask.getEndTime() < startTime) indexTask.setEndTime(startTime);

@@ -26,6 +26,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingBangBang;
@@ -51,7 +55,7 @@ public class Decongestion {
 
 	private void prepare() {
 								
-		DecongestionTollSetting tollSettingApproach = null;
+		final DecongestionTollSetting tollSettingApproach;
 		
 		if (info.getDecongestionConfigGroup().getTOLLING_APPROACH().equals(TollingApproach.PID)) {
 			tollSettingApproach = new DecongestionTollingPID(info);	
@@ -70,19 +74,35 @@ public class Decongestion {
 		} else {
 			throw new RuntimeException("Decongestion toll setting approach not implemented. Aborting...");
 		}
-		
+				
 		// decongestion pricing
-		final DecongestionControlerListener decongestion = new DecongestionControlerListener(info, tollSettingApproach);		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.addControlerListenerBinding().toInstance(decongestion);
+				
+				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionTollSetting.class).toInstance(tollSettingApproach);
+
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				
+				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
 			}
 		});
 		
 		// toll-adjusted routing
-		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory(info, info.getScenario().getConfig().planCalcScore());
+		
+		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
 		travelDisutilityFactory.setSigma(sigma);
+		
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {

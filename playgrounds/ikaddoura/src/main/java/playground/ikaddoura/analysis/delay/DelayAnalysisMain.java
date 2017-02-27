@@ -59,7 +59,8 @@ public class DelayAnalysisMain {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		DelayAnalysis delayAnalysis = new DelayAnalysis(scenario);
+		DelayAnalysis delayAnalysis = new DelayAnalysis();
+		delayAnalysis.setScenario(scenario);
 		events.addHandler(delayAnalysis);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);

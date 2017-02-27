@@ -50,15 +50,11 @@ public static void main(String[] args) {
 		
 		Config config = ConfigUtils.loadConfig(configfile, new VariableAccessConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.global().setNumberOfThreads(8);
-		config.controler().setRunId("r02_t8");
-		config.controler().setOutputDirectory("/net/ils4/jbischoff/bvg/output/"+config.controler().getRunId()+"/");
-		config.controler().setLastIteration(0);
 		final  Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
-
+		
 		controler.run();
 
 

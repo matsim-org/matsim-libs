@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.*;
+import java.util.List;
 
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -41,17 +41,17 @@ public class TaxiStatsDumper
             "StayRatio_fleetAvg", "StayRatio_avg", "StayRatio_sd", null, //
             "OccupDriveRatio_fleetAvg" };
 
-    private final TaxiData taxiData;
+    private final Fleet fleet;
     private final TaxiConfigGroup taxiCfg;
     private final OutputDirectoryHierarchy controlerIO;
     private final CompactCSVWriter multiDayWriter;
 
 
     @Inject
-    public TaxiStatsDumper(TaxiData taxiData, TaxiConfigGroup taxiCfg,
+    public TaxiStatsDumper(Fleet fleet, TaxiConfigGroup taxiCfg,
             OutputDirectoryHierarchy controlerIO)
     {
-        this.taxiData = taxiData;
+        this.fleet = fleet;
         this.taxiCfg = taxiCfg;
         this.controlerIO = controlerIO;
         multiDayWriter = new CompactCSVWriter(
@@ -63,7 +63,7 @@ public class TaxiStatsDumper
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
-        TaxiStatsCalculator calculator = new TaxiStatsCalculator(taxiData.getVehicles().values());
+        TaxiStatsCalculator calculator = new TaxiStatsCalculator(fleet.getVehicles().values());
 
         appendToMultiDayStats(calculator.getDailyStats(), event);
 

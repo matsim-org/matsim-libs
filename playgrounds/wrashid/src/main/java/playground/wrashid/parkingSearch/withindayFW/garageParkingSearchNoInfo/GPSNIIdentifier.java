@@ -117,7 +117,7 @@ public class GPSNIIdentifier extends DuringLegAgentSelector implements MobsimIni
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		this.agents.clear();
-		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
+		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents().values()) {
 			this.agents.put(agent.getId(), agent);
 		}
 	}

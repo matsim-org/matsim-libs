@@ -20,61 +20,45 @@
 package org.matsim.contrib.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+public class RunTaxiScenario {
+	public static void run(String configFile, boolean otfvis) {
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		createControler(config, otfvis).run();
+	}
 
-public class RunTaxiScenario
-{
-    public static void run(String configFile, boolean otfvis)
-    {
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
-                new OTFVisConfigGroup());
-        createControler(config, otfvis).run();
-    }
+	public static Controler createControler(Config config, boolean otfvis) {
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		config.checkConsistency();
 
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 
-    public static Controler createControler(Config config, boolean otfvis)
-    {
-        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-        config.checkConsistency();
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new TaxiOutputModule());
+		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
-        return createControler(scenario, taxiData, otfvis);
-    }
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
+		}
 
+		return controler;
+	}
 
-    public static Controler createControler(Scenario scenario, TaxiData taxiData, boolean otfvis)
-    {
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TaxiModule(taxiData));
-        double expAveragingAlpha = 0.05;//from the AV flow paper 
-        controler.addOverridingModule(
-                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
-
-        if (otfvis) {
-            controler.addOverridingModule(new OTFVisLiveModule());
-        }
-
-        return controler;
-    }
-
-
-    public static void main(String[] args)
-    {
-        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
-        //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
-        RunTaxiScenario.run(configFile, true);
-    }
+	public static void main(String[] args) {
+		String configFile = "one_taxi/one_taxi_config.xml";
+		//String configFile = "mielec_2014_02/config.xml";
+		RunTaxiScenario.run(configFile, true);
+	}
 }

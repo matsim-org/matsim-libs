@@ -89,10 +89,10 @@ public class CNEventsReader extends MatsimXmlParser {
 				Id<Person> affectedAgentId = Id.createPersonId(attributes.get(NoiseEventAffected.ATTRIBUTE_AGENT_ID));
 				Double amount = Double.parseDouble(attributes.get(NoiseEventAffected.ATTRIBUTE_AMOUNT_DOUBLE));
 				String activityType = attributes.get(NoiseEventAffected.ATTRIBUTE_ACTIVTITY_TYPE);
-				Double emergenceTime = Double.parseDouble(attributes.get(NoiseEventAffected.ATTRIBUTE_EMERGENCE_TIME));
+				Double timeBinEndTime = Double.parseDouble(attributes.get(NoiseEventAffected.ATTRIBUTE_TIME_BIN));
 				Id<ReceiverPoint> receiverPointId = Id.create(attributes.get(NoiseEventAffected.ATTRIBUTE_RECEIVERPOINT_ID), ReceiverPoint.class);
 			
-				return new NoiseEventAffected(time, emergenceTime, affectedAgentId, amount, receiverPointId, activityType);
+				return new NoiseEventAffected(time, timeBinEndTime, affectedAgentId, amount, receiverPointId, activityType);
 			}
 		};
 		
@@ -106,13 +106,14 @@ public class CNEventsReader extends MatsimXmlParser {
 				Map<String, String> attributes = event.getAttributes();
 				
 				Double time = Double.parseDouble(attributes.get(NoiseEventCaused.ATTRIBUTE_TIME));
-				Double emergenceTime = Double.parseDouble(attributes.get(NoiseEventCaused.ATTRIBUTE_EMERGENCE_TIME));
+				Double timeBinEndTime = Double.parseDouble(attributes.get(NoiseEventCaused.ATTRIBUTE_TIME_BIN));
+				Double linkEnteringTime = Double.parseDouble(attributes.get(NoiseEventCaused.ATTRIBUTE_ENTERING_TIME));
 				Id<Person> causingAgentId = Id.createPersonId(attributes.get(NoiseEventCaused.ATTRIBUTE_AGENT_ID));
 				Id<Vehicle> causingVehicleId = Id.create(attributes.get(NoiseEventCaused.ATTRIBUTE_VEHICLE_ID), Vehicle.class);
 				Double amount = Double.parseDouble(attributes.get(NoiseEventCaused.ATTRIBUTE_AMOUNT_DOUBLE));
 				Id<Link> linkId = Id.createLinkId(attributes.get(NoiseEventCaused.ATTRIBUTE_LINK_ID));
 			
-				return new NoiseEventCaused(time, emergenceTime, causingAgentId, causingVehicleId, amount, linkId);
+				return new NoiseEventCaused(time, timeBinEndTime, linkEnteringTime, causingAgentId, causingVehicleId, amount, linkId);
 			}
 		};
 		

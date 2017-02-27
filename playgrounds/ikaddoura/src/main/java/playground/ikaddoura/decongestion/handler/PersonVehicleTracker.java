@@ -22,6 +22,8 @@ package playground.ikaddoura.decongestion.handler;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 
+import com.google.inject.Inject;
+
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
 
@@ -29,16 +31,15 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
  * 
  * Keeps track of which vehicle is used by which person.
  * 
+ * Assumes the taxi driver to be the last one enters the vehicle.
+ * 
  * @author ikaddoura
  */
 
 public class PersonVehicleTracker implements PersonEntersVehicleEventHandler {
 
-	private final DecongestionInfo congestionInfo;
-	
-	public PersonVehicleTracker(DecongestionInfo congestionInfo) {
-		this.congestionInfo = congestionInfo;
-	}
+	@Inject
+	private DecongestionInfo congestionInfo;
 
 	@Override
 	public void reset(int iteration) {
