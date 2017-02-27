@@ -95,7 +95,7 @@ public class RunBerlinAV {
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
 //			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_berlinArea_av-trip-share-0.1_av-20000/";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_test3/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_test4/";
 			analyzeNoise = true;
 			agentBasedActivityScheduling = false;
 			otfvis = false;
@@ -128,38 +128,6 @@ public class RunBerlinAV {
 			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
 			controler = aa.prepareControler(false);
 		}
-		
-		// #############################
-		// congestion pricing
-		// #############################
-
-		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setKp(0.);
-		decongestionSettings.setKi(0.);
-		decongestionSettings.setKd(0.);
-		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.0);
-		decongestionSettings.setMsa(false);
-		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-		log.info(decongestionSettings.toString());
-			
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				
-				this.bind(DecongestionInfo.class).toInstance(info);
-				
-				this.bind(DelayAnalysis.class).asEagerSingleton();				
-				this.addEventHandlerBinding().to(DelayAnalysis.class);
-				
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
-			}
-		});
 		
 		// #############################
 		// taxi

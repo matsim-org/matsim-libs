@@ -95,7 +95,7 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Inject(optional=true)
 	private IntervalBasedTolling intervalBasedTolling;
 	
-	@Inject
+	@Inject(optional=true)
 	private DelayAnalysis delayComputation;
 	
 	private int nextDisableInnovativeStrategiesIteration = -1;
@@ -176,58 +176,59 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 				
-		// Store and write out some aggregated numbers for analysis purposes.
-				
-		this.iteration2totalDelay.put(event.getIteration(), this.delayComputation.getTotalDelay());
-		double totalPayments = 0.;
-		if (this.intervalBasedTolling != null) totalPayments = this.intervalBasedTolling.getTotalTollPayments();
-		this.iteration2totalTollPayments.put(event.getIteration(), totalPayments);
-		this.iteration2totalTravelTime.put(event.getIteration(), this.delayComputation.getTotalTravelTime());
-		
-		double monetizedUserBenefits = 0.;
-		for (Person person : this.congestionInfo.getScenario().getPopulation().getPersons().values()) {
-			monetizedUserBenefits = monetizedUserBenefits + person.getSelectedPlan().getScore() / this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		}
-		this.iteration2userBenefits.put(event.getIteration(), monetizedUserBenefits);
-		
-		CongestionInfoWriter.writeIterationStats(
-				this.iteration2totalDelay,
-				this.iteration2totalTollPayments,
-				this.iteration2totalTravelTime,
-				this.iteration2userBenefits,
-				outputDirectory
-				);
-		
-		XYLineChart chart1 = new XYLineChart("Total travel time and total delay", "Iteration", "Hours");
-		double[] iterations1 = new double[event.getIteration() + 1];
-		double[] values1a = new double[event.getIteration() + 1];
-		double[] values1b = new double[event.getIteration() + 1];
-		for (int i = this.congestionInfo.getScenario().getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
-			iterations1[i] = i;
-			values1a[i] = this.iteration2totalDelay.get(i) / 3600.;
-			values1b[i] = this.iteration2totalTravelTime.get(i) / 3600.;
-		}
-		chart1.addSeries("Total delay", iterations1, values1a);
-		chart1.addSeries("Total travel time", iterations1, values1b);
-		chart1.saveAsPng(outputDirectory + "travelTime_delay.png", 800, 600);
-		
-		XYLineChart chart2 = new XYLineChart("System welfare, user benefits and toll revenues", "Iteration", "Monetary units");
-		double[] iterations2 = new double[event.getIteration() + 1];
-		double[] values2a = new double[event.getIteration() + 1];
-		double[] values2b = new double[event.getIteration() + 1];
-		double[] values2c = new double[event.getIteration() + 1];
+		if (this.delayComputation != null) {
+			// Store and write out some aggregated numbers for analysis purposes.
+			
+			this.iteration2totalDelay.put(event.getIteration(), this.delayComputation.getTotalDelay());
+			double totalPayments = 0.;
+			if (this.intervalBasedTolling != null) totalPayments = this.intervalBasedTolling.getTotalTollPayments();
+			this.iteration2totalTollPayments.put(event.getIteration(), totalPayments);
+			this.iteration2totalTravelTime.put(event.getIteration(), this.delayComputation.getTotalTravelTime());
+			
+			double monetizedUserBenefits = 0.;
+			for (Person person : this.congestionInfo.getScenario().getPopulation().getPersons().values()) {
+				monetizedUserBenefits = monetizedUserBenefits + person.getSelectedPlan().getScore() / this.congestionInfo.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney();
+			}
+			this.iteration2userBenefits.put(event.getIteration(), monetizedUserBenefits);
+			
+			CongestionInfoWriter.writeIterationStats(
+					this.iteration2totalDelay,
+					this.iteration2totalTollPayments,
+					this.iteration2totalTravelTime,
+					this.iteration2userBenefits,
+					outputDirectory
+					);
+			
+			XYLineChart chart1 = new XYLineChart("Total travel time and total delay", "Iteration", "Hours");
+			double[] iterations1 = new double[event.getIteration() + 1];
+			double[] values1a = new double[event.getIteration() + 1];
+			double[] values1b = new double[event.getIteration() + 1];
+			for (int i = this.congestionInfo.getScenario().getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
+				iterations1[i] = i;
+				values1a[i] = this.iteration2totalDelay.get(i) / 3600.;
+				values1b[i] = this.iteration2totalTravelTime.get(i) / 3600.;
+			}
+			chart1.addSeries("Total delay", iterations1, values1a);
+			chart1.addSeries("Total travel time", iterations1, values1b);
+			chart1.saveAsPng(outputDirectory + "travelTime_delay.png", 800, 600);
+			
+			XYLineChart chart2 = new XYLineChart("System welfare, user benefits and toll revenues", "Iteration", "Monetary units");
+			double[] iterations2 = new double[event.getIteration() + 1];
+			double[] values2a = new double[event.getIteration() + 1];
+			double[] values2b = new double[event.getIteration() + 1];
+			double[] values2c = new double[event.getIteration() + 1];
 
-		for (int i = this.congestionInfo.getScenario().getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
-			iterations2[i] = i;
-			values2a[i] = this.iteration2userBenefits.get(i) + this.iteration2totalTollPayments.get(i);
-			values2b[i] = this.iteration2userBenefits.get(i);
-			values2c[i] = this.iteration2totalTollPayments.get(i);
+			for (int i = this.congestionInfo.getScenario().getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
+				iterations2[i] = i;
+				values2a[i] = this.iteration2userBenefits.get(i) + this.iteration2totalTollPayments.get(i);
+				values2b[i] = this.iteration2userBenefits.get(i);
+				values2c[i] = this.iteration2totalTollPayments.get(i);
+			}
+			chart2.addSeries("System welfare", iterations2, values2a);
+			chart2.addSeries("User benefits", iterations2, values2b);
+			chart2.addSeries("Toll revenues", iterations2, values2c);
+			chart2.saveAsPng(outputDirectory + "systemWelfare_userBenefits_tollRevenues.png", 800, 600);
 		}
-		chart2.addSeries("System welfare", iterations2, values2a);
-		chart2.addSeries("User benefits", iterations2, values2b);
-		chart2.addSeries("Toll revenues", iterations2, values2c);
-		chart2.saveAsPng(outputDirectory + "systemWelfare_userBenefits_tollRevenues.png", 800, 600);
-		
 	}
 
 	@Override

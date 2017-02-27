@@ -172,11 +172,9 @@ public class RunBerlinMinExtCostAV {
 				this.bind(AgentFilter.class).to(AVAgentFilter.class);
 
 				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
-				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
 								
 				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
-				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
 				this.addControlerListenerBinding().to(DecongestionControlerListener.class);

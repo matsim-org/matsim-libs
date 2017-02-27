@@ -152,6 +152,16 @@ public class AnalysisControlerListener implements IterationEndsListener {
 		chart2.addSeries("Toll revenues", iterations2, values2c);
 		chart2.addSeries("Noise damages", iterations2, values2d);
 		chart2.saveAsPng(runDirectory + "systemWelfare_userBenefits_noiseDamages_tollRevenues.png", 800, 600);
+		
+		XYLineChart chart3 = new XYLineChart("Noise damages [EUR]", "Iteration", "Hours");
+		double[] iterations3 = new double[event.getIteration() + 1];
+		double[] values3 = new double[event.getIteration() + 1];
+		for (int i = this.scenario.getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
+			iterations3[i] = i;
+			values3[i] = this.iteration2totalNoiseDamages.get(i);
+		}
+		chart3.addSeries("Noise damages", iterations3, values3);
+		chart3.saveAsPng(runDirectory + "noiseDamages.png", 800, 600);
 	}
 	
 	private static void writeIterationStats(
