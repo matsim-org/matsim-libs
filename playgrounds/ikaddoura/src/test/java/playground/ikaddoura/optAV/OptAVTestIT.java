@@ -48,6 +48,7 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.*;
 import playground.ikaddoura.decongestion.tollSetting.*;
 import playground.ikaddoura.moneyTravelDisutility.*;
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
  * @author ikaddoura
@@ -190,7 +191,8 @@ public class OptAVTestIT {
 			public void install() {
 												
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
-				
+				this.bind(AgentFilter.class).to(AVAgentFilter.class);
+
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
@@ -352,6 +354,7 @@ public class OptAVTestIT {
 				
 				this.bind(DecongestionInfo.class).toInstance(info);
 				
+				this.bind(AgentFilter.class).to(AVAgentFilter.class);
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);			
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
 

@@ -57,6 +57,7 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
 * @author ikaddoura
@@ -190,7 +191,9 @@ public class RunBerlinAV {
 				public void install() {
 													
 					addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
-					
+
+					this.bind(AgentFilter.class).to(AVAgentFilter.class);
+
 					this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 					this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 					this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
