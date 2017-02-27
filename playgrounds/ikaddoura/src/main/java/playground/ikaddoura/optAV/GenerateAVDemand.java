@@ -50,7 +50,7 @@ public class GenerateAVDemand {
 	
 	private static final String inputPlansFile = "run_194c.150.plans_selected.xml.gz";
 	
-	private static final double taxiTripShare = 0.1;
+	private static final double taxiTripShare = 0.5;
 	
 	private static final boolean specificArea = true;
 	private static final double minX = 4554761.;

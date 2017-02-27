@@ -34,9 +34,7 @@ import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.NoiseOfflineCalculation;
 import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
@@ -54,7 +52,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
@@ -107,6 +104,12 @@ public class OptAVTestIT {
 		Scenario scenario1 = ScenarioUtils.loadScenario(config1);
 		Controler controler1 = new Controler(scenario1);
 		
+		// noise analysis
+		
+		NoiseContext noiseContext1 = new NoiseContext(controler1.getScenario());
+		noiseContext1.getNoiseParams().setInternalizeNoiseDamages(false);
+		controler1.addControlerListener(new NoiseCalculationOnline(noiseContext1));
+		
 		// taxi
 
 		FleetImpl fleet = new FleetImpl();
@@ -146,23 +149,6 @@ public class OptAVTestIT {
 		
         controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         controler1.run();
-		
-		String outputDirectory = controler1.getConfig().controler().getOutputDirectory();
-		if (!outputDirectory.endsWith("/")) {
-			outputDirectory = outputDirectory + "/";
-		}
-
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler1.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-
-		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario1, outputDirectory);
-		noiseCalculation.run();	
-		
-		String outputFilePath = outputDirectory + "noise-analysis_it." + scenario1.getConfig().controler().getLastIteration() + "/";
-		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
-		process.run();
-		
-		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler1.getConfig().controler().getOutputDirectory(), outputFilePath + controler1.getConfig().controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		analysis1.run();
 		
 		// ##################################################################
 		// noise pricing
@@ -220,8 +206,8 @@ public class OptAVTestIT {
 		
 		// noise pricing
 		
-		NoiseContext noiseContext = new NoiseContext(controler2.getScenario());
-		controler2.addControlerListener(new NoiseCalculationOnline(noiseContext));
+		NoiseContext noiseContext2 = new NoiseContext(controler2.getScenario());
+		controler2.addControlerListener(new NoiseCalculationOnline(noiseContext2));
 		
 		// analysis
 		        
@@ -237,14 +223,6 @@ public class OptAVTestIT {
         controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler2.run();
 		
-		String outputDirectory2 = controler2.getConfig().controler().getOutputDirectory();
-		if (!outputDirectory2.endsWith("/")) {
-			outputDirectory2 = outputDirectory2 + "/";
-		}
-
-		PersonTripNoiseAnalysisRun analysis2 = new PersonTripNoiseAnalysisRun(controler2.getConfig().controler().getOutputDirectory());
-		analysis2.run();
-
 		// print outs
 					
 		System.out.println("----------------------------------");
@@ -311,7 +289,6 @@ public class OptAVTestIT {
 		controler1.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				// travel disutility factory for DVRP
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory1);
 			}
 		}); 
@@ -330,9 +307,6 @@ public class OptAVTestIT {
 		
         controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler1.run();
-				
-		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler1.getConfig().controler().getOutputDirectory());
-		analysis1.run();
 		
 		// ##################################################################
 		// congestion pricing
@@ -415,7 +389,6 @@ public class OptAVTestIT {
 			@Override
 			public void install() {
 												
-				// travel disutility factory for DVRP
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory2);
 
 				this.bind(AgentFilter.class).to(AVAgentFilter.class);
@@ -439,14 +412,6 @@ public class OptAVTestIT {
 		// run
         controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler2.run();
-		
-		String outputDirectory2 = controler2.getConfig().controler().getOutputDirectory();
-		if (!outputDirectory2.endsWith("/")) {
-			outputDirectory2 = outputDirectory2 + "/";
-		}
-
-		PersonTripNoiseAnalysisRun analysis2 = new PersonTripNoiseAnalysisRun(controler2.getConfig().controler().getOutputDirectory());
-		analysis2.run();
 
 		// print outs
 					
