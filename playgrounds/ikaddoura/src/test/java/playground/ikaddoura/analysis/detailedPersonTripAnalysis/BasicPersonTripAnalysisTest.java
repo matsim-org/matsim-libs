@@ -170,7 +170,8 @@ public class BasicPersonTripAnalysisTest {
 	
 	public BasicPersonTripAnalysisHandler analyseScenario(String eventsFile, Scenario scenario) {
 
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(scenario);	
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();	
+		basicHandler.setScenario(scenario);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);

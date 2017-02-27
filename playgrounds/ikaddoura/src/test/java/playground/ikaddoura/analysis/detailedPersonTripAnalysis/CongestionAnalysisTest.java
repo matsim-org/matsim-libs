@@ -222,7 +222,8 @@ public class CongestionAnalysisTest {
 	
 	public CongestionAnalysisHandler analyseScenario(String eventsFile, Scenario scenario) {
 
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(scenario);
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();
+		basicHandler.setScenario(scenario);
 		CongestionAnalysisHandler congestionHandler = new CongestionAnalysisHandler(basicHandler);	
 		
 		EventsManager events = EventsUtils.createEventsManager();

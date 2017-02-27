@@ -35,6 +35,8 @@ import org.matsim.contrib.noise.events.NoiseEventCaused;
 import org.matsim.contrib.noise.handler.NoiseEventAffectedHandler;
 import org.matsim.contrib.noise.handler.NoiseEventCausedHandler;
 
+import com.google.inject.Inject;
+
 /**
  * Analyzes an event file with noise events.
  * 
@@ -44,6 +46,7 @@ import org.matsim.contrib.noise.handler.NoiseEventCausedHandler;
 public class NoiseAnalysisHandler implements NoiseEventCausedHandler, NoiseEventAffectedHandler {
 	private final static Logger log = Logger.getLogger(NoiseAnalysisHandler.class);
 
+	@Inject
 	private BasicPersonTripAnalysisHandler basicHandler;
 	
 	private boolean caughtNoiseEvent = false;
@@ -55,7 +58,7 @@ public class NoiseAnalysisHandler implements NoiseEventCausedHandler, NoiseEvent
 	private double causedNoiseCost = 0.;
 	private double affectedNoiseCost = 0.;
 	
-	public NoiseAnalysisHandler(BasicPersonTripAnalysisHandler basicHandler) {
+	public void setBasicHandler(BasicPersonTripAnalysisHandler basicHandler) {
 		this.basicHandler = basicHandler;
 	}
 

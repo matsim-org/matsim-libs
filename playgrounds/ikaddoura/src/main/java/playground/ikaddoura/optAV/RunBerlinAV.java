@@ -50,13 +50,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
-import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
@@ -203,6 +203,8 @@ public class RunBerlinAV {
 		// #############################
 		// run
 		// #############################
+			
+		controler.addOverridingModule(new PersonTripAnalysisModule());
 
 		if (otfvis) controler.addOverridingModule(new OTFVisLiveModule());	
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

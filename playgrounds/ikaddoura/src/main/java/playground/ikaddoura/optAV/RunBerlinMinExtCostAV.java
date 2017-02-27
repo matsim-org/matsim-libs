@@ -41,6 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
 import playground.ikaddoura.decongestion.*;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
@@ -217,6 +218,8 @@ public class RunBerlinMinExtCostAV {
 		// #############################
 		// run
 		// #############################
+		
+		controler.addOverridingModule(new PersonTripAnalysisModule());
 		
 		if (otfvis) controler.addOverridingModule(new OTFVisLiveModule());	
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
