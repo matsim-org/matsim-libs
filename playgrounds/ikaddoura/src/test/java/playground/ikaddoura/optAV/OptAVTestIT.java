@@ -59,7 +59,6 @@ import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
 import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
@@ -225,12 +224,14 @@ public class OptAVTestIT {
 		controler2.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
 		// analysis
+		        
+		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
+		
+		controler2.addOverridingModule(new PersonTripAnalysisModule());
 		
 		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
 		controler2.getEvents().addHandler(handler2);
 		controler2.getConfig().controler().setCreateGraphs(false);
-        
-		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
 		
 		// run
         controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -317,6 +318,8 @@ public class OptAVTestIT {
 		
 		// analysis
 		
+		controler1.addOverridingModule(new PersonTripAnalysisModule());
+		
 		if (otfvis) controler1.addOverridingModule(new OTFVisLiveModule());	
 		
 		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
@@ -379,11 +382,9 @@ public class OptAVTestIT {
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
 
 				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
-				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
 								
 				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
-				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
 				this.addControlerListenerBinding().to(DecongestionControlerListener.class);				
@@ -417,7 +418,7 @@ public class OptAVTestIT {
 				// travel disutility factory for DVRP
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory2);
 
-//				this.bind(AgentFilter.class).to(AVAgentFilter.class); // TODO: add once person is not null
+				this.bind(AgentFilter.class).to(AVAgentFilter.class);
 				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
@@ -427,12 +428,14 @@ public class OptAVTestIT {
 		
 		// analysis
 		
+		controler2.addOverridingModule(new PersonTripAnalysisModule());
+
+		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
+
 		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
 		controler2.getEvents().addHandler(handler2);
 		controler2.getConfig().controler().setCreateGraphs(false);
-        
-		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
-		
+        		
 		// run
         controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler2.run();

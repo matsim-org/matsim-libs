@@ -29,8 +29,9 @@ import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.NoiseOfflineCalculation;
+import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -51,12 +52,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup;
-import playground.ikaddoura.decongestion.DecongestionControlerListener;
-import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
+import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
@@ -130,6 +127,29 @@ public class RunBerlinAV {
 		}
 		
 		// #############################
+		// noise analysis
+		// #############################
+		
+		if (analyzeNoise) {
+			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+			noiseParams.setInternalizeNoiseDamages(false);
+			
+			if (agentBasedActivityScheduling) {
+				List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
+				for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
+					if (!params.getActivityType().contains("interaction")) {
+						consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
+					}
+				}
+				String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
+				noiseParams.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));			
+			}
+
+			log.info(noiseParams.toString());
+			controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
+		}
+		
+		// #############################
 		// taxi
 		// #############################
 
@@ -145,14 +165,9 @@ public class RunBerlinAV {
 		controler.addOverridingModule(new TaxiOutputModule());
 		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
         
-//		 final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
-//					new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
-//							controler.getConfig().planCalcScore()));
-		
-		final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory(
-				DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
-				controler.getConfig().planCalcScore()
-				);
+		 final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
+					new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
+							controler.getConfig().planCalcScore()));
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -167,19 +182,23 @@ public class RunBerlinAV {
 					this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
 				}
 			}); 
+			
+		// #############################
+		// welfare analysis
+		// #############################
 
+		controler.addOverridingModule(new PersonTripAnalysisModule());
+			
 		// #############################
 		// run
 		// #############################
 			
-		controler.addOverridingModule(new PersonTripAnalysisModule());
-
 		if (otfvis) controler.addOverridingModule(new OTFVisLiveModule());	
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
 		// #############################
-		// analysis
+		// post processing
 		// #############################
 		
 		String outputDirectory = config.controler().getOutputDirectory();
@@ -188,47 +207,26 @@ public class RunBerlinAV {
 		}
 		
 		if (analyzeNoise) {
-			NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-			noiseParameters.setInternalizeNoiseDamages(false);
 			
-			if (agentBasedActivityScheduling) {
-				List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
-				for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
-					if (!params.getActivityType().contains("interaction")) {
-						consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
-					}
-				}
-				String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
-				noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));
-			}
-
-			log.info(noiseParameters.toString());
-			NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
-			noiseCalculation.run();	
+			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 			
-			String outputFilePath = outputDirectory + "noise-analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
-			ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
-			process.run();
+			String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
+			String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 			
-			if (noiseParameters.isComputeNoiseDamages()) {
-				final String[] labels = { "damages_receiverPoint" };
-				final String[] workingDirectories = { outputFilePath + "damages_receiverPoint/" };
-
-				MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-				merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
-				merger.setOutputDirectory(outputFilePath);
-				merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
-				merger.setWorkingDirectory(workingDirectories);
-				merger.setLabel(labels);
-				merger.run();
-			}
+			ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, noiseParams.getReceiverPointGap());
+			processNoiseImmissions.run();
 			
-			PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory(), outputFilePath + controler.getConfig().controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-			analysis.run();
+			final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
+			final String[] workingDirectories = { controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/consideredAgentUnits/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration()  + "/damages_receiverPoint/" };
+	
+			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+			merger.setReceiverPointsFile(receiverPointsFile);
+			merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
+			merger.setTimeBinSize(noiseParams.getTimeBinSizeNoiseComputation());
+			merger.setWorkingDirectory(workingDirectories);
+			merger.setLabel(labels);
+			merger.run();
 			
-		} else {
-			PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
-			analysis.run();
 		}
 	}
 }
