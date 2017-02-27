@@ -24,8 +24,9 @@ package org.matsim.contrib.noise.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -56,7 +57,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 	private static final Logger log = Logger.getLogger(PersonActivityTracker.class);
 	
 	private final NoiseContext noiseContext;
-	private final List<String> consideredActivityTypes = new ArrayList<String>();
+	private final Set<String> consideredActivityTypes = new HashSet<String>();
 	
 	private Map<Id<Person>, Integer> personId2currentActNr = new HashMap<Id<Person>, Integer>();
 		
@@ -111,7 +112,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 							countWarn++;
 						}
 					} else {
-						if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(person.getId())) {
+						if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()) != null) {
 							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()).add(actInfo);
 						} else {
 							ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
@@ -127,7 +128,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 	
 	public void handleEvent(ActivityStartEvent event) {
 						
-		if (!(this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getPersonId()))) {
+		if (!(this.noiseContext.getScenario().getPopulation().getPersons().get(event.getPersonId()) != null)) {
 		} else {
 		
 			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
@@ -156,9 +157,9 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 					actInfo.setEndTime(30 * 3600.); // assuming this activity to be the last one in the agents' plan, will be overwritten if it is not the last activity
 					actInfo.setActivityType(event.getActType());
 					
-					if (this.noiseContext.getReceiverPoints().containsKey(rpId)) {
+					if (this.noiseContext.getReceiverPoints().get(rpId) != null) {
 						
-						if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
+						if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId()) != null) {
 							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId()).add(actInfo);
 						
 						} else {
@@ -175,7 +176,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 				
-		if (!(this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getPersonId()))) {
+		if (!(this.noiseContext.getScenario().getPopulation().getPersons().get(event.getPersonId()) != null)) {
 		} else {
 			
 			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
@@ -185,7 +186,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 					Coord coord = noiseContext.getGrid().getPersonId2listOfConsideredActivityCoords().get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
 					Id<ReceiverPoint> rpId = noiseContext.getGrid().getActivityCoord2receiverPointId().get(coord);
 
-					if (this.noiseContext.getReceiverPoints().containsKey(rpId) && this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
+					if (this.noiseContext.getReceiverPoints().get(rpId) != null && this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId()) != null) {
 						for (PersonActivityInfo actInfo : this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId())) {
 							if (actInfo.getEndTime() == 30 * 3600.) {
 								actInfo.setEndTime(event.getTime());
