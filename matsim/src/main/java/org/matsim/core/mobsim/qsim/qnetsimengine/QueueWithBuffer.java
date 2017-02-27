@@ -204,10 +204,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		
 	}
 
-	//for the time being we are not checking veh type etc.; PCU equivalent is fine for testing purposes
-	//vehicles of sizes smaller than the threshold can violate flowCap
-	private static final double PCU_THRESHOLD_FOR_FLOW_CAP_EASING = 0.0;// 0 means no easing...
-	
 	@Override
 	 final void addFromWait(final QVehicle veh) {
 		addToBuffer(veh);
@@ -222,7 +218,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		//this check can be moved to 'addFromWait'
 		//it is a double check, and makes only sense to protect against calling addToBuffer() without calling
 		//hasFlowCapacityLeft() first. This only could happen for addFromWait(), because it can be called from outside
-	    if (flowcap_accumulate.getValue() > 0.0  || veh.getVehicle().getType().getPcuEquivalents() < PCU_THRESHOLD_FOR_FLOW_CAP_EASING) {
+		if (flowcap_accumulate.getValue() > 0.0 || veh.getVehicle().getType().getPcuEquivalents() <= context.qsimConfig
+				.getPcuThresholdForFlowCapacityEasing()) {
 			flowcap_accumulate.addValue(-veh.getFlowCapacityConsumptionInEquivalents(), now);
 		} else {
 			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
@@ -250,7 +247,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
             updateFastFlowAccumulation();
         }
         
-		return flowcap_accumulate.getValue() > 0.0 || veh.getVehicle().getType().getPcuEquivalents() < PCU_THRESHOLD_FOR_FLOW_CAP_EASING;
+		return flowcap_accumulate.getValue() > 0.0 || veh.getVehicle().getType()
+				.getPcuEquivalents() <= context.qsimConfig.getPcuThresholdForFlowCapacityEasing();
 	}
 
 

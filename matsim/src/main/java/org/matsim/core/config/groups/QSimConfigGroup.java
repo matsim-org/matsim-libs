@@ -51,7 +51,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
 	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
-
+	
 	public static enum TrafficDynamics { queue, withHoles,
 		KWM //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
 	} ;
@@ -76,6 +76,20 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	
 	private StarttimeInterpretation simStarttimeInterpretation = StarttimeInterpretation.maxOfStarttimeAndEarliestActivityEnd;
 	
+	//Vehicles of size (in PCU) smaller than this threshold will be allowed to enter the buffer even
+	//if flowcap_accumulate is not positive.
+	//The default value is 0.0 meaning that all vehicles of non-zero sizes will be let into buffer only
+	//if flowcap_accumulate > 0.
+	//
+	//Flow capacity easing prevents buses from waiting long time for entering the buffer in sub-sampled scenarios
+	//For instance, for 10% scenario, a car (representing 10 cars) has a size of 1.0, a bus (representing 1 bus) of 0.3,
+	//and link flow capacities are reduced to about 0.1 of the original capacity.
+	//(1) If pcuThresholdForFlowCapacityEasing == 0, all busses following private cars wait long times before entering
+	//the buffer (recovering the flow capacity accumulator takes approx. 10 times longer than in the 100% scenario).
+	//(2) If pcuThresholdForFlowCapacityEasing == 0.3, busses at the front of the queue immediately enter the buffer
+	//(once they arrive at the end of a link).
+	private double pcuThresholdForFlowCapacityEasing = 0.0;
+
 	// ---
 	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
 	public static enum VehicleBehavior { teleport, wait, exception } ;
@@ -543,5 +557,14 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
 		// yyyyyy this should better become a threshold number!  kai, aug'16
 		return this.usingTravelTimeCheckInTeleportation = val ;
+	}
+	
+	
+	public double getPcuThresholdForFlowCapacityEasing() {
+		return pcuThresholdForFlowCapacityEasing;
+	}
+	
+	public void setPcuThresholdForFlowCapacityEasing(double pcuThresholdForFlowCapacityEasing) {
+		this.pcuThresholdForFlowCapacityEasing = pcuThresholdForFlowCapacityEasing;
 	}
 }
