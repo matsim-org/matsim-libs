@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.TravelTime;
@@ -58,13 +57,6 @@ class UtilityFunction {
 		this.telepTimeOpt = new TimeStructureOptimizer(TimeStructureOptimizer.LOGIC.sampers, this.scenario,
 				tripRouterProvider, maxTrials, maxFailures, mode2travelTime, this.newFreeFlowTTs(),
 				betaTravelSampers_1_h, sampersCarDelay);
-
-		// this.congTimeOpt = new TimeStructureOptimizer(this.scenario,
-		// tripRouterProvider, maxTrials, maxFailures,
-		// mode2travelTime, this.newFreeFlowTTs(), betaTravelSampers_1_h);
-		// this.telepTimeOpt = new TimeStructureOptimizer(this.scenario, null,
-		// maxTrials, maxFailures, null,
-		// this.newFreeFlowTTs(), betaTravelSampers_1_h);
 	}
 
 	private Map<String, TravelTime> newFreeFlowTTs() {
@@ -98,19 +90,21 @@ class UtilityFunction {
 	}
 
 	// TODO NEW
-	public String allUtilitiesToString(final Person person) {
-		final StringBuffer result = new StringBuffer("TYPE\tSAMPERS\tMATSim");
-		for (TourSequence.Type type : TourSequence.Type.values()) {
-			final TourSequence representativeTourSequence = new TourSequence(type);
-			final Plan representativePlan = (representativeTourSequence).asPlan(this.scenario, person);
-			this.evaluate(representativePlan, representativeTourSequence);
-			result.append("\n");
-			result.append(type.toString());
-			result.append("\t");
-			result.append(this.teleportationTravelTimeUtility + this.ActivityModeOnlyUtility);
-			result.append("\t");
-			result.append(this.congTravelTimeUtility + this.ActivityModeOnlyUtility);
-		}
-		return result.toString();
-	}
+	// public String allUtilitiesToString(final Person person) {
+	// final StringBuffer result = new StringBuffer("TYPE\tSAMPERS\tMATSim");
+	// for (TourSequence.Type type : TourSequence.Type.values()) {
+	// final TourSequence representativeTourSequence = new TourSequence(type);
+	// final Plan representativePlan =
+	// (representativeTourSequence).asPlan(this.scenario, person);
+	// this.evaluate(representativePlan, representativeTourSequence);
+	// result.append("\n");
+	// result.append(type.toString());
+	// result.append("\t");
+	// result.append(this.teleportationTravelTimeUtility +
+	// this.ActivityModeOnlyUtility);
+	// result.append("\t");
+	// result.append(this.congTravelTimeUtility + this.ActivityModeOnlyUtility);
+	// }
+	// return result.toString();
+	// }
 }

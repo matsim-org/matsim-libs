@@ -28,8 +28,7 @@ public class Sampers2MATSimResampler implements Runnable {
 
 	public Sampers2MATSimResampler(final Random rnd, final Set<? extends Alternative> choiceSet,
 			final int drawsWithReplacement) {
-
-		this.rnd = rnd;
+		this.rnd = new Random(rnd.nextLong());
 		this.alternatives = new ArrayList<>(choiceSet.size());
 		this.acceptanceProbas = new ArrayList<>(choiceSet.size());
 
@@ -50,10 +49,6 @@ public class Sampers2MATSimResampler implements Runnable {
 		for (Double acceptanceWeight : acceptanceWeights) {
 			this.acceptanceProbas.add(acceptanceWeight / maxAcceptanceWeight);
 		}
-
-		// System.out.println(acceptanceWeights);
-		// System.out.println(this.acceptanceProbas);
-		// System.exit(0);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------

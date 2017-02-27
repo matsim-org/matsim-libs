@@ -70,10 +70,10 @@ class ChoiceRunner implements Runnable {
 			final double betaTravelSampers_1_h, final SampersCarDelay sampersCarDelay, final double sampersLogitScale) {
 		this.person = person;
 		this.sampleCnt = sampleCnt;
-		this.rnd = rnd;
+		this.rnd = new Random(rnd.nextLong());
 		this.scenario = scenario;
 		this.tripRouterProvider = tripRouterProvider;
-		this.mode2travelTime = mode2travelTime;
+		this.mode2travelTime = new LinkedHashMap<>(mode2travelTime);
 		this.maxTrials = maxTrials;
 		this.maxFailures = maxFailures;
 		this.usePTto1 = usePTto1;
@@ -86,7 +86,6 @@ class ChoiceRunner implements Runnable {
 			final TourSequence tourSeq = new TourSequence(type);
 			this.tourSeqAlts.add(tourSeq);
 		}
-
 	}
 
 	// -------------------- RESULT ACCESS --------------------
@@ -108,11 +107,11 @@ class ChoiceRunner implements Runnable {
 		}
 
 		final MultinomialLogit teleportationBasedMNL = new MultinomialLogit(TourSequence.Type.values().length, 1);
-		teleportationBasedMNL.setUtilityScale(1.0);
+		teleportationBasedMNL.setUtilityScale(this.sampersLogitScale);
 		teleportationBasedMNL.setCoefficient(0, 1.0);
 
 		final MultinomialLogit congestionBasedMNL = new MultinomialLogit(TourSequence.Type.values().length, 1);
-		congestionBasedMNL.setUtilityScale(1.0);
+		congestionBasedMNL.setUtilityScale(this.sampersLogitScale);
 		congestionBasedMNL.setCoefficient(0, 1.0);
 
 		final List<Double> activityModeOnlyUtilities = new ArrayList<>(TourSequence.Type.values().length);

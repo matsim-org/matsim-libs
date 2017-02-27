@@ -47,13 +47,15 @@ public class Main {
 	static final boolean usePTto1 = true; // true in base case
 	static final boolean usePTto2 = false; // false in base case
 
-	static final int outerIts = 10;
-	static final int popSize = 1000;
+	static final int outerIts = 20;
+	static final int popSize = 1000; // TODO!
 	static final double replanProba = 1.0;
 	static final String expectationFilePrefix = "./output/cba/toynet/expectation-before-it";
 	static final String experienceFilePrefix = "./output/cba/toynet/experience-after-it";
 	static final String demandStatsFilePrefix = "./output/cba/toynet/demandStats-in-it";
-
+	static final String populationLogFileName = "./output/cba/toynet/populationLog.txt";
+	static final String travelTimeLogFileName = "./output/cba/toynet/traveltimeLog.txt";
+	
 	static final int resampleCnt = 10000; // resample cnt 1 yields "plain
 											// sampers"; 10000 yields
 											// "corrected"
@@ -62,17 +64,13 @@ public class Main {
 	static final int maxTrials = 10;
 	static final int maxFailures = 3;
 
-	static final int ttAvgIts = 1;
+	static final int ttAvgIts = Integer.MAX_VALUE;
 
 	/*-
 	 * ============================================================ 
 	 *      DEMAND MODEL
 	 * ============================================================
 	 */
-
-	// private static AverageTravelTime avgTravelTimes = null;
-
-	private static AverageTravelTimeAcrossRuns avgTTsAcrossRuns = null;
 
 	private static void runDemandModel(final Scenario scenario, final int outerIt) {
 
@@ -85,8 +83,8 @@ public class Main {
 			carTravelTime = new FreeSpeedTravelTime();
 		} else {
 			if (avgTTsAcrossRuns == null) {
-				assert (outerIt != 2);
-				avgTTsAcrossRuns = new AverageTravelTimeAcrossRuns(Integer.MAX_VALUE);
+				assert (outerIt == 2);
+				avgTTsAcrossRuns = new AverageTravelTimeAcrossRuns(ttAvgIts, travelTimeLogFileName);
 			}
 			avgTTsAcrossRuns.addData(scenario);
 			carTravelTime = avgTTsAcrossRuns;
@@ -113,12 +111,11 @@ public class Main {
 
 		final SampersCarDelay sampersCarDelay = new SampersCarDelay(new TimeDiscretization(6 * 3600, 3600, 16),
 				carTravelTime, scenario.getNetwork());
-		// TimeDiscretizationFactory.newInstance(scenario.getConfig()),
-		// carTravelTime, scenario.getNetwork());
 
 		DemandModel.replanPopulation(resampleCnt, rnd, scenario, factory, outerIt == 1 ? 1.0 : replanProba,
 				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
-				maxFailures, usePTto1, usePTto2, mode2tt, betaTravelSampers_1_h, sampersCarDelay, sampersLogitScale);
+				maxFailures, usePTto1, usePTto2, mode2tt, betaTravelSampers_1_h, sampersCarDelay, sampersLogitScale,
+				populationAnalyzer);
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write("./input/cba/toynet/population.xml");
@@ -161,11 +158,17 @@ public class Main {
 	 * ============================================================
 	 */
 
+	private static AverageTravelTimeAcrossRuns avgTTsAcrossRuns = null;
+
+	private static PopulationAnalyzer populationAnalyzer = null;
+
 	public static void main(String[] args) {
 
 		System.out.println("STARTED");
 
 		final ExperiencedScoreAnalyzer experiencedScoreAnalyzer = new ExperiencedScoreAnalyzer();
+
+		populationAnalyzer = new PopulationAnalyzer(populationLogFileName);
 
 		for (int outerIt = 1; outerIt <= outerIts; outerIt++) {
 
@@ -191,6 +194,12 @@ public class Main {
 				config.getModule("plans").addParam("inputPlansFile", "population.xml");
 				final Scenario scenario = ScenarioUtils.loadScenario(config);
 				runSupplyModel(scenario, outerIt, experiencedScoreAnalyzer);
+
+				for (Person person : scenario.getPopulation().getPersons().values()) {
+					populationAnalyzer.registerExperiencedScore(person);
+				}
+				populationAnalyzer.dumpAnalysis();
+				populationAnalyzer.clear();
 			}
 
 			System.out.println("DONE");

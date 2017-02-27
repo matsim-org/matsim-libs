@@ -26,7 +26,7 @@ class PlanForResampling implements Alternative {
 
 	private final EpsilonDistribution epsDistr;
 
-	private double epsilonRealization = 0.0;
+	private Double epsilonRealization = null;
 
 	private Double matsimChoiceProba = null;
 

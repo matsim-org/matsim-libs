@@ -56,7 +56,8 @@ class DemandModel {
 			final Provider<TripRouter> tripRouterProvider, final double replanProba, final String expectationFileName,
 			final String demandStatsFileName, final int maxTrials, final int maxFailures, final boolean usePTto1,
 			final boolean usePTto2, final Map<String, TravelTime> mode2travelTime, final double betaTravelSampers_1_h,
-			final SampersCarDelay sampersCarDelay, final double sampersLogitScale) {
+			final SampersCarDelay sampersCarDelay, final double sampersLogitScale,
+			final PopulationAnalyzer populationAnalyzer) {
 
 		final ChoiceModel choiceModel = new ChoiceModel(sampleCnt, rnd, scenario, tripRouterProvider, mode2travelTime,
 				maxTrials, maxFailures, usePTto1, usePTto2, betaTravelSampers_1_h, sampersCarDelay, sampersLogitScale);
@@ -139,62 +140,13 @@ class DemandModel {
 			plan.setScore(planForResampling.getSampersOnlyScore() + planForResampling.getSampersEpsilonRealization()
 					+ planForResampling.getMATSimTimeScore());
 			person.setSelectedPlan(plan);
+			populationAnalyzer.registerChosenPlan(planForResampling);
 
 			expectationWriter.println(person.getId() + "\t" + planForResampling.getSampersTimeScore() + "\t"
 					+ planForResampling.getMATSimTimeScore());
 
 			demandAnalyzer.registerChoice(planForResampling);
 		}
-
-		// for (Person person : scenario.getPopulation().getPersons().values())
-		// {
-		// if (Math.random() < replanProba) {
-		//
-		// final Set<PlanForResampling> chosenPlans =
-		// choiceModel.choosePlans(person);
-		// coverageStats.add(((double) chosenPlans.size()) / ((double)
-		// TourSequence.Type.values().length));
-		//
-		// final Sampers2MATSimResampler resampler = new
-		// Sampers2MATSimResampler(rnd, chosenPlans, sampleCnt);
-		// final PlanForResampling planForResampling =
-		// (PlanForResampling) resampler.next();
-		//
-		// final List<Double> probabilities = new
-		// ArrayList<>(chosenPlans.size());
-		// Integer choiceIndex = null;
-		// int i = 0;
-		// for (PlanForResampling planAlternativeForResampling :
-		// chosenPlans) {
-		// probabilities.add(planAlternativeForResampling.getMATSimChoiceProba());
-		// if (planForResampling == planAlternativeForResampling) {
-		// assert (choiceIndex == null);
-		// choiceIndex = i;
-		// }
-		// i++;
-		// }
-		// System.out.println("CHOICE: " + choiceIndex + ", PROBAS: " +
-		// probabilities);
-		// resamplingTest.registerChoiceAndDistribution(choiceIndex,
-		// probabilities);
-		//
-		// final Plan plan = planForResampling.plan;
-		// person.getPlans().clear();
-		// person.setSelectedPlan(null);
-		// person.addPlan(plan);
-		// plan.setPerson(person);
-		// plan.setScore(planForResampling.getSampersOnlyScore() +
-		// planForResampling.getSampersEpsilonRealization()
-		// + planForResampling.getMATSimTimeScore());
-		// person.setSelectedPlan(plan);
-		//
-		// expectationWriter.println(person.getId() + "\t" +
-		// planForResampling.getSampersTimeScore() + "\t"
-		// + planForResampling.getMATSimTimeScore());
-		//
-		// demandAnalyzer.registerChoice(planForResampling);
-		// }
-		// }
 
 		expectationWriter.flush();
 		expectationWriter.close();
