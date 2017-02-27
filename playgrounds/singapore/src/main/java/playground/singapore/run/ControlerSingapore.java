@@ -3,34 +3,18 @@ package playground.singapore.run;
 import com.google.inject.Provider;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 
+import org.matsim.pt.router.TransitRouter;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
-import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
-import playground.singapore.transitLocationChoice.TransitLocationChoiceStrategy;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /*import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
@@ -70,9 +54,14 @@ public class ControlerSingapore {
         logger.warn("About to init StopStopTimeCalculator...");
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
-        logger.warn("About to init TransitRouterWSImplFactory...");
-        controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
-        //services.setTransitRouterFactory(new TransitRouterEventsWSFactory(services.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+		logger.warn("About to init TransitRouterWSImplFactory...");
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+			}
+		});
+		//services.setTransitRouterFactory(new TransitRouterEventsWSFactory(services.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		//services.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(services.getConfig().planCalcScore(), services.getScenario()));
 		// comment: I would argue that when you add waitTime/stopTime to the router, you also need to adapt the scoring function accordingly.
 		// kai, sep'13
