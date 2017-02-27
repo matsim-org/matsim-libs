@@ -220,8 +220,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		//this check can be moved to 'addFromWait'
-		//it is a double check, and makes only sense to protect against calling addToBuffer without calling
-		//hasFlowCapacityLeft() first. This only could happen for addFromWait()
+		//it is a double check, and makes only sense to protect against calling addToBuffer() without calling
+		//hasFlowCapacityLeft() first. This only could happen for addFromWait(), because it can be called from outside
 	    if (flowcap_accumulate.getValue() > 0.0  || veh.getVehicle().getType().getPcuEquivalents() < PCU_THRESHOLD_FOR_FLOW_CAP_EASING) {
 			flowcap_accumulate.addValue(-veh.getFlowCapacityConsumptionInEquivalents(), now);
 		} else {
