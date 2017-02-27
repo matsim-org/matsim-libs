@@ -206,6 +206,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	 final void addFromWait(final QVehicle veh) {
+		//To protect against calling addToBuffer() without calling hasFlowCapacityLeft() first.
+		//This only could happen for addFromWait(), because it can be called from outside QueueWithBuffer
+		if (flowcap_accumulate.getValue() <= 0.0 && veh.getVehicle().getType().getPcuEquivalents() > context.qsimConfig
+				.getPcuThresholdForFlowCapacityEasing()) {
+			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
+		}
+		
 		addToBuffer(veh);
 	}
 
@@ -214,16 +221,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// kai/mz/amit, mar'12
 		
 		double now = context.getSimTimer().getTimeOfDay() ;
-		
-		//this check can be moved to 'addFromWait'
-		//it is a double check, and makes only sense to protect against calling addToBuffer() without calling
-		//hasFlowCapacityLeft() first. This only could happen for addFromWait(), because it can be called from outside
-		if (flowcap_accumulate.getValue() > 0.0 || veh.getVehicle().getType().getPcuEquivalents() <= context.qsimConfig
-				.getPcuThresholdForFlowCapacityEasing()) {
-			flowcap_accumulate.addValue(-veh.getFlowCapacityConsumptionInEquivalents(), now);
-		} else {
-			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
-		}
+		flowcap_accumulate.addValue(-veh.getFlowCapacityConsumptionInEquivalents(), now);
 		
 		buffer.add(veh);
 		if (buffer.size() == 1) {
