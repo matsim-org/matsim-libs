@@ -166,7 +166,15 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                 int sizeL = destinationLinks.get(virtualNode).size();
                 if (sizeL > sizeV)
                     throw new RuntimeException("rebalancing inconsistent " + sizeL + " > " + sizeV);
+                long outTotal = rebalanceCount.entrySet()
+                        .stream()
+                        .filter(e->e.getKey().getFrom().equals(virtualNode))
+                        .mapToInt(e->e.getValue()).sum();
+                GlobalAssert.that(outTotal == sizeL);
             }
+
+
+
 
             // fill request destinations
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
