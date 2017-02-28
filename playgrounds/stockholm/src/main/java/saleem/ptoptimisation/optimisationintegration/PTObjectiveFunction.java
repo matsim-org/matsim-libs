@@ -45,6 +45,9 @@ public class PTObjectiveFunction implements ObjectiveFunction {
 		result /= ptstate.getPersonIdView().size();
 		if(added>0){
 			for(int i=0; i<added; i++){
+				/*0.00045 is 4500 SEK per day divided by entire population of Stockholm, 4500 calculated by keeping cost of bus, 
+				 * maintenance cost, parking cost, driver salaries, fuel cost etc. in mind.
+				 */
 				result = result + 0.00045;//Added vehicles have an adverse effect on total neg score
 			}
 		}
