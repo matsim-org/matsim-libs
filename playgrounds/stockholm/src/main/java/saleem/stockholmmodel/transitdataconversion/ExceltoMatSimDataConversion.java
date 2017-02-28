@@ -9,6 +9,13 @@ package saleem.stockholmmodel.transitdataconversion;
 public class ExceltoMatSimDataConversion {
 	public static void main(String[] args){
 		//It may take a few minutes, so please be patient...
+		/*
+		 * Add the following at the very start of transit schedule if there are SAX parsing errors while running the simulation.
+		 
+		  <?xml version="1.0" encoding="UTF-8"?>
+		  <!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+ 
+		 */
 		ExcelReportsReader ex = new ExcelReportsReader();
 		TransitSchedule transit = new TransitSchedule();
 		ex.readExcelReportStopStallen(transit, "H:\\Matsim\\Reports\\Stoppstallen.xls" );
