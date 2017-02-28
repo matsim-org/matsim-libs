@@ -25,9 +25,11 @@ import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVUtils;
+import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
@@ -56,6 +58,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
     public LPFeedbackLIPDispatcher( //
                                     AVDispatcherConfig config, //
+                                    AVGeneratorConfig generatorConfig, //
                                     TravelTime travelTime, //
                                     ParallelLeastCostPathCalculator router, //
                                     EventsManager eventsManager, //
@@ -76,18 +79,13 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         travelTimes = travelTimesIn;
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         this.initiateLP();
-        numberOfAVs = 2500;//Integer.parseInt(config.getParams().get("numberOfVehicles"));
+        numberOfAVs = (int) generatorConfig.getNumberOfVehicles();//Integer.parseInt(config.getParams().get("numberOfVehicles"));
         REBALANCING_PERIOD = Integer.parseInt(config.getParams().get("rebalancingPeriod"));//5*60;//Integer.parseInt(config.getParams().get("rebalancingPeriod"));
     }
 
 
     @Override
     public void redispatch(double now) {
-        // DEBUGGING:
-
-
-
-
         // A: outside rebalancing periods, permanently assign vehicles to requests if they have arrived at a customer
         //    i.e. stay on the same link
         total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
@@ -441,7 +439,7 @@ public static class Factory implements AVDispatcherFactory {
     public static Map<VirtualLink, Double> travelTimes;
 
     @Override
-    public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+    public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
         AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
         AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
@@ -455,6 +453,7 @@ public static class Factory implements AVDispatcherFactory {
 
         return new LPFeedbackLIPDispatcher(
                 config,
+                generatorConfig,
                 travelTime,
                 router,
                 eventsManager,

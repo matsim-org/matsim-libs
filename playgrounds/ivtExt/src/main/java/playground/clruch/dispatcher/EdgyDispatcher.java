@@ -21,8 +21,10 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
+import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
@@ -134,7 +136,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             return new EdgyDispatcher( //
                     config, travelTime, router, eventsManager, network);
         }

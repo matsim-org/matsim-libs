@@ -13,6 +13,7 @@ import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -22,7 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class HungarianDispatcher extends UniversalDispatcher {
-    private static final int DISPATCH_PERIOD = 30;
+    private final int DISPATCH_PERIOD;
 
     final Network network; // <- for verifying link references
     final Collection<Link> linkReferences; // <- for verifying link references
@@ -39,6 +40,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
+        DISPATCH_PERIOD = Integer.parseInt(avDispatcherConfig.getParams().get("dispatchPeriod"));
     }
 
     /**
@@ -111,7 +113,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             return new HungarianDispatcher( //
                     config, travelTime, router, eventsManager, network);
         }

@@ -21,6 +21,7 @@ import com.google.inject.name.Names;
 
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 import playground.sebhoerl.avtaxi.data.AVData;
 import playground.sebhoerl.avtaxi.data.AVOperator;
@@ -84,6 +85,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
 
         for (AVOperatorConfig oc : config.getOperatorConfigs()) {
             AVDispatcherConfig dc = oc.getDispatcherConfig();
+            AVGeneratorConfig gc = oc.getGeneratorConfig();
             String strategy = dc.getStrategyName();
 
             if (!factories.containsKey(strategy)) {
@@ -91,7 +93,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
             }
 
             AVDispatcher.AVDispatcherFactory factory = factories.get(strategy);
-            AVDispatcher dispatcher = factory.createDispatcher(dc);
+            AVDispatcher dispatcher = factory.createDispatcher(dc,gc);
 
             for (AVVehicle vehicle : vehicles.get(oc.getId())) {
                 dispatcher.registerVehicle(vehicle);
