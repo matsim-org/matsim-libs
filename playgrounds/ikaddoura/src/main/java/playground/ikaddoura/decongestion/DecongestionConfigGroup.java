@@ -27,16 +27,11 @@ package playground.ikaddoura.decongestion;
 
 public class DecongestionConfigGroup {
 	
-	// No pricing
-//	private TollingApproach TOLLING_APPROACH = TollingApproach.NoPricing;
-
 	// BangBang approach
-//	private TollingApproach TOLLING_APPROACH = TollingApproach.BangBang;
 	private double INITIAL_TOLL = 10.0;
 	private double TOLL_ADJUSTMENT = 1.0; // default: 0.1
 
 	// PID approach
-	private TollingApproach TOLLING_APPROACH = TollingApproach.PID;
 	private double TOLL_BLEND_FACTOR = 1.0; // default: 1.0
 	private boolean msa = false;
 	private double Kp = 1.0;
@@ -51,10 +46,6 @@ public class DecongestionConfigGroup {
 	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0; // set to 1.0 to account for rounding errors
 	private double FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = 0.1; // set above 0.0 to disable pricing in the previous iterations
 	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0; // set below 1.0 to disable price adjustment for final iterations
-	
-	public enum TollingApproach {
-        NoPricing, BangBang, PID
-	}
 	
 	// ######################################################################################
 	
@@ -102,16 +93,9 @@ public class DecongestionConfigGroup {
 		return FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT;
 	}
 
-	public TollingApproach getTOLLING_APPROACH() {
-		return TOLLING_APPROACH;
-	}
 
 	public double getTOLL_BLEND_FACTOR() {
 		return TOLL_BLEND_FACTOR;
-	}
-
-	public void setTOLLING_APPROACH(TollingApproach tOLLING_APPROACH) {
-		TOLLING_APPROACH = tOLLING_APPROACH;
 	}
 
 	public void setTOLL_ADJUSTMENT(double tOLL_ADJUSTMENT) {
@@ -158,7 +142,7 @@ public class DecongestionConfigGroup {
 	@Override
 	public String toString() {
 		return "DecongestionConfigGroup [INITIAL_TOLL=" + INITIAL_TOLL + ", TOLL_ADJUSTMENT=" + TOLL_ADJUSTMENT
-				+ ", TOLLING_APPROACH=" + TOLLING_APPROACH + ", TOLL_BLEND_FACTOR=" + TOLL_BLEND_FACTOR + ", Kp=" + Kp
+				+ ", TOLL_BLEND_FACTOR=" + TOLL_BLEND_FACTOR + ", Kp=" + Kp
 				+ ", Ki=" + Ki + ", Kd=" + Kd + ", UPDATE_PRICE_INTERVAL=" + UPDATE_PRICE_INTERVAL
 				+ ", WRITE_OUTPUT_ITERATION=" + WRITE_OUTPUT_ITERATION + ", TOLERATED_AVERAGE_DELAY_SEC="
 				+ TOLERATED_AVERAGE_DELAY_SEC + ", FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT="

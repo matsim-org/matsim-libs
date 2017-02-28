@@ -22,33 +22,47 @@
  */
 package playground.ikaddoura.optAV;
 
-import org.junit.*;
-import org.matsim.api.core.v01.*;
-import org.matsim.contrib.av.robotaxi.scoring.*;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
+import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.noise.*;
+import org.matsim.contrib.noise.NoiseCalculationOnline;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
-import org.matsim.contrib.taxi.run.*;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
+import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
+import org.matsim.contrib.taxi.run.TaxiOutputModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
-import playground.ikaddoura.decongestion.*;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.*;
-import playground.ikaddoura.decongestion.tollSetting.*;
-import playground.ikaddoura.moneyTravelDisutility.*;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
+import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
+import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
  * @author ikaddoura
@@ -90,6 +104,12 @@ public class OptAVTestIT {
 		Scenario scenario1 = ScenarioUtils.loadScenario(config1);
 		Controler controler1 = new Controler(scenario1);
 		
+		// noise analysis
+		
+		NoiseContext noiseContext1 = new NoiseContext(controler1.getScenario());
+		noiseContext1.getNoiseParams().setInternalizeNoiseDamages(false);
+		controler1.addControlerListener(new NoiseCalculationOnline(noiseContext1));
+		
 		// taxi
 
 		FleetImpl fleet = new FleetImpl();
@@ -117,6 +137,8 @@ public class OptAVTestIT {
 				
 		// analysis
 		
+		controler1.addOverridingModule(new PersonTripAnalysisModule());
+		
 		if (otfvis) controler1.addOverridingModule(new OTFVisLiveModule());	
 		
 		LinkDemandEventHandler handler1 = new LinkDemandEventHandler(controler1.getScenario().getNetwork());
@@ -127,23 +149,6 @@ public class OptAVTestIT {
 		
         controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         controler1.run();
-		
-		String outputDirectory = controler1.getConfig().controler().getOutputDirectory();
-		if (!outputDirectory.endsWith("/")) {
-			outputDirectory = outputDirectory + "/";
-		}
-
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler1.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-
-		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario1, outputDirectory);
-		noiseCalculation.run();	
-		
-		String outputFilePath = outputDirectory + "noise-analysis_it." + scenario1.getConfig().controler().getLastIteration() + "/";
-		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
-		process.run();
-		
-		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler1.getConfig().controler().getOutputDirectory(), outputFilePath + controler1.getConfig().controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		analysis1.run();
 		
 		// ##################################################################
 		// noise pricing
@@ -191,7 +196,8 @@ public class OptAVTestIT {
 			public void install() {
 												
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
-				
+				this.bind(AgentFilter.class).to(AVAgentFilter.class);
+
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
@@ -200,29 +206,23 @@ public class OptAVTestIT {
 		
 		// noise pricing
 		
-		NoiseContext noiseContext = new NoiseContext(controler2.getScenario());
-		controler2.addControlerListener(new NoiseCalculationOnline(noiseContext));
+		NoiseContext noiseContext2 = new NoiseContext(controler2.getScenario());
+		controler2.addControlerListener(new NoiseCalculationOnline(noiseContext2));
 		
 		// analysis
+		        
+		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
+		
+		controler2.addOverridingModule(new PersonTripAnalysisModule());
 		
 		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
 		controler2.getEvents().addHandler(handler2);
 		controler2.getConfig().controler().setCreateGraphs(false);
-        
-		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
 		
 		// run
         controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler2.run();
 		
-		String outputDirectory2 = controler2.getConfig().controler().getOutputDirectory();
-		if (!outputDirectory2.endsWith("/")) {
-			outputDirectory2 = outputDirectory2 + "/";
-		}
-
-		PersonTripNoiseAnalysisRun analysis2 = new PersonTripNoiseAnalysisRun(controler2.getConfig().controler().getOutputDirectory());
-		analysis2.run();
-
 		// print outs
 					
 		System.out.println("----------------------------------");
@@ -289,12 +289,13 @@ public class OptAVTestIT {
 		controler1.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				// travel disutility factory for DVRP
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory1);
 			}
 		}); 
 		
 		// analysis
+		
+		controler1.addOverridingModule(new PersonTripAnalysisModule());
 		
 		if (otfvis) controler1.addOverridingModule(new OTFVisLiveModule());	
 		
@@ -306,9 +307,6 @@ public class OptAVTestIT {
 		
         controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler1.run();
-				
-		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler1.getConfig().controler().getOutputDirectory());
-		analysis1.run();
 		
 		// ##################################################################
 		// congestion pricing
@@ -339,7 +337,6 @@ public class OptAVTestIT {
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKp(999.);
-		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
@@ -347,26 +344,24 @@ public class OptAVTestIT {
 		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 		
 		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
 		
 		controler2.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
 				this.bind(DecongestionInfo.class).toInstance(info);
-				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
 				
+				this.bind(AgentFilter.class).to(AVAgentFilter.class);
+				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);			
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
 
 				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
-				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
 								
 				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
-				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);				
 
 			}
 		});
@@ -394,10 +389,9 @@ public class OptAVTestIT {
 			@Override
 			public void install() {
 												
-				// travel disutility factory for DVRP
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory2);
 
-//				this.bind(AgentFilter.class).to(AVAgentFilter.class); // TODO: add once person is not null
+				this.bind(AgentFilter.class).to(AVAgentFilter.class);
 				
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
@@ -407,23 +401,17 @@ public class OptAVTestIT {
 		
 		// analysis
 		
+		controler2.addOverridingModule(new PersonTripAnalysisModule());
+
+		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
+
 		LinkDemandEventHandler handler2 = new LinkDemandEventHandler(controler2.getScenario().getNetwork());
 		controler2.getEvents().addHandler(handler2);
 		controler2.getConfig().controler().setCreateGraphs(false);
-        
-		if (otfvis) controler2.addOverridingModule(new OTFVisLiveModule());
-		
+        		
 		// run
         controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler2.run();
-		
-		String outputDirectory2 = controler2.getConfig().controler().getOutputDirectory();
-		if (!outputDirectory2.endsWith("/")) {
-			outputDirectory2 = outputDirectory2 + "/";
-		}
-
-		PersonTripNoiseAnalysisRun analysis2 = new PersonTripNoiseAnalysisRun(controler2.getConfig().controler().getOutputDirectory());
-		analysis2.run();
 
 		// print outs
 					

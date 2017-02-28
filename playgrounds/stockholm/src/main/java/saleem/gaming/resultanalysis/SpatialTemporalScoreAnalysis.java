@@ -16,7 +16,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-
+/**
+ * A class to calculate accessibility measure for gaming scenarios, 
+ * based on average all day utility of travellers performing an activity in,
+ * or travelling through a certain area, with in a certain time window, using a certain mode.
+ * 
+ * @author Mohammad Saleem
+ */
 public class SpatialTemporalScoreAnalysis {
 	
 	
@@ -44,7 +50,9 @@ public class SpatialTemporalScoreAnalysis {
 		return scenario;
 	}
 	
-	//Calculate score of people with in the area of focus, in the considered time, using a given mode and returns a tuple (number of relevant people, score)
+	/* Calculate score of people with in the area of focus, in the considered time, 
+	 * using a given mode and returns a tuple (number of relevant people, score)
+	 */
 	public String calculateScore(String mode, Coord origin, double gridsize, double fromtime, double totime){ 
 		Set<Person> relevantpersons = getRelevantPersons(mode, origin, gridsize, fromtime, totime);
 		double score = getScoreOfRelevantPersons(relevantpersons);
@@ -77,15 +85,14 @@ public class SpatialTemporalScoreAnalysis {
 	}
 	
 	public static void main(String[] args){
-		/*
-		  Mode can be "car", "pt" or "both"
-		  If changing scenario, change plans file, events file and cordinates where to check score (if needed); you will need to re-instantiate the stsanalyser object.
-		  Scenario is changed when you need to switch from Max PT to Min PT, or you want to change population i.e. employed to unemployed or unemployed to mixed etc., 
-		  or you want to increase population elsewhere i,e. check for population increase in Arstafaltet instead of Alvsjo. If you change PT measure, also change config file accordingly
-		  between Max and Min accordingly.  
-		  If only checking score at a different time or place or for different mode but within existing scenario, you won't need to re-instantiate the stsanalyser object,
-		  just call the calculateScore() function with changed coordinates, mode and/or starting and end time.
-		  Default scenario is Farsta Centrum, Max PT measure, Employed Population, PT mode, Morning Peak Hour (06:00 to 09:00)
+		/* Mode can be "car", "pt" or "both"
+		   If changing scenario, change plans file, events file and cordinates where to check score (if needed); you will need to re-instantiate the stsanalyser object.
+		   Scenario is changed when you need to switch from Max PT to Min PT, or you want to change population i.e. employed to unemployed or unemployed to mixed etc., 
+		   or you want to increase population elsewhere i,e. check for population increase in Arstafaltet instead of Alvsjo. If you change PT measure, also change config file accordingly
+		   between Max and Min accordingly.  
+		   If only checking score at a different time or place or for different mode but within existing scenario, you won't need to re-instantiate the stsanalyser object,
+		   just call the calculateScore() function with changed coordinates, mode and/or starting and end time.
+		   Default scenario is Farsta Centrum, Max PT measure, Employed Population, PT mode, Morning Peak Hour (06:00 to 09:00)
 		 */
 		SpatialTemporalScoreAnalysis stsanalyser = new SpatialTemporalScoreAnalysis("C:\\Jayanth\\FarstaCentrum\\configFarstaCentrumMax.xml", "C:\\Jayanth\\FarstaCentrum\\employedmax\\1000.plans.xml.gz", 
 				"C:\\Jayanth\\FarstaCentrum\\employedmax\\1000.events.xml.gz");

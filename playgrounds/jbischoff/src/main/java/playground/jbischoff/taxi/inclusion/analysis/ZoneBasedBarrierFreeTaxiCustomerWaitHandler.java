@@ -162,7 +162,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 					bw.write(e.getKey()+";");
 					double allTrips = 0.;
 					double allWait = 0.;
-					for (int i = 6; i<24; i++){
+					for (int i = 4; i<24; i++){
 						double waitTime = waitTimes[i];
 						int trips = e.getValue()[i];
 						double averageWaitTime = waitTime/trips;

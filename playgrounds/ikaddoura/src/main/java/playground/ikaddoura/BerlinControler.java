@@ -39,10 +39,16 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
-import playground.ikaddoura.decongestion.Decongestion;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
+import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -167,7 +173,6 @@ public class BerlinControler {
 			log.info("Kp: " + kp);
 			
 			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 			decongestionSettings.setKp(kp);
 			decongestionSettings.setKi(0.);
 			decongestionSettings.setKd(0.);
@@ -183,9 +188,42 @@ public class BerlinControler {
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			
 			final DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-			final Decongestion decongestion = new Decongestion(controler, info);
-			decongestion.setSigma(sigma);
-			controler = decongestion.getControler();
+			
+			// congestion toll computation
+			
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					
+					this.bind(DecongestionInfo.class).toInstance(info);
+					
+					this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
+					this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+					
+					this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+					this.bind(DelayAnalysis.class).asEagerSingleton();
+					this.bind(PersonVehicleTracker.class).asEagerSingleton();
+									
+					this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+					this.addEventHandlerBinding().to(DelayAnalysis.class);
+					this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+					
+					this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+				}
+			});
+			
+			// toll-adjusted routing
+			
+			final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
+			travelDisutilityFactory.setSigma(this.sigma);
+			
+			controler.addOverridingModule(new AbstractModule(){
+				@Override
+				public void install() {
+					this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+				}
+			});	
 				
 		} else if (pricingApproach.toString().equals(PricingApproach.QBPV3.toString())) {
 			

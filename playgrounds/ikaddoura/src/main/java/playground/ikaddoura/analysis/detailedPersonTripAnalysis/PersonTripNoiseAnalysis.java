@@ -427,7 +427,10 @@ public class PersonTripNoiseAnalysis {
 			bw.write("travel related user benefits (sample size) (including toll payments) [monetary units];" + userBenefits);
 			bw.newLine();
 			
-			bw.write("toll revenues (sample size) [monetary units];" + tollPayments);
+			bw.write("revenues (sample size) (tolls/fares payed by private car users or passengers) [monetary units];" + tollPayments);
+			bw.newLine();
+			
+			bw.write("total payments (sample size) (including pt and taxi drivers) [monetary units];" + basicHandler.getTotalPayments());
 			bw.newLine();
 			
 			double welfare = tollPayments + userBenefits - affectedNoiseCost;

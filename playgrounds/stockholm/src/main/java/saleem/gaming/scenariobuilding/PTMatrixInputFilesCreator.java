@@ -20,7 +20,9 @@ import saleem.stockholmmodel.modelbuilding.PTCapacityAdjusmentPerSample;
 
 
 /**
- * @author dziemke
+ * A class to create input files for ThreadedMatrixCreator class.
+ * 
+ * @author dziemke, Mohammad Saleem
  */
 public class PTMatrixInputFilesCreator {
 	private static final Logger log = Logger.getLogger(PTMatrixInputFilesCreator.class);
@@ -47,7 +49,7 @@ public class PTMatrixInputFilesCreator {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
 
-		//		controler.addControlerListener(new FareControlListener());
+//		controler.addControlerListener(new FareControlListener());
 //		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 //			@Inject CharyparNagelScoringParametersForPerson parameters;
 //			@Override

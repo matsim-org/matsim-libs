@@ -19,31 +19,48 @@
 
 package playground.ikaddoura.optAV;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.av.robotaxi.scoring.*;
+import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
+import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.noise.*;
+import org.matsim.contrib.noise.NoiseCalculationOnline;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.utils.*;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
+import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
-import org.matsim.contrib.taxi.run.*;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
+import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
+import org.matsim.contrib.taxi.run.TaxiOutputModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripNoiseAnalysisRun;
-import playground.ikaddoura.decongestion.*;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.*;
-import playground.ikaddoura.decongestion.tollSetting.*;
-import playground.ikaddoura.moneyTravelDisutility.*;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
+import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
+import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
 
 /**
 * @author ikaddoura
@@ -54,11 +71,11 @@ public class RunBerlinMinExtCostAV {
 	private static final Logger log = Logger.getLogger(RunBerlinMinExtCostAV.class);
 
 	private static String configFile;
-	private static String outputDirectory;
-	
+	private static String outputDirectory;	
 	private static double kP;	
 	private static boolean internalizeNoise;
-	
+	private static boolean agentBasedActivityScheduling;
+
 	private static boolean otfvis;
 	
 	public static void main(String[] args) {
@@ -73,14 +90,20 @@ public class RunBerlinMinExtCostAV {
 			kP = Double.parseDouble(args[2]);
 			log.info("kP: "+ kP);
 			
-			internalizeNoise = Boolean.getBoolean(args[3]);
+			internalizeNoise = Boolean.parseBoolean(args[3]);
 			log.info("internalizeNoise: "+ internalizeNoise);
+			
+			agentBasedActivityScheduling = Boolean.parseBoolean(args[4]);
+			log.info("agentBasedActivityScheduling: "+ agentBasedActivityScheduling);
 			
 			otfvis = false;
 			
 		} else {
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
+			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct.xml";
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/minExtCostAV/";
+			kP = 2 * 12./3600.;
+			internalizeNoise = false;
+			agentBasedActivityScheduling = false;
 			otfvis = false;
 		}
 		
@@ -108,8 +131,10 @@ public class RunBerlinMinExtCostAV {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
-		AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-		controler = aa.prepareControler(false);
+		if (agentBasedActivityScheduling) {
+			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
+			controler = aa.prepareControler(false);
+		}
 				
 		// #############################
 		// noise pricing
@@ -118,8 +143,19 @@ public class RunBerlinMinExtCostAV {
 		if (internalizeNoise) {
 			NoiseConfigGroup noiseParams = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 			noiseParams.setInternalizeNoiseDamages(true);
-			log.info(noiseParams.toString());
 			
+			if (agentBasedActivityScheduling) {
+				List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<>();
+				for (ActivityParams params : controler.getConfig().planCalcScore().getActivityParams()) {
+					if (!params.getActivityType().contains("interaction")) {
+						consideredActivitiesForSpatialFunctionality.add(params.getActivityType());
+					}
+				}
+				String[] consideredActivitiesForSpatialFunctionalityArray = new String[consideredActivitiesForSpatialFunctionality.size()];
+				noiseParams.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForSpatialFunctionality.toArray(consideredActivitiesForSpatialFunctionalityArray));
+			}
+			
+			log.info(noiseParams.toString());
 			controler.addControlerListener(new NoiseCalculationOnline(new NoiseContext(controler.getScenario())));
 		}
 		
@@ -128,8 +164,7 @@ public class RunBerlinMinExtCostAV {
 		// #############################
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-		decongestionSettings.setKp(2 * 12./3600.);
+		decongestionSettings.setKp(kP);
 		decongestionSettings.setKi(0.);
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setMsa(true);
@@ -137,27 +172,26 @@ public class RunBerlinMinExtCostAV {
 		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 		
 		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-		DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
 				this.bind(DecongestionInfo.class).toInstance(info);
-				this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
-
-				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
-
-				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
-				this.bind(DelayAnalysis.class).asEagerSingleton();
-				this.bind(PersonVehicleTracker.class).asEagerSingleton();
-								
-				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
-				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
+				
+//				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
+//				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
+//				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
+				
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+				
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();								
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
 				
 				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
 			}
 		});
 		
@@ -177,21 +211,32 @@ public class RunBerlinMinExtCostAV {
 		controler.addOverridingModule(new TaxiOutputModule());
         controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
+        // #############################
+        // travel disutility
+        // #############################
+
 		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(null);
 
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 												
-				// travel disutility factory for DVRP
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 				
+//				this.bind(AgentFilter.class).to(AVAgentFilter.class);
+
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
 			}
 		}); 
 
+		// #############################
+		// welfare analysis
+		// #############################
+		
+		controler.addOverridingModule(new PersonTripAnalysisModule());
+		
 		// #############################
 		// run
 		// #############################
@@ -201,7 +246,7 @@ public class RunBerlinMinExtCostAV {
 		controler.run();
 		
 		// #############################
-		// analysis
+		// post processing
 		// #############################
 		
 		if (internalizeNoise) {
@@ -224,9 +269,6 @@ public class RunBerlinMinExtCostAV {
 			merger.setLabel(labels);
 			merger.run();	
 		}
-		
-		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
-		analysis1.run();
 	}
 }
 

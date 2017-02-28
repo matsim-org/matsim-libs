@@ -42,7 +42,7 @@ abstract class QLaneI implements Identifiable<Lane> {
 	
 	abstract void addFromWait( final QVehicle veh);
 
-	abstract boolean isAcceptingFromWait();
+	abstract boolean isAcceptingFromWait(QVehicle veh);
 
 	abstract boolean isActive();
 

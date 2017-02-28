@@ -25,6 +25,7 @@ package org.matsim.contrib.matsim4urbansim.config;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
@@ -68,12 +69,12 @@ public class M4UConfigUtils {
 		// add accessibility parameter
 		AccessibilityConfigGroup acm = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		
-		acm.setCellSizeCellBasedAccessibility( matsim4urbansimConfigPart1.getCellSize().intValue() );
+		acm.setCellSizeCellBasedAccessibility( matsim4urbansimConfigPart1.getCellSize().longValue() );
 		
 		// by shape file
 		if(matsim4urbansimConfigPart1.isAccessibilityComputationAreaFromShapeFile()){
 			
-			acm.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromShapeFile.toString());
+			acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile);
 
 			if(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile()  != null &&
 			  (new File(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile().getInputFile())).exists())
@@ -85,7 +86,7 @@ public class M4UConfigUtils {
 		// by bounding box
 		if(matsim4urbansimConfigPart1.isAccessibilityComputationAreaFromBoundingBox()){
 			
-			acm.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromBoundingBox.toString());
+			acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
 			
 			acm.setBoundingBoxBottom(matsim4urbansimConfigPart1.getBoundingBoxBottom()) ;
 			acm.setBoundingBoxTop(matsim4urbansimConfigPart1.getBoundingBoxTop()) ;
@@ -95,7 +96,7 @@ public class M4UConfigUtils {
 		// by network
 		if(matsim4urbansimConfigPart1.isAccessibilityComputationAreaFromNetwork()){
 			
-			acm.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromNetwork.toString());
+			acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromNetwork);
 		}
 	}
 	

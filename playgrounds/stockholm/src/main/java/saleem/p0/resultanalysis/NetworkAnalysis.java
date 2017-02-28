@@ -31,7 +31,12 @@ import org.matsim.core.utils.charts.XYLineChart;
 
 import saleem.p0.stockholm.StockholmP0Helper;
 import saleem.stockholmmodel.utils.CollectionUtil;
-
+/**
+ * A class to analyse network effects due to P0.
+ * Covers a varied set of statistics for comparison with the fixed time policy.
+ * 
+ * @author Mohammad Saleem
+ */
 public class NetworkAnalysis {
 	public static void main(String[] args){
 		NetworkAnalysis analyser = new NetworkAnalysis();

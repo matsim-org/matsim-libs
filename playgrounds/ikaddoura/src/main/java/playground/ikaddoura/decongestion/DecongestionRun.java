@@ -31,13 +31,20 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisRun;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 
 /**
  * Starts an interval-based decongestion pricing simulation run.
@@ -101,35 +108,28 @@ public class DecongestionRun {
 				"_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() +
 				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() +
 				"_timeMutationWeight" + weight +
-				"_timeMutationRange" + config.timeAllocationMutator().getMutationRange() +
-				"_" + decongestionSettings.getTOLLING_APPROACH();
+				"_timeMutationRange" + config.timeAllocationMutator().getMutationRange();
 		
-		if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.NoPricing.toString())) {
-			// no relevant parameters
-		
-		} else {
-			
-			outputDirectory = outputDirectory
+		// General pricing settings
+		outputDirectory = outputDirectory
 					+ "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() + "_it"
 					+ "_toleratedDelay" + decongestionSettings.getTOLERATED_AVERAGE_DELAY_SEC()
 					+ "_start" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT()
 					+ "_end" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT();
+		
+		// BangBang
+//		outputDirectory = outputDirectory + 
+//						"_init" + decongestionSettings.getINITIAL_TOLL() +
+//						"_adj" + decongestionSettings.getTOLL_ADJUSTMENT();
 			
-			if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.BangBang.toString())) {			
-				outputDirectory = outputDirectory + 
-						"_init" + decongestionSettings.getINITIAL_TOLL() +
-						"_adj" + decongestionSettings.getTOLL_ADJUSTMENT();
-			
-			} else if (decongestionSettings.getTOLLING_APPROACH().toString().equals(TollingApproach.PID.toString())) {
-				outputDirectory = outputDirectory +
+		// PID
+		outputDirectory = outputDirectory +
 						"_Kp" + decongestionSettings.getKp() +
 						"_Ki" + decongestionSettings.getKi() +
 						"_Kd" + decongestionSettings.getKd() +
 						"_tollMSA" + decongestionSettings.isMsa() + 
 						"_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR();
-			}
-		}
-			
+					
 		log.info("Output directory: " + outputDirectory);
 		
 		config.controler().setOutputDirectory(outputDirectory + "/");
@@ -137,11 +137,49 @@ public class DecongestionRun {
 		Controler controler = new Controler(scenario);
 
 		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-		Decongestion decongestion = new Decongestion(controler, info);
-		controler = decongestion.getControler();
 		
+		// #############################################################
+		
+		// congestion toll computation
+		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				
+				this.bind(DecongestionInfo.class).toInstance(info);
+				
+				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				
+				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+			}
+		});
+		
+		// toll-adjusted routing
+		
+		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
+		travelDisutilityFactory.setSigma(0.);
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+			}
+		});	
+		
+		// #############################################################
+	
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        controler.run(); 
+        controler.run();
         
         PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(outputDirectory);
 		analysis.run();

@@ -40,13 +40,13 @@ public class TimeProfileCollector
         String[] getHeader();
 
 
-        String[] calcValues();
+        Object[] calcValues();
     }
 
 
     private final ProfileCalculator calculator;
     private final List<Double> times = new ArrayList<>();
-    private final List<String[]> timeProfile = new ArrayList<>();
+    private final List<Object[]> timeProfile = new ArrayList<>();
     private final int interval;
     private final String outputFile;
     private final MatsimServices matsimServices;
@@ -98,7 +98,8 @@ public class TimeProfileCollector
                 IOUtils.getBufferedWriter(file + ".txt"))) {
             writer.writeNext("time", calculator.getHeader());
             for (int i = 0; i < timeProfile.size(); i++) {
-                writer.writeNext(Time.writeTime(times.get(i), timeFormat), timeProfile.get(i));
+                writer.writeNext(Time.writeTime(times.get(i), timeFormat), //
+                		TimeProfiles.combineValuesIntoStrings(timeProfile.get(i)));
             }
         }
 

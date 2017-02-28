@@ -4,6 +4,7 @@ package saleem.stockholmmodel.transitdataconversion;
  * Execution class to convert Excel reports of transit data into MatSim forms. 
  * VehicleTypes.xls, Stoppstallen.xls and all transit schedule excel reports are required.
  *
+ * @author Mohammad Saleem
  */
 public class ExceltoMatSimDataConversion {
 	public static void main(String[] args){

@@ -8,7 +8,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
- * @author dziemke
+ * A class to write CSV files.
+ * 
  */
 public final class CSVFileWriter {
 	private static final Logger log = Logger.getLogger(CSVFileWriter.class);

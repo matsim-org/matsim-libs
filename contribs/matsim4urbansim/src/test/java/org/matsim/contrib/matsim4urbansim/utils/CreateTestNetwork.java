@@ -52,7 +52,8 @@ public class CreateTestNetwork {
 	 * 
 	 * @return the created test network
 	 */
-	public static Network createTestNetwork() {
+	private static Network createTestNetwork() {
+		// yyyy nowhere used.  kai, feb'17
 
 		/*
 		 * (2)		(5)------(8)
@@ -190,7 +191,8 @@ public class CreateTestNetwork {
 	 *  
 	 * @return the location of the written csv file
 	 */
-	public static String createTestPtStationCSVFile(){
+	private static String createTestPtStationCSVFile(){
+		// yyyy nowhere used.  kai, feb'17
 		
 		/*
 		 * (2)	    (5)------(8)

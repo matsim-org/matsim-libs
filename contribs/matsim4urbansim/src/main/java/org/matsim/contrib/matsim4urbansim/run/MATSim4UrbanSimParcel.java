@@ -375,7 +375,8 @@ class MATSim4UrbanSimParcel{
 				}
 
 				if(computeZoneBasedAccessibilities){
-					// creates zone based table of log sums
+					// yy the following should better use AccessibilityModule().  kai, feb'17
+
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject private Map<String,TravelTime> travelTimes ;
 						@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
@@ -404,7 +405,7 @@ class MATSim4UrbanSimParcel{
 									Gbl.assertNotNull(travelDisutilityFactory);
 									calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
 									break; }
-								case pt:
+								case matrixBasedPt:
 									if ( ptMatrix != null ) {
 										calc = PtMatrixAccessibilityUtils.createPtMatrixAccessibilityCalculator(ptMatrix, config) ;
 									} else {
@@ -414,10 +415,14 @@ class MATSim4UrbanSimParcel{
 								case walk:
 									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 									break;
+									//$CASES-OMITTED$
 								default:
-									throw new RuntimeException("not implemented") ;
+									log.warn("Accessibility computation not implemented for mode=" + mode + ". Since this is matsim4urbansim, which is deprecated, we will continue anyways.") ;
+									calc=null ;
 								}
-								accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								if ( calc != null ) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								}
 							}
 
 							final UrbanSimParameterConfigModuleV3 urbanSimConfig = ConfigUtils.addOrGetModule( getConfig(), UrbanSimParameterConfigModuleV3.class);
@@ -441,6 +446,8 @@ class MATSim4UrbanSimParcel{
 				}
 
 				if(computeGridBasedAccessibility){
+					// yy the following should better use AccessibilityModule().  kai, feb'17
+
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject private Map<String,TravelTime> travelTimes ;
 						@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
@@ -503,9 +510,12 @@ class MATSim4UrbanSimParcel{
 									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 									break;
 								default:
-									throw new RuntimeException("not implemented") ;
+									log.warn("Accessibility computation not implemented for mode=" + mode + ". Since this is matsim4urbansim, which is deprecated, we will continue anyways.") ;
+									calc=null ;
 								}
-								accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								if ( calc != null ) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								}
 							}
 							
 							final GridBasedAccessibilityShutdownListenerV3 gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, boundingBox, cellSize_m);

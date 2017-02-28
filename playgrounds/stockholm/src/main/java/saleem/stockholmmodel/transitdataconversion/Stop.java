@@ -1,7 +1,10 @@
 package saleem.stockholmmodel.transitdataconversion;
 
-/** A PT stop object used in converting Excel based Stop data into MatSim based transit schedule 
+/** 
+ * A PT stop object used in converting Excel based Stop data into MatSim based transit schedule 
  * data structure, consisting of neccessary information about stops.
+ * 
+ * @author Mohammad Saleem
  */
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

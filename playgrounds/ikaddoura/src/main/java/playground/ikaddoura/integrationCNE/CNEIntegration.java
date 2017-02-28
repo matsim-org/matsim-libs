@@ -43,7 +43,6 @@ import playground.agarwalamit.utils.PersonFilter;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
@@ -216,7 +215,6 @@ public class CNEIntegration {
 			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
 			
 				final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-				decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
 				decongestionSettings.setKp(kP);
 				decongestionSettings.setKi(0.);
 				decongestionSettings.setKd(0.);
@@ -225,15 +223,14 @@ public class CNEIntegration {
 				decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 				
 				DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-				DecongestionTollingPID tollSetting = new DecongestionTollingPID(info);
 				
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
 						
 						this.bind(DecongestionInfo.class).toInstance(info);
-						this.bind(DecongestionTollSetting.class).toInstance(tollSetting);
 						
+						this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 						this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
 
 						this.bind(IntervalBasedTollingAll.class).asEagerSingleton();

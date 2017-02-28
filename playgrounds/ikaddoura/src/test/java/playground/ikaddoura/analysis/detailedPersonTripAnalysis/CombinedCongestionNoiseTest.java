@@ -115,9 +115,11 @@ public class CombinedCongestionNoiseTest {
 	
 	public CongestionAndNoiseHandler analyseScenario(String eventsFile, Scenario scenario) {
 
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(scenario);
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();
+		basicHandler.setScenario(scenario);
 		CongestionAnalysisHandler congestionHandler = new CongestionAnalysisHandler(basicHandler);
-		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler(basicHandler);
+		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler();
+		noiseHandler.setBasicHandler(basicHandler);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);

@@ -74,7 +74,7 @@ class SampersCarDelay {
 		this.type2delay_h.put(TourSequence.Type.work_pt_other2_car, other2_h);
 	}
 
-	double getDelay_h(TourSequence seq) {
+	synchronized double getDelay_h(TourSequence seq) {
 		return this.type2delay_h.get(seq.type);
 	}
 

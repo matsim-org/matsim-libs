@@ -5,8 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Transit Schedule data structure used for writing Excel based transit data 
- * into MatSim form. One could also use the built in MatSIm Transit Schedule.
+ * This class represents a Transit Schedule data structure used for writing Excel based transit data 
+ * into MatSim form. One could also use the built in MatSim Transit Schedule.
+ * 
+ * @author Mohammad Saleem
  */
 
 public class TransitSchedule {

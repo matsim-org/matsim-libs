@@ -17,7 +17,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
+/**
+ * A class for collecting link data for visualizing congestioin benefits of P0
+ * 
+ * @author Mohammad Saleem
+ */
 public class P0Visualisation {
 	public static void main(String[] args){
 		P0Visualisation visualiser = new P0Visualisation();

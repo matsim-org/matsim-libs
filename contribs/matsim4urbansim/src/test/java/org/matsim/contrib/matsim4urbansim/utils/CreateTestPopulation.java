@@ -33,7 +33,8 @@ public class CreateTestPopulation {
 	 * @param nPersons the number of persons created for the population
 	 * @return test population
 	 */
-	public static Population createTestPopulation(int nPersons){
+	private static Population createTestPopulation(int nPersons){
+		// yyyy nowhere used. kai, feb'17
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
@@ -77,7 +78,8 @@ public class CreateTestPopulation {
 	 * @param workCoord coordinate for ALL work activities
 	 * @return
 	 */
-	public static Population createTestPtPopulation(int nPersons, Coord homeCoord, Coord workCoord){
+	private static Population createTestPtPopulation(int nPersons, Coord homeCoord, Coord workCoord){
+		// yyyy nowhere used.  kai, feb'17
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();

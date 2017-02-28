@@ -15,7 +15,12 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import saleem.stockholmmodel.utils.StockholmTransformationFactory;
 
-//This class writes loaded (translated from excel reports) transit schedule and vehicles into TransitSchedule.xml and Vehicles.xml file.
+/** 
+ * A class to write loaded (translated from excel reports) transit schedule and vehicles 
+ * into TransitSchedule.xml and Vehicles.xml file.
+ * 
+ * @author Mohammad Saleem
+ */
 public class XMLWriter {
 	//To convert from WGS84 into SWEREF99, as recommended in Matsim specifications to avoid using spherical coordinates. 
 	private CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_SWEREF99);

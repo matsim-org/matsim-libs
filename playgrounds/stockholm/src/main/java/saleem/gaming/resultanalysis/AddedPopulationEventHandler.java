@@ -16,7 +16,12 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
-
+/**
+ * A event handling class to help in doing basic plausibility check over the executed gaming simulation scenarios, 
+ * before the results were provided to ProtoWorld to be used in interactive gaming.
+ * 
+ * @author Mohammad Saleem
+ */
 public class AddedPopulationEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, TransitDriverStartsEventHandler, PersonStuckEventHandler{
 	private Set<Id<Person>> transitDrivers = new HashSet<>();
 	private Map<Id<Person>, Double> times = new HashMap<>();
@@ -41,7 +46,9 @@ public class AddedPopulationEventHandler implements PersonDepartureEventHandler,
 		// TODO Auto-generated method stub
 		
 	}
-	//event.getPersonId().toString().contains("a") is to ensure considering added population only, has to be removed if want to consider everyone.
+	/* event.getPersonId().toString().contains("a") is to ensure considering added population only, 
+	 * has to be removed if want to consider everyone.(non-Javadoc)
+	 */
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		if(!transitDrivers.contains(event.getPersonId())){//Transit drivers are ignored as they are not passengers

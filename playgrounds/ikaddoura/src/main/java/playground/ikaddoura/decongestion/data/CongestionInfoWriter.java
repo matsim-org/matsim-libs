@@ -209,7 +209,7 @@ public class CongestionInfoWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
-			bw.write("Iteration ; Total delay [hours] ; Total toll payments [monetary units] ; Total travel time [hours]; Total user benefits [monetary units]; System welfare [monetary units]");
+			bw.write("Iteration ; Total delay [hours] ; Total congestion toll payments [monetary units] ; Total travel time [hours]; Total user benefits [monetary units]; System welfare (only considering congestion toll revenues, other revenues are neglected [monetary units]");
 			bw.newLine();
 			
 			for (Integer iteration : iteration2totalDelay.keySet()) {

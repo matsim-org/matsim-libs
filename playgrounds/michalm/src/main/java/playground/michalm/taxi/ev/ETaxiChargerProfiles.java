@@ -32,7 +32,7 @@ public class ETaxiChargerProfiles
         String[] header = { "plugged", "queued", "assigned" };
         return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
-            public String[] calcValues()
+            public Integer[] calcValues()
             {
                 int plugged = 0;
                 int queued = 0;
@@ -44,7 +44,7 @@ public class ETaxiChargerProfiles
                     assigned += logic.getAssignedCount();
                 }
 
-                return new String[] { plugged + "", queued + "", assigned + "" };
+                return new Integer[] { plugged , queued , assigned };
             }
         };
     }

@@ -2,6 +2,8 @@ package saleem.stockholmmodel.transitdataconversion;
 
 /**
  * Class representing a vehicle type within transit schedule
+ * 
+ * @author Mohammad Saleem
  */
 public class VehicleType {
 	private String id;

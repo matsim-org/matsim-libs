@@ -19,6 +19,7 @@
 
 package playground.ikaddoura.moneyTravelDisutility;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -116,7 +117,11 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 			if (timeBin != null) {
 
 				if(this.vehicleFilter != null) {
-					String agentType = vehicleFilter.getAgentTypeFromId(person.getId());
+					Id<Person> personId = null;
+					if (person != null) {
+						personId = person.getId();
+					}
+					String agentType = vehicleFilter.getAgentTypeFromId(personId);
 					Double avgMoneyAmountVehicleType = timeBin.getAgentTypeId2avgAmount().get(agentType);
 					
 					if (avgMoneyAmountVehicleType != null && avgMoneyAmountVehicleType != 0.) {

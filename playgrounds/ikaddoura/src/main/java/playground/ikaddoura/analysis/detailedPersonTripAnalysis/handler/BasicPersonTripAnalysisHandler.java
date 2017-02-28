@@ -55,6 +55,8 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.inject.Inject;
+
 /**
  * 
  * @author ikaddoura , lkroeger
@@ -66,7 +68,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	
 	private final static Logger log = Logger.getLogger(BasicPersonTripAnalysisHandler.class);
 	
-	private final Scenario scenario;
+	@Inject
+	private Scenario scenario;
 	
 	// temporary information
 	private final Map<Id<Person>,Integer> personId2currentTripNumber = new HashMap<>();
@@ -77,7 +80,6 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 	private final Set<Id<Person>> ptDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> ptVehicles = new HashSet<>();
-
 	private final Set<Id<Person>> taxiDrivers = new HashSet<Id<Person>>();
 
 	// analysis information to be stored
@@ -99,8 +101,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private int warnCnt0 = 0;
 	private int warnCnt1 = 0;
 	private int warnCnt2 = 0;
-
-	public BasicPersonTripAnalysisHandler(Scenario scenario) {
+	
+	public void setScenario(Scenario scenario) {
 		this.scenario = scenario;
 	}
 
@@ -564,6 +566,14 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		return totalPayments;
 	}
 	
+	public double getTotalPaymentsByPersons() {
+		double totalPaymentsByPersons = 0.;
+		for (Id<Person> id : this.personId2totalpayments.keySet()) {
+			totalPaymentsByPersons += this.personId2totalpayments.get(id);
+		}
+		return totalPaymentsByPersons;
+	}
+	
 	public Set<Id<Person>> getTaxiDrivers() {
 		return taxiDrivers;
 	}
@@ -586,6 +596,16 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2inVehicleTime() {
 		return personId2tripNumber2inVehicleTime;
+	}
+
+	public Double getTotalTravelTimeByPersons() {
+		double totalTravelTimeByPersons = 0.;
+		for (Id<Person> id : this.personId2tripNumber2travelTime.keySet()) {
+			for (Integer tripNr : this.personId2tripNumber2travelTime.get(id).keySet()) {
+				totalTravelTimeByPersons += this.personId2tripNumber2travelTime.get(id).get(tripNr);
+			}
+		}
+		return totalTravelTimeByPersons;
 	}
 	
 }

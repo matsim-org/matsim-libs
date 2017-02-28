@@ -10,7 +10,12 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.geometry.transformations.WGS84toAtlantis;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03Plus;
-
+/**
+ * A factory to instantiate a specific coordinate transformation.
+ *
+ * @author Mohammad Saleem
+ *
+ */
 public class StockholmTransformationFactory extends TransformationFactory{
 	public final static String WGS84_RT90 = "WGS84toRT90";
 	public final static String WGS84_SWEREF99 = "WGS84toSWEREF99";

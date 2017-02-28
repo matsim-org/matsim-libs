@@ -243,8 +243,10 @@ public class NoiseAnalysisTest {
 	
 	public NoiseAnalysisHandler analyseScenario(String eventsFile, Scenario scenario) {
 
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(scenario);
-		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler(basicHandler);	
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();
+		basicHandler.setScenario(scenario);
+		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler();
+		noiseHandler.setBasicHandler(basicHandler);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);

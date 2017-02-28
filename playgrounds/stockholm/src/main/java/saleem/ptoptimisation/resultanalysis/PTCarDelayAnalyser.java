@@ -32,16 +32,16 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.vehicles.Vehicle;
 
 /**
+ * This class is for result analysis, primarily PT traveler delay calculation (waiting times) at PT stops
  * 
  * @author Mohammad Saleem
- *
  */
 
 public class PTCarDelayAnalyser implements BasicEventHandler, AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
 PersonStuckEventHandler{ 
 
 	private int totalStuck = 0; int hourlystopexits = 0;
-	double time=-3600, entrytimes=0, exittimes=0; //Required for calculation of delay and plotting
+	private double time=-3600, entrytimes=0, exittimes=0; //Required for calculation of delay and plotting
 
 	private Set<Id<Person>> transitDrivers = new HashSet<>();
 	private Set<Id<Vehicle>> transitVehicles = new HashSet<>();
@@ -66,21 +66,21 @@ PersonStuckEventHandler{
 		}else{
 			this.transitVehicles.clear();
 		}
-//		if(this.times==null) {
-//			this.times = new ArrayList<Double>();
-//		}else{
-//			this.times.clear();
-//		}
-//		if(this.delays==null) {
-//			this.delays = new ArrayList<Double>();
-//		}else{
-//			this.delays.clear();
-//		}
-//		if(this.personStopEntryTimes==null) {
-//			this.personStopEntryTimes = new HashMap<>();
-//		}else{
-//			this.personStopEntryTimes.clear();
-//		}
+		if(this.times==null) {
+			this.times = new ArrayList<Double>();
+		}else{
+			this.times.clear();
+		}
+		if(this.delays==null) {
+			this.delays = new ArrayList<Double>();
+		}else{
+			this.delays.clear();
+		}
+		if(this.personStopEntryTimes==null) {
+			this.personStopEntryTimes = new HashMap<>();
+		}else{
+			this.personStopEntryTimes.clear();
+		}
 	}
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -91,14 +91,14 @@ PersonStuckEventHandler{
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
-			return; 
-			// ignore transit drivers or persons entering non-transit vehicles
+			return; // ignore transit drivers or persons entering non-transit vehicles
 		}
 		this.registerEntry(personStopEntryTimes.get(event.getPersonId()));
-		this.registerExit(event.getTime());
-		this.personStopEntryTimes.remove(event.getPersonId());
+		this.registerExit(event.getTime());//Extract arrival time at PT stop. 
+		this.personStopEntryTimes.remove(event.getPersonId());//Register his exiting time from PT stop. Delay is: stop exit time - stop entry time
 	}
 	// TODO Auto-generated method stub
+	//Register arrival time at PT stop
 	@Override
 	public void handleEvent(AgentWaitingForPtEvent event) {
 		this.personStopEntryTimes.put(event.getPersonId(), event.getTime());// Register person against the stop
@@ -110,19 +110,19 @@ PersonStuckEventHandler{
 	}
 	@Override
 	public void handleEvent(Event event) {
-		if(event.getTime()-time>=3600) {
-//			System.out.println(event.getTime());
+		if(event.getTime()-time>=3600) {//Average delay stats over hourly bins
 			if(hourlystopexits==0)hourlystopexits=1;
 			delays.add((exittimes-entrytimes)/hourlystopexits);
-			times.add((double)Math.round(event.getTime()/3600));
+			times.add((double)Math.round(event.getTime()/3600));//Counting in hours
 			exittimes=0;entrytimes=0;hourlystopexits=0;
-			time=(double)Math.round(event.getTime()/3600)*3600;
+			time=(double)Math.round(event.getTime()/3600)*3600;//Current time
 		}
 	}
+	//A traveler entering a PT stop and starting waiting
 	public void registerEntry(double time){
 		entrytimes = entrytimes + time;
 	}
-	
+	//A traveler exiting a PT stop (boarding a vehicle) and stopping to wait
 	public void registerExit(double time){
 		exittimes = exittimes + time;
 		hourlystopexits+=1;
@@ -130,6 +130,7 @@ PersonStuckEventHandler{
 	public int getTotalStuckOutsideStops() {
 		return this.totalStuck;
 	}
+	//Load a scenario to analyse
 	public PTCarDelayAnalyser loadScenario(String configfile, String eventspath){
 		Config config = ConfigUtils.loadConfig(configfile);
 	    final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -141,6 +142,7 @@ PersonStuckEventHandler{
 		reader.readFile(eventspath);
 		return delayhandler;
 	}
+	//Write delay stats to path file
 	public void writeStatistics(String stats, String path){
 		try { 
 			File file=new File(path);
@@ -152,6 +154,7 @@ PersonStuckEventHandler{
 	        //catch logic here
 	    }
 	}
+	//Change ArrayList to String form
 	public String getDelayStatsAsString(){
 		String stats="";
 		Iterator<Double> hoursiterator = this.times.iterator();

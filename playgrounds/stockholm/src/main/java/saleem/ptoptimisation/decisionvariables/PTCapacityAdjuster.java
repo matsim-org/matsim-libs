@@ -12,8 +12,16 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-
+/**
+ * A class for adjusting capacity of vehicles, such that big vehicles serve peak hours and small vehicles serve off-peak hours.
+ * 
+ * @author Mohammad Saleem
+ *
+ */
 public class PTCapacityAdjuster {
+	/*This function adjusts capacity of vehicles, such that big vehicles serve peak hours 
+	 * and small vehicles serve off-peak hours. Note that SBUS, LBUS, STRAIN, LTRAIN, STRAM, LTRAM etc. must be defined in Vehicles.xml file.
+	 */
 	public void adjustCapacity(Vehicles vehicles, TransitSchedule schedule, double factorline, double factorroute){
 		Iterator<TransitLine> lines = schedule.getTransitLines().values().iterator();
 		Map<Id<Vehicle>, Vehicle> vehicleinstances = vehicles.getVehicles();
@@ -31,8 +39,10 @@ public class PTCapacityAdjuster {
 							Departure departure = departures.next();
 							if(inPeakHour(departure.getDepartureTime())){
 								Vehicle veh = vehicleinstances.get(departure.getVehicleId());
-								if(!veh.getType().getId().toString().startsWith("L") && !veh.getType().getId().toString().startsWith("S")){//If capacity not already decreased/increased
-									VehicleType vtype = vehicles.getVehicleTypes().get(Id.create("L"+veh.getType().getId().toString(), VehicleType.class));
+								if(!veh.getType().getId().toString().startsWith("L") && 
+										!veh.getType().getId().toString().startsWith("S")){//If capacity not already decreased/increased
+									VehicleType vtype = vehicles.getVehicleTypes().get(Id.create("L"+veh.getType().
+											getId().toString(), VehicleType.class));//Increase capacity
 									if(vtype!=null){
 										vehicles.removeVehicle(veh.getId());
 										veh = new VehicleImpl(veh.getId(), vtype);
@@ -43,8 +53,10 @@ public class PTCapacityAdjuster {
 								
 							}else{
 								Vehicle veh = vehicleinstances.get(departure.getVehicleId());
-								if(!veh.getType().getId().toString().startsWith("S") && !veh.getType().getId().toString().startsWith("L")){
-									VehicleType vtype = vehicles.getVehicleTypes().get(Id.create("S"+veh.getType().getId().toString(), VehicleType.class));
+								if(!veh.getType().getId().toString().startsWith("S") && 
+										!veh.getType().getId().toString().startsWith("L")){//If capacity not already decreased/increased
+									VehicleType vtype = vehicles.getVehicleTypes().get(Id.create("S"+veh.getType().
+											getId().toString(), VehicleType.class));//Decrease capacity
 									if(vtype!=null){
 										vehicles.removeVehicle(veh.getId());
 										veh = new VehicleImpl(veh.getId(), vtype);
@@ -60,6 +72,7 @@ public class PTCapacityAdjuster {
 			}
 		}
 	}
+	//Is the departure in morning or evening Peak hour??
 	public boolean inPeakHour(double time){
 		return (time>=25200 && time<=34200) || (time>=57600 && time<=66600);
 	}

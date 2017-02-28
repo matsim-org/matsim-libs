@@ -19,11 +19,13 @@
 
 package playground.ikaddoura.decongestion.handler;
 
+import org.matsim.core.events.handler.EventHandler;
+
 /**
 * @author ikaddoura
 */
 
-public interface IntervalBasedTolling {
+public interface IntervalBasedTolling extends EventHandler{
 
 	public double getTotalTollPayments();
 

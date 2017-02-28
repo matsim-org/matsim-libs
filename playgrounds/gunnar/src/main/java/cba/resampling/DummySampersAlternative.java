@@ -59,4 +59,16 @@ class DummySampersAlternative implements Alternative {
 		return this.epsilonDistribution;
 	}
 
+	@Override
+	public double getSampersEpsilonRealization() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setSampersEpsilonRealization(double eps) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

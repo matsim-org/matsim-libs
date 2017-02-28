@@ -17,13 +17,17 @@ import org.matsim.vehicles.VehicleType;
 
 import saleem.ptoptimisation.decisionvariables.TransitScheduleAdapter;
 
+/**
+ * Execution class for StockholmPTCar model. Before running the simulation, the main function reads the Config file, 
+ * gets the storage capacity factor to calculate the sample size, and then sets the sitting capacity, 
+ * standing capacity and passenger car equivalents of the vehicle types based on the sample size. 
+ * This is neccessary if a smaller than 100% demand sample is executed, in the same way as setting storage capacity and 
+ * flow capacity (in the Config file) of the network links.
+ * 
+ * @author Mohammad Saleem
+ */
 public class StockholmScenarioSimulation {
 public static void main(String[] args) {
-	
-/*	Execution class for StockholmPTCar model. Before running the simulation, this function reads the Config file, gets the storage capacity factor to calculate the sample size, and then sets the sitting capacity, 
- * standing capacity and passenger car equivalents of the vehicle types based on the sample size. This is done to balance out the effect of setting storage capacity 
- * factor and flow capacity factor (in the Config file) on the PT links.
-*/
 	
 	String path = "./ihop2/matsim-input/configoptimisationcarpt.xml";
 	

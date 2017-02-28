@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
@@ -25,6 +25,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.vehicles.Vehicle;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.crowding.events.CrowdedPenaltyEvent;
@@ -144,7 +145,12 @@ public class ChoiceGenerationWithCrowdingControler implements BeforeMobsimListen
 
 		log.warn("About to init TransitRouterEventsHeteroWSFactory...");
 		if (controler.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostType").equals("homo")) {
-			controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+				}
+			});
 		} else {
 			controler.addOverridingModule(new TransitRouterEventsAndHeterogeneityBasedWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		}

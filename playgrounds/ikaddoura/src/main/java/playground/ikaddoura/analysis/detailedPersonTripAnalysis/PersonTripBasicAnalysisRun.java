@@ -123,7 +123,9 @@ public class PersonTripBasicAnalysisRun {
 		
 		// standard events analysis
 		
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(scenario);	
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();
+		basicHandler.setScenario(scenario);
+
 		VTTSHandler vttsHandler = new VTTSHandler(scenario);
 		
 		EventsManager events = EventsUtils.createEventsManager();

@@ -69,10 +69,13 @@ public class PersonTripAnalysisTest {
 		
 		// standard events analysis
 	
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(scenario);	
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();
+		basicHandler.setScenario(scenario);
+
 		VTTSHandler vttsHandler = new VTTSHandler(scenario);
 		CongestionAnalysisHandler congestionHandler = new CongestionAnalysisHandler(basicHandler);
-		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler(basicHandler);
+		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler();
+		noiseHandler.setBasicHandler(basicHandler);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);

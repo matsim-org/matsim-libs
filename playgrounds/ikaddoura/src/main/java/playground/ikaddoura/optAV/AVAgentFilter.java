@@ -30,17 +30,23 @@ import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 public class AVAgentFilter implements AgentFilter {
 
-	private String[] vehicleTypeIdPrefixes = {"taxi", "rt"};
+//	private String[] vehicleTypeIdPrefixes = {"taxi", "rt"};
 
 	@Override
 	public String getAgentTypeFromId(Id<Person> id) {
 		
-		for (String prefix : vehicleTypeIdPrefixes) {
-			if (id.toString().startsWith(prefix)) {
-				return prefix;
-			}
+//		for (String prefix : vehicleTypeIdPrefixes) {
+//			if (id.toString().startsWith(prefix)) {
+//				return prefix;
+//			}
+//		}
+//		return "other";
+		
+		if (id == null) {
+			return "taxi";
+		} else {
+			return "ohter";
 		}
-		return "other";
 	}
 
 }

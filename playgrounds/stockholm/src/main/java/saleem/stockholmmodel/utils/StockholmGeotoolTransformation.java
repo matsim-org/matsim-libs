@@ -11,7 +11,12 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Point;
-
+/**
+ * A class to convert coordinates from one coordinate system to
+ * another one.
+ * 
+ * @author Mohammad Saleem
+ */
 public class StockholmGeotoolTransformation implements CoordinateTransformation{
 	private MathTransform transform;
 

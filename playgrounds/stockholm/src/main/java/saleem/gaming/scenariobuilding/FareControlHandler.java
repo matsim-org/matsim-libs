@@ -13,6 +13,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * A class to enforce PT fare
+ * 
+ * @author Mohammad Saleem
+ */
 public class FareControlHandler implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler{
 	private Set<Id<Person>>  transitDrivers = new HashSet<>();
 	private Set<Id<Vehicle>> transitVehicles = new HashSet<>();

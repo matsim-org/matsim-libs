@@ -67,10 +67,10 @@ public class RunTaxiEvaluation {
 		List<String> normalWaitTimes = new ArrayList<>();
 		List<String> barrierfreeWaitTimes = new ArrayList<>();
 		
-		for (int i = 50; i <= 1000; i = i + 50) {
+		for (int i = 50; i <= 500; i = i + 50) {
 			String runId = "taxis_" + i;
 			String dir = "D:/runs-svn/barrierFreeTaxi/1500_run_" + i + "/";
-			System.out.println("run " + runId);
+			System.out.println("pop " + runId);
 			ZoneBasedBarrierFreeTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandlerBF = new ZoneBasedBarrierFreeTaxiCustomerWaitHandler(
 					network, geo, true);
 			ZoneBasedBarrierFreeTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandlerNonBF = new ZoneBasedBarrierFreeTaxiCustomerWaitHandler(
@@ -84,9 +84,10 @@ public class RunTaxiEvaluation {
 			String eventsFile = dir + runId + ".output_events.xml.gz";
 
 			new MatsimEventsReader(events).readFile(eventsFile);
-			zoneBasedTaxiCustomerWaitHandlerBF.writeCustomerStats(dir);
-			zoneBasedTaxiCustomerWaitHandlerNonBF.writeCustomerStats(dir);
-			travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(dir);
+			String outDir = dir+runId;
+			zoneBasedTaxiCustomerWaitHandlerBF.writeCustomerStats(outDir);
+			zoneBasedTaxiCustomerWaitHandlerNonBF.writeCustomerStats(outDir);
+			travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(outDir);
 			normalWaitTimes.add(i + "\t" + zoneBasedTaxiCustomerWaitHandlerNonBF.getOverallAverageWaitTime());
 			barrierfreeWaitTimes.add(i + "\t" + zoneBasedTaxiCustomerWaitHandlerBF.getOverallAverageWaitTime());
 			

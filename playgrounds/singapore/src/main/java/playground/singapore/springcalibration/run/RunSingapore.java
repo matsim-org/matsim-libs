@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
@@ -24,8 +24,8 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.singapore.scoring.CharyparNagelOpenTimesActivityScoring;
 import playground.singapore.springcalibration.run.roadpricing.SubpopRoadPricingModule;
@@ -136,9 +136,13 @@ public class RunSingapore {
 				(int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
         log.info("About to init TransitRouterWSImplFactory...");
-        
-        controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
-        
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+			}
+		});
         // TODO: also take into account waiting times and stop times in scoring?!
 		// -----------------------------------------------------------------------------
 		
