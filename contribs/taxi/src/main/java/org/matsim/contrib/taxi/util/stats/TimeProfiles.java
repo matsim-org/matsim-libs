@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import java.util.*;
+
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.CSVLineBuilder;
 
@@ -43,19 +45,21 @@ public class TimeProfiles
 
 
             @Override
-            public String[] calcValues()
+            public Object[] calcValues()
             {
-                CSVLineBuilder builder = new CSVLineBuilder();
+            	List<Object> values = new ArrayList<>(header.length); 
                 for (ProfileCalculator pc : calculators) {
-                    builder.addAll(pc.calcValues());
+                	for (Object val : pc.calcValues()) {
+                		values.add(val);
+                	}
                 }
-                return builder.build();
+                return values.toArray();
             }
         };
     }
 
 
-    public static String[] combineValues(Object... values)
+    public static String[] combineValuesIntoStrings(Object... values)
     {
         String[] strings = new String[values.length];
         for (int i = 0; i < values.length; i++) {
@@ -85,13 +89,13 @@ public class TimeProfiles
 
 
         @Override
-        public String[] calcValues()
+        public Object[] calcValues()
         {
-            return new String[] { calcValue() };
+            return new Object[] { calcValue() };
         }
 
 
-        public abstract String calcValue();
+        public abstract Object calcValue();
     }
 
 

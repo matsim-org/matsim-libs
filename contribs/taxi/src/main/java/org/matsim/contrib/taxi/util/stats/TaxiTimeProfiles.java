@@ -39,10 +39,10 @@ public class TaxiTimeProfiles
     {
         return new TimeProfiles.SingleValueProfileCalculator("Idle") {
             @Override
-            public String calcValue()
+            public Integer calcValue()
             {
                 return Iterables.size(Iterables.filter(fleet.getVehicles().values(),
-                        TaxiSchedulerUtils.createIsIdle(scheduleInquiry))) + "";
+                        TaxiSchedulerUtils.createIsIdle(scheduleInquiry)));
             }
         };
     }
@@ -50,10 +50,10 @@ public class TaxiTimeProfiles
 
     public static ProfileCalculator createCurrentTaxiTaskOfTypeCounter(final Fleet fleet)
     {
-        String[] header = TimeProfiles.combineValues((Object[])TaxiTaskType.values());
+        String[] header = TimeProfiles.combineValuesIntoStrings((Object[])TaxiTaskType.values());
         return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
-            public String[] calcValues()
+            public Long[] calcValues()
             {
                 LongEnumAdder<TaxiTaskType> counter = new LongEnumAdder<>(TaxiTaskType.class);
 
@@ -64,9 +64,9 @@ public class TaxiTimeProfiles
                     }
                 }
 
-                String[] counts = new String[TaxiTaskType.values().length];
+                Long[] counts = new Long[TaxiTaskType.values().length];
                 for (TaxiTaskType e : TaxiTaskType.values()) {
-                    counts[e.ordinal()] = counter.getLong(e) + "";
+                    counts[e.ordinal()] = counter.getLong(e);
                 }
                 return counts;
             }
@@ -79,9 +79,9 @@ public class TaxiTimeProfiles
     {
         return new TimeProfiles.SingleValueProfileCalculator(requestStatus.name()) {
             @Override
-            public String calcValue()
+            public Integer calcValue()
             {
-                return TaxiRequests.countRequestsWithStatus(requests, requestStatus) + "";
+                return TaxiRequests.countRequestsWithStatus(requests, requestStatus);
             }
         };
     }

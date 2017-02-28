@@ -37,16 +37,16 @@ public class EvTimeProfiles
                 "0.9+" };
         return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
-            public String[] calcValues()
+            public Long[] calcValues()
             {
                 UniformHistogram histogram = new UniformHistogram(0.1, header.length);
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
                     histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
                 }
 
-                String[] values = new String[header.length];
+                Long[] values = new Long[header.length];
                 for (int b = 0; b < header.length; b++) {
-                    values[b] = histogram.getCount(b) + "";
+                    values[b] = histogram.getCount(b);
                 }
                 return values;
             }
@@ -58,13 +58,13 @@ public class EvTimeProfiles
     {
         return new TimeProfiles.SingleValueProfileCalculator("meanSOC") {
             @Override
-            public String calcValue()
+            public Double calcValue()
             {
                 Mean mean = new Mean();
                 for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
                     mean.increment(ev.getBattery().getSoc());
                 }
-                return String.format("%.3f", mean.getResult() / EvUnitConversions.J_PER_kWh);//print out in [kWh]
+                return mean.getResult() / EvUnitConversions.J_PER_kWh;// in [kWh]
             }
         };
     }
@@ -87,13 +87,12 @@ public class EvTimeProfiles
 
         return new TimeProfiles.MultiValueProfileCalculator(header) {
             @Override
-            public String[] calcValues()
+            public Double[] calcValues()
             {
-                String[] vals = new String[columns];
+            	Double[] vals = new Double[columns];
                 int col = 0;
                 for (ElectricVehicle ev : selectedEvs) {
-                    vals[col++] = String.format("%.3f",
-                            ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh);//print out in [kWh]
+                    vals[col++] = ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh;// in [kWh]
                 }
                 return vals;
             }

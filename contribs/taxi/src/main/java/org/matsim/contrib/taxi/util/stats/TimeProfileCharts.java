@@ -44,7 +44,7 @@ public class TimeProfileCharts
 
 
     public static JFreeChart chartProfile(String[] series, List<Double> times,
-            List<String[]> timeProfile, ChartType type)
+            List<Object[]> timeProfile, ChartType type)
     {
         DefaultTableXYDataset dataset = createXYDataset(series, times, timeProfile);
         JFreeChart chart;
@@ -84,7 +84,7 @@ public class TimeProfileCharts
 
 
     public static DefaultTableXYDataset createXYDataset(String[] series, List<Double> times,
-            List<String[]> timeProfile)
+            List<Object[]> timeProfile)
     {
         DefaultTableXYDataset dataset = new DefaultTableXYDataset();
         XYSeries[] seriesArray = new XYSeries[series.length];
@@ -93,10 +93,10 @@ public class TimeProfileCharts
         }
 
         for (int t = 0; t < timeProfile.size(); t++) {
-            String[] timePoint = timeProfile.get(t);
+            Object[] timePoint = timeProfile.get(t);
             double hour = times.get(t) / 3600;
             for (int s = 0; s < series.length; s++) {
-                seriesArray[s].add(hour, Double.parseDouble(timePoint[s]));
+                seriesArray[s].add(hour, Double.parseDouble(timePoint[s] + ""));
             }
         }
 
