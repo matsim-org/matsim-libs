@@ -33,7 +33,7 @@ public class TripAnalyzerV2Extended {
 	
 	/* Parameters */
 //	private static final String runId = "run_200";	// <----------
-	private static final String runId = "be_109";	// <----------
+	private static final String runId = "be_118";	// <----------
 	private static final String usedIteration = "300"; // most frequently used value: 150 // <----------
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
