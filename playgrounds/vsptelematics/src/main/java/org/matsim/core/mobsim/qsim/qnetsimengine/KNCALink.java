@@ -244,7 +244,7 @@ public class KNCALink {
 			@Override void addFromWait(QVehicle veh) {
 			}
 
-			@Override boolean isAcceptingFromWait() {
+			@Override boolean isAcceptingFromWait(QVehicle veh) {
 				return false ;
 			}
 

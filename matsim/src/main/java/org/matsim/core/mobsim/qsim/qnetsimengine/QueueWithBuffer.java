@@ -206,6 +206,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	 final void addFromWait(final QVehicle veh) {
+		//To protect against calling addToBuffer() without calling hasFlowCapacityLeft() first.
+		//This only could happen for addFromWait(), because it can be called from outside QueueWithBuffer
+		if (flowcap_accumulate.getValue() <= 0.0 && veh.getVehicle().getType().getPcuEquivalents() > context.qsimConfig
+				.getPcuThresholdForFlowCapacityEasing()) {
+			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
+		}
+		
 		addToBuffer(veh);
 	}
 
@@ -214,12 +221,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// kai/mz/amit, mar'12
 		
 		double now = context.getSimTimer().getTimeOfDay() ;
-		
-	    if (flowcap_accumulate.getValue() > 0.0  ) {
-			flowcap_accumulate.addValue(-veh.getFlowCapacityConsumptionInEquivalents(), now);
-		} else {
-			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
-		}
+		flowcap_accumulate.addValue(-veh.getFlowCapacityConsumptionInEquivalents(), now);
 		
 		buffer.add(veh);
 		if (buffer.size() == 1) {
@@ -234,16 +236,17 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	 final boolean isAcceptingFromWait() {
-		return this.hasFlowCapacityLeft() ;
+	 final boolean isAcceptingFromWait(QVehicle veh) {
+		return this.hasFlowCapacityLeft(veh) ;
 	}
 
-	private boolean hasFlowCapacityLeft() {
+	private boolean hasFlowCapacityLeft(QVehicle veh) {
         if(context.qsimConfig.isUsingFastCapacityUpdate() ){
             updateFastFlowAccumulation();
         }
         
-		return flowcap_accumulate.getValue() > 0.0;
+		return flowcap_accumulate.getValue() > 0.0 || veh.getVehicle().getType()
+				.getPcuEquivalents() <= context.qsimConfig.getPcuThresholdForFlowCapacityEasing();
 	}
 
 
@@ -427,7 +430,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			}
 			
 			/* is there still room left in the buffer? */
-			if (!hasFlowCapacityLeft() ) {
+			if (!hasFlowCapacityLeft(veh) ) {
 				return;
 			}
 
