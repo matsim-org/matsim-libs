@@ -71,7 +71,6 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
             int num_abortTrip = 0;
             int num_driveOrder = 0;
-            Collection<VehicleLinkPair> assignedVehicles = new LinkedList<>();
 
             { // see if any car is driving by a request. if so, then stay there to be matched!
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
@@ -84,7 +83,6 @@ public class HungarianDispatcher extends UniversalDispatcher {
                         if (!requestList.isEmpty()) {
                             requestList.remove(0);
                             setVehicleDiversion(vehicleLinkPair, link);
-                            assignedVehicles.add(vehicleLinkPair);
                             ++num_abortTrip;
                         }
                     }
@@ -97,12 +95,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
                 // only optimize over vehicles which are not reroutable
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
-                Collection<VehicleLinkPair> reRoutablevVehicles = new LinkedList<>();
-                for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-                    if (!assignedVehicles.contains(vehicleLinkPair)) {
-                        reRoutablevVehicles.add(vehicleLinkPair);
-                    }
-                }
+
 
                 // Save request in list which is neede for abstractVehicleDestMatcher
                 AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
@@ -113,8 +106,8 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
 
                 // find the Euclidean bipartite matching for all vehicles using the Hungarian method
-                System.out.println("optimizing over "+reRoutablevVehicles.size()+" vehicles and "+requestlocs.size() + " requests.");
-                Map<VehicleLinkPair, Link> hungarianmatches = abstractVehicleDestMatcher.match(reRoutablevVehicles, requestlocs);
+                System.out.println("optimizing over "+divertableVehicles.size()+" vehicles and "+requestlocs.size() + " requests.");
+                Map<VehicleLinkPair, Link> hungarianmatches = abstractVehicleDestMatcher.match(divertableVehicles, requestlocs);
 
                 // use the result to setVehicleDiversion
                 for (VehicleLinkPair vehicleLinkPair : hungarianmatches.keySet()) {
