@@ -21,13 +21,18 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         // since Collection::iterator does not make guarantees about the order
         List<VehicleLinkPair> ordered_vehicleLinkPairs = new ArrayList<>(vehicleLinkPairs);
         // ensure that the number of vehicles is the same as the number of
+        // TODO: this restriction was removed, check for compatibility in ConsensusDispatcher, ConsensusDispatcherDFRv20 and LPFeedbackLIPDispatcher
+        /*
         GlobalAssert.that(ordered_vehicleLinkPairs.size() == links.size());
+        */
 
         // cost of assigning vehicle i to dest j, i.e. distance from vehicle i to destination j
         final int n = ordered_vehicleLinkPairs.size();
-        GlobalAssert.that(0 < n);
-        
-        final double distancematrix[][] = new double[n][n];
+        final int m = links.size();
+        GlobalAssert.that(0 <= n);
+        GlobalAssert.that(0 <= m);
+
+        final double distancematrix[][] = new double[n][m];
 
         int i = -1;
         for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
@@ -48,15 +53,19 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         // vehicle at position i is assigned to destination matchinghungarianAlgorithm[j]
         int matchinghungarianAlgorithm[] = hungarianAlgorithm.execute(); // O(n^3)
 
-        // do the assignment according to the Hungarian algorithm
+        // do the assignment according to the Hungarian algorithm (only for the matched elements, otherwise keep current drive destination)
         Map<VehicleLinkPair, Link> map = new HashMap<>();
         i = -1;
         for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
             ++i;
-            map.put(vehicleLinkPair, (Link) links.get(matchinghungarianAlgorithm[i]));
+            if(matchinghungarianAlgorithm[i]>=0){
+                map.put(vehicleLinkPair, (Link) links.get(matchinghungarianAlgorithm[i]));
+            }
+            // TODO check if this makes sense or another link should be chosen if no matching takes place.
+            else{
+                map.put(vehicleLinkPair, (Link) vehicleLinkPair.getDivertableLocation());
+            }
         }
         return map;
-
-
     }
 }

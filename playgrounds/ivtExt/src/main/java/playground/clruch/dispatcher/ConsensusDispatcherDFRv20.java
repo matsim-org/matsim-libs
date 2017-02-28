@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
  */
 
 
-
 public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
     public static final int REBALANCING_PERIOD = 5 * 60; // TODO
     final AbstractVirtualNodeDest virtualNodeDest;
@@ -37,15 +36,15 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
 
 
     public ConsensusDispatcherDFRv20( //
-                                AVDispatcherConfig config, //
-                                TravelTime travelTime, //
-                                ParallelLeastCostPathCalculator router, //
-                                EventsManager eventsManager, //
-                                VirtualNetwork virtualNetwork, //
-                                AbstractVirtualNodeDest abstractVirtualNodeDest, //
-                                AbstractRequestSelector abstractRequestSelector, //
-                                AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-                                Map<VirtualLink, Double> linkWeightsIn
+                                      AVDispatcherConfig config, //
+                                      TravelTime travelTime, //
+                                      ParallelLeastCostPathCalculator router, //
+                                      EventsManager eventsManager, //
+                                      VirtualNetwork virtualNetwork, //
+                                      AbstractVirtualNodeDest abstractVirtualNodeDest, //
+                                      AbstractRequestSelector abstractRequestSelector, //
+                                      AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
+                                      Map<VirtualLink, Double> linkWeightsIn
     ) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         this.virtualNodeDest = abstractVirtualNodeDest;
@@ -71,7 +70,7 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
 
         // for available vhicles, perform a rebalancing computation after REBALANCING_PERIOD seconds.
         if (seconds % REBALANCING_PERIOD == 0) {
-            System.out.println("@"+seconds+" mr = " + total_matchedRequests);
+            System.out.println("@" + seconds + " mr = " + total_matchedRequests);
             // 0 get available vehicles and requests per virtual node
             // number of customers, where there has not yet been made a car2customer matching
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
@@ -193,19 +192,8 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
                         collection.stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
             }
 
-            // 2.4 fill extra destinations for left over vehicles
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
 
-
-                // number of vehicles that can be matched to requests
-                int size = availableVehicles.get(virtualNode).size() - destinationLinks.get(virtualNode).size(); //
-
-                // TODO maybe not final API; may cause excessive diving
-                List<Link> localTargets = virtualNodeDest.selectLinkSet(virtualNode, size);
-                destinationLinks.get(virtualNode).addAll(localTargets);
-            }
-
-            // 2.5 assign destinations to the available vehicles
+            // 2.4 assign destinations to the available vehicles
             {
                 GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
                 GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
@@ -216,9 +204,11 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
                             .match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode)) //
                             .entrySet().stream().forEach(this::setVehicleDiversion);
                 long dur = System.nanoTime() - tic;
-                // System.out.println("hungarianmatching = " + (dur * 1e-9) + " sec");
-
             }
+
+            // 2.5 define action for leftover vehicles
+            // no action taken here, possible to send leftover vehicles to new destination in
+            // virtual node where they currently stay.
         }
     }
 
