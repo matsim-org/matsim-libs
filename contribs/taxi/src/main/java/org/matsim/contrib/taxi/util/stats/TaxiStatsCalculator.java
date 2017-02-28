@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -68,7 +68,7 @@ public class TaxiStatsCalculator
 
     private void updateStatsForVehicle(Vehicle vehicle)
     {
-        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
+        Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return;// do not evaluate - the vehicle is unused
         }
@@ -76,15 +76,16 @@ public class TaxiStatsCalculator
         @SuppressWarnings("unchecked")
         LongEnumAdder<TaxiTaskType>[] vehicleHourlySums = new LongEnumAdder[hours];
 
-        for (TaxiTask t : schedule.getTasks()) {
+        for (Task t : schedule.getTasks()) {
+            TaxiTask tt = (TaxiTask)t;
             int[] hourlyDurations = TaxiStatsCalculators.calcHourlyDurations((int)t.getBeginTime(),
                     (int)t.getEndTime());
             int fromHour = TaxiStatsCalculators.getHour(t.getBeginTime());
             for (int i = 0; i < hourlyDurations.length; i++) {
-                includeTaskIntoHourlySums(vehicleHourlySums, fromHour + i, t, hourlyDurations[i]);
+                includeTaskIntoHourlySums(vehicleHourlySums, fromHour + i, tt, hourlyDurations[i]);
             }
 
-            if (t.getTaxiTaskType() == TaxiTaskType.PICKUP) {
+            if (tt.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 Request req = ((TaxiPickupTask)t).getRequest();
                 double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
                 int hour = TaxiStatsCalculators.getHour(req.getT0());

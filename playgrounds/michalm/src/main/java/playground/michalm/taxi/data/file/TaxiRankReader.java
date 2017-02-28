@@ -37,11 +37,11 @@ public class TaxiRankReader
 
     private final static int DEFAULT_RANK_CAPACITY = Integer.MAX_VALUE;
 
-    private final TaxiDataWithRanks data;
+    private final TaxiRankDataImpl data;
     private Map<Id<Link>, ? extends Link> links;
 
 
-    public TaxiRankReader(Scenario scenario, TaxiDataWithRanks data)
+    public TaxiRankReader(Scenario scenario, TaxiRankDataImpl data)
     {
         this.data = data;
         links = scenario.getNetwork().getLinks();

@@ -30,7 +30,6 @@ public class SquareGridSystem
 {
     private final SquareGrid grid;
     private final Map<Id<Zone>, Zone> zones = new HashMap<>();
-    private final Map<Id<Zone>, Zone> safeZones = Collections.unmodifiableMap(zones);
 
 
     public SquareGridSystem(Network network, double cellSize)
@@ -60,7 +59,7 @@ public class SquareGridSystem
     @Override
     public Map<Id<Zone>, Zone> getZones()
     {
-        return safeZones;
+        return Collections.unmodifiableMap(zones);
     }
 
 

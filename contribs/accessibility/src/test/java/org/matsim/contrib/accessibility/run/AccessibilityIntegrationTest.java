@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -57,6 +58,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 
 /**
+ * I can't say how similar or different to {@link AccessibilityIntegrationTest} this one here is.  kai, feb'17
+ * 
  * @author nagel
  */
 public class AccessibilityIntegrationTest {
@@ -114,7 +117,7 @@ public class AccessibilityIntegrationTest {
 		double max = 200.;
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
 		acg.setBoundingBoxBottom(min);
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
@@ -184,7 +187,7 @@ public class AccessibilityIntegrationTest {
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setCellSizeCellBasedAccessibility(100);
 		// set area by shapefile in this test
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile);
 		//		acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
 		acg.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
 
@@ -207,6 +210,7 @@ public class AccessibilityIntegrationTest {
 		// compare some results -> done in EvaluateTestResults 
 	}
 	
+	@Ignore
 	@Test
 	public void testWithFile(){
 		/*TODO Complete - JWJ, Dec'16 */
@@ -219,7 +223,7 @@ public class AccessibilityIntegrationTest {
 		}
 		
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFile.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFile);
 		acg.setMeasuringPointsFile(f.getAbsolutePath());
 		
 		final Scenario sc = createTestScenario(config);
@@ -233,7 +237,9 @@ public class AccessibilityIntegrationTest {
 		controler.run();
 		
 		/* FIXME This currently does NOTHING... it completely ignores the 
-		 * file-based instruction.
+		 * file-based instruction.  (presumably JWJ, dec'16)
+		 * 
+		 * This is now in principle working; I fixed at least one bug.  But pointFile.csv is empty. --> disabling the test.  kai, feb'17
 		 */
 	}
 

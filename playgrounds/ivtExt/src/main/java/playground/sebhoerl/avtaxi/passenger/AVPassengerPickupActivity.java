@@ -12,7 +12,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 public class AVPassengerPickupActivity extends AbstractDynActivity implements PassengerPickupActivity {
     private final PassengerEngine passengerEngine;
-    private final StayTask pickupTask;
+    private final DynAgent driver;
     private final Set<? extends PassengerRequest> requests;
     private final double pickupDuration;
 
@@ -21,49 +21,47 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
     private double endTime = 0.0;
     private int passengersAboard = 0;
 
-    public AVPassengerPickupActivity(PassengerEngine passengerEngine, StayTask pickupTask,
-	    Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
-	super(activityType);
-
-	if (requests.size() > pickupTask.getSchedule().getVehicle().getCapacity()) {
-	    // Number of requests exceeds number of seats
-	    throw new IllegalStateException();
+	public AVPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask, Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
+        super(activityType);
+        
+        if (requests.size() > pickupTask.getSchedule().getVehicle().getCapacity()) {
+        	// Number of requests exceeds number of seats
+        	throw new IllegalStateException();
+        }
+        
+        this.passengerEngine = passengerEngine;
+        this.driver = driver;
+        this.pickupDuration = pickupDuration;
+        this.requests = requests;
+        
+        endTime = pickupTask.getBeginTime();
+        passengersAboard = 0;
+        
+        double now = pickupTask.getBeginTime();
+        
+        for (PassengerRequest request : requests) {
+    		if (passengerEngine.pickUpPassenger(this, driver, request, pickupTask.getBeginTime())) {
+    			passengersAboard++;
+    		}
+    		
+    		if (request.getT0() > maximumRequestT0) {
+    			maximumRequestT0 = request.getT0();
+    		}
+        }
+        
+        if (passengersAboard == requests.size()) {
+        	endTime = now + pickupDuration;
+        } else {
+        	setEndTimeIfWaitingForPassengers(now);
+        }
 	}
-
-	this.passengerEngine = passengerEngine;
-	this.pickupTask = pickupTask;
-	this.pickupDuration = pickupDuration;
-	this.requests = requests;
-
-	endTime = pickupTask.getBeginTime();
-	passengersAboard = 0;
-
-	double now = pickupTask.getBeginTime();
-	DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-
-	for (PassengerRequest request : requests) {
-	    if (passengerEngine.pickUpPassenger(this, driver, request, pickupTask.getBeginTime())) {
-		passengersAboard++;
-	    }
-
-	    if (request.getT0() > maximumRequestT0) {
-		maximumRequestT0 = request.getT0();
-	    }
-	}
-
-	if (passengersAboard == requests.size()) {
-	    endTime = now + pickupDuration;
-	} else {
-	    setEndTimeIfWaitingForPassengers(now);
-	}
-    }
 
     private void setEndTimeIfWaitingForPassengers(double now) {
-	endTime = Math.max(now, maximumRequestT0) + pickupDuration;
+		endTime = Math.max(now, maximumRequestT0) + pickupDuration;
 
-	if (endTime == now) {
-	    endTime += 1;
-	}
+		if (endTime == now) {
+			endTime += 1;
+		}
     }
 
     @Override
@@ -73,37 +71,36 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
 
     @Override
     public void doSimStep(double now) {
-	if (passengersAboard < requests.size()) {
-	    setEndTimeIfWaitingForPassengers(now);
-	}
+		if (passengersAboard < requests.size()) {
+			setEndTimeIfWaitingForPassengers(now);
+		}
     }
 
     private PassengerRequest getRequestForPassenger(MobsimPassengerAgent passenger) {
-	for (PassengerRequest request : requests) {
-	    if (passenger == request.getPassenger())
-		return request;
-	}
+		for (PassengerRequest request : requests) {
+			if (passenger == request.getPassenger())
+			return request;
+		}
 
-	return null;
+		return null;
     }
 
-    @Override
-    public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-	PassengerRequest request = getRequestForPassenger(passenger);
-
-	if (request == null) {
-	    throw new IllegalArgumentException("I am waiting for different passengers!");
+	@Override
+	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
+		PassengerRequest request = getRequestForPassenger(passenger);
+		
+		if (request == null) {
+			throw new IllegalArgumentException("I am waiting for different passengers!");
+		}
+		
+		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+			passengersAboard++;
+		} else {
+			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
+		}
+		
+		if (passengersAboard == requests.size()) {
+			endTime = now + pickupDuration;
+		}
 	}
-
-	DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-	if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
-	    passengersAboard++;
-	} else {
-	    throw new IllegalStateException("The passenger is not on the link or not available for departure!");
-	}
-
-	if (passengersAboard == requests.size()) {
-	    endTime = now + pickupDuration;
-	}
-    }
 }

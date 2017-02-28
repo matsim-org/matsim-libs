@@ -25,7 +25,7 @@ public class LogitEpsilonDistribution implements EpsilonDistribution {
 	}
 	
 	public static void main(String[] args) {
-		final LogitEpsilonDistribution distr = new LogitEpsilonDistribution(1.0);
+		final LogitEpsilonDistribution distr = new LogitEpsilonDistribution(0.1);
 		System.out.println("mean: " + distr.gumbel.getNumericalMean());
 		System.out.println("variance: " + distr.gumbel.getNumericalVariance());
 	}

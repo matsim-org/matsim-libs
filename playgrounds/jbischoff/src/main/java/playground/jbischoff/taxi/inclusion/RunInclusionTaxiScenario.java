@@ -20,20 +20,18 @@
 package playground.jbischoff.taxi.inclusion;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import playground.jbischoff.taxi.setup.JbTaxiModule;
+
+import playground.jbischoff.taxi.setup.*;
 
 
 public class RunInclusionTaxiScenario
@@ -50,10 +48,11 @@ public class RunInclusionTaxiScenario
     {
     	for (int i = 50; i<=1000; i=i+50){
     	
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());
         config.controler().setOutputDirectory("D:/runs-svn/barrierFreeTaxi/1500_run_"+i+"/");
         config.controler().setRunId("taxis_"+i);
+        DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
         TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
         taxi.setTaxisFile("hc_vehicles"+i+".xml.gz");
         createControler(config, false).run();
@@ -68,20 +67,12 @@ public class RunInclusionTaxiScenario
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
-        return createControler(scenario, taxiData, otfvis);
-    }
+        FleetImpl fleet = new FleetImpl();
+        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 
-
-    public static Controler createControler(Scenario scenario, TaxiData taxiData, boolean otfvis)
-    {
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new JbTaxiModule(taxiData));
-        double expAveragingAlpha = 0.05;//from the AV flow paper 
-        controler.addOverridingModule(
-                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+        controler.addOverridingModule(new JbTaxiModule(fleet));
+        controler.addOverridingModule(TaxiOptimizerModules.createModule(fleet, JbTaxiOptimizerProvider.class));
 
         if (otfvis) {
             controler.addOverridingModule(new OTFVisLiveModule());

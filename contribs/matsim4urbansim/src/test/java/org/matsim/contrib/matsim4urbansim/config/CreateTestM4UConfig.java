@@ -32,8 +32,10 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -41,6 +43,10 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author thomas
+ *
+ */
+/**
+ * @author nagel
  *
  */
 public class CreateTestM4UConfig {
@@ -57,19 +63,20 @@ public class CreateTestM4UConfig {
 	
 	// yy why is all of this public?  could you please write a comment why that design decision was made?  thx.  kai, apr'13
 	// changed to package-private.  Not optimal, but better.  kai, aug'15
+	// making some of them static final so that I can inline them.  kai, feb'17
 	
 	private String matsimExternalConfigFileName 				= "";
 	 private String networkInputFileName 	 					= "";
 	 private String inputPlansFileName 						= "";
 	 String hotstartPlansFileName						= "";
-	 BigInteger firstIteration					= new BigInteger("0");
-	 BigInteger lastIteration						= new BigInteger("1");
-	 String activityType_0						= "home";
-	 String activityType_1						= "work";
-	 BigInteger homeActivityTypicalDuration		= new BigInteger("43200");	
-	 BigInteger workActivityTypicalDuration		= new BigInteger("28800");	
-	BigInteger workActivityOpeningTime			= new BigInteger("25200");
-	BigInteger workActivityLatestStartTime		= new BigInteger("32400");
+	 static final BigInteger firstIteration					= new BigInteger("0");
+	 static final BigInteger lastIteration						= new BigInteger("1");
+	 static final String homeActivity						= "home";
+	 static final String workActivity						= "work";
+	 static final BigInteger homeActivityTypicalDuration		= new BigInteger("43200");	
+	 static final BigInteger workActivityTypicalDuration		= new BigInteger("28800");	
+	static final BigInteger workActivityOpeningTime			= new BigInteger("25200");
+	static final BigInteger workActivityLatestStartTime		= new BigInteger("32400");
 	BigInteger maxAgentPlanMemorySize			= new BigInteger("5");
 	Double timeAllocationMutatorProbability		= 0.1;
 	Double changeExpBetaProbability				= 0.9;
@@ -90,7 +97,8 @@ public class CreateTestM4UConfig {
 	boolean agentPerformance						= true;
 	boolean zoneBasedAccessibility				= true;
 	boolean cellBasedAccessibility 				= true;
-	BigInteger cellSizeCellBasedAccessibility	= new BigInteger("100");
+//	BigInteger cellSizeCellBasedAccessibility	= new BigInteger("100");
+	static final long cellSizeCellBasedAccessibility	= 100 ;
 	String shapeFileCellBasedAccessibilityInputFile	= "";
 	boolean useCustomBoundingBox 				= false;
 	Double boundingBoxTop						= 0.;
@@ -203,7 +211,7 @@ public class CreateTestM4UConfig {
 	/**
 	 * generates the external MATSim config file with the specified parameter settings
 	 */
-	public final String generateConfigV3(){
+	public final String generateM4UConfigV3(){
 		
 		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory of 
 			= new org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory();	
@@ -223,7 +231,7 @@ public class CreateTestM4UConfig {
 		
 		// matsimConfigType
 		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType matsimConfigType = of.createMatsimConfigType();
-		matsimConfigType.setCellSize(this.cellSizeCellBasedAccessibility);
+		matsimConfigType.setCellSize(BigInteger.valueOf(this.cellSizeCellBasedAccessibility));
 		matsimConfigType.setAccessibilityComputationAreaFromShapeFile(false);
 		matsimConfigType.setAccessibilityComputationAreaFromBoundingBox(false);
 		matsimConfigType.setAccessibilityComputationAreaFromNetwork(true);
@@ -235,8 +243,8 @@ public class CreateTestM4UConfig {
 		matsimConfigType.setWarmStartPlansFile(warmStartPlansFile);
 		matsimConfigType.setHotStartPlansFile(hotStartPlansFile);		
 		matsimConfigType.setUseHotStart(true);
-		matsimConfigType.setActivityType0(this.activityType_0);
-		matsimConfigType.setActivityType1(this.activityType_1);
+		matsimConfigType.setActivityType0(this.homeActivity);
+		matsimConfigType.setActivityType1(this.workActivity);
 		matsimConfigType.setHomeActivityTypicalDuration(this.homeActivityTypicalDuration);
 		matsimConfigType.setWorkActivityTypicalDuration(this.workActivityTypicalDuration);
 		matsimConfigType.setWorkActivityOpeningTime(this.workActivityOpeningTime);
@@ -269,9 +277,7 @@ public class CreateTestM4UConfig {
 		
 		return writeConfigFileV3(m4uConfigType);
 	}
-	
 
-	
 	/**
 	 * writes the Matsim4UrbansimConfigType confing at the specified place using JAXB
 	 * 

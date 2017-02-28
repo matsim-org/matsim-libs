@@ -49,7 +49,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	
 	public final boolean usingOldScoringBelowZeroUtilityDuration ;
 	
-	public final int simulationPeriodInDays;
+	public final double simulationPeriodInDays;
 
 	private CharyparNagelScoringParameters(
 			final Map<String, ActivityUtilityParameters> utilParams,
@@ -64,7 +64,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			final double abortedPlanScore,
 			final boolean scoreActs,
 			final boolean usingOldScoringBelowZeroUtilityDuration,
-			final int simulationPeriodInDays) {
+			final double simulationPeriodInDays) {
 		this.utilParams = utilParams;
 		this.modeParams = modeParams;
 		this.marginalUtilityOfWaiting_s = marginalUtilityOfWaiting_s;
@@ -94,7 +94,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		private double abortedPlanScore;
 		private boolean scoreActs;
 		private boolean usingOldScoringBelowZeroUtilityDuration;
-		private int simulationPeriodInDays = 1;
+		private double simulationPeriodInDays = 1.0;
 
 		public Builder(
 				final Scenario scenario,

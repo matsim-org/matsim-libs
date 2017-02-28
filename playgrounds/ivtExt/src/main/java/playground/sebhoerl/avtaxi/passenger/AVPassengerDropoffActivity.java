@@ -10,29 +10,29 @@ import org.matsim.contrib.dynagent.DynAgent;
 
 public class AVPassengerDropoffActivity extends VrpActivity {
     private final PassengerEngine passengerEngine;
-    private final StayTask dropoffTask;
+    private final DynAgent driver;
     private final Set<? extends PassengerRequest> requests;
 
-    public AVPassengerDropoffActivity(PassengerEngine passengerEngine, StayTask dropoffTask,
-	    Set<? extends PassengerRequest> requests, String activityType) {
-	super(activityType, dropoffTask);
+    public AVPassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask dropoffTask,
+                                      Set<? extends PassengerRequest> requests, String activityType)
+    {
+        super(activityType, dropoffTask);
 
-	this.passengerEngine = passengerEngine;
-	this.dropoffTask = dropoffTask;
-	this.requests = requests;
-
-	if (requests.size() > dropoffTask.getSchedule().getVehicle().getCapacity()) {
-	    // Number of requests exceeds number of seats
-	    throw new IllegalStateException();
-	}
+        this.passengerEngine = passengerEngine;
+        this.driver = driver;
+        this.requests = requests;
+        
+        if (requests.size() > dropoffTask.getSchedule().getVehicle().getCapacity()) {
+        	// Number of requests exceeds number of seats
+        	throw new IllegalStateException();
+        }
     }
 
     @Override
-    public void finalizeAction(double now) {
-	DynAgent driver = dropoffTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-
-	for (PassengerRequest request : requests) {
-	    passengerEngine.dropOffPassenger(driver, request, now);
-	}
+    public void finalizeAction(double now)
+    {
+        for (PassengerRequest request : requests) {
+        	passengerEngine.dropOffPassenger(driver, request, now);
+        }
     }
 }

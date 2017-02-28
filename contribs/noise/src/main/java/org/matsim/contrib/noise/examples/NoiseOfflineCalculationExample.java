@@ -50,7 +50,7 @@ public class NoiseOfflineCalculationExample {
 		config.controler().setLastIteration(lastIteration);		
 						
 		// adjust the default noise parameters
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
 		noiseParameters.setReceiverPointGap(12345789.);
 		// ...
 		
@@ -60,7 +60,9 @@ public class NoiseOfflineCalculationExample {
 		noiseCalculation.run();
 		
 		// some processing of the output data
-		String outputFilePath = outputDirectory + "analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
+		if (!outputDirectory.endsWith("/")) outputDirectory = outputDirectory + "/";
+		
+		String outputFilePath = outputDirectory + "noise-analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
 		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
 				

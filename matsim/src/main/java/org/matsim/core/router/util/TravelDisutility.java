@@ -35,6 +35,7 @@ import org.matsim.vehicles.Vehicle;
  * See {@link tutorial.programming.randomizingRouter.RunRandomizingRouterExample} for an example.
  *
  * @author mrieser
+ * @see {@link org.matsim.core.router.costcalculators.TravelDisutilityFactory}
  */
 public interface TravelDisutility {
 

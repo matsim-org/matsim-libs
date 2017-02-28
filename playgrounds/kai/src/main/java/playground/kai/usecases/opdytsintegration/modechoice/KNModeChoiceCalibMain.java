@@ -71,7 +71,7 @@ class KNModeChoiceCalibMain {
 		config.strategy().clearStrategySettings();
 		{
 			StrategySettings stratSets = new StrategySettings() ;
-			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
+			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
 			stratSets.setWeight(0.9);
 			config.strategy().addStrategySettings(stratSets);
 		}

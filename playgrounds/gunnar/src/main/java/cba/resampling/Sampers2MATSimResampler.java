@@ -10,7 +10,7 @@ import java.util.Set;
  * @author Gunnar Flötteröd
  *
  */
-public class Sampers2MATSimResampler {
+public class Sampers2MATSimResampler implements Runnable {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -62,7 +62,9 @@ public class Sampers2MATSimResampler {
 		final List<Double> randomUtilityRealizations = new ArrayList<>(this.alternatives.size());
 		for (Alternative alt : this.alternatives) {
 			final double targetScore = alt.getSampersOnlyScore() + alt.getMATSimTimeScore();
-			randomUtilityRealizations.add(targetScore + alt.getEpsilonDistribution().nextEpsilon());
+			final double epsilonRealization = alt.getEpsilonDistribution().nextEpsilon();
+			randomUtilityRealizations.add(targetScore + epsilonRealization);
+			alt.setSampersEpsilonRealization(epsilonRealization);
 		}
 		int result = 0;
 		double resultRU = randomUtilityRealizations.get(0);
@@ -86,5 +88,18 @@ public class Sampers2MATSimResampler {
 			}
 		}
 	}
-
+	
+	// -------------------- IMPLEMENTATION OF Runnable --------------------
+	
+	private Alternative result = null;
+	
+	public Alternative getResult() {
+		return this.result;
+	}
+	
+	@Override
+	public void run() {
+		System.out.println("Simulating a choice");
+		this.result = this.next();
+	}
 }

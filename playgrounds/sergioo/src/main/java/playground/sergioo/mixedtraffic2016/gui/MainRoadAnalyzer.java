@@ -39,11 +39,7 @@ public class MainRoadAnalyzer extends Thread {
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		File vehiclesFile = new File(configFile.getParentFile(),scenario.getConfig().vehicles().getVehiclesFile());
 		new VehicleReaderV1(scenario.getVehicles()).readFile(vehiclesFile.getAbsolutePath());
-		Map<String, Road.Mode> modes = new HashMap<>();
-		for(VehicleType vehicleType: scenario.getVehicles().getVehicleTypes().values()) {
-			modes.put(vehicleType.getId().toString(), new Road.Mode(vehicleType.getLength(), vehicleType.getWidth(), vehicleType.getMaximumVelocity()));
-		}
-		Road road = new Road(scenario.getConfig().qsim().getLinkDynamics()==LinkDynamics.FIFO?Road.TypeRoad.MODE_SHARED:Road.TypeRoad.MODE_INDEPENDENT, modes, link.getLength(), link.getFreespeed(), analyzer.vehicles.values());
+		Road road = new Road(scenario.getConfig().qsim().getLinkDynamics()==LinkDynamics.FIFO?Road.TypeRoad.MODE_SHARED:Road.TypeRoad.MODE_INDEPENDENT, scenario.getVehicles().getVehicleTypes().values(), link.getLength(), link.getFreespeed(), analyzer.vehicles.values());
 		Animation animation = new Animation(road);
 		Window window = new Window(road, animation);
 		window.setVisible(true);

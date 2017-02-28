@@ -20,6 +20,8 @@
 package org.matsim.integration.daily.accessibility;
 
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -65,13 +68,12 @@ public class RunCombinedOsmReaderKibera {
 		// the type of land use of the area which the build belongs to.
 		double buildingTypeFromVicinityRange = 0.;
 		
-		createFacilites(osmFile, outputBase, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
+		createFacilites(osmFile, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
 	}
 	
 		
-	public static void createFacilites(String osmFile, String outputBase, String facilityFile, String attributeFile,
+	public static void createFacilites(String osmFile, String facilityFile, String attributeFile,
 			String outputCRS, double buildingTypeFromVicinityRange) {
-//		LogToOutputSaver.setOutputDirectory(outputBase);
 		LOG.info("Parsing land use from OpenStreetMap.");
 
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
@@ -87,6 +89,21 @@ public class RunCombinedOsmReaderKibera {
 			e.printStackTrace();
 		}
 		LOG.info("Output will be wirtten to " + facilityFile);
+	}
+	
+	
+	public static ActivityFacilities createFacilites(InputStream osmInputStream, String outputCRS, double buildingTypeFromVicinityRange) {
+		LOG.info("Parsing land use from OpenStreetMap.");
+
+		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
+				buildOsmLandUseToMatsimTypeMap(), buildOsmBuildingToMatsimTypeMap(),
+				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
+				buildOsmTourismToMatsimTypeMap(), buildUnmannedEntitiesList(),
+				buildingTypeFromVicinityRange);
+			combinedOsmReader.parseFile(osmInputStream);
+			ActivityFacilities facilities = combinedOsmReader.getActivityFacilities();
+
+			return facilities;
 	}
 	
 	

@@ -50,11 +50,11 @@ public class CreateTaxiVehicles {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		int numberofVehicles = 2000;
+		int numberofVehicles = 5000;
 		double operationStartTime = 0.; //t0
 		double operationEndTime = 24*3600.;	//t1
 		int seats = 4;
-		String networkfile = "./src/main/resources/cottbus_robotaxi/network.xml.gz";
+		String networkfile = "cottbus_robotaxi/network.xml.gz";
 		String taxisFile = "./src/main/resources/cottbus_robotaxi/taxis_"+numberofVehicles+".xml";
 		List<Vehicle> vehicles = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();

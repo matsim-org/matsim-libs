@@ -70,7 +70,7 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 	private int iterationsUsed = 0;
 
 	@Inject
-	MultiModeCountsControlerListener(QSimConfigGroup qsimConfigGroup, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+	private MultiModeCountsControlerListener(QSimConfigGroup qsimConfigGroup, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.config = countsConfigGroup; 
 		this.volumesAnalyzer = volumesAnalyzer;
@@ -172,7 +172,8 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 		}
 	}
 
-	/*package*/ boolean useVolumesOfIteration(final int iteration, final int firstIteration) {
+	/*package*/
+	private boolean useVolumesOfIteration(final int iteration, final int firstIteration) {
 		int iterationMod = iteration % this.config.getWriteCountsInterval();
 		int effectiveIteration = iteration - firstIteration;
 		int averaging = Math.min(this.config.getAverageCountsOverIterations(), this.config.getWriteCountsInterval());
@@ -184,7 +185,8 @@ public class MultiModeCountsControlerListener implements StartupListener, Iterat
 				&& (effectiveIteration + (this.config.getWriteCountsInterval() - iterationMod) >= averaging));
 	}
 
-	/*package*/ boolean createCountsInIteration(final int iteration) {
+	/*package*/
+	private boolean createCountsInIteration(final int iteration) {
 		return ((iteration % this.config.getWriteCountsInterval() == 0) && (this.iterationsUsed >= this.config.getAverageCountsOverIterations()));		
 	}
 

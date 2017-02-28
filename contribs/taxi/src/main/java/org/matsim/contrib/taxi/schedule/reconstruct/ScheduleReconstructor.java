@@ -25,8 +25,9 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
 import org.matsim.vehicles.Vehicle;
@@ -36,7 +37,8 @@ import com.google.inject.Inject;
 
 public class ScheduleReconstructor
 {
-    final TaxiData taxiData = new TaxiData();
+    final FleetImpl fleet = new FleetImpl();
+    final Map<Id<Request>, TaxiRequest> taxiRequests = new LinkedHashMap<>();
     final Map<Id<Link>, ? extends Link> links;
 
     final Map<Id<Person>, ScheduleBuilder> scheduleBuilders = new LinkedHashMap<>();
@@ -58,7 +60,7 @@ public class ScheduleReconstructor
         stayRecorder = new StayRecorder(this);
         eventsManager.addHandler(stayRecorder);
 
-        requestRecorder = new RequestRecorder(this, TaxiModule.TAXI_MODE);
+        requestRecorder = new RequestRecorder(this, TaxiOptimizerModules.TAXI_MODE);
         eventsManager.addHandler(requestRecorder);
     }
 
@@ -90,21 +92,21 @@ public class ScheduleReconstructor
     }
 
 
-    public TaxiData getTaxiData()
+    public Fleet getFleet()
     {
         if (!schedulesValidated) {
             validateSchedules();
         }
 
-        return taxiData;
+        return fleet;
     }
 
 
-    public static TaxiData reconstructFromFile(Network network, String eventsFile)
+    public static Fleet reconstructFromFile(Network network, String eventsFile)
     {
         EventsManager eventsManager = EventsUtils.createEventsManager();
         ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager);
         new MatsimEventsReader(eventsManager).readFile(eventsFile);
-        return reconstructor.getTaxiData();
+        return reconstructor.getFleet();
     }
 }

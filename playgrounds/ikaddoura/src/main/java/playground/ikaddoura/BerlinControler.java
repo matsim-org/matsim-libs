@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.Decongestion;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
@@ -62,12 +62,13 @@ public class BerlinControler {
 	private static String outputBaseDirectory;
 
 	private static boolean agentSpecificActivityScheduling;
+	private static boolean adjustPopulation;
 	private static double activityDurationBin;
 	private static double tolerance;
 	
 	private static PricingApproach pricingApproach;
 	private static double blendFactor;
-	
+		
 	private enum PricingApproach {
 		NoPricing, PID, QBPV3, QBPV9, QBPV10
 	}
@@ -85,15 +86,18 @@ public class BerlinControler {
 			log.info("outputBaseDirectory: "+ outputBaseDirectory);
 			
 			agentSpecificActivityScheduling = Boolean.parseBoolean(args[2]);
-			log.info("addModifiedActivities: "+ agentSpecificActivityScheduling);
+			log.info("agentSpecificActivityScheduling: "+ agentSpecificActivityScheduling);
+			
+			adjustPopulation = Boolean.parseBoolean(args[3]);
+			log.info("adjustPopulation: "+ adjustPopulation);
 
-			activityDurationBin = Double.parseDouble(args[3]);
+			activityDurationBin = Double.parseDouble(args[4]);
 			log.info("activityDurationBin: "+ activityDurationBin);
 			
-			tolerance = Double.parseDouble(args[4]);
+			tolerance = Double.parseDouble(args[5]);
 			log.info("tolerance: "+ tolerance);
 
-			String congestionTollingApproachString = args[5];
+			String congestionTollingApproachString = args[6];
 			if (congestionTollingApproachString.equals(PricingApproach.NoPricing.toString())) {
 				pricingApproach = PricingApproach.NoPricing;
 			} else if (congestionTollingApproachString.equals(PricingApproach.QBPV3.toString())) {
@@ -109,7 +113,7 @@ public class BerlinControler {
 			}
 			log.info("pricingApproach: " + pricingApproach);
 			
-			blendFactor = Double.parseDouble(args[6]);
+			blendFactor = Double.parseDouble(args[7]);
 			log.info("blendFactor: "+ blendFactor);
 			 
 		} else {
@@ -118,6 +122,7 @@ public class BerlinControler {
 			outputBaseDirectory = "../../../runs-svn/berlin-dz-time/output/";
 			
 			agentSpecificActivityScheduling = true;
+			adjustPopulation = true;
 			activityDurationBin = 3600.;
 			tolerance = 3600.;
 			
@@ -149,7 +154,7 @@ public class BerlinControler {
 			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
 			aa.setActivityDurationBin(activityDurationBin);
 			aa.setTolerance(tolerance);
-			controler = aa.prepareControler();			
+			controler = aa.prepareControler(adjustPopulation);			
 		}
 				
 		if (pricingApproach.toString().equals(PricingApproach.NoPricing.toString())) {
@@ -177,7 +182,7 @@ public class BerlinControler {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			
-			final DecongestionInfo info = new DecongestionInfo(controler.getScenario(), decongestionSettings);
+			final DecongestionInfo info = new DecongestionInfo(decongestionSettings);
 			final Decongestion decongestion = new Decongestion(controler, info);
 			decongestion.setSigma(sigma);
 			controler = decongestion.getControler();
@@ -245,7 +250,7 @@ public class BerlinControler {
 		
 		// analysis
 		
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		PersonTripCongestionNoiseAnalysisRun analysis = new PersonTripCongestionNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
 		MATSimVideoUtils.createLegHistogramVideo(controler.getConfig().controler().getOutputDirectory());

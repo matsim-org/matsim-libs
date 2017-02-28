@@ -12,10 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
@@ -99,7 +96,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
 
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
+        final Schedule schedule = avVehicle.getSchedule();
         GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule)); // check that current task is last task in schedule
 
         final double endPickupTime = getTimeNow() + pickupDurationPerStop;
@@ -123,8 +120,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param destination
      */
     protected final void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
-        AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
+        final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
+        Task abstractTask = schedule.getCurrentTask(); // <- implies that task is started
         new AVTaskAdapter(abstractTask) {
             @Override
             public void handle(AVDriveTask avDriveTask) {

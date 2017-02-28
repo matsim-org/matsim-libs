@@ -23,7 +23,7 @@
 		<param name="snapshotFormat" value="otfvis" />
 		<param name="writeSnapshotsInterval" value="0" />
 		<param name="writeEventsInterval" value="5" />
-		<param name="writePlansInterval" value="5" />
+		<param name="writePlansInterval" value="0" />
 	</module>
 	
 	<module name="noise" >
@@ -37,6 +37,7 @@
 		<param name="consideredActivitiesForReceiverPointGrid" value="home,work,noise_sensitive" />
 		<param name="hgvIdPrefixes" value="lkw" />
 		<param name="internalizeNoiseDamages" value="true" />
+		<param name="computeAvgNoiseCostPerLinkAndTime" value="false" />
 		<param name="noiseAllocationApproach" value="MarginalCost" />
 		<param name="receiverPointGap" value="100.0" />
 		<param name="receiverPointsGridMaxX" value="0.0" />
@@ -84,10 +85,10 @@
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="3" /> <!-- 0 means unlimited -->
 		
-		<param name="ModuleProbability_1" value="0.7" />
+		<param name="ModuleProbability_1" value="0.5" />
 		<param name="Module_1" value="BestScore" />
 		
-		<param name="ModuleProbability_2" value="0.3" />
+		<param name="ModuleProbability_2" value="0.5" />
 		<param name="Module_2" value="ReRoute" />
 		<param name="ModuleDisableAfterIteration_2" value="4" />
 		

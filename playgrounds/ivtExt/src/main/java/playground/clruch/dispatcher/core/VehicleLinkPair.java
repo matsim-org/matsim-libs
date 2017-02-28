@@ -27,7 +27,7 @@ public class VehicleLinkPair {
      *         the final {@link Link} of the path that the vehicles is currently driving on
      */
     public Link getCurrentDriveDestination() {
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
+        final Schedule schedule = avVehicle.getSchedule();
         final AVTask avTask = (AVTask) schedule.getCurrentTask();
         if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {
             final AVDriveTask avDriveTask = (AVDriveTask) avTask;

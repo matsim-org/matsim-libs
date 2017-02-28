@@ -19,12 +19,10 @@
 
 package playground.jbischoff.taxi.setup;
 
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.vehicles.*;
 
@@ -36,17 +34,17 @@ public class JbTaxiModule
 {
     public static final String TAXI_MODE = "taxi";
 
-    private final TaxiData taxiData;
+    private final Fleet taxiData;
     private final VehicleType vehicleType;
 
 
-    public JbTaxiModule(TaxiData taxiData)
+    public JbTaxiModule(Fleet taxiData)
     {
         this(taxiData, VehicleUtils.getDefaultVehicleType());
     }
 
 
-    public JbTaxiModule(TaxiData taxiData, VehicleType vehicleType)
+    public JbTaxiModule(Fleet taxiData, VehicleType vehicleType)
     {
         this.taxiData = taxiData;
         this.vehicleType = vehicleType;
@@ -56,10 +54,8 @@ public class JbTaxiModule
     @Override
     public void install()
     {
-        addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
-        bind(TaxiData.class).toInstance(taxiData);
+        bind(Fleet.class).toInstance(taxiData);
         bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
-        bind(TaxiOptimizerFactory.class).to(JbDefaultTaxiOptimizerFactory.class);
 
         //addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
         //addControlerListenerBinding().to(TaxiStatsDumper.class);

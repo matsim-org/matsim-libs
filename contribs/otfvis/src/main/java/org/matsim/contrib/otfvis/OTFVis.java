@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -47,6 +48,7 @@ import org.matsim.vis.otfvis.OTFClientFile;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.snapshotwriters.*;
 
@@ -158,7 +160,12 @@ public class OTFVis {
 	}
 
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
-		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim);
+        return startServerAndRegisterWithQSim(config, scenario, events, qSim, null);
+    }
+	
+    public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim,
+            NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
+		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim, nonPlanAgentQueryHelper);
 
 		if (config.transit().isUseTransit()) {
 
@@ -239,8 +246,8 @@ public class OTFVis {
 			}
 
 			@Override
-			public Collection<MobsimAgent> getAgents() {
-				return Collections.emptyList();
+			public Map<Id<Person>, MobsimAgent> getAgents() {
+				return Collections.emptyMap();
 			}
 
 			@Override

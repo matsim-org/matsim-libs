@@ -24,7 +24,6 @@ public class Debugger1 {
 
         String netFile = "/Users/laemmel/scenarios/misanthrope/paper/network.xml";
 
-        CTRunner.WIDTH = 2;
         CTRunner.DEBUG = true;
 
         Config c = ConfigUtils.createConfig();

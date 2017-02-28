@@ -70,7 +70,7 @@ public class TeleportationEngineWDistanceCheckTest {
 		params.setScoringThisActivityAtAll(false);
 		
 		StrategySettings stratSets = new StrategySettings() ;
-		stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
+		stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
 		stratSets.setWeight(1.);
 		config.strategy().addStrategySettings( stratSets );
 		
