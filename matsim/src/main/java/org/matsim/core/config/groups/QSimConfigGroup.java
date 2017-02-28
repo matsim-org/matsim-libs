@@ -76,18 +76,20 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	
 	private StarttimeInterpretation simStarttimeInterpretation = StarttimeInterpretation.maxOfStarttimeAndEarliestActivityEnd;
 	
-	//Vehicles of size (in PCU) smaller than this threshold will be allowed to enter the buffer even
-	//if flowcap_accumulate is not positive.
+	//Vehicles of size (in PCU) smaller than or equal to this threshold will be allowed to enter the buffer even
+	//if flowcap_accumulate <= 0.
 	//The default value is 0.0 meaning that all vehicles of non-zero sizes will be let into buffer only
 	//if flowcap_accumulate > 0.
 	//
 	//Flow capacity easing prevents buses from waiting long time for entering the buffer in sub-sampled scenarios
-	//For instance, for 10% scenario, a car (representing 10 cars) has a size of 1.0, a bus (representing 1 bus) of 0.3,
-	//and link flow capacities are reduced to about 0.1 of the original capacity.
-	//(1) If pcuThresholdForFlowCapacityEasing == 0, all busses following private cars wait long times before entering
-	//the buffer (recovering the flow capacity accumulator takes approx. 10 times longer than in the 100% scenario).
-	//(2) If pcuThresholdForFlowCapacityEasing == 0.3, busses at the front of the queue immediately enter the buffer
-	//(once they arrive at the end of a link).
+	//For instance, for 10% scenario, a car (representing 10 cars) has a size of 1.0 PCU, a bus (representing 1 bus)
+	//has a size of 0.3 PCU, and link flow capacities are reduced to about 0.1 of the original capacity.
+	//(1) If pcuThresholdForFlowCapacityEasing == 0, all buses moving just behind private cars wait long times before
+	//entering the buffer (recovering the flow capacity accumulator in a 10% scenario takes approx. 10 times longer than
+	//in the 100% scenario).
+	//(2) If pcuThresholdForFlowCapacityEasing == 0.3, buses at the front of the queue immediately enter the buffer
+	//(once they arrive at the end of a link). If they (one or more buses) have been queued behind a private car,
+	//they all leave the link at the same time as the preceding private car.
 	private double pcuThresholdForFlowCapacityEasing = 0.0;
 
 	// ---
