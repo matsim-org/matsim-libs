@@ -115,6 +115,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * assigns new destination to vehicle.
      * if vehicle is already located at destination, nothing happens.
      * 
+     * in one pass of redispatch(...), the function setVehicleDiversion(...)
+     * may only be invoked once for a single vehicle (specified in vehicleLinkPair). 
+     *
      * @param vehicleLinkPair
      *            is provided from super.getDivertableVehicles()
      * @param destination
@@ -177,7 +180,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         stringBuilder.append("#requests " + getAVRequests().size());
         stringBuilder.append(", #stay " + //
                 getStayVehicles().values().stream().flatMap(Queue::stream).count());
-        stringBuilder.append(", #divert " + getDivertableVehicles().size());
+        stringBuilder.append(", #divert " + getDivertableVehicles().size()); // TODO not efficient, only debug
         return stringBuilder.toString();
     }
 

@@ -100,7 +100,10 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
-     * @return collection of cars that are in the driving state without customer, or stay task
+     * @return collection of cars that are in the driving state without customer, or stay task.
+     * if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
+     * that invoke assignDirective(...), the vehicle is not included in the successive call to
+     * getDivertableVehicles() until it becomes <i>divertable</i> again.
      */
     protected final Collection<VehicleLinkPair> getDivertableVehicles() {
         Collection<VehicleLinkPair> collection = new LinkedList<>();
