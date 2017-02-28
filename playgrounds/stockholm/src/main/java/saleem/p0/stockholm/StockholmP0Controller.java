@@ -26,7 +26,7 @@ public class StockholmP0Controller {
 
 	public static void main(String[] args) {
 		
-		String path = "./ihop2/matsim-input/configSingleJunction.xml";
+		String path = "./ihop2/matsim-input/config.xml";
 
 		Config config = ConfigUtils.loadConfig(path);
 		config.network().setTimeVariantNetwork(true);
