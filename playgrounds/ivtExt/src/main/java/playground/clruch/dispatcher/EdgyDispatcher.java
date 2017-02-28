@@ -75,7 +75,8 @@ public class EdgyDispatcher extends UniversalDispatcher {
             int num_abortTrip = 0;
             int num_driveOrder = 0;
 
-            { // see if any car is driving by a request. if so, then stay there to be matched!
+            { // TODO this should be replaceable by a simple adapter
+                // see if any car is driving by a request. if so, then stay there to be matched!
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
@@ -92,7 +93,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
                 }
             }
 
-            {
+            { // TODO this should be replaceable by some naive matcher
                 Iterator<AVRequest> requestIterator = getAVRequests().iterator();
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
