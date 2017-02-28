@@ -51,7 +51,7 @@ public class PopulationDensityGenerator implements AVGenerator {
                         density.put(link, 1.0);
                     }
 
-                    linkList.add(link);
+                    if (!linkList.contains(link)) linkList.add(link);
                     sum += 1.0;
                 }
 
@@ -79,7 +79,7 @@ public class PopulationDensityGenerator implements AVGenerator {
 
         // Multinomial selection
         double r = MatsimRandom.getRandom().nextDouble();
-        Link selectedLink = null;
+        Link selectedLink = linkList.get(0);
 
         for (Link link : linkList) {
             if (r <= cumulativeDensity.get(link)) {
