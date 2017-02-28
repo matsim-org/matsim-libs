@@ -29,11 +29,12 @@ import saleem.ptoptimisation.decisionvariables.TransitScheduleAdapter;
 public class StockholmScenarioSimulation {
 public static void main(String[] args) {
 	
-	String path = "./ihop2/matsim-input/configoptimisationcarpt.xml";
+	String path = "./ihop2/matsim-input/config.xml";
 	
     Config config = ConfigUtils.loadConfig(path);
     final Scenario scenario = ScenarioUtils.loadScenario(config);
 	Controler controler = new Controler(scenario);
+	//If due to network cleanup, the network has to be scaled up, then set sample size here manually, according to population sample size
     double samplesize = config.qsim().getStorageCapFactor();	// Changing vehicle and road capacity according to sample size
 	PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
 	capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
