@@ -69,27 +69,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         final long round_now = Math.round(now);
         if (round_now % DISPATCH_PERIOD == 0) {
 
-            int num_abortTrip = 0;
-            int num_driveOrder = 0;
-
             Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
-
-            { // see if any car is driving by a request. if so, then stay there to be matched!
-                Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
-                for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-                    Link link = vehicleLinkPair.getDivertableLocation();
-                    if (requests.containsKey(link)) {
-                        List<AVRequest> requestList = requests.get(link);
-                        if (!requestList.isEmpty()) {
-                            requestList.remove(0);
-                            setVehicleDiversion(vehicleLinkPair, link);
-                            ++num_abortTrip;
-                        }
-                    }
-                }
-            }
-
-
             { // for all remaining vehicles and requests, perform a bipartite matching
 
                 // call getDivertableVehicles again to get remaining vehicles

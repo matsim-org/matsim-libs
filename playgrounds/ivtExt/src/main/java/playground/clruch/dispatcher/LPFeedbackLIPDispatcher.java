@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.utils.objectattributes.attributeconverters.FloatConverter;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.VirtualLink;
@@ -26,6 +27,7 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
+import playground.sebhoerl.avtaxi.framework.AVUtils;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
@@ -33,7 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
-    public static final int REBALANCING_PERIOD = 5 * 60; // TODO
+    public final int REBALANCING_PERIOD;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
@@ -49,7 +51,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     int ret;
     Map<Integer, String> numij_vLinkMap = new LinkedHashMap<>(); // LinkedHashMap chosen as the ordering should remain the same for iterating several times over the keyset.
     Map<Integer, VirtualNode> num_vNodeMap = new LinkedHashMap<>();
-    int numberOfAVs = 0;
+    final int numberOfAVs;
 
 
     public LPFeedbackLIPDispatcher( //
@@ -74,16 +76,20 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         travelTimes = travelTimesIn;
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         this.initiateLP();
-        numberOfAVs = Integer.parseInt(config.getParams().get("numberOfVehicles"));
+        numberOfAVs = 2500;//Integer.parseInt(config.getParams().get("numberOfVehicles"));
+        REBALANCING_PERIOD = Integer.parseInt(config.getParams().get("rebalancingPeriod"));//5*60;//Integer.parseInt(config.getParams().get("rebalancingPeriod"));
     }
 
 
     @Override
     public void redispatch(double now) {
+        // DEBUGGING:
 
-        // A: outside rebalancing periods, permanently assign vehicles to requests if they are on the same link
-        // TODO: check if this approach results in lost time because the vehicles first go to STAY mode and then
-        // TODO: subsequently pickup the customer and one iteration is lost in between
+
+
+
+        // A: outside rebalancing periods, permanently assign vehicles to requests if they have arrived at a customer
+        //    i.e. stay on the same link
         total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
         Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableVehicles();
         Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
@@ -441,6 +447,8 @@ public static class Factory implements AVDispatcherFactory {
         AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
         AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
         // TODO relate to general directory given in argument of main function
+
+
 
 
         // TODO:
