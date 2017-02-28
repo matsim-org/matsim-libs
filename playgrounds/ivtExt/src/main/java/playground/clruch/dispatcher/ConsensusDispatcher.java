@@ -52,7 +52,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         }
         linkWeights = linkWeightsIn;
     }
-    
+
     private int total_matchedRequests = 0;
 
     @Override
@@ -61,12 +61,12 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         // if (now>LAST_REDISPATCH_ITER) return; // not needed anymore, notification will be given instead
         // match requests and vehicles if they are at the same link
         int seconds = (int) Math.round(now);
-        
+
         total_matchedRequests += MatchRequestsWithStayVehicles.inOrderOfArrival(this);
-        
+
         // for available vhicles, perform a rebalancing computation after REBALANCING_PERIOD seconds.
         if (seconds % REBALANCING_PERIOD == 0) {
-            System.out.println("@"+seconds+" mr = " + total_matchedRequests);
+            System.out.println("@" + seconds + " mr = " + total_matchedRequests);
             // 0 get available vehicles and requests per virtual node
             Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableVehicles();
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
@@ -186,23 +186,11 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                         collection.stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
             }
 
-            // 2.4 fill extra destinations for left over vehicles
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-
-
-                // number of vehicles that can be matched to requests
-                int size = availableVehicles.get(virtualNode).size() - destinationLinks.get(virtualNode).size(); //
-
-                // TODO maybe not final API; may cause excessive diving
-                List<Link> localTargets = virtualNodeDest.selectLinkSet(virtualNode, size);
-                destinationLinks.get(virtualNode).addAll(localTargets);
-            }
-
-            // 2.5 assign destinations to the available vehicles
+            // 2.4 assign destinations to the available vehicles
             {
                 GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
                 GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
-                
+
                 long tic = System.nanoTime(); // DO NOT PUT PARALLEL anywhere in this loop !                
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
                     vehicleDestMatcher //
@@ -212,6 +200,10 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                 // System.out.println("hungarianmatching = " + (dur * 1e-9) + " sec");
 
             }
+
+            // 2.5 define action for leftover vehicles
+            // no action taken here, possible to send leftover vehicles to new destination in
+            // virtual node where they currently stay.
         }
     }
 
