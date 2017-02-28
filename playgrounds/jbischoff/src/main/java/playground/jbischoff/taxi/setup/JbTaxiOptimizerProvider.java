@@ -19,6 +19,8 @@
 
 package playground.jbischoff.taxi.setup;
 
+import javax.inject.Inject;
+
 import org.apache.commons.configuration.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -44,6 +46,7 @@ public class JbTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelTime travelTime;
 	private final QSim qSim;
 
+	@Inject
 	public JbTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Scenario scenario, Fleet fleet,
 			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
 		this.taxiCfg = taxiCfg;
