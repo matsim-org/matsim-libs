@@ -2,7 +2,6 @@ package playground.clruch.dispatcher.utils;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.HungarianAlgorithm;
@@ -11,8 +10,7 @@ import java.util.*;
 
 /**
  * array matching with Euclidean distance as criteria
- * 
- * TODO suitable for n < ?
+ *
  */
 public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
     @Override
@@ -20,11 +18,6 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
 
         // since Collection::iterator does not make guarantees about the order
         List<VehicleLinkPair> ordered_vehicleLinkPairs = new ArrayList<>(vehicleLinkPairs);
-        // ensure that the number of vehicles is the same as the number of
-        // TODO: this restriction was removed, check for compatibility in ConsensusDispatcher, ConsensusDispatcherDFRv20 and LPFeedbackLIPDispatcher
-        /*
-        GlobalAssert.that(ordered_vehicleLinkPairs.size() == links.size());
-        */
 
         // cost of assigning vehicle i to dest j, i.e. distance from vehicle i to destination j
         final int n = ordered_vehicleLinkPairs.size();
@@ -60,10 +53,6 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
             ++i;
             if(matchinghungarianAlgorithm[i]>=0){
                 map.put(vehicleLinkPair, (Link) links.get(matchinghungarianAlgorithm[i]));
-            }
-            // TODO check if this makes sense or another link should be chosen if no matching takes place.
-            else{
-                map.put(vehicleLinkPair, (Link) vehicleLinkPair.getDivertableLocation());
             }
         }
         return map;

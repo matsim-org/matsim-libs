@@ -41,29 +41,10 @@ public class HungarianDispatcher extends UniversalDispatcher {
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
     }
 
-    /**
-     * verify that link references are present in the network
-     */
-    @SuppressWarnings("unused") // for verifying link references
-    private void verifyLinkReferencesInvariant() {
-        List<Link> testset = getDivertableVehicles().stream() //
-                .map(VehicleLinkPair::getCurrentDriveDestination) //
-                .filter(Objects::nonNull) //
-                .collect(Collectors.toList());
-        if (!linkReferences.containsAll(testset))
-            throw new RuntimeException("network change 1");
-        if (!linkReferences.containsAll(network.getLinks().values()))
-            throw new RuntimeException("network change 2");
-        if (0 < testset.size())
-            System.out.println("network " + linkReferences.size() + " contains all " + testset.size());
-    }
-
     int total_matchedRequests = 0;
 
     @Override
     public void redispatch(double now) {
-        // verifyReferences(); // <- debugging only
-
         total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
 
         final long round_now = Math.round(now);
@@ -71,20 +52,18 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
             int num_abortTrip = 0;
             int num_driveOrder = 0;
-            Collection<VehicleLinkPair> assignedVehicles = new LinkedList<>();
+
+            Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
 
             { // see if any car is driving by a request. if so, then stay there to be matched!
-                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
-
                 for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-                    Link link = vehicleLinkPair.getDivertableLocation(); // TODO check if this should apply only to driving vehicles
+                    Link link = vehicleLinkPair.getDivertableLocation();
                     if (requests.containsKey(link)) {
                         List<AVRequest> requestList = requests.get(link);
                         if (!requestList.isEmpty()) {
                             requestList.remove(0);
                             setVehicleDiversion(vehicleLinkPair, link);
-                            assignedVehicles.add(vehicleLinkPair);
                             ++num_abortTrip;
                         }
                     }
@@ -94,27 +73,21 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
             { // for all remaining vehicles and requests, perform a bipartite matching
 
-                // only optimize over vehicles which are not reroutable
-                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
+                // call getDivertableVehicles again to get remaining vehicles
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
-                Collection<VehicleLinkPair> reRoutablevVehicles = new LinkedList<>();
-                for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-                    if (!assignedVehicles.contains(vehicleLinkPair)) {
-                        reRoutablevVehicles.add(vehicleLinkPair);
-                    }
-                }
 
-                // Save request in list which is neede for abstractVehicleDestMatcher
+                // Save request in list which is needed for abstractVehicleDestMatcher
                 AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
-                List<Link> requestlocs = new LinkedList<Link>();
-                for (Link link : requests.keySet()) {
-                    requestlocs.add(link);
-                }
-
+                List<Link> requestlocs =
+                        requests.values()
+                                .stream()
+                                .flatMap(List::stream)
+                                .map(AVRequest::getFromLink)
+                                .collect(Collectors.toList());
 
                 // find the Euclidean bipartite matching for all vehicles using the Hungarian method
-                System.out.println("optimizing over "+reRoutablevVehicles.size()+" vehicles and "+requestlocs.size() + " requests.");
-                Map<VehicleLinkPair, Link> hungarianmatches = abstractVehicleDestMatcher.match(reRoutablevVehicles, requestlocs);
+                System.out.println("optimizing over "+divertableVehicles.size()+" vehicles and "+requestlocs.size() + " requests.");
+                Map<VehicleLinkPair, Link> hungarianmatches = abstractVehicleDestMatcher.match(divertableVehicles, requestlocs);
 
                 // use the result to setVehicleDiversion
                 for (VehicleLinkPair vehicleLinkPair : hungarianmatches.keySet()) {

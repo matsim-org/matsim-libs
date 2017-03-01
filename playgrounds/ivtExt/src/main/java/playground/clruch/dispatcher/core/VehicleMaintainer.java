@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -37,7 +36,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * path computations attached to assignments are computed in parallel
  * {@link ParallelLeastCostPathCalculator}.
  */
-public abstract class VehicleMaintainer implements AVDispatcher {
+abstract class VehicleMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;
 
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
@@ -45,7 +44,7 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
 
-    protected VehicleMaintainer(EventsManager eventsManager) {
+    VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
     }
 
@@ -167,7 +166,10 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     public abstract void redispatch(double now);
 
-    public synchronized String getVehicleMaintainerStatusString() { // TODO still needs to evaluate
+    /**
+     * @return debug information about status of this instance of {@link VehicleMaintainer}
+     */
+    public synchronized String getVehicleMaintainerStatusString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#directives " + private_vehicleDirectives.size() + ", ");
         stringBuilder.append("total routingTime=" + (routingTimeNano * 1e-9) + " sec");

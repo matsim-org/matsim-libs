@@ -30,6 +30,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
     final Map<VirtualLink, Double> linkWeights;
     Map<VirtualLink, Double> rebalanceFloating;
 
+    final AbstractVehicleRequestMatcher vehicleRequestMatcher;
 
     public ConsensusDispatcher( //
                                 AVDispatcherConfig config, //
@@ -51,6 +52,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
             rebalanceFloating.put(virtualLink, 0.0);
         }
         linkWeights = linkWeightsIn;
+        vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
     }
 
     private int total_matchedRequests = 0;
@@ -62,7 +64,7 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
         // match requests and vehicles if they are at the same link
         int seconds = (int) Math.round(now);
 
-        total_matchedRequests += MatchRequestsWithStayVehicles.inOrderOfArrival(this);
+        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
 
         // for available vhicles, perform a rebalancing computation after REBALANCING_PERIOD seconds.
         if (seconds % REBALANCING_PERIOD == 0) {
@@ -166,7 +168,15 @@ public class ConsensusDispatcher extends PartitionedDispatcher {
                 int sizeL = destinationLinks.get(virtualNode).size();
                 if (sizeL > sizeV)
                     throw new RuntimeException("rebalancing inconsistent " + sizeL + " > " + sizeV);
+                long outTotal = rebalanceCount.entrySet()
+                        .stream()
+                        .filter(e->e.getKey().getFrom().equals(virtualNode))
+                        .mapToInt(e->e.getValue()).sum();
+                GlobalAssert.that(outTotal == sizeL);
             }
+
+
+
 
             // fill request destinations
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {

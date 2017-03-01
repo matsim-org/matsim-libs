@@ -34,6 +34,7 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
     final Map<VirtualLink, Double> linkWeights;
     Map<VirtualLink, Double> rebalanceFloating;
 
+    final AbstractVehicleRequestMatcher vehicleRequestMatcher;
 
     public ConsensusDispatcherDFRv20( //
                                       AVDispatcherConfig config, //
@@ -55,6 +56,7 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
             rebalanceFloating.put(virtualLink, 0.0);
         }
         linkWeights = linkWeightsIn;
+        vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
     }
 
     private int total_matchedRequests = 0;
@@ -66,7 +68,7 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
         // match requests and vehicles if they are at the same link
         int seconds = (int) Math.round(now);
 
-        total_matchedRequests += MatchRequestsWithStayVehicles.inOrderOfArrival(this);
+        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
 
         // for available vhicles, perform a rebalancing computation after REBALANCING_PERIOD seconds.
         if (seconds % REBALANCING_PERIOD == 0) {

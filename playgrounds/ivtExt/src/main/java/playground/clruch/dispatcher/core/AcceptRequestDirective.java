@@ -3,7 +3,6 @@ package playground.clruch.dispatcher.core;
 import java.util.Arrays;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
@@ -26,7 +25,7 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
  *  4) append dropoff task
  *  5) append new stay task
  */
-class AcceptRequestDirective extends FuturePathDirective {
+final class AcceptRequestDirective extends FuturePathDirective {
     final AVVehicle avVehicle;
     final AVRequest avRequest;
     final double getTimeNow;
