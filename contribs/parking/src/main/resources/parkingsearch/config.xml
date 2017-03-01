@@ -2,7 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 	<module name="network">
-		<param name="inputNetworkFile" value="C:\Users\Joschka\Documents\shared-svn\projects\bmw_carsharing\example\grid_network.xml"/>
+		<param name="inputNetworkFile" value="grid_network.xml"/>
 	</module>
 
 	<module name="controler">
