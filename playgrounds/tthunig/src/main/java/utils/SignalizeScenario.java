@@ -48,13 +48,21 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesFactory;
 import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.BoundingBox;
 
 import com.amazonaws.services.kms.model.UnsupportedOperationException;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+
+import playground.dgrether.DgPaths;
 
 /**
  * This class converts a scenario without signals into a scenario with signals at all intersections.
@@ -64,22 +72,39 @@ import com.amazonaws.services.kms.model.UnsupportedOperationException;
  * @author tthunig
  */
 public class SignalizeScenario {
-
+	
+	Scenario scenario;
+	Envelope bbEnv;
+	String signalControlIdentifier = DefaultPlanbasedSignalSystemController.IDENTIFIER;
+	
 	/**
-	 * call method with same name with signal control identifier DefaultPlanbasedSignalSystemController
+	 * constructor.
+	 * 
+	 * @param scenario contains a network, but no signal or lane information
 	 */
-	public static void createSignalsForAllLinks(Scenario scenario){
-		createSignalsForAllLinks(scenario, DefaultPlanbasedSignalSystemController.IDENTIFIER);
+	public SignalizeScenario(Scenario scenario) {
+		this.scenario = scenario;
+	}
+	
+	public void setSignalControlIdentifier(String signalControlIdentifier){
+		this.signalControlIdentifier = signalControlIdentifier;
+	}
+	
+	public void setBoundingBox(String bbShapeFile){
+//		String boundingBoxShape = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shape_files/signal_systems/cottbus_city_bounding_box.shp";
+		ShapeFileReader shapeReader = new ShapeFileReader();
+		shapeReader.readFileAndInitialize(bbShapeFile);
+		SimpleFeature f = shapeReader.getFeatureSet().iterator().next();
+		BoundingBox bb = f.getBounds();
+		bbEnv = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
 	}
 	
 	/**
 	 * Creates a signal system at every intersection which contains a signal on every link. 
 	 * No lanes are used, i.e. from every signal one can reach all outgoing links.
 	 * The signal information is saved in the given Scenario.
-	 * 
-	 * @param scenario a scenario which contains a network, but no signal or lane information
 	 */
-	public static void createSignalsForAllLinks(Scenario scenario, String signalControlIdentifier){
+	public void createSignalsForAllLinks(){
 		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -90,24 +115,14 @@ public class SignalizeScenario {
 		createGroupForEverySignal(scenario);
 		createControlForEveryGroup(scenario, signalControlIdentifier);
 	}
-	
-	/**
-	 * call method with same name with signal control identifier DefaultPlanbasedSignalSystemController
-	 */
-	public static void createSignalsAndLanesForAllTurnings(Scenario scenario){
-		createSignalsAndLanesForAllTurnings(scenario, DefaultPlanbasedSignalSystemController.IDENTIFIER);
-	}
 
 	/**
 	 * On every link a lane is created for each outgoing link.
 	 * Afterwards a signal system is created at every intersection which contains 
 	 * a signal on every lane, i.e. for every turning relation.
 	 * The lane and signal information is saved in the given Scenario.
-	 * 
-	 * @param scenario a scenario which contains a network, but no signal oder lane information
-	 * @param signalControlIdentifier 
 	 */
-	public static void createSignalsAndLanesForAllTurnings(Scenario scenario, String signalControlIdentifier){
+	public void createSignalsAndLanesForAllTurnings(){
 		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), 
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -121,7 +136,13 @@ public class SignalizeScenario {
 		createControlForEveryGroup(scenario, signalControlIdentifier);
 	}
 
-	private static void createLanesForEveryInLinkOutLinkPair(Scenario scenario) {
+	/**
+	 * for every link with more than one outgoing link, this method creates an original lane and outgoing lanes for all turning possibilities.
+	 * if a bounding box envelope is used, lanes are only created for links that lead to nodes inside the envelope.
+	 * 
+	 * @param scenario
+	 */
+	private void createLanesForEveryInLinkOutLinkPair(Scenario scenario) {
 		Lanes lanes = scenario.getLanes();
 		LanesFactory fac = lanes.getFactory();
 
@@ -129,34 +150,38 @@ public class SignalizeScenario {
 			throw new UnsupportedOperationException("Creating lanes and signals at all intersections is only supported for scenarios that do not contain lanes yet.");
 		}
 		
-		for (Link inLink : scenario.getNetwork().getLinks().values()){
-			// Create lanes for every link with outgoing links
-			if ((inLink.getToNode().getOutLinks() != null) && (!inLink.getToNode().getOutLinks().isEmpty())){
-				LanesToLinkAssignment linkLanes = fac.createLanesToLinkAssignment(inLink.getId());
-				lanes.addLanesToLinkAssignment(linkLanes);
-				List<Id<Lane>> linkLaneIds = new ArrayList<>();
-				for (Link outLink : inLink.getToNode().getOutLinks().values()) {
-					// TODO decide for suitable capacity, lane length and alignment. use dg utils or lane v1 to v2 converter logik?
-					double laneCap = inLink.getCapacity();
-					double laneStart_mFromLinkEnd = inLink.getLength()/2;
-					int alignment = 0;
-					Id<Lane> laneId = Id.create(inLink.getId() + "." + outLink.getId(), Lane.class);
-					LanesUtils.createAndAddLane(linkLanes, fac, laneId, laneCap, laneStart_mFromLinkEnd, alignment, 1, Collections.singletonList(outLink.getId()), null);
-					linkLaneIds.add(laneId);
+		for (Link inLink : scenario.getNetwork().getLinks().values()) {
+			// to node lies inside the bounding box envelope
+			if (bbEnv != null && bbEnv.contains(MGC.coord2Coordinate(inLink.getToNode().getCoord()))) {
+				// Create lanes for every link with more than one outgoing link
+				if ((inLink.getToNode().getOutLinks() != null) && (inLink.getToNode().getOutLinks().size() > 1)) {
+					LanesToLinkAssignment linkLanes = fac.createLanesToLinkAssignment(inLink.getId());
+					lanes.addLanesToLinkAssignment(linkLanes);
+					List<Id<Lane>> linkLaneIds = new ArrayList<>();
+					for (Link outLink : inLink.getToNode().getOutLinks().values()) {
+						// TODO decide for suitable capacity, lane length and alignment. use dg utils or lane v1 to v2 converter logik?
+						double laneCap = inLink.getCapacity();
+						double laneStart_mFromLinkEnd = inLink.getLength() / 2;
+						int alignment = 0;
+						Id<Lane> laneId = Id.create(inLink.getId() + "." + outLink.getId(), Lane.class);
+						LanesUtils.createAndAddLane(linkLanes, fac, laneId, laneCap, laneStart_mFromLinkEnd, alignment, 1, Collections.singletonList(outLink.getId()), null);
+						linkLaneIds.add(laneId);
+					}
+					// create original lane
+					LanesUtils.createAndAddLane(linkLanes, fac, Id.create(inLink.getId() + ".ol", Lane.class), inLink.getCapacity(), inLink.getLength(), 0, 1, null, linkLaneIds);
 				}
-				// create original lane
-				LanesUtils.createAndAddLane(linkLanes, fac, Id.create(inLink.getId() + ".ol", Lane.class), inLink.getCapacity(), inLink.getLength(), 0, 1, null, linkLaneIds);
 			}
 		}
 	}
 
 	/**
-	 * create a signal system at every node with signals at all links or lanes (if useLanes is true)
+	 * create a signal system at every node inside the bounding box envelope.
+	 * creates signals at all links or lanes (if useLanes is true)
 	 * 
 	 * @param scenario
 	 * @param useLanes
 	 */
-	private static void createSystemAtEveryNode(Scenario scenario, boolean useLanes) {
+	private void createSystemAtEveryNode(Scenario scenario, boolean useLanes) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
 	
@@ -165,40 +190,49 @@ public class SignalizeScenario {
 		}
 		
 		for (Node node : scenario.getNetwork().getNodes().values()){
-			// Create system for every node with outgoing and ingoing links
-			if ((node.getOutLinks() != null) && (!node.getOutLinks().isEmpty())
-					&& (node.getInLinks() != null) && (!node.getInLinks().isEmpty())) {
-				// create signal system
-				SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem" + node.getId(), SignalSystem.class));
-				signalsData.getSignalSystemsData().addSignalSystemData(signalSystem);
+			// node lies inside the bounding box envelope
+			if (bbEnv != null && bbEnv.contains(MGC.coord2Coordinate(node.getCoord()))) {
 
-				// go through all ingoing links
-				for (Id<Link> linkId : node.getInLinks().keySet()) {
-					if (useLanes) {
-						// go through all ingoing lanes
-						for (Lane lane : scenario.getLanes().getLanesToLinkAssignments().get(linkId).getLanes().values()) {
-							// do not create signals for original lanes
-							if (!lane.getId().toString().endsWith(".ol")) {
-								SignalData signal = fac.createSignalData(Id.create("signal" + linkId + "." + lane.getId(), Signal.class));
-								signalSystem.addSignalData(signal);
-								signal.setLinkId(linkId);
-								signal.addLaneId(lane.getId());
-								for (Id<Link> toLinkId : lane.getToLinkIds()) {
-									signal.addTurningMoveRestriction(toLinkId);
+				// Create system for every node with outgoing and ingoing links
+				if ((node.getOutLinks() != null) && (!node.getOutLinks().isEmpty()) && (node.getInLinks() != null) && (!node.getInLinks().isEmpty())) {
+					// if (node.getOutLinks().size() == 1 && node.getInLinks().size() == 1
+					// && node.getOutLinks().get(0).getToNode().equals(node.getInLinks().get(0).getFromNode())){
+					// // do not create signals at dead end streets
+					// continue;
+					// }
+
+					// create signal system
+					SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem" + node.getId(), SignalSystem.class));
+					signalsData.getSignalSystemsData().addSignalSystemData(signalSystem);
+
+					// go through all ingoing links
+					for (Id<Link> linkId : node.getInLinks().keySet()) {
+						if (useLanes && scenario.getLanes().getLanesToLinkAssignments().containsKey(linkId)) {
+							// go through all ingoing lanes
+							for (Lane lane : scenario.getLanes().getLanesToLinkAssignments().get(linkId).getLanes().values()) {
+								// do not create signals for original lanes
+								if (!lane.getId().toString().endsWith(".ol")) {
+									SignalData signal = fac.createSignalData(Id.create("signal" + linkId + "." + lane.getId(), Signal.class));
+									signalSystem.addSignalData(signal);
+									signal.setLinkId(linkId);
+									signal.addLaneId(lane.getId());
+									for (Id<Link> toLinkId : lane.getToLinkIds()) {
+										signal.addTurningMoveRestriction(toLinkId);
+									}
 								}
 							}
+						} else { // i.e. no lanes
+							SignalData signal = fac.createSignalData(Id.create("signal" + linkId, Signal.class));
+							signalSystem.addSignalData(signal);
+							signal.setLinkId(linkId);
 						}
-					} else { // i.e. no lanes
-						SignalData signal = fac.createSignalData(Id.create("signal" + linkId, Signal.class));
-						signalSystem.addSignalData(signal);
-						signal.setLinkId(linkId);
 					}
 				}
 			}
 		}
 	}
 
-	private static void createGroupForEverySignal(Scenario scenario) {
+	private void createGroupForEverySignal(Scenario scenario) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		for (SignalSystemData system : signalsData.getSignalSystemsData().getSignalSystemData().values()) {
 			SignalUtils.createAndAddSignalGroups4Signals(signalsData.getSignalGroupsData(), system);
@@ -211,7 +245,7 @@ public class SignalizeScenario {
 	 * @param scenario
 	 * @param signalControlIdentifier 
 	 */
-	private static void createControlForEveryGroup(Scenario scenario, String signalControlIdentifier) {
+	private void createControlForEveryGroup(Scenario scenario, String signalControlIdentifier) {
 		int CYCLE_TIME = 90;
 		
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
