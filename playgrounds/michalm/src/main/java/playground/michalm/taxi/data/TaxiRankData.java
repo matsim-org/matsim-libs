@@ -23,8 +23,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-
-public interface TaxiRankData
-{
-    Map<Id<TaxiRank>, ? extends TaxiRank> getTaxiRanks();
+public interface TaxiRankData {
+	Map<Id<TaxiRank>, ? extends TaxiRank> getTaxiRanks();
 }

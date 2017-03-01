@@ -25,22 +25,16 @@ import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 
 import playground.michalm.ev.data.Charger;
 
+public class BestChargerFinder {
+	private static final LinkProvider<Charger> CHARGER_TO_LINK = (charger) -> charger.getLink();
 
-public class BestChargerFinder
-{
-    private static final LinkProvider<Charger> CHARGER_TO_LINK = (charger) -> charger.getLink();
+	private final BestDispatchFinder dispatchFinder;
 
-    private final BestDispatchFinder dispatchFinder;
+	public BestChargerFinder(BestDispatchFinder dispatchFinder) {
+		this.dispatchFinder = dispatchFinder;
+	}
 
-
-    public BestChargerFinder(BestDispatchFinder dispatchFinder)
-    {
-        this.dispatchFinder = dispatchFinder;
-    }
-
-
-    public Dispatch<Charger> findBestChargerForVehicle(Vehicle veh, Iterable<Charger> chargers)
-    {
-        return dispatchFinder.findBestDestination(veh, chargers, CHARGER_TO_LINK);
-    }
+	public Dispatch<Charger> findBestChargerForVehicle(Vehicle veh, Iterable<Charger> chargers) {
+		return dispatchFinder.findBestDestination(veh, chargers, CHARGER_TO_LINK);
+	}
 }

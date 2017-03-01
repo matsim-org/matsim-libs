@@ -27,51 +27,38 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.michalm.ev.data.Charger;
 
+public class ChargingStartEvent extends Event {
+	public static final String EVENT_TYPE = "charging_start";
+	public static final String ATTRIBUTE_CHARGER = "charger";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
-public class ChargingStartEvent
-    extends Event
-{
-    public static final String EVENT_TYPE = "charging_start";
-    public static final String ATTRIBUTE_CHARGER = "charger";
-    public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	private final Id<Charger> chargerId;
+	private final Id<Vehicle> vehicleId;
 
-    private final Id<Charger> chargerId;
-    private final Id<Vehicle> vehicleId;
+	public ChargingStartEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId) {
+		super(time);
+		this.chargerId = chargerId;
+		this.vehicleId = vehicleId;
+	}
 
+	public Id<Charger> getChargerId() {
+		return chargerId;
+	}
 
-    public ChargingStartEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId)
-    {
-        super(time);
-        this.chargerId = chargerId;
-        this.vehicleId = vehicleId;
-    }
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
+	}
 
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
 
-    public Id<Charger> getChargerId()
-    {
-        return chargerId;
-    }
-
-
-    public Id<Vehicle> getVehicleId()
-    {
-        return vehicleId;
-    }
-
-
-    @Override
-    public String getEventType()
-    {
-        return EVENT_TYPE;
-    }
-
-
-    @Override
-    public Map<String, String> getAttributes()
-    {
-        Map<String, String> attr = super.getAttributes();
-        attr.put(ATTRIBUTE_CHARGER, chargerId.toString());
-        attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
-        return attr;
-    }
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_CHARGER, chargerId.toString());
+		attr.put(ATTRIBUTE_VEHICLE, vehicleId.toString());
+		return attr;
+	}
 }

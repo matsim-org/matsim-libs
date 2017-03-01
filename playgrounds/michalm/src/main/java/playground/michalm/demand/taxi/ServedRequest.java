@@ -23,15 +23,10 @@ import java.util.Date;
 
 import org.matsim.api.core.v01.*;
 
+public interface ServedRequest extends Identifiable<ServedRequest> {
+	Date getStartTime();
 
-public interface ServedRequest
-    extends Identifiable<ServedRequest>
-{
-    Date getStartTime();
+	Coord getFrom();
 
-
-    Coord getFrom();
-
-
-    Coord getTo();
+	Coord getTo();
 }

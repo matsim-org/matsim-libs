@@ -21,33 +21,29 @@ package playground.michalm.jtrrouter;
 
 import java.util.*;
 
-
 /**
  * @author michalm
  */
-public class Flow
-{
-    final int node;
-    final int next;
+public class Flow {
+	final int node;
+	final int next;
 
-    final int[] counts;
+	final int[] counts;
 
-    final boolean isInFlow;
-    final boolean isOutFlow;
+	final boolean isInFlow;
+	final boolean isOutFlow;
 
-    final List<Route> routes;// routes found
+	final List<Route> routes;// routes found
 
+	public Flow(int node, int next, int[] counts, boolean isInFlow, boolean isOutFlow) {
+		this.node = node;
+		this.next = next;
 
-    public Flow(int node, int next, int[] counts, boolean isInFlow, boolean isOutFlow)
-    {
-        this.node = node;
-        this.next = next;
+		this.counts = counts;
 
-        this.counts = counts;
+		this.isInFlow = isInFlow;
+		this.isOutFlow = isOutFlow;
 
-        this.isInFlow = isInFlow;
-        this.isOutFlow = isOutFlow;
-
-        routes = new ArrayList<>();
-    }
+		routes = new ArrayList<>();
+	}
 }

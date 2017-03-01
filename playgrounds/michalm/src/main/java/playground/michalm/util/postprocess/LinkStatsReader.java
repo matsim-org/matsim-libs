@@ -23,75 +23,70 @@ import java.util.*;
 
 import org.matsim.core.utils.io.IOUtils;
 
+public class LinkStatsReader {
+	public static class LinkStats {
+		String linkId, fromId, toId;
+		double length, freeSpeed, capacity;
 
-public class LinkStatsReader
-{
-    public static class LinkStats
-    {
-        String linkId, fromId, toId;
-        double length, freeSpeed, capacity;
+		double[] hrs;
+		double dailyHrs;
+		double[] tt;
+	}
 
-        double[] hrs;
-        double dailyHrs;
-        double[] tt;
-    }
+	public static List<? extends LinkStats> readLinkStats(String file) {
+		List<LinkStats> linkStatsList = new ArrayList<>();
+		@SuppressWarnings("resource")
+		Scanner sc = new Scanner(IOUtils.getBufferedReader(file)).useLocale(Locale.ENGLISH);
 
+		// ============ HEADER ==========
+		// LINK ORIG_ID FROM TO LENGTH FREESPEED CAPACITY
+		// HRS0-1min HRS0-1avg HRS0-1max
+		// ...............
+		// HRS23-24min HRS23-24avg HRS23-24max
+		// HRS0-24min HRS0-24avg HRS0-24max
+		// TRAVELTIME0-1min TRAVELTIME0-1avg TRAVELTIME0-1max
+		// ...............
+		// TRAVELTIME23-24min TRAVELTIME23-24avg TRAVELTIME23-24max
 
-    public static List<? extends LinkStats> readLinkStats(String file)
-    {
-        List<LinkStats> linkStatsList = new ArrayList<>();
-        @SuppressWarnings("resource")
-        Scanner sc = new Scanner(IOUtils.getBufferedReader(file)).useLocale(Locale.ENGLISH);
+		sc.nextLine();// skip header
 
-        // ============ HEADER ==========
-        // LINK ORIG_ID FROM TO LENGTH FREESPEED CAPACITY
-        // HRS0-1min HRS0-1avg HRS0-1max
-        // ...............
-        // HRS23-24min HRS23-24avg HRS23-24max
-        // HRS0-24min HRS0-24avg HRS0-24max
-        // TRAVELTIME0-1min TRAVELTIME0-1avg TRAVELTIME0-1max
-        // ...............
-        // TRAVELTIME23-24min TRAVELTIME23-24avg TRAVELTIME23-24max
+		while (sc.hasNext()) {
+			LinkStats ls = new LinkStats();
 
-        sc.nextLine();// skip header
+			ls.linkId = sc.next();
+			// ORIG_ID is unused (obsolete column)
+			ls.fromId = sc.next();
+			ls.toId = sc.next();
 
-        while (sc.hasNext()) {
-            LinkStats ls = new LinkStats();
+			ls.length = sc.nextDouble();
+			ls.freeSpeed = sc.nextDouble();
+			ls.capacity = sc.nextDouble();
 
-            ls.linkId = sc.next();
-            // ORIG_ID is unused (obsolete column)
-            ls.fromId = sc.next();
-            ls.toId = sc.next();
+			// ========== VOLUMES ===========
+			double[] hrs = ls.hrs = new double[24];
+			for (int i = 0; i < 24; i++) {
+				sc.next();// skip HRS min
+				hrs[i] = sc.nextDouble();// HRS avg
+				sc.next();// skip HRS max
+			}
 
-            ls.length = sc.nextDouble();
-            ls.freeSpeed = sc.nextDouble();
-            ls.capacity = sc.nextDouble();
+			sc.next();// skip HRS min
+			ls.dailyHrs = sc.nextDouble();// HRS avg
+			sc.next();// skip HRS max
 
-            // ========== VOLUMES ===========
-            double[] hrs = ls.hrs = new double[24];
-            for (int i = 0; i < 24; i++) {
-                sc.next();// skip HRS min
-                hrs[i] = sc.nextDouble();// HRS avg
-                sc.next();// skip HRS max
-            }
+			// ========== TRAVE TIMES ===========
 
-            sc.next();// skip HRS min
-            ls.dailyHrs = sc.nextDouble();// HRS avg
-            sc.next();// skip HRS max
+			double[] tt = ls.tt = new double[24];
+			for (int i = 0; i < 24; i++) {
+				sc.next();// skip TT min
+				tt[i] = sc.nextDouble();// TT avg
+				sc.next();// skip TT max
+			}
 
-            // ========== TRAVE TIMES ===========
+			linkStatsList.add(ls);
+		}
 
-            double[] tt = ls.tt = new double[24];
-            for (int i = 0; i < 24; i++) {
-                sc.next();// skip TT min
-                tt[i] = sc.nextDouble();// TT avg
-                sc.next();// skip TT max
-            }
-
-            linkStatsList.add(ls);
-        }
-
-        sc.close();
-        return linkStatsList;
-    }
+		sc.close();
+		return linkStatsList;
+	}
 }

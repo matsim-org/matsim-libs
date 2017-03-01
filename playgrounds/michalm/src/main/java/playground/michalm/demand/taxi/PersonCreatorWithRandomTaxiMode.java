@@ -29,79 +29,62 @@ import org.matsim.contrib.zone.Zone;
 
 import playground.michalm.demand.DefaultPersonCreator;
 
+public class PersonCreatorWithRandomTaxiMode extends DefaultPersonCreator {
+	private final UniformRandom uniform = RandomUtils.getGlobalUniform();
 
-public class PersonCreatorWithRandomTaxiMode
-    extends DefaultPersonCreator
-{
-    private final UniformRandom uniform = RandomUtils.getGlobalUniform();
+	private final List<Person> taxiCustomers = new ArrayList<>();
+	private final double taxiProbability;
 
-    private final List<Person> taxiCustomers = new ArrayList<>();
-    private final double taxiProbability;
+	public PersonCreatorWithRandomTaxiMode(Scenario scenario, double taxiProbability) {
+		super(scenario);
+		this.taxiProbability = taxiProbability;
+	}
 
+	@Override
+	public Person createPerson(Plan plan, Zone fromZone, Zone toZone) {
+		if (isTaxiCustomer(fromZone, toZone)) {
+			taxiCustomers.add(plan.getPerson());
+		}
 
-    public PersonCreatorWithRandomTaxiMode(Scenario scenario, double taxiProbability)
-    {
-        super(scenario);
-        this.taxiProbability = taxiProbability;
-    }
+		return super.createPerson(plan, fromZone, toZone);
+	}
 
+	public boolean isTaxiCustomer(Zone fromZone, Zone toZone) {
+		if (taxiProbability == 0 || !isInternalZone(fromZone) || !isInternalZone(toZone)) {
+			return false;
+		}
 
-    @Override
-    public Person createPerson(Plan plan, Zone fromZone, Zone toZone)
-    {
-        if (isTaxiCustomer(fromZone, toZone)) {
-            taxiCustomers.add(plan.getPerson());
-        }
+		return uniform.trueOrFalse(taxiProbability);
+	}
 
-        return super.createPerson(plan, fromZone, toZone);
-    }
+	private static boolean isInternalZone(Zone zone) {
+		String type = zone.getType();
+		return type == null || type.toLowerCase().equals("internal");
+	}
 
+	public void writeTaxiCustomers(String taxiCustomersFile) {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(taxiCustomersFile)))) {
+			for (Person p : taxiCustomers) {
+				bw.write(p.getId().toString());
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    public boolean isTaxiCustomer(Zone fromZone, Zone toZone)
-    {
-        if (taxiProbability == 0 || !isInternalZone(fromZone) || !isInternalZone(toZone)) {
-            return false;
-        }
+	public static List<String> readTaxiCustomerIds(String taxiCustomersFile) {
+		try (BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFile)))) {
+			List<String> taxiCustomerIds = new ArrayList<>();
 
-        return uniform.trueOrFalse(taxiProbability);
-    }
+			String line;
+			while ((line = br.readLine()) != null) {
+				taxiCustomerIds.add(line);
+			}
 
-
-    private static boolean isInternalZone(Zone zone)
-    {
-        String type = zone.getType();
-        return type == null || type.toLowerCase().equals("internal");
-    }
-
-
-    public void writeTaxiCustomers(String taxiCustomersFile)
-    {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(taxiCustomersFile)))) {
-            for (Person p : taxiCustomers) {
-                bw.write(p.getId().toString());
-                bw.newLine();
-            }
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    public static List<String> readTaxiCustomerIds(String taxiCustomersFile)
-    {
-        try (BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFile)))) {
-            List<String> taxiCustomerIds = new ArrayList<>();
-
-            String line;
-            while ( (line = br.readLine()) != null) {
-                taxiCustomerIds.add(line);
-            }
-
-            return taxiCustomerIds;
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+			return taxiCustomerIds;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

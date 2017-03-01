@@ -21,34 +21,25 @@ package playground.michalm.jtrrouter.matsim;
 
 import playground.michalm.jtrrouter.Flow;
 
-
 /**
  * @author michalm
  */
-public class MATSimFlow
-    extends Flow
-{
-    final int inLink;
-    final int outLink;
+public class MATSimFlow extends Flow {
+	final int inLink;
+	final int outLink;
 
+	public MATSimFlow(int node, int inLink, int outLink, int next, int count) {
+		super(node, next, new int[] { count }, inLink != -1, outLink != -1);
 
-    public MATSimFlow(int node, int inLink, int outLink, int next, int count)
-    {
-        super(node, next, new int[] { count }, inLink != -1, outLink != -1);
+		this.inLink = inLink;
+		this.outLink = outLink;
+	}
 
-        this.inLink = inLink;
-        this.outLink = outLink;
-    }
+	public int getInLink() {
+		return inLink;
+	}
 
-
-    public int getInLink()
-    {
-        return inLink;
-    }
-
-
-    public int getOutLink()
-    {
-        return outLink;
-    }
+	public int getOutLink() {
+		return outLink;
+	}
 }

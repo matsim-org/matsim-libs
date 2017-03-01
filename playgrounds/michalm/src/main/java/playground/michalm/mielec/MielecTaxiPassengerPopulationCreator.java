@@ -24,69 +24,64 @@ import java.util.List;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
 import org.matsim.contrib.util.CSVReaders;
 import org.matsim.core.config.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+public class MielecTaxiPassengerPopulationCreator {
+	public static void process(String suffix) {
+		String dir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/plans_taxi/";
+		String demandFile = dir + "taxi_demand_" + suffix + ".txt";
+		String planFile = dir + "plans_only_taxi_mini_benchmark_" + suffix + ".xml.gz";
 
-public class MielecTaxiPassengerPopulationCreator
-{
-    public static void process(String suffix)
-    {
-        String dir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/plans_taxi/";
-        String demandFile = dir + "taxi_demand_" + suffix + ".txt";
-        String planFile = dir + "plans_only_taxi_mini_benchmark_" + suffix + ".xml.gz";
-        
-        //we have two travel demand waves:
-        //6:00:00-12:59:59
-        //13:00:00-19:59:59
-        final int maxDepartureTime = 13 * 3600;
-        final int departureTimeShift = 6 * 3600;
+		// we have two travel demand waves:
+		// 6:00:00-12:59:59
+		// 13:00:00-19:59:59
+		final int maxDepartureTime = 13 * 3600;
+		final int departureTimeShift = 6 * 3600;
 
-        Config config = ConfigUtils.createConfig();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        Population population = scenario.getPopulation();
-        PopulationFactory pf = population.getFactory();
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Population population = scenario.getPopulation();
+		PopulationFactory pf = population.getFactory();
 
-        List<String[]> lines = CSVReaders.readTSV(demandFile);
-        for (int i = 1; i < lines.size(); i++) {
-            String[] line = lines.get(i);
-            Id<Person> personId = Id.createPersonId(line[0]);
+		List<String[]> lines = CSVReaders.readTSV(demandFile);
+		for (int i = 1; i < lines.size(); i++) {
+			String[] line = lines.get(i);
+			Id<Person> personId = Id.createPersonId(line[0]);
 
-            double departureTime = Double.parseDouble(line[1]);
-            if (departureTime >= maxDepartureTime) {
-                continue;
-            }
-            departureTime -= departureTimeShift;
-            
-            Id<Link> fromLinkId = Id.createLinkId(line[2]);
-            Id<Link> toLinkId = Id.createLinkId(line[3]);
+			double departureTime = Double.parseDouble(line[1]);
+			if (departureTime >= maxDepartureTime) {
+				continue;
+			}
+			departureTime -= departureTimeShift;
 
-            Plan plan = pf.createPlan();
-            Activity act = pf.createActivityFromLinkId("dummy", fromLinkId);
-            act.setEndTime(departureTime);
-            plan.addActivity(act);
-            Leg leg = pf.createLeg(TaxiOptimizerModules.TAXI_MODE);
-            leg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
-            plan.addLeg(leg);
-            plan.addActivity(pf.createActivityFromLinkId("dummy", toLinkId));
+			Id<Link> fromLinkId = Id.createLinkId(line[2]);
+			Id<Link> toLinkId = Id.createLinkId(line[3]);
 
-            Person person = pf.createPerson(personId);
-            person.addPlan(plan);
-            population.addPerson(person);
-        }
+			Plan plan = pf.createPlan();
+			Activity act = pf.createActivityFromLinkId("dummy", fromLinkId);
+			act.setEndTime(departureTime);
+			plan.addActivity(act);
+			Leg leg = pf.createLeg(TaxiOptimizerModules.TAXI_MODE);
+			leg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
+			plan.addLeg(leg);
+			plan.addActivity(pf.createActivityFromLinkId("dummy", toLinkId));
 
-        new PopulationWriter(population).write(planFile);
-    }
+			Person person = pf.createPerson(personId);
+			person.addPlan(plan);
+			population.addPerson(person);
+		}
 
+		new PopulationWriter(population).write(planFile);
+	}
 
-    public static void main(String[] args)
-    {
-        String[] suffixes = { "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0" };
-        for (String suffix : suffixes) {
-            process(suffix);
-        }
-    }
+	public static void main(String[] args) {
+		String[] suffixes = { "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0" };
+		for (String suffix : suffixes) {
+			process(suffix);
+		}
+	}
 }

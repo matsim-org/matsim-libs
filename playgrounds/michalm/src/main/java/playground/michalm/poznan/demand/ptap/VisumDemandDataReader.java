@@ -30,80 +30,68 @@ import org.matsim.matrices.Matrix;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.util.visum.VisumMatrixReader;
 
+public class VisumDemandDataReader {
+	public static Map<String, double[]> readHourlyShares(String sharesFile) {
+		Map<String, double[]> hourlyShares = new LinkedHashMap<>();
 
-public class VisumDemandDataReader
-{
-    public static Map<String, double[]> readHourlyShares(String sharesFile)
-    {
-        Map<String, double[]> hourlyShares = new LinkedHashMap<>();
+		try (Scanner scanner = new Scanner(new File(sharesFile))) {
+			scanner.useLocale(Locale.US);
+			scanner.nextLine();
 
-        try (Scanner scanner = new Scanner(new File(sharesFile))) {
-            scanner.useLocale(Locale.US);
-            scanner.nextLine();
+			while (scanner.hasNext()) {
+				String key = scanner.next();
 
-            while (scanner.hasNext()) {
-                String key = scanner.next();
+				double[] shares = new double[24];
+				for (int i = 0; i < shares.length; i++) {
+					shares[i] = scanner.nextDouble();
+				}
 
-                double[] shares = new double[24];
-                for (int i = 0; i < shares.length; i++) {
-                    shares[i] = scanner.nextDouble();
-                }
+				hourlyShares.put(key, shares);
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 
-                hourlyShares.put(key, shares);
-            }
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+		return hourlyShares;
+	}
 
-        return hourlyShares;
-    }
+	public static Map<String, Tuple<String, String>> readActivityPairs(String activityFile) {
+		Map<String, Tuple<String, String>> activityPairs = new LinkedHashMap<>();
 
+		try (Scanner scanner = new Scanner(new File(activityFile))) {
+			scanner.useLocale(Locale.US);
 
-    public static Map<String, Tuple<String, String>> readActivityPairs(String activityFile)
-    {
-        Map<String, Tuple<String, String>> activityPairs = new LinkedHashMap<>();
+			while (scanner.hasNext()) {
+				String key = scanner.next();
+				String fromActivity = scanner.next();
+				String toActivity = scanner.next();
 
-        try (Scanner scanner = new Scanner(new File(activityFile))) {
-            scanner.useLocale(Locale.US);
+				activityPairs.put(key, new Tuple<>(fromActivity, toActivity));
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 
-            while (scanner.hasNext()) {
-                String key = scanner.next();
-                String fromActivity = scanner.next();
-                String toActivity = scanner.next();
+		return activityPairs;
+	}
 
-                activityPairs.put(key, new Tuple<>(fromActivity, toActivity));
-            }
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+	public static Map<String, Matrix> readODMatrices(String bindingsFile, String mainDir, Map<Id<Zone>, Zone> zones) {
+		Map<String, Matrix> odMatrices = new LinkedHashMap<>();
 
-        return activityPairs;
-    }
+		try (Scanner scanner = new Scanner(new File(bindingsFile))) {
+			while (scanner.hasNext()) {
+				String key = scanner.next();
+				String odMatrixFile = mainDir + scanner.next();
 
+				double[][] visumODMatrix = VisumMatrixReader.readMatrix(odMatrixFile);
+				Matrix odMatrix = MatrixUtils.createSparseMatrix(key, zones.keySet(), visumODMatrix);
 
-    public static Map<String, Matrix> readODMatrices(String bindingsFile, String mainDir,
-            Map<Id<Zone>, Zone> zones)
-    {
-        Map<String, Matrix> odMatrices = new LinkedHashMap<>();
+				odMatrices.put(key, odMatrix);
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 
-        try (Scanner scanner = new Scanner(new File(bindingsFile))) {
-            while (scanner.hasNext()) {
-                String key = scanner.next();
-                String odMatrixFile = mainDir + scanner.next();
-
-                double[][] visumODMatrix = VisumMatrixReader.readMatrix(odMatrixFile);
-                Matrix odMatrix = MatrixUtils.createSparseMatrix(key, zones.keySet(),
-                        visumODMatrix);
-
-                odMatrices.put(key, odMatrix);
-            }
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        return odMatrices;
-    }
+		return odMatrices;
+	}
 }

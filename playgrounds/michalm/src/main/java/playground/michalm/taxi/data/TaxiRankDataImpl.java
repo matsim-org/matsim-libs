@@ -23,22 +23,15 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 
+public class TaxiRankDataImpl implements TaxiRankData {
+	private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
 
-public class TaxiRankDataImpl
-    implements TaxiRankData
-{
-    private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
+	@Override
+	public Map<Id<TaxiRank>, ? extends TaxiRank> getTaxiRanks() {
+		return Collections.unmodifiableMap(taxiRanks);
+	}
 
-
-    @Override
-    public Map<Id<TaxiRank>, ? extends TaxiRank> getTaxiRanks()
-    {
-        return Collections.unmodifiableMap(taxiRanks);
-    }
-
-
-    public void addTaxiRank(TaxiRank taxiRank)
-    {
-        taxiRanks.put(taxiRank.getId(), taxiRank);
-    }
+	public void addTaxiRank(TaxiRank taxiRank) {
+		taxiRanks.put(taxiRank.getId(), taxiRank);
+	}
 }

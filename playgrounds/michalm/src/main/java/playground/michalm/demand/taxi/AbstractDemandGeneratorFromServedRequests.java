@@ -20,67 +20,56 @@
 package playground.michalm.demand.taxi;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
+public abstract class AbstractDemandGeneratorFromServedRequests {
+	private final Scenario scenario;
+	private final Network network;
+	private final PopulationFactory pf;
 
-public abstract class AbstractDemandGeneratorFromServedRequests
-{
-    private final Scenario scenario;
-    private final Network network;
-    private final PopulationFactory pf;
+	public AbstractDemandGeneratorFromServedRequests(Scenario scenario) {
+		this.scenario = scenario;
+		pf = scenario.getPopulation().getFactory();
+		network = (Network) scenario.getNetwork();
+	}
 
+	protected Person generatePassenger(ServedRequest request, double startTime) {
+		Plan plan = pf.createPlan();
 
-    public AbstractDemandGeneratorFromServedRequests(Scenario scenario)
-    {
-        this.scenario = scenario;
-        pf = scenario.getPopulation().getFactory();
-        network = (Network)scenario.getNetwork();
-    }
-    
-    
-    protected Person generatePassenger(ServedRequest request, double startTime)
-    {
-        Plan plan = pf.createPlan();
+		// start
+		Activity startAct = createActivityFromCoord("start", request.getFrom());
+		startAct.setEndTime(startTime);
 
-        // start
-        Activity startAct = createActivityFromCoord("start", request.getFrom());
-        startAct.setEndTime(startTime);
+		// end
+		Activity endAct = createActivityFromCoord("end", request.getTo());
 
-        // end
-        Activity endAct = createActivityFromCoord("end", request.getTo());
+		// trip
+		Leg leg = pf.createLeg(TaxiOptimizerModules.TAXI_MODE);
+		leg.setRoute(new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId()));
 
-        // trip
-        Leg leg = pf.createLeg(TaxiOptimizerModules.TAXI_MODE);
-        leg.setRoute(new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId()));
+		plan.addActivity(startAct);
+		plan.addLeg(leg);
+		plan.addActivity(endAct);
 
-        plan.addActivity(startAct);
-        plan.addLeg(leg);
-        plan.addActivity(endAct);
+		Person passenger = pf.createPerson(Id.createPersonId(request.getId()));
+		passenger.addPlan(plan);
+		scenario.getPopulation().addPerson(passenger);
+		return passenger;
+	}
 
-        Person passenger = pf.createPerson(Id.createPersonId(request.getId()));
-        passenger.addPlan(plan);
-        scenario.getPopulation().addPerson(passenger);
-        return passenger;
-    }
+	private Activity createActivityFromCoord(String actType, Coord coord) {
+		Activity activity = (Activity) pf.createActivityFromCoord(actType, coord);
+		final Coord coord1 = coord;
+		Link link = NetworkUtils.getNearestLinkExactly(network, coord1);
+		activity.setLinkId(link.getId());
+		return activity;
+	}
 
-
-    private Activity createActivityFromCoord(String actType, Coord coord)
-    {
-        Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
-	final Coord coord1 = coord;
-        Link link = NetworkUtils.getNearestLinkExactly(network,coord1);
-        activity.setLinkId(link.getId());
-        return activity;
-    }
-
-
-    public void write(String plansFile)
-    {
-        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(plansFile);
-    }
+	public void write(String plansFile) {
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(plansFile);
+	}
 }

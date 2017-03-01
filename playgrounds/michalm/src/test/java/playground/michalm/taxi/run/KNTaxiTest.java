@@ -21,15 +21,12 @@ package playground.michalm.taxi.run;
 
 import org.junit.Test;
 
-
-public class KNTaxiTest
-{
-    @Test
-    public void testRun()
-    {
-        String configFile = "src/main/resources/mielec_2014_02/KN_config.xml";
-        KNTaxi.run(configFile, false, false, false);        
-        KNTaxi.run(configFile, true, false, false);
-        KNTaxi.run(configFile, true, true, false);
-    }
+public class KNTaxiTest {
+	@Test
+	public void testRun() {
+		String configFile = "src/main/resources/mielec_2014_02/KN_config.xml";
+		KNTaxi.run(configFile, false, false, false);
+		KNTaxi.run(configFile, true, false, false);
+		KNTaxi.run(configFile, true, true, false);
+	}
 }

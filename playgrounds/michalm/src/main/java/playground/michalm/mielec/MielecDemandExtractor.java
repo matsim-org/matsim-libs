@@ -21,48 +21,41 @@ package playground.michalm.mielec;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.config.*;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+public class MielecDemandExtractor {
+	public static void main(String[] args) {
+		String[] suffixes = { "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0" };
+		for (String suffix : suffixes) {
+			process(suffix);
+		}
+	}
 
-public class MielecDemandExtractor
-{
-    public static void main(String[] args)
-    {
-        String[] suffixes = { "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0" };
-        for (String suffix : suffixes) {
-            process(suffix);
-        }
-    }
+	private static void process(String suffix) {
+		String dir = "d:/eclipse/shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/plans_taxi/";
+		String planFile = dir + "plans_taxi_" + suffix + ".xml.gz";
+		String demandFile = dir + "taxi_demand_" + suffix + ".txt";
 
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new PopulationReader(scenario).readFile(planFile);
 
-    private static void process(String suffix)
-    {
-        String dir = "d:/eclipse/shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/plans_taxi/";
-        String planFile = dir + "plans_taxi_" + suffix + ".xml.gz";
-        String demandFile = dir + "taxi_demand_" + suffix + ".txt";
+		try (CompactCSVWriter csvWriter = new CompactCSVWriter(IOUtils.getBufferedWriter(demandFile))) {
+			csvWriter.writeNext("personId", "departureTime", "fromLinkId", "toLinkId");
 
-        Config config = ConfigUtils.createConfig();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new PopulationReader(scenario).readFile(planFile);
+			for (Person p : scenario.getPopulation().getPersons().values()) {
+				Leg leg = (Leg) p.getPlans().get(0).getPlanElements().get(1);
 
-        try (CompactCSVWriter csvWriter = new CompactCSVWriter(
-                IOUtils.getBufferedWriter(demandFile))) {
-            csvWriter.writeNext("personId", "departureTime", "fromLinkId", "toLinkId");
-
-            for (Person p : scenario.getPopulation().getPersons().values()) {
-                Leg leg = (Leg)p.getPlans().get(0).getPlanElements().get(1);
-
-                if (leg.getMode() == TaxiOptimizerModules.TAXI_MODE) {
-                    csvWriter.writeNext(p.getId() + "", (int)leg.getDepartureTime() + "", //
-                            leg.getRoute().getStartLinkId() + "",
-                            leg.getRoute().getEndLinkId() + "");
-                }
-            }
-        }
-    }
+				if (leg.getMode() == TaxiOptimizerModules.TAXI_MODE) {
+					csvWriter.writeNext(p.getId() + "", (int) leg.getDepartureTime() + "", //
+							leg.getRoute().getStartLinkId() + "", leg.getRoute().getEndLinkId() + "");
+				}
+			}
+		}
+	}
 }

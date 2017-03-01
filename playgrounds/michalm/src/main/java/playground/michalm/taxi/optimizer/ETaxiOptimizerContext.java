@@ -28,18 +28,12 @@ import org.matsim.core.router.util.*;
 import playground.michalm.ev.data.EvData;
 import playground.michalm.taxi.scheduler.ETaxiScheduler;
 
+public class ETaxiOptimizerContext extends TaxiOptimizerContext {
+	public final EvData evData;
 
-public class ETaxiOptimizerContext
-    extends TaxiOptimizerContext
-{
-    public final EvData evData;
-
-
-    public ETaxiOptimizerContext(Fleet fleet, Network network, MobsimTimer timer,
-            TravelTime travelTime, TravelDisutility travelDisutility, ETaxiScheduler scheduler,
-            EvData evData)
-    {
-        super(fleet, network, timer, travelTime, travelDisutility, scheduler);
-        this.evData = evData;
-    }
+	public ETaxiOptimizerContext(Fleet fleet, Network network, MobsimTimer timer, TravelTime travelTime,
+			TravelDisutility travelDisutility, ETaxiScheduler scheduler, EvData evData) {
+		super(fleet, network, timer, travelTime, travelDisutility, scheduler);
+		this.evData = evData;
+	}
 }

@@ -29,6 +29,6 @@ public class RunFlowCapEasingScenario {
 		Config config = ConfigUtils.loadConfig("d:/temp/golan/configtest.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.run();	
+		controler.run();
 	}
 }

@@ -21,21 +21,18 @@ package playground.michalm.stockholm;
 
 import java.util.Date;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
 
-public class TaxiTrace
-{
-    final String taxiId;
-    final Date time;
-    final Coord coord;
-    final boolean hired;
-    
-    
-    public TaxiTrace(String taxiId, Date time, Coord coord, boolean hired)
-    {
-        this.taxiId = taxiId;
-        this.time = time;
-        this.coord = coord;
-        this.hired = hired;
-    }
+public class TaxiTrace {
+	final String taxiId;
+	final Date time;
+	final Coord coord;
+	final boolean hired;
+
+	public TaxiTrace(String taxiId, Date time, Coord coord, boolean hired) {
+		this.taxiId = taxiId;
+		this.time = time;
+		this.coord = coord;
+		this.hired = hired;
+	}
 }

@@ -29,30 +29,22 @@ import com.google.inject.*;
 
 import playground.michalm.ev.data.EvData;
 
+public class ETaxiChargerOccupancyTimeProfileCollectorProvider implements Provider<MobsimListener> {
+	private final EvData evData;
+	private final MatsimServices matsimServices;
 
-public class ETaxiChargerOccupancyTimeProfileCollectorProvider
-    implements Provider<MobsimListener>
-{
-    private final EvData evData;
-    private final MatsimServices matsimServices;
+	@Inject
+	public ETaxiChargerOccupancyTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices) {
+		this.evData = evData;
+		this.matsimServices = matsimServices;
+	}
 
-
-    @Inject
-    public ETaxiChargerOccupancyTimeProfileCollectorProvider(EvData evData,
-            MatsimServices matsimServices)
-    {
-        this.evData = evData;
-        this.matsimServices = matsimServices;
-    }
-
-
-    @Override
-    public MobsimListener get()
-    {
-        ProfileCalculator calc = ETaxiChargerProfiles.createChargerOccupancyCalculator(evData);
-        TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
-                "charger_occupancy_time_profiles", matsimServices);
-        collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
-        return collector;
-    }
+	@Override
+	public MobsimListener get() {
+		ProfileCalculator calc = ETaxiChargerProfiles.createChargerOccupancyCalculator(evData);
+		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "charger_occupancy_time_profiles",
+				matsimServices);
+		collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+		return collector;
+	}
 }

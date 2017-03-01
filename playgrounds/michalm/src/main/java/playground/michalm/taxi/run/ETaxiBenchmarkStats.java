@@ -13,43 +13,30 @@ import com.google.inject.Inject;
 
 import playground.michalm.taxi.utli.stats.*;
 
+public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
+	public static final String[] HEADER = ObjectArrays.concat(TaxiBenchmarkStats.HEADER, "QueuedTimeRatio_fleetAvg");
 
-public class ETaxiBenchmarkStats
-    extends TaxiBenchmarkStats
-{
-    public static final String[] HEADER = ObjectArrays.concat(TaxiBenchmarkStats.HEADER,
-            "QueuedTimeRatio_fleetAvg");
+	private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
 
-    private final SummaryStatistics queuedTimeRatio = new SummaryStatistics();
+	@Inject
+	public ETaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
+			OutputDirectoryHierarchy controlerIO) {
+		super(fleet, requestCollector, controlerIO);
+	}
 
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		super.notifyAfterMobsim(event);
+		ETaxiStats singleRunEStats = new ETaxiStatsCalculator(fleet.getVehicles().values()).getDailyEStats();
+		queuedTimeRatio.addValue(singleRunEStats.getFleetQueuedTimeRatio());
+	}
 
-    @Inject
-    public ETaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
-            OutputDirectoryHierarchy controlerIO)
-    {
-        super(fleet, requestCollector, controlerIO);
-    }
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		writeFile("ebenchmark_stats.txt", HEADER);
+	}
 
-
-    @Override
-    public void notifyAfterMobsim(AfterMobsimEvent event)
-    {
-        super.notifyAfterMobsim(event);
-        ETaxiStats singleRunEStats = new ETaxiStatsCalculator(fleet.getVehicles().values())
-                .getDailyEStats();
-        queuedTimeRatio.addValue(singleRunEStats.getFleetQueuedTimeRatio());
-    }
-
-
-    @Override
-    public void notifyShutdown(ShutdownEvent event)
-    {
-        writeFile("ebenchmark_stats.txt", HEADER);
-    }
-
-
-    protected CSVLineBuilder createAndInitLineBuilder()
-    {
-        return super.createAndInitLineBuilder().addf("%.3f", queuedTimeRatio.getMean());
-    };
+	protected CSVLineBuilder createAndInitLineBuilder() {
+		return super.createAndInitLineBuilder().addf("%.3f", queuedTimeRatio.getMean());
+	};
 }

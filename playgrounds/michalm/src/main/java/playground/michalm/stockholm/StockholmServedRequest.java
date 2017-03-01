@@ -25,47 +25,34 @@ import org.matsim.api.core.v01.*;
 
 import playground.michalm.demand.taxi.ServedRequest;
 
+public class StockholmServedRequest implements ServedRequest {
+	final Id<ServedRequest> id;
+	final List<TaxiTrace> trace;
+	final String taxiId;
 
-public class StockholmServedRequest
-    implements ServedRequest
-{
-    final Id<ServedRequest> id;
-    final List<TaxiTrace> trace;
-    final String taxiId;
+	public StockholmServedRequest(Id<ServedRequest> id, List<TaxiTrace> trace, String taxiId) {
+		this.id = id;
+		this.trace = trace;
+		this.taxiId = taxiId;
+	}
 
+	@Override
+	public Id<ServedRequest> getId() {
+		return id;
+	}
 
-    public StockholmServedRequest(Id<ServedRequest> id, List<TaxiTrace> trace, String taxiId)
-    {
-        this.id = id;
-        this.trace = trace;
-        this.taxiId = taxiId;
-    }
+	@Override
+	public Coord getFrom() {
+		return trace.get(0).coord;
+	}
 
+	@Override
+	public Coord getTo() {
+		return trace.get(trace.size() - 1).coord;
+	}
 
-    @Override
-    public Id<ServedRequest> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public Coord getFrom()
-    {
-        return trace.get(0).coord;
-    }
-
-
-    @Override
-    public Coord getTo()
-    {
-        return trace.get(trace.size() - 1).coord;
-    }
-
-
-    @Override
-    public Date getStartTime()
-    {
-        return trace.get(0).time;
-    }
+	@Override
+	public Date getStartTime() {
+		return trace.get(0).time;
+	}
 }

@@ -31,24 +31,19 @@ import com.google.inject.Inject;
 
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
-
-public class ETaxiActionCreator
-    extends TaxiActionCreator
-{
+public class ETaxiActionCreator extends TaxiActionCreator {
 	@Inject
-    public ETaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer, QSim qSim)
-    {
-        super(passengerEngine, taxiCfg, optimizer, qSim);
-    }
+	public ETaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer,
+			QSim qSim) {
+		super(passengerEngine, taxiCfg, optimizer, qSim);
+	}
 
+	@Override
+	public DynAction createAction(DynAgent dynAgent, Task task, double now) {
+		if (task instanceof ETaxiChargingTask) {
+			return new ETaxiAtChargerActivity((ETaxiChargingTask) task);
+		}
 
-    @Override
-    public DynAction createAction(DynAgent dynAgent, Task task, double now)
-    {
-        if (task instanceof ETaxiChargingTask) {
-            return new ETaxiAtChargerActivity((ETaxiChargingTask)task);
-        }
-
-        return super.createAction(dynAgent, task, now);
-    }
+		return super.createAction(dynAgent, task, now);
+	}
 }

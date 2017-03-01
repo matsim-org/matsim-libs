@@ -28,39 +28,33 @@ import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 
+public class RecalcStatsAudiAVFlowPaper {
+	public static void main(String[] args) {
+		String networkFile = "../../../shared-svn/projects/audi_av/scenario/flowpaper/prep-runs/input/networkc.xml.gz";
+		String path = "../../../runs-svn/avsim/flowpaper_0.15fc/";
 
-public class RecalcStatsAudiAVFlowPaper
-{
-    public static void main(String[] args)
-    {
-        String networkFile = "../../../shared-svn/projects/audi_av/scenario/flowpaper/prep-runs/input/networkc.xml.gz";
-        String path = "../../../runs-svn/avsim/flowpaper_0.15fc/";
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile(networkFile);
 
-        Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile(networkFile);
+		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
 
-        ExecutorService service = Executors
-                .newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
+		for (String fleetSize : TaxiStatsExtractor.FLEETS) {
+			for (String av : TaxiStatsExtractor.AVS) {
+				String id = TaxiStatsExtractor.getId(fleetSize, av);
 
-        for (String fleetSize : TaxiStatsExtractor.FLEETS) {
-            for (String av : TaxiStatsExtractor.AVS) {
-                String id = TaxiStatsExtractor.getId(fleetSize, av);
+				service.execute(() -> {
+					Fleet fleet = ScheduleReconstructor.reconstructFromFile(network,
+							path + id + "/" + id + ".output_events.xml.gz");
 
-                service.execute(() -> {
-                    Fleet fleet = ScheduleReconstructor.reconstructFromFile(network,
-                            path + id + "/" + id + ".output_events.xml.gz");
+					TaxiStatsCalculator calculator = new TaxiStatsCalculator(fleet.getVehicles().values());
+					String prefix = path + id + "/ITERS/it.50/" + id + ".50.";
 
-                    TaxiStatsCalculator calculator = new TaxiStatsCalculator(
-                            fleet.getVehicles().values());
-                    String prefix = path + id + "/ITERS/it.50/" + id + ".50.";
-
-                    new TaxiStatsWriter(calculator.getTaxiStats())
-                            .write(prefix + "hourly_stats_new_stats.txt");
-                    new TaxiHistogramsWriter(calculator.getTaxiStats())
-                            .write(prefix + "hourly_histograms_new_stats.txt");
-                });
-            }
-        }
-        service.shutdown();
-    }
+					new TaxiStatsWriter(calculator.getTaxiStats()).write(prefix + "hourly_stats_new_stats.txt");
+					new TaxiHistogramsWriter(calculator.getTaxiStats())
+							.write(prefix + "hourly_histograms_new_stats.txt");
+				});
+			}
+		}
+		service.shutdown();
+	}
 }

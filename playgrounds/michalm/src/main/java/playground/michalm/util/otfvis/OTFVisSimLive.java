@@ -23,28 +23,22 @@ import java.util.Arrays;
 
 import org.matsim.contrib.otfvis.OTFVis;
 
+public class OTFVisSimLive {
+	public static void main(String[] args) {
+		String dir;
+		String cfgFile;
 
-public class OTFVisSimLive
-{
-    public static void main(String[] args)
-    {
-        String dir;
-        String cfgFile;
+		if (args.length == 1 && args[0].equals("test")) {// for testing
+			dir = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
 
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            dir = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
+			cfgFile = "config-verB_with_vrp.xml";
+		} else if (args.length == 2) {
+			dir = args[0];
+			cfgFile = args[1];
+		} else {
+			throw new IllegalArgumentException("Incorrect program arguments: " + Arrays.toString(args));
+		}
 
-            cfgFile = "config-verB_with_vrp.xml";
-        }
-        else if (args.length == 2) {
-            dir = args[0];
-            cfgFile = args[1];
-        }
-        else {
-            throw new IllegalArgumentException(
-                    "Incorrect program arguments: " + Arrays.toString(args));
-        }
-
-        OTFVis.playConfig(dir + cfgFile);
-    }
+		OTFVis.playConfig(dir + cfgFile);
+	}
 }

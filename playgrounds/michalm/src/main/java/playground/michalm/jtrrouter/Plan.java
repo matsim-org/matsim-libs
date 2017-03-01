@@ -22,27 +22,20 @@ package playground.michalm.jtrrouter;
 /**
  * @author michalm
  */
-public class Plan
-{
-    final int id;
-    final Route route;
+public class Plan {
+	final int id;
+	final Route route;
 
+	public Plan(int id, Route route) {
+		this.id = id;
+		this.route = route;
+	}
 
-    public Plan(int id, Route route)
-    {
-        this.id = id;
-        this.route = route;
-    }
+	public int getId() {
+		return id;
+	}
 
-
-    public int getId()
-    {
-        return id;
-    }
-
-
-    public Route getRoute()
-    {
-        return route;
-    }
+	public Route getRoute() {
+		return route;
+	}
 }
