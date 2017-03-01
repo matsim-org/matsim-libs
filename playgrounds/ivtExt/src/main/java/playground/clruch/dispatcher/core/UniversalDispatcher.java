@@ -112,7 +112,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * if vehicle is already located at destination, nothing happens.
      * 
      * in one pass of redispatch(...), the function setVehicleDiversion(...)
-     * may only be invoked once for a single vehicle (specified in vehicleLinkPair). 
+     * may only be invoked once for a single vehicle (specified in vehicleLinkPair).
      *
      * @param vehicleLinkPair
      *            is provided from super.getDivertableVehicles()
@@ -169,14 +169,15 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     /**
-     * @return debug information
+     * @return debug information about status of this instance of {@link UniversalDispatcher}
      */
     public final String getUniversalDispatcherStatusString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#requests " + getAVRequests().size());
         stringBuilder.append(", #stay " + //
                 getStayVehicles().values().stream().flatMap(Queue::stream).count());
-        stringBuilder.append(", #divert " + getDivertableVehicles().size()); // TODO not efficient, only debug
+        stringBuilder.append(", #divert " + //
+                getDivertableVehicles().size());
         return stringBuilder.toString();
     }
 
