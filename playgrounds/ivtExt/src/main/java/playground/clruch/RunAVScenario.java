@@ -3,15 +3,6 @@ package playground.clruch;
 import java.io.File;
 import java.net.MalformedURLException;
 
-
-import org.gnu.glpk.GLPK;
-import org.gnu.glpk.GLPKConstants;
-import org.gnu.glpk.GlpkException;
-import org.gnu.glpk.SWIGTYPE_p_double;
-import org.gnu.glpk.SWIGTYPE_p_int;
-import org.gnu.glpk.glp_prob;
-import org.gnu.glpk.glp_smcp;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -21,7 +12,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.dispatcher.ConsensusDispatcher;
 import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
 import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.netdata.LinkWeights;

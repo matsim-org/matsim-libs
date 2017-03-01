@@ -117,7 +117,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      *            is provided from super.getDivertableVehicles()
      * @param destination
      */
-    protected final void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+    protected final Void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
         final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
         Task task = schedule.getCurrentTask(); // <- implies that task is started
         new AVTaskAdapter(task) {
@@ -145,6 +145,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     assignDirective(vehicleLinkPair.avVehicle, new EmptyDirective());
             }
         };
+        return null;
     }
 
     protected final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {
