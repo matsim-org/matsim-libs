@@ -97,7 +97,7 @@ public class BackwardCompatibilityForOldPlansType {
 	 * All main mode had "Generic" route type which is converted to "links" route (nov'15).
 	 * Consequently, old plans file can not be used with the current head. Routes needs to be converted first.
 	 */
-	public void extractPlansIncludingLegRoutes(){
+	private void extractPlansIncludingLegRoutes(){
 		Scenario scIn = LoadMyScenarios.loadScenarioFromPlans(inputPlans);
 		Population popOut = scOut.getPopulation();
 		for (Person p : scIn.getPopulation().getPersons().values()) {

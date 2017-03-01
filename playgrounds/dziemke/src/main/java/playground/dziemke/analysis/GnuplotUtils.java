@@ -94,7 +94,7 @@ public class GnuplotUtils {
 
 			reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			while ((line = reader.readLine()) != null) {
-				log.error("error: " + line);
+				log.warn(": " + line);
 			}
 		} catch (IOException e) {
 			log.error("ERROR while executing gnuplot command.");

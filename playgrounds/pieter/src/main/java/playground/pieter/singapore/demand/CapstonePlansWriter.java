@@ -8,8 +8,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import others.sergioo.util.dataBase.DataBaseAdmin;
@@ -26,8 +25,14 @@ import java.util.*;
  * Created by fouriep on 1/12/15.
  */
 public class CapstonePlansWriter {
+    public static final String HOME_XL = "homeXL";
+    public static final String HOME_VISIT = "homeVisit";
     private final MutableScenario scenario;
     private static int freightCount = 0;
+    //typical durations and cluster centroids of the two home activity types, classified by duration
+    private static final int homeDurationCutoff = 15*3600;
+    private static final int homeClusterTypical = (int) (12.5*3600);
+    private static final int homeClusterExtraLong = (int) (18.75*3600);
     private int badplanCount;
     public int carlegs, ptlegs, passengerlegs;
 
@@ -52,6 +57,7 @@ public class CapstonePlansWriter {
         String sex;
         String income;
         String citizen;
+        String homeType = "home";
         int license;
         boolean isDriver = false;
 
@@ -69,6 +75,8 @@ public class CapstonePlansWriter {
             //the start time of the home activity in the evening is allocated first
             ActivityInfo last = activitySequence.getLast();
             double homeBudget = activityBudgets.getFirst().dur;
+            if(homeBudget > homeDurationCutoff)
+                homeType = HOME_XL;
             last.start = activityBudgets.getFirst().start;
             last.dur = 86400 - activityBudgets.getFirst().start;
             homeBudget = homeBudget - last.dur;
@@ -187,7 +195,7 @@ public class CapstonePlansWriter {
                 ActivityInfo activityInfo = activitySequence.get(i);
                 if (i == 0 || i == activitySequence.size() - 1) {
                     Coord homeCoord = homefacility.getCoord();
-                    Activity home = (Activity) populationFactory.createActivityFromCoord("home", homeCoord);
+                    Activity home = (Activity) populationFactory.createActivityFromCoord(homeType, homeCoord);
                     plan.addActivity(home);
                     if (i == 0)
                         home.setEndTime(activityInfo.end);
@@ -201,6 +209,20 @@ public class CapstonePlansWriter {
                         plan.addActivity(mainAct);
                         mainAct.setEndTime(activityInfo.end);
                         mainAct.setFacilityId(mainfacility.getId());
+                    } else if (activityInfo.type.equals("pudo")) {
+                        ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(Id.create(activityInfo.postcode, ActivityFacility.class));
+                        thecoord = activityFacility.getCoord();
+                        Activity act = (Activity) populationFactory.createActivityFromCoord(activityInfo.type, thecoord);
+                        plan.addActivity(act);
+                        act.setMaximumDuration(120);
+                        act.setFacilityId(activityFacility.getId());
+                    } else if (activityInfo.type.equals("home")) {
+                        ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(Id.create(activityInfo.postcode, ActivityFacility.class));
+                        thecoord = activityFacility.getCoord();
+                        Activity act = (Activity) populationFactory.createActivityFromCoord(HOME_VISIT, thecoord);
+                        plan.addActivity(act);
+                        act.setEndTime(activityInfo.end);
+                        act.setFacilityId(activityFacility.getId());
                     } else {
                         ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(Id.create(activityInfo.postcode, ActivityFacility.class));
                         thecoord = activityFacility.getCoord();
@@ -284,11 +306,29 @@ public class CapstonePlansWriter {
      */
     public static void main(String[] args) throws SQLException, NoConnectionException, ClassNotFoundException,
             InstantiationException, IllegalAccessException, IOException {
-        DataBaseAdmin dba = new DataBaseAdmin(new File("/Users/fouriep/IdeaProjects/matsim/playgrounds/pieter/connections/matsim2postgres.properties"));
+        System.out.println("This class requires 3 command lineparametrs to run:");
+        System.out.println("1. A .properties file that contains connection information for the jdbc driver;");
+        System.out.println("2. The prefix for naming the output files (plans, object attributes and facilities);");
+        System.out.println("3. The fraction of the synthetic population to include in the plans file. (0 < x <= 1).");
+        DataBaseAdmin dba = new DataBaseAdmin(new File(args[0]));
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         FacilitiesToSQL f2sql = new FacilitiesToSQL(dba, scenario);
-        f2sql.loadFacilitiesFromSQL("p_facilities.facilities_jpr");
-        new CapstonePlansWriter(scenario, dba).run("capsUnroutedPlans_jpr", 0.25);
+        f2sql.loadFacilitiesFromSQL("p_facilities.new_facilities");
+        CapstonePlansWriter.clearHomeTimesAndAddExtraHomeTypes(scenario.getActivityFacilities());
+        new CapstonePlansWriter(scenario, dba).run(args[1], Double.parseDouble(args[2]));
+
+    }
+    //the home activity should not have opening times,else bad things happen
+    private static void clearHomeTimesAndAddExtraHomeTypes(ActivityFacilities activityFacilities) {
+        TreeMap<Id<ActivityFacility>, ActivityFacility> homeFacilities = activityFacilities.getFacilitiesForActivityType("home");
+        for (ActivityFacility facility : homeFacilities.values()) {
+            ActivityOptionImpl home = (ActivityOptionImpl) facility.getActivityOptions().get("home");
+            home.clearOpeningTimes();
+            //add the two extra home activity types
+            facility.addActivityOption(new ActivityOptionImpl(HOME_XL));
+            facility.addActivityOption(new ActivityOptionImpl(HOME_VISIT));
+        }
+
 
     }
 

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -19,6 +18,7 @@ import com.google.inject.name.Named;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
+import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -29,12 +29,13 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class EdgyDispatcher extends UniversalDispatcher {
-    private static final int DISPATCH_PERIOD = 30;
+    private static final int DISPATCH_PERIOD = 5 * 60;
 
     final Network network; // <- for verifying link references
     final Collection<Link> linkReferences; // <- for verifying link references
 
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
+    final DrivebyRequestStopper drivebyRequestStopper;
 
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -46,6 +47,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
+        drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
     }
 
     /** verify that link references are present in the network */
@@ -77,24 +79,9 @@ public class EdgyDispatcher extends UniversalDispatcher {
             int num_abortTrip = 0;
             int num_driveOrder = 0;
 
-            { // see if any car is driving by a request. if so, then stay there to be matched!
-                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
-                Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
+            num_abortTrip += drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
 
-                for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-                    Link link = vehicleLinkPair.getDivertableLocation(); // TODO check if this should apply only to driving vehicles
-                    if (requests.containsKey(link)) {
-                        List<AVRequest> requestList = requests.get(link);
-                        if (!requestList.isEmpty()) {
-                            requestList.remove(0);
-                            setVehicleDiversion(vehicleLinkPair, link);
-                            ++num_abortTrip;
-                        }
-                    }
-                }
-            }
-
-            {
+            { // TODO this should be replaceable by some naive matcher
                 Iterator<AVRequest> requestIterator = getAVRequests().iterator();
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 

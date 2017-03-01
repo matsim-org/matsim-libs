@@ -36,7 +36,7 @@ import java.util.ArrayList;
  * 
  * @author cdobler
  */
-public class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra {
+public class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra implements BackwardMultiNodePathCalculator {
 	
 	public BackwardFastMultiNodeDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction,
 			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 

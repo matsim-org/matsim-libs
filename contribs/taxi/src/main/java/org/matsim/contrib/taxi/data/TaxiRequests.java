@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.taxi.data;
 
+import java.util.Collection;
+
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 import com.google.common.base.Predicate;
@@ -69,9 +72,11 @@ public class TaxiRequests
     }
 
 
-    public static int countRequestsWithStatus(Iterable<TaxiRequest> requests,
+    @SuppressWarnings("unchecked")
+    public static int countRequestsWithStatus(Iterable<? extends Request> requests,
             TaxiRequestStatus status)
     {
-        return Iterables.size(Iterables.filter(requests, new TaxiRequestStatusPredicate(status)));
+        return Iterables.size(Iterables.filter((Collection<TaxiRequest>)requests,
+                new TaxiRequestStatusPredicate(status)));
     }
 }

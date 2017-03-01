@@ -1,6 +1,10 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
+	<module name="dvrp">
+		<param name="mode" value="taxi" />
+	</module>
+
 	<module name="taxi">
 		<param name="destinationKnown" value="false" />
 		<param name="vehicleDiversion" value="false" />
@@ -8,8 +12,8 @@
 		<param name="dropoffDuration" value="60" />
 		<param name="onlineVehicleTracker" value="false" />
 
-		<param name="taxisFile" value="src/main/resources/mielec_2014_02/taxis-25.xml" />
-		<!-- param name="taxisFile" value="src/main/resources/mielec_2014_02/taxis-50.xml" / -->
+		<param name="taxisFile" value="taxis-25.xml" />
+		<!-- param name="taxisFile" value="taxis-50.xml" / -->
 
 		<param name="timeProfiles" value="true" />
 		<param name="detailedStats" value="true" />

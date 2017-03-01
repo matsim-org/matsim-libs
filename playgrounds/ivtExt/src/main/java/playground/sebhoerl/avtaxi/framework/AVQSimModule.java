@@ -50,10 +50,15 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
         bind(AVDispatchmentListener.class);
     }
 
-    @Provides
-    @Singleton
-    public PassengerEngine providePassengerEngine(EventsManager events, AVRequestCreator requestCreator, AVOptimizer optimizer, AVData data, Network network) {
-        return new PassengerEngine(AVModule.AV_MODE, events, requestCreator, optimizer, data, network);
+    @Provides @Singleton
+    public PassengerEngine providePassengerEngine(EventsManager events, AVRequestCreator requestCreator, AVOptimizer optimizer, Network network) {
+        return new PassengerEngine(
+                AVModule.AV_MODE,
+                events,
+                requestCreator,
+                optimizer,
+                network
+        );
     }
 
     @Provides

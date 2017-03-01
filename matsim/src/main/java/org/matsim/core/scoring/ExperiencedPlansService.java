@@ -13,4 +13,6 @@ public interface ExperiencedPlansService {
 
 	Map<Id<Person>, Plan> getExperiencedPlans();
 
+	void finishIteration();
+
 }

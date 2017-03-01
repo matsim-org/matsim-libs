@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
+import playground.gregor.gis.cutoutnetwork.BountingBoxFilter;
 import playground.gregor.misanthrope.run.CTRunner;
 import playground.gregor.misanthrope.simulation.CTEvent;
 import playground.gregor.misanthrope.simulation.CTEventsPaulPriorityQueue;
@@ -15,9 +16,8 @@ import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
-import static playground.gregor.misanthrope.run.CTRunner.WIDTH;
+import static playground.gregor.misanthrope.simulation.physics.CTCell.MIN_CELL_WIDTH;
 
 public class CTNetwork {
 
@@ -26,13 +26,12 @@ public class CTNetwork {
     private static int WIDTH_WRN_CNT = 0;
 
     private final CTEventsPaulPriorityQueue events = new CTEventsPaulPriorityQueue();
-    //	private final PriorityQueue<CTEvent> events = new PriorityQueue<>();
     private final CTNetsimEngine engine;
-    private final int cores = Runtime.getRuntime().availableProcessors();
     private Map<Id<Link>, CTLink> links = new HashMap<>();
     private Map<Id<Node>, CTNode> nodes = new ConcurrentHashMap<>();
     private Network network;
     private EventsManager em;
+    private BountingBoxFilter filter;
 
     public CTNetwork(Network network, EventsManager em, CTNetsimEngine engine) {
         this.network = network;
@@ -69,18 +68,17 @@ public class CTNetwork {
         this.network.getLinks().values().forEach(l -> {
 
             double width = l.getCapacity() / 1.33;
-            if (width < 2 * WIDTH) {
+            if (width < MIN_CELL_WIDTH) {
                 if (WIDTH_WRN_CNT++ < 10) {
-                    log.warn("Width of link: " + l.getId() + " is too small. Increasing it from: " + width + " to: " + WIDTH);
+                    log.warn("Width of link: " + l.getId() + " is too small. Increasing it from: " + width + " to: " + MIN_CELL_WIDTH);
                     if (WIDTH_WRN_CNT == 10) {
                         log.warn(Gbl.FUTURE_SUPPRESSED);
                     }
                 }
-                width = 2 * WIDTH;
-
+                width = MIN_CELL_WIDTH;
+                l.setCapacity(width * 1.33);
             }
-            width = WIDTH * ((int) (width / WIDTH) + 1);
-            l.setCapacity(width * 1.33);
+
         });
         this.network.getNodes().values().parallelStream().forEach(n -> {
             double mxCap = 0;
@@ -107,18 +105,17 @@ public class CTNetwork {
             }
         });
 
-        this.links.values().stream().forEach(CTLink::init);
+        this.links.values().parallelStream().forEach(CTLink::init);
+        this.filter = new BountingBoxFilter(650608, 651253, 9893743, 9894168);
+
+//        this.links.values().stream().filter(l -> this.filter.test(l.getDsLink().getFromNode())).forEach(CTLink::debug);
+//        this.links.values().stream().filter(l -> l.getDsLink().getId().toString().contains("el")).forEach(CTLink::debug);
         this.links.values().forEach(CTLink::debug);
         this.nodes.values().parallelStream().forEach(CTNode::init);
 
         log.info("verifying network");
         checkNetwork();
         log.info("done.");
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
 
     }
 
@@ -172,17 +169,9 @@ public class CTNetwork {
         if (CTRunner.DEBUG) {
             draw(time);
         }
-//
-//        if (((int) time) % 60 == 0) {
-//            this.nodes.values().parallelStream().forEach(n -> {
-//                if (n.getCTCell().getN() > 0 && (n.getCTCell().getCurrentEvent() == null || n.getCTCell().getCurrentEvent().isInvalid()))
-//                    n.getCTCell().updateIntendedCellJumpTimeAndChooseNextJumper(time);
-//            });
-//            this.links.values().parallelStream().flatMap(l -> l.getCells().stream()).forEach(c -> {
-//                if (c.getN() > 0 && (c.getCurrentEvent() == null || c.getCurrentEvent().isInvalid()))
-//                    c.updateIntendedCellJumpTimeAndChooseNextJumper(time);
-//            });
-//        }
+//        this.links.values().stream().flatMap(l->l.getCells().stream()).forEach(c->c.updateIntendedCellJumpTimeAndChooseNextJumper(time));
+//        this.nodes.values().stream().forEach(n->n.getCTCell().updateIntendedCellJumpTimeAndChooseNextJumper(time));
+
 
         while (this.events.peek() != null && events.peek().getExecTime() < time + 1) {
             CTEvent e = events.poll();
@@ -198,11 +187,13 @@ public class CTNetwork {
     }
 
     private void draw(double time) {
-        for (CTLink link : getLinks().values()) {
+
+//        links.values().stream().filter(l -> l.getDsLink().getId().toString().contains("el")).forEach(link -> {
+//        links.values().stream().filter(l -> this.filter.test(l.getDsLink().getFromNode())).forEach(link -> {
+        links.values().forEach(link -> {
+
             Link ll = link.getDsLink();
-//			if (!accept(ll)){
-//			    continue;
-//            }
+
             double dx = ll.getToNode().getCoord().getX() - ll.getFromNode().getCoord().getX();
             double dy = ll.getToNode().getCoord().getY() - ll.getFromNode().getCoord().getY();
             dx /= ll.getLength();
@@ -210,11 +201,9 @@ public class CTNetwork {
             for (CTCell cell : link.getCells()) {
                 drawCell(cell, time, dx, dy);
             }
-        }
 
-//		for (CTNode n : this.nodes.values())  {
-//		    drawCell(n.getCTCell(),time,0,0);
-//        }
+        });
+
     }
 
     private boolean accept(Link ll) {
@@ -228,17 +217,13 @@ public class CTNetwork {
         }
 
         return false;
-//        for (Link l : ll.getToNode().getOutLinks().values() ) {
-//        	        if (l.getId().toString().contains("el")) {
-//        	            return true;
-//                    }
-//                }
+
     }
 
     private void drawCell(CTCell cell, double time, double dx, double dy) {
         for (CTPed ped : cell.getPeds()) {
-            double oX = (5 - (ped.hashCode() % 10)) / (20. / WIDTH);
-            double oY = (5 - ((23 * ped.hashCode()) % 10)) / (20. / WIDTH);
+            double oX = (5 - (ped.hashCode() % 10)) / (20. / cell.getWidth());
+            double oY = (5 - ((23 * ped.hashCode()) % 10)) / (20. / cell.getWidth());
 
             double x = cell.getX() + oX / 2.;
             double y = cell.getY() + oY / 2.;
@@ -275,53 +260,9 @@ public class CTNetwork {
         this.events.add(e);
     }
 
-    CTNode getCTNode(Id<Node> id) {
-        return this.nodes.get(id);
-    }
-
-
     public void afterSim() {
 
-//                    this.nodes.values().parallelStream().forEach(n -> {
-//                        if (n.getCTCell().getN() > 0)
-//                            log.error("still " + n.getCTCell().getN() + " peds in cell");
-//                    });
-//                    this.links.values().parallelStream().flatMap(l -> l.getCells().stream()).forEach(c -> {
-//                        if (c.getN() > 0)
-//                            log.error("still " + c.getN() + " peds in cell");
-//                    });
+
     }
-
-    private final class Worker implements Runnable {
-
-        private LinkedBlockingQueue<CTNetworkEntity> q = new LinkedBlockingQueue<>();
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    CTNetworkEntity e = q.take();
-                    if (e instanceof CTLink) {
-                        e.init();
-                    } else {
-                        if (e instanceof CTNode) {
-                            e.init();
-                            ((CTNode) e).getCTCell().debug(em);
-                        } else {
-                            break;
-                        }
-                    }
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
-
-        }
-
-        public void add(CTNetworkEntity e) {
-            q.offer(e);
-        }
-    }
-
 
 }

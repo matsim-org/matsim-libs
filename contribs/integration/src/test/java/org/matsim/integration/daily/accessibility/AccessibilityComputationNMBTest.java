@@ -110,7 +110,7 @@ public class AccessibilityComputationNMBTest {
 //		acg.setTimeOfDay(16.*60.*60.);
 		// ----------
 		
-		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromNetwork.toString());
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromNetwork);
 		// Network bounds to determine envelope
 //		BoundingBox networkBounds = BoundingBox.createBoundingBox(scenario.getNetwork());
 //		Envelope networkEnvelope = new Envelope(networkBounds.getXMin(), networkBounds.getXMax(), networkBounds.getYMin(), networkBounds.getYMax());

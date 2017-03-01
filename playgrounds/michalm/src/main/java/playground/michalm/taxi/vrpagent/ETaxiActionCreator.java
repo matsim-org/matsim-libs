@@ -19,12 +19,15 @@
 
 package playground.michalm.taxi.vrpagent;
 
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
-import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
-import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSim;
+
+import com.google.inject.Inject;
 
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
@@ -32,20 +35,20 @@ import playground.michalm.taxi.schedule.ETaxiChargingTask;
 public class ETaxiActionCreator
     extends TaxiActionCreator
 {
-    public ETaxiActionCreator(PassengerEngine passengerEngine, LegCreator legCreator,
-            double pickupDuration, MobsimTimer timer)
+	@Inject
+    public ETaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer, QSim qSim)
     {
-        super(passengerEngine, legCreator, pickupDuration);
+        super(passengerEngine, taxiCfg, optimizer, qSim);
     }
 
 
     @Override
-    public DynAction createAction(Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, Task task, double now)
     {
         if (task instanceof ETaxiChargingTask) {
             return new ETaxiAtChargerActivity((ETaxiChargingTask)task);
         }
 
-        return super.createAction(task, now);
+        return super.createAction(dynAgent, task, now);
     }
 }

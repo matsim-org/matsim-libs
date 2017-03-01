@@ -109,7 +109,7 @@ public class Lp {
 
 
             // Write model to file
-            GLPK.glp_write_lp(lp, null, "testlinearprogram.lp");
+//            GLPK.glp_write_lp(lp, null, "testlinearprogram.lp");
 
             // Solve model
             parm = new glp_smcp();
@@ -127,7 +127,7 @@ public class Lp {
             for (int eq = 1; eq <= n; ++eq) {
                 GLPK.glp_set_row_bnds(lp, eq, GLPKConstants.GLP_LO, 18.0, 0.0); // TODO change 15.0 to vi_excess-vi_d
             }
-            GLPK.glp_write_lp(lp, null, "testlinearprogram_after.lp");
+//            GLPK.glp_write_lp(lp, null, "testlinearprogram_after.lp");
 
 
 

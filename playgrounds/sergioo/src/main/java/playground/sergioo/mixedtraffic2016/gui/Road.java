@@ -9,6 +9,7 @@ import java.util.Observable;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.matsim.vehicles.VehicleType;
 import others.sergioo.util.geometry.Line2D;
 import others.sergioo.util.geometry.Point2D;
 import others.sergioo.visUtils.PointLines;
@@ -68,15 +69,15 @@ public class Road extends Observable implements PointLines{
 				return (-b+Math.sqrt(b*b+2*r*area))/r;
 		}
 	}
-	public static class Mode {
-		private double lenght;
-		private double width;
-		private double speed;
-		private double acceleration = 1;
-		private double position;
-		public Mode(double lenght, double width, double speed) {
+	private static class Mode {
+		double length;
+		double width;
+		double speed;
+		double acceleration = 1;
+		double position;
+		public Mode(double length, double width, double speed) {
 			super();
-			this.lenght = lenght;
+			this.length = length;
 			this.width = width;
 			this.speed = speed;
 		}
@@ -126,8 +127,9 @@ public class Road extends Observable implements PointLines{
 	private double length;
 	private double currentTime;
 	
-	public Road(TypeRoad type, Map<String, Mode> modes, double length, double linkSpeed, Collection<Vehicle> vehicles) throws Exception {
-		this.modes = modes;
+	public Road(TypeRoad type, Collection<VehicleType> vehicleTypes, double length, double linkSpeed, Collection<Vehicle> vehicles) throws Exception {
+		for(VehicleType vehicleType: vehicleTypes)
+			modes.put(vehicleType.getId().toString(), new Road.Mode(vehicleType.getLength(), vehicleType.getWidth(), vehicleType.getMaximumVelocity()));
 		length/=5/2;
 		this.length = length;
 		double maxWidth = 0, sumWidth = 0;
@@ -201,7 +203,7 @@ public class Road extends Observable implements PointLines{
 					//else
 						y=mode.position;
 					double x = vehicle.getPosition(time);
-					double w = SCALE*mode.width, l = mode.lenght;
+					double w = SCALE*mode.width, l = mode.length;
 					pbl = new Point2D(x+GAP/4, y-w/2+GAP);
 					ptl = new Point2D(x+GAP/4, y+w/2-GAP);
 					pbr = new Point2D(x+l-GAP/4, y-w/2+1.5*GAP);
@@ -217,13 +219,13 @@ public class Road extends Observable implements PointLines{
 	private void calculateSpeedFunction(Vehicle vehicle, Vehicle prevVehicleM, Vehicle prevVehicle) {
 		Mode mode = modes.get(vehicle.mode);
 		if(prevVehicleM==null)
-			vehicle.speedFunction.addAll(getSpeedFuntionA(mode.speed, mode.acceleration, vehicle.inTime, vehicle.outTime, length/(vehicle.outTime-vehicle.inTime), mode.lenght));
+			vehicle.speedFunction.addAll(getSpeedFuntionA(mode.speed, mode.acceleration, vehicle.inTime, vehicle.outTime, length/(vehicle.outTime-vehicle.inTime), mode.length));
 		else {
 			if(prevVehicleM.inTime>=vehicle.inTime) {
 				double length = 0;
 				for(LineFunction function:prevVehicleM.speedFunction) {
-					if(length + function.getArea()>mode.lenght) {
-						vehicle.inTime = function.to + function.getValueArea(mode.lenght-length);
+					if(length + function.getArea()>mode.length) {
+						vehicle.inTime = function.to + function.getValueArea(mode.length -length);
 						break;
 					}
 					length += function.getArea();
@@ -237,8 +239,8 @@ public class Road extends Observable implements PointLines{
 			}
 			double length = 0;
 			LineFunction last = ((LinkedList<LineFunction>)prevVehicleM.speedFunction).getLast();
-			double lastDis = Math.min(mode.lenght, last.bf*(vehicle.outTime-prevVehicleM.outTime)), rTime = Math.min(REACTION_TIME, vehicle.outTime-prevVehicleM.outTime-(lastDis==0?0:lastDis/last.bf));
-			lastDis = mode.lenght;
+			double lastDis = Math.min(mode.length, last.bf*(vehicle.outTime-prevVehicleM.outTime)), rTime = Math.min(REACTION_TIME, vehicle.outTime-prevVehicleM.outTime-(lastDis==0?0:lastDis/last.bf));
+			lastDis = mode.length;
 			rTime = 0.5;
 			for(int i=0; i<prevVehicleM.speedFunction.size(); i++) {
 				LineFunction function = prevVehicleM.speedFunction.get(i);
@@ -293,7 +295,7 @@ public class Road extends Observable implements PointLines{
 					}
 				}
 			}
-			vehicle.speedFunction.addAll(getSpeedFuntionA(mode.speed, mode.acceleration, vehicle.inTime, vehicle.outTime, this.length/(vehicle.outTime-vehicle.inTime), mode.lenght));
+			vehicle.speedFunction.addAll(getSpeedFuntionA(mode.speed, mode.acceleration, vehicle.inTime, vehicle.outTime, this.length/(vehicle.outTime-vehicle.inTime), mode.length));
 		}
 	}
 	private List<LineFunction> getSpeedFuntionA(double maxSpeed, double acceleration, double inTime, double outTime, double speed, double vLength) {

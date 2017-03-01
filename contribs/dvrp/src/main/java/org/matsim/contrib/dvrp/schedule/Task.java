@@ -22,50 +22,87 @@ package org.matsim.contrib.dvrp.schedule;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 
+/**
+ * Root class of Task hierarchy.
+ * <br/><br/>
+ * Design comments:<ul>
+ * <li> This interface makes fairly strong assumptions on its implementation.  I am wondering a bit if the design
+ * purpose might not be better expressed by removing the interfaces and simply have an implementation class hierarchy.  A bit 
+ * like the MATSim events, which also originally were interfaces with implementations behind them, and at some point
+ * we united this again.  kai, feb'17
+ * </ul>
+ * 
+ * @author (of documentation) nagel
+ */
 public interface Task
 {
-    public enum TaskType
-    {
-        STAY, DRIVE;
-    }
+	public enum TaskStatus
+	{
+		PLANNED, STARTED, PERFORMED;
+	}
 
 
-    public enum TaskStatus
-    {
-        PLANNED, STARTED, PERFORMED;
-    }
+	TaskStatus getStatus();
 
 
-    TaskType getType();
+	// inclusive
+	/**
+	 * Returns the begin time of the task.  Design comments:<ul>
+	 * <li> I don't know in which cases this is not the end time of the previous task.  kai, feb'17
+	 * </ul>
+	 */
+	double getBeginTime();
 
 
-    TaskStatus getStatus();
+	// exclusive
+	/**
+	 * Returns the end time of the task.  
+	 * <br/><br/>
+	 * Design comment(s):<ul>
+	 * <li> I cannot say what the difference to getTaskTracker().predictEndTime() is.  Possibly, 
+	 * getEndTime() is the time when the task actually ends, either because it is a stay task, or because the end time is
+	 * only set when it ends.   kai, feb'17
+	 * </ul>
+	 */
+	double getEndTime();
 
 
-    // inclusive
-    double getBeginTime();
+	/**
+	 * Back pointer the schedule that contains the task.  Set by ScheduleImpl
+	 * through a package-protected variable.  
+	 */
+	Schedule getSchedule();
 
 
-    // exclusive
-    double getEndTime();
+	/**
+	 * Index of the task in the schedule.  Managed by ScheduleImpl
+	 * through a package-protected variable.
+	 * <br/><br/>
+	 * Design comment(s):<ul>
+	 * <li> Should we really have this in the interface?  {@link java.util.List} has an <code>indexOf(...)</code> method that is able to pull out indices (given that the same task object is never entered twice).  kai, feb'17
+	 * </ul>
+	 */
+	int getTaskIdx();
 
 
-    Schedule<? extends Task> getSchedule();
+	void setBeginTime(double beginTime);
 
 
-    int getTaskIdx();
+	void setEndTime(double endTime);
 
 
-    // SETTERS:
-    void setBeginTime(double beginTime);
+	/**
+	 * A TaskTracker predicts the task end time.  
+	 * <br/><br/>
+	 * Design notes:<ul>
+	 * <li> I cannot say what the difference to getEndTime is.  kai, feb'17
+	 * </ul>
+	 */
+	TaskTracker getTaskTracker();
 
 
-    void setEndTime(double endTime);
-
-
-    //
-    TaskTracker getTaskTracker();
-
-
-    void initTaskTracker(TaskTracker taskTracker);
+	/**
+	 * adds the TaskTracker to the Task.  The existing implementation accepts this only when the Task is already started.
+	 */
+	void initTaskTracker(TaskTracker taskTracker);
 }

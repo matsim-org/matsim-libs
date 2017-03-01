@@ -20,12 +20,7 @@
 
 package playground.sergioo.ptsim2013;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -119,7 +114,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private final List<ActivityHandler> activityHandlers = new ArrayList<ActivityHandler>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 	private AgentCounter agentCounter;
-	private Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
+	private Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
 	private TransitQSimEngine transitEngine;
 
@@ -277,10 +272,10 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	public void insertAgentIntoMobsim( MobsimAgent agent ) {
-		if ( this.agents.contains(agent) ) {
+		if ( this.agents.containsKey(agent.getId()) ) {
 			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
 		}
-		agents.add(agent);
+		agents.put(agent.getId(), agent);
 		this.agentCounter.incLiving();
 		arrangeNextAgentAction(agent);
 	}
@@ -366,7 +361,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private double calculateFirstAgentStartTime() {
 		double firstAgentStartTime = Double.POSITIVE_INFINITY;
-		for (MobsimAgent agent : agents) {
+		for (MobsimAgent agent : agents.values()) {
 			firstAgentStartTime = Math.min(firstAgentStartTime, agent.getActivityEndTime());
 		}
 		return firstAgentStartTime;
@@ -488,8 +483,8 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public Collection<MobsimAgent> getAgents() {
-		return Collections.unmodifiableCollection(this.agents);
+	public Map<Id<Person>, MobsimAgent> getAgents() {
+		return Collections.unmodifiableMap(this.agents);
 	}
 
 	public void addAgentSource(AgentSource agentSource) {

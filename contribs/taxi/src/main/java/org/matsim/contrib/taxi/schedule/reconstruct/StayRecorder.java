@@ -99,7 +99,7 @@ public class StayRecorder
                 || event.getActType().equals("Before schedule") //old naming (TODO to be removed soon)
         ) {
             Link startLink = reconstructor.links.get(event.getLinkId());
-            reconstructor.scheduleBuilders.put(personId, new ScheduleBuilder(reconstructor.taxiData,
+            reconstructor.scheduleBuilders.put(personId, new ScheduleBuilder(reconstructor.fleet,
                     personId, startLink, event.getTime()));
         }
     }

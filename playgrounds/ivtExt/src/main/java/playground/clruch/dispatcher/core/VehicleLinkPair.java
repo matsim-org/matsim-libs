@@ -1,7 +1,6 @@
 package playground.clruch.dispatcher.core;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
@@ -27,7 +26,7 @@ public class VehicleLinkPair {
      *         the final {@link Link} of the path that the vehicles is currently driving on
      */
     public Link getCurrentDriveDestination() {
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
+        final Schedule schedule = avVehicle.getSchedule();
         final AVTask avTask = (AVTask) schedule.getCurrentTask();
         if (avTask.getAVTaskType().equals(AVTask.AVTaskType.DRIVE)) {
             final AVDriveTask avDriveTask = (AVDriveTask) avTask;

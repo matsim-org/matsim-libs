@@ -29,7 +29,7 @@ public class SinglePassengerPickupActivity
     implements PassengerPickupActivity
 {
     private final PassengerEngine passengerEngine;
-    private final StayTask pickupTask;
+    private final DynAgent driver;
     private final PassengerRequest request;
     private final double pickupDuration;
 
@@ -37,18 +37,18 @@ public class SinglePassengerPickupActivity
     private double endTime;
 
 
-    public SinglePassengerPickupActivity(PassengerEngine passengerEngine, StayTask pickupTask,
+    public SinglePassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
             PassengerRequest request, double pickupDuration, String activityType)
     {
         super(activityType);
         
         this.passengerEngine = passengerEngine;
-        this.pickupTask = pickupTask;
+        this.driver = driver;
         this.request = request;
         this.pickupDuration = pickupDuration;
 
         double now = pickupTask.getBeginTime();
-        DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
+        
         passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
 
         if (passengerAboard) {
@@ -94,7 +94,6 @@ public class SinglePassengerPickupActivity
             throw new IllegalArgumentException("I am waiting for a different passenger!");
         }
 
-        DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
         passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
 
         if (!passengerAboard) {

@@ -135,7 +135,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>av</artifactId>
+			<artifactId>dvrp</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

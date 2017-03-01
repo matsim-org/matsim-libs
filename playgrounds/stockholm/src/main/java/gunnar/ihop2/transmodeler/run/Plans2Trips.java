@@ -1,8 +1,8 @@
 package gunnar.ihop2.transmodeler.run;
 
-import static saleem.stockholmscenario.utils.StockholmTransformationFactory.WGS84_EPSG3857;
-import static saleem.stockholmscenario.utils.StockholmTransformationFactory.WGS84_SWEREF99;
-import static saleem.stockholmscenario.utils.StockholmTransformationFactory.getCoordinateTransformation;
+import static saleem.stockholmmodel.utils.StockholmTransformationFactory.WGS84_EPSG3857;
+import static saleem.stockholmmodel.utils.StockholmTransformationFactory.WGS84_SWEREF99;
+import static saleem.stockholmmodel.utils.StockholmTransformationFactory.getCoordinateTransformation;
 
 import java.util.LinkedHashSet;
 

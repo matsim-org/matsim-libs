@@ -17,4 +17,8 @@ public interface Alternative {
 
 	public EpsilonDistribution getEpsilonDistribution();
 
+	public double getSampersEpsilonRealization();
+	
+	public void setSampersEpsilonRealization(double eps);
+	
 }

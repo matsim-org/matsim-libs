@@ -69,14 +69,14 @@ public class VehicleData
     }
 
 
-    public VehicleData(TaxiOptimizerContext optimContext, Iterable<Vehicle> vehicles)
+    public VehicleData(TaxiOptimizerContext optimContext, Iterable<? extends Vehicle> vehicles)
     {
         this(optimContext, vehicles, NO_PLANNING_HORIZON);
     }
 
 
     //skipping vehicles with departure.time > curr_time + maxDepartureDelay
-    public VehicleData(TaxiOptimizerContext optimContext, Iterable<Vehicle> vehicles,
+    public VehicleData(TaxiOptimizerContext optimContext, Iterable<? extends Vehicle> vehicles,
             double planningHorizon)
     {
         double currTime = optimContext.timer.getTimeOfDay();

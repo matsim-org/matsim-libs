@@ -38,8 +38,8 @@ public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
     private final AssignmentTaxiOptimizerParams params;
-    protected final FastMultiNodeDijkstra router;
-    protected final BackwardFastMultiNodeDijkstra backwardRouter;
+    private final FastMultiNodeDijkstra router;
+    private final BackwardFastMultiNodeDijkstra backwardRouter;
     private final FastAStarEuclidean euclideanRouter;
     private final VehicleAssignmentProblem<TaxiRequest> assignmentProblem;
     private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
@@ -78,8 +78,8 @@ public class AssignmentTaxiOptimizer
                 optimContext.travelDisutility, optimContext.travelTime,
                 optimContext.scheduler.getParams().AStarEuclideanOverdoFactor, fastRouterFactory);
 
-        assignmentProblem = new VehicleAssignmentProblem<TaxiRequest>(optimContext.travelTime,
-                router, backwardRouter, euclideanRouter, params.nearestRequestsLimit,
+        assignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime,
+                getRouter(), getBackwardRouter(), euclideanRouter, params.nearestRequestsLimit,
                 params.nearestVehiclesLimit);
 
         assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
@@ -90,7 +90,7 @@ public class AssignmentTaxiOptimizer
     protected void scheduleUnplannedRequests()
     {
         //advance request not considered => horizon==0 
-        AssignmentRequestData rData = new AssignmentRequestData(optimContext, 0, unplannedRequests);
+        AssignmentRequestData rData = new AssignmentRequestData(getOptimContext(), 0, getUnplannedRequests());
         if (rData.getSize() == 0) {
             return;
         }
@@ -105,19 +105,29 @@ public class AssignmentTaxiOptimizer
                 cost);
 
         for (Dispatch<TaxiRequest> a : assignments) {
-            optimContext.scheduler.scheduleRequest(a.vehicle, a.destination, a.path);
-            unplannedRequests.remove(a.destination);
+            getOptimContext().scheduler.scheduleRequest(a.vehicle, a.destination, a.path);
+            getUnplannedRequests().remove(a.destination);
         }
     }
 
 
     private VehicleData initVehicleData(AssignmentRequestData rData)
     {
-        int idleVehs = Iterables.size(Iterables.filter(optimContext.taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
+        int idleVehs = Iterables.size(Iterables.filter(getOptimContext().fleet.getVehicles().values(),
+                TaxiSchedulerUtils.createIsIdle(getOptimContext().scheduler)));
         double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
                 params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
-        return new VehicleData(optimContext, optimContext.taxiData.getVehicles().values(),
+        return new VehicleData(getOptimContext(), getOptimContext().fleet.getVehicles().values(),
                 vehPlanningHorizon);
     }
+
+
+protected MultiNodePathCalculator getRouter() {
+	return router;
+}
+
+
+protected BackwardMultiNodePathCalculator getBackwardRouter() {
+	return backwardRouter;
+}
 }

@@ -19,11 +19,10 @@
 
 package org.matsim.contrib.util;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.List;
 
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.io.*;
 
 import com.opencsv.*;
 

@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.data;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 
 
 public class VehicleImpl
@@ -36,9 +35,7 @@ public class VehicleImpl
     private final double t0;
     private double t1;
 
-    private Schedule<? extends AbstractTask> schedule;
-
-    private VrpAgentLogic agentLogic;
+    private Schedule schedule;
 
 
     public VehicleImpl(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1)
@@ -49,7 +46,7 @@ public class VehicleImpl
         this.t0 = t0;
         this.t1 = t1;
 
-        schedule = new ScheduleImpl<AbstractTask>(this);
+        schedule = new ScheduleImpl(this);
     }
 
 
@@ -96,23 +93,9 @@ public class VehicleImpl
 
 
     @Override
-    public Schedule<? extends AbstractTask> getSchedule()
+    public Schedule getSchedule()
     {
         return schedule;
-    }
-
-
-    @Override
-    public VrpAgentLogic getAgentLogic()
-    {
-        return agentLogic;
-    }
-
-
-    @Override
-    public void setAgentLogic(VrpAgentLogic agentLogic)
-    {
-        this.agentLogic = agentLogic;
     }
 
 
@@ -133,6 +116,6 @@ public class VehicleImpl
     @Override
     public void resetSchedule()
     {
-        schedule = new ScheduleImpl<AbstractTask>(this);
+        schedule = new ScheduleImpl(this);
     }
 }

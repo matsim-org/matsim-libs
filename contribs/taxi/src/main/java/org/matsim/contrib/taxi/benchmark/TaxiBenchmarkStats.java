@@ -1,7 +1,8 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -22,7 +23,8 @@ public class TaxiBenchmarkStats
             "EmptyDriveRatio_fleetAvg", //
             "StayRatio_fleetAvg" };
 
-    protected final TaxiData taxiData;
+    protected final Fleet fleet;
+    private final SubmittedTaxiRequestsCollector requestCollector;
     private final OutputDirectoryHierarchy controlerIO;
 
     private final SummaryStatistics passengerWaitTime = new SummaryStatistics();
@@ -34,9 +36,11 @@ public class TaxiBenchmarkStats
 
 
     @Inject
-    public TaxiBenchmarkStats(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
+    public TaxiBenchmarkStats(Fleet fleet, SubmittedTaxiRequestsCollector requestCollector,
+            OutputDirectoryHierarchy controlerIO)
     {
-        this.taxiData = taxiData;
+        this.fleet = fleet;
+        this.requestCollector = requestCollector;
         this.controlerIO = controlerIO;
     }
 
@@ -44,7 +48,7 @@ public class TaxiBenchmarkStats
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
-        TaxiStats singleRunStats = new TaxiStatsCalculator(taxiData.getVehicles().values())
+        TaxiStats singleRunStats = new TaxiStatsCalculator(fleet.getVehicles().values())
                 .getDailyStats();
 
         passengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMean());
@@ -76,8 +80,8 @@ public class TaxiBenchmarkStats
     protected CSVLineBuilder createAndInitLineBuilder()
     {
         return new CSVLineBuilder()//
-                .addf("%d", taxiData.getRequests().size())//
-                .addf("%d", taxiData.getVehicles().size())//
+                .addf("%d", requestCollector.getRequests().size())//
+                .addf("%d", fleet.getVehicles().size())//
                 .addf("%.1f", passengerWaitTime.getMean())//
                 .addf("%.0f", pc95PassengerWaitTime.getMean())//
                 .addf("%.0f", maxPassengerWaitTime.getMean())//

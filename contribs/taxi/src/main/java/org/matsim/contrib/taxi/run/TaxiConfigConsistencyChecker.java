@@ -19,21 +19,17 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 
+public class TaxiConfigConsistencyChecker extends DvrpConfigConsistencyChecker {
+	@Override
+	public void checkConsistency(Config config) {
+		super.checkConsistency(config);
 
-public class TaxiConfigConsistencyChecker
-    extends VrpQSimConfigConsistencyChecker
-{
-    @Override
-    public void checkConsistency(Config config)
-    {
-        super.checkConsistency(config);
-
-        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-        if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {
-            throw new RuntimeException("Diversion requires online tracking");
-        }
-    }
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {
+			throw new RuntimeException("Diversion requires online tracking");
+		}
+	}
 }

@@ -22,7 +22,6 @@ package playground.michalm.taxi.optimizer.rules;
 import java.util.Collections;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
@@ -55,7 +54,7 @@ public class RuleBasedETaxiOptimizer
         this.params = params;
         evData = optimContext.evData;
         eScheduler = (ETaxiScheduler)optimContext.scheduler;
-        eDispatchFinder = new BestChargerFinder(dispatchFinder);
+        eDispatchFinder = new BestChargerFinder(getDispatchFinder());
     }
 
 
@@ -64,7 +63,7 @@ public class RuleBasedETaxiOptimizer
     {
         if (isNewDecisionEpoch(e, params.socCheckTimeStep)) {
             chargeIdleUnderchargedVehicles(
-                    Iterables.filter(idleTaxiRegistry.getVehicles(), this::isUndercharged));
+                    Iterables.filter(getIdleTaxiRegistry().getVehicles(), this::isUndercharged));
         }
 
         super.notifyMobsimBeforeSimStep(e);
@@ -82,13 +81,12 @@ public class RuleBasedETaxiOptimizer
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    public void nextTask(Vehicle vehicle)
     {
-        super.nextTask(schedule);
+        super.nextTask(vehicle);
 
-        Vehicle veh = schedule.getVehicle();
-        if (optimContext.scheduler.isIdle(veh) && isUndercharged(veh)) {
-            chargeIdleUnderchargedVehicles(Collections.singleton(veh));
+        if (getOptimContext().scheduler.isIdle(vehicle) && isUndercharged(vehicle)) {
+            chargeIdleUnderchargedVehicles(Collections.singleton(vehicle));
         }
     }
 

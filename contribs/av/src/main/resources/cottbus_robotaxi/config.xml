@@ -15,6 +15,11 @@
 		<!-- taxi fare per hour (fee = positive value) -->
 		<param name="timeFare_h" value="3.6" />
 	</module>
+
+	<module name="dvrp">
+		<param name="mode" value="taxi" />
+	</module>
+
 	<module name="taxi">
 
 		<!-- Used in AStarEuclidean for shortest path search for occupied drives. 
@@ -22,6 +27,10 @@
 			cost of obtaining longer paths -->
 		<param name="AStarEuclideanOverdoFactor" value="1.0" />
 
+		<param name="breakIfNotAllRequestsServed" value="false" />
+		
+		<param name="changeStartLinkToLastLinkInSchedule" value="true" />
+		
 		<!-- If false, the drop-off location remains unknown to the optimizer and 
 			scheduler until the end of pickup -->
 		<param name="destinationKnown" value="false" />
@@ -42,7 +51,9 @@
 
 		<!-- An XML file specifying the taxi fleet. The file format according to 
 			dvrp_vehicles_v1.dtd -->
-		<param name="taxisFile" value="taxis_2000.xml" />
+		<!-- To create your own vehicles, see org.matsim.contrib.av.vehicles.CreateTaxiVehicles  -->
+		<param name="taxisFile" value="taxis_5000.xml" />
+		<!--  param name="taxisFile" value="taxis_2000.xml" /  -->
 
 		<!-- If true, time profiles of vehicle statuses (i.e. current task type) 
 			and the number of unplanned requests -->
@@ -87,7 +98,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/robotaxi" />
+		<param name="outputDirectory" value="output/robotaxi" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />

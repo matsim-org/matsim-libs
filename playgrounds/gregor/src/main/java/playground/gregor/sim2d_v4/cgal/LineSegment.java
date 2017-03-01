@@ -105,6 +105,7 @@ public class LineSegment {
     // pseudo angle, e.g. for sorting by angle
     // cf. http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
     public double getPseudoAngle() {
+//        return Math.atan2(dx,dy);
         double p = dx / (Math.abs(dx) + Math.abs(dy));
         if (dy < 0) {
             return p - 1;

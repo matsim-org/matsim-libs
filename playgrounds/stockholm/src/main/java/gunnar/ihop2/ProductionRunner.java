@@ -1,5 +1,8 @@
 package gunnar.ihop2;
 
+import gunnar.ihop2.regent.demandreading.PopulationCreator;
+import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork;
+
 import java.io.IOException;
 
 import org.matsim.core.config.Config;
@@ -9,9 +12,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
-import gunnar.ihop2.regent.demandreading.PopulationCreator;
-import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork;
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+import saleem.stockholmmodel.utils.StockholmTransformationFactory;
 
 /**
  * 

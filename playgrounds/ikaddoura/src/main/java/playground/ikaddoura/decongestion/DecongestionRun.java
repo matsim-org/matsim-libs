@@ -35,6 +35,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisRun;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 
@@ -64,7 +65,7 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output_convergence_1000.output_plans/";
+			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output2/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -79,8 +80,8 @@ public class DecongestionRun {
 		decongestionSettings.setTOLL_BLEND_FACTOR(0.);
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setKi(0.);
-		decongestionSettings.setKp(0.025);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setKp(0.05);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.8);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 		
@@ -133,13 +134,17 @@ public class DecongestionRun {
 		
 		config.controler().setOutputDirectory(outputDirectory + "/");
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
-		final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-		final Decongestion decongestion = new Decongestion(new Controler(scenario), info);
+		Controler controler = new Controler(scenario);
+
+		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		Decongestion decongestion = new Decongestion(controler, info);
+		controler = decongestion.getControler();
 		
-		final Controler controler = decongestion.getControler();
         controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        controler.run();        
+        controler.run(); 
+        
+        PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(outputDirectory);
+		analysis.run();
 	}
 }
 

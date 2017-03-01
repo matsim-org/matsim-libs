@@ -2,7 +2,6 @@ package playground.clruch.dispatcher.core;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -22,7 +21,7 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
  *  2) remove former stay task with old destination
  *  3) append new stay task
  */
-class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
+final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
     DriveVehicleDiversionDirective(VehicleLinkPair vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
         super(vehicleLinkPair, destination, futurePathContainer);
@@ -30,10 +29,9 @@ class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
-        // AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
-        final AVDriveTask avDriveTask = (AVDriveTask) schedule.getCurrentTask();
-        AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
+        final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
+        final AVDriveTask avDriveTask = (AVDriveTask) schedule.getCurrentTask(); // <- implies that task is started
+        final AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
         final double scheduleEndTime = avStayTask.getEndTime();
 
         TaskTracker taskTracker = avDriveTask.getTaskTracker();

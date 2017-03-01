@@ -42,7 +42,7 @@ public class SingleRideAppender {
     }
 
     public void schedule(AVRequest request, AVVehicle vehicle, double now) {
-        Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
+        Schedule schedule = vehicle.getSchedule();
         AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
 
         LeastCostPathFuture pickup = router.calcLeastCostPath(stayTask.getLink().getToNode(), request.getFromLink().getFromNode(), now, null, null);
@@ -58,7 +58,7 @@ public class SingleRideAppender {
 
         AVTimingParameters timing = config.getParent().getTimingParameters();
 
-        Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicle.getSchedule();
+        Schedule schedule = vehicle.getSchedule();
         AVStayTask stayTask = (AVStayTask) Schedules.getLastTask(schedule);
 
         double startTime = 0.0;

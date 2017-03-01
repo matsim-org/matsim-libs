@@ -260,6 +260,33 @@ public abstract class CGAL {
         return sI * s1.length;
     }
 
+    /**
+     * If ls1 and ls2 prune ls1 so it starts at the intersection point and leave ls1 untouched otherwise.
+     *
+     * @param ls1 the line segment to prune
+     * @param ls2 the intersecting line segment
+     */
+    public static void pruneIntersectingLineSegments(LineSegment ls1, LineSegment ls2) {
+        LineSegment ls1RB = LineSegment.createFromCoords(ls1.x0 + ls1.dy * ls1.width / 2, ls1.y0 - ls1.dx * ls1.width / 2, ls1.x1 + ls1.dy * ls1.width / 2, ls1.y1 - ls1.dx * ls1.width / 2);
+        LineSegment ls1LB = LineSegment.createFromCoords(ls1.x0 - ls1.dy * ls1.width / 2, ls1.y0 + ls1.dx * ls1.width / 2, ls1.x1 - ls1.dy * ls1.width / 2, ls1.y1 + ls1.dx * ls1.width / 2);
+
+        LineSegment ls2RB = LineSegment.createFromCoords(ls2.x0 + ls2.dy * ls2.width / 2, ls2.y0 - ls2.dx * ls2.width / 2, ls2.x1 + ls2.dy * ls2.width / 2, ls2.y1 - ls2.dx * ls2.width / 2);
+        LineSegment ls2LB = LineSegment.createFromCoords(ls2.x0 - ls2.dy * ls2.width / 2, ls2.y0 + ls2.dx * ls2.width / 2, ls2.x1 - ls2.dy * ls2.width / 2, ls2.y1 + ls2.dx * ls2.width / 2);
+
+        double coeff1 = CGAL.intersectCoeff(ls1RB, ls2RB);
+        double coeff2 = CGAL.intersectCoeff(ls1RB, ls2LB);
+        double coeff3 = CGAL.intersectCoeff(ls1LB, ls2LB);
+        double coeff4 = CGAL.intersectCoeff(ls1LB, ls2RB);
+
+        double amount = Math.max(Math.max(coeff2, coeff4), Math.max(coeff1, coeff3));
+        if (amount > 0) {
+            ls1.x0 = ls1.x0 + ls1.dx * amount;
+            ls1.y0 = ls1.y0 + ls1.dy * amount;
+            ls1.length -= amount;
+        }
+    }
+
+
     public static final class Vector {
         double x;
         double y;

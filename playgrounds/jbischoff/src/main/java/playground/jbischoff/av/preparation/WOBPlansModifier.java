@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -94,7 +94,7 @@ public static void main(String[] args) throws IOException {
 					if (leg.getMode().equals(TransportMode.car)||leg.getMode().equals(TransportMode.pt))
 {
 						
-						leg.setMode(TaxiModule.TAXI_MODE);
+						leg.setMode(TaxiOptimizerModules.TAXI_MODE);
 						Id<Link> start = null;
 						Id<Link> end = null;
 						if (leg.getRoute()!=null){
