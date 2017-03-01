@@ -46,6 +46,7 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.Gbl;
@@ -55,6 +56,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Binder;
 
 
 /**
@@ -122,19 +125,24 @@ public class AccessibilityIntegrationTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
-
-		// ---
-
-		final Scenario sc = createTestScenario(config);
-
-		// ---
-
+		final Scenario sc = createTestScenario(config) ;
+		
+		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
+		
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true,true,true,true,true);
 		module.addSpatialGridDataExchangeListener( evaluateListener ) ;
 		controler.addOverridingModule(module);
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				bind(PtMatrix.class).toInstance(ptMatrix);
+			}
+		});
 
 		// ---
 
@@ -152,6 +160,10 @@ public class AccessibilityIntegrationTest {
 		// ---
 		
 		final Scenario sc = createTestScenario(config) ;
+		
+		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
 		// ---
 
@@ -161,6 +173,12 @@ public class AccessibilityIntegrationTest {
 		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true,true,true,true,true);
 		module.addSpatialGridDataExchangeListener( evaluateListener ) ;
 		controler.addOverridingModule(module);
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				bind(PtMatrix.class).toInstance(ptMatrix);
+			}
+		});
 
 		// ---
 
@@ -194,6 +212,10 @@ public class AccessibilityIntegrationTest {
 		// ---
 
 		final Scenario sc = createTestScenario(config) ;
+		
+		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
 		// ---
 		
@@ -202,6 +224,12 @@ public class AccessibilityIntegrationTest {
 		final AccessibilityModule module = new AccessibilityModule();
 		module.addSpatialGridDataExchangeListener( new EvaluateTestResults(true,true,true,true,true) ) ;
 		controler.addOverridingModule(module);
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				bind(PtMatrix.class).toInstance(ptMatrix);
+			}
+		});
 		
 		// ---
 		
@@ -276,6 +304,7 @@ public class AccessibilityIntegrationTest {
 			this.isComputingMode.put( Modes4Accessibility.car, usingCarGrid ) ;
 			this.isComputingMode.put( Modes4Accessibility.bike, usingBikeGrid ) ;
 			this.isComputingMode.put( Modes4Accessibility.walk, usingWalkGrid ) ;
+			this.isComputingMode.put( Modes4Accessibility.matrixBasedPt, usingPtGrid ) ;
 
 			//			this.isComputingMode.put( Modes4Accessibility.pt, usingPtGrid ) ;
 			// this wasn't commented out yesterday, but I cannot say what it was doing in which way. kai, dec'16
@@ -443,6 +472,7 @@ public class AccessibilityIntegrationTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 //		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
 
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork(); // this is a little odd. kai, dec'16
@@ -468,10 +498,6 @@ public class AccessibilityIntegrationTest {
 	
 	private static Scenario createTestScenario(final Config config) {
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-
-		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
-		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
 		// creating test opportunities (facilities)
 		final ActivityFacilities opportunities = sc.getActivityFacilities();
