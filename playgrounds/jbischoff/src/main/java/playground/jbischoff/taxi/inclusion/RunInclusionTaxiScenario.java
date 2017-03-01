@@ -39,7 +39,7 @@ public class RunInclusionTaxiScenario
     public static void run(String configFile, boolean otfvis)
     {
     	
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());
         createControler(config, otfvis).run();
     

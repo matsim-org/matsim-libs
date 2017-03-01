@@ -22,6 +22,7 @@ package playground.jbischoff.taxibus.scenario;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -47,7 +48,7 @@ public class KNTaxibusExample {
 		// passengers live in larger area and want to go to railway station (now with nicer routes), two different algorithms:
 		
 //		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configClustered.xml", new TaxibusConfigGroup());
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configJsprit.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configJsprit.xml", new TaxibusConfigGroup(), new DvrpConfigGroup());
 		
 		// passengers live in larger area and have distributed destinations, shared taxi for 2 persons:
 //		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());

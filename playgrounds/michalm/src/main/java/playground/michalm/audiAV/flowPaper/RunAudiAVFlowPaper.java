@@ -20,6 +20,7 @@
 package playground.michalm.audiAV.flowPaper;
 
 import org.matsim.contrib.av.flow.AvIncreasedCapacityModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.*;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
@@ -30,7 +31,7 @@ import com.google.inject.name.Names;
 
 public class RunAudiAVFlowPaper {
 	public static void run(String configFile, double flowEfficiencyFactor, String inputEvents) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup());
 		final Controler controler = RunTaxiScenario.createControler(config, false);
 
 		// to speed up computations

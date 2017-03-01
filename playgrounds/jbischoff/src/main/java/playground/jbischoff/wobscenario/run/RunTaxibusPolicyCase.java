@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -64,7 +65,7 @@ public class RunTaxibusPolicyCase {
 		if (args.length>0){
 			configFileName = args[0];
 		}
-		Config config = ConfigUtils.loadConfig(configFileName, new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFileName, new TaxibusConfigGroup(), new DvrpConfigGroup());
 //		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);

@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.taxibus.run.examples;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.taxibus.run.configuration.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -40,7 +41,7 @@ public class RunTaxibusExample {
 
 		// Select either of the following config files
 		// Config config = ConfigUtils.loadConfig("taxibus_example/configClustered.xml", new TaxibusConfigGroup());
-		Config config = ConfigUtils.loadConfig("taxibus_example/configJsprit.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig("taxibus_example/configJsprit.xml", new TaxibusConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);

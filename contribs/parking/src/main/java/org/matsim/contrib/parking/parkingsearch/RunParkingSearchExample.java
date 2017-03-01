@@ -23,6 +23,7 @@
 package org.matsim.contrib.parking.parkingsearch;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
 import org.matsim.core.config.Config;
@@ -54,7 +55,7 @@ public class RunParkingSearchExample {
 	 *            turns otfvis visualisation on or off
 	 */
 	public void run(boolean otfvis) {
-		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml");
+		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", new DvrpConfigGroup());
 		config.plans().setInputFile("population100.xml");
 		config.facilities().setInputFile("parkingFacilities.xml");
 		config.controler().setOutputDirectory("output");

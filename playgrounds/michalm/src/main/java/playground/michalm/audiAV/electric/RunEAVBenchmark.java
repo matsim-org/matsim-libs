@@ -21,6 +21,7 @@ package playground.michalm.audiAV.electric;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.*;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
@@ -46,7 +47,7 @@ import playground.michalm.taxi.run.*;
  */
 public class RunEAVBenchmark {
 	public static void run(String configFile, int runs) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new EvConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(), new EvConfigGroup());
 		createControler(config, runs).run();
 	}
 

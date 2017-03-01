@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -49,7 +50,7 @@ public class RunSharedTaxiExample {
 
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig(args[0], new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig(args[0], new TaxibusConfigGroup(), new DvrpConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 	
 		Scenario scenario = ScenarioUtils.loadScenario(config);

@@ -1,6 +1,7 @@
 package playground.dhosse.av;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -13,7 +14,7 @@ public class AutonomousTaxiLowMaxVelocityExample {
 	public static void main(String args[]){
 		
 		Config config = ConfigUtils.loadConfig("/home/dhosse/at/config.xml",
-				new TaxiConfigGroup());
+				new TaxiConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setLastIteration(0);
         config.controler().setOutputDirectory("/home/dhosse/at/output/");
