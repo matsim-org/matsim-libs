@@ -76,7 +76,7 @@ public class DownstreamSignalController implements SignalController {
 	}
 
 	/* the controller will allow a delay of at most this factor times the free speed travel time */
-	private static final double DELAY_FACTOR = 2;
+	private static final double DELAY_FACTOR = 1;
 	/* the controller will allow a link occupation of at most this factor time the maximum number of vehicles regarding to the storage capacity */
 	private static final double STORAGE_FACTOR = 0.75;
 	
@@ -189,8 +189,13 @@ public class DownstreamSignalController implements SignalController {
 	private boolean allDownstreamLinksEmpty(Id<SignalGroup> signalGroupId) {
 		for (Id<Signal> signalId : this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(this.system.getId()).get(signalGroupId).getSignalIds()) {
 			for (Id<Link> downstreamLinkId : signal2DownstreamLinkMap.get(signalId)) {
+				// TODO try around with different regimes
 				// stop green if one of the numbers is exceeded
-				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > Math.min(linkMaxNoCarsForStorage.get(downstreamLinkId), linkMaxNoCarsForFreeSpeed.get(downstreamLinkId))) {
+//				if (this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId) > linkMaxNoCarsForFreeSpeed.get(downstreamLinkId)) {
+				int numberOfCarsOnLink = this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId);
+				int maxNoCarsForStorage = linkMaxNoCarsForStorage.get(downstreamLinkId);
+				int maxNoCarsForFreespeed = linkMaxNoCarsForFreeSpeed.get(downstreamLinkId);
+				if (numberOfCarsOnLink > Math.min(maxNoCarsForStorage, maxNoCarsForFreespeed)) {
 					return false;
 				}
 			}
@@ -215,16 +220,16 @@ public class DownstreamSignalController implements SignalController {
 	}
 
 	private void determineDownstreamLinks() {
-		SignalSystemData ssd = signalsData.getSignalSystemsData().getSignalSystemData().get(this.system.getId());
-		for (SignalData sd : ssd.getSignalData().values()) {
-			systemNode = this.network.getLinks().get(sd.getLinkId()).getToNode();
+		SignalSystemData signalSystem = signalsData.getSignalSystemsData().getSignalSystemData().get(this.system.getId());
+		for (SignalData signal : signalSystem.getSignalData().values()) {
+			systemNode = this.network.getLinks().get(signal.getLinkId()).getToNode();
 
-			this.signal2DownstreamLinkMap.put(sd.getId(), new HashSet<>());
-			if (sd.getTurningMoveRestrictions() != null) {
-				this.signal2DownstreamLinkMap.get(sd.getId()).addAll(sd.getTurningMoveRestrictions());
+			this.signal2DownstreamLinkMap.put(signal.getId(), new HashSet<>());
+			if (signal.getTurningMoveRestrictions() != null) {
+				this.signal2DownstreamLinkMap.get(signal.getId()).addAll(signal.getTurningMoveRestrictions());
 			} else {
 				// if no turning move restrictions are set, turning is allowed to all outgoing links
-				this.signal2DownstreamLinkMap.get(sd.getId()).addAll(systemNode.getOutLinks().keySet());
+				this.signal2DownstreamLinkMap.get(signal.getId()).addAll(systemNode.getOutLinks().keySet());
 			}
 		}
 	}
