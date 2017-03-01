@@ -71,4 +71,10 @@ class DummySampersAlternative implements Alternative {
 		
 	}
 
+	@Override
+	public void setMATSimTimeScore(double score) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

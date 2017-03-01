@@ -47,15 +47,15 @@ public class Main {
 	static final boolean usePTto1 = true; // true in base case
 	static final boolean usePTto2 = false; // false in base case
 
-	static final int outerIts = 20;
-	static final int popSize = 1000; // TODO!
-	static final double replanProba = 1.0;
+	static final int outerIts = 100;
+	static final int popSize = 1000;
+	static final Double replanProba = null; // NULL means 1/outerIteration
 	static final String expectationFilePrefix = "./output/cba/toynet/expectation-before-it";
 	static final String experienceFilePrefix = "./output/cba/toynet/experience-after-it";
 	static final String demandStatsFilePrefix = "./output/cba/toynet/demandStats-in-it";
 	static final String populationLogFileName = "./output/cba/toynet/populationLog.txt";
 	static final String travelTimeLogFileName = "./output/cba/toynet/traveltimeLog.txt";
-	
+
 	static final int resampleCnt = 10000; // resample cnt 1 yields "plain
 											// sampers"; 10000 yields
 											// "corrected"
@@ -112,7 +112,16 @@ public class Main {
 		final SampersCarDelay sampersCarDelay = new SampersCarDelay(new TimeDiscretization(6 * 3600, 3600, 16),
 				carTravelTime, scenario.getNetwork());
 
-		DemandModel.replanPopulation(resampleCnt, rnd, scenario, factory, outerIt == 1 ? 1.0 : replanProba,
+		final double usedReplanProba;
+		if (replanProba == null) {
+			usedReplanProba = 1.0 / outerIt;
+		} else if (outerIt == 1) {
+			usedReplanProba = 1.0;
+		} else {
+			usedReplanProba = replanProba;
+		}
+
+		DemandModel.replanPopulation(resampleCnt, rnd, scenario, factory, usedReplanProba,
 				expectationFilePrefix + outerIt + ".txt", demandStatsFilePrefix + outerIt + ".txt", maxTrials,
 				maxFailures, usePTto1, usePTto2, mode2tt, betaTravelSampers_1_h, sampersCarDelay, sampersLogitScale,
 				populationAnalyzer);

@@ -81,9 +81,9 @@ class AverageTravelTimeAcrossRuns implements TravelTime {
 	}
 
 	double FACT = 1.0;
-	
+
 	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+	public synchronized double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		double sum = 0;
 		for (int i = 0; i < this.myTravelTimes.size(); i++) {
 			sum += FACT * this.myTravelTimes.get(i).getLinkTravelTime(link, time, person, vehicle);

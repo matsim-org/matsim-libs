@@ -20,7 +20,7 @@ class PlanForResampling implements Alternative {
 
 	private final double teleportationTravelTimeUtility;
 
-	private final double congestedTravelTimeUtility;
+	private double congestedTravelTimeUtility;
 
 	private final double sampersChoiceProba;
 
@@ -99,4 +99,25 @@ class PlanForResampling implements Alternative {
 	public void setSampersEpsilonRealization(double eps) {
 		this.epsilonRealization = eps;
 	}
+
+	@Override
+	public void setMATSimTimeScore(double score) {
+		this.congestedTravelTimeUtility = score;
+	}
+
+	// -------------------- OVERRIDING OF Object --------------------
+
+	@Override
+	public String toString() {
+		final StringBuffer result = new StringBuffer();
+		result.append(this.getClass().getSimpleName() + " for person " + this.plan.getPerson() + " and type "
+				+ this.tourSequence.type + "\n");
+		result.append("V(type,dest,mode) = " + this.activityModeOnlyUtility + "\n");
+		result.append("V_Sampers(time)   = " + this.teleportationTravelTimeUtility + "\n");
+		result.append("V_MATSim(time)    = " + this.congestedTravelTimeUtility + "\n");
+		result.append("P_sampers(this)   = " + this.sampersChoiceProba + "\n");
+		result.append("P_MATSim(this)    = " + this.matsimChoiceProba);
+		return result.toString();
+	}
+
 }

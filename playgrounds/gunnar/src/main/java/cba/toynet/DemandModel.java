@@ -80,6 +80,26 @@ class DemandModel {
 			throw new RuntimeException();
 		}
 
+		// >>>>>>>>>> NEW FOR TESTING >>>>>>>>>>
+		//
+		// for (Map.Entry<Person, ChoiceRunner> person2ChoiceRunnerEntry :
+		// person2ChoiceRunner.entrySet()) {
+		// System.out.println("PERSON " +
+		// person2ChoiceRunnerEntry.getKey().getId() + " HAS "
+		// + person2ChoiceRunnerEntry.getValue().getResult().size() + "
+		// ALTERNATIVES.");
+		// System.out.println();
+		// for (PlanForResampling planForResampling :
+		// person2ChoiceRunnerEntry.getValue().getResult()) {
+		// System.out.println(planForResampling);
+		// System.out.println();
+		// }
+		// System.out.println();
+		// System.out.println();
+		// }
+		//
+		// <<<<<<<<<< NEW FOR TESTING <<<<<<<<<<
+
 		// simulate choices (in parallel)
 
 		final DemandAnalyzer demandAnalyzer = new DemandAnalyzer();

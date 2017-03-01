@@ -13,6 +13,8 @@ public interface Alternative {
 
 	public double getMATSimTimeScore();
 
+	public void setMATSimTimeScore(double score);
+	
 	public double getSampersChoiceProbability();
 
 	public EpsilonDistribution getEpsilonDistribution();

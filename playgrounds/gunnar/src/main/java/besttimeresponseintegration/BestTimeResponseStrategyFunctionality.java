@@ -57,7 +57,7 @@ public class BestTimeResponseStrategyFunctionality {
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
 			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
 			final TripTravelTimes<Facility, String> myTravelTimes) {
-//			final BestTimeResponseTravelTimes myTravelTimes) {
+		// final BestTimeResponseTravelTimes myTravelTimes) {
 
 		final CharyparNagelScoringParameters personScoringParams = scoringParams.getScoringParameters(plan.getPerson());
 
@@ -68,16 +68,17 @@ public class BestTimeResponseStrategyFunctionality {
 		if (plan.getPlanElements().size() <= 1) {
 			throw new RuntimeException("Cannot compute initial plan data for a plan with less than two elements.");
 		}
-		
+
 		/*
-		 * Replace transit_walk and pt interactions with one single pt leg between two real activities (no pt interaction).
+		 * Replace transit_walk and pt interactions with one single pt leg
+		 * between two real activities (no pt interaction).
 		 */
 		TransitActsRemover remover = new TransitActsRemover();
 		remover.run(plan);
 
 		this.plannedActivities = new ArrayList<>(plan.getPlanElements().size() / 2);
 		this.initialDptTimes_s = new ArrayList<>(plan.getPlanElements().size() / 2);
-		
+
 		// Every other element is an activity; skip the last home activity.
 		for (int q = 0; q < plan.getPlanElements().size() - 1; q += 2) {
 
@@ -133,9 +134,9 @@ public class BestTimeResponseStrategyFunctionality {
 	}
 
 	// public BestTimeResponseTravelTimes getTravelTimes() {
-	public TripTravelTimes<Facility, String> getTravelTimes() {
-		return this.myTravelTimes;
-	}
+	// public TripTravelTimes<Facility, String> getTravelTimes() {
+	// return this.myTravelTimes;
+	// }
 
 	public double[] initialDptTimesArray_s() {
 		final double[] result = new double[this.initialDptTimes_s.size()];

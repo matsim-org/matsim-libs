@@ -16,7 +16,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Provider;
 
-import cba.resampling.LogitEpsilonDistribution;
+import cba.resampling.MyGumbelDistribution;
 import floetteroed.utilities.math.MultinomialLogit;
 
 /**
@@ -148,7 +148,7 @@ class ChoiceRunner implements Runnable {
 				final PlanForResampling planForResampling = new PlanForResampling(planAlts.get(planIndex),
 						activityModeOnlyUtilities.get(planIndex), teleportationTravelTimeUtilities.get(planIndex),
 						congestedTravelTimeUtilities.get(planIndex), teleportationBasedMNL.getProbs().get(planIndex),
-						new LogitEpsilonDistribution(this.sampersLogitScale));
+						new MyGumbelDistribution(this.sampersLogitScale));
 				planForResampling.setMATSimChoiceProba(congestionBasedMNL.getProbs().get(planIndex));
 				planForResampling.setTourSequence(this.tourSeqAlts.get(planIndex));
 				plansForResampling.put(planIndex, planForResampling);

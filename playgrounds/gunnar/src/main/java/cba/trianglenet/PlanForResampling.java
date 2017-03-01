@@ -89,4 +89,10 @@ class PlanForResampling implements Alternative {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void setMATSimTimeScore(double score) {
+		// TODO Auto-generated method stub
+		
+	}
 }

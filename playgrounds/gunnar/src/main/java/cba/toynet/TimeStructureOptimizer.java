@@ -87,6 +87,7 @@ class TimeStructureOptimizer {
 			// use simulated travel times
 			travelTimes = new BestTimeResponseTravelTimes(this.scenario.getNetwork(), this.timeDiscretization,
 					this.tripRouterProvider.get(), plan.getPerson(), this.mode2travelTime);
+			// TODO HERE ONE HAS AN INSTANCE OF AverageTravelTimeAcrossRuns IN mode2travelTime. OK!!!
 		} else if (LOGIC.sampers.equals(this.logic)) {
 			// use free-flow travel times
 			travelTimes = new BestTimeResponseTravelTimes(this.scenario.getNetwork(), this.timeDiscretization,
