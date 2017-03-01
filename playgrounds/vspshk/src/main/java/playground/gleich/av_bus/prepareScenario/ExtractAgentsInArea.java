@@ -37,15 +37,15 @@ import java.util.Set;
  */
 public class ExtractAgentsInArea {
 	
-	private static String inputNetworkPath = FilePaths.PATH_NETWORK_BERLIN_100PCT;
-	private static String inputPopulationPath = FilePaths.PATH_POPULATION_BERLIN_100PCT_UNFILTERED;
-	private static String studyAreaShpPath = FilePaths.PATH_STUDY_AREA_SHP;
-	private static String studyAreaShpKey = FilePaths.STUDY_AREA_SHP_KEY;
-	private static String studyAreaShpElement = FilePaths.STUDY_AREA_SHP_ELEMENT;
-	private static String outputPopulationPath = FilePaths.PATH_POPULATION_BERLIN_100PCT_FILTERED;
-	private static String outputNetworkPath = FilePaths.PATH_NETWORK_BERLIN_100PCT_ENCLOSED_IN_AREA;
-	private static String outputLinksInAreaPath = FilePaths.PATH_BERLIN_100PCT_LINKS_ENCLOSED_IN_AREA;
-	private static String outputLinksInAreaShpPath = FilePaths.PATH_BERLIN_100PCT_SHP_LINKS_ENCLOSED_IN_AREA;
+	private String inputNetworkPath;
+	private String inputPopulationPath;
+	private String studyAreaShpPath;
+	private String studyAreaShpKey;
+	private String studyAreaShpElement;
+	private String outputPopulationPath;
+	private String outputNetworkPath;
+	private String outputLinksInAreaPath;
+	private String outputLinksInAreaShpPath;
 	private Scenario inputScenario;
 	private Scenario outputScenario;
 	private Network networkEnclosedInStudyArea;
@@ -53,30 +53,44 @@ public class ExtractAgentsInArea {
 	private Geometry geometryStudyArea;
 	
 	public static void main(String[] args) {
-
+		ExtractAgentsInArea extractor = new ExtractAgentsInArea();
+		
 		if (args.length != 0) {
-			inputNetworkPath = args[0];
-			inputPopulationPath = args[1];
-			studyAreaShpPath = args[2];
-			studyAreaShpKey = args[3];
-			studyAreaShpElement = args[4];
-			outputPopulationPath = args[5];
+			extractor.inputNetworkPath = args[0];
+			extractor.inputPopulationPath = args[1];
+			extractor.studyAreaShpPath = args[2];
+			extractor.studyAreaShpKey = args[3];
+			extractor.studyAreaShpElement = args[4];
+			extractor.outputPopulationPath = args[5];
+			extractor.outputNetworkPath = args[6];
+			extractor.outputLinksInAreaPath = args[7];
+			extractor.outputLinksInAreaShpPath = args[8];
+			
+		} else {
+			extractor.inputNetworkPath = FilePaths.PATH_NETWORK_BERLIN_100PCT;
+			extractor.inputPopulationPath = FilePaths.PATH_POPULATION_BERLIN_100PCT_UNFILTERED;
+			extractor.studyAreaShpPath = FilePaths.PATH_STUDY_AREA_SHP;
+			extractor.studyAreaShpKey = FilePaths.STUDY_AREA_SHP_KEY;
+			extractor.studyAreaShpElement = FilePaths.STUDY_AREA_SHP_ELEMENT;
+			extractor.outputPopulationPath = FilePaths.PATH_POPULATION_BERLIN_100PCT_FILTERED;
+			extractor.outputNetworkPath = FilePaths.PATH_NETWORK_BERLIN_100PCT_ENCLOSED_IN_AREA;
+			extractor.outputLinksInAreaPath = FilePaths.PATH_BERLIN_100PCT_LINKS_ENCLOSED_IN_AREA;
+			extractor.outputLinksInAreaShpPath = FilePaths.PATH_BERLIN_100PCT_SHP_LINKS_ENCLOSED_IN_AREA;
 		}
-
-		(new ExtractAgentsInArea()).run();
+		extractor.run();
 	}
 	
 	private void run(){
 		initialize();
 		System.out.println("initialize done");
-//		selectAgentsByActivitiesInArea();
+		selectAgentsByActivitiesInArea();
 		System.out.println("selectAgentsByActivitiesInArea() done");
 		findLinksInArea();
 		System.out.println("findLinksInArea() done");
-//		selectAgentsByRoutesThroughArea();
+		selectAgentsByRoutesThroughArea();
 		System.out.println("selectAgentsByRoutesThroughArea() done");
-//		removeTransitActsAndCarRoutes();
-//		new PopulationWriter(outputScenario.getPopulation()).writeV4(outputPopulationPath);
+		removeTransitActsAndCarRoutes();
+		new PopulationWriter(outputScenario.getPopulation()).writeV4(outputPopulationPath);
 	}
 	
 	/** Find all links whose start and end are situated within the area */
@@ -107,10 +121,10 @@ public class ExtractAgentsInArea {
 						link.getCapacity(), link.getNumberOfLanes());
 				newNetworkLink.setAllowedModes(link.getAllowedModes());
 				
-				Links2ESRIShape shp = new Links2ESRIShape(networkEnclosedInStudyArea, outputLinksInAreaShpPath, "DHDN_GK4");
-				shp.write();
 			}
 		}
+		Links2ESRIShape shp = new Links2ESRIShape(networkEnclosedInStudyArea, outputLinksInAreaShpPath, "DHDN_GK4");
+		shp.write();
 		new NetworkWriter(networkEnclosedInStudyArea).write(outputNetworkPath);
 		CSVWriter linksWriter = new CSVWriter(outputLinksInAreaPath, ",");
 		for(Id<Link> link : linksInArea){
@@ -156,7 +170,7 @@ public class ExtractAgentsInArea {
 		inputScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		outputScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(inputScenario.getNetwork()).readFile(inputNetworkPath);
-//		new PopulationReader(inputScenario).readFile(inputPopulationPath);
+		new PopulationReader(inputScenario).readFile(inputPopulationPath);
 		geometryStudyArea = JbUtils.readShapeFileAndExtractGeometry(studyAreaShpPath,studyAreaShpKey).get(studyAreaShpElement);
 	}
 	
