@@ -75,7 +75,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * 
      * @return list of {@link AVRequest}s grouped by link
      */
-    public final Map<Link, List<AVRequest>> getAVRequestsAtLinks() {
+    protected final Map<Link, List<AVRequest>> getAVRequestsAtLinks() {
         return getAVRequests().stream() // <- intentionally not parallel to guarantee ordering of requests
                 .collect(Collectors.groupingBy(AVRequest::getFromLink));
     }
@@ -89,8 +89,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest
      *            provided by getAVRequests()
      */
-    // TODO should be 'protected'
-    public synchronized final Void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+    protected synchronized final Void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
         boolean status = matchedRequests.add(avRequest);
