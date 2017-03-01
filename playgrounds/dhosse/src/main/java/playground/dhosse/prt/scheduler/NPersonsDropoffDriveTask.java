@@ -14,21 +14,8 @@ public class NPersonsDropoffDriveTask extends TaxiOccupiedDriveTask {
 		
 		super(path, requests.get(0));
 		this.requests = requests;
-		
-		for(TaxiRequest request : requests){
-			request.setOccupiedDriveTask(this);
-		}
-		
 	}
 	
-	@Override
-    public void disconnectFromRequest()
-    {
-		for(TaxiRequest request : this.requests){
-			request.setOccupiedDriveTask(null);
-		}
-    }
-
 
     @Override
     public TaxiTaskType getTaxiTaskType()

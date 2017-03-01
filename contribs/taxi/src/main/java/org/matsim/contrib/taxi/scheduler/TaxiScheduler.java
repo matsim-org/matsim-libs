@@ -509,11 +509,13 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 
 	protected void taskRemovedFromSchedule(Schedule schedule, TaxiTask task) {
 		if (task instanceof TaxiTaskWithRequest) {
-			TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-			taskWithReq.disconnectFromRequest();
+			TaxiRequest request = ((TaxiTaskWithRequest)task).getRequest();
 
 			if (task.getTaxiTaskType() == TaxiTaskType.PICKUP) {
-				removedRequests.add(taskWithReq.getRequest());
+				request.setPickupTask(null);
+				removedRequests.add(request);
+			} else if (task.getTaxiTaskType() == TaxiTaskType.DROPOFF) {
+				request.setDropoffTask(null);
 			}
 		}
 	}

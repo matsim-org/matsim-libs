@@ -34,12 +34,6 @@ public class TaxiOccupiedDriveTask extends DriveTaskImpl implements TaxiTaskWith
 		}
 
 		this.request = request;
-		request.setOccupiedDriveTask(this);
-	}
-
-	@Override
-	public void disconnectFromRequest() {
-		request.setOccupiedDriveTask(null);
 	}
 
 	@Override

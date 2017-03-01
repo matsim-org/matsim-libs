@@ -33,11 +33,6 @@ public class TaxiPickupTask extends StayTaskImpl implements TaxiTaskWithRequest 
 	}
 
 	@Override
-	public void disconnectFromRequest() {
-		request.setPickupTask(null);
-	}
-
-	@Override
 	public TaxiTaskType getTaxiTaskType() {
 		return TaxiTaskType.PICKUP;
 	}

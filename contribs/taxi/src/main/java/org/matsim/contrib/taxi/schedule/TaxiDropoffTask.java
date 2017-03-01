@@ -33,11 +33,6 @@ public class TaxiDropoffTask extends StayTaskImpl implements TaxiTaskWithRequest
 	}
 
 	@Override
-	public void disconnectFromRequest() {
-		request.setDropoffTask(null);
-	}
-
-	@Override
 	public TaxiTaskType getTaxiTaskType() {
 		return TaxiTaskType.DROPOFF;
 	}
