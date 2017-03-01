@@ -41,29 +41,10 @@ public class HungarianDispatcher extends UniversalDispatcher {
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
     }
 
-    /**
-     * verify that link references are present in the network
-     */
-    @SuppressWarnings("unused") // for verifying link references
-    private void verifyLinkReferencesInvariant() {
-        List<Link> testset = getDivertableVehicles().stream() //
-                .map(VehicleLinkPair::getCurrentDriveDestination) //
-                .filter(Objects::nonNull) //
-                .collect(Collectors.toList());
-        if (!linkReferences.containsAll(testset))
-            throw new RuntimeException("network change 1");
-        if (!linkReferences.containsAll(network.getLinks().values()))
-            throw new RuntimeException("network change 2");
-        if (0 < testset.size())
-            System.out.println("network " + linkReferences.size() + " contains all " + testset.size());
-    }
-
     int total_matchedRequests = 0;
 
     @Override
     public void redispatch(double now) {
-        // verifyReferences(); // <- debugging only
-
         total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
 
         final long round_now = Math.round(now);
