@@ -58,10 +58,12 @@ public class Trips2PlansConverter {
        private String tripLocationsFile = "Y:/bvg-taxi/departures.txt";
        private List<String> selectedTrips = new ArrayList<>();
        private Random random = MatsimRandom.getRandom();
-       double sampleSize = 1.0;
-       private String plansFile  = "Y:/bvg-taxi/plans"+sampleSize+".xml";
-       private String tripsFile  = "Y:/bvg-taxi/trips"+sampleSize+".csv";
-       
+       double sampleSize = 0.2;
+       private boolean randomize = true;
+       private String plansFile  = "Y:/bvg-taxi/plans"+sampleSize+"_"+randomize+".xml";
+       private String tripsFile  = "Y:/bvg-taxi/trips"+sampleSize+"_"+randomize+".csv";
+       private int randomAllocation_meters = 300;
+       private int[] depHour = new int [24];
 
        
        
@@ -78,7 +80,9 @@ public class Trips2PlansConverter {
              createPlans(scenario.getPopulation());
              new PopulationWriter(scenario.getPopulation()).write(plansFile);
              JbUtils.collection2Text(selectedTrips,tripsFile, "time;fromStop;toStop;fromX;fromY;toX;toY");
-             
+             for (int i = 0; i<depHour.length;i++)
+             {System.out.println(i +"\t"+ depHour[i]);
+             }
        }
 
        private void createPlans(Population population) {
@@ -86,11 +90,14 @@ public class Trips2PlansConverter {
              for (Trip trip : trips)
              {
                     if (this.random.nextDouble()<sampleSize){
+                    randomizeTrip(trip);	
                     Person p = population.getFactory().createPerson(Id.createPersonId(trip.fromLoc+"_"+trip.toLoc+"_"+(int)trip.departureTime+"_"+i));
                     i++;
                     Plan plan = population.getFactory().createPlan();
                     p.addPlan(plan);
                     Activity act = population.getFactory().createActivityFromCoord("departure", trip.fromCoord);
+                    int hour = JbUtils.getHour(trip.departureTime);
+                    depHour[hour]++;
                     if (trip.departureTime<18*3600){
                            trip.departureTime += 24*3600;
                     }
@@ -104,7 +111,21 @@ public class Trips2PlansConverter {
              }}
        }
 
-       private void readTrips(String tripLocationsFile2) {
+       /**
+	 * @param trip
+	 */
+	private void randomizeTrip(Trip trip) {
+		double fromX = trip.fromCoord.getX() + - randomAllocation_meters + random.nextInt(2*randomAllocation_meters); 
+		double fromY = trip.fromCoord.getY() + - randomAllocation_meters + random.nextInt(2*randomAllocation_meters);
+		trip.fromCoord = new Coord(fromX,fromY);
+		
+		double toX = trip.toCoord.getX() + - randomAllocation_meters + random.nextInt(2*randomAllocation_meters); 
+		double toY = trip.toCoord.getY() + - randomAllocation_meters + random.nextInt(2*randomAllocation_meters);
+		trip.toCoord = new Coord(toX,toY);
+		
+	}
+
+	private void readTrips(String tripLocationsFile2) {
              TabularFileParserConfig config = new TabularFileParserConfig();
         config.setDelimiterTags(new String[] {";"});
         config.setFileName(tripLocationsFile2);

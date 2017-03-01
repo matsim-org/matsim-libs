@@ -96,6 +96,7 @@ public class CreatePeoplemoverStops {
 			while (!added)
 			{
 				stop = f.createTransitStopFacility(Id.create(l.getId().toString()+"_stop_"+ii, TransitStopFacility.class), stop.getCoord(), false);
+				stop.setLinkId(l.getId());
 				ii++;
 				try {
 				schedule.addStopFacility(stop);

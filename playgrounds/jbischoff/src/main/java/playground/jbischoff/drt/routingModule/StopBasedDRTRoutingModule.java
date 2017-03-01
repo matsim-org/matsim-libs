@@ -138,6 +138,9 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 		for (TransitStopFacility stop : stopCandidates)
 		{
 			Link stopLink = network.getLinks().get(stop.getLinkId());
+			if (stopLink == null)
+			{throw new RuntimeException("Stop "+stop.getId()+" on link id "+stop.getLinkId() + " is not part of the network.");
+			}
 			double [] stopLinkVector = getVector(stopLink.getFromNode().getCoord(), stopLink.getToNode().getCoord());
 			double [] destinationVector = getVector(stopLink.getFromNode().getCoord(),toCoord);
 			double heading = calcHeading(stopLinkVector,destinationVector);
