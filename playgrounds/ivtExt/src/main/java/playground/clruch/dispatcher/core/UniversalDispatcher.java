@@ -17,7 +17,6 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.clruch.dispatcher.AVTaskAdapter;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.GlobalAssert;
@@ -118,10 +117,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      *            is provided from super.getDivertableVehicles()
      * @param destination
      */
-    protected final void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+    protected final Void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
         final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
-        Task abstractTask = schedule.getCurrentTask(); // <- implies that task is started
-        new AVTaskAdapter(abstractTask) {
+        Task task = schedule.getCurrentTask(); // <- implies that task is started
+        new AVTaskAdapter(task) {
             @Override
             public void handle(AVDriveTask avDriveTask) {
                 if (!avDriveTask.getPath().getToLink().equals(destination)) { // ignore when vehicle is already going there
@@ -146,6 +145,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     assignDirective(vehicleLinkPair.avVehicle, new EmptyDirective());
             }
         };
+        return null;
     }
 
     protected final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {

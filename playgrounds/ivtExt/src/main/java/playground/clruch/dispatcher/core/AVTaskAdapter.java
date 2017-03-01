@@ -1,18 +1,23 @@
-package playground.clruch.dispatcher;
-
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
+package playground.clruch.dispatcher.core;
 
 import org.matsim.contrib.dvrp.schedule.Task;
+
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
+import playground.sebhoerl.avtaxi.schedule.AVTask.AVTaskType;
 
-public class AVTaskAdapter implements AVTaskListener {
+/**
+ * An {@link AVTaskAdapter} is created using a {@link Task}, which is casted
+ * to {@link AVTask} internally. The adapter then invokes the handling function
+ * corresponding to one of the four possible {@link AVTaskType}s of the given task.  
+ */
+/* package until needed elsewhere */ class AVTaskAdapter implements AVTaskListener {
 
-    public AVTaskAdapter(Task abstractTask) {
-        AVTask avTask = (AVTask) abstractTask;
+    public AVTaskAdapter(Task task) {
+        final AVTask avTask = (AVTask) task;
         switch (avTask.getAVTaskType()) {
         case PICKUP: {
             handle((AVPickupTask) avTask);

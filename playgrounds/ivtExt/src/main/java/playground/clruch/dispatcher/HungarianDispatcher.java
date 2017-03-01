@@ -10,6 +10,7 @@ import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
+import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -28,6 +29,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
     final Collection<Link> linkReferences; // <- for verifying link references
 
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
+    final DrivebyRequestStopper drivebyRequestStopper;
 
     private HungarianDispatcher( //
                                  AVDispatcherConfig avDispatcherConfig, //
@@ -39,6 +41,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
+        drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
     }
 
     int total_matchedRequests = 0;
@@ -52,27 +55,13 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
             int num_abortTrip = 0;
             int num_driveOrder = 0;
-
-            Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
-
-            { // see if any car is driving by a request. if so, then stay there to be matched!
-                Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
-                for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-                    Link link = vehicleLinkPair.getDivertableLocation();
-                    if (requests.containsKey(link)) {
-                        List<AVRequest> requestList = requests.get(link);
-                        if (!requestList.isEmpty()) {
-                            requestList.remove(0);
-                            setVehicleDiversion(vehicleLinkPair, link);
-                            ++num_abortTrip;
-                        }
-                    }
-                }
-            }
-
+            
+            // see if any car is driving by a request. if so, then stay there to be matched!
+            num_abortTrip += drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
 
             { // for all remaining vehicles and requests, perform a bipartite matching
 
+                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
                 // call getDivertableVehicles again to get remaining vehicles
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
@@ -90,9 +79,11 @@ public class HungarianDispatcher extends UniversalDispatcher {
                 Map<VehicleLinkPair, Link> hungarianmatches = abstractVehicleDestMatcher.match(divertableVehicles, requestlocs);
 
                 // use the result to setVehicleDiversion
-                for (VehicleLinkPair vehicleLinkPair : hungarianmatches.keySet()) {
-                    setVehicleDiversion(vehicleLinkPair, hungarianmatches.get(vehicleLinkPair));
-                }
+                hungarianmatches.entrySet().forEach(this::setVehicleDiversion);
+                // TODO remove commented code below, since the line above does the job
+//                for (VehicleLinkPair vehicleLinkPair : hungarianmatches.keySet()) {
+//                    setVehicleDiversion(vehicleLinkPair, hungarianmatches.get(vehicleLinkPair));
+//                }
             }
         }
     }
