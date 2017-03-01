@@ -23,56 +23,40 @@ import java.util.*;
 
 import com.google.common.collect.Iterables;
 
+public class CSVLineBuilder {
+	private final List<String> line = new ArrayList<>();
 
-public class CSVLineBuilder
-{
-    private final List<String> line = new ArrayList<>();
+	public CSVLineBuilder add(String cell) {
+		line.add(cell);
+		return this;
+	}
 
+	public CSVLineBuilder addf(String format, Object cell) {
+		line.add(String.format(format, cell));
+		return this;
+	}
 
-    public CSVLineBuilder add(String cell)
-    {
-        line.add(cell);
-        return this;
-    }
+	public CSVLineBuilder addEmpty() {
+		line.add(null);
+		return this;
+	}
 
+	public CSVLineBuilder addAll(Iterable<String> cells) {
+		Iterables.addAll(line, cells);
+		return this;
+	}
 
-    public CSVLineBuilder addf(String format, Object cell)
-    {
-        line.add(String.format(format, cell));
-        return this;
-    }
+	public CSVLineBuilder addAll(String... cells) {
+		Collections.addAll(line, cells);
+		return this;
+	}
 
+	public CSVLineBuilder addBuilder(CSVLineBuilder builder) {
+		line.addAll(builder.line);
+		return this;
+	}
 
-    public CSVLineBuilder addEmpty()
-    {
-        line.add(null);
-        return this;
-    }
-
-
-    public CSVLineBuilder addAll(Iterable<String> cells)
-    {
-        Iterables.addAll(line, cells);
-        return this;
-    }
-
-
-    public CSVLineBuilder addAll(String... cells)
-    {
-        Collections.addAll(line, cells);
-        return this;
-    }
-
-
-    public CSVLineBuilder addBuilder(CSVLineBuilder builder)
-    {
-        line.addAll(builder.line);
-        return this;
-    }
-
-
-    public String[] build()
-    {
-        return line.toArray(new String[line.size()]);
-    }
+	public String[] build() {
+		return line.toArray(new String[line.size()]);
+	}
 }

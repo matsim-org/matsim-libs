@@ -23,15 +23,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
+public interface DriverDynLeg extends DynLeg {
+	Id<Link> getNextLinkId();
 
-public interface DriverDynLeg
-    extends DynLeg
-{
-    Id<Link> getNextLinkId();
+	void movedOverNode(Id<Link> newLinkId);
 
-
-    void movedOverNode(Id<Link> newLinkId);
-
-
-    Id<Vehicle> getPlannedVehicleId();
+	Id<Vehicle> getPlannedVehicleId();
 }

@@ -25,102 +25,81 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dynagent.*;
 
+public class VrpAgentLogic implements DynAgentLogic {
+	public static final String BEFORE_SCHEDULE_ACTIVITY_TYPE = "BeforeVrpSchedule";
+	public static final String AFTER_SCHEDULE_ACTIVITY_TYPE = "AfterVrpSchedule";
 
-public class VrpAgentLogic
-    implements DynAgentLogic
-{
-    public static final String BEFORE_SCHEDULE_ACTIVITY_TYPE = "BeforeVrpSchedule";
-    public static final String AFTER_SCHEDULE_ACTIVITY_TYPE = "AfterVrpSchedule";
+	public interface DynActionCreator {
+		DynAction createAction(DynAgent dynAgent, Task task, double now);
+	}
 
+	private final VrpOptimizer optimizer;
+	private final DynActionCreator dynActionCreator;
+	private final Vehicle vehicle;
+	private DynAgent agent;
 
-    public interface DynActionCreator
-    {
-        DynAction createAction(DynAgent dynAgent, Task task, double now);
-    }
+	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, Vehicle vehicle) {
+		this.optimizer = optimizer;
+		this.dynActionCreator = dynActionCreator;
 
+		this.vehicle = vehicle;
+	}
 
-    private final VrpOptimizer optimizer;
-    private final DynActionCreator dynActionCreator;
-    private final Vehicle vehicle;
-    private DynAgent agent;
+	@Override
+	public DynActivity computeInitialActivity(DynAgent dynAgent) {
+		this.agent = dynAgent;
+		return createBeforeScheduleActivity();// INITIAL ACTIVITY (activate the agent in QSim)
+	}
 
+	@Override
+	public DynAgent getDynAgent() {
+		return agent;
+	}
 
-    public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, Vehicle vehicle)
-    {
-        this.optimizer = optimizer;
-        this.dynActionCreator = dynActionCreator;
+	@Override
+	public DynAction computeNextAction(DynAction oldAction, double now) {
+		Schedule schedule = vehicle.getSchedule();
 
-        this.vehicle = vehicle;
-    }
+		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
+			return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
+		}
+		// else: PLANNED or STARTED
 
+		optimizer.nextTask(vehicle);
+		// remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
 
-    @Override
-    public DynActivity computeInitialActivity(DynAgent dynAgent)
-    {
-        this.agent = dynAgent;
-        return createBeforeScheduleActivity();// INITIAL ACTIVITY (activate the agent in QSim)
-    }
+		if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
+			return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
+		}
 
+		Task task = schedule.getCurrentTask();
+		DynAction action = dynActionCreator.createAction(agent, task, now);
 
-    @Override
-    public DynAgent getDynAgent()
-    {
-        return agent;
-    }
+		return action;
+	}
 
+	private DynActivity createBeforeScheduleActivity() {
+		return new AbstractDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE) {
+			public double getEndTime() {
+				Schedule s = vehicle.getSchedule();
 
-    @Override
-    public DynAction computeNextAction(DynAction oldAction, double now)
-    {
-        Schedule schedule = vehicle.getSchedule();
+				switch (s.getStatus()) {
+					case PLANNED:
+						return s.getBeginTime();
+					case UNPLANNED:
+						return vehicle.getT1();
+					default:
+						throw new IllegalStateException();
+				}
+			}
+		};
+	}
 
-        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
-            return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
-        }
-        // else: PLANNED or STARTED
+	private DynActivity createAfterScheduleActivity() {
+		return new StaticDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
+	}
 
-        optimizer.nextTask(vehicle);
-        // remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
-
-        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
-            return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
-        }
-
-        Task task = schedule.getCurrentTask();
-        DynAction action = dynActionCreator.createAction(agent, task, now);
-
-        return action;
-    }
-
-
-    private DynActivity createBeforeScheduleActivity()
-    {
-        return new AbstractDynActivity(BEFORE_SCHEDULE_ACTIVITY_TYPE) {
-            public double getEndTime()
-            {
-                Schedule s = vehicle.getSchedule();
-
-                switch (s.getStatus()) {
-                    case PLANNED:
-                        return s.getBeginTime();
-                    case UNPLANNED:
-                        return vehicle.getT1();
-                    default:
-                        throw new IllegalStateException();
-                }
-            }
-        };
-    }
-
-
-    private DynActivity createAfterScheduleActivity()
-    {
-        return new StaticDynActivity(AFTER_SCHEDULE_ACTIVITY_TYPE, Double.POSITIVE_INFINITY);
-    }
-    
-    
-    Vehicle getVehicle()
-    {
-    	return vehicle;
-    }
+	Vehicle getVehicle() {
+		return vehicle;
+	}
 }

@@ -27,50 +27,39 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.*;
 import org.matsim.facilities.Facility;
 
+public class DynRoutingModule implements RoutingModule {
+	private final String mode;
+	private StageActivityTypes stageActivityTypes;
 
-public class DynRoutingModule
-    implements RoutingModule
-{
-    private final String mode;
-    private StageActivityTypes stageActivityTypes;
+	public DynRoutingModule(String mode) {
+		this.mode = mode;
+	}
 
+	@Override
+	public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
+			Person person) {
+		Route route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+		route.setDistance(Double.NaN);
+		route.setTravelTime(Double.NaN);
 
-    public DynRoutingModule(String mode)
-    {
-        this.mode = mode;
-    }
+		Leg leg = PopulationUtils.createLeg(mode);
+		leg.setDepartureTime(departureTime);
+		leg.setTravelTime(Double.NaN);
+		leg.setRoute(route);
 
+		return Collections.singletonList(leg);
+	}
 
-    @Override
-    public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility,
-            double departureTime, Person person)
-    {
-        Route route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-        route.setDistance(Double.NaN);
-        route.setTravelTime(Double.NaN);
+	/**
+	 * @param stageActivityTypes
+	 *            the stageActivityTypes to set
+	 */
+	public void setStageActivityTypes(StageActivityTypes stageActivityTypes) {
+		this.stageActivityTypes = stageActivityTypes;
+	}
 
-        Leg leg = PopulationUtils.createLeg(mode);
-        leg.setDepartureTime(departureTime);
-        leg.setTravelTime(Double.NaN);
-        leg.setRoute(route);
-
-        return Collections.singletonList(leg);
-    }
-
-
-    /**
-     * @param stageActivityTypes the stageActivityTypes to set
-     */
-    public void setStageActivityTypes(StageActivityTypes stageActivityTypes)
-    {
-        this.stageActivityTypes = stageActivityTypes;
-    }
-
-
-    @Override
-    public StageActivityTypes getStageActivityTypes()
-    {
-        return this.stageActivityTypes != null ? this.stageActivityTypes
-                : EmptyStageActivityTypes.INSTANCE;
-    }
+	@Override
+	public StageActivityTypes getStageActivityTypes() {
+		return this.stageActivityTypes != null ? this.stageActivityTypes : EmptyStageActivityTypes.INSTANCE;
+	}
 }

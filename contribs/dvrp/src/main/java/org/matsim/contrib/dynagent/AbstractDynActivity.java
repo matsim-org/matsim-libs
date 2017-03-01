@@ -19,31 +19,23 @@
 
 package org.matsim.contrib.dynagent;
 
-public abstract class AbstractDynActivity
-    implements DynActivity
-{
-    private final String activityType;
+public abstract class AbstractDynActivity implements DynActivity {
+	private final String activityType;
 
+	public AbstractDynActivity(String activityType) {
+		this.activityType = activityType;
+	}
 
-    public AbstractDynActivity(String activityType)
-    {
-        this.activityType = activityType;
-    }
+	@Override
+	public String getActivityType() {
+		return activityType;
+	}
 
+	@Override
+	public void doSimStep(double now) {
+	}
 
-    @Override
-    public String getActivityType()
-    {
-        return activityType;
-    }
-
-
-    @Override
-    public void doSimStep(double now)
-    {}
-
-
-    @Override
-    public void finalizeAction(double now)
-    {}
+	@Override
+	public void finalizeAction(double now) {
+	}
 }

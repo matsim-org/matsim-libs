@@ -21,9 +21,6 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.api.core.v01.network.Link;
 
-
-public interface StayTask
-    extends Task
-{
-    Link getLink();
+public interface StayTask extends Task {
+	Link getLink();
 }

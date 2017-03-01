@@ -23,32 +23,23 @@ import java.io.PrintWriter;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
+public class LeastCostPathCalculatorCacheStats {
+	private final SummaryStatistics hitStats = new SummaryStatistics();
+	private final SummaryStatistics missStats = new SummaryStatistics();
 
-public class LeastCostPathCalculatorCacheStats
-{
-    private final SummaryStatistics hitStats = new SummaryStatistics();
-    private final SummaryStatistics missStats = new SummaryStatistics();
+	public void updateStats(LeastCostPathCalculatorWithCache calculatorWithCache) {
+		hitStats.addValue(calculatorWithCache.getCacheStats().getHits());
+		missStats.addValue(calculatorWithCache.getCacheStats().getMisses());
+	}
 
+	public static final String HEADER = "cfg\tHits\tMisses";
 
-    public void updateStats(LeastCostPathCalculatorWithCache calculatorWithCache)
-    {
-        hitStats.addValue(calculatorWithCache.getCacheStats().getHits());
-        missStats.addValue(calculatorWithCache.getCacheStats().getMisses());
-    }
+	public void printStats(PrintWriter pw, String id) {
+		pw.printf("%10s\t%f\t%f\n", id, hitStats.getMean(), missStats.getMean());
+	}
 
-
-    public static final String HEADER = "cfg\tHits\tMisses";
-
-
-    public void printStats(PrintWriter pw, String id)
-    {
-        pw.printf("%10s\t%f\t%f\n", id, hitStats.getMean(), missStats.getMean());
-    }
-
-
-    public void clearStats()
-    {
-        hitStats.clear();
-        missStats.clear();
-    }
+	public void clearStats() {
+		hitStats.clear();
+		missStats.clear();
+	}
 }

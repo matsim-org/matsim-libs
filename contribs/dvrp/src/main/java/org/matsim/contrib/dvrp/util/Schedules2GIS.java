@@ -33,68 +33,60 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+public class Schedules2GIS {
+	private final Iterable<? extends Vehicle> vehicles;
+	private final PolylineFeatureFactory factory;
 
-public class Schedules2GIS
-{
-    private final Iterable<? extends Vehicle> vehicles;
-    private final PolylineFeatureFactory factory;
+	public Schedules2GIS(Iterable<? extends Vehicle> vehicles, String coordSystem) {
+		this.vehicles = vehicles;
 
+		factory = new PolylineFeatureFactory.Builder().//
+				setCrs(MGC.getCRS(coordSystem)).//
+				setName("vrp_route").//
+				addAttribute("VEH_ID", Integer.class).//
+				addAttribute("VEH_NAME", String.class).//
+				addAttribute("ROUTE_ID", Integer.class).//
+				addAttribute("ARC_IDX", Integer.class).//
+				create();
+	}
 
-    public Schedules2GIS(Iterable<? extends Vehicle> vehicles, String coordSystem)
-    {
-        this.vehicles = vehicles;
+	public void write(String vrpOutDir) {
+		new File(vrpOutDir).mkdir();
+		String file = vrpOutDir + "\\route_";
 
-        factory = new PolylineFeatureFactory.Builder().//
-                setCrs(MGC.getCRS(coordSystem)).//
-                setName("vrp_route").//
-                addAttribute("VEH_ID", Integer.class).//
-                addAttribute("VEH_NAME", String.class).//
-                addAttribute("ROUTE_ID", Integer.class).//
-                addAttribute("ARC_IDX", Integer.class).//
-                create();
-    }
+		for (Vehicle v : vehicles) {
+			Iterable<DriveTask> drives = Schedules.createDriveTaskIter(v.getSchedule());
+			Collection<SimpleFeature> features = new ArrayList<>();
 
+			for (DriveTask drive : drives) {
+				Coordinate[] coords = createLineString(drive);
 
-    public void write(String vrpOutDir)
-    {
-        new File(vrpOutDir).mkdir();
-        String file = vrpOutDir + "\\route_";
+				if (coords != null) {
+					features.add(this.factory.createPolyline(coords,
+							new Object[] { v.getId(), v.getId(), drive.getTaskIdx() }, null));
+				}
+			}
 
-        for (Vehicle v : vehicles) {
-            Iterable<DriveTask> drives = Schedules.createDriveTaskIter(v.getSchedule());
-            Collection<SimpleFeature> features = new ArrayList<>();
+			if (!features.isEmpty()) {
+				ShapeFileWriter.writeGeometries(features, file + v.getId() + ".shp");
+			}
+		}
+	}
 
-            for (DriveTask drive : drives) {
-                Coordinate[] coords = createLineString(drive);
+	private Coordinate[] createLineString(DriveTask driveTask) {
+		VrpPath path = driveTask.getPath();
 
-                if (coords != null) {
-                    features.add(this.factory.createPolyline(coords,
-                            new Object[] { v.getId(), v.getId(), drive.getTaskIdx() }, null));
-                }
-            }
+		if (path.getLinkCount() == 1) {
+			return null;
+		}
 
-            if (!features.isEmpty()) {
-                ShapeFileWriter.writeGeometries(features, file + v.getId() + ".shp");
-            }
-        }
-    }
+		List<Coordinate> coordList = new ArrayList<>();
 
+		for (Link l : path) {
+			Coord c = l.getToNode().getCoord();
+			coordList.add(new Coordinate(c.getX(), c.getY()));
+		}
 
-    private Coordinate[] createLineString(DriveTask driveTask)
-    {
-        VrpPath path = driveTask.getPath();
-
-        if (path.getLinkCount() == 1) {
-            return null;
-        }
-
-        List<Coordinate> coordList = new ArrayList<>();
-
-        for (Link l : path) {
-            Coord c = l.getToNode().getCoord();
-            coordList.add(new Coordinate(c.getX(), c.getY()));
-        }
-
-        return coordList.toArray(new Coordinate[coordList.size()]);
-    }
+		return coordList.toArray(new Coordinate[coordList.size()]);
+	}
 }

@@ -26,34 +26,24 @@ import org.matsim.core.utils.io.*;
 
 import com.opencsv.*;
 
+public class CSVReaders {
+	public static List<String[]> readTSV(String file) {
+		return readFile(file, '\t');
+	}
 
-public class CSVReaders
-{
-    public static List<String[]> readTSV(String file)
-    {
-        return readFile(file, '\t');
-    }
+	public static List<String[]> readCSV(String file) {
+		return readFile(file, CSVParser.DEFAULT_SEPARATOR);
+	}
 
+	public static List<String[]> readSemicolonSV(String file) {
+		return readFile(file, ';');
+	}
 
-    public static List<String[]> readCSV(String file)
-    {
-        return readFile(file, CSVParser.DEFAULT_SEPARATOR);
-    }
-
-
-    public static List<String[]> readSemicolonSV(String file)
-    {
-        return readFile(file, ';');
-    }
-
-
-    public static List<String[]> readFile(String file, char separator)
-    {
-        try (CSVReader reader = new CSVReader(IOUtils.getBufferedReader(file), separator)) {
-            return reader.readAll();
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
+	public static List<String[]> readFile(String file, char separator) {
+		try (CSVReader reader = new CSVReader(IOUtils.getBufferedReader(file), separator)) {
+			return reader.readAll();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 }

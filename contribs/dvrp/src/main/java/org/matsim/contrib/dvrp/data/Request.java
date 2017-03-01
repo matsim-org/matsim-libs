@@ -21,34 +21,29 @@ package org.matsim.contrib.dvrp.data;
 
 import org.matsim.api.core.v01.Identifiable;
 
-
 /**
  * @author michalm
  */
-public interface Request
-extends Identifiable<Request>
-{
+public interface Request extends Identifiable<Request> {
 	double getQuantity();
 
-
 	/**
-	 * Design comments:<ul>
-	 * <li> Rename to <code>getEarliestStartTime()</code>?  kai, feb'17
+	 * Design comments:
+	 * <ul>
+	 * <li>Rename to <code>getEarliestStartTime()</code>? kai, feb'17
 	 * </ul>
 	 */
 	double getT0();// earliest start time
 
-
 	/**
-	 * Design comments:<ul>
-	 * <li> Rename to <code>getLatestStartTime()</code>?  kai, feb'17
+	 * Design comments:
+	 * <ul>
+	 * <li>Rename to <code>getLatestStartTime()</code>? kai, feb'17
 	 * </ul>
 	 */
 	double getT1();// latest start time
 
-
 	double getSubmissionTime();
-
 
 	boolean isRejected();
 }

@@ -23,99 +23,74 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.*;
 
+public class VehicleImpl implements Vehicle {
+	private final Id<Vehicle> id;
+	private Link startLink;
+	private final double capacity;
 
-public class VehicleImpl
-    implements Vehicle
-{
-    private final Id<Vehicle> id;
-    private Link startLink;
-    private final double capacity;
+	// TW for vehicle
+	private final double t0;
+	private double t1;
 
-    // TW for vehicle
-    private final double t0;
-    private double t1;
+	private Schedule schedule;
 
-    private Schedule schedule;
+	public VehicleImpl(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1) {
+		this.id = id;
+		this.startLink = startLink;
+		this.capacity = capacity;
+		this.t0 = t0;
+		this.t1 = t1;
 
+		schedule = new ScheduleImpl(this);
+	}
 
-    public VehicleImpl(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1)
-    {
-        this.id = id;
-        this.startLink = startLink;
-        this.capacity = capacity;
-        this.t0 = t0;
-        this.t1 = t1;
+	@Override
+	public Id<Vehicle> getId() {
+		return id;
+	}
 
-        schedule = new ScheduleImpl(this);
-    }
+	@Override
+	public Link getStartLink() {
+		return startLink;
+	}
 
+	@Override
+	public void setStartLink(Link link) {
+		this.startLink = link;
+	}
 
-    @Override
-    public Id<Vehicle> getId()
-    {
-        return id;
-    }
+	@Override
+	public double getCapacity() {
+		return capacity;
+	}
 
+	@Override
+	public double getT0() {
+		return t0;
+	}
 
-    @Override
-    public Link getStartLink()
-    {
-        return startLink;
-    }
+	@Override
+	public double getT1() {
+		return t1;
+	}
 
+	@Override
+	public Schedule getSchedule() {
+		return schedule;
+	}
 
-    @Override
-    public void setStartLink(Link link)
-    {
-        this.startLink = link;
-    }
+	@Override
+	public String toString() {
+		return "Vehicle_" + id;
+	}
 
+	@Override
+	public void setT1(double t1) {
+		this.t1 = t1;
+	}
 
-    @Override
-    public double getCapacity()
-    {
-        return capacity;
-    }
-
-
-    @Override
-    public double getT0()
-    {
-        return t0;
-    }
-
-
-    @Override
-    public double getT1()
-    {
-        return t1;
-    }
-
-
-    @Override
-    public Schedule getSchedule()
-    {
-        return schedule;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "Vehicle_" + id;
-    }
-
-
-    @Override
-    public void setT1(double t1)
-    {
-        this.t1 = t1;
-    }
-
-
-    @Override
-    public void resetSchedule()
-    {
-        schedule = new ScheduleImpl(this);
-    }
+	@Override
+	public void resetSchedule() {
+		schedule = new ScheduleImpl(this);
+	}
 }

@@ -19,14 +19,10 @@
 
 package org.matsim.contrib.dvrp.path;
 
-public interface VrpPathWithTravelData
-    extends VrpPath
-{
-    public double getDepartureTime();
+public interface VrpPathWithTravelData extends VrpPath {
+	public double getDepartureTime();
 
+	public double getTravelTime();
 
-    public double getTravelTime();
-
-
-    public double getArrivalTime();
+	public double getArrivalTime();
 }

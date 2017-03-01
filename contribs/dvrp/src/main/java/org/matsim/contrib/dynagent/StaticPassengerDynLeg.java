@@ -23,58 +23,43 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 
-
 /**
  * @author jbischoff
  */
-public class StaticPassengerDynLeg
-    implements PassengerDynLeg
-{
-    private Route route;
-    private String mode;
+public class StaticPassengerDynLeg implements PassengerDynLeg {
+	private Route route;
+	private String mode;
 
+	public StaticPassengerDynLeg(Route route, String mode) {
+		this.route = route;
+		this.mode = mode;
+	}
 
-    public StaticPassengerDynLeg(Route route, String mode)
-    {
-        this.route = route;
-        this.mode = mode;
-    }
+	@Override
+	public String getMode() {
+		return mode;
+	}
 
+	@Override
+	public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
+	}
 
-    @Override
-    public String getMode()
-    {
-        return mode;
-    }
+	@Override
+	public Id<Link> getDestinationLinkId() {
+		return route.getEndLinkId();
+	}
 
+	@Override
+	public Double getExpectedTravelTime() {
+		return route.getTravelTime();
+	}
 
-    @Override
-    public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId)
-    {}
+	@Override
+	public Double getExpectedTravelDistance() {
+		return route.getDistance();
+	}
 
-
-    @Override
-    public Id<Link> getDestinationLinkId()
-    {
-        return route.getEndLinkId();
-    }
-
-
-    @Override
-    public Double getExpectedTravelTime()
-    {
-        return route.getTravelTime();
-    }
-
-
-    @Override
-    public Double getExpectedTravelDistance()
-    {
-        return route.getDistance();
-    }
-
-
-    @Override
-    public void finalizeAction(double now)
-    {}
+	@Override
+	public void finalizeAction(double now) {
+	}
 }

@@ -23,8 +23,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-
-public interface Fleet
-{
-    Map<Id<Vehicle>, ? extends Vehicle> getVehicles();
+public interface Fleet {
+	Map<Id<Vehicle>, ? extends Vehicle> getVehicles();
 }

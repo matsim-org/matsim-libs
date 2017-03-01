@@ -28,30 +28,22 @@ import org.matsim.core.mobsim.qsim.*;
 
 import com.google.inject.*;
 
+public class RandomDynQSimProvider implements Provider<Mobsim> {
+	private final Scenario scenario;
+	private final EventsManager events;
+	private final Collection<AbstractQSimPlugin> plugins;
 
-public class RandomDynQSimProvider
-    implements Provider<Mobsim>
-{
-    private final Scenario scenario;
-    private final EventsManager events;
-    private final Collection<AbstractQSimPlugin> plugins;
+	@Inject
+	public RandomDynQSimProvider(Scenario scenario, EventsManager events, Collection<AbstractQSimPlugin> plugins) {
+		this.scenario = scenario;
+		this.events = events;
+		this.plugins = plugins;
+	}
 
-
-    @Inject
-    public RandomDynQSimProvider(Scenario scenario, EventsManager events,
-            Collection<AbstractQSimPlugin> plugins)
-    {
-        this.scenario = scenario;
-        this.events = events;
-        this.plugins = plugins;
-    }
-
-
-    @Override
-    public Mobsim get()
-    {
-        QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
-        qSim.addAgentSource(new RandomDynAgentSource(qSim, 100));
-        return qSim;
-    }
+	@Override
+	public Mobsim get() {
+		QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
+		qSim.addAgentSource(new RandomDynAgentSource(qSim, 100));
+		return qSim;
+	}
 }

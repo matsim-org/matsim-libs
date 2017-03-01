@@ -22,15 +22,10 @@ package org.matsim.contrib.dvrp.tracker;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
+public interface OnlineDriveTaskTracker extends TaskTracker {
+	LinkTimePair getDiversionPoint();
 
-public interface OnlineDriveTaskTracker
-    extends TaskTracker
-{
-    LinkTimePair getDiversionPoint();
+	void divertPath(VrpPathWithTravelData newSubPath);
 
-
-    void divertPath(VrpPathWithTravelData newSubPath);
-
-
-    void movedOverNode();
+	void movedOverNode();
 }

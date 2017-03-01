@@ -77,11 +77,11 @@ public class DvrpModule extends AbstractModule {
 		String mode = dvrpCfg.getMode();
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
 		bind(Fleet.class).toInstance(fleet);// TODO add vehFile into DvrpConfig?
-		
-		//Visualisation of schedules for DVRP DynAgents
+
+		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
-		
-		//VrpTravelTimeEstimator
+
+		// VrpTravelTimeEstimator
 		install(VrpTravelTimeModules.createTravelTimeEstimatorModule(dvrpCfg.getTravelTimeEstimationAlpha()));
 	}
 

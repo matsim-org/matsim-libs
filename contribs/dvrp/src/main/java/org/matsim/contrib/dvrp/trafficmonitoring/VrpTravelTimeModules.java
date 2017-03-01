@@ -62,7 +62,7 @@ public class VrpTravelTimeModules {
 		return new AbstractModule() {
 			public void install() {
 				// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
-				//for the car mode
+				// for the car mode
 				addTravelTimeBinding(TransportMode.car).toInstance(travelTime);
 				addTravelTimeBinding(DVRP_ESTIMATED).toInstance(travelTime);
 			}

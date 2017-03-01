@@ -21,26 +21,19 @@ package org.matsim.contrib.dvrp.data.file;
 
 import org.xml.sax.Attributes;
 
+public class ReaderUtils {
+	public static double getDouble(Attributes atts, String qName, double defaultValue) {
+		String val = atts.getValue(qName);
+		return val != null ? Double.parseDouble(val) : defaultValue;
+	}
 
-public class ReaderUtils
-{
-    public static double getDouble(Attributes atts, String qName, double defaultValue)
-    {
-        String val = atts.getValue(qName);
-        return val != null ? Double.parseDouble(val) : defaultValue;
-    }
+	public static int getInt(Attributes atts, String qName, int defaultValue) {
+		String val = atts.getValue(qName);
+		return val != null ? Integer.parseInt(val) : defaultValue;
+	}
 
-
-    public static int getInt(Attributes atts, String qName, int defaultValue)
-    {
-        String val = atts.getValue(qName);
-        return val != null ? Integer.parseInt(val) : defaultValue;
-    }
-
-
-    public static String getString(Attributes atts, String qName, String defaultValue)
-    {
-        String val = atts.getValue(qName);
-        return val != null ? val : defaultValue;
-    }
+	public static String getString(Attributes atts, String qName, String defaultValue) {
+		String val = atts.getValue(qName);
+		return val != null ? val : defaultValue;
+	}
 }

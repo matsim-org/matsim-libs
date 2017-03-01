@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
-public interface TaskTracker
-{
-    double predictEndTime();
+public interface TaskTracker {
+	double predictEndTime();
 }

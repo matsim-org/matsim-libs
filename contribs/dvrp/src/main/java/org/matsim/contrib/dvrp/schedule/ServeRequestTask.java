@@ -22,22 +22,15 @@ package org.matsim.contrib.dvrp.schedule;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 
+public class ServeRequestTask extends StayTaskImpl {
+	private final Request request;
 
-public class ServeRequestTask
-    extends StayTaskImpl
-{
-    private final Request request;
+	public ServeRequestTask(double beginTime, double endTime, Link link, Request request) {
+		super(beginTime, endTime, link);
+		this.request = request;
+	}
 
-
-    public ServeRequestTask(double beginTime, double endTime, Link link, Request request)
-    {
-        super(beginTime, endTime, link);
-        this.request = request;
-    }
-
-
-    public Request getRequest()
-    {
-        return request;
-    }
+	public Request getRequest() {
+		return request;
+	}
 }
