@@ -27,7 +27,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.tasks.DrtStayTask;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
@@ -73,7 +73,7 @@ public class JspritDispatchCreator implements RequestDispatcher {
 	 * @see playground.jbischoff.taxibus.algorithm.optimizer.clustered. RequestDispatcher#createDispatch(java.util.Set)
 	 */
 	@Override
-	public TaxibusDispatch createDispatch(Set<TaxibusRequest> commonRequests) {
+	public TaxibusDispatch createDispatch(Set<DrtRequest> commonRequests) {
 		Coord requestCentroid = calcRequestCentroid(commonRequests);
 		Vehicle veh = findClosestIdleVehicle(requestCentroid);
 		if (veh != null) {
@@ -87,10 +87,10 @@ public class JspritDispatchCreator implements RequestDispatcher {
 	 * @param veh
 	 * @return
 	 */
-	private TaxibusDispatch createDispatchForVehicle(Set<TaxibusRequest> commonRequests, Vehicle veh) {
+	private TaxibusDispatch createDispatchForVehicle(Set<DrtRequest> commonRequests, Vehicle veh) {
 		VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
 		vrpBuilder.setFleetSize(FleetSize.FINITE);
-		Map<String, TaxibusRequest> requests = new HashMap<>();
+		Map<String, DrtRequest> requests = new HashMap<>();
 		VehicleTypeImpl.Builder vehicleTypeBuilder = VehicleTypeImpl.Builder.newInstance("vehicleType")
 				.addCapacityDimension(0, commonRequests.size());
 		VehicleType vehicleType = vehicleTypeBuilder.build();
@@ -107,7 +107,7 @@ public class JspritDispatchCreator implements RequestDispatcher {
 
 		vrpBuilder.addVehicle(vehicle);
 
-		for (TaxibusRequest req : commonRequests) {
+		for (DrtRequest req : commonRequests) {
 			String rId = req.getId().toString();
 			requests.put(rId, req);
 			Location fromLoc = Location.Builder.newInstance()
@@ -185,9 +185,9 @@ public class JspritDispatchCreator implements RequestDispatcher {
 	 * @param commonRequests
 	 * @return
 	 */
-	private Coord calcRequestCentroid(Set<TaxibusRequest> commonRequests) {
+	private Coord calcRequestCentroid(Set<DrtRequest> commonRequests) {
 		Set<Coord> coords = new HashSet<>();
-		for (TaxibusRequest r : commonRequests) {
+		for (DrtRequest r : commonRequests) {
 			coords.add(r.getFromLink().getCoord());
 		}
 		return getCoordCentroid(coords);

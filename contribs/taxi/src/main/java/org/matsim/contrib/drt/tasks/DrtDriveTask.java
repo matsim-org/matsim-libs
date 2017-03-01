@@ -28,15 +28,12 @@ import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
  * @author jbischoff
  */
 public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
-
 	public DrtDriveTask(VrpPathWithTravelData path) {
 		super(path);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public DrtTaskType getDrtTaskType() {
-
 		return DrtTaskType.DRIVE_EMPTY;
 	}
 
@@ -44,5 +41,4 @@ public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
 	protected String commonToString() {
 		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
 	}
-
 }

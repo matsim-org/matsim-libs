@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.taxibus.algorithm.utils;
 
 import java.util.ArrayList;
 
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
@@ -44,7 +44,7 @@ public class TaxibusUtils {
 
 	public static void printRequestPath(TaxibusDispatch best) {
 		System.out.println("RequestPath for vehicle : " + best.vehicle.getId());
-		for (TaxibusRequest r : best.requests) {
+		for (DrtRequest r : best.requests) {
 			System.out.println(r.toString() + "\tfrom\t" + r.getFromLink().getId().toString() + "\tto:\t"
 					+ r.getToLink().getId().toString());
 		}

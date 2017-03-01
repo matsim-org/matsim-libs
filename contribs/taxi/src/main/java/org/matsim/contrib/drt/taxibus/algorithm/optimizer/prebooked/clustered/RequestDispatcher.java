@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 
 import java.util.Set;
 
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**
@@ -30,5 +30,5 @@ import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDisp
  */
 public interface RequestDispatcher {
 
-	TaxibusDispatch createDispatch(Set<TaxibusRequest> commonRequests);
+	TaxibusDispatch createDispatch(Set<DrtRequest> commonRequests);
 }

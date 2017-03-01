@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.TaxibusScheduler;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
@@ -57,7 +57,7 @@ public class SharedTaxiDispatchFinder {
 				optimContext.travelTime, false);
 	}
 
-	public TaxibusDispatch findBestNewVehicleForRequest(TaxibusRequest req, Iterable<? extends Vehicle> vehicles)
+	public TaxibusDispatch findBestNewVehicleForRequest(DrtRequest req, Iterable<? extends Vehicle> vehicles)
 	// this one is basically a copy from the taxi package. I'm not entirely happy with this solution, but well.
 	{
 		double currTime = optimContext.timer.getTimeOfDay();
@@ -110,7 +110,7 @@ public class SharedTaxiDispatchFinder {
 		return new TaxibusDispatch(bestVehicle, req, vrpPath);
 	}
 
-	public TaxibusDispatch findBestVehicleForRequest(TaxibusRequest req, Set<Vehicle> busyVehicles,
+	public TaxibusDispatch findBestVehicleForRequest(DrtRequest req, Set<Vehicle> busyVehicles,
 			Set<Vehicle> idleVehicles) {
 		TaxibusDispatch bestNewPath = findBestNewVehicleForRequest(req, idleVehicles);
 
@@ -124,12 +124,12 @@ public class SharedTaxiDispatchFinder {
 		for (Vehicle veh : busyVehicles) {
 
 			Schedule schedule = veh.getSchedule();
-			Set<TaxibusRequest> currentRequests = scheduler.getCurrentlyPlannedRequests(schedule);
+			Set<DrtRequest> currentRequests = scheduler.getCurrentlyPlannedRequests(schedule);
 			if (currentRequests.size() > 1) {
 				throw new IllegalStateException("Not supported by this optimizer");
 			}
 
-			TaxibusRequest firstRequest = (TaxibusRequest)currentRequests.toArray()[0];
+			DrtRequest firstRequest = (DrtRequest)currentRequests.toArray()[0];
 			double pickup2pickupDist = DistanceUtils.calculateSquaredDistance(firstRequest.getFromLink().getCoord(),
 					req.getFromLink().getCoord());
 			double firstEuclidDist = DistanceUtils.calculateSquaredDistance(firstRequest.getFromLink().getCoord(),

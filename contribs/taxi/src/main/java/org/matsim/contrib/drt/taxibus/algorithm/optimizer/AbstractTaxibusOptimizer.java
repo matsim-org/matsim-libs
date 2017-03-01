@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer;
 
 import java.util.*;
 
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.tasks.DrtTask;
 import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.*;
@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 public abstract class AbstractTaxibusOptimizer implements TaxibusOptimizer {
 	private final TaxibusOptimizerContext optimContext;
-	private final Collection<TaxibusRequest> unplannedRequests;
+	private final Collection<DrtRequest> unplannedRequests;
 
 	private final boolean doUnscheduleAwaitingRequests;// PLANNED or TAXI_DISPATCHED
 	private final boolean destinationKnown;
@@ -77,7 +77,7 @@ public abstract class AbstractTaxibusOptimizer implements TaxibusOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.add((TaxibusRequest)request);
+		unplannedRequests.add((DrtRequest)request);
 		requiresReoptimization = true;
 	}
 
@@ -109,7 +109,7 @@ public abstract class AbstractTaxibusOptimizer implements TaxibusOptimizer {
 		return optimContext;
 	}
 
-	protected Collection<TaxibusRequest> getUnplannedRequests() {
+	protected Collection<DrtRequest> getUnplannedRequests() {
 		return unplannedRequests;
 	}
 

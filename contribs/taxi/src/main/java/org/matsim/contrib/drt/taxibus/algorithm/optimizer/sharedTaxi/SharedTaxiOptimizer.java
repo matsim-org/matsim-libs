@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer.sharedTaxi;
 
 import java.util.*;
 
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.tasks.DrtTask;
 import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.*;
@@ -47,8 +47,8 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 
 	@Override
 	protected void scheduleUnplannedRequests() {
-		Set<TaxibusRequest> handledRequests = new HashSet<>();
-		for (TaxibusRequest request : getUnplannedRequests()) {
+		Set<DrtRequest> handledRequests = new HashSet<>();
+		for (DrtRequest request : getUnplannedRequests()) {
 			TaxibusDispatch bestPath = findBestVehicleForRequest(request);
 			if (bestPath != null) {
 				getOptimContext().scheduler.scheduleRequest(bestPath);
@@ -61,7 +61,7 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 
 	}
 
-	private TaxibusDispatch findBestVehicleForRequest(TaxibusRequest req) {
+	private TaxibusDispatch findBestVehicleForRequest(DrtRequest req) {
 		TaxibusDispatch bestPath = null;
 		Set<Vehicle> idleVehicles = new HashSet<>();
 		Set<Vehicle> busyVehicles = new HashSet<>();
@@ -78,7 +78,7 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 				// Logger.getLogger(getClass()).info(veh.getId() + " "+ type);
 				if (type.equals(DrtTaskType.DRIVE_EMPTY)) {
 
-					Set<TaxibusRequest> currentRequests = getOptimContext().scheduler
+					Set<DrtRequest> currentRequests = getOptimContext().scheduler
 							.getCurrentlyPlannedRequests(schedule);
 					if (currentRequests.size() < 2) {
 						busyVehicles.add(veh);
@@ -100,7 +100,7 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 				}
 				// Logger.getLogger(getClass()).info(schedule.getTasks().get(schedule.getTaskCount()-1));
 
-				for (TaxibusRequest all : bestPath.requests) {
+				for (DrtRequest all : bestPath.requests) {
 					all.setDropoffTask(null);
 					all.getDriveWithPassengerTask().clear();
 				}

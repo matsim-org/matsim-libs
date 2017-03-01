@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.tasks.*;
 import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
@@ -174,11 +174,11 @@ public class TaxibusScheduler {
 		Iterator<VrpPathWithTravelData> iterator = best.path.iterator();
 		double lastEndTime;
 		VrpPathWithTravelData path;
-		Set<TaxibusRequest> onBoard = new LinkedHashSet<>();
-		Set<TaxibusRequest> droppedOff = new LinkedHashSet<>();
-		Set<TaxibusRequest> pickedUp = new LinkedHashSet<>();
-		TreeSet<TaxibusRequest> pickUpsForLink = null;
-		TreeSet<TaxibusRequest> dropOffsForLink = null;
+		Set<DrtRequest> onBoard = new LinkedHashSet<>();
+		Set<DrtRequest> droppedOff = new LinkedHashSet<>();
+		Set<DrtRequest> pickedUp = new LinkedHashSet<>();
+		TreeSet<DrtRequest> pickUpsForLink = null;
+		TreeSet<DrtRequest> dropOffsForLink = null;
 		if (lastTask.getDrtTaskType() == DrtTaskType.STAY) {
 			best.failIfAnyRequestNotUnplanned();
 			path = iterator.next();
@@ -253,7 +253,7 @@ public class TaxibusScheduler {
 		}
 		if (!onBoard.isEmpty()) {
 			log.error("we forgot someone, expected route: ");
-			for (TaxibusRequest r : onBoard) {
+			for (DrtRequest r : onBoard) {
 				log.error("pax:" + r.getPassenger().getId() + " from: " + r.getFromLink().getId() + " to "
 						+ r.getToLink().getId());
 				for (VrpPathWithTravelData desiredPath : best.path) {
@@ -270,9 +270,9 @@ public class TaxibusScheduler {
 		// log.info("Done Scheduling");
 	}
 
-	private double scheduleDropOffs(Schedule bestSched, Set<TaxibusRequest> onBoard,
-			TreeSet<TaxibusRequest> dropOffsForLink, Set<TaxibusRequest> droppedOff, double beginTime) {
-		for (TaxibusRequest req : dropOffsForLink) {
+	private double scheduleDropOffs(Schedule bestSched, Set<DrtRequest> onBoard,
+			TreeSet<DrtRequest> dropOffsForLink, Set<DrtRequest> droppedOff, double beginTime) {
+		for (DrtRequest req : dropOffsForLink) {
 			if (!onBoard.contains(req)) {
 				continue;
 			}
@@ -294,10 +294,10 @@ public class TaxibusScheduler {
 		return beginTime;
 	}
 
-	private double schedulePickups(Schedule bestSched, double beginTime, Set<TaxibusRequest> onBoard,
-			Set<TaxibusRequest> pickedUp, TreeSet<TaxibusRequest> pickUpsForLink) {
+	private double schedulePickups(Schedule bestSched, double beginTime, Set<DrtRequest> onBoard,
+			Set<DrtRequest> pickedUp, TreeSet<DrtRequest> pickUpsForLink) {
 
-		for (TaxibusRequest req : pickUpsForLink) {
+		for (DrtRequest req : pickUpsForLink) {
 			if (pickedUp.contains(req))
 				continue;
 			double t3 = Math.max(beginTime, req.getT0()) + params.pickupDuration;
@@ -311,7 +311,7 @@ public class TaxibusScheduler {
 		return beginTime;
 	}
 
-	private double scheduleDriveAlongPath(Schedule bestSched, VrpPathWithTravelData path, Set<TaxibusRequest> onBoard,
+	private double scheduleDriveAlongPath(Schedule bestSched, VrpPathWithTravelData path, Set<DrtRequest> onBoard,
 			double lastEndtime) {
 
 		// VrpPathWithTravelData updatedPath = new
@@ -490,8 +490,8 @@ public class TaxibusScheduler {
 	 * Awaiting == unpicked-up, i.e. requests with status PLANNED or TAXI_DISPATCHED See {@link TaxiRequestStatus}
 	 */
 
-	public Set<TaxibusRequest> getCurrentlyPlannedRequests(Schedule schedule) {
-		Set<TaxibusRequest> plannedRequests = new HashSet<>();
+	public Set<DrtRequest> getCurrentlyPlannedRequests(Schedule schedule) {
+		Set<DrtRequest> plannedRequests = new HashSet<>();
 		List<? extends Task> tasks = schedule.getTasks();
 
 		for (int i = schedule.getTaskCount() - 1; i > schedule.getCurrentTask().getTaskIdx(); i--) {

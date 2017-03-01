@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.tasks;
 
 import java.util.Set;
 
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
@@ -31,12 +31,12 @@ import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
  */
 public class DrtDriveWithPassengerTask extends DriveTaskImpl implements DrtTaskWithRequests {
 
-	private Set<TaxibusRequest> requests;
+	private Set<DrtRequest> requests;
 
-	public DrtDriveWithPassengerTask(Set<TaxibusRequest> requests, VrpPathWithTravelData path) {
+	public DrtDriveWithPassengerTask(Set<DrtRequest> requests, VrpPathWithTravelData path) {
 		super(path);
 		this.requests = requests;
-		for (TaxibusRequest req : this.requests) {
+		for (DrtRequest req : this.requests) {
 			req.addDriveWithPassengerTask(this);
 		}
 	}
@@ -48,12 +48,12 @@ public class DrtDriveWithPassengerTask extends DriveTaskImpl implements DrtTaskW
 	}
 
 	@Override
-	public Set<TaxibusRequest> getRequests() {
+	public Set<DrtRequest> getRequests() {
 		return requests;
 	}
 
 	@Override
-	public void removeFromRequest(TaxibusRequest request) {
+	public void removeFromRequest(DrtRequest request) {
 
 		request.addDriveWithPassengerTask(null);
 		this.requests.remove(request);
@@ -62,7 +62,7 @@ public class DrtDriveWithPassengerTask extends DriveTaskImpl implements DrtTaskW
 
 	@Override
 	public void removeFromAllRequests() {
-		for (TaxibusRequest request : this.requests) {
+		for (DrtRequest request : this.requests) {
 			request.addDriveWithPassengerTask(null);
 
 		}

@@ -24,7 +24,7 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked;
 
 import java.util.*;
 
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 
 /**
  * @author  jbischoff
@@ -38,5 +38,5 @@ public interface RequestFilter {
 	 * @param requests
 	 * @return
 	 */
-	List<Set<TaxibusRequest>> prefilterRequests(Set<TaxibusRequest> requests);
+	List<Set<DrtRequest>> prefilterRequests(Set<DrtRequest> requests);
 }

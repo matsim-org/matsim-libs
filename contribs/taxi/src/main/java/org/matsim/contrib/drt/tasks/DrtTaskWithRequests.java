@@ -21,13 +21,13 @@ package org.matsim.contrib.drt.tasks;
 
 import java.util.Set;
 
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 
 public interface DrtTaskWithRequests extends DrtTask {
-	Set<TaxibusRequest> getRequests();
+	Set<DrtRequest> getRequests();
 
 	// called (when removing a task) in order to update the request2task assignment
-	void removeFromRequest(TaxibusRequest request);
+	void removeFromRequest(DrtRequest request);
 
 	void removeFromAllRequests();
 }

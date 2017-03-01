@@ -25,7 +25,7 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked;
 import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -56,7 +56,7 @@ public class CentroidBasedRequestDeterminatorAndFilter implements RequestDetermi
 
 	@Override
 	public boolean isRequestServable(Request request) {
-		TaxibusRequest r = (TaxibusRequest)request;
+		DrtRequest r = (DrtRequest)request;
 		Coord fromCoord = r.getFromLink().getCoord();
 		Coord toCoord = r.getToLink().getCoord();
 		if (((CoordUtils.calcEuclideanDistance(fromCoord, coord1) <= radius1)
@@ -69,14 +69,14 @@ public class CentroidBasedRequestDeterminatorAndFilter implements RequestDetermi
 	}
 
 	@Override
-	public List<Set<TaxibusRequest>> prefilterRequests(Set<TaxibusRequest> requests) {
+	public List<Set<DrtRequest>> prefilterRequests(Set<DrtRequest> requests) {
 		// 0-3: Centroid 1 (by quadrant)
 		// 4-7: Centroid 2 (by quadrant)
-		List<Set<TaxibusRequest>> filteredRequests = new ArrayList<>();
+		List<Set<DrtRequest>> filteredRequests = new ArrayList<>();
 		for (int i = 0; i <= 7; i++) {
-			filteredRequests.add(new HashSet<TaxibusRequest>());
+			filteredRequests.add(new HashSet<DrtRequest>());
 		}
-		for (TaxibusRequest r : requests) {
+		for (DrtRequest r : requests) {
 			final Coord fromCoord = r.getFromLink().getCoord();
 			int quad;
 			double r1_distance = DistanceUtils.calculateDistance(fromCoord, coord1);

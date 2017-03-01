@@ -25,7 +25,7 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.drt.TaxibusRequest;
+import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 
 	final PrebookedTaxibusOptimizerContext context;
-	final Collection<TaxibusRequest> unplannedRequests;
+	final Collection<DrtRequest> unplannedRequests;
 	final Random r = MatsimRandom.getLocalInstance();
 	final RequestDispatcher dispatcher;
 
@@ -67,7 +67,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	public void requestSubmitted(Request request) {
 		if (context.requestDeterminator.isRequestServable(request)) {
 			// Logger.getLogger(getClass()).info("Submitting " + request);
-			this.unplannedRequests.add((TaxibusRequest)request);
+			this.unplannedRequests.add((DrtRequest)request);
 		}
 	}
 
@@ -81,22 +81,22 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		if ((e.getSimulationTime() % (context.clustering_period_min * 60)) == 0) {
-			Set<TaxibusRequest> dueRequests = new HashSet<>();
-			for (TaxibusRequest r : unplannedRequests) {
+			Set<DrtRequest> dueRequests = new HashSet<>();
+			for (DrtRequest r : unplannedRequests) {
 				if (e.getSimulationTime() >= r.getT0() - context.prebook_period_min * 60) {
 					dueRequests.add(r);
 				}
 			}
 			unplannedRequests.removeAll(dueRequests);
 			if (dueRequests.size() > 0) {
-				List<Set<TaxibusRequest>> filteredRequests = context.requestFilter.prefilterRequests(dueRequests);
-				Set<Set<TaxibusRequest>> clusteredRides = clusterRequests(filteredRequests);
-				for (Set<TaxibusRequest> cluster : clusteredRides) {
+				List<Set<DrtRequest>> filteredRequests = context.requestFilter.prefilterRequests(dueRequests);
+				Set<Set<DrtRequest>> clusteredRides = clusterRequests(filteredRequests);
+				for (Set<DrtRequest> cluster : clusteredRides) {
 					TaxibusDispatch dispatch = dispatcher.createDispatch(cluster);
 					if (dispatch != null) {
 						context.scheduler.scheduleRequest(dispatch);
 					} else {
-						for (TaxibusRequest r : cluster) {
+						for (DrtRequest r : cluster) {
 							this.unplannedRequests.add(r);
 						}
 					}
@@ -109,14 +109,14 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	/**
 	 * @return
 	 */
-	private Set<Set<TaxibusRequest>> clusterRequests(List<Set<TaxibusRequest>> prefilteredDueRequests) {
-		HashSet<Set<TaxibusRequest>> dispatchSet = new HashSet<>();
-		for (Set<TaxibusRequest> dueRequests : prefilteredDueRequests) {
-			HashSet<Set<TaxibusRequest>> bestSet = new HashSet<>();
+	private Set<Set<DrtRequest>> clusterRequests(List<Set<DrtRequest>> prefilteredDueRequests) {
+		HashSet<Set<DrtRequest>> dispatchSet = new HashSet<>();
+		for (Set<DrtRequest> dueRequests : prefilteredDueRequests) {
+			HashSet<Set<DrtRequest>> bestSet = new HashSet<>();
 			HashSet<Request> bestSetLeftOvers = new HashSet<>();
 			double bestDispatchScore = Double.MAX_VALUE;
 			for (int i = 0; i < context.clusteringRounds; i++) {
-				HashSet<Set<TaxibusRequest>> currentSet = new HashSet<>();
+				HashSet<Set<DrtRequest>> currentSet = new HashSet<>();
 
 				List<Request> allOpenRequests = new ArrayList<>();
 				allOpenRequests.addAll(dueRequests);
@@ -127,20 +127,20 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 				// allOpenRequests);
 				int occupancy = Math.min((allOpenRequests.size() / vehiclesOnDispatch), context.capacity);
 				for (int c = 0; c < vehiclesOnDispatch; c++) {
-					Set<TaxibusRequest> currentBus = new HashSet<>();
+					Set<DrtRequest> currentBus = new HashSet<>();
 					for (int o = 0; o < occupancy; o++) {
 						if (!allOpenRequests.isEmpty()) {
-							currentBus.add((TaxibusRequest)allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
+							currentBus.add((DrtRequest)allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
 						}
 					}
 
 					currentSet.add(currentBus);
 				}
 
-				for (Set<TaxibusRequest> bus : currentSet) {
+				for (Set<DrtRequest> bus : currentSet) {
 					if (!allOpenRequests.isEmpty()) {
 						if (bus.size() < context.capacity) {
-							bus.add((TaxibusRequest)allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
+							bus.add((DrtRequest)allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
 						} else {
 							continue;
 						}
@@ -157,7 +157,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			}
 			dispatchSet.addAll(bestSet);
 			for (Request r : bestSetLeftOvers) {
-				unplannedRequests.add((TaxibusRequest)r);
+				unplannedRequests.add((DrtRequest)r);
 			}
 		}
 
@@ -168,15 +168,15 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	 * @param currentSet
 	 * @return
 	 */
-	private double scoreSet(HashSet<Set<TaxibusRequest>> currentSet) {
+	private double scoreSet(HashSet<Set<DrtRequest>> currentSet) {
 		double score = 0;
-		for (Set<TaxibusRequest> bus : currentSet) {
+		for (Set<DrtRequest> bus : currentSet) {
 			double cscore = 0;
 			double xFromMed = 0;
 			double yFromMed = 0;
 			double xToMed = 0;
 			double yToMed = 0;
-			for (TaxibusRequest r : bus) {
+			for (DrtRequest r : bus) {
 				xFromMed += r.getFromLink().getCoord().getX();
 				yFromMed += r.getFromLink().getCoord().getY();
 				xToMed += r.getToLink().getCoord().getX();
@@ -184,7 +184,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			}
 			Coord fromCentroid = new Coord(xFromMed / bus.size(), yFromMed / bus.size());
 			Coord toCentroid = new Coord(xToMed / bus.size(), yToMed / bus.size());
-			for (TaxibusRequest r : bus) {
+			for (DrtRequest r : bus) {
 				cscore += DistanceUtils.calculateSquaredDistance(r.getFromLink().getCoord(), fromCentroid);
 				cscore += DistanceUtils.calculateSquaredDistance(r.getToLink().getCoord(), toCentroid);
 			}

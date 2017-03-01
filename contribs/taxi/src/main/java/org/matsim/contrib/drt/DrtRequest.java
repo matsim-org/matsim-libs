@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 /**
  * @author jbischoff (might not be needed)
  */
-public class TaxibusRequest extends RequestImpl implements PassengerRequest {
+public class DrtRequest extends RequestImpl implements PassengerRequest {
 
 	public enum TaxibusRequestStatus {
 		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
@@ -62,7 +62,7 @@ public class TaxibusRequest extends RequestImpl implements PassengerRequest {
 
 	private ArrayList<DrtDriveWithPassengerTask> driveWithPassengerTasks = new ArrayList<>();
 
-	public TaxibusRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double t0,
+	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double t0,
 			double submissionTime) {
 		super(id, 1, t0, t0, submissionTime);
 		this.passenger = passenger;

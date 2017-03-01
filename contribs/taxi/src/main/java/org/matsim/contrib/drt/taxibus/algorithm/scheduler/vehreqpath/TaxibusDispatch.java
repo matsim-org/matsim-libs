@@ -23,21 +23,21 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.TaxibusRequest;
-import org.matsim.contrib.drt.TaxibusRequest.TaxibusRequestStatus;
+import org.matsim.contrib.drt.DrtRequest;
+import org.matsim.contrib.drt.DrtRequest.TaxibusRequestStatus;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 public class TaxibusDispatch {
 	public final Vehicle vehicle;
-	public final Set<TaxibusRequest> requests;
+	public final Set<DrtRequest> requests;
 	public final ArrayList<VrpPathWithTravelData> path;
 
 	private double earliestNextDeparture = 0;
 
 	double twMax;
 
-	public TaxibusDispatch(Vehicle vehicle, TaxibusRequest request, VrpPathWithTravelData path) {
+	public TaxibusDispatch(Vehicle vehicle, DrtRequest request, VrpPathWithTravelData path) {
 		this.requests = new LinkedHashSet<>();
 		this.path = new ArrayList<>();
 		this.requests.add(request);
@@ -56,15 +56,15 @@ public class TaxibusDispatch {
 
 	}
 
-	public void addRequests(Collection<TaxibusRequest> requests) {
+	public void addRequests(Collection<DrtRequest> requests) {
 		this.requests.addAll(requests);
 	}
 
-	public void addRequest(TaxibusRequest request) {
+	public void addRequest(DrtRequest request) {
 		this.requests.add(request);
 	}
 
-	public void addRequestAndPath(TaxibusRequest request, VrpPathWithTravelData path) {
+	public void addRequestAndPath(DrtRequest request, VrpPathWithTravelData path) {
 		this.requests.add(request);
 		// System.out.println(requests);
 		this.path.add(path);
@@ -98,7 +98,7 @@ public class TaxibusDispatch {
 	}
 
 	public void failIfAnyRequestNotUnplanned() {
-		for (TaxibusRequest request : this.requests) {
+		for (DrtRequest request : this.requests) {
 			if (request.getStatus() != TaxibusRequestStatus.UNPLANNED) {
 				throw new IllegalStateException();
 			}
@@ -106,7 +106,7 @@ public class TaxibusDispatch {
 	}
 
 	public void failIfRequestNotUnplannedOrDispatched() {
-		for (TaxibusRequest request : this.requests) {
+		for (DrtRequest request : this.requests) {
 			if (request.getStatus() != TaxibusRequestStatus.UNPLANNED) {
 				if (request.getStatus() != TaxibusRequestStatus.DISPATCHED) {
 					Logger.getLogger(getClass()).error(request.toString() + " S: " + request.getStatus());
@@ -116,9 +116,9 @@ public class TaxibusDispatch {
 		}
 	}
 
-	public TreeSet<TaxibusRequest> getPickUpsForLink(Link link) {
-		TreeSet<TaxibusRequest> beginningRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
-		for (TaxibusRequest req : this.requests) {
+	public TreeSet<DrtRequest> getPickUpsForLink(Link link) {
+		TreeSet<DrtRequest> beginningRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
+		for (DrtRequest req : this.requests) {
 			if (req.getFromLink().equals(link)) {
 
 				if (req.getPickupTask() == null) {
@@ -130,9 +130,9 @@ public class TaxibusDispatch {
 		return beginningRequests.isEmpty() ? null : beginningRequests;
 	}
 
-	public TreeSet<TaxibusRequest> getDropOffsForLink(Link link) {
-		TreeSet<TaxibusRequest> endingRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
-		for (TaxibusRequest req : this.requests) {
+	public TreeSet<DrtRequest> getDropOffsForLink(Link link) {
+		TreeSet<DrtRequest> endingRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
+		for (DrtRequest req : this.requests) {
 			if (req.getToLink().equals(link)) {
 
 				endingRequests.add(req);
