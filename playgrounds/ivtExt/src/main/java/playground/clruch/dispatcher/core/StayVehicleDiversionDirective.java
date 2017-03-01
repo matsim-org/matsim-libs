@@ -2,7 +2,6 @@ package playground.clruch.dispatcher.core;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 
@@ -18,7 +17,7 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
  *  2) append drive task
  *  3) append stay task for later
  */
-class StayVehicleDiversionDirective extends VehicleDiversionDirective {
+final class StayVehicleDiversionDirective extends VehicleDiversionDirective {
 
     StayVehicleDiversionDirective(VehicleLinkPair vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
         super(vehicleLinkPair, destination, futurePathContainer);
