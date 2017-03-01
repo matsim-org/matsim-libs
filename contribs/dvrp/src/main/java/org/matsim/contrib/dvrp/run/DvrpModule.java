@@ -82,7 +82,7 @@ public class DvrpModule extends AbstractModule {
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 
 		// VrpTravelTimeEstimator
-		install(VrpTravelTimeModules.createTravelTimeEstimatorModule(dvrpCfg.getTravelTimeEstimationAlpha()));
+		install(VrpTravelTimeModules.createTravelTimeEstimatorModule());
 	}
 
 	@Provides

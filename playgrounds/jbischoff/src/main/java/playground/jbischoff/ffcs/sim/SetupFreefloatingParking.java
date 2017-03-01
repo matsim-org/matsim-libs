@@ -87,7 +87,7 @@ public class SetupFreefloatingParking {
 		};
 		routingModuleCar.setStageActivityTypes(stageActivityTypesCar);
 		new CarsharingVehiclesReader(data).parse(ffcsconfig.getVehiclesFileUrl(controler.getConfig().getContext()));
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override

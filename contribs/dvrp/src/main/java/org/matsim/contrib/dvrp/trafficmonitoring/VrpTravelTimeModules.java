@@ -30,16 +30,15 @@ public class VrpTravelTimeModules {
 	public static final String DVRP_INITIAL = "dvrp_initial";
 	public static final String DVRP_ESTIMATED = "dvrp_estimated";
 
-	public static AbstractModule createTravelTimeEstimatorModule(double expAveragingAlpha) {
-		return createTravelTimeEstimatorModule(new FreeSpeedTravelTime(), expAveragingAlpha);
+	public static AbstractModule createTravelTimeEstimatorModule() {
+		return createTravelTimeEstimatorModule(new FreeSpeedTravelTime());
 	}
 
 	/**
 	 * Travel times recorded during the previous iteration. They are always updated after the mobsim ends. This is the
 	 * standard approach for running DVRP
 	 */
-	public static AbstractModule createTravelTimeEstimatorModule(final TravelTime initialTravelTime,
-			final double expAveragingAlpha) {
+	public static AbstractModule createTravelTimeEstimatorModule(final TravelTime initialTravelTime) {
 		return new AbstractModule() {
 			public void install() {
 				bind(TravelTime.class).annotatedWith(Names.named(VrpTravelTimeModules.DVRP_INITIAL))

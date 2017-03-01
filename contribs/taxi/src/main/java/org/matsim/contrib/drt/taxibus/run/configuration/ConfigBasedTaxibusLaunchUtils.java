@@ -60,7 +60,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 			orderManager = null;
 		}
 
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
 		controler.addOverridingModule(new DynQSimModule<>(TaxibusQSimProvider.class));
 		controler.addOverridingModule(new AbstractModule() {
 

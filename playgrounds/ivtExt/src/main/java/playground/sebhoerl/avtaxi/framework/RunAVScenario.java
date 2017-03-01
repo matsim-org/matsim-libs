@@ -22,7 +22,7 @@ public class RunAVScenario {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
 		controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
 		controler.addOverridingModule(new AVModule());
 

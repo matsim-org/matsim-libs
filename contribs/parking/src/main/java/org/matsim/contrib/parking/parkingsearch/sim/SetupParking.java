@@ -61,7 +61,7 @@ public class SetupParking {
 			}
 		};
 		routingModuleCar.setStageActivityTypes(stageActivityTypesCar);
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
