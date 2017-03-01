@@ -19,44 +19,44 @@
 
 package org.matsim.contrib.drt.taxibus.algorithm.optimizer.sharedTaxi;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.tasks.DrtTask;
 import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.AbstractTaxibusOptimizer;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.*;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
 public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 
 	private final double maximumDetourFactor;
 	private final SharedTaxiDispatchFinder dispatchFinder;
-	
-	public SharedTaxiOptimizer(TaxibusOptimizerContext optimContext, boolean doUnscheduleAwaitingRequests, double maximumDetourFactor) {
+
+	public SharedTaxiOptimizer(TaxibusOptimizerContext optimContext, boolean doUnscheduleAwaitingRequests,
+			double maximumDetourFactor) {
 		super(optimContext, doUnscheduleAwaitingRequests);
-		this.dispatchFinder = new SharedTaxiDispatchFinder(optimContext,maximumDetourFactor);
+		this.dispatchFinder = new SharedTaxiDispatchFinder(optimContext, maximumDetourFactor);
 		this.maximumDetourFactor = maximumDetourFactor;
 	}
 
 	@Override
 	protected void scheduleUnplannedRequests() {
 		Set<TaxibusRequest> handledRequests = new HashSet<>();
-		for (TaxibusRequest request : getUnplannedRequests()){
+		for (TaxibusRequest request : getUnplannedRequests()) {
 			TaxibusDispatch bestPath = findBestVehicleForRequest(request);
-			if (bestPath!= null){ 
+			if (bestPath != null) {
 				getOptimContext().scheduler.scheduleRequest(bestPath);
-				handledRequests.add(request);}
-			
+				handledRequests.add(request);
+			}
+
 		}
-		
+
 		getUnplannedRequests().removeAll(handledRequests);
 
 	}
@@ -65,46 +65,48 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 		TaxibusDispatch bestPath = null;
 		Set<Vehicle> idleVehicles = new HashSet<>();
 		Set<Vehicle> busyVehicles = new HashSet<>();
-		for (Vehicle veh : this.getOptimContext().vrpData.getVehicles().values()){
+		for (Vehicle veh : this.getOptimContext().vrpData.getVehicles().values()) {
 			Schedule schedule = veh.getSchedule();
-			if (getOptimContext().scheduler.isIdle(veh)){
-				// empty vehicle = no customer onboard so far, we are adding those requests to a Set and let the ordinary 
+			if (getOptimContext().scheduler.isIdle(veh)) {
+				// empty vehicle = no customer onboard so far, we are adding those requests to a Set and let the
+				// ordinary
 				// BestDispatchFinder do the job
 				idleVehicles.add(veh);
-			}
-			else if (getOptimContext().scheduler.isStarted(veh)){
+			} else if (getOptimContext().scheduler.isStarted(veh)) {
 				// busy vehicle = we are currently picking someone up, maximum of passengers for this optimizer = 2;
-				DrtTaskType  type =  ((DrtTask)schedule.getCurrentTask()).getDrtTaskType();
-//				Logger.getLogger(getClass()).info(veh.getId() + " "+ type);
-				if (type.equals(DrtTaskType.DRIVE_EMPTY)){
-					
-					Set<TaxibusRequest> currentRequests = getOptimContext().scheduler.getCurrentlyPlannedRequests(schedule);
-					if (currentRequests.size()<2){
+				DrtTaskType type = ((DrtTask) schedule.getCurrentTask()).getDrtTaskType();
+				// Logger.getLogger(getClass()).info(veh.getId() + " "+ type);
+				if (type.equals(DrtTaskType.DRIVE_EMPTY)) {
+
+					Set<TaxibusRequest> currentRequests = getOptimContext().scheduler
+							.getCurrentlyPlannedRequests(schedule);
+					if (currentRequests.size() < 2) {
 						busyVehicles.add(veh);
 					}
 				}
-		
+
 			}
-			
+
 		}
 		bestPath = dispatchFinder.findBestVehicleForRequest(req, busyVehicles, idleVehicles);
-		if (bestPath!=null){
-		if (busyVehicles.contains(bestPath.vehicle)){
-			//Shared ride: We need to get rid of the previous planned objects in schedule. In our case we know it must be 3 (Stay,Drive,Dropoff)
-			Schedule schedule = bestPath.vehicle.getSchedule();
-			int oldcount = schedule.getTaskCount() ;
-			for (int ix = oldcount ;ix>schedule.getCurrentTask().getTaskIdx()+2; ix--){
-				schedule.removeLastTask();
-			}
-//			Logger.getLogger(getClass()).info(schedule.getTasks().get(schedule.getTaskCount()-1));
+		if (bestPath != null) {
+			if (busyVehicles.contains(bestPath.vehicle)) {
+				// Shared ride: We need to get rid of the previous planned objects in schedule. In our case we know it
+				// must be 3 (Stay,Drive,Dropoff)
+				Schedule schedule = bestPath.vehicle.getSchedule();
+				int oldcount = schedule.getTaskCount();
+				for (int ix = oldcount; ix > schedule.getCurrentTask().getTaskIdx() + 2; ix--) {
+					schedule.removeLastTask();
+				}
+				// Logger.getLogger(getClass()).info(schedule.getTasks().get(schedule.getTaskCount()-1));
 
-			
-			for (TaxibusRequest all : bestPath.requests){
-				all.setDropoffTask(null);
-				all.getDriveWithPassengerTask().clear();
+				for (TaxibusRequest all : bestPath.requests) {
+					all.setDropoffTask(null);
+					all.getDriveWithPassengerTask().clear();
+				}
 			}
-		}}
-		
+		}
+
 		return bestPath;
 	}
 

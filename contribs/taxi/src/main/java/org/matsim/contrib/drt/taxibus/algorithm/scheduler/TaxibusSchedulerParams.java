@@ -22,16 +22,15 @@ package org.matsim.contrib.drt.taxibus.algorithm.scheduler;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
 public class TaxibusSchedulerParams extends TaxiSchedulerParams {
 
-	public TaxibusSchedulerParams(double pickupDuration,
-			double dropoffDuration) {
+	public TaxibusSchedulerParams(double pickupDuration, double dropoffDuration) {
 		super(true, false, pickupDuration, dropoffDuration, 1.0);
-		//		We assume we a) know where we are heading to and b) do not allow diversions once a bus is running
-		
+		// We assume we a) know where we are heading to and b) do not allow diversions once a bus is running
+
 	}
 
 }

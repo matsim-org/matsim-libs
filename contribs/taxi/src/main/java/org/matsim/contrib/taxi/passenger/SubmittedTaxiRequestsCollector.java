@@ -25,27 +25,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 
+public class SubmittedTaxiRequestsCollector {
+	private final Map<Id<Request>, TaxiRequest> requests = new LinkedHashMap<>();
 
-public class SubmittedTaxiRequestsCollector
-{
-    private final Map<Id<Request>, TaxiRequest> requests = new LinkedHashMap<>();
+	public Map<Id<Request>, ? extends TaxiRequest> getRequests() {
+		return Collections.unmodifiableMap(requests);
+	}
 
+	// to be used by TaxiRequestCreator
+	void addRequest(TaxiRequest request) {
+		requests.put(request.getId(), request);
+	}
 
-    public Map<Id<Request>, ? extends TaxiRequest> getRequests()
-    {
-        return Collections.unmodifiableMap(requests);
-    }
-
-
-    //to be used by TaxiRequestCreator
-    void addRequest(TaxiRequest request)
-    {
-        requests.put(request.getId(), request);
-    }
-
-
-    public void reset()
-    {
-        requests.clear();
-    }
+	public void reset() {
+		requests.clear();
+	}
 }

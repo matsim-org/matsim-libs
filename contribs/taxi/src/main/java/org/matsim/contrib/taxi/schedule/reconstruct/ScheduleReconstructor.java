@@ -34,79 +34,65 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
+public class ScheduleReconstructor {
+	final FleetImpl fleet = new FleetImpl();
+	final Map<Id<Request>, TaxiRequest> taxiRequests = new LinkedHashMap<>();
+	final Map<Id<Link>, ? extends Link> links;
 
-public class ScheduleReconstructor
-{
-    final FleetImpl fleet = new FleetImpl();
-    final Map<Id<Request>, TaxiRequest> taxiRequests = new LinkedHashMap<>();
-    final Map<Id<Link>, ? extends Link> links;
+	final Map<Id<Person>, ScheduleBuilder> scheduleBuilders = new LinkedHashMap<>();
+	private boolean schedulesValidated = false;
 
-    final Map<Id<Person>, ScheduleBuilder> scheduleBuilders = new LinkedHashMap<>();
-    private boolean schedulesValidated = false;
+	private final DriveRecorder driveRecorder;
+	private final StayRecorder stayRecorder;
+	private final RequestRecorder requestRecorder;
 
-    private final DriveRecorder driveRecorder;
-    private final StayRecorder stayRecorder;
-    private final RequestRecorder requestRecorder;
+	@Inject
+	public ScheduleReconstructor(Network network, EventsManager eventsManager) {
+		links = network.getLinks();
 
+		driveRecorder = new DriveRecorder(this);
+		eventsManager.addHandler(driveRecorder);
 
-    @Inject
-    public ScheduleReconstructor(Network network, EventsManager eventsManager)
-    {
-        links = network.getLinks();
+		stayRecorder = new StayRecorder(this);
+		eventsManager.addHandler(stayRecorder);
 
-        driveRecorder = new DriveRecorder(this);
-        eventsManager.addHandler(driveRecorder);
+		requestRecorder = new RequestRecorder(this, TaxiOptimizerModules.TAXI_MODE);
+		eventsManager.addHandler(requestRecorder);
+	}
 
-        stayRecorder = new StayRecorder(this);
-        eventsManager.addHandler(stayRecorder);
+	Id<Person> getDriver(Id<Vehicle> vehicleId) {
+		return Id.createPersonId(vehicleId);
+	}
 
-        requestRecorder = new RequestRecorder(this, TaxiOptimizerModules.TAXI_MODE);
-        eventsManager.addHandler(requestRecorder);
-    }
+	ScheduleBuilder getBuilder(Id<Person> personId) {
+		return scheduleBuilders.get(personId);
+	}
 
+	private void validateSchedules() {
+		if (driveRecorder.hasOngoingDrives() || stayRecorder.hasOngoingStays()
+				|| requestRecorder.hasAwaitingRequests()) {
+			throw new IllegalStateException();
+		}
 
-    Id<Person> getDriver(Id<Vehicle> vehicleId)
-    {
-        return Id.createPersonId(vehicleId);
-    }
+		for (ScheduleBuilder sb : scheduleBuilders.values()) {
+			if (!sb.isScheduleBuilt()) {
+				throw new IllegalSelectorException();
+			}
+		}
+	}
 
+	public Fleet getFleet() {
+		if (!schedulesValidated) {
+			validateSchedules();
+		}
 
-    ScheduleBuilder getBuilder(Id<Person> personId)
-    {
-        return scheduleBuilders.get(personId);
-    }
+		return fleet;
+	}
 
-
-    private void validateSchedules()
-    {
-        if (driveRecorder.hasOngoingDrives() || stayRecorder.hasOngoingStays()
-                || requestRecorder.hasAwaitingRequests()) {
-            throw new IllegalStateException();
-        }
-
-        for (ScheduleBuilder sb : scheduleBuilders.values()) {
-            if (!sb.isScheduleBuilt()) {
-                throw new IllegalSelectorException();
-            }
-        }
-    }
-
-
-    public Fleet getFleet()
-    {
-        if (!schedulesValidated) {
-            validateSchedules();
-        }
-
-        return fleet;
-    }
-
-
-    public static Fleet reconstructFromFile(Network network, String eventsFile)
-    {
-        EventsManager eventsManager = EventsUtils.createEventsManager();
-        ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager);
-        new MatsimEventsReader(eventsManager).readFile(eventsFile);
-        return reconstructor.getFleet();
-    }
+	public static Fleet reconstructFromFile(Network network, String eventsFile) {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager);
+		new MatsimEventsReader(eventsManager).readFile(eventsFile);
+		return reconstructor.getFleet();
+	}
 }

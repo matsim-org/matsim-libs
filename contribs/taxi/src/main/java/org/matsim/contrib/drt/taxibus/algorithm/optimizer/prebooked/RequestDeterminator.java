@@ -35,6 +35,4 @@ public interface RequestDeterminator {
 
 	boolean isRequestServable(Request request);
 
-	
-	
 }

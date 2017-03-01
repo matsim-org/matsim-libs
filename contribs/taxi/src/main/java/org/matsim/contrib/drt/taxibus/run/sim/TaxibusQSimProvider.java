@@ -23,11 +23,9 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.DrtActionCreator;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizer;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.*;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered.ClusteringTaxibusOptimizer;
-import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered.JspritDispatchCreator;
+import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered.*;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.jsprit.JspritTaxibusOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.sharedTaxi.SharedTaxiOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.passenger.*;
@@ -47,96 +45,82 @@ import com.beust.jcommander.internal.Nullable;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 
-
 /**
  * @author jbischoff
  */
 
-public class TaxibusQSimProvider
-    implements Provider<QSim>
-{
-    private final Scenario scenario;
-    private final EventsManager events;
-    private final Collection<AbstractQSimPlugin> plugins;
-    private final Fleet fleetData;
-    private final TravelTime travelTime;
-    private final TaxibusConfigGroup tbcg;
-    private final TaxibusPassengerOrderManager orderManager;
+public class TaxibusQSimProvider implements Provider<QSim> {
+	private final Scenario scenario;
+	private final EventsManager events;
+	private final Collection<AbstractQSimPlugin> plugins;
+	private final Fleet fleetData;
+	private final TravelTime travelTime;
+	private final TaxibusConfigGroup tbcg;
+	private final TaxibusPassengerOrderManager orderManager;
 
-    @Inject
-    TaxibusQSimProvider(Scenario scenario, EventsManager events,
-            Collection<AbstractQSimPlugin> plugins, Fleet vrpData,
-            @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
-            @Nullable TaxibusPassengerOrderManager orderManager)
-    {
-        this.scenario = scenario;
-        this.events = events;
-        this.plugins = plugins;
-        this.fleetData = vrpData;
-        this.travelTime = travelTime;
-        this.tbcg = tbcg;
-        this.orderManager = orderManager;
-    }
+	@Inject
+	TaxibusQSimProvider(Scenario scenario, EventsManager events, Collection<AbstractQSimPlugin> plugins, Fleet vrpData,
+			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
+			@Nullable TaxibusPassengerOrderManager orderManager) {
+		this.scenario = scenario;
+		this.events = events;
+		this.plugins = plugins;
+		this.fleetData = vrpData;
+		this.travelTime = travelTime;
+		this.tbcg = tbcg;
+		this.orderManager = orderManager;
+	}
 
+	@Override
+	public QSim get() {
+		QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
 
-    @Override
-    public QSim get()
-    {
-        QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
+		TaxibusOptimizer optimizer = createTaxibusOptimizer(qSim);
+		qSim.addQueueSimulationListeners(optimizer);
 
-        TaxibusOptimizer optimizer = createTaxibusOptimizer(qSim);
-        qSim.addQueueSimulationListeners(optimizer);
+		TaxibusPassengerEngine passengerEngine = new TaxibusPassengerEngine(TaxibusUtils.TAXIBUS_MODE, events,
+				new TaxibusRequestCreator(), optimizer, scenario.getNetwork());
+		qSim.addMobsimEngine(passengerEngine);
+		qSim.addDepartureHandler(passengerEngine);
+		if (orderManager != null) {
+			orderManager.setPassengerEngine(passengerEngine);
+			qSim.addQueueSimulationListeners(orderManager);
+		}
 
-        TaxibusPassengerEngine passengerEngine = new TaxibusPassengerEngine(
-                TaxibusUtils.TAXIBUS_MODE, events, new TaxibusRequestCreator(), optimizer,
-                scenario.getNetwork());
-        qSim.addMobsimEngine(passengerEngine);
-        qSim.addDepartureHandler(passengerEngine);
-        if (orderManager!=null){
-        orderManager.setPassengerEngine(passengerEngine);
-        qSim.addQueueSimulationListeners(orderManager);
-        }
-        
-        LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
-        DrtActionCreator actionCreator = new DrtActionCreator(passengerEngine, legCreator,
-                tbcg.getPickupDuration());
-        qSim.addAgentSource(new VrpAgentSource(actionCreator, fleetData, optimizer, qSim));
+		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
+		DrtActionCreator actionCreator = new DrtActionCreator(passengerEngine, legCreator, tbcg.getPickupDuration());
+		qSim.addAgentSource(new VrpAgentSource(actionCreator, fleetData, optimizer, qSim));
 
-        return qSim;
-    }
+		return qSim;
+	}
 
+	private TaxibusOptimizer createTaxibusOptimizer(QSim qSim) {
+		// Joschka, now you can safely use travel times for disutility - these are from the past
+		// (not the currently collected)
+		TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
+		TaxibusSchedulerParams params = new TaxibusSchedulerParams(tbcg.getPickupDuration(), tbcg.getDropoffDuration());
+		TaxibusScheduler scheduler = new TaxibusScheduler(fleetData, qSim.getSimTimer(), params);
+		TaxibusOptimizerContext optimizerContext = new TaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(),
+				travelTime, travelDisutility, scheduler, tbcg);
 
-    private TaxibusOptimizer createTaxibusOptimizer(QSim qSim)
-    {
-        //Joschka, now you can safely use travel times for disutility - these are from the past
-        //(not the currently collected)
-        TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-        TaxibusSchedulerParams params = new TaxibusSchedulerParams(tbcg.getPickupDuration(),
-                tbcg.getDropoffDuration());
-        TaxibusScheduler scheduler = new TaxibusScheduler(fleetData, qSim.getSimTimer(), params);
-        TaxibusOptimizerContext optimizerContext = new TaxibusOptimizerContext(fleetData, scenario,
-                qSim.getSimTimer(), travelTime, travelDisutility, scheduler,
-                tbcg);
+		switch (tbcg.getAlgorithm()) {
 
-        switch (tbcg.getAlgorithm()) {
+			case "sharedTaxi":
+				return new SharedTaxiOptimizer(optimizerContext, false, tbcg.getDetourFactor());
 
-            case "sharedTaxi":
-            	return new SharedTaxiOptimizer(optimizerContext, false, tbcg.getDetourFactor());
-            
-            case "jsprit":
-            {
-            	PrebookedTaxibusOptimizerContext context = new PrebookedTaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
-            	return new JspritTaxibusOptimizer(context);
-            }
-           
-            case "clustered_jsprit":
-            {
-            	PrebookedTaxibusOptimizerContext context = new PrebookedTaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
-            	return new ClusteringTaxibusOptimizer(context, new JspritDispatchCreator(context));
-            }
-            default:
-                throw new RuntimeException(
-                        "No config parameter set for algorithm, please check and assign in config");
-        }
-    }
+			case "jsprit": {
+				PrebookedTaxibusOptimizerContext context = new PrebookedTaxibusOptimizerContext(fleetData, scenario,
+						qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+				return new JspritTaxibusOptimizer(context);
+			}
+
+			case "clustered_jsprit": {
+				PrebookedTaxibusOptimizerContext context = new PrebookedTaxibusOptimizerContext(fleetData, scenario,
+						qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
+				return new ClusteringTaxibusOptimizer(context, new JspritDispatchCreator(context));
+			}
+			default:
+				throw new RuntimeException("No config parameter set for algorithm, please check and assign in config");
+		}
+	}
 }

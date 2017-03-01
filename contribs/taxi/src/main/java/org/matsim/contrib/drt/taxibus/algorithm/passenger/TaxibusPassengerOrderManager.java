@@ -25,14 +25,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.taxibus.algorithm.utils.TaxibusUtils;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -46,8 +42,9 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 	private TaxibusPassengerEngine passengerEngine;
 
 	public TaxibusPassengerOrderManager() {
-		
+
 	}
+
 	public void setPassengerEngine(TaxibusPassengerEngine passengerEngine) {
 		this.passengerEngine = passengerEngine;
 	}
@@ -71,7 +68,7 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 					return;
 				if (mobsimAgent.getState().equals(State.ABORT))
 					return;
-				
+
 				PlanAgent agent = (PlanAgent) mobsimAgent;
 				PlanElement nextPlanElement = agent.getNextPlanElement();
 				if (nextPlanElement != null) {
@@ -84,8 +81,9 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 						Leg leg = (Leg) nextPlanElement;
 						if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)) {
 							double departureTime = mobsimAgent.getActivityEndTime();
-							if (departureTime < event.getTime())  {
-								departureTime = event.getTime() + 60;}
+							if (departureTime < event.getTime()) {
+								departureTime = event.getTime() + 60;
+							}
 							prebookTaxiBusTrip(mobsimAgent, leg, departureTime);
 						}
 					}
@@ -114,7 +112,7 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 	}
 
 	private void prebookTaxiBusTrip(MobsimAgent mobsimAgent, Leg leg, double departureTime) {
-//		System.out.println("taxi trip booked for " + mobsimAgent.getId() +" at "+Time.writeTime(departureTime));
+		// System.out.println("taxi trip booked for " + mobsimAgent.getId() +" at "+Time.writeTime(departureTime));
 		this.passengerEngine.prebookTrip(qSim.getSimTimer().getTimeOfDay(), (MobsimPassengerAgent) mobsimAgent,
 				leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), departureTime);
 

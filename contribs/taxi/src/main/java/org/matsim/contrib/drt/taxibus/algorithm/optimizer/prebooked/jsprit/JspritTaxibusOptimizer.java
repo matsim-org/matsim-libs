@@ -57,8 +57,8 @@ import com.graphhopper.jsprit.core.util.*;
  *
  */
 /**
- * A taxibus optimizer relying on the Jsprit package for both pickup/delivery planning and
- *  the actual planning of tours. Includes the dispatching to the scheduler.
+ * A taxibus optimizer relying on the Jsprit package for both pickup/delivery planning and the actual planning of tours.
+ * Includes the dispatching to the scheduler.
  */
 public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 
@@ -77,23 +77,11 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking#
-	 * nextLinkEntered(org.matsim.contrib.dvrp.schedule.DriveTask)
-	 */
 	@Override
 	public void nextLinkEntered(DriveTask driveTask) {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.contrib.dvrp.optimizer.VrpOptimizer#requestSubmitted(org.
-	 * matsim.contrib.dvrp.data.Request)
-	 */
 	@Override
 	public void requestSubmitted(Request request) {
 		if (context.requestDeterminator.isRequestServable(request)) {
@@ -102,27 +90,13 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.contrib.dvrp.optimizer.VrpOptimizer#nextTask(org.matsim.
-	 * contrib.dvrp.schedule.Schedule)
-	 */
 	@Override
 	public void nextTask(Vehicle vehicle) {
-        Schedule schedule = vehicle.getSchedule();
+		Schedule schedule = vehicle.getSchedule();
 		context.scheduler.updateBeforeNextTask(schedule);
 		schedule.nextTask();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener#
-	 * notifyMobsimBeforeSimStep(org.matsim.core.mobsim.framework.events.
-	 * MobsimBeforeSimStepEvent)
-	 */
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		if ((e.getSimulationTime() % (context.clustering_period_min * 60)) == 0) {
@@ -134,7 +108,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 			}
 			unplannedRequests.removeAll(dueRequests);
 			if (dueRequests.size() > 0) {
-					
+
 				VehicleRoutingProblem.Builder vrpBuilder = VehicleRoutingProblem.Builder.newInstance();
 				vrpBuilder.setFleetSize(FleetSize.FINITE);
 				Map<String, Vehicle> vehicles = new HashMap<>();
@@ -161,7 +135,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 				if (vrpBuilder.getAddedVehicles().isEmpty()) {
 					this.unplannedRequests.addAll(dueRequests);
 				} else {
-					
+
 					for (TaxibusRequest req : dueRequests) {
 
 						String rId = req.getId().toString();
@@ -174,11 +148,11 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 								.setCoordinate(Coordinate.newInstance(req.getToLink().getCoord().getX(),
 										req.getToLink().getCoord().getY()))
 								.build();
-						
+
 						double pickupOffSet = Math.max(e.getSimulationTime(), req.getT0());
 						Shipment shipment = Shipment.Builder.newInstance(rId).addSizeDimension(0, 1)
 								.setPickupLocation(fromLoc).setDeliveryLocation(toLoc)
-								.setPickupTimeWindow(TimeWindow.newInstance(pickupOffSet, pickupOffSet+ 3600)).build();
+								.setPickupTimeWindow(TimeWindow.newInstance(pickupOffSet, pickupOffSet + 3600)).build();
 
 						vrpBuilder.addJob(shipment);
 					}
@@ -211,11 +185,12 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 						dispatch.addPath(VrpPaths.calcAndCreatePath(lastDestination, veh.getStartLink(), d + 60, router,
 								context.travelTime));
 						for (Job j : vr.getTourActivities().getJobs()) {
-							if (requests.containsKey(j.getId())){
-							TaxibusRequest r = requests.remove(j.getId());
-							dispatch.addRequest(r);}
-							else {
-								Logger.getLogger(getClass()).error(j.getId() + " is not a part of request list? "+ requests.toString());
+							if (requests.containsKey(j.getId())) {
+								TaxibusRequest r = requests.remove(j.getId());
+								dispatch.addRequest(r);
+							} else {
+								Logger.getLogger(getClass())
+										.error(j.getId() + " is not a part of request list? " + requests.toString());
 							}
 						}
 						context.scheduler.scheduleRequest(dispatch);
@@ -230,7 +205,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 					/*
 					 * print nRoutes and totalCosts of bestSolution
 					 */
-//					SolutionPrinter.print(bestSolution);
+					// SolutionPrinter.print(bestSolution);
 
 				}
 			}

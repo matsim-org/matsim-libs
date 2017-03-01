@@ -23,8 +23,9 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
 /**
- * @author  jbischoff
- *	Task for driving w/o pax
+ * Task for driving w/o pax
+ * 
+ * @author jbischoff
  */
 public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
 
@@ -35,15 +36,13 @@ public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
 
 	@Override
 	public DrtTaskType getDrtTaskType() {
-		
+
 		return DrtTaskType.DRIVE_EMPTY;
 	}
 
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getDrtTaskType().name() + "]" + super.commonToString();
-    }
-
+	@Override
+	protected String commonToString() {
+		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+	}
 
 }

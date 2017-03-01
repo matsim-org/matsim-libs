@@ -25,17 +25,14 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 
-
-public class TaxiSchedules
-{
-    public static Iterable<TaxiRequest> getTaxiRequests(Schedule schedule)
-    {
-        List<TaxiRequest> taxiRequests = new ArrayList<>();
-        for (Task t : schedule.getTasks()) {
-            if ( ((TaxiTask)t).getTaxiTaskType() == TaxiTaskType.PICKUP) {
-                taxiRequests.add( ((TaxiPickupTask)t).getRequest());
-            }
-        }
-        return taxiRequests;
-    }
+public class TaxiSchedules {
+	public static Iterable<TaxiRequest> getTaxiRequests(Schedule schedule) {
+		List<TaxiRequest> taxiRequests = new ArrayList<>();
+		for (Task t : schedule.getTasks()) {
+			if (((TaxiTask) t).getTaxiTaskType() == TaxiTaskType.PICKUP) {
+				taxiRequests.add(((TaxiPickupTask) t).getRequest());
+			}
+		}
+		return taxiRequests;
+	}
 }

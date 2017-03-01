@@ -25,25 +25,17 @@ import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 
+public class FifoTaxiOptimizer extends AbstractTaxiOptimizer {
+	private final BestDispatchFinder dispatchFinder;
 
-public class FifoTaxiOptimizer
-    extends AbstractTaxiOptimizer
-{
-    private final BestDispatchFinder dispatchFinder;
+	public FifoTaxiOptimizer(TaxiOptimizerContext optimContext, FifoTaxiOptimizerParams params) {
+		super(optimContext, params, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true);
+		dispatchFinder = new BestDispatchFinder(optimContext);
+	}
 
-
-    public FifoTaxiOptimizer(TaxiOptimizerContext optimContext, FifoTaxiOptimizerParams params)
-    {
-        super(optimContext, params, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR),
-                true);
-        dispatchFinder = new BestDispatchFinder(optimContext);
-    }
-
-
-    @Override
-    protected void scheduleUnplannedRequests()
-    {
-        new FifoSchedulingProblem(getOptimContext(), dispatchFinder)
-                .scheduleUnplannedRequests((Queue<TaxiRequest>)getUnplannedRequests());
-    }
+	@Override
+	protected void scheduleUnplannedRequests() {
+		new FifoSchedulingProblem(getOptimContext(), dispatchFinder)
+				.scheduleUnplannedRequests((Queue<TaxiRequest>) getUnplannedRequests());
+	}
 }

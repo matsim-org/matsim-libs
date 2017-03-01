@@ -26,24 +26,21 @@ import org.matsim.contrib.taxi.scheduler.*;
 
 import com.google.common.collect.Iterables;
 
+public class TaxiOptimizationValidation {
+	public static void assertNoUnplannedRequestsWhenIdleVehicles(TaxiScheduler taxiScheduler, Fleet fleet,
+			Iterable<? extends Request> requests) {
+		int vehCount = Iterables
+				.size(Iterables.filter(fleet.getVehicles().values(), TaxiSchedulerUtils.createIsIdle(taxiScheduler)));
 
-public class TaxiOptimizationValidation
-{
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(TaxiScheduler taxiScheduler,
-            Fleet fleet, Iterable<? extends Request> requests)
-    {
-        int vehCount = Iterables.size(Iterables.filter(fleet.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(taxiScheduler)));
+		if (vehCount == 0) {
+			return;// OK
+		}
 
-        if (vehCount == 0) {
-            return;//OK
-        }
+		if (TaxiRequests.countRequestsWithStatus(requests, TaxiRequestStatus.UNPLANNED) == 0) {
+			return; // OK
+		}
 
-        if (TaxiRequests.countRequestsWithStatus(requests, TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
-    }
+		// idle vehicles and unplanned requests
+		throw new IllegalStateException();
+	}
 }

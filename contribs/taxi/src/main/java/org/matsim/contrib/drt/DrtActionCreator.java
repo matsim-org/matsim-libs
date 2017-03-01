@@ -19,66 +19,50 @@
 
 package org.matsim.contrib.drt;
 
-import org.matsim.contrib.drt.tasks.DrtDropoffTask;
-import org.matsim.contrib.drt.tasks.DrtPickupTask;
-import org.matsim.contrib.drt.tasks.DrtStayTask;
-import org.matsim.contrib.drt.tasks.DrtTask;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
-import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
+import org.matsim.contrib.drt.tasks.*;
+import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.*;
 
-
-
-public class DrtActionCreator
-    implements VrpAgentLogic.DynActionCreator
-{
-    public static final String TAXIBUS_STAY_NAME = "DrtStay";
+public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
+	public static final String TAXIBUS_STAY_NAME = "DrtStay";
 	public static final String TAXIBUS_DROPOFF_NAME = "DrtDropoff";
 	public final static String TAXIBUS_PICKUP_NAME = "DrtPickup";
 	private final PassengerEngine passengerEngine;
-    private final VrpLegs.LegCreator legCreator;
-    private final double pickupDuration;
+	private final VrpLegs.LegCreator legCreator;
+	private final double pickupDuration;
 
+	public DrtActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator, double pickupDuration) {
+		this.passengerEngine = passengerEngine;
+		this.legCreator = legCreator;
+		this.pickupDuration = pickupDuration;
+	}
 
-    public DrtActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator,
-            double pickupDuration)
-    {
-        this.passengerEngine = passengerEngine;
-        this.legCreator = legCreator;
-        this.pickupDuration = pickupDuration;
-    }
+	@Override
+	public DynAction createAction(DynAgent dynAgent, final Task task, double now) {
+		DrtTask tt = (DrtTask) task;
 
+		switch (tt.getDrtTaskType()) {
+			case DRIVE_EMPTY:
+			case DRIVE_WITH_PASSENGER:
+				return legCreator.createLeg((DriveTask) task);
 
-    @Override
-    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
-    {
-        DrtTask tt = (DrtTask)task;
+			case PICKUP:
+				final DrtPickupTask pst = (DrtPickupTask) task;
+				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
+						pickupDuration, TAXIBUS_PICKUP_NAME);
 
-        switch (tt.getDrtTaskType()) {
-            case DRIVE_EMPTY:
-            case DRIVE_WITH_PASSENGER:
-                return legCreator.createLeg((DriveTask)task);
+			case DROPOFF:
+				final DrtDropoffTask dst = (DrtDropoffTask) task;
+				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(),
+						TAXIBUS_DROPOFF_NAME);
 
-            case PICKUP:
-                final DrtPickupTask pst = (DrtPickupTask)task;
-                return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
-                        pickupDuration, TAXIBUS_PICKUP_NAME);
+			case STAY:
+				return new VrpActivity(TAXIBUS_STAY_NAME, (DrtStayTask) task);
 
-            case DROPOFF:
-                final DrtDropoffTask dst = (DrtDropoffTask)task;
-                return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(), TAXIBUS_DROPOFF_NAME);
-
-            case STAY:
-                return new VrpActivity(TAXIBUS_STAY_NAME, (DrtStayTask)task);
-
-            default:
-                throw new IllegalStateException();
-        }
-    }
+			default:
+				throw new IllegalStateException();
+		}
+	}
 }

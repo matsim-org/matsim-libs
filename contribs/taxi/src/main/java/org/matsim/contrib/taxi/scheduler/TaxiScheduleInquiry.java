@@ -22,17 +22,12 @@ package org.matsim.contrib.taxi.scheduler;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
+public interface TaxiScheduleInquiry {
+	LinkTimePair getImmediateDiversion(Vehicle veh);
 
-public interface TaxiScheduleInquiry
-{
-    LinkTimePair getImmediateDiversion(Vehicle veh);
+	LinkTimePair getEarliestIdleness(Vehicle veh);
 
+	LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh);
 
-    LinkTimePair getEarliestIdleness(Vehicle veh);
-
-
-    LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh);
-
-
-    boolean isIdle(Vehicle vehicle);
+	boolean isIdle(Vehicle vehicle);
 }

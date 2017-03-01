@@ -24,42 +24,29 @@ import java.util.HashSet;
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
+public class DrtDropoffTask extends StayTaskImpl implements DrtTaskWithRequests {
+	private final TaxibusRequest request;
 
+	public DrtDropoffTask(double beginTime, double endTime, TaxibusRequest request) {
+		super(beginTime, endTime, request.getToLink());
 
-public class DrtDropoffTask
-    extends StayTaskImpl
-    implements DrtTaskWithRequests
-{
-    private final TaxibusRequest request;
+		this.request = request;
+		request.setDropoffTask(this);
+	}
 
+	@Override
+	public DrtTaskType getDrtTaskType() {
+		return DrtTaskType.DROPOFF;
+	}
 
-    public DrtDropoffTask(double beginTime, double endTime, TaxibusRequest request)
-    {
-        super(beginTime, endTime, request.getToLink());
+	public TaxibusRequest getRequest() {
+		return request;
+	}
 
-        this.request = request;
-        request.setDropoffTask(this);
-    }
-
-    @Override
-    public DrtTaskType getDrtTaskType()
-    {
-        return DrtTaskType.DROPOFF;
-    }
-
-
-    public TaxibusRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getDrtTaskType().name() + "]" + super.commonToString();
-    }
-
+	@Override
+	protected String commonToString() {
+		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+	}
 
 	@Override
 	public HashSet<TaxibusRequest> getRequests() {
@@ -68,15 +55,15 @@ public class DrtDropoffTask
 		return t;
 	}
 
-
 	@Override
 	public void removeFromRequest(TaxibusRequest request) {
-		if (request!=this.request) {
+		if (request != this.request) {
 			throw new IllegalStateException();
 		}
 		request.setDropoffTask(null);
-		
+
 	}
+
 	@Override
 	public void removeFromAllRequests() {
 		removeFromRequest(this.request);

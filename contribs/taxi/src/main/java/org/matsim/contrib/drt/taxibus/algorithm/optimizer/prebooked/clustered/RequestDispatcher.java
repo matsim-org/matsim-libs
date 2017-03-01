@@ -25,10 +25,10 @@ import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
 public interface RequestDispatcher {
 
-	TaxibusDispatch createDispatch (Set<TaxibusRequest> commonRequests);
+	TaxibusDispatch createDispatch(Set<TaxibusRequest> commonRequests);
 }

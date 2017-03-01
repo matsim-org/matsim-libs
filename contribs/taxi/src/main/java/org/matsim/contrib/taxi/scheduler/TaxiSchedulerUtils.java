@@ -23,16 +23,12 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 
 import com.google.common.base.Predicate;
 
-
-public class TaxiSchedulerUtils
-{
-    public static Predicate<Vehicle> createIsIdle(final TaxiScheduleInquiry scheduleInquiry)
-    {
-        return new Predicate<Vehicle>() {
-            public boolean apply(Vehicle vehicle)
-            {
-                return scheduleInquiry.isIdle(vehicle);
-            }
-        };
-    }
+public class TaxiSchedulerUtils {
+	public static Predicate<Vehicle> createIsIdle(final TaxiScheduleInquiry scheduleInquiry) {
+		return new Predicate<Vehicle>() {
+			public boolean apply(Vehicle vehicle) {
+				return scheduleInquiry.isIdle(vehicle);
+			}
+		};
+	}
 }

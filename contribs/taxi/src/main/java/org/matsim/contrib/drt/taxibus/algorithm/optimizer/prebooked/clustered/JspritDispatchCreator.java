@@ -22,43 +22,31 @@
  */
 package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.tasks.DrtStayTask;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
+import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.router.Dijkstra;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
-import com.graphhopper.jsprit.core.problem.Location;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.*;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import com.graphhopper.jsprit.core.problem.vehicle.*;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
-import com.graphhopper.jsprit.core.util.Coordinate;
-import com.graphhopper.jsprit.core.util.Solutions;
-
+import com.graphhopper.jsprit.core.util.*;
 
 /**
  * @author  jbischoff
@@ -82,8 +70,7 @@ public class JspritDispatchCreator implements RequestDispatcher {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see playground.jbischoff.taxibus.algorithm.optimizer.clustered.
-	 * RequestDispatcher#createDispatch(java.util.Set)
+	 * @see playground.jbischoff.taxibus.algorithm.optimizer.clustered. RequestDispatcher#createDispatch(java.util.Set)
 	 */
 	@Override
 	public TaxibusDispatch createDispatch(Set<TaxibusRequest> commonRequests) {
@@ -107,9 +94,9 @@ public class JspritDispatchCreator implements RequestDispatcher {
 		VehicleTypeImpl.Builder vehicleTypeBuilder = VehicleTypeImpl.Builder.newInstance("vehicleType")
 				.addCapacityDimension(0, commonRequests.size());
 		VehicleType vehicleType = vehicleTypeBuilder.build();
-		
+
 		DrtStayTask ct = (DrtStayTask) veh.getSchedule().getCurrentTask();
-		
+
 		Coord startCoord = ct.getLink().getCoord();
 		String vId = veh.getId().toString();
 		Builder vehicleBuilder = VehicleImpl.Builder.newInstance(vId);
@@ -117,7 +104,7 @@ public class JspritDispatchCreator implements RequestDispatcher {
 		vehicleBuilder.setType(vehicleType);
 		vehicleBuilder.setReturnToDepot(false);
 		VehicleImpl vehicle = vehicleBuilder.build();
-		
+
 		vrpBuilder.addVehicle(vehicle);
 
 		for (TaxibusRequest req : commonRequests) {
@@ -161,8 +148,9 @@ public class JspritDispatchCreator implements RequestDispatcher {
 			lastAct = current;
 			lastDestination = currentDestination;
 		}
-		if (context.returnToDepot){
-		dispatch.addPath(VrpPaths.calcAndCreatePath(lastDestination, veh.getStartLink(), d+60, router, context.travelTime));
+		if (context.returnToDepot) {
+			dispatch.addPath(VrpPaths.calcAndCreatePath(lastDestination, veh.getStartLink(), d + 60, router,
+					context.travelTime));
 		}
 		dispatch.addRequests(commonRequests);
 
@@ -204,18 +192,18 @@ public class JspritDispatchCreator implements RequestDispatcher {
 		}
 		return getCoordCentroid(coords);
 	}
-	
-	private Coord getCoordCentroid(Set<Coord> coords){
-		double x=0;
-		double y=0;
-		for (Coord c : coords){
-			x+=c.getX();
-			y+=c.getY();
+
+	private Coord getCoordCentroid(Set<Coord> coords) {
+		double x = 0;
+		double y = 0;
+		for (Coord c : coords) {
+			x += c.getX();
+			y += c.getY();
 		}
-		x = x/coords.size();
-		y = y/coords.size();
-		return new Coord(x,y);
-		
+		x = x / coords.size();
+		y = y / coords.size();
+		return new Coord(x, y);
+
 	}
 
 }

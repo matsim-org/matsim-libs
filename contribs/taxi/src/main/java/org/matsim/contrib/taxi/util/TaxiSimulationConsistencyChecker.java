@@ -32,45 +32,32 @@ import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
 
+public class TaxiSimulationConsistencyChecker implements AfterMobsimListener {
+	private final SubmittedTaxiRequestsCollector requestCollector;
+	private final TaxiConfigGroup tcg;
 
-public class TaxiSimulationConsistencyChecker
-    implements AfterMobsimListener
-{
-    private final SubmittedTaxiRequestsCollector requestCollector;
-    private final TaxiConfigGroup tcg;
+	@Inject
+	public TaxiSimulationConsistencyChecker(SubmittedTaxiRequestsCollector requestCollector, Config config) {
+		this.requestCollector = requestCollector;
+		this.tcg = TaxiConfigGroup.get(config);
+	}
 
+	public void addCheckAllRequestsPerformed() {
+		for (Request r : requestCollector.getRequests().values()) {
+			TaxiRequest tr = (TaxiRequest) r;
+			if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
+				if (tcg.isBreakSimulationIfNotAllRequestsServed()) {
+					throw new IllegalStateException();
+				} else {
+					Logger.getLogger(getClass()).warn("Taxi request not performed. Request time:\t"
+							+ Time.writeTime(tr.getT0()) + "\tPassenger:\t" + tr.getPassenger().getId());
+				}
+			}
+		}
+	}
 
-    @Inject
-    public TaxiSimulationConsistencyChecker(SubmittedTaxiRequestsCollector requestCollector,
-            Config config)
-    {
-        this.requestCollector = requestCollector;
-        this.tcg = TaxiConfigGroup.get(config);
-    }
-
-
-    public void addCheckAllRequestsPerformed()
-    {
-        for (Request r : requestCollector.getRequests().values()) {
-            TaxiRequest tr = (TaxiRequest)r;
-            if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
-                if (tcg.isBreakSimulationIfNotAllRequestsServed()) {
-                    throw new IllegalStateException();
-                }
-                else {
-                    Logger.getLogger(getClass())
-                            .warn("Taxi request not performed. Request time:\t"
-                                    + Time.writeTime(tr.getT0()) + "\tPassenger:\t"
-                                    + tr.getPassenger().getId());
-                }
-            }
-        }
-    }
-
-
-    @Override
-    public void notifyAfterMobsim(AfterMobsimEvent event)
-    {
-        addCheckAllRequestsPerformed();
-    }
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		addCheckAllRequestsPerformed();
+	}
 }

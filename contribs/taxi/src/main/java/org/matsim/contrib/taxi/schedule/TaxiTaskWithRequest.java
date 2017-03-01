@@ -21,13 +21,9 @@ package org.matsim.contrib.taxi.schedule;
 
 import org.matsim.contrib.taxi.data.TaxiRequest;
 
+public interface TaxiTaskWithRequest extends TaxiTask {
+	TaxiRequest getRequest();
 
-public interface TaxiTaskWithRequest
-    extends TaxiTask
-{
-    TaxiRequest getRequest();
-
-
-    //called (when removing a task) in order to update the request2task assignment 
-    void disconnectFromRequest();
+	// called (when removing a task) in order to update the request2task assignment
+	void disconnectFromRequest();
 }

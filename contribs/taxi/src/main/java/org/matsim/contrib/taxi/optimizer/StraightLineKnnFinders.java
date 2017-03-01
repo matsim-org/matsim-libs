@@ -21,32 +21,25 @@ package org.matsim.contrib.taxi.optimizer;
 
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 
-
 /**
  * kNN - k Nearest Neighbours
  */
-public class StraightLineKnnFinders
-{
-    public static <D> StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> createDestEntryFinder(
-            int k)
-    {
-        if (k < 0) {
-            return null;
-        }
+public class StraightLineKnnFinders {
+	public static <D> StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> createDestEntryFinder(int k) {
+		if (k < 0) {
+			return null;
+		}
 
-        LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
-        return new StraightLineKnnFinder<>(k, LinkProviders.VEHICLE_ENTRY_TO_LINK, linkProvider);
-    }
+		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
+		return new StraightLineKnnFinder<>(k, LinkProviders.VEHICLE_ENTRY_TO_LINK, linkProvider);
+	}
 
+	public static <D> StraightLineKnnFinder<DestEntry<D>, VehicleData.Entry> createVehicleDepartureFinder(int k) {
+		if (k < 0) {
+			return null;
+		}
 
-    public static <D> StraightLineKnnFinder<DestEntry<D>, VehicleData.Entry> createVehicleDepartureFinder(
-            int k)
-    {
-        if (k < 0) {
-            return null;
-        }
-
-        LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
-        return new StraightLineKnnFinder<>(k, linkProvider, LinkProviders.VEHICLE_ENTRY_TO_LINK);
-    }
+		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
+		return new StraightLineKnnFinder<>(k, linkProvider, LinkProviders.VEHICLE_ENTRY_TO_LINK);
+	}
 }

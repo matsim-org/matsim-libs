@@ -52,11 +52,11 @@ public class DvrpBenchmarkModule extends DvrpModule {
 		String mode = dvrpCfg.getMode();
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
 		bind(Fleet.class).toInstance(fleet);
-		
-		//Visualisation of schedules for DVRP DynAgents
+
+		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
-		
-		//Fixed free-speed TT
+
+		// Fixed free-speed TT
 		install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
 	}
 }

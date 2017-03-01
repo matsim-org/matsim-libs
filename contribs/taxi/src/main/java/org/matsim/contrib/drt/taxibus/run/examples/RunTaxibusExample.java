@@ -20,11 +20,9 @@
 package org.matsim.contrib.drt.taxibus.run.examples;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
+import org.matsim.contrib.drt.taxibus.run.configuration.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -32,44 +30,38 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * @author jbischoff
- * An example of the taxibus DRT system. 
- * The system allows for two different optimizers, one based wholly on jsprit, 
- * the other one with some clustering algorithms. Both depict a sample setup where passengers want to reach 
- * the train station by 8:00 or 9:00 respectively.
+ * @author jbischoff An example of the taxibus DRT system. The system allows for two different optimizers, one based
+ *         wholly on jsprit, the other one with some clustering algorithms. Both depict a sample setup where passengers
+ *         want to reach the train station by 8:00 or 9:00 respectively.
  */
 public class RunTaxibusExample {
-	
 
 	public static void main(String[] args) {
 
-		
-		//Select either of the following config files
-//		Config config = ConfigUtils.loadConfig("taxibus_example/configClustered.xml", new TaxibusConfigGroup());
+		// Select either of the following config files
+		// Config config = ConfigUtils.loadConfig("taxibus_example/configClustered.xml", new TaxibusConfigGroup());
 		Config config = ConfigUtils.loadConfig("taxibus_example/configJsprit.xml", new TaxibusConfigGroup());
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
-		
-		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
+
+		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME,
+				OTFVisConfigGroup.class);
 		visConfig.setAgentSize(250);
 		visConfig.setLinkWidth(5);
 		visConfig.setDrawNonMovingItems(true);
 		visConfig.setDrawTime(true);
-		
+
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		
-		//Comment out the following line in case you do not require OTFVis visualisation
-		controler.addOverridingModule( new OTFVisLiveModule() );
-		
+
+		// Comment out the following line in case you do not require OTFVis visualisation
+		controler.addOverridingModule(new OTFVisLiveModule());
+
 		controler.run();
 
-	
 	}
 
-	
-	
 }

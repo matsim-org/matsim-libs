@@ -21,13 +21,10 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.junit.Test;
 
-
-public class RunTaxiBenchmarkTest
-{
-    @Test
-    public void testRunOneTaxi()
-    {
-        String configFile = "./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml";
-        RunTaxiBenchmark.run(configFile, 3);
-    }
+public class RunTaxiBenchmarkTest {
+	@Test
+	public void testRunOneTaxi() {
+		String configFile = "./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml";
+		RunTaxiBenchmark.run(configFile, 3);
+	}
 }

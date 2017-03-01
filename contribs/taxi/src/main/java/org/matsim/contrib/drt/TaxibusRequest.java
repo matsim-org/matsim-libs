@@ -23,61 +23,52 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.tasks.DrtDriveWithPassengerTask;
-import org.matsim.contrib.drt.tasks.DrtTask;
-import org.matsim.contrib.drt.tasks.DrtTaskWithRequests;
+import org.matsim.contrib.drt.tasks.*;
 import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.RequestImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
- * @author  jbischoff
- * (might not be needed)
+ * @author jbischoff (might not be needed)
  */
-public class TaxibusRequest extends RequestImpl   implements PassengerRequest
- {
-	
-    public enum TaxibusRequestStatus
-    {
-        //INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
-        UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
-        PLANNED, // planned - included into one of the routes
+public class TaxibusRequest extends RequestImpl implements PassengerRequest {
 
-        //we have started serving the request but we may still divert the cab
-        DISPATCHED,
+	public enum TaxibusRequestStatus {
+		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
+		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
+		PLANNED, // planned - included into one of the routes
 
-        //we have to carry out the request 
-        // - difference between taxi and taxibus seems to minimal, but the actual tasks are different, because Pickuptasks for certain requests may be with customers on board already
-        PICKUP,
-        RIDE, 
-        DROPOFF,
+		// we have started serving the request but we may still divert the cab
+		DISPATCHED,
 
-        PERFORMED, //
-        //REJECTED, // rejected by the DISPATCHER
-        //CANCELLED, // canceled by the CUSTOMER
-        ;
-    };
-	
-    private final MobsimPassengerAgent passenger;
-    private final Link fromLink;
-    private final Link toLink;
+		// we have to carry out the request
+		// - difference between taxi and taxibus seems to minimal, but the actual tasks are different, because
+		// Pickuptasks for certain requests may be with customers on board already
+		PICKUP, RIDE, DROPOFF,
+
+		PERFORMED, //
+		// REJECTED, // rejected by the DISPATCHER
+		// CANCELLED, // canceled by the CUSTOMER
+		;
+	};
+
+	private final MobsimPassengerAgent passenger;
+	private final Link fromLink;
+	private final Link toLink;
 	private DrtTaskWithRequests pickupTask = null;
 	private DrtTaskWithRequests dropoffTask = null;;
 
-	
 	private ArrayList<DrtDriveWithPassengerTask> driveWithPassengerTasks = new ArrayList<>();
 
-    public TaxibusRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-            double t0, double submissionTime)
-    {
-        super(id, 1, t0, t0, submissionTime);
-        this.passenger = passenger;
-        this.fromLink = fromLink;
-        this.toLink = toLink;
-    }
+	public TaxibusRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double t0,
+			double submissionTime) {
+		super(id, 1, t0, t0, submissionTime);
+		this.passenger = passenger;
+		this.fromLink = fromLink;
+		this.toLink = toLink;
+	}
 
 	@Override
 	public Link getFromLink() {
@@ -95,8 +86,8 @@ public class TaxibusRequest extends RequestImpl   implements PassengerRequest
 	}
 
 	public void setPickupTask(DrtTaskWithRequests pickupTask) {
-        this.pickupTask = pickupTask;
-		
+		this.pickupTask = pickupTask;
+
 	}
 
 	public void addDriveWithPassengerTask(DrtDriveWithPassengerTask task) {
@@ -120,59 +111,51 @@ public class TaxibusRequest extends RequestImpl   implements PassengerRequest
 	}
 
 	public TaxibusRequestStatus getStatus() {
-		    {
-		        if (pickupTask == null) {
-		            return TaxibusRequestStatus.UNPLANNED;
-		        }
+		{
+			if (pickupTask == null) {
+				return TaxibusRequestStatus.UNPLANNED;
+			}
 
-		        switch (pickupTask.getStatus()) {
-		            case PLANNED:
-		                DrtTask currentTask = (DrtTask)pickupTask.getSchedule().getCurrentTask();
-		                if (currentTask.getDrtTaskType() == DrtTaskType.DRIVE_EMPTY && //
-		                        pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
-		                    return TaxibusRequestStatus.DISPATCHED;
-		                }
+			switch (pickupTask.getStatus()) {
+				case PLANNED:
+					DrtTask currentTask = (DrtTask) pickupTask.getSchedule().getCurrentTask();
+					if (currentTask.getDrtTaskType() == DrtTaskType.DRIVE_EMPTY && //
+							pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
+						return TaxibusRequestStatus.DISPATCHED;
+					}
 
-		                return TaxibusRequestStatus.PLANNED;
+					return TaxibusRequestStatus.PLANNED;
 
-		            case STARTED:
-		                return TaxibusRequestStatus.PICKUP;
-		                
-		            case PERFORMED://continue
-		        }
+				case STARTED:
+					return TaxibusRequestStatus.PICKUP;
 
-		        if (!driveWithPassengerTasks.isEmpty())
-		        {
-		        	for (DrtDriveWithPassengerTask t : driveWithPassengerTasks){
-		        		
-		        		if (t.getStatus().equals(TaskStatus.STARTED)){
-		        			
-		        			return TaxibusRequestStatus.RIDE;
-		        		}
-		        	}
-		        }
-		        
+				case PERFORMED:// continue
+			}
 
-		        switch (dropoffTask.getStatus()) {
-		            case STARTED:
-		                return TaxibusRequestStatus.DROPOFF;
+			if (!driveWithPassengerTasks.isEmpty()) {
+				for (DrtDriveWithPassengerTask t : driveWithPassengerTasks) {
 
-		            case PERFORMED:
-		                return TaxibusRequestStatus.PERFORMED;
-		                
-		            case PLANNED://not illegal here
-		            	return TaxibusRequestStatus.PLANNED;
-		        }
+					if (t.getStatus().equals(TaskStatus.STARTED)) {
 
-		        throw new IllegalStateException("Unreachable code");
-		    }
-		
+						return TaxibusRequestStatus.RIDE;
+					}
+				}
+			}
+
+			switch (dropoffTask.getStatus()) {
+				case STARTED:
+					return TaxibusRequestStatus.DROPOFF;
+
+				case PERFORMED:
+					return TaxibusRequestStatus.PERFORMED;
+
+				case PLANNED:// not illegal here
+					return TaxibusRequestStatus.PLANNED;
+			}
+
+			throw new IllegalStateException("Unreachable code");
+		}
+
 	}
-
-	
-	
-	
-	
-	
 
 }

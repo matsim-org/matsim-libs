@@ -40,7 +40,8 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final double pickupDuration;
 
 	@Inject
-	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer, QSim qSim) {
+	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer,
+			QSim qSim) {
 		this(passengerEngine,
 				taxiCfg.isOnlineVehicleTracker() ? //
 						VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking) optimizer,

@@ -25,33 +25,26 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.util.PartialSort;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
+public class StraightLineKnnFinder<T, N> {
+	private final int k;
+	private final LinkProvider<T> objectToLink;
+	private final LinkProvider<N> neighbourToLink;
 
-public class StraightLineKnnFinder<T, N>
-{
-    private final int k;
-    private final LinkProvider<T> objectToLink;
-    private final LinkProvider<N> neighbourToLink;
+	public StraightLineKnnFinder(int k, LinkProvider<T> objectToLink, LinkProvider<N> neighbourToLink) {
+		this.k = k;
+		this.objectToLink = objectToLink;
+		this.neighbourToLink = neighbourToLink;
+	}
 
+	public List<N> findNearest(T obj, Iterable<N> neighbours) {
+		Coord objectCoord = objectToLink.apply(obj).getCoord();
+		PartialSort<N> nearestRequestSort = new PartialSort<N>(k);
 
-    public StraightLineKnnFinder(int k, LinkProvider<T> objectToLink,
-            LinkProvider<N> neighbourToLink)
-    {
-        this.k = k;
-        this.objectToLink = objectToLink;
-        this.neighbourToLink = neighbourToLink;
-    }
+		for (N n : neighbours) {
+			Coord nCoord = neighbourToLink.apply(n).getCoord();
+			nearestRequestSort.add(n, DistanceUtils.calculateSquaredDistance(objectCoord, nCoord));
+		}
 
-
-    public List<N> findNearest(T obj, Iterable<N> neighbours)
-    {
-        Coord objectCoord = objectToLink.apply(obj).getCoord();
-        PartialSort<N> nearestRequestSort = new PartialSort<N>(k);
-
-        for (N n : neighbours) {
-            Coord nCoord = neighbourToLink.apply(n).getCoord();
-            nearestRequestSort.add(n, DistanceUtils.calculateSquaredDistance(objectCoord, nCoord));
-        }
-
-        return nearestRequestSort.retriveKSmallestElements();
-    }
+		return nearestRequestSort.retriveKSmallestElements();
+	}
 }

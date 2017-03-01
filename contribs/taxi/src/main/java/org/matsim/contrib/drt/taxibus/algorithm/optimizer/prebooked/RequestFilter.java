@@ -22,8 +22,7 @@
  */
 package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.contrib.drt.TaxibusRequest;
 

@@ -19,19 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.taxibus.run.configuration;
 
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
 import org.matsim.contrib.drt.taxibus.algorithm.utils.TaxibusUtils;
 import org.matsim.contrib.drt.taxibus.run.sim.TaxibusQSimProvider;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.contrib.dynagent.run.*;
+import org.matsim.core.controler.*;
 
 import com.google.inject.util.Providers;
 
@@ -58,7 +54,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 				.parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
 		final TaxibusPassengerOrderManager orderManager;
 
-		if ((tbcg.getAlgorithm().equals("clustered_jsprit"))||(tbcg.getAlgorithm().equals("jsprit"))) {
+		if ((tbcg.getAlgorithm().equals("clustered_jsprit")) || (tbcg.getAlgorithm().equals("jsprit"))) {
 			orderManager = new TaxibusPassengerOrderManager();
 		} else {
 			orderManager = null;
@@ -75,9 +71,11 @@ public class ConfigBasedTaxibusLaunchUtils {
 					addEventHandlerBinding().toInstance(orderManager);
 					bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
 				} else {
-					bind(TaxibusPassengerOrderManager.class).toProvider(Providers.<TaxibusPassengerOrderManager>of(null));
+					bind(TaxibusPassengerOrderManager.class)
+							.toProvider(Providers.<TaxibusPassengerOrderManager> of(null));
 				}
-		        addRoutingModuleBinding(TaxibusUtils.TAXIBUS_MODE).toInstance(new DynRoutingModule(TaxibusUtils.TAXIBUS_MODE));
+				addRoutingModuleBinding(TaxibusUtils.TAXIBUS_MODE)
+						.toInstance(new DynRoutingModule(TaxibusUtils.TAXIBUS_MODE));
 				bind(Fleet.class).toInstance(fleetData);
 
 			}

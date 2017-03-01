@@ -19,137 +19,105 @@
 
 package org.matsim.contrib.drt.taxibus.algorithm.optimizer;
 
-import java.util.Collection;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.drt.tasks.DrtTask;
 import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Requests;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
+public abstract class AbstractTaxibusOptimizer implements TaxibusOptimizer {
+	private final TaxibusOptimizerContext optimContext;
+	private final Collection<TaxibusRequest> unplannedRequests;
 
-public abstract class AbstractTaxibusOptimizer
-    implements TaxibusOptimizer
-{
-    private final TaxibusOptimizerContext optimContext;
-    private final Collection<TaxibusRequest> unplannedRequests;
+	private final boolean doUnscheduleAwaitingRequests;// PLANNED or TAXI_DISPATCHED
+	private final boolean destinationKnown;
+	private final boolean vehicleDiversion;
 
-    private final boolean doUnscheduleAwaitingRequests;//PLANNED or TAXI_DISPATCHED
-    private final boolean destinationKnown;
-    private final boolean vehicleDiversion;
+	private boolean requiresReoptimization = false;
 
-    private boolean requiresReoptimization = false;
+	public AbstractTaxibusOptimizer(TaxibusOptimizerContext optimContext, boolean doUnscheduleAwaitingRequests) {
+		this.optimContext = optimContext;
+		this.unplannedRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
+		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
 
+		destinationKnown = optimContext.scheduler.getParams().destinationKnown;
+		vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
+	}
 
-    public AbstractTaxibusOptimizer(TaxibusOptimizerContext optimContext,
-             boolean doUnscheduleAwaitingRequests)
-    {
-        this.optimContext = optimContext;
-        this.unplannedRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
-       	this.doUnscheduleAwaitingRequests=doUnscheduleAwaitingRequests;
+	@Override
+	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
+		if (!unplannedRequests.isEmpty()) {
+			requiresReoptimization = true;
+		}
 
-        destinationKnown = optimContext.scheduler.getParams().destinationKnown;
-        vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
-    }
+		if (requiresReoptimization) {
 
+			for (Vehicle v : optimContext.vrpData.getVehicles().values()) {
+				optimContext.scheduler.updateTimeline(v.getSchedule());
+			}
+			if (e.getSimulationTime() % 60 == 0) {
+				scheduleUnplannedRequests();
+			}
+			if (doUnscheduleAwaitingRequests && vehicleDiversion) {
+				handleAimlessDriveTasks();
+			}
 
-    @Override
-    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
-    {
-    	if (!unplannedRequests.isEmpty()) { requiresReoptimization = true;
-    	}
-    	
-        if (requiresReoptimization) {
-            
+			requiresReoptimization = false;
+		}
+	}
 
-            for (Vehicle v : optimContext.vrpData.getVehicles().values()) {
-                optimContext.scheduler.updateTimeline(v.getSchedule());
-            }
-            if (e.getSimulationTime() % 60 == 0){
-            scheduleUnplannedRequests();
-            }
-            if (doUnscheduleAwaitingRequests && vehicleDiversion) {
-                handleAimlessDriveTasks();
-            }
-            
-            requiresReoptimization = false;
-        }
-    }
+	protected abstract void scheduleUnplannedRequests();
 
+	protected void handleAimlessDriveTasks() {
+		optimContext.scheduler.stopAllAimlessDriveTasks();
+	}
 
- 
+	@Override
+	public void requestSubmitted(Request request) {
+		unplannedRequests.add((TaxibusRequest) request);
+		requiresReoptimization = true;
+	}
 
+	@Override
+	public void nextTask(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
+		optimContext.scheduler.updateBeforeNextTask(schedule);
 
-    protected abstract void scheduleUnplannedRequests();
+		Task newCurrentTask = schedule.nextTask();
 
-    
-    protected void handleAimlessDriveTasks()
-    {
-        optimContext.scheduler.stopAllAimlessDriveTasks();
-    }
-    
+		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
+			requiresReoptimization = doReoptimizeAfterNextTask((DrtTask) newCurrentTask);
+		}
+	}
 
-    @Override
-    public void requestSubmitted(Request request)
-    {
-        unplannedRequests.add((TaxibusRequest)request);
-        requiresReoptimization = true;
-    }
+	protected boolean doReoptimizeAfterNextTask(DrtTask newCurrentTask) {
+		return !destinationKnown && newCurrentTask.getDrtTaskType() == DrtTaskType.DRIVE_WITH_PASSENGER;
+	}
 
+	@Override
+	public void nextLinkEntered(DriveTask driveTask) {
+		optimContext.scheduler.updateTimeline(driveTask.getSchedule());
 
-    @Override
-    public void nextTask(Vehicle vehicle)
-    {
-        Schedule schedule = vehicle.getSchedule();
-        optimContext.scheduler.updateBeforeNextTask(schedule);
+		// TODO we may here possibly decide whether or not to reoptimize
+		// if (delays/speedups encountered) {requiresReoptimization = true;}
+	}
 
-        Task newCurrentTask = schedule.nextTask();
+	protected TaxibusOptimizerContext getOptimContext() {
+		return optimContext;
+	}
 
-        if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-            requiresReoptimization = doReoptimizeAfterNextTask((DrtTask)newCurrentTask);
-        }
-    }
+	protected Collection<TaxibusRequest> getUnplannedRequests() {
+		return unplannedRequests;
+	}
 
+	protected boolean isRequiresReoptimization() {
+		return requiresReoptimization;
+	}
 
-    protected boolean doReoptimizeAfterNextTask(DrtTask newCurrentTask)
-    {
-        return !destinationKnown
-                && newCurrentTask.getDrtTaskType() == DrtTaskType.DRIVE_WITH_PASSENGER;
-    }
-
-
-    @Override
-    public void nextLinkEntered(DriveTask driveTask)
-    {
-        optimContext.scheduler.updateTimeline(driveTask.getSchedule());
-
-        //TODO we may here possibly decide whether or not to reoptimize
-        //if (delays/speedups encountered) {requiresReoptimization = true;}
-    }
-
-
-protected TaxibusOptimizerContext getOptimContext() {
-	return optimContext;
-}
-
-
-protected Collection<TaxibusRequest> getUnplannedRequests() {
-	return unplannedRequests;
-}
-
-
-protected boolean isRequiresReoptimization() {
-	return requiresReoptimization;
-}
-
-
-protected void setRequiresReoptimization(boolean requiresReoptimization) {
-	this.requiresReoptimization = requiresReoptimization;
-}
+	protected void setRequiresReoptimization(boolean requiresReoptimization) {
+		this.requiresReoptimization = requiresReoptimization;
+	}
 }

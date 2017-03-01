@@ -25,45 +25,34 @@ import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
+public class LinkProviders {
+	public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = new LinkProvider<TaxiRequest>() {
+		public Link apply(TaxiRequest req) {
+			return req.getFromLink();
+		}
+	};
 
-public class LinkProviders
-{
-    public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = new LinkProvider<TaxiRequest>() {
-        public Link apply(TaxiRequest req)
-        {
-            return req.getFromLink();
-        }
-    };
+	public static <D> LinkProvider<DestEntry<D>> createDestEntryToLink() {
+		return new LinkProvider<DestEntry<D>>() {
+			@Override
+			public Link apply(DestEntry<D> dest) {
+				return dest.link;
+			}
+		};
+	}
 
+	public static final LinkProvider<VehicleData.Entry> VEHICLE_ENTRY_TO_LINK = new LinkProvider<VehicleData.Entry>() {
+		public Link apply(VehicleData.Entry veh) {
+			return veh.link;
+		}
+	};
 
-    public static <D> LinkProvider<DestEntry<D>> createDestEntryToLink()
-    {
-        return new LinkProvider<DestEntry<D>>() {
-            @Override
-            public Link apply(DestEntry<D> dest)
-            {
-                return dest.link;
-            }
-        };
-    }
-
-
-    public static final LinkProvider<VehicleData.Entry> VEHICLE_ENTRY_TO_LINK = new LinkProvider<VehicleData.Entry>() {
-        public Link apply(VehicleData.Entry veh)
-        {
-            return veh.link;
-        }
-    };
-
-
-    public static LinkProvider<Vehicle> createImmediateDiversionOrEarliestIdlenessLinkProvider(
-            final TaxiScheduleInquiry scheduleInquiry)
-    {
-        return new LinkProvider<Vehicle>() {
-            public Link apply(Vehicle veh)
-            {
-                return scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh).link;
-            }
-        };
-    }
+	public static LinkProvider<Vehicle> createImmediateDiversionOrEarliestIdlenessLinkProvider(
+			final TaxiScheduleInquiry scheduleInquiry) {
+		return new LinkProvider<Vehicle>() {
+			public Link apply(Vehicle veh) {
+				return scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh).link;
+			}
+		};
+	}
 }

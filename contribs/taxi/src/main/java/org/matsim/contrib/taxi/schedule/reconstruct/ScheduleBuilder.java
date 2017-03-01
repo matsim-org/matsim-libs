@@ -25,84 +25,69 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.reconstruct.StayRecorder.Stay;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
+public class ScheduleBuilder {
+	private Schedule schedule;
+	private TaxiRequest currentRequest = null;
 
-public class ScheduleBuilder
-{
-    private Schedule schedule;
-    private TaxiRequest currentRequest = null;
+	ScheduleBuilder(FleetImpl fleet, Id<Person> personId, Link link, double t0) {
+		Vehicle vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0, Double.NaN);
+		fleet.addVehicle(vehicle);
+		schedule = vehicle.getSchedule();
+	}
 
+	void addDrive(VrpPathWithTravelData vrpPath) {
+		if (currentRequest != null) {
+			schedule.addTask(new TaxiOccupiedDriveTask(vrpPath, currentRequest));
+		} else {
+			schedule.addTask(new TaxiEmptyDriveTask(vrpPath));
+		}
+	}
 
-    ScheduleBuilder(FleetImpl fleet, Id<Person> personId, Link link, double t0)
-    {
-        Vehicle vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0,
-                Double.NaN);
-        fleet.addVehicle(vehicle);
-        schedule = vehicle.getSchedule();
-    }
+	void addStay(Stay stay) {
+		switch (stay.activityType) {
+			case TaxiActionCreator.STAY_ACTIVITY_TYPE:
+			case "Stay":// old naming (TODO to be removed soon)
+				schedule.addTask(new TaxiStayTask(stay.startTime, stay.endTime, stay.link));
+				return;
 
+			case TaxiActionCreator.PICKUP_ACTIVITY_TYPE:
+			case "PassengerPickup":// old naming (TODO to be removed soon)
+				schedule.addTask(new TaxiPickupTask(stay.startTime, stay.endTime, currentRequest));
+				return;
 
-    void addDrive(VrpPathWithTravelData vrpPath)
-    {
-        if (currentRequest != null) {
-            schedule.addTask(new TaxiOccupiedDriveTask(vrpPath, currentRequest));
-        }
-        else {
-            schedule.addTask(new TaxiEmptyDriveTask(vrpPath));
-        }
-    }
+			case TaxiActionCreator.DROPOFF_ACTIVITY_TYPE:
+			case "PassengerDropoff":// old naming (TODO to be removed soon)
+				currentRequest.setToLink(stay.link);// TODO this should be moved to RequestRecorder once the events are
+													// re-ordered
+				schedule.addTask(new TaxiDropoffTask(stay.startTime, stay.endTime, currentRequest));
 
+				currentRequest = null;
+				return;
+		}
+	}
 
-    void addStay(Stay stay)
-    {
-        switch (stay.activityType) {
-            case TaxiActionCreator.STAY_ACTIVITY_TYPE:
-            case "Stay"://old naming (TODO to be removed soon)
-                schedule.addTask(new TaxiStayTask(stay.startTime, stay.endTime, stay.link));
-                return;
+	void addRequest(TaxiRequest request) {
+		if (currentRequest != null) {
+			throw new IllegalStateException("Currently only one passenger per vehicle");
+		}
+		currentRequest = request;
+	}
 
-            case TaxiActionCreator.PICKUP_ACTIVITY_TYPE:
-            case "PassengerPickup"://old naming (TODO to be removed soon)
-                schedule.addTask(new TaxiPickupTask(stay.startTime, stay.endTime, currentRequest));
-                return;
+	void endSchedule(double t1) {
+		if (currentRequest != null) {
+			throw new IllegalStateException();
+		}
 
-            case TaxiActionCreator.DROPOFF_ACTIVITY_TYPE:
-            case "PassengerDropoff"://old naming (TODO to be removed soon)
-                currentRequest.setToLink(stay.link);//TODO this should be moved to RequestRecorder once the events are re-ordered
-                schedule.addTask(new TaxiDropoffTask(stay.startTime, stay.endTime, currentRequest));
+		schedule.getVehicle().setT1(t1);
+		schedule = null;// just to make sure no modifications will be made
+	}
 
-                currentRequest = null;
-                return;
-        }
-    }
-
-
-    void addRequest(TaxiRequest request)
-    {
-        if (currentRequest != null) {
-            throw new IllegalStateException("Currently only one passenger per vehicle");
-        }
-        currentRequest = request;
-    }
-
-
-    void endSchedule(double t1)
-    {
-        if (currentRequest != null) {
-            throw new IllegalStateException();
-        }
-
-        schedule.getVehicle().setT1(t1);
-        schedule = null;//just to make sure no modifications will be made
-    }
-
-
-    boolean isScheduleBuilt()
-    {
-        return schedule == null;
-    }
+	boolean isScheduleBuilt() {
+		return schedule == null;
+	}
 }

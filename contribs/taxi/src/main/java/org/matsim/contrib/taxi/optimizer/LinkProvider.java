@@ -23,9 +23,6 @@ import org.matsim.api.core.v01.network.Link;
 
 import com.google.common.base.Function;
 
-
-public interface LinkProvider<T>
-    extends Function<T, Link>
-{
-    Link apply(T object);
+public interface LinkProvider<T> extends Function<T, Link> {
+	Link apply(T object);
 }

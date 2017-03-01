@@ -24,42 +24,29 @@ import java.util.HashSet;
 import org.matsim.contrib.drt.TaxibusRequest;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
+public class DrtPickupTask extends StayTaskImpl implements DrtTaskWithRequests {
+	private final TaxibusRequest request;
 
+	public DrtPickupTask(double beginTime, double endTime, TaxibusRequest request) {
+		super(beginTime, endTime, request.getFromLink());
 
-public class DrtPickupTask
-    extends StayTaskImpl
-    implements DrtTaskWithRequests
-{
-    private final TaxibusRequest request;
+		this.request = request;
+		request.setPickupTask(this);
+	}
 
+	@Override
+	public DrtTaskType getDrtTaskType() {
+		return DrtTaskType.PICKUP;
+	}
 
-    public DrtPickupTask(double beginTime, double endTime, TaxibusRequest request)
-    {
-        super(beginTime, endTime, request.getFromLink());
+	public TaxibusRequest getRequest() {
+		return request;
+	}
 
-        this.request = request;
-        request.setPickupTask(this);
-    }
-
-    @Override
-    public DrtTaskType getDrtTaskType()
-    {
-        return DrtTaskType.PICKUP;
-    }
-
-
-    public TaxibusRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getDrtTaskType().name() + "]" + super.commonToString();
-    }
-
+	@Override
+	protected String commonToString() {
+		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+	}
 
 	@Override
 	public HashSet<TaxibusRequest> getRequests() {
@@ -68,16 +55,15 @@ public class DrtPickupTask
 		return t;
 	}
 
-
 	@Override
 	public void removeFromRequest(TaxibusRequest request) {
-		if (request!=this.request) {
+		if (request != this.request) {
 			throw new IllegalStateException();
 		}
 		request.setPickupTask(null);
-		
+
 	}
-	
+
 	@Override
 	public void removeFromAllRequests() {
 		removeFromRequest(this.request);

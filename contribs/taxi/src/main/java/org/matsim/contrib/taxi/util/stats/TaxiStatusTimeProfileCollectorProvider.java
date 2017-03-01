@@ -33,54 +33,46 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
 import com.google.inject.*;
 
+public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimListener> {
+	private final Fleet fleet;
+	private final SubmittedTaxiRequestsCollector requestCollector;
+	private final MatsimServices matsimServices;
 
-public class TaxiStatusTimeProfileCollectorProvider
-    implements Provider<MobsimListener>
-{
-    private final Fleet fleet;
-    private final SubmittedTaxiRequestsCollector requestCollector;
-    private final MatsimServices matsimServices;
+	@Inject
+	public TaxiStatusTimeProfileCollectorProvider(Fleet fleet, MatsimServices matsimServices,
+			SubmittedTaxiRequestsCollector requestCollector) {
+		this.fleet = fleet;
+		this.requestCollector = requestCollector;
+		this.matsimServices = matsimServices;
+	}
 
+	@Override
+	public MobsimListener get() {
+		ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
+				TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(fleet), //
+				TaxiTimeProfiles.createRequestsWithStatusCounter(requestCollector.getRequests().values(),
+						TaxiRequestStatus.UNPLANNED));
 
-    @Inject
-    public TaxiStatusTimeProfileCollectorProvider(Fleet fleet, MatsimServices matsimServices,
-            SubmittedTaxiRequestsCollector requestCollector)
-    {
-        this.fleet = fleet;
-        this.requestCollector = requestCollector;
-        this.matsimServices = matsimServices;
-    }
+		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "taxi_status_time_profiles",
+				matsimServices);
 
+		collector.setChartCustomizer(new Customizer() {
+			public void customize(JFreeChart chart, ChartType chartType) {
+				TimeProfileCharts.changeSeriesColors(chart,
+						new Paint[] { new Color(91, 155, 213), // EMPTY_DRIVE
+								new Color(237, 125, 49), // PICKUP
+								new Color(165, 165, 165), // OCCUPIED_DRIVE
+								new Color(255, 192, 0), // DROPOFF
+								new Color(112, 173, 71), // STAY
+								new Color(37, 94, 145) }); // UNPLANNED (requests)
 
-    @Override
-    public MobsimListener get()
-    {
-        ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
-                TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(fleet), //
-                TaxiTimeProfiles.createRequestsWithStatusCounter(
-                        requestCollector.getRequests().values(), TaxiRequestStatus.UNPLANNED));
+				if (chartType == ChartType.StackedArea) {
+					((DefaultTableXYDataset) chart.getXYPlot().getDataset()).removeSeries(5);
+				}
+			}
+		});
 
-        TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
-                "taxi_status_time_profiles", matsimServices);
-
-        collector.setChartCustomizer(new Customizer() {
-            public void customize(JFreeChart chart, ChartType chartType)
-            {
-                TimeProfileCharts.changeSeriesColors(chart,
-                        new Paint[] { new Color(91, 155, 213), // EMPTY_DRIVE
-                                new Color(237, 125, 49), // PICKUP
-                                new Color(165, 165, 165), // OCCUPIED_DRIVE
-                                new Color(255, 192, 0), // DROPOFF
-                                new Color(112, 173, 71), // STAY
-                                new Color(37, 94, 145) }); // UNPLANNED (requests)
-
-                if (chartType == ChartType.StackedArea) {
-                    ((DefaultTableXYDataset)chart.getXYPlot().getDataset()).removeSeries(5);
-                }
-            }
-        });
-
-        collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
-        return collector;
-    }
+		collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+		return collector;
+	}
 }
