@@ -49,6 +49,6 @@ public class PoznanZones {
 			throw new RuntimeException();
 		}
 
-		return (MultiPolygon) features.iterator().next().getDefaultGeometry();
+		return (MultiPolygon)features.iterator().next().getDefaultGeometry();
 	}
 }

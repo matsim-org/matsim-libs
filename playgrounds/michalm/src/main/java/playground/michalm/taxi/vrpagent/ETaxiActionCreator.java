@@ -41,7 +41,7 @@ public class ETaxiActionCreator extends TaxiActionCreator {
 	@Override
 	public DynAction createAction(DynAgent dynAgent, Task task, double now) {
 		if (task instanceof ETaxiChargingTask) {
-			return new ETaxiAtChargerActivity((ETaxiChargingTask) task);
+			return new ETaxiAtChargerActivity((ETaxiChargingTask)task);
 		}
 
 		return super.createAction(dynAgent, task, now);

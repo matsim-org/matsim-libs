@@ -42,7 +42,7 @@ public class EAVUtils {
 		}
 
 		for (Vehicle v : fleet.getVehicles().values()) {
-			Ev ev = ((EvrpVehicle) v).getEv();
+			Ev ev = ((EvrpVehicle)v).getEv();
 			ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
 			ev.setAuxEnergyConsumption(
 					new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider, EAVUtils::isServingCustomer));
@@ -51,12 +51,12 @@ public class EAVUtils {
 	}
 
 	private static boolean isServingCustomer(ElectricVehicle ev) {
-		Schedule schedule = ((Ev) ev).getEvrpVehicle().getSchedule();
+		Schedule schedule = ((Ev)ev).getEvrpVehicle().getSchedule();
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return false;
 		}
 
-		switch (((TaxiTask) schedule.getCurrentTask()).getTaxiTaskType()) {
+		switch (((TaxiTask)schedule.getCurrentTask()).getTaxiTaskType()) {
 			case PICKUP:
 			case OCCUPIED_DRIVE:
 			case DROPOFF:

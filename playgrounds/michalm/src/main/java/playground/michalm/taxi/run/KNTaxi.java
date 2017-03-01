@@ -70,7 +70,7 @@ class KNTaxi {
 	private static void setEndTimeForFirstActivities(Scenario scenario, double time) {
 		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
 		for (Person p : persons.values()) {
-			Activity activity = (Activity) p.getSelectedPlan().getPlanElements().get(0);
+			Activity activity = (Activity)p.getSelectedPlan().getPlanElements().get(0);
 			activity.setEndTime(time);
 		}
 	}

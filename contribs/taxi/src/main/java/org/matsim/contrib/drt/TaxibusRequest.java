@@ -118,7 +118,7 @@ public class TaxibusRequest extends RequestImpl implements PassengerRequest {
 
 			switch (pickupTask.getStatus()) {
 				case PLANNED:
-					DrtTask currentTask = (DrtTask) pickupTask.getSchedule().getCurrentTask();
+					DrtTask currentTask = (DrtTask)pickupTask.getSchedule().getCurrentTask();
 					if (currentTask.getDrtTaskType() == DrtTaskType.DRIVE_EMPTY && //
 							pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
 						return TaxibusRequestStatus.DISPATCHED;

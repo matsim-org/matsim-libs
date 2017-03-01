@@ -90,8 +90,7 @@ public class VehicleAssignmentProblem<D> {
 	// private static int calcPathsForDestinationsCount = 0;
 
 	private PathData[][] createPathDataMatrix() {
-		PathData[][] pathDataMatrix = (PathData[][]) Array.newInstance(PathData.class, vData.getSize(),
-				dData.getSize());
+		PathData[][] pathDataMatrix = (PathData[][])Array.newInstance(PathData.class, vData.getSize(), dData.getSize());
 
 		if (dData.getSize() > vData.getSize()) {
 			calcPathsForVehicles(pathDataMatrix);

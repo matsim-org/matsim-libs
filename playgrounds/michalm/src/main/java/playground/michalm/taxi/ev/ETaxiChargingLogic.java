@@ -60,17 +60,17 @@ public class ETaxiChargingLogic extends FixedSpeedChargingWithQueueingLogic {
 
 	@Override
 	protected void notifyVehicleQueued(ElectricVehicle ev, double now) {
-		((Ev) ev).getAtChargerActivity().vehicleQueued(now);
+		((Ev)ev).getAtChargerActivity().vehicleQueued(now);
 	}
 
 	@Override
 	protected void notifyChargingStarted(ElectricVehicle ev, double now) {
-		((Ev) ev).getAtChargerActivity().chargingStarted(now);
+		((Ev)ev).getAtChargerActivity().chargingStarted(now);
 	}
 
 	@Override
 	protected void notifyChargingEnded(ElectricVehicle ev, double now) {
-		((Ev) ev).getAtChargerActivity().chargingEnded(now);
+		((Ev)ev).getAtChargerActivity().chargingEnded(now);
 	}
 
 	public double getEnergyToCharge(ElectricVehicle ev) {

@@ -76,7 +76,7 @@ public class VehicleGenerator {
 	}
 
 	private void initQueue(double[] vehicleCounts) {
-		int queueCapacity = (int) new Max().evaluate(vehicleCounts) + 1;
+		int queueCapacity = (int)new Max().evaluate(vehicleCounts) + 1;
 		activeVehicles = new PriorityQueue<>(queueCapacity, Vehicles.T1_COMPARATOR);
 	}
 
@@ -95,7 +95,7 @@ public class VehicleGenerator {
 			throw new IllegalArgumentException();
 		}
 
-		return (int) uniform.floorOrCeil(expectedVehicleCount) - activeVehicles.size();
+		return (int)uniform.floorOrCeil(expectedVehicleCount) - activeVehicles.size();
 	}
 
 	private void addVehicles(int count) {

@@ -34,7 +34,7 @@ public class ETaxiChargerProfiles {
 				int queued = 0;
 				int assigned = 0;
 				for (Charger c : evData.getChargers().values()) {
-					ETaxiChargingLogic logic = (ETaxiChargingLogic) c.getLogic();
+					ETaxiChargingLogic logic = (ETaxiChargingLogic)c.getLogic();
 					plugged += logic.getPluggedCount();
 					queued += logic.getQueuedCount();
 					assigned += logic.getAssignedCount();

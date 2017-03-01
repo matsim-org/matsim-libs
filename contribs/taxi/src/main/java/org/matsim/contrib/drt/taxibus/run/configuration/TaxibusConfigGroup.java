@@ -67,7 +67,7 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public static TaxibusConfigGroup get(Config config) {
-		return (TaxibusConfigGroup) config.getModules().get(GROUP_NAME);
+		return (TaxibusConfigGroup)config.getModules().get(GROUP_NAME);
 	}
 
 	@Override

@@ -67,7 +67,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	public void requestSubmitted(Request request) {
 		if (context.requestDeterminator.isRequestServable(request)) {
 			// Logger.getLogger(getClass()).info("Submitting " + request);
-			this.unplannedRequests.add((TaxibusRequest) request);
+			this.unplannedRequests.add((TaxibusRequest)request);
 		}
 	}
 
@@ -121,7 +121,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 				List<Request> allOpenRequests = new ArrayList<>();
 				allOpenRequests.addAll(dueRequests);
 				Collections.shuffle(allOpenRequests, r);
-				int vehiclesOnDispatch = (int) Math.min(context.vehiclesAtSameTime,
+				int vehiclesOnDispatch = (int)Math.min(context.vehiclesAtSameTime,
 						Math.max(1, allOpenRequests.size() / context.minOccupancy));
 				// Logger.getLogger(getClass()).info("vehicles on dispatch "+ vehiclesOnDispatch+" requests "+
 				// allOpenRequests);
@@ -130,7 +130,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 					Set<TaxibusRequest> currentBus = new HashSet<>();
 					for (int o = 0; o < occupancy; o++) {
 						if (!allOpenRequests.isEmpty()) {
-							currentBus.add((TaxibusRequest) allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
+							currentBus.add((TaxibusRequest)allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
 						}
 					}
 
@@ -140,7 +140,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 				for (Set<TaxibusRequest> bus : currentSet) {
 					if (!allOpenRequests.isEmpty()) {
 						if (bus.size() < context.capacity) {
-							bus.add((TaxibusRequest) allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
+							bus.add((TaxibusRequest)allOpenRequests.remove(r.nextInt(allOpenRequests.size())));
 						} else {
 							continue;
 						}
@@ -157,7 +157,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 			}
 			dispatchSet.addAll(bestSet);
 			for (Request r : bestSetLeftOvers) {
-				unplannedRequests.add((TaxibusRequest) r);
+				unplannedRequests.add((TaxibusRequest)r);
 			}
 		}
 
@@ -188,7 +188,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 				cscore += DistanceUtils.calculateSquaredDistance(r.getFromLink().getCoord(), fromCentroid);
 				cscore += DistanceUtils.calculateSquaredDistance(r.getToLink().getCoord(), toCentroid);
 			}
-			cscore = cscore / (double) bus.size();
+			cscore = cscore / (double)bus.size();
 			score += cscore;
 		}
 		return score;

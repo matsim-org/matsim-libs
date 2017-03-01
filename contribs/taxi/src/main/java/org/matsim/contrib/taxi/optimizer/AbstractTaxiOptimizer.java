@@ -93,7 +93,7 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.add((TaxiRequest) request);
+		unplannedRequests.add((TaxiRequest)request);
 		requiresReoptimization = true;
 	}
 
@@ -105,7 +105,7 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 		Task newCurrentTask = schedule.nextTask();
 
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-			requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask) newCurrentTask);
+			requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
 		}
 	}
 

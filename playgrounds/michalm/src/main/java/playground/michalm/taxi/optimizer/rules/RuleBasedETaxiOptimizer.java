@@ -47,7 +47,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 		super(optimContext, params);
 		this.params = params;
 		evData = optimContext.evData;
-		eScheduler = (ETaxiScheduler) optimContext.scheduler;
+		eScheduler = (ETaxiScheduler)optimContext.scheduler;
 		eDispatchFinder = new BestChargerFinder(getDispatchFinder());
 	}
 
@@ -63,7 +63,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	private void chargeIdleUnderchargedVehicles(Iterable<Vehicle> vehicles) {
 		for (Vehicle v : vehicles) {
 			Dispatch<Charger> eDispatch = eDispatchFinder.findBestChargerForVehicle(v, evData.getChargers().values());
-			eScheduler.scheduleCharging((EvrpVehicle) v, eDispatch.destination, eDispatch.path);
+			eScheduler.scheduleCharging((EvrpVehicle)v, eDispatch.destination, eDispatch.path);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	}
 
 	private boolean isUndercharged(Vehicle v) {
-		Battery b = ((EvrpVehicle) v).getEv().getBattery();
+		Battery b = ((EvrpVehicle)v).getEv().getBattery();
 		return b.getSoc() < params.minRelativeSoc * b.getCapacity();
 	}
 }

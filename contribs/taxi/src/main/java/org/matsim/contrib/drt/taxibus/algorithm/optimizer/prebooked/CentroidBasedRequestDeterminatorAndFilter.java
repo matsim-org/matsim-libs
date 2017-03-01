@@ -56,7 +56,7 @@ public class CentroidBasedRequestDeterminatorAndFilter implements RequestDetermi
 
 	@Override
 	public boolean isRequestServable(Request request) {
-		TaxibusRequest r = (TaxibusRequest) request;
+		TaxibusRequest r = (TaxibusRequest)request;
 		Coord fromCoord = r.getFromLink().getCoord();
 		Coord toCoord = r.getToLink().getCoord();
 		if (((CoordUtils.calcEuclideanDistance(fromCoord, coord1) <= radius1)

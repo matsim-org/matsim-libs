@@ -47,7 +47,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 		// this is done exactly once per simulation
 
 		Scenario scenario = controler.getScenario();
-		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModules()
+		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup)scenario.getConfig().getModules()
 				.get(TaxibusConfigGroup.GROUP_NAME);
 		final FleetImpl fleetData = new FleetImpl();
 		new VehicleReader(scenario.getNetwork(), fleetData)

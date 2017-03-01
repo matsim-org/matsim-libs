@@ -59,7 +59,7 @@ public class VisumMatrixReader {
 			}
 
 			// values
-			matrix = (double[][]) Array.newInstance(double.class, count, count);
+			matrix = (double[][])Array.newInstance(double.class, count, count);
 			for (int i = 0; i < count; i++) {
 				for (int j = 0; j < count; j++) {
 					matrix[i][j] = nr.nextDouble();

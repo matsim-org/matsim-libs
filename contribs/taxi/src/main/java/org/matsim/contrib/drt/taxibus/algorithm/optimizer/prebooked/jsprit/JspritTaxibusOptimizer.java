@@ -86,7 +86,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 	public void requestSubmitted(Request request) {
 		if (context.requestDeterminator.isRequestServable(request)) {
 			// Logger.getLogger(getClass()).info("Submitting " + request);
-			this.unplannedRequests.add((TaxibusRequest) request);
+			this.unplannedRequests.add((TaxibusRequest)request);
 		}
 	}
 

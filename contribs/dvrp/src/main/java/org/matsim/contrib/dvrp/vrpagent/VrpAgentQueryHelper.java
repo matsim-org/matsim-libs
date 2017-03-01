@@ -56,7 +56,7 @@ public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			Task currentTask = schedule.getCurrentTask();
 			if (currentTask instanceof StayTask) {
-				return createActivity((StayTask) currentTask);
+				return createActivity((StayTask)currentTask);
 			}
 		}
 
@@ -75,10 +75,10 @@ public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			for (Task t : schedule.getTasks()) {
 				if (t instanceof DriveTask) {
-					planElements.add(createLeg((DriveTask) t));
+					planElements.add(createLeg((DriveTask)t));
 				} else {
 
-					planElements.add(createActivity((StayTask) t));
+					planElements.add(createActivity((StayTask)t));
 				}
 			}
 		}
@@ -87,7 +87,7 @@ public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
 	}
 
 	private Vehicle getVehicle(MobsimAgent mobsimAgent) {
-		return ((VrpAgentLogic) ((DynAgent) mobsimAgent).getAgentLogic()).getVehicle();
+		return ((VrpAgentLogic)((DynAgent)mobsimAgent).getAgentLogic()).getVehicle();
 	}
 
 	protected Leg createLeg(DriveTask task) {

@@ -77,7 +77,7 @@ public class RunTaxiBenchmark {
 		Scenario scenario = new ScenarioBuilder(config).build();
 
 		if (config.network().isTimeVariantNetwork()) {// TODO use guice to choose between TimeVariantLinkFactories?
-			((Network) scenario.getNetwork()).getFactory()
+			((Network)scenario.getNetwork()).getFactory()
 					.setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
 		}
 

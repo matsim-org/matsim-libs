@@ -77,7 +77,7 @@ public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 		for (Vehicle veh : getOptimContext().fleet.getVehicles().values()) {
 			if (getOptimContext().scheduler.isIdle(veh)) {
-				Link link = ((StayTask) veh.getSchedule().getCurrentTask()).getLink();
+				Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
 				Zone zone = linkToZone.get(link.getId());
 				if (zone != null) {
 					PriorityQueue<Vehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());

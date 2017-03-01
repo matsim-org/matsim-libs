@@ -67,7 +67,7 @@ public class PolygonBasedFilter {
 	public static Predicate<SimpleFeature> createFeatureInsidePolygonPredicate(final Geometry polygonGeometry) {
 		return new Predicate<SimpleFeature>() {
 			public boolean apply(SimpleFeature feature) {
-				return polygonGeometry.contains((Geometry) feature.getDefaultGeometry());
+				return polygonGeometry.contains((Geometry)feature.getDefaultGeometry());
 			}
 		};
 	}
@@ -88,6 +88,6 @@ public class PolygonBasedFilter {
 			throw new RuntimeException("No. of features: " + ftColl.size() + "; should be 1");
 		}
 
-		return (Geometry) ftColl.iterator().next().getDefaultGeometry();
+		return (Geometry)ftColl.iterator().next().getDefaultGeometry();
 	}
 }

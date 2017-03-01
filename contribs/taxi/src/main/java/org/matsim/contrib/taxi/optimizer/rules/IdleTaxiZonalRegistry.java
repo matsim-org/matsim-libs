@@ -54,7 +54,7 @@ public class IdleTaxiZonalRegistry {
 	}
 
 	public void addVehicle(Vehicle vehicle) {
-		TaxiStayTask stayTask = (TaxiStayTask) vehicle.getSchedule().getCurrentTask();
+		TaxiStayTask stayTask = (TaxiStayTask)vehicle.getSchedule().getCurrentTask();
 		Id<Zone> zoneId = getZoneId(stayTask);
 
 		if (vehiclesInZones.get(zoneId).put(vehicle.getId(), vehicle) != null) {
@@ -67,7 +67,7 @@ public class IdleTaxiZonalRegistry {
 	}
 
 	public void removeVehicle(Vehicle vehicle) {
-		TaxiStayTask stayTask = (TaxiStayTask) Schedules.getPreviousTask(vehicle.getSchedule());
+		TaxiStayTask stayTask = (TaxiStayTask)Schedules.getPreviousTask(vehicle.getSchedule());
 		Id<Zone> zoneId = getZoneId(stayTask);
 
 		if (vehiclesInZones.get(zoneId).remove(vehicle.getId()) == null) {

@@ -65,7 +65,7 @@ public class OneTaxiOptimizer implements VrpOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		Schedule schedule = vehicle.getSchedule();
-		StayTask lastTask = (StayTask) Schedules.getLastTask(schedule);// only WaitTask possible here
+		StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
 		double currentTime = timer.getTimeOfDay();
 
 		switch (lastTask.getStatus()) {
@@ -82,7 +82,7 @@ public class OneTaxiOptimizer implements VrpOptimizer {
 				throw new IllegalStateException();
 		}
 
-		OneTaxiRequest req = (OneTaxiRequest) request;
+		OneTaxiRequest req = (OneTaxiRequest)request;
 		Link fromLink = req.getFromLink();
 		Link toLink = req.getToLink();
 

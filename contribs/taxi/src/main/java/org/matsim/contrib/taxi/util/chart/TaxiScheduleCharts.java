@@ -18,7 +18,7 @@ public class TaxiScheduleCharts {
 	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = new DescriptionCreator() {
 		@Override
 		public String create(Task task) {
-			return ((TaxiTask) task).getTaxiTaskType().name();
+			return ((TaxiTask)task).getTaxiTaskType().name();
 		}
 	};
 
@@ -26,11 +26,11 @@ public class TaxiScheduleCharts {
 		@Override
 		public String create(Task task) {
 			if (task instanceof TaxiTaskWithRequest) {
-				TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest) task;
+				TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
 				return taskWithReq.getTaxiTaskType().name() + "_" + taskWithReq.getRequest().getPassenger().getId();
 			}
 
-			return ((TaxiTask) task).getTaxiTaskType().name();
+			return ((TaxiTask)task).getTaxiTaskType().name();
 		}
 	};
 
@@ -42,7 +42,7 @@ public class TaxiScheduleCharts {
 
 	public static final PaintSelector TAXI_PAINT_SELECTOR = new PaintSelector() {
 		public Paint select(Task task) {
-			switch (((TaxiTask) task).getTaxiTaskType()) {
+			switch (((TaxiTask)task).getTaxiTaskType()) {
 				case PICKUP:
 				case DROPOFF:
 					return PICKUP_DROPOFF_COLOR;

@@ -48,7 +48,7 @@ public class ZoneShpReader {
 		for (SimpleFeature ft : features) {
 			String id = ft.getAttribute(idHeader).toString();
 			Zone z = zones.get(Id.create(id, Zone.class));
-			z.setMultiPolygon((MultiPolygon) ft.getDefaultGeometry());
+			z.setMultiPolygon((MultiPolygon)ft.getDefaultGeometry());
 		}
 	}
 }

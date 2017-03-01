@@ -43,8 +43,8 @@ public class UniformRandom {
 			return from;
 		}
 
-		long delta = (long) ((1L + (long) to - (long) from) * rg.nextDouble());
-		return (int) (from + delta);
+		long delta = (long)((1L + (long)to - (long)from) * rg.nextDouble());
+		return (int)(from + delta);
 	}
 
 	public double floorOrCeil(double value) {

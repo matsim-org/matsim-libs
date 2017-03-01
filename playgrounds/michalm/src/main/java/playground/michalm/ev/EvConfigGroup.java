@@ -28,7 +28,7 @@ public class EvConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("deprecation")
 	public static EvConfigGroup get(Config config) {
-		return (EvConfigGroup) config.getModule(GROUP_NAME);
+		return (EvConfigGroup)config.getModule(GROUP_NAME);
 	}
 
 	public static final String CHARGE_TIME_STEP = "chargeTimeStep";

@@ -62,7 +62,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 		Schedule schedule = vehicle.getSchedule();
 		divertOrAppendDrive(schedule, vrpPath);
 
-		ETaxiChargingLogic logic = (ETaxiChargingLogic) charger.getLogic();
+		ETaxiChargingLogic logic = (ETaxiChargingLogic)charger.getLogic();
 		Ev ev = vehicle.getEv();
 		double chargingEndTime = vrpPath.getArrivalTime() + logic.estimateMaxWaitTimeOnArrival()
 				+ logic.estimateChargeTime(ev);
@@ -91,7 +91,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	@Override
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
 		Task currentTask = schedule.getCurrentTask();
-		switch (((TaxiTask) currentTask).getTaxiTaskType()) {
+		switch (((TaxiTask)currentTask).getTaxiTaskType()) {
 			case EMPTY_DRIVE:
 				Task nextTask = Schedules.getNextTask(schedule);
 				if (!(nextTask instanceof ETaxiChargingTask)) {
@@ -133,7 +133,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 			}
 
 			schedule.removeTask(task);
-			taskRemovedFromSchedule(schedule, (TaxiTask) task);
+			taskRemovedFromSchedule(schedule, (TaxiTask)task);
 		}
 
 		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
@@ -148,7 +148,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 			// we can use chargeEndTime for both begin and end times,
 			// the right endTime is set in TaxiScheduler.removeAwaitingRequestsImpl()
 			double chargeEndTime = lastTask.getEndTime();
-			Link chargeLink = ((ETaxiChargingTask) lastTask).getLink();
+			Link chargeLink = ((ETaxiChargingTask)lastTask).getLink();
 			schedule.addTask(new TaxiStayTask(chargeEndTime, chargeEndTime, chargeLink));
 		}
 	}
@@ -156,7 +156,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	@Override
 	protected void taskRemovedFromSchedule(Schedule schedule, TaxiTask task) {
 		if (task instanceof ETaxiChargingTask) {
-			((ETaxiChargingTask) task).removeFromChargerLogic();
+			((ETaxiChargingTask)task).removeFromChargerLogic();
 			vehiclesWithUnscheduledCharging.add(schedule.getVehicle());
 		} else {
 			super.taskRemovedFromSchedule(schedule, task);

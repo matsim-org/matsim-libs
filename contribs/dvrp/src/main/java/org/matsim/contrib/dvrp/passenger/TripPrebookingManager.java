@@ -72,7 +72,7 @@ public class TripPrebookingManager implements MobsimInitializedListener, MobsimB
 
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
-		double startTime = ((QSim) e.getQueueSimulation()).getSimTimer().getSimStartTime();
+		double startTime = ((QSim)e.getQueueSimulation()).getSimTimer().getSimStartTime();
 		prebookTrips(startTime - 1);
 	}
 

@@ -18,15 +18,15 @@ public class Array2DReader {
 	public static final Strategy STRING_STRATEGY = new StringStrategy();
 
 	public static double[][] getDoubleArray(String file, int cols) {
-		return (double[][]) getArray(file, cols, DOUBLE_STRATEGY);
+		return (double[][])getArray(file, cols, DOUBLE_STRATEGY);
 	}
 
 	public static int[][] getIntArray(String file, int cols) {
-		return (int[][]) getArray(file, cols, INT_STRATEGY);
+		return (int[][])getArray(file, cols, INT_STRATEGY);
 	}
 
 	public static String[][] getStringArray(String file, int cols) {
-		return (String[][]) getArray(file, cols, STRING_STRATEGY);
+		return (String[][])getArray(file, cols, STRING_STRATEGY);
 	}
 
 	public static Object getArray(String file, int cols, Strategy strategy) {
@@ -79,7 +79,7 @@ public class Array2DReader {
 		Object row0 = rows.get(0);
 		Class<?> clazz = row0 != null ? row0.getClass() : Object.class;
 
-		return rows.toArray((Object[]) Array.newInstance(clazz, rows.size()));
+		return rows.toArray((Object[])Array.newInstance(clazz, rows.size()));
 	}
 
 	public static interface Strategy {
@@ -94,7 +94,7 @@ public class Array2DReader {
 		}
 
 		public void addToRow(Object row, int idx, String element) {
-			((double[]) row)[idx] = Double.parseDouble(element);
+			((double[])row)[idx] = Double.parseDouble(element);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class Array2DReader {
 		}
 
 		public void addToRow(Object row, int idx, String element) {
-			((int[]) row)[idx] = Integer.parseInt(element);
+			((int[])row)[idx] = Integer.parseInt(element);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class Array2DReader {
 		}
 
 		public void addToRow(Object row, int idx, String element) {
-			((String[]) row)[idx] = element;
+			((String[])row)[idx] = element;
 		}
 	}
 }

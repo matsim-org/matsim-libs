@@ -56,7 +56,7 @@ public class AudiAVSmallChargingInfrastructureCreator {
 			List<Charger> fractChargers = new ArrayList<>();
 			int totalPlugs = 0;
 			for (Charger ch : data.getChargers().values()) {
-				int plugs = (int) uniform.floorOrCeil(fraction * ch.getPlugs());
+				int plugs = (int)uniform.floorOrCeil(fraction * ch.getPlugs());
 				if (plugs > 0) {
 					fractChargers.add(new ChargerImpl(ch.getId(), ch.getPower(), plugs, ch.getLink()));
 					totalPlugs += plugs;

@@ -42,8 +42,8 @@ public class SquareGrid {
 
 		initBounds();
 
-		cols = (int) Math.ceil((maxX - minX) / cellSize);
-		rows = (int) Math.ceil((maxY - minY) / cellSize);
+		cols = (int)Math.ceil((maxX - minX) / cellSize);
+		rows = (int)Math.ceil((maxY - minY) / cellSize);
 
 		initZones();
 	}
@@ -94,8 +94,8 @@ public class SquareGrid {
 	}
 
 	public Zone getZone(Coord coord) {
-		int r = (int) ((coord.getY() - minY) / cellSize);// == Math.floor
-		int c = (int) ((coord.getX() - minX) / cellSize);// == Math.floor
+		int r = (int)((coord.getY() - minY) / cellSize);// == Math.floor
+		int c = (int)((coord.getX() - minX) / cellSize);// == Math.floor
 		return zones[r * cols + c];
 	}
 }

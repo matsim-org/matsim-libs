@@ -95,7 +95,7 @@ public class JspritDispatchCreator implements RequestDispatcher {
 				.addCapacityDimension(0, commonRequests.size());
 		VehicleType vehicleType = vehicleTypeBuilder.build();
 
-		DrtStayTask ct = (DrtStayTask) veh.getSchedule().getCurrentTask();
+		DrtStayTask ct = (DrtStayTask)veh.getSchedule().getCurrentTask();
 
 		Coord startCoord = ct.getLink().getCoord();
 		String vId = veh.getId().toString();
@@ -129,7 +129,7 @@ public class JspritDispatchCreator implements RequestDispatcher {
 			Logger.getLogger(getClass()).error("Solution has more than one vehicle on dispatch???");
 			throw new RuntimeException();
 		}
-		VehicleRoute vr = (VehicleRoute) bestSolution.getRoutes().toArray()[0];
+		VehicleRoute vr = (VehicleRoute)bestSolution.getRoutes().toArray()[0];
 		Iterator<TourActivity> it = vr.getActivities().iterator();
 		TourActivity lastAct = it.next();
 		Link lastDestination = context.scenario.getNetwork().getLinks()
@@ -166,7 +166,7 @@ public class JspritDispatchCreator implements RequestDispatcher {
 		Vehicle bestVehicle = null;
 		for (Vehicle veh : this.context.vrpData.getVehicles().values()) {
 			if (context.scheduler.isIdle(veh)) {
-				DrtStayTask ct = (DrtStayTask) veh.getSchedule().getCurrentTask();
+				DrtStayTask ct = (DrtStayTask)veh.getSchedule().getCurrentTask();
 				Coord startCoord = ct.getLink().getCoord();
 				double distance = DistanceUtils.calculateSquaredDistance(startCoord, coord);
 				if (distance < bestDistance) {

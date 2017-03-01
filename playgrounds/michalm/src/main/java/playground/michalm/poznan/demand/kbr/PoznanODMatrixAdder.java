@@ -57,7 +57,7 @@ public class PoznanODMatrixAdder {
 			double[][] odMatrix = VisumMatrixReader.readMatrix(odMatrixFile);
 
 			if (totalODMatrices[i] == null) {
-				totalODMatrices[i] = (double[][]) Array.newInstance(//
+				totalODMatrices[i] = (double[][])Array.newInstance(//
 						double.class, odMatrix.length, odMatrix[0].length);
 			}
 

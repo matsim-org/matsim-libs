@@ -65,11 +65,11 @@ public class ETaxiStatsCalculator {
 
 		for (Task t : schedule.getTasks()) {
 			if (t instanceof ETaxiChargingTask) {
-				ETaxiChargingTask chargingTask = (ETaxiChargingTask) t;
+				ETaxiChargingTask chargingTask = (ETaxiChargingTask)t;
 
-				int arrivalTime = (int) t.getBeginTime();
-				int chargingStartTime = (int) chargingTask.getChargingStartedTime();
-				int chargingEndTime = (int) t.getEndTime();
+				int arrivalTime = (int)t.getBeginTime();
+				int chargingStartTime = (int)chargingTask.getChargingStartedTime();
+				int chargingEndTime = (int)t.getEndTime();
 
 				updateHourlyStateTimes(ETaxiState.QUEUED, arrivalTime, chargingStartTime);
 				updateHourlyStateTimes(ETaxiState.PLUGGED, chargingStartTime, chargingEndTime);

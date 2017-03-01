@@ -129,7 +129,7 @@ public class SharedTaxiDispatchFinder {
 				throw new IllegalStateException("Not supported by this optimizer");
 			}
 
-			TaxibusRequest firstRequest = (TaxibusRequest) currentRequests.toArray()[0];
+			TaxibusRequest firstRequest = (TaxibusRequest)currentRequests.toArray()[0];
 			double pickup2pickupDist = DistanceUtils.calculateSquaredDistance(firstRequest.getFromLink().getCoord(),
 					req.getFromLink().getCoord());
 			double firstEuclidDist = DistanceUtils.calculateSquaredDistance(firstRequest.getFromLink().getCoord(),

@@ -40,7 +40,7 @@ public class SubzoneUtils {
 			GeometryCollector geometryCollector = new GeometryCollector();
 
 			for (SimpleFeature f : subzonePattern) {
-				Geometry featureGeometry = (Geometry) f.getDefaultGeometry();
+				Geometry featureGeometry = (Geometry)f.getDefaultGeometry();
 
 				try {
 					geometryCollector.add(zoneMultiPoly.intersection(featureGeometry));

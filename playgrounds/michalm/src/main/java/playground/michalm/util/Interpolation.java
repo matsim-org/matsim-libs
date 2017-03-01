@@ -25,7 +25,7 @@ public class Interpolation {
 	}
 
 	public static double interpolate(double[] vals, int timeInterval, double time) {
-		int idx0 = (int) time / timeInterval;
+		int idx0 = (int)time / timeInterval;
 		int idx1 = idx0 + 1;
 
 		double weight1 = time % timeInterval;
@@ -36,7 +36,7 @@ public class Interpolation {
 	}
 
 	public static double interpolate(int[] vals, int timeInterval, double time) {
-		int idx0 = (int) time / timeInterval;
+		int idx0 = (int)time / timeInterval;
 		int idx1 = idx0 + 1;
 
 		double weight1 = time % timeInterval;

@@ -65,7 +65,7 @@ public class TransimsJTRRouter extends JTRRouter {
 	}
 
 	protected void addPlan(int id, int startTime, Route route, int subFlow) {
-		TransimsFlow tFlow = (TransimsFlow) route.getInFlow();
+		TransimsFlow tFlow = (TransimsFlow)route.getInFlow();
 		int type = tFlow.types[subFlow];
 		int subType = tFlow.subTypes[subFlow];
 

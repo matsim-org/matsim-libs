@@ -44,7 +44,7 @@ public class TaxiSimulationConsistencyChecker implements AfterMobsimListener {
 
 	public void addCheckAllRequestsPerformed() {
 		for (Request r : requestCollector.getRequests().values()) {
-			TaxiRequest tr = (TaxiRequest) r;
+			TaxiRequest tr = (TaxiRequest)r;
 			if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
 				if (tcg.isBreakSimulationIfNotAllRequestsServed()) {
 					throw new IllegalStateException();

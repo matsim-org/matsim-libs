@@ -39,7 +39,7 @@ public class ETaxiUtils {
 		}
 
 		for (Vehicle v : fleet.getVehicles().values()) {
-			Ev ev = ((EvrpVehicle) v).getEv();
+			Ev ev = ((EvrpVehicle)v).getEv();
 			ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
 			ev.setAuxEnergyConsumption(new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider, ETaxiUtils::isTurnedOn));
 			evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);
@@ -47,6 +47,6 @@ public class ETaxiUtils {
 	}
 
 	private static boolean isTurnedOn(ElectricVehicle ev) {
-		return ((Ev) ev).getEvrpVehicle().getSchedule().getStatus() == ScheduleStatus.STARTED;
+		return ((Ev)ev).getEvrpVehicle().getSchedule().getStatus() == ScheduleStatus.STARTED;
 	}
 }

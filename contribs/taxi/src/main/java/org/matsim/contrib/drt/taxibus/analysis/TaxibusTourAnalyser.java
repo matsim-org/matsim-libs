@@ -229,7 +229,7 @@ public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivitySta
 	}
 
 	private int getHour(double time) {
-		int hour = (int) Math.floor(time / (3600));
+		int hour = (int)Math.floor(time / (3600));
 		if (hour > 23) {
 			hour = hour % 24;
 		}

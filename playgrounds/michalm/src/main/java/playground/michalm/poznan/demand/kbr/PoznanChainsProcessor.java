@@ -134,7 +134,7 @@ public class PoznanChainsProcessor {
 					error(row, col, "not integer");
 				}
 
-				return (int) v;
+				return (int)v;
 			default:
 				error(row, col, "not a number");
 				return -1;

@@ -131,7 +131,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 		while (vehIter.hasNext() && !getUnplannedRequests().isEmpty()) {
 			Vehicle veh = vehIter.next();
 
-			Link link = ((TaxiStayTask) veh.getSchedule().getCurrentTask()).getLink();
+			Link link = ((TaxiStayTask)veh.getSchedule().getCurrentTask()).getLink();
 			Iterable<TaxiRequest> selectedReqs = getUnplannedRequests().size() > params.nearestRequestsLimit
 					? unplannedRequestRegistry.findNearestRequests(link.getToNode(), params.nearestRequestsLimit)
 					: getUnplannedRequests();
@@ -148,7 +148,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		super.requestSubmitted(request);
-		unplannedRequestRegistry.addRequest((TaxiRequest) request);
+		unplannedRequestRegistry.addRequest((TaxiRequest)request);
 	}
 
 	@Override
@@ -157,7 +157,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-			TaxiStayTask lastTask = (TaxiStayTask) Schedules.getLastTask(schedule);
+			TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(schedule);
 			if (lastTask.getBeginTime() < schedule.getVehicle().getT1()) {
 				idleTaxiRegistry.removeVehicle(schedule.getVehicle());
 			}
@@ -165,7 +165,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 			idleTaxiRegistry.addVehicle(schedule.getVehicle());
 		} else {
 			if (!Schedules.isFirstTask(schedule.getCurrentTask())) {
-				TaxiTask previousTask = (TaxiTask) Schedules.getPreviousTask(schedule);
+				TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
 				if (isWaitStay(previousTask)) {
 					idleTaxiRegistry.removeVehicle(schedule.getVehicle());
 				}

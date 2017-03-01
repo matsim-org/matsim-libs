@@ -44,7 +44,7 @@ public class AudiAVSmallFleetCreator {
 
 		UniformRandom uniform = RandomUtils.getGlobalUniform();
 		for (int i = 5; i <= 20; i++) {
-			double fraction = (double) i / 10_000;
+			double fraction = (double)i / 10_000;
 			List<Vehicle> fractVehs = Lists
 					.newArrayList(Iterables.filter(fleet.getVehicles().values(), v -> uniform.trueOrFalse(fraction)));
 			new VehicleWriter(fractVehs).write(fractVehFilePrefix + fractVehs.size() + ".xml.gz");

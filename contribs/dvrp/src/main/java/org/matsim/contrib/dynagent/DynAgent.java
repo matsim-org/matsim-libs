@@ -78,12 +78,12 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 		DynAction nextDynAction = agentLogic.computeNextAction(oldDynAction, now);
 
 		if (nextDynAction instanceof DynActivity) {
-			dynActivity = (DynActivity) nextDynAction;
+			dynActivity = (DynActivity)nextDynAction;
 			state = MobsimAgent.State.ACTIVITY;
 
 			events.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
 		} else {
-			dynLeg = (DynLeg) nextDynAction;
+			dynLeg = (DynLeg)nextDynAction;
 			state = MobsimAgent.State.LEG;
 		}
 	}
@@ -140,7 +140,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 	// VehicleUsingAgent
 	@Override
 	public final Id<Vehicle> getPlannedVehicleId() {
-		Id<Vehicle> vehId = ((DriverDynLeg) dynLeg).getPlannedVehicleId();
+		Id<Vehicle> vehId = ((DriverDynLeg)dynLeg).getPlannedVehicleId();
 		// according to BasicPlanAgentImpl
 		return vehId != null ? vehId : Id.create(id, Vehicle.class);
 	}
@@ -172,13 +172,13 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 	// DriverAgent
 	@Override
 	public Id<Link> chooseNextLinkId() {
-		return ((DriverDynLeg) dynLeg).getNextLinkId();
+		return ((DriverDynLeg)dynLeg).getNextLinkId();
 	}
 
 	// DriverAgent
 	@Override
 	public void notifyMoveOverNode(Id<Link> newLinkId) {
-		((DriverDynLeg) dynLeg).movedOverNode(newLinkId);
+		((DriverDynLeg)dynLeg).movedOverNode(newLinkId);
 		currentLinkId = newLinkId;
 	}
 
@@ -222,25 +222,25 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 	@Override
 	public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
 			TransitVehicle transitVehicle) {
-		return ((PTPassengerDynLeg) dynLeg).getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
+		return ((PTPassengerDynLeg)dynLeg).getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
 	}
 
 	// PTPassengerAgent
 	@Override
 	public boolean getExitAtStop(TransitStopFacility stop) {
-		return ((PTPassengerDynLeg) dynLeg).getExitAtStop(stop);
+		return ((PTPassengerDynLeg)dynLeg).getExitAtStop(stop);
 	}
 
 	// PTPassengerAgent
 	@Override
 	public Id<TransitStopFacility> getDesiredAccessStopId() {
-		return ((PTPassengerDynLeg) dynLeg).getDesiredAccessStopId();
+		return ((PTPassengerDynLeg)dynLeg).getDesiredAccessStopId();
 	}
 
 	// PTPassengerAgent
 	@Override
 	public Id<TransitStopFacility> getDesiredDestinationStopId() {
-		return ((PTPassengerDynLeg) dynLeg).getDesiredDestinationStopId();
+		return ((PTPassengerDynLeg)dynLeg).getDesiredDestinationStopId();
 	}
 
 	// PTPassengerAgent

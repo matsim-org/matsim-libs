@@ -67,7 +67,7 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 								new Color(37, 94, 145) }); // UNPLANNED (requests)
 
 				if (chartType == ChartType.StackedArea) {
-					((DefaultTableXYDataset) chart.getXYPlot().getDataset()).removeSeries(5);
+					((DefaultTableXYDataset)chart.getXYPlot().getDataset()).removeSeries(5);
 				}
 			}
 		});

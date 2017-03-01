@@ -48,7 +48,7 @@ public class BarcelonaNetworkChangeEventsGenerator {
 			prevFactor = SCALING_FACTORS[i];
 
 			if (relativeFactor != 1) {
-				NetworkChangeEvent e = new NetworkChangeEvent((double) (i * 3600));
+				NetworkChangeEvent e = new NetworkChangeEvent((double)(i * 3600));
 				e.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, relativeFactor));
 				e.addLinks(network.getLinks().values());
 				this.networkChangeEvents.add(e);

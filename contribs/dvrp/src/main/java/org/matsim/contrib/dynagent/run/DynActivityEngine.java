@@ -105,9 +105,9 @@ public class DynActivityEngine extends ActivityEngine {
 		} else {
 			// The agent commences an activity on this link.
 			if (beforeFirstSimStep) {
-				dynAgents.add((DynAgent) agent);
+				dynAgents.add((DynAgent)agent);
 			} else {
-				newDynAgents.add((DynAgent) agent);
+				newDynAgents.add((DynAgent)agent);
 			}
 
 			internalInterface.registerAdditionalAgentOnLink(agent);

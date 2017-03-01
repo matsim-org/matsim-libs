@@ -11,21 +11,21 @@ import org.junit.Test;
  */
 public class Array2DReaderTest {
 	private void assertDoubleArray(String contents, double[][] expected) throws IOException {
-		double[][] actual = (double[][]) Array2DReader.getArray(createReader(contents), expected[0].length,
+		double[][] actual = (double[][])Array2DReader.getArray(createReader(contents), expected[0].length,
 				Array2DReader.DOUBLE_STRATEGY);
 
 		Array2DAssert.assertEquals(expected, actual);
 	}
 
 	private void assertIntArray(String contents, int[][] expected) throws IOException {
-		int[][] actual = (int[][]) Array2DReader.getArray(createReader(contents), expected[0].length,
+		int[][] actual = (int[][])Array2DReader.getArray(createReader(contents), expected[0].length,
 				Array2DReader.INT_STRATEGY);
 
 		Array2DAssert.assertEquals(expected, actual);
 	}
 
 	private void assertStringArray(String contents, String[][] expected) throws IOException {
-		String[][] actual = (String[][]) Array2DReader.getArray(createReader(contents), expected[0].length,
+		String[][] actual = (String[][])Array2DReader.getArray(createReader(contents), expected[0].length,
 				Array2DReader.STRING_STRATEGY);
 
 		Array2DAssert.assertEquals(expected, actual);

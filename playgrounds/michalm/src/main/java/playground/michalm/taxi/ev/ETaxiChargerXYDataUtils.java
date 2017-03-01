@@ -43,7 +43,7 @@ public class ETaxiChargerXYDataUtils {
 
 			@Override
 			public String[] calculate(Charger charger) {
-				ETaxiChargingLogic logic = (ETaxiChargingLogic) charger.getLogic();
+				ETaxiChargingLogic logic = (ETaxiChargingLogic)charger.getLogic();
 				int plugs = charger.getPlugs();
 				return new String[] { charger.getPlugs() + "", //
 						getValue(logic.getPluggedCount(), plugs, relative), //
@@ -52,7 +52,7 @@ public class ETaxiChargerXYDataUtils {
 			}
 
 			private String getValue(int count, int plugs, boolean relative) {
-				return relative ? ((double) count / plugs) + "" : count + "";
+				return relative ? ((double)count / plugs) + "" : count + "";
 			}
 		};
 	}

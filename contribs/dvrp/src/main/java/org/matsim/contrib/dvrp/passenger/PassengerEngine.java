@@ -102,7 +102,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 			return false;
 		}
 
-		MobsimPassengerAgent passenger = (MobsimPassengerAgent) agent;
+		MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
 
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 		double departureTime = now;

@@ -29,7 +29,7 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("deprecation")
 	public static TaxiConfigGroup get(Config config) {
-		return (TaxiConfigGroup) config.getModule(GROUP_NAME);
+		return (TaxiConfigGroup)config.getModule(GROUP_NAME);
 		// yy this will fail if the module is not in the config. Is this intended? If not, use
 		// ConfigUtils.addOrCreateModule(...). kai, jan'17
 	}

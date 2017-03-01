@@ -43,7 +43,7 @@ public class Array2DUtils {
 			throw new RuntimeException("Null or empty array");
 		}
 
-		Object[][] transposed = (Object[][]) Array.newInstance(array[0].getClass().getComponentType(),
+		Object[][] transposed = (Object[][])Array.newInstance(array[0].getClass().getComponentType(),
 				new int[] { array[0].length, array.length });
 
 		for (int i = 0; i < transposed.length; i++) {
@@ -56,11 +56,11 @@ public class Array2DUtils {
 	}
 
 	public static int[][] createIntArray(int rows, int cols) {
-		return (int[][]) Array.newInstance(int.class, rows, cols);
+		return (int[][])Array.newInstance(int.class, rows, cols);
 	}
 
 	public static double[][] createDoubleArray(int rows, int cols) {
-		return (double[][]) Array.newInstance(double.class, rows, cols);
+		return (double[][])Array.newInstance(double.class, rows, cols);
 	}
 
 	public static int[][] deepCopy(int[][] array) {

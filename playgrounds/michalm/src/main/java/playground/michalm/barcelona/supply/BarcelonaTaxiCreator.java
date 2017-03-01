@@ -40,7 +40,7 @@ public class BarcelonaTaxiCreator implements VehicleCreator {
 	private int currentVehicleId = 0;
 
 	public BarcelonaTaxiCreator(Scenario scenario) {
-		network = (Network) scenario.getNetwork();
+		network = (Network)scenario.getNetwork();
 		preparedPolygon = new PreparedPolygon(BarcelonaZones.readAgglomerationArea());
 	}
 

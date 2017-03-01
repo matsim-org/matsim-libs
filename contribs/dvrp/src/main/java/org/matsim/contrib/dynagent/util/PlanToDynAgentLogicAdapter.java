@@ -48,7 +48,7 @@ public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 	public DynActivity computeInitialActivity(DynAgent adapterAgent) {
 		this.agent = adapterAgent;
 
-		Activity act = (Activity) planElemIter.next();
+		Activity act = (Activity)planElemIter.next();
 		return new StaticDynActivity(act.getType(), act.getEndTime());
 	}
 
@@ -62,12 +62,12 @@ public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 		PlanElement planElem = planElemIter.next();
 
 		if (planElem instanceof Activity) {
-			Activity act = (Activity) planElem;
+			Activity act = (Activity)planElem;
 			return new StaticDynActivity(act.getType(), act.getEndTime());
 		} else if (planElem instanceof Leg) {
 			// only the 'car' mode supported right now
-			Leg leg = (Leg) planElem;
-			return new StaticDriverDynLeg(leg.getMode(), (NetworkRoute) leg.getRoute());
+			Leg leg = (Leg)planElem;
+			return new StaticDriverDynLeg(leg.getMode(), (NetworkRoute)leg.getRoute());
 		} else {
 			throw new IllegalStateException();
 		}

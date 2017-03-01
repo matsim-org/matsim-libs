@@ -53,7 +53,7 @@ public class DistanceCalculators {
 		return new DistanceCalculator() {
 			@Override
 			public double calcDistance(Coord from, Coord to) {
-				Network networkImpl = (Network) network;
+				Network networkImpl = (Network)network;
 				final Coord coord = from;
 				Node fromNode = NetworkUtils.getNearestNode(networkImpl, coord);
 				final Coord coord1 = to;

@@ -36,7 +36,7 @@ public class ETaxiChargingTask extends StayTaskImpl implements TaxiTask {
 		super(beginTime, endTime, charger.getLink());
 		this.charger = charger;
 		this.ev = ev;
-		logic = (ETaxiChargingLogic) charger.getLogic();
+		logic = (ETaxiChargingLogic)charger.getLogic();
 
 		logic.addAssignedVehicle(ev);
 	}

@@ -24,18 +24,18 @@ import org.matsim.api.core.v01.network.Link;
 public class Tasks {
 	public static Link getBeginLink(Task task) {
 		if (task instanceof DriveTask) {
-			return ((DriveTask) task).getPath().getFromLink();
+			return ((DriveTask)task).getPath().getFromLink();
 		} else if (task instanceof StayTask) {
-			return ((StayTask) task).getLink();
+			return ((StayTask)task).getLink();
 		}
 		throw new IllegalStateException("Only: DRIVE or STAY");
 	}
 
 	public static Link getEndLink(Task task) {
 		if (task instanceof DriveTask) {
-			return ((DriveTask) task).getPath().getToLink();
+			return ((DriveTask)task).getPath().getToLink();
 		} else if (task instanceof StayTask) {
-			return ((StayTask) task).getLink();
+			return ((StayTask)task).getLink();
 		}
 		throw new IllegalStateException("Only: DRIVE or STAY");
 	}

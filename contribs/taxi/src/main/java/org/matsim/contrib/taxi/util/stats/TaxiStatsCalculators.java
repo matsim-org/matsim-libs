@@ -35,11 +35,11 @@ public class TaxiStatsCalculators {
 			}
 		}
 
-		return (int) Math.ceil(maxEndTime / 3600);
+		return (int)Math.ceil(maxEndTime / 3600);
 	}
 
 	public static int getHour(double time) {
-		return (int) (time / 3600);
+		return (int)(time / 3600);
 	}
 
 	public static <T> List<T> createStatsList(T[] hourlyStats, T dailyStats) {
@@ -50,8 +50,8 @@ public class TaxiStatsCalculators {
 	}
 
 	public static int[] calcHourlyDurations(int from, int to) {
-		int firstHour = (int) from / 3600;
-		int lastHour = (int) to / 3600;
+		int firstHour = (int)from / 3600;
+		int lastHour = (int)to / 3600;
 
 		if (firstHour == lastHour) {
 			return new int[] { to - from };

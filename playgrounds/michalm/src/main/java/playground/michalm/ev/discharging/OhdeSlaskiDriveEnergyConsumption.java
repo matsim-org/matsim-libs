@@ -57,7 +57,7 @@ public class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption 
 		power = new double[maxAvgSpeed * speedStepsPerUnit];
 		power[0] = calcPower(zeroSpeed);
 		for (int i = 1; i < power.length; i++) {
-			power[i] = calcPower((double) i / speedStepsPerUnit);
+			power[i] = calcPower((double)i / speedStepsPerUnit);
 			// System.out.println(((double)i / speedStepsPerUnit) + " -> " + power [i]);
 		}
 	}
@@ -75,7 +75,7 @@ public class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption 
 		}
 
 		double avgSpeed = link.getLength() / travelTime;
-		int idx = (int) Math.round(avgSpeed * speedStepsPerUnit);
+		int idx = (int)Math.round(avgSpeed * speedStepsPerUnit);
 		return power[idx] * travelTime;
 	}
 }

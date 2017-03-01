@@ -61,10 +61,10 @@ public class TimeProfileCharts {
 		plot.setDomainGridlinesVisible(false);
 		plot.setBackgroundPaint(Color.white);
 
-		NumberAxis xAxis = (NumberAxis) plot.getDomainAxis();
+		NumberAxis xAxis = (NumberAxis)plot.getDomainAxis();
 		xAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
-		NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
+		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
 		yAxis.setAutoRange(true);
 
 		XYItemRenderer renderer = plot.getRenderer();

@@ -136,7 +136,7 @@ public class TaxiBenchmarkPostProcessor {
 				lineRatio.append('\t');
 			} else {
 				Stats s = e.stats.get(0);
-				double ratio = (double) s.n / s.m;
+				double ratio = (double)s.n / s.m;
 				lineId.append('\t').append(e.id);
 				lineN.append('\t').append(s.n);
 				lineM.append('\t').append(s.m);

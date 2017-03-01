@@ -69,7 +69,7 @@ public class TimeDiscretizer {
 			throw new IllegalArgumentException();
 		}
 
-		int idx = (int) time / timeInterval;// rounding down
+		int idx = (int)time / timeInterval;// rounding down
 
 		if (idx < intervalCount) {
 			return idx;

@@ -22,7 +22,7 @@ public class ChartSaveUtils {
 		try (OutputStream out = new FileOutputStream(filename + ".emf")) {
 			EMFGraphics2D emf2d = new EMFGraphics2D(out, new Dimension(width, height));
 			emf2d.startExport();
-			chart.draw((Graphics2D) emf2d.create(), new java.awt.Rectangle(width, height));
+			chart.draw((Graphics2D)emf2d.create(), new java.awt.Rectangle(width, height));
 			emf2d.endExport();
 		} catch (IOException e) {
 			throw new RuntimeException(e);

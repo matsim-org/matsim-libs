@@ -67,16 +67,16 @@ public class TaxiStatsCalculator {
 		LongEnumAdder<TaxiTaskType>[] vehicleHourlySums = new LongEnumAdder[hours];
 
 		for (Task t : schedule.getTasks()) {
-			TaxiTask tt = (TaxiTask) t;
-			int[] hourlyDurations = TaxiStatsCalculators.calcHourlyDurations((int) t.getBeginTime(),
-					(int) t.getEndTime());
+			TaxiTask tt = (TaxiTask)t;
+			int[] hourlyDurations = TaxiStatsCalculators.calcHourlyDurations((int)t.getBeginTime(),
+					(int)t.getEndTime());
 			int fromHour = TaxiStatsCalculators.getHour(t.getBeginTime());
 			for (int i = 0; i < hourlyDurations.length; i++) {
 				includeTaskIntoHourlySums(vehicleHourlySums, fromHour + i, tt, hourlyDurations[i]);
 			}
 
 			if (tt.getTaxiTaskType() == TaxiTaskType.PICKUP) {
-				Request req = ((TaxiPickupTask) t).getRequest();
+				Request req = ((TaxiPickupTask)t).getRequest();
 				double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
 				int hour = TaxiStatsCalculators.getHour(req.getT0());
 				hourlyStats[hour].passengerWaitTime.addValue(waitTime);

@@ -47,22 +47,22 @@ public class BeforeSimulationTripPrebooker implements MobsimInitializedListener 
 	 */
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
-		Collection<MobsimAgent> agents = ((QSim) e.getQueueSimulation()).getAgents().values();
+		Collection<MobsimAgent> agents = ((QSim)e.getQueueSimulation()).getAgents().values();
 		String mode = passengerEngine.getMode();
 
 		for (MobsimAgent mobsimAgent : agents) {
 			if (mobsimAgent instanceof PlanAgent) {
-				Plan plan = ((PlanAgent) mobsimAgent).getCurrentPlan();
+				Plan plan = ((PlanAgent)mobsimAgent).getCurrentPlan();
 
 				for (PlanElement elem : plan.getPlanElements()) {
 					if (elem instanceof Leg) {
-						Leg leg = (Leg) elem;
+						Leg leg = (Leg)elem;
 
 						if (leg.getMode().equals(mode)) {
 							Id<Link> fromLinkId = leg.getRoute().getStartLinkId();
 							Id<Link> toLinkId = leg.getRoute().getEndLinkId();
 							double departureTime = leg.getDepartureTime();
-							passengerEngine.prebookTrip(0, (MobsimPassengerAgent) mobsimAgent, fromLinkId, toLinkId,
+							passengerEngine.prebookTrip(0, (MobsimPassengerAgent)mobsimAgent, fromLinkId, toLinkId,
 									departureTime);
 						}
 					}

@@ -61,7 +61,7 @@ public class DvrpModule extends AbstractModule {
 
 		listeners = new ArrayList<>();
 		if (MobsimListener.class.isAssignableFrom(vrpOptimizerClass)) {
-			listeners.add((Class<? extends MobsimListener>) vrpOptimizerClass);
+			listeners.add((Class<? extends MobsimListener>)vrpOptimizerClass);
 		}
 	}
 

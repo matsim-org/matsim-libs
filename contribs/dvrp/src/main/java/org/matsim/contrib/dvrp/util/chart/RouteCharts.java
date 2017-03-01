@@ -50,22 +50,22 @@ public class RouteCharts {
 		JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", lData, PlotOrientation.VERTICAL, true,
 				true, false);
 
-		XYPlot plot = (XYPlot) chart.getPlot();
+		XYPlot plot = (XYPlot)chart.getPlot();
 		plot.setRangeGridlinesVisible(false);
 		plot.setDomainGridlinesVisible(false);
 		plot.setBackgroundPaint(Color.white);
 
-		NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
+		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
 		yAxis.setAutoRangeIncludesZero(false);
 
-		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
 		renderer.setSeriesShapesVisible(0, true);
 		renderer.setSeriesLinesVisible(0, false);
 		renderer.setSeriesItemLabelsVisible(0, true);
 
 		renderer.setBaseItemLabelGenerator(new XYItemLabelGenerator() {
 			public String generateLabel(XYDataset dataset, int series, int item) {
-				return ((CoordDataset) dataset).getText(series, item);
+				return ((CoordDataset)dataset).getText(series, item);
 			}
 		});
 
@@ -92,15 +92,15 @@ public class RouteCharts {
 		JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", nData, PlotOrientation.VERTICAL, false,
 				true, false);
 
-		XYPlot plot = (XYPlot) chart.getPlot();
+		XYPlot plot = (XYPlot)chart.getPlot();
 		plot.setRangeGridlinesVisible(false);
 		plot.setDomainGridlinesVisible(false);
 		plot.setBackgroundPaint(Color.white);
 
-		NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
+		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
 		yAxis.setAutoRangeIncludesZero(false);
 
-		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
 		renderer.setSeriesShapesVisible(0, true);
 		renderer.setSeriesLinesVisible(0, false);
 		renderer.setSeriesItemLabelsVisible(0, true);
@@ -175,7 +175,7 @@ public class RouteCharts {
 				return null;
 			}
 
-			return ((CoordDataset) dataset).getText(series, item);
+			return ((CoordDataset)dataset).getText(series, item);
 		}
 	}
 }

@@ -63,8 +63,8 @@ public class CountDropoffsPerLink {
 			if (planElements.size() != 3) {
 				throw new RuntimeException();
 			}
-			if (((Leg) planElements.get(1)).getMode().equals("taxi")) {
-				counts.get(((Activity) planElements.get(2)).getLinkId()).increment();
+			if (((Leg)planElements.get(1)).getMode().equals("taxi")) {
+				counts.get(((Activity)planElements.get(2)).getLinkId()).increment();
 				taxiLegs++;
 			}
 			allLegs++;

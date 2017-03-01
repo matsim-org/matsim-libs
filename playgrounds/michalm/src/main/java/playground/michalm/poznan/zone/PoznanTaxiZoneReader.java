@@ -109,7 +109,7 @@ public class PoznanTaxiZoneReader {
 	private void removeInnerFromOuterZone(String innerId, String outerId) {
 		Zone inner = zones.get(Id.create(innerId, Zone.class));
 		Zone outer = zones.get(Id.create(outerId, Zone.class));
-		Polygon polygon = (Polygon) outer.getMultiPolygon().difference(inner.getMultiPolygon());
+		Polygon polygon = (Polygon)outer.getMultiPolygon().difference(inner.getMultiPolygon());
 		outer.setMultiPolygon(geometryFactory.createMultiPolygon(new Polygon[] { polygon }));
 	}
 

@@ -51,8 +51,8 @@ public class TransimsPlan extends Plan implements Comparable<TransimsPlan> {
 		int id = getId();
 		Route route = getRoute();
 
-		TransimsFlow inFlow = (TransimsFlow) route.getInFlow();
-		TransimsFlow outFlow = (TransimsFlow) route.getOutFlow();
+		TransimsFlow inFlow = (TransimsFlow)route.getInFlow();
+		TransimsFlow outFlow = (TransimsFlow)route.getOutFlow();
 
 		writer.println(id + " 0 1 1");
 		writer.println(startTime + " " + inFlow.inParking + " 2 " + outFlow.outParking + " 2");

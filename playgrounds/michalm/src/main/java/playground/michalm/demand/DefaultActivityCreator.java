@@ -59,7 +59,7 @@ public class DefaultActivityCreator implements ActivityCreator {
 		Coord coord = new Coord(p.getX(), p.getY());
 		Link link = NetworkUtils.getNearestLink(network, coord);
 
-		Activity activity = (Activity) pf.createActivityFromCoord(actType, coord);
+		Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
 		activity.setLinkId(link.getId());
 		return activity;
 	}

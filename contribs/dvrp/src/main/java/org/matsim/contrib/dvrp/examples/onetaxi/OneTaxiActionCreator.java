@@ -41,9 +41,9 @@ public class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	@Override
 	public DynAction createAction(DynAgent dynAgent, final Task task, double now) {
 		if (task instanceof DriveTask) {
-			return VrpLegs.createLegWithOfflineTracker((DriveTask) task, timer);
+			return VrpLegs.createLegWithOfflineTracker((DriveTask)task, timer);
 		} else if (task instanceof OneTaxiServeTask) { // PICKUP or DROPOFF
-			final OneTaxiServeTask serveTask = (OneTaxiServeTask) task;
+			final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
 
 			if (serveTask.isPickup()) {
 				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
@@ -53,7 +53,7 @@ public class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 						"OneTaxiDropoff");
 			}
 		} else { // WAIT
-			return new VrpActivity("OneTaxiStay", (StayTask) task);
+			return new VrpActivity("OneTaxiStay", (StayTask)task);
 		}
 	}
 }

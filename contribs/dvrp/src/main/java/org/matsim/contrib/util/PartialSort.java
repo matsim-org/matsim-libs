@@ -72,7 +72,7 @@ public class PartialSort<T> {
 	 */
 	public List<T> retriveKSmallestElements() {
 		@SuppressWarnings("unchecked")
-		T[] array = (T[]) new Object[kSmallestElements.size()];
+		T[] array = (T[])new Object[kSmallestElements.size()];
 		for (int i = array.length - 1; i >= 0; i--) {
 			array[i] = kSmallestElements.poll().element;
 		}

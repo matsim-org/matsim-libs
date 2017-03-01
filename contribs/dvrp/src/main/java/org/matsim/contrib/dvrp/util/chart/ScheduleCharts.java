@@ -50,7 +50,7 @@ public class ScheduleCharts {
 		// chart
 		JFreeChart chart = ChartFactory.createXYBarChart("Schedules", "Time", false, "Vehicles", xyTaskDataset,
 				PlotOrientation.HORIZONTAL, false, true, false);
-		XYPlot plot = (XYPlot) chart.getPlot();
+		XYPlot plot = (XYPlot)chart.getPlot();
 
 		// Y axis
 		String[] series = new String[vehicles.size()];
@@ -111,7 +111,7 @@ public class ScheduleCharts {
 		}
 
 		private ChartTask getTask(int series, int item) {
-			ChartTask chartTask = (ChartTask) tsc.getSeries(series).get(item);
+			ChartTask chartTask = (ChartTask)tsc.getSeries(series).get(item);
 			return chartTask;
 		}
 
@@ -168,8 +168,8 @@ public class ScheduleCharts {
 				String description = descriptionCreator.create(t);
 
 				TimePeriod duration = new SimpleTimePeriod(//
-						new Date((int) Math.floor(t.getBeginTime() * 1000)), //
-						new Date((int) Math.ceil(t.getEndTime() * 1000)));
+						new Date((int)Math.floor(t.getBeginTime() * 1000)), //
+						new Date((int)Math.ceil(t.getEndTime() * 1000)));
 
 				scheduleTaskSeries.add(new ChartTask(description, duration, t));
 			}

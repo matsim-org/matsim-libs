@@ -74,7 +74,7 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 				idleVehicles.add(veh);
 			} else if (getOptimContext().scheduler.isStarted(veh)) {
 				// busy vehicle = we are currently picking someone up, maximum of passengers for this optimizer = 2;
-				DrtTaskType type = ((DrtTask) schedule.getCurrentTask()).getDrtTaskType();
+				DrtTaskType type = ((DrtTask)schedule.getCurrentTask()).getDrtTaskType();
 				// Logger.getLogger(getClass()).info(veh.getId() + " "+ type);
 				if (type.equals(DrtTaskType.DRIVE_EMPTY)) {
 

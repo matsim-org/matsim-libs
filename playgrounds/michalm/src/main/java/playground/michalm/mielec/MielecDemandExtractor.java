@@ -49,10 +49,10 @@ public class MielecDemandExtractor {
 			csvWriter.writeNext("personId", "departureTime", "fromLinkId", "toLinkId");
 
 			for (Person p : scenario.getPopulation().getPersons().values()) {
-				Leg leg = (Leg) p.getPlans().get(0).getPlanElements().get(1);
+				Leg leg = (Leg)p.getPlans().get(0).getPlanElements().get(1);
 
 				if (leg.getMode() == TaxiOptimizerModules.TAXI_MODE) {
-					csvWriter.writeNext(p.getId() + "", (int) leg.getDepartureTime() + "", //
+					csvWriter.writeNext(p.getId() + "", (int)leg.getDepartureTime() + "", //
 							leg.getRoute().getStartLinkId() + "", leg.getRoute().getEndLinkId() + "");
 				}
 			}

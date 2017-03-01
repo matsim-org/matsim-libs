@@ -64,7 +64,7 @@ public class XYDataCollector<T extends Identifiable<T>>
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		if (e.getSimulationTime() % interval == 0) {
-			String time = (int) e.getSimulationTime() + "";
+			String time = (int)e.getSimulationTime() + "";
 			for (T o : monitoredObjects) {
 				Coord coord = calculator.getCoord(o);
 				writer.writeNext(time, o.getId() + "", coord.getX() + "", coord.getY() + "", calculator.calculate(o));

@@ -70,7 +70,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		super(optimContext, params);
 		this.params = params;
 		evData = optimContext.evData;
-		eScheduler = (ETaxiScheduler) optimContext.scheduler;
+		eScheduler = (ETaxiScheduler)optimContext.scheduler;
 
 		if (optimContext.scheduler.getParams().vehicleDiversion
 				&& optimContext.scheduler.getParams().destinationKnown) {
@@ -134,7 +134,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		List<Dispatch<ChargerPlug>> assignments = eAssignmentProblem.findAssignments(vData, pData, cost);
 
 		for (Dispatch<ChargerPlug> a : assignments) {
-			eScheduler.scheduleCharging((EvrpVehicle) a.vehicle, a.destination.charger, a.path);
+			eScheduler.scheduleCharging((EvrpVehicle)a.vehicle, a.destination.charger, a.path);
 			if (scheduledForCharging.put(a.vehicle.getId(), a.vehicle) != null) {
 				throw new IllegalStateException();
 			}
@@ -167,7 +167,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		// filter least charged vehicles
 		PartialSort<Entry> leastChargedSort = new PartialSort<>(pData.getSize());
 		for (Entry e : vData.getEntries()) {
-			Battery b = ((EvrpVehicle) e.vehicle).getEv().getBattery();
+			Battery b = ((EvrpVehicle)e.vehicle).getEv().getBattery();
 			leastChargedSort.add(e, b.getSoc());// assumption: all b.capacities are equal
 		}
 
@@ -176,7 +176,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 
 	// TODO MIN_RELATIVE_SOC should depend on %idle
 	private boolean doNeedChargingScheduling(Vehicle v) {
-		Battery b = ((EvrpVehicle) v).getEv().getBattery();
+		Battery b = ((EvrpVehicle)v).getEv().getBattery();
 		boolean undercharged = b.getSoc() < params.minRelativeSoc * b.getCapacity();
 		return (undercharged && !scheduledForCharging.containsKey(v.getId()));
 	}

@@ -63,14 +63,14 @@ public class ODDemandGenerator {
 			Id<Zone> toLoc = Id.create(e.getToLocation(), Zone.class);
 			Zone fromZone = zones.get(fromLoc);
 			Zone toZone = zones.get(toLoc);
-			int trips = (int) uniform.floorOrCeil(flowCoeff * e.getValue());
+			int trips = (int)uniform.floorOrCeil(flowCoeff * e.getValue());
 
 			for (int k = 0; k < trips; k++) {
 				Plan plan = pf.createPlan();
 
 				// act0
 				Activity startAct = activityCreator.createActivity(fromZone, fromActivityType);
-				startAct.setEndTime((int) uniform.nextDouble(startTime, startTime + duration));
+				startAct.setEndTime((int)uniform.nextDouble(startTime, startTime + duration));
 
 				// act1
 				Activity endAct = activityCreator.createActivity(toZone, toActivityType);

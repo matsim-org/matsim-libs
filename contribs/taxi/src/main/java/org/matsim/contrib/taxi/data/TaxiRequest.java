@@ -122,7 +122,7 @@ public class TaxiRequest extends RequestImpl implements PassengerRequest {
 					return TaxiRequestStatus.PLANNED;
 				}
 
-				TaxiTask currentTask = (TaxiTask) pickupTask.getSchedule().getCurrentTask();
+				TaxiTask currentTask = (TaxiTask)pickupTask.getSchedule().getCurrentTask();
 				if (currentTask.getTaxiTaskType() == TaxiTaskType.EMPTY_DRIVE && //
 						pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
 					return TaxiRequestStatus.TAXI_DISPATCHED;

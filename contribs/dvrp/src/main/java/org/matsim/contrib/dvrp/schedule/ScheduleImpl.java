@@ -30,7 +30,7 @@ public class ScheduleImpl implements Schedule {
 	private final Vehicle vehicle;
 
 	private final List<AbstractTask> tasks = new ArrayList<>();
-	private final List<? extends Task> unmodifiableTasks = (List<? extends Task>) Collections.unmodifiableList(tasks);
+	private final List<? extends Task> unmodifiableTasks = (List<? extends Task>)Collections.unmodifiableList(tasks);
 
 	private ScheduleStatus status = ScheduleStatus.UNPLANNED;
 	private AbstractTask currentTask = null;
@@ -65,7 +65,7 @@ public class ScheduleImpl implements Schedule {
 			status = ScheduleStatus.PLANNED;
 		}
 
-		AbstractTask t = (AbstractTask) task;
+		AbstractTask t = (AbstractTask)task;
 		tasks.add(taskIdx, t);
 		t.schedule = this;
 		t.taskIdx = taskIdx;

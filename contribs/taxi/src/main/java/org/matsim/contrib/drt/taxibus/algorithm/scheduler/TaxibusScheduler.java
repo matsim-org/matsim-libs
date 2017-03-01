@@ -48,7 +48,7 @@ public class TaxibusScheduler {
 		this.timer = timer;
 		this.params = params;
 
-		((FleetImpl) vrpData).resetSchedules();
+		((FleetImpl)vrpData).resetSchedules();
 
 		for (Vehicle veh : this.vrpData.getVehicles().values()) {
 			Schedule schedule = veh.getSchedule();
@@ -63,7 +63,7 @@ public class TaxibusScheduler {
 	public boolean isIdle(Vehicle vehicle) {
 		if (!isStarted(vehicle))
 			return false;
-		DrtTask currentTask = (DrtTask) vehicle.getSchedule().getCurrentTask();
+		DrtTask currentTask = (DrtTask)vehicle.getSchedule().getCurrentTask();
 		return Schedules.isLastTask(currentTask) && currentTask.getDrtTaskType() == DrtTaskType.STAY;
 	}
 
@@ -97,11 +97,11 @@ public class TaxibusScheduler {
 		switch (schedule.getStatus()) {
 			case PLANNED:
 			case STARTED:
-				DrtTask lastTask = (DrtTask) Schedules.getLastTask(schedule);
+				DrtTask lastTask = (DrtTask)Schedules.getLastTask(schedule);
 
 				switch (lastTask.getDrtTaskType()) {
 					case STAY:
-						link = ((StayTask) lastTask).getLink();
+						link = ((StayTask)lastTask).getLink();
 						time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());// TODO
 																						// very
 																						// optimistic!!!
@@ -138,12 +138,12 @@ public class TaxibusScheduler {
 			return null;
 		}
 
-		DrtTask currentTask = (DrtTask) schedule.getCurrentTask();
+		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
 		if (!Schedules.isLastTask(currentTask) || currentTask.getDrtTaskType() != DrtTaskType.DRIVE_EMPTY) {
 			return null;
 		}
 
-		OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker) currentTask.getTaskTracker();
+		OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker)currentTask.getTaskTracker();
 		return filterValidLinkTimePair(tracker.getDiversionPoint(), veh);
 	}
 
@@ -161,7 +161,7 @@ public class TaxibusScheduler {
 
 		Schedule bestSched = best.vehicle.getSchedule();
 
-		DrtTask lastTask = (DrtTask) Schedules.getLastTask(bestSched);
+		DrtTask lastTask = (DrtTask)Schedules.getLastTask(bestSched);
 		// log.info("Bus " + best.vehicle.getId() + " Scheduled Route");
 		// for (VrpPathWithTravelData path : best.path) {
 		// log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
@@ -182,7 +182,7 @@ public class TaxibusScheduler {
 		if (lastTask.getDrtTaskType() == DrtTaskType.STAY) {
 			best.failIfAnyRequestNotUnplanned();
 			path = iterator.next();
-			scheduleDriveToFirstRequest((DrtStayTask) lastTask, bestSched, path);
+			scheduleDriveToFirstRequest((DrtStayTask)lastTask, bestSched, path);
 			lastEndTime = path.getArrivalTime();
 			path = iterator.next();
 			pickUpsForLink = best.getPickUpsForLink(path.getFromLink());
@@ -414,7 +414,7 @@ public class TaxibusScheduler {
 		double t = newTaskEndTime;
 
 		for (int i = startIdx; i < tasks.size(); i++) {
-			DrtTask task = (DrtTask) tasks.get(i);
+			DrtTask task = (DrtTask)tasks.get(i);
 
 			switch (task.getDrtTaskType()) {
 				case STAY: {
@@ -449,7 +449,7 @@ public class TaxibusScheduler {
 					// cannot be shortened/lengthen, therefore must be moved
 					// forward/backward
 					task.setBeginTime(t);
-					VrpPathWithTravelData path = (VrpPathWithTravelData) ((DriveTask) task).getPath();
+					VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath();
 					t += path.getTravelTime(); // TODO one may consider
 												// recalculation of SP!!!!
 					task.setEndTime(t);
@@ -459,7 +459,7 @@ public class TaxibusScheduler {
 
 				case PICKUP: {
 					task.setBeginTime(t);// t == taxi's arrival time
-					double t0 = ((DrtPickupTask) task).getRequest().getT0();// t0
+					double t0 = ((DrtPickupTask)task).getRequest().getT0();// t0
 																			// ==
 																			// passenger's
 																			// departure
@@ -497,7 +497,7 @@ public class TaxibusScheduler {
 		for (int i = schedule.getTaskCount() - 1; i > schedule.getCurrentTask().getTaskIdx(); i--) {
 			Task task = tasks.get(i);
 			if (task instanceof DrtTaskWithRequests) {
-				plannedRequests.addAll(((DrtTaskWithRequests) task).getRequests());
+				plannedRequests.addAll(((DrtTaskWithRequests)task).getRequests());
 			}
 
 		}

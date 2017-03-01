@@ -61,6 +61,6 @@ public class TaxiRequests {
 	@SuppressWarnings("unchecked")
 	public static int countRequestsWithStatus(Iterable<? extends Request> requests, TaxiRequestStatus status) {
 		return Iterables
-				.size(Iterables.filter((Collection<TaxiRequest>) requests, new TaxiRequestStatusPredicate(status)));
+				.size(Iterables.filter((Collection<TaxiRequest>)requests, new TaxiRequestStatusPredicate(status)));
 	}
 }

@@ -36,6 +36,6 @@ public class FifoTaxiOptimizer extends AbstractTaxiOptimizer {
 	@Override
 	protected void scheduleUnplannedRequests() {
 		new FifoSchedulingProblem(getOptimContext(), dispatchFinder)
-				.scheduleUnplannedRequests((Queue<TaxiRequest>) getUnplannedRequests());
+				.scheduleUnplannedRequests((Queue<TaxiRequest>)getUnplannedRequests());
 	}
 }

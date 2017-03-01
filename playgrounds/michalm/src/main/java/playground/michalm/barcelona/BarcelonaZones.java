@@ -35,6 +35,6 @@ public class BarcelonaZones {
 			throw new RuntimeException();
 		}
 
-		return (MultiPolygon) features.iterator().next().getDefaultGeometry();
+		return (MultiPolygon)features.iterator().next().getDefaultGeometry();
 	}
 }

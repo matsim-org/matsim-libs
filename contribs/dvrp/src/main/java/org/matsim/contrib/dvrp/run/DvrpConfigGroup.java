@@ -28,7 +28,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("deprecation")
 	public static DvrpConfigGroup get(Config config) {
-		return (DvrpConfigGroup) config.getModule(GROUP_NAME);// will fail if not in the config
+		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
 	}
 
 	public static final String MODE = "mode";

@@ -42,7 +42,7 @@ class AssignmentChargerPlugData extends AssignmentDestinationData<ChargerPlug> {
 
 		int idx = 0;
 		for (Charger c : chargers) {
-			ETaxiChargingLogic logic = (ETaxiChargingLogic) c.getLogic();
+			ETaxiChargingLogic logic = (ETaxiChargingLogic)c.getLogic();
 
 			int dispatched = logic.getAssignedCount();
 			int queued = logic.getQueuedCount();

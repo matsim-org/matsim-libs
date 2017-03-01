@@ -42,13 +42,9 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	@Inject
 	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer,
 			QSim qSim) {
-		this(passengerEngine,
-				taxiCfg.isOnlineVehicleTracker() ? //
-						VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking) optimizer,
-								qSim.getSimTimer())
-						: //
-						VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer()), //
-				taxiCfg.getPickupDuration());
+		this(passengerEngine, taxiCfg.isOnlineVehicleTracker() ? //
+				VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer, qSim.getSimTimer())
+				: VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer()), taxiCfg.getPickupDuration());
 	}
 
 	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator, double pickupDuration) {
@@ -59,25 +55,25 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	@Override
 	public DynAction createAction(DynAgent dynAgent, final Task task, double now) {
-		TaxiTask tt = (TaxiTask) task;
+		TaxiTask tt = (TaxiTask)task;
 
 		switch (tt.getTaxiTaskType()) {
 			case EMPTY_DRIVE:
 			case OCCUPIED_DRIVE:
-				return legCreator.createLeg((DriveTask) task);
+				return legCreator.createLeg((DriveTask)task);
 
 			case PICKUP:
-				final TaxiPickupTask pst = (TaxiPickupTask) task;
+				final TaxiPickupTask pst = (TaxiPickupTask)task;
 				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
 						pickupDuration, PICKUP_ACTIVITY_TYPE);
 
 			case DROPOFF:
-				final TaxiDropoffTask dst = (TaxiDropoffTask) task;
+				final TaxiDropoffTask dst = (TaxiDropoffTask)task;
 				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(),
 						DROPOFF_ACTIVITY_TYPE);
 
 			case STAY:
-				return new VrpActivity(STAY_ACTIVITY_TYPE, (TaxiStayTask) task);
+				return new VrpActivity(STAY_ACTIVITY_TYPE, (TaxiStayTask)task);
 
 			default:
 				throw new IllegalStateException();

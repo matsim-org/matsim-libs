@@ -48,8 +48,8 @@ public class FilterTaxiRequestsWithinBerlin {
 
 		for (Person p : berlinBrbScenario.getPopulation().getPersons().values()) {
 			Plan plan = p.getPlans().get(0);
-			Activity fromActivity = (Activity) plan.getPlanElements().get(0);
-			Activity toActivity = (Activity) plan.getPlanElements().get(2);
+			Activity fromActivity = (Activity)plan.getPlanElements().get(0);
+			Activity toActivity = (Activity)plan.getPlanElements().get(2);
 
 			if (onlyBerlinLinks.containsKey(fromActivity.getLinkId())
 					&& onlyBerlinLinks.containsKey(toActivity.getLinkId())) {

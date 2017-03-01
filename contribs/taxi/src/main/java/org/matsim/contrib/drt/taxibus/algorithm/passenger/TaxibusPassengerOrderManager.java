@@ -69,7 +69,7 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 				if (mobsimAgent.getState().equals(State.ABORT))
 					return;
 
-				PlanAgent agent = (PlanAgent) mobsimAgent;
+				PlanAgent agent = (PlanAgent)mobsimAgent;
 				PlanElement nextPlanElement = agent.getNextPlanElement();
 				if (nextPlanElement != null) {
 					if (nextPlanElement instanceof Activity) {
@@ -78,7 +78,7 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 						return;
 					}
 					if (nextPlanElement instanceof Leg) {
-						Leg leg = (Leg) nextPlanElement;
+						Leg leg = (Leg)nextPlanElement;
 						if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)) {
 							double departureTime = mobsimAgent.getActivityEndTime();
 							if (departureTime < event.getTime()) {
@@ -95,13 +95,13 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
 
-		this.qSim = (QSim) e.getQueueSimulation();
+		this.qSim = (QSim)e.getQueueSimulation();
 		Collection<MobsimAgent> agents = qSim.getAgents().values();
 
 		for (MobsimAgent mobsimAgent : agents) {
 			if (mobsimAgent instanceof PlanAgent) {
-				PlanAgent agent = (PlanAgent) mobsimAgent;
-				Leg leg = (Leg) agent.getNextPlanElement();
+				PlanAgent agent = (PlanAgent)mobsimAgent;
+				Leg leg = (Leg)agent.getNextPlanElement();
 				if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)) {
 					// if (leg.getMode().equals("car")){
 					double departureTime = mobsimAgent.getActivityEndTime();
@@ -113,7 +113,7 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 
 	private void prebookTaxiBusTrip(MobsimAgent mobsimAgent, Leg leg, double departureTime) {
 		// System.out.println("taxi trip booked for " + mobsimAgent.getId() +" at "+Time.writeTime(departureTime));
-		this.passengerEngine.prebookTrip(qSim.getSimTimer().getTimeOfDay(), (MobsimPassengerAgent) mobsimAgent,
+		this.passengerEngine.prebookTrip(qSim.getSimTimer().getTimeOfDay(), (MobsimPassengerAgent)mobsimAgent,
 				leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), departureTime);
 
 	}

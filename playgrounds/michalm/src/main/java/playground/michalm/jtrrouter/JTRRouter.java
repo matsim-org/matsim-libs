@@ -86,7 +86,7 @@ public abstract class JTRRouter {
 
 			int count = flowCfg.getMaxIndex("flow") + 1;
 			for (int i = 0; i < count; i++) {
-				initFlow((HierarchicalConfiguration) flowCfg.subset("flow(" + i + ')'));
+				initFlow((HierarchicalConfiguration)flowCfg.subset("flow(" + i + ')'));
 			}
 
 			// process turns.xml
@@ -94,7 +94,7 @@ public abstract class JTRRouter {
 
 			count = nodeCfg.getMaxIndex("turn") + 1;
 			for (int i = 0; i < count; i++) {
-				initTurn((HierarchicalConfiguration) nodeCfg.subset("turn(" + i + ')'));
+				initTurn((HierarchicalConfiguration)nodeCfg.subset("turn(" + i + ')'));
 			}
 		} catch (ConfigurationException e) {
 			throw new RuntimeException(e);
@@ -190,12 +190,12 @@ public abstract class JTRRouter {
 			}
 
 			for (int subFlow = 0; subFlow < flow.counts.length; subFlow++) {
-				int count = (int) Math.round(flowFactor * flow.counts[subFlow]);
+				int count = (int)Math.round(flowFactor * flow.counts[subFlow]);
 
 				double interval = genPeriod / count;
 
 				for (int v = 0; v < count; v++) {
-					int startTime = genStartTime + (int) (v * interval);
+					int startTime = genStartTime + (int)(v * interval);
 
 					// select route
 					Route route = null;

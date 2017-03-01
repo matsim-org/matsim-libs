@@ -40,7 +40,7 @@ public class UniformHistogram extends AbstractHistogram<Double> {
 	}
 
 	public void addValue(double value) {
-		increment(Math.min((int) (value / binSize), counts.length - 1));
+		increment(Math.min((int)(value / binSize), counts.length - 1));
 	}
 
 	@Override

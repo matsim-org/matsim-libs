@@ -52,8 +52,8 @@ public class SocHistogramTimeProfileCollectorProvider implements Provider<Mobsim
 			public void customize(JFreeChart chart, ChartType chartType) {
 				Paint[] paints = new Paint[10];
 				for (int i = 0; i < 10; i++) {
-					float f = (float) Math.sin(Math.PI * (9f - i) / 9 / 2);
-					paints[i] = new Color(f, (float) Math.sqrt(1 - f * f), 0f);
+					float f = (float)Math.sin(Math.PI * (9f - i) / 9 / 2);
+					paints[i] = new Color(f, (float)Math.sqrt(1 - f * f), 0f);
 				}
 
 				TimeProfileCharts.changeSeriesColors(chart, paints);

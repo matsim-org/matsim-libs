@@ -14,7 +14,7 @@ public class PopulationUtils {
 
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Leg) {
-					((Leg) pe).setMode(mode);
+					((Leg)pe).setMode(mode);
 				}
 			}
 		}
@@ -36,7 +36,7 @@ public class PopulationUtils {
 	private static boolean hasLegOfMode(Plan plan, String mode) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
-				if (((Leg) pe).getMode().equals(mode)) {
+				if (((Leg)pe).getMode().equals(mode)) {
 					return true;
 				}
 			}

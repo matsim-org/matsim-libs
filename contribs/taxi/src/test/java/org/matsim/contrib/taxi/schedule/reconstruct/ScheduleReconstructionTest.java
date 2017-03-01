@@ -72,7 +72,7 @@ public class ScheduleReconstructionTest {
 
 		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.fleet.getVehicles().values());
 
-		compareRequests((Collection<TaxiRequest>) requestCollector.getRequests().values(),
+		compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
 				scheduleReconstructor.taxiRequests.values());
 	}
 
@@ -115,7 +115,7 @@ public class ScheduleReconstructionTest {
 			Assert.assertEquals(o.getBeginTime(), r.getBeginTime(), 0);
 			Assert.assertEquals(o.getEndTime(), r.getEndTime(), 0);
 			Assert.assertEquals(o.getTaskIdx(), r.getTaskIdx());
-			Assert.assertEquals(((TaxiTask) o).getTaxiTaskType(), ((TaxiTask) r).getTaxiTaskType());
+			Assert.assertEquals(((TaxiTask)o).getTaxiTaskType(), ((TaxiTask)r).getTaxiTaskType());
 
 			Assert.assertEquals(TaskStatus.PERFORMED, o.getStatus());
 			Assert.assertEquals(TaskStatus.PLANNED, r.getStatus());

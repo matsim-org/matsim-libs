@@ -71,7 +71,7 @@ public class Zones {
 
 	public static MultiPolygon transformMultiPolygon(MultiPolygon multiPolygon, MathTransform transform) {
 		try {
-			return (MultiPolygon) JTS.transform(multiPolygon, transform);
+			return (MultiPolygon)JTS.transform(multiPolygon, transform);
 		} catch (TransformException e) {
 			throw new RuntimeException(e);
 		}

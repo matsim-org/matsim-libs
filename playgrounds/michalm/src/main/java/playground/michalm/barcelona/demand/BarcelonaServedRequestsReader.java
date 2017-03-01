@@ -96,7 +96,7 @@ public class BarcelonaServedRequestsReader {
 	}
 
 	private static double degMin2Deg(double v) {
-		double deg = (int) v;
+		double deg = (int)v;
 		double min = v - deg;
 		return deg + min * 5 / 3;
 	}

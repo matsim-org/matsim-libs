@@ -110,12 +110,12 @@ public class Schedules {
 
 	@SuppressWarnings("unchecked")
 	public static Iterable<StayTask> createStayTaskIter(Schedule schedule) {
-		return (Iterable<StayTask>) createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
+		return (Iterable<StayTask>)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static Iterable<DriveTask> createDriveTaskIter(Schedule schedule) {
-		return (Iterable<DriveTask>) createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
+		return (Iterable<DriveTask>)createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
 	}
 
 	public static Iterable<? extends Task> createTaskFilterIter(Schedule schedule,

@@ -41,25 +41,25 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	@Override
 	public DynAction createAction(DynAgent dynAgent, final Task task, double now) {
-		DrtTask tt = (DrtTask) task;
+		DrtTask tt = (DrtTask)task;
 
 		switch (tt.getDrtTaskType()) {
 			case DRIVE_EMPTY:
 			case DRIVE_WITH_PASSENGER:
-				return legCreator.createLeg((DriveTask) task);
+				return legCreator.createLeg((DriveTask)task);
 
 			case PICKUP:
-				final DrtPickupTask pst = (DrtPickupTask) task;
+				final DrtPickupTask pst = (DrtPickupTask)task;
 				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
 						pickupDuration, TAXIBUS_PICKUP_NAME);
 
 			case DROPOFF:
-				final DrtDropoffTask dst = (DrtDropoffTask) task;
+				final DrtDropoffTask dst = (DrtDropoffTask)task;
 				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(),
 						TAXIBUS_DROPOFF_NAME);
 
 			case STAY:
-				return new VrpActivity(TAXIBUS_STAY_NAME, (DrtStayTask) task);
+				return new VrpActivity(TAXIBUS_STAY_NAME, (DrtStayTask)task);
 
 			default:
 				throw new IllegalStateException();

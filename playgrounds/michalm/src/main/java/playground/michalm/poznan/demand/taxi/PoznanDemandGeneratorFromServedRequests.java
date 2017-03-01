@@ -49,7 +49,7 @@ public class PoznanDemandGeneratorFromServedRequests extends AbstractDemandGener
 	}
 
 	private int getTime(Date time, Date timeZero) {
-		return (int) ((time.getTime() - timeZero.getTime()) / 1000);
+		return (int)((time.getTime() - timeZero.getTime()) / 1000);
 	}
 
 	public static void main(String[] args) {

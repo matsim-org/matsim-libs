@@ -44,7 +44,7 @@ public class TaxiTimeProfiles {
 	}
 
 	public static ProfileCalculator createCurrentTaxiTaskOfTypeCounter(final Fleet fleet) {
-		String[] header = TimeProfiles.combineValuesIntoStrings((Object[]) TaxiTaskType.values());
+		String[] header = TimeProfiles.combineValuesIntoStrings((Object[])TaxiTaskType.values());
 		return new TimeProfiles.MultiValueProfileCalculator(header) {
 			@Override
 			public Long[] calcValues() {
@@ -52,7 +52,7 @@ public class TaxiTimeProfiles {
 
 				for (Vehicle veh : fleet.getVehicles().values()) {
 					if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-						TaxiTask currentTask = (TaxiTask) veh.getSchedule().getCurrentTask();
+						TaxiTask currentTask = (TaxiTask)veh.getSchedule().getCurrentTask();
 						counter.increment(currentTask.getTaxiTaskType());
 					}
 				}

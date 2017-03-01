@@ -34,7 +34,7 @@ public abstract class AbstractDemandGeneratorFromServedRequests {
 	public AbstractDemandGeneratorFromServedRequests(Scenario scenario) {
 		this.scenario = scenario;
 		pf = scenario.getPopulation().getFactory();
-		network = (Network) scenario.getNetwork();
+		network = (Network)scenario.getNetwork();
 	}
 
 	protected Person generatePassenger(ServedRequest request, double startTime) {
@@ -62,7 +62,7 @@ public abstract class AbstractDemandGeneratorFromServedRequests {
 	}
 
 	private Activity createActivityFromCoord(String actType, Coord coord) {
-		Activity activity = (Activity) pf.createActivityFromCoord(actType, coord);
+		Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
 		final Coord coord1 = coord;
 		Link link = NetworkUtils.getNearestLinkExactly(network, coord1);
 		activity.setLinkId(link.getId());
