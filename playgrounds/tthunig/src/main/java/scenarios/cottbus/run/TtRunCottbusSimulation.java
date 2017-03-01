@@ -22,11 +22,21 @@
 package scenarios.cottbus.run;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -45,6 +55,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.AbstractModule;
@@ -57,6 +68,8 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LanesWriter;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
+import org.matsim.roadpricing.RoadPricingModule;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import analysis.TtAnalyzedGeneralResultsWriter;
@@ -71,6 +84,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import signals.CombinedSignalsModule;
 import signals.downstreamSensor.DownstreamSignalController;
 import utils.SignalizeScenario;
@@ -95,21 +109,23 @@ public class TtRunCottbusSimulation {
 	}
 	private final static PopulationType POP_TYPE = PopulationType.WoMines;
 	public enum PopulationType {
+		GRID_LOCK_BTU, // artificial demand: from every ingoing link to every outgoing link of the inner city ring
 		BTU_POP_MATSIM_ROUTES,
 		BTU_POP_BTU_ROUTES,
 		WMines, // with mines as working places. causes an oversized number of working places in the south west of Cottbus.
 		WoMines // without mines as working places
 	}
 	
-	private final static SignalType SIGNAL_TYPE = SignalType.ALL_NODES_DOWNSTREAM;
+	private final static SignalType SIGNAL_TYPE = SignalType.MS_SYLVIA;
 	public enum SignalType {
-		NONE, MS, MS_RANDOM_OFFSETS, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN, ALL_NODES_ALL_GREEN, ALL_NODES_DOWNSTREAM
+		NONE, MS, MS_RANDOM_OFFSETS, MS_SYLVIA, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN, 
+		ALL_NODES_ALL_GREEN, ALL_NODES_DOWNSTREAM, ALL_GREEN_INSIDE_ENVELOPE, ALL_DOWNSTREAM_INSIDE_ENVELOPE
 	}
 	
 	// defines which kind of pricing should be used
 	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	private enum PricingType {
-		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED
+		NONE, CP_V3, CP_V4, CP_V7, CP_V8, CP_V9, CP_V10, FLOWBASED, CORDON_INNERCITY, CORDON_RING
 	}
 	
 	// choose a sigma for the randomized router
@@ -126,15 +142,15 @@ public class TtRunCottbusSimulation {
 	
 	public static void main(String[] args) {		
 		Config config = defineConfig();
-		config.qsim().setEndTime(36.*3600.);
 		
-		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class ) ;
-		otfvisConfig.setDrawTime(true);
+//		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class ) ;
+//		otfvisConfig.setDrawTime(true);
+//		otfvisConfig.setAgentSize(80f);
 		
 		Scenario scenario = prepareScenario( config );
 		Controler controler = prepareController( scenario );
 		
-		controler.addOverridingModule( new OTFVisWithSignalsLiveModule() ) ;
+//		controler.addOverridingModule( new OTFVisWithSignalsLiveModule() ) ;
 		
 		controler.run();
 	}
@@ -164,7 +180,7 @@ public class TtRunCottbusSimulation {
 			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes_v3.xml");
 			break;
 		}
-		if (SIGNAL_TYPE.toString().startsWith("ALL_NODES")){
+		if (SIGNAL_TYPE.toString().startsWith("ALL")){
 			config.network().setLaneDefinitionsFile(null);
 		}
 		
@@ -180,12 +196,29 @@ public class TtRunCottbusSimulation {
 			break;
 		case WoMines:
 			if (NETWORK_TYPE.equals(NetworkType.V1)){
-//				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
-				// use routes from a 100th iteration as initial plans
-				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_100it_MS_cap0.7.xml.gz");
+				if (SIGNAL_TYPE.toString().contains("ENVELOPE")){
+//					config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-3_100it_cap0.5_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_ALL_GREEN_INSIDE_ENVELOPE_5plans_WoMines_V1/output_plans.xml.gz");
+//					config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-6_100it_cap0.7_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_ALL_GREEN_INSIDE_ENVELOPE_5plans_WoMines_V1/output_plans.xml.gz");
+					config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-13_100it_cap0.5_ReRoute0.1_tbs900_ChExp0.9_beta2_lanes_2link_ALL_DOWNSTREAM_INSIDE_ENVELOPE_5plans_WoMines_V1/output_plans.xml.gz");
+				} else {
+//					 config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
+					// use routes from a 100th iteration as initial plans
+					config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_100it_MS_cap0.7.xml.gz");
+				}
 			} else {
 				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
 			}
+			break;
+		case GRID_LOCK_BTU:
+			// take these as initial plans
+			if (SIGNAL_TYPE.equals(SignalType.MS) || SIGNAL_TYPE.equals(SignalType.DOWNSTREAM_MS)){
+				config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-2_100it_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_MS_5plans_GRID_LOCK_BTU_BTU_NET_3600'12'6/output_plans.xml.gz");
+			} else if (SIGNAL_TYPE.toString().startsWith("ALL")){
+				config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-3_100it_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_ALL_NODES_ALL_GREEN_5plans_GRID_LOCK_BTU_BTU_NET_3600'12'3/output_plans.xml.gz");
+//				config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-3_100it_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_ALL_NODES_DOWNSTREAM_5plans_GRID_LOCK_BTU_BTU_NET_3600'12'3/output_plans.xml.gz");						
+			}
+			break;
+		default:
 			break;
 		}
 		// // pt scenario
@@ -194,12 +227,12 @@ public class TtRunCottbusSimulation {
 
 		// set number of iterations
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(100);
 
 		// able or enable signals and lanes
-		config.qsim().setUseLanes(SIGNAL_TYPE.toString().startsWith("ALL_NODES") ? false : true);
+		config.qsim().setUseLanes(SIGNAL_TYPE.toString().startsWith("ALL") ? false : true);
 		// set signal files
-		if (!SIGNAL_TYPE.equals(SignalType.NONE) && !SIGNAL_TYPE.toString().startsWith("ALL_NODES")) {
+		if (!SIGNAL_TYPE.equals(SignalType.NONE) && !SIGNAL_TYPE.toString().startsWith("ALL")) {
 			SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 			signalConfigGroup.setUseSignalSystems(true);
 			// set signal systems
@@ -217,7 +250,7 @@ public class TtRunCottbusSimulation {
 			default:
 				signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13_v2.1.xml");
 				break;
-			}
+			}			
 			// set signal group
 			if (NETWORK_TYPE.equals(NetworkType.V1) || NETWORK_TYPE.equals(NetworkType.BTU_NET)) {
 				signalConfigGroup.setSignalGroupsFile(INPUT_BASE_DIR + "signal_groups_no_13.xml");
@@ -242,6 +275,13 @@ public class TtRunCottbusSimulation {
 					throw new UnsupportedOperationException("It is not yet supported to combine " + SIGNAL_TYPE + " and " + NETWORK_TYPE);
 				}
 				break;
+			case MS_SYLVIA:
+				if (NETWORK_TYPE.equals(NetworkType.V1)){
+					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_sylvia_no_13.xml");
+				} else {
+					throw new UnsupportedOperationException("It is not yet supported to combine " + SIGNAL_TYPE + " and " + NETWORK_TYPE);
+				}
+				break;
 			case BTU_OPT:
 			case DOWNSTREAM_BTUOPT:
 				if (NETWORK_TYPE.equals(NetworkType.V1) || NETWORK_TYPE.equals(NetworkType.BTU_NET)) {
@@ -250,6 +290,15 @@ public class TtRunCottbusSimulation {
 					throw new UnsupportedOperationException("It is not yet supported to combine " + SIGNAL_TYPE + " and " + NETWORK_TYPE);
 				}
 				break;
+			}
+		}
+		if (PRICING_TYPE.toString().startsWith("CORDON_")){
+			RoadPricingConfigGroup roadPricingCG = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+			// TODO adapt toll value here
+			if (PRICING_TYPE.equals(PricingType.CORDON_INNERCITY)){
+				roadPricingCG.setTollLinksFile(INPUT_BASE_DIR + "cordonToll/tollLinksFile_innerCityWoRing_100.xml");
+			} else { // PricingType.CORDON_RING
+				roadPricingCG.setTollLinksFile(INPUT_BASE_DIR + "cordonToll/tollLinksFile_innerCityWRing_100.xml");				
 			}
 		}
 		
@@ -264,6 +313,7 @@ public class TtRunCottbusSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
+		// TODO
 		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
 
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -320,15 +370,20 @@ public class TtRunCottbusSimulation {
 
 		config.qsim().setStuckTime( 3600 );
 		config.qsim().setRemoveStuckVehicles(false);
+		config.qsim().setStartTime(3600 * 5); 
+		config.qsim().setEndTime(24.*3600.);
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(false); // false is default
+//		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles); // queue is default
 		
 		if (NETWORK_TYPE.equals(NetworkType.BTU_NET)){
 			LOG.warn("Keep in mind that the btu network has already be scaled");
 		}
-		config.qsim().setStorageCapFactor( SCALING_FACTOR );
+//		config.qsim().setStorageCapFactor( SCALING_FACTOR );
+		/* storage cap should be scaled less than flow capacity factor. 
+		 * read in NicolaiNagelHiResAccessibilityMethod (2014), p.75f. (or p.9 in preprint), they mention RieserNagel2008NetworkBreakdown as reference */
+		config.qsim().setStorageCapFactor( SCALING_FACTOR / Math.pow(SCALING_FACTOR,1/4) );
 		config.qsim().setFlowCapFactor( SCALING_FACTOR );
 		
-		config.qsim().setStartTime(3600 * 5); 
-
 		// adapt monetary distance cost rate
 		// (should be negative. the smaller it is, the more counts the distance.
 		// use -12.0 to balance time [h] and distance [m].
@@ -391,8 +446,7 @@ public class TtRunCottbusSimulation {
 	}
 
 	private static Scenario prepareScenario(Config config) {
-		Scenario scenario = ScenarioUtils.loadScenario(config);		
-		createRunNameAndOutputDir(scenario);
+		Scenario scenario = ScenarioUtils.loadScenario(config);	
 	
 		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
@@ -423,21 +477,80 @@ public class TtRunCottbusSimulation {
 			}
 			break;
 		case ALL_NODES_ALL_GREEN:
-			// signalize all intersections with an all day green signal plan, create lanes for all intersections
-			SignalizeScenario.createSignalsAndLanesForAllTurnings(scenario, DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			break;
 		case ALL_NODES_DOWNSTREAM:
-			// signalize all intersections, use downstream signal controller, create lanes for all intersections
-			SignalizeScenario.createSignalsAndLanesForAllTurnings(scenario, DownstreamSignalController.IDENTIFIER);
+		case ALL_GREEN_INSIDE_ENVELOPE:
+		case ALL_DOWNSTREAM_INSIDE_ENVELOPE:
+			// signalize all intersections (or all inside envelope), create lanes for all intersections
+			SignalizeScenario signalizer = new SignalizeScenario(scenario);
+			if (SIGNAL_TYPE.toString().contains("DOWNSTREAM"))
+				signalizer.setSignalControlIdentifier(DownstreamSignalController.IDENTIFIER);
+			if (SIGNAL_TYPE.toString().contains("ENVELOPE"))
+				signalizer.setBoundingBox(INPUT_BASE_DIR + "shape_files/signal_systems/bounding_box.shp");
+			signalizer.createSignalsAndLanesForAllTurnings();
 			break;
 		default:
 			break;
 		}
 		
+//		// adoptions for artificial population (GRID_LOCK_BTU)
+//		if (POP_TYPE.equals(PopulationType.GRID_LOCK_BTU)){
+//			createArificialGridLockPopulation(scenario);
+//		}
+		
+		createRunNameAndOutputDir(scenario);
 		if (WRITE_INITIAL_FILES) 
 			writeInitFiles(scenario);
 		
 		return scenario;
+	}
+
+	private static void createArificialGridLockPopulation(Scenario scenario) {
+		String[] inLinks = {"7919", "4909", "1281", "506", "3411", "2100-2098-5377", "6230",
+				"40", "3503", "6663", "2759", "2475"};
+		String[] outLinks = {"7918", "4908", "1282", "4511", "3418", "5376-2097-2099", "6213",
+				"8632", "3490", "6662", "2758", "6747"};
+		List<Id<Link>> inLinkIds = new LinkedList<>();
+		List<Id<Link>> outLinkIds = new LinkedList<>();
+		for (int i=0; i<inLinks.length; i++){
+			inLinkIds.add(Id.createLinkId(inLinks[i]));
+			outLinkIds.add(Id.createLinkId(outLinks[i]));
+		}
+		
+		Population pop = scenario.getPopulation();
+		
+		int numberOfPersonsPerODPerH = 3600/12/3;
+		double simulationPeriod_h = 3;
+		double simulationStartTime_s = 6*3600;
+		for (Id<Link> inLinkId : inLinkIds){
+			for (Id<Link> outLinkId : outLinkIds){
+				for (int i = 0; i < numberOfPersonsPerODPerH * simulationPeriod_h; i++) {
+					// create a person
+					Person person = pop.getFactory().createPerson(Id.createPersonId(inLinkId + "_" + outLinkId + "_" + i));
+
+					// create a start activity at the inLink
+					Activity startAct = pop.getFactory().createActivityFromLinkId("dummy", inLinkId);
+					// distribute agents uniformly between simulationStartTime and (simulationStartTime + simulationPeriod) am.
+					startAct.setEndTime(simulationStartTime_s + (double)(i)/(numberOfPersonsPerODPerH * simulationPeriod_h) * simulationPeriod_h * 3600);
+				
+					// create a drain activity at outLink
+					Activity drainAct = pop.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(outLinkId));
+					
+					// create a dummy leg
+					Leg leg = pop.getFactory().createLeg(TransportMode.car);
+					
+					// create a plan for the person that contains all this information
+					Plan plan = pop.getFactory().createPlan();
+					plan.addActivity(startAct);
+					plan.addLeg(leg);
+					plan.addActivity(drainAct);
+					
+					// store information in population
+					person.addPlan(plan);
+					
+					pop.addPerson(person);
+				}
+			}
+		}		
 	}
 
 	private static Controler prepareController(Scenario scenario) {
@@ -456,7 +569,7 @@ public class TtRunCottbusSimulation {
 			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
 
-		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED)){
+		if (PRICING_TYPE.toString().startsWith("CP_")){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
 			
@@ -485,27 +598,27 @@ public class TtRunCottbusSimulation {
 			// choose the correct congestion handler and add it
 			EventHandler congestionHandler = null;
 			switch (PRICING_TYPE){
-			case V3:
+			case CP_V3:
 				congestionHandler = new CongestionHandlerImplV3(controler.getEvents(), 
 						controler.getScenario());
 				break;
-			case V4:
+			case CP_V4:
 				congestionHandler = new CongestionHandlerImplV4(controler.getEvents(), 
 						controler.getScenario());
 				break;
-			case V7:
+			case CP_V7:
 				congestionHandler = new CongestionHandlerImplV7(controler.getEvents(), 
 						controler.getScenario());
 				break;
-			case V8:
+			case CP_V8:
 				congestionHandler = new CongestionHandlerImplV8(controler.getEvents(), 
 						controler.getScenario());
 				break;
-			case V9:
+			case CP_V9:
 				congestionHandler = new CongestionHandlerImplV9(controler.getEvents(), 
 						controler.getScenario());
 				break;
-			case V10:
+			case CP_V10:
 				congestionHandler = new CongestionHandlerImplV10(controler.getEvents(), 
 						controler.getScenario());
 				break;
@@ -521,6 +634,9 @@ public class TtRunCottbusSimulation {
 			throw new UnsupportedOperationException("Not yet implemented!");
 //			Initializer initializer = new Initializer();
 //			controler.addControlerListener(initializer);		
+		} else if (PRICING_TYPE.toString().startsWith("CORDON_")){
+			// (loads the road pricing scheme, uses custom travel disutility including tolls, etc.)
+			controler.addOverridingModule(new RoadPricingModule());
 		} else { // no pricing
 			
 			// adapt sigma for randomized routing
