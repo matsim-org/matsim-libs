@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.drt.run;
 
 import org.junit.Rule;
 import org.junit.Test;
