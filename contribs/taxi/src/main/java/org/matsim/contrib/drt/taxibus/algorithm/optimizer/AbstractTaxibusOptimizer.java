@@ -94,7 +94,7 @@ public abstract class AbstractTaxibusOptimizer implements TaxibusOptimizer {
 	}
 
 	protected boolean doReoptimizeAfterNextTask(DrtTask newCurrentTask) {
-		return !destinationKnown && newCurrentTask.getDrtTaskType() == DrtTaskType.DRIVE_WITH_PASSENGER;
+		return !destinationKnown && newCurrentTask.getDrtTaskType() == DrtTaskType.DRIVE_WITH_PASSENGERS;
 	}
 
 	@Override

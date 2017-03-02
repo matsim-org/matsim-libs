@@ -319,7 +319,7 @@ public class TaxibusScheduler {
 		// path.getTravelTime(), path.getTravelCost(), path.getLinks(),
 		// path.getLinkTTs());
 
-		DrtDriveWithPassengerTask task = new DrtDriveWithPassengerTask(onBoard, path);
+		DrtDriveWithPassengersTask task = new DrtDriveWithPassengersTask(onBoard, path);
 		task.setBeginTime(lastEndtime);
 		// for (int i = 0; i < path.getLinkCount(); i++) {
 		// log.info(path.getLink(i).getId().toString());
@@ -445,7 +445,7 @@ public class TaxibusScheduler {
 				}
 
 				case DRIVE_EMPTY:
-				case DRIVE_WITH_PASSENGER: {
+				case DRIVE_WITH_PASSENGERS: {
 					// cannot be shortened/lengthen, therefore must be moved
 					// forward/backward
 					task.setBeginTime(t);

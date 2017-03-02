@@ -29,17 +29,17 @@ import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
  * @author jbischoff
  *
  */
-public class DrtDriveWithPassengerTask extends DriveTaskImpl implements DrtTaskWithRequests {
+public class DrtDriveWithPassengersTask extends DriveTaskImpl implements DrtTaskWithRequests {
 	private final Set<DrtRequest> requests;
 
-	public DrtDriveWithPassengerTask(Set<DrtRequest> requests, VrpPathWithTravelData path) {
+	public DrtDriveWithPassengersTask(Set<DrtRequest> requests, VrpPathWithTravelData path) {
 		super(path);
 		this.requests = requests;
 	}
 
 	@Override
 	public DrtTaskType getDrtTaskType() {
-		return DrtTaskType.DRIVE_WITH_PASSENGER;
+		return DrtTaskType.DRIVE_WITH_PASSENGERS;
 	}
 
 	@Override

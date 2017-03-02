@@ -45,7 +45,7 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 
 		switch (tt.getDrtTaskType()) {
 			case DRIVE_EMPTY:
-			case DRIVE_WITH_PASSENGER:
+			case DRIVE_WITH_PASSENGERS:
 				return legCreator.createLeg((DriveTask)task);
 
 			case PICKUP:
