@@ -50,9 +50,14 @@ public class VrpTravelTimeEstimator implements TravelTime, MobsimBeforeCleanupLi
 	public VrpTravelTimeEstimator(@Named(VrpTravelTimeModules.DVRP_INITIAL) TravelTime initialTT,
 			@Named(TransportMode.car) TravelTime observedTT, Network network,
 			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig) {
+		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
+	}
+
+	public VrpTravelTimeEstimator(TravelTime initialTT, TravelTime observedTT, Network network,
+			TravelTimeCalculatorConfigGroup ttCalcConfig, double travelTimeEstimationAlpha) {
 		this.observedTT = observedTT;
 
-		alpha = dvrpConfig.getTravelTimeEstimationAlpha();
+		alpha = travelTimeEstimationAlpha;
 		if (alpha > 1 || alpha <= 0) {
 			throw new RuntimeException("travelTimeEstimationAlpha must be in (0,1]");
 		}
