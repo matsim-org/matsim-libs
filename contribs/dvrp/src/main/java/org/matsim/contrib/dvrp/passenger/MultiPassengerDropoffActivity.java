@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.tasks;
+package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
+import java.util.Set;
 
-import org.matsim.contrib.drt.DrtRequest;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
+import org.matsim.contrib.dynagent.DynAgent;
 
-public class DrtPickupTask extends StayTaskImpl implements DrtTaskWithRequests {
-	private final Set<DrtRequest> requests;
+public class MultiPassengerDropoffActivity extends VrpActivity {
+	private final PassengerEngine passengerEngine;
+	private final DynAgent driver;
+	private final Set<? extends PassengerRequest> requests;
 
-	public DrtPickupTask(double beginTime, double endTime, Set<DrtRequest> requests) {
-		super(beginTime, endTime, requests.iterator().next().getFromLink());
+	public MultiPassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask dropoffTask,
+			Set<? extends PassengerRequest> requests, String activityType) {
+		super(activityType, dropoffTask);
 
-		this.requests = new HashSet<>(requests);
-		for (DrtRequest req : this.requests) {
-			req.setPickupTask(this);
+		this.passengerEngine = passengerEngine;
+		this.driver = driver;
+		this.requests = requests;
+	}
+
+	@Override
+	public void finalizeAction(double now) {
+		for (PassengerRequest request : requests) {
+			passengerEngine.dropOffPassenger(driver, request, now);
 		}
-	}
-
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		return DrtTaskType.PICKUP;
-	}
-
-	@Override
-	public Set<DrtRequest> getRequests() {
-		return requests;
-	}
-
-	@Override
-	protected String commonToString() {
-		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
 	}
 }

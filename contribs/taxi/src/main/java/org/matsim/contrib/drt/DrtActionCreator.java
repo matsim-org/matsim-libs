@@ -50,12 +50,12 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 
 			case PICKUP:
 				final DrtPickupTask pst = (DrtPickupTask)task;
-				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequest(),
+				return new MultiPassengerPickupActivity(passengerEngine, dynAgent, pst, pst.getRequests(),
 						pickupDuration, TAXIBUS_PICKUP_NAME);
 
 			case DROPOFF:
 				final DrtDropoffTask dst = (DrtDropoffTask)task;
-				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequest(),
+				return new MultiPassengerDropoffActivity(passengerEngine, dynAgent, dst, dst.getRequests(),
 						TAXIBUS_DROPOFF_NAME);
 
 			case STAY:

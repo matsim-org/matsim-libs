@@ -19,19 +19,21 @@
 
 package org.matsim.contrib.drt.tasks;
 
-import java.util.HashSet;
+import java.util.*;
 
 import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
 public class DrtDropoffTask extends StayTaskImpl implements DrtTaskWithRequests {
-	private final DrtRequest request;
+	private final Set<DrtRequest> requests;
 
-	public DrtDropoffTask(double beginTime, double endTime, DrtRequest request) {
-		super(beginTime, endTime, request.getToLink());
+	public DrtDropoffTask(double beginTime, double endTime, Set<DrtRequest> requests) {
+		super(beginTime, endTime, requests.iterator().next().getToLink());
 
-		this.request = request;
-		request.setDropoffTask(this);
+		this.requests = new HashSet<>(requests);
+		for (DrtRequest req : this.requests) {
+			req.setDropoffTask(this);
+		}
 	}
 
 	@Override
@@ -39,33 +41,13 @@ public class DrtDropoffTask extends StayTaskImpl implements DrtTaskWithRequests 
 		return DrtTaskType.DROPOFF;
 	}
 
-	public DrtRequest getRequest() {
-		return request;
+	@Override
+	public Set<DrtRequest> getRequests() {
+		return requests;
 	}
 
 	@Override
 	protected String commonToString() {
 		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
-	}
-
-	@Override
-	public HashSet<DrtRequest> getRequests() {
-		HashSet<DrtRequest> t = new HashSet<>();
-		t.add(request);
-		return t;
-	}
-
-	@Override
-	public void removeRequest(DrtRequest request) {
-		if (request != this.request) {
-			throw new IllegalStateException();
-		}
-		request.setDropoffTask(null);
-
-	}
-
-	@Override
-	public void removeAllRequests() {
-		removeRequest(this.request);
 	}
 }
