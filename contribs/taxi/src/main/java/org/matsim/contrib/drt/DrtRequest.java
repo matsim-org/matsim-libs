@@ -19,15 +19,13 @@
 
 package org.matsim.contrib.drt;
 
-import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.tasks.*;
 import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
@@ -35,7 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
  */
 public class DrtRequest extends RequestImpl implements PassengerRequest {
 
-	public enum TaxibusRequestStatus {
+	public enum DrtRequestStatus {
 		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
 		PLANNED, // planned - included into one of the routes
@@ -52,15 +50,13 @@ public class DrtRequest extends RequestImpl implements PassengerRequest {
 		// REJECTED, // rejected by the DISPATCHER
 		// CANCELLED, // canceled by the CUSTOMER
 		;
-	};
+	}
 
 	private final MobsimPassengerAgent passenger;
 	private final Link fromLink;
 	private final Link toLink;
-	private DrtTaskWithRequests pickupTask = null;
-	private DrtTaskWithRequests dropoffTask = null;;
-
-	private ArrayList<DrtDriveWithPassengerTask> driveWithPassengerTasks = new ArrayList<>();
+	private DrtPickupTask pickupTask = null;
+	private DrtDropoffTask dropoffTask = null;;
 
 	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double t0,
 			double submissionTime) {
@@ -85,77 +81,59 @@ public class DrtRequest extends RequestImpl implements PassengerRequest {
 		return passenger;
 	}
 
-	public void setPickupTask(DrtTaskWithRequests pickupTask) {
-		this.pickupTask = pickupTask;
-
-	}
-
-	public void addDriveWithPassengerTask(DrtDriveWithPassengerTask task) {
-		this.driveWithPassengerTasks.add(task);
-	}
-
-	public DrtTaskWithRequests getDropoffTask() {
-		return dropoffTask;
-	}
-
-	public void setDropoffTask(DrtTaskWithRequests dropoffTask) {
-		this.dropoffTask = dropoffTask;
-	}
-
-	public DrtTaskWithRequests getPickupTask() {
+	public DrtPickupTask getPickupTask() {
 		return pickupTask;
 	}
 
-	public ArrayList<DrtDriveWithPassengerTask> getDriveWithPassengerTask() {
-		return driveWithPassengerTasks;
+	public void setPickupTask(DrtPickupTask pickupTask) {
+		this.pickupTask = pickupTask;
 	}
 
-	public TaxibusRequestStatus getStatus() {
-		{
-			if (pickupTask == null) {
-				return TaxibusRequestStatus.UNPLANNED;
-			}
+	public DrtDropoffTask getDropoffTask() {
+		return dropoffTask;
+	}
 
-			switch (pickupTask.getStatus()) {
-				case PLANNED:
-					DrtTask currentTask = (DrtTask)pickupTask.getSchedule().getCurrentTask();
-					if (currentTask.getDrtTaskType() == DrtTaskType.DRIVE_EMPTY && //
-							pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
-						return TaxibusRequestStatus.DISPATCHED;
-					}
+	public void setDropoffTask(DrtDropoffTask dropoffTask) {
+		this.dropoffTask = dropoffTask;
+	}
 
-					return TaxibusRequestStatus.PLANNED;
-
-				case STARTED:
-					return TaxibusRequestStatus.PICKUP;
-
-				case PERFORMED:// continue
-			}
-
-			if (!driveWithPassengerTasks.isEmpty()) {
-				for (DrtDriveWithPassengerTask t : driveWithPassengerTasks) {
-
-					if (t.getStatus().equals(TaskStatus.STARTED)) {
-
-						return TaxibusRequestStatus.RIDE;
-					}
-				}
-			}
-
-			switch (dropoffTask.getStatus()) {
-				case STARTED:
-					return TaxibusRequestStatus.DROPOFF;
-
-				case PERFORMED:
-					return TaxibusRequestStatus.PERFORMED;
-
-				case PLANNED:// not illegal here
-					return TaxibusRequestStatus.PLANNED;
-			}
-
-			throw new IllegalStateException("Unreachable code");
+	public DrtRequestStatus getStatus() {
+		if (pickupTask == null) {
+			return DrtRequestStatus.UNPLANNED;
 		}
 
-	}
+		switch (pickupTask.getStatus()) {
+			case PLANNED:
+				if (pickupTask.getSchedule().getStatus() == ScheduleStatus.PLANNED) {
+					return DrtRequestStatus.PLANNED;
+				}
 
+				DrtTask currentTask = (DrtTask)pickupTask.getSchedule().getCurrentTask();
+				if (currentTask.getDrtTaskType() == DrtTaskType.DRIVE_EMPTY && //
+						pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
+					return DrtRequestStatus.DISPATCHED;
+				}
+
+				return DrtRequestStatus.PLANNED;
+
+			case STARTED:
+				return DrtRequestStatus.PICKUP;
+
+			case PERFORMED:// continue
+		}
+
+		switch (dropoffTask.getStatus()) {
+			case PLANNED:
+				return DrtRequestStatus.RIDE;
+
+			case STARTED:
+				return DrtRequestStatus.DROPOFF;
+
+			case PERFORMED:
+				return DrtRequestStatus.PERFORMED;
+
+		}
+
+		throw new IllegalStateException("Unreachable code");
+	}
 }

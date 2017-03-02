@@ -24,7 +24,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.DrtRequest;
-import org.matsim.contrib.drt.DrtRequest.TaxibusRequestStatus;
+import org.matsim.contrib.drt.DrtRequest.DrtRequestStatus;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
@@ -99,7 +99,7 @@ public class TaxibusDispatch {
 
 	public void failIfAnyRequestNotUnplanned() {
 		for (DrtRequest request : this.requests) {
-			if (request.getStatus() != TaxibusRequestStatus.UNPLANNED) {
+			if (request.getStatus() != DrtRequestStatus.UNPLANNED) {
 				throw new IllegalStateException();
 			}
 		}
@@ -107,8 +107,8 @@ public class TaxibusDispatch {
 
 	public void failIfRequestNotUnplannedOrDispatched() {
 		for (DrtRequest request : this.requests) {
-			if (request.getStatus() != TaxibusRequestStatus.UNPLANNED) {
-				if (request.getStatus() != TaxibusRequestStatus.DISPATCHED) {
+			if (request.getStatus() != DrtRequestStatus.UNPLANNED) {
+				if (request.getStatus() != DrtRequestStatus.DISPATCHED) {
 					Logger.getLogger(getClass()).error(request.toString() + " S: " + request.getStatus());
 					throw new IllegalStateException();
 				}

@@ -30,20 +30,15 @@ import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
  *
  */
 public class DrtDriveWithPassengerTask extends DriveTaskImpl implements DrtTaskWithRequests {
-
-	private Set<DrtRequest> requests;
+	private final Set<DrtRequest> requests;
 
 	public DrtDriveWithPassengerTask(Set<DrtRequest> requests, VrpPathWithTravelData path) {
 		super(path);
 		this.requests = requests;
-		for (DrtRequest req : this.requests) {
-			req.addDriveWithPassengerTask(this);
-		}
 	}
 
 	@Override
 	public DrtTaskType getDrtTaskType() {
-
 		return DrtTaskType.DRIVE_WITH_PASSENGER;
 	}
 
@@ -53,20 +48,12 @@ public class DrtDriveWithPassengerTask extends DriveTaskImpl implements DrtTaskW
 	}
 
 	@Override
-	public void removeFromRequest(DrtRequest request) {
-
-		request.addDriveWithPassengerTask(null);
+	public void removeRequest(DrtRequest request) {
 		this.requests.remove(request);
-
 	}
 
 	@Override
-	public void removeFromAllRequests() {
-		for (DrtRequest request : this.requests) {
-			request.addDriveWithPassengerTask(null);
-
-		}
+	public void removeAllRequests() {
 		this.requests.clear();
 	}
-
 }

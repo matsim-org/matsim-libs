@@ -44,7 +44,7 @@ public class TaxiRequest extends RequestImpl implements PassengerRequest {
 		// REJECTED, // rejected by the DISPATCHER
 		// CANCELLED, // canceled by the CUSTOMER
 		;
-	};
+	}
 
 	private final MobsimPassengerAgent passenger;
 	private final Link fromLink;

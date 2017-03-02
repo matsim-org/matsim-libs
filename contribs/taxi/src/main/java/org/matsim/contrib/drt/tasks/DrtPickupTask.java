@@ -56,7 +56,7 @@ public class DrtPickupTask extends StayTaskImpl implements DrtTaskWithRequests {
 	}
 
 	@Override
-	public void removeFromRequest(DrtRequest request) {
+	public void removeRequest(DrtRequest request) {
 		if (request != this.request) {
 			throw new IllegalStateException();
 		}
@@ -65,7 +65,7 @@ public class DrtPickupTask extends StayTaskImpl implements DrtTaskWithRequests {
 	}
 
 	@Override
-	public void removeFromAllRequests() {
-		removeFromRequest(this.request);
+	public void removeAllRequests() {
+		removeRequest(this.request);
 	}
 }

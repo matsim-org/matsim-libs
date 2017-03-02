@@ -102,7 +102,6 @@ public class SharedTaxiOptimizer extends AbstractTaxibusOptimizer {
 
 				for (DrtRequest all : bestPath.requests) {
 					all.setDropoffTask(null);
-					all.getDriveWithPassengerTask().clear();
 				}
 			}
 		}
