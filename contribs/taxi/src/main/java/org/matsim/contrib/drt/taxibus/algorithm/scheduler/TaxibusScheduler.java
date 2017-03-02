@@ -358,7 +358,7 @@ public class TaxibusScheduler {
 		}
 
 		if (path.getLinkCount() > 1) {
-			bestSched.addTask(new DrtDriveTask(path));
+			bestSched.addTask(new DrtEmptyDriveTask(path));
 		}
 	}
 
