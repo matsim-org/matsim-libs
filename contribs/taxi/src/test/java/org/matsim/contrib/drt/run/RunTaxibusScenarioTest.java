@@ -19,14 +19,11 @@
 
 package org.matsim.contrib.drt.run;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.matsim.contrib.drt.taxibus.run.configuration.TaxibusConfigGroup;
-import org.matsim.contrib.drt.taxibus.run.examples.RunSharedTaxiExample;
-import org.matsim.contrib.drt.taxibus.run.examples.RunTaxibusExample;
+import org.matsim.contrib.drt.taxibus.run.examples.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.testcases.MatsimTestUtils;
 

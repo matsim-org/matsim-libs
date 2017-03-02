@@ -21,9 +21,9 @@ package org.matsim.contrib.taxi.optimizer;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
 public class LinkProviders {
 	public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = new LinkProvider<TaxiRequest>() {
@@ -48,7 +48,7 @@ public class LinkProviders {
 	};
 
 	public static LinkProvider<Vehicle> createImmediateDiversionOrEarliestIdlenessLinkProvider(
-			final ScheduleInquiry scheduleInquiry) {
+			final TaxiScheduleInquiry scheduleInquiry) {
 		return new LinkProvider<Vehicle>() {
 			public Link apply(Vehicle veh) {
 				return scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh).link;

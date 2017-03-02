@@ -39,7 +39,7 @@ import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.misc.Time;
 
-public class TaxiScheduler implements ScheduleInquiry {
+public class TaxiScheduler implements TaxiScheduleInquiry {
 	private final Fleet fleet;
 	protected final TaxiSchedulerParams params;
 	private final MobsimTimer timer;
@@ -176,11 +176,11 @@ public class TaxiScheduler implements ScheduleInquiry {
 		return filterValidLinkTimePair(tracker.getDiversionPoint(), veh);
 	}
 
-	private LinkTimePair filterValidLinkTimePair(LinkTimePair pair, Vehicle veh) {
+	private static LinkTimePair filterValidLinkTimePair(LinkTimePair pair, Vehicle veh) {
 		return pair.time >= veh.getT1() ? null : pair;
 	}
 
-	private LinkTimePair createValidLinkTimePair(Link link, double time, Vehicle veh) {
+	private static LinkTimePair createValidLinkTimePair(Link link, double time, Vehicle veh) {
 		return time >= veh.getT1() ? null : new LinkTimePair(link, time);
 	}
 

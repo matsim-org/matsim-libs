@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.fifo;
+package org.matsim.contrib.taxi.scheduler;
 
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import java.util.*;
+/**
+ * @author michalm
+ */
+public interface TaxiScheduleInquiry extends ScheduleInquiry {
+	LinkTimePair getImmediateDiversion(Vehicle veh);
 
-import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
+	LinkTimePair getEarliestIdleness(Vehicle veh);
 
-public class FifoTaxiOptimizerTest {
-	@Test
-	public void testFifo() {
-		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
-
-		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
-		Map<String, String> params = createAbstractOptimParams(OptimizerType.FIFO);
-
-		runBenchmark(variants, params, benchmark);
-	}
+	LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh);
 }

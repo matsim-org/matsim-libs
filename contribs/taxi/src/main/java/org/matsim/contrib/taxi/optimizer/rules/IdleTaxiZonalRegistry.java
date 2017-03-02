@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
 import org.matsim.contrib.zone.*;
 
 import com.google.common.base.Predicate;

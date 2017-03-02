@@ -20,17 +20,10 @@
 package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 /**
  * @author michalm
  */
 public interface ScheduleInquiry {
-	LinkTimePair getImmediateDiversion(Vehicle veh);
-
-	LinkTimePair getEarliestIdleness(Vehicle veh);
-
-	LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh);
-
 	boolean isIdle(Vehicle vehicle);
 }

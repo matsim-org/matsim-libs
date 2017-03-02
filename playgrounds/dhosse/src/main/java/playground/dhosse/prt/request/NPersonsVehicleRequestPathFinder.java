@@ -9,6 +9,7 @@ import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -20,7 +21,7 @@ public class NPersonsVehicleRequestPathFinder
 {
     private final TaxiOptimizerContext optimContext;
 
-    private final ScheduleInquiry scheduler;
+    private final TaxiScheduleInquiry scheduler;
     private final int vehicleCapacity;
     private final LeastCostPathCalculator router;
 
