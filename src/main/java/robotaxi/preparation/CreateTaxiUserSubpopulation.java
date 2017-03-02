@@ -24,9 +24,7 @@ package robotaxi.preparation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculators;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.io.MatsimPopulationReaderTest;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
