@@ -23,6 +23,7 @@
 package org.matsim.contrib.parking.parkingsearch.sim;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
@@ -43,15 +44,14 @@ import org.matsim.core.router.StageActivityTypes;
  * @author  jbischoff
  *
  */
-/**
- *
- */
+
 public class SetupParking {
 	// TODO: create config group and make this all configurable?
 
 	static public void installParkingModules(Controler controler) {
 		// No need to route car routes in Routing module in advance, as they are
 		// calculated on the fly
+		controler.getConfig().addModule(new DvrpConfigGroup());
 		final DynRoutingModule routingModuleCar = new DynRoutingModule(TransportMode.car);
 		StageActivityTypes stageActivityTypesCar = new StageActivityTypes() {
 			@Override

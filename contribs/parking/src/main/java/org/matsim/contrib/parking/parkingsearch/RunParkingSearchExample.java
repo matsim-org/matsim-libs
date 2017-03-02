@@ -23,7 +23,6 @@
 package org.matsim.contrib.parking.parkingsearch;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
 import org.matsim.core.config.Config;
@@ -43,21 +42,22 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunParkingSearchExample {
 
 	public static void main(String[] args) {
-		// set to false, if you don't require visualisation, then the example will run for 10 iterations. 
-		new RunParkingSearchExample().run(true);
+		
+		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml");
+		//all further input files are set in the config.
+		
+		// set to false, if you don't require visualisation, then the example will run for 11 iterations, with OTFVis, only one iteration is performed. 
+		new RunParkingSearchExample().run(config,true);
 
 	}
 
 	/**
-	 * 
+	 * @param config
+	 * 			a standard MATSim config
 	 * @param otfvis
 	 *            turns otfvis visualisation on or off
 	 */
-	public void run(boolean otfvis) {
-		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", new DvrpConfigGroup());
-		//all further input files are set in the config.
-		
-
+	public void run(Config config, boolean otfvis) {
 		if (otfvis) {
 			config.controler().setLastIteration(0);
 		} else {
