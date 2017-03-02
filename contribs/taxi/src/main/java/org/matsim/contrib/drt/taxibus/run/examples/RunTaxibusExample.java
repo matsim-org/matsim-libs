@@ -39,10 +39,16 @@ public class RunTaxibusExample {
 
 	public static void main(String[] args) {
 
-		// Select either of the following config files
-		// Config config = ConfigUtils.loadConfig("taxibus_example/configClustered.xml", new TaxibusConfigGroup());
 		Config config = ConfigUtils.loadConfig("taxibus_example/configJsprit.xml", new TaxibusConfigGroup(), new DvrpConfigGroup());
-
+//		Config config = ConfigUtils.loadConfig("taxibus_example/configClustered.xml", new TaxibusConfigGroup(), new DvrpConfigGroup());
+//		for a different algorithm.
+		
+//		set to "false", if you do not require OTFVis visualisation
+		new RunTaxibusExample().run(config, true);
+		
+	}
+	
+	public void run(Config config, boolean otfvis){
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 
@@ -58,9 +64,9 @@ public class RunTaxibusExample {
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 
-		// Comment out the following line in case you do not require OTFVis visualisation
+		if (otfvis){
 		controler.addOverridingModule(new OTFVisLiveModule());
-
+		}
 		controler.run();
 
 	}
