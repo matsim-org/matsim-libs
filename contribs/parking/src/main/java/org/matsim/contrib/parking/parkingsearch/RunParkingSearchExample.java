@@ -47,7 +47,13 @@ public class RunParkingSearchExample {
 		//all further input files are set in the config.
 		
 		// set to false, if you don't require visualisation, then the example will run for 11 iterations, with OTFVis, only one iteration is performed. 
-		new RunParkingSearchExample().run(config,true);
+		boolean otfvis = false;
+		if (otfvis) {
+			config.controler().setLastIteration(0);
+		} else {
+			config.controler().setLastIteration(10);
+		}
+		new RunParkingSearchExample().run(config,otfvis);
 
 	}
 
@@ -58,11 +64,6 @@ public class RunParkingSearchExample {
 	 *            turns otfvis visualisation on or off
 	 */
 	public void run(Config config, boolean otfvis) {
-		if (otfvis) {
-			config.controler().setLastIteration(0);
-		} else {
-			config.controler().setLastIteration(10);
-		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
