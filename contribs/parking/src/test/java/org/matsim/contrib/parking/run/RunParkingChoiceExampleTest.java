@@ -18,17 +18,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.run;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.parking.parkingchoice.run.RunParkingChoiceExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**
  * @author nagel
