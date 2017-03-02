@@ -6,9 +6,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -31,7 +31,7 @@ public class BestDispatchFinder {
 
 	private final TaxiOptimizerContext optimContext;
 	private final MultiNodeDijkstra router;
-	private final TaxiScheduleInquiry scheduleInquiry;
+	private final ScheduleInquiry scheduleInquiry;
 	private final int expectedNeighbourhoodSize;
 
 	public BestDispatchFinder(TaxiOptimizerContext optimContext) {

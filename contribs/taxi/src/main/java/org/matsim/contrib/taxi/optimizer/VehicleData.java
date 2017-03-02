@@ -23,8 +23,8 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
 public class VehicleData {
 	public static class Entry extends LinkTimePair {
@@ -68,7 +68,7 @@ public class VehicleData {
 			double planningHorizon) {
 		double currTime = optimContext.timer.getTimeOfDay();
 		double maxDepartureTime = currTime + planningHorizon;
-		TaxiScheduleInquiry scheduleInquiry = optimContext.scheduler;
+		ScheduleInquiry scheduleInquiry = optimContext.scheduler;
 
 		int idx = 0;
 		int idleCounter = 0;

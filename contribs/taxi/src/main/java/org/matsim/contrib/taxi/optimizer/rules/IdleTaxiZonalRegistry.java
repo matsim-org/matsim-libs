@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.zone.*;
@@ -41,7 +41,7 @@ public class IdleTaxiZonalRegistry {
 
 	private final Predicate<Vehicle> isIdle;
 
-	public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, TaxiScheduleInquiry scheduleInquiry) {
+	public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, ScheduleInquiry scheduleInquiry) {
 		this.zonalSystem = zonalSystem;
 		zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
 

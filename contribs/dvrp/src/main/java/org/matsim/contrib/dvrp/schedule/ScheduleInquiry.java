@@ -17,12 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.scheduler;
+package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-public interface TaxiScheduleInquiry {
+/**
+ * @author michalm
+ */
+public interface ScheduleInquiry {
 	LinkTimePair getImmediateDiversion(Vehicle veh);
 
 	LinkTimePair getEarliestIdleness(Vehicle veh);

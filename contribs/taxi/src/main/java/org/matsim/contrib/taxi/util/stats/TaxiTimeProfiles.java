@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.data.TaxiRequests;
@@ -33,7 +34,7 @@ import com.google.common.collect.Iterables;
 
 public class TaxiTimeProfiles {
 	public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet,
-			final TaxiScheduleInquiry scheduleInquiry) {
+			final ScheduleInquiry scheduleInquiry) {
 		return new TimeProfiles.SingleValueProfileCalculator("Idle") {
 			@Override
 			public Integer calcValue() {

@@ -2,14 +2,13 @@ package playground.dhosse.prt.request;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -21,7 +20,7 @@ public class NPersonsVehicleRequestPathFinder
 {
     private final TaxiOptimizerContext optimContext;
 
-    private final TaxiScheduleInquiry scheduler;
+    private final ScheduleInquiry scheduler;
     private final int vehicleCapacity;
     private final LeastCostPathCalculator router;
 

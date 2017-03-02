@@ -39,7 +39,7 @@ import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.misc.Time;
 
-public class TaxiScheduler implements TaxiScheduleInquiry {
+public class TaxiScheduler implements ScheduleInquiry {
 	private final Fleet fleet;
 	protected final TaxiSchedulerParams params;
 	private final MobsimTimer timer;

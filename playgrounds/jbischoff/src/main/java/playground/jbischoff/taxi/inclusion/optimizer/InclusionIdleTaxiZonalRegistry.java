@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.zone.*;
@@ -46,7 +46,7 @@ public class InclusionIdleTaxiZonalRegistry
     private final String barrierFreeTaxiDesignator;
 
 
-    public InclusionIdleTaxiZonalRegistry(ZonalSystem zonalSystem, TaxiScheduleInquiry scheduleInquiry,String barrierFreeTaxiDesignator)
+    public InclusionIdleTaxiZonalRegistry(ZonalSystem zonalSystem, ScheduleInquiry scheduleInquiry,String barrierFreeTaxiDesignator)
     {
     	this.barrierFreeTaxiDesignator = barrierFreeTaxiDesignator;
         this.zonalSystem = zonalSystem;
@@ -131,7 +131,7 @@ public class InclusionIdleTaxiZonalRegistry
         return vehicles.size();
     }
     
-    private Predicate<Vehicle> createIsIdleAndBarrierFreePredicate(final TaxiScheduleInquiry scheduleInquiry)
+    private Predicate<Vehicle> createIsIdleAndBarrierFreePredicate(final ScheduleInquiry scheduleInquiry)
     {
         return new Predicate<Vehicle>() {
             public boolean apply(Vehicle vehicle)
