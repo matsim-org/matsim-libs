@@ -57,20 +57,16 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Binder;
-
-
 /**
  * I can't say how similar or different to {@link AccessibilityIntegrationTest} this one here is.  kai, feb'17
  * 
- * @author nagel
+ * @author nagel, dziemke
  */
 public class AccessibilityIntegrationTest {
 
 	private static final Logger LOG = Logger.getLogger(AccessibilityIntegrationTest.class);
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-
 
 	@SuppressWarnings("static-method")
 	@Test
@@ -125,8 +121,8 @@ public class AccessibilityIntegrationTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
-		final Scenario sc = createTestScenario(config) ;
 		
+		final Scenario sc = createTestScenario(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
@@ -135,7 +131,7 @@ public class AccessibilityIntegrationTest {
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true,true,true,true,true);
-		module.addSpatialGridDataExchangeListener( evaluateListener ) ;
+		module.addSpatialGridDataExchangeListener(evaluateListener);
 		controler.addOverridingModule(module);
 		controler.addOverridingModule(new AbstractModule() {			
 			@Override
@@ -144,11 +140,9 @@ public class AccessibilityIntegrationTest {
 			}
 		});
 
-		// ---
-
 		controler.run();
 
-		// compare some results -> done in EvaluateTestResults.  But check that this was done at all:
+		// Compare some results -> done in EvaluateTestResults. Check here that this was done at all
 		Assert.assertTrue( evaluateListener.isDone() ) ;
 	}
 
@@ -157,21 +151,16 @@ public class AccessibilityIntegrationTest {
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = createTestConfig() ;
 		
-		// ---
-		
 		final Scenario sc = createTestScenario(config) ;
-		
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
-
-		// ---
 
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true,true,true,true,true);
-		module.addSpatialGridDataExchangeListener( evaluateListener ) ;
+		module.addSpatialGridDataExchangeListener(evaluateListener);
 		controler.addOverridingModule(module);
 		controler.addOverridingModule(new AbstractModule() {			
 			@Override
@@ -180,11 +169,9 @@ public class AccessibilityIntegrationTest {
 			}
 		});
 
-		// ---
-
 		controler.run();
 
-		// compare some results -> done in EvaluateTestResults.  But check that this was done at all:
+		// Compare some results -> done in EvaluateTestResults. Check here that this was done at all
 		Assert.assertTrue( evaluateListener.isDone() ) ;
 	}
 
@@ -204,25 +191,20 @@ public class AccessibilityIntegrationTest {
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setCellSizeCellBasedAccessibility(100);
-		// set area by shapefile in this test
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile);
-		//		acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
+		//		acg.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
 		acg.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
 
-		// ---
-
 		final Scenario sc = createTestScenario(config) ;
-		
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
-		// ---
-		
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
-		module.addSpatialGridDataExchangeListener( new EvaluateTestResults(true,true,true,true,true) ) ;
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true,true,true,true,true);
+		module.addSpatialGridDataExchangeListener(evaluateListener) ;
 		controler.addOverridingModule(module);
 		controler.addOverridingModule(new AbstractModule() {			
 			@Override
@@ -231,12 +213,12 @@ public class AccessibilityIntegrationTest {
 			}
 		});
 		
-		// ---
-		
 		controler.run();
 
-		// compare some results -> done in EvaluateTestResults 
+		// Compare some results -> done in EvaluateTestResults. Check here that this was done at all
+		Assert.assertTrue( evaluateListener.isDone() ) ;
 	}
+
 	
 	@Ignore
 	@Test
@@ -272,7 +254,6 @@ public class AccessibilityIntegrationTest {
 	}
 
 
-
 	/**
 	 * This is called by the GridBasedAccessibilityListener and gets the resulting SpatialGrids. This test checks if the 
 	 * SpatialGrids for activated transport modes (see above) are instantiated or null if the specific transport mode is
@@ -282,7 +263,7 @@ public class AccessibilityIntegrationTest {
 	 */
 	 static class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 
-		private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<>();
+		private Map<String,Boolean> isComputingMode = new HashMap<>();
 		
 		private boolean isDone = false ;
 
@@ -300,13 +281,17 @@ public class AccessibilityIntegrationTest {
 		 * @param usingPtGrid
 		 */
 		public EvaluateTestResults(boolean usingFreeSpeedGrid, boolean usingCarGrid, boolean usingBikeGrid, boolean usingWalkGrid, boolean usingPtGrid){
-			this.isComputingMode.put( Modes4Accessibility.freespeed, usingFreeSpeedGrid ) ;
-			this.isComputingMode.put( Modes4Accessibility.car, usingCarGrid ) ;
-			this.isComputingMode.put( Modes4Accessibility.bike, usingBikeGrid ) ;
-			this.isComputingMode.put( Modes4Accessibility.walk, usingWalkGrid ) ;
-			this.isComputingMode.put( Modes4Accessibility.matrixBasedPt, usingPtGrid ) ;
-
-			//			this.isComputingMode.put( Modes4Accessibility.pt, usingPtGrid ) ;
+//			this.isComputingMode.put( Modes4Accessibility.freespeed, usingFreeSpeedGrid ) ;
+//			this.isComputingMode.put( Modes4Accessibility.car, usingCarGrid ) ;
+//			this.isComputingMode.put( Modes4Accessibility.bike, usingBikeGrid ) ;
+//			this.isComputingMode.put( Modes4Accessibility.walk, usingWalkGrid ) ;
+//			this.isComputingMode.put( Modes4Accessibility.matrixBasedPt, usingPtGrid ) ;
+			this.isComputingMode.put( "freespeed", usingFreeSpeedGrid ) ;
+			this.isComputingMode.put( TransportMode.car, usingCarGrid ) ;
+			this.isComputingMode.put( TransportMode.bike, usingBikeGrid ) ;
+			this.isComputingMode.put( TransportMode.walk, usingWalkGrid ) ;
+			this.isComputingMode.put( "matrixBasedPt", usingPtGrid ) ;
+			// this.isComputingMode.put( Modes4Accessibility.pt, usingPtGrid ) ;
 			// this wasn't commented out yesterday, but I cannot say what it was doing in which way. kai, dec'16
 			// actually it looks like it was working at some time since there are commented-out regression tests for pt.  But they 
 			// were already commented out when I looked at this.  kai, dec'16
@@ -316,7 +301,6 @@ public class AccessibilityIntegrationTest {
 		 * This gets the resulting SpatialGrids from the GridBasedAccessibilityListener.
 		 * - SpatialGrids for transport modes with "useXXXGrid=false"must be null
 		 * - SpatialGrids for transport modes with "useXXXGrid=true"must not be null
-		 * 
 		 */
 		@Override
 		public void setAndProcessSpatialGrids( Map<String,SpatialGrid> spatialGrids ){
@@ -325,9 +309,9 @@ public class AccessibilityIntegrationTest {
 
 			for ( Modes4Accessibility modeEnum : Modes4Accessibility.values() ) {
 				String mode = modeEnum.toString(); // TODO only temporarily
-				LOG.info("mode="+mode);
+				LOG.info("mode=" + mode);
 				Gbl.assertNotNull(spatialGrids);
-				if ( this.isComputingMode.get(modeEnum)!=null) {
+				if (this.isComputingMode.get(mode) != null) {
 					// this was without the !=null yesterday but I cannot say what it was doing or why it was working or not.  kai, dec'16
 					Assert.assertNotNull( spatialGrids.get(mode) ) ;
 				} else {
@@ -344,33 +328,35 @@ public class AccessibilityIntegrationTest {
 						expected.accessibilityCar = 2.14860942375311;
 						expected.accessibilityBike = 2.2257398663221;
 						expected.accessibilityWalk = 1.70054725728361;
-						//						expected.accessibilityPt = 0.461863556339195;
+						expected.accessibilityPt = 0.461863556339195;
 					} else if(x == 50 && y == 150){
 						expected.accessibilityFreespeed = 2.1766435716006005;
 						expected.accessibilityCar = 2.1766435716006005;
 						expected.accessibilityBike = 2.2445468698643367;
-						//						expected.accessibilityBike = 1.; // deliberately wrong for testing
+						// expected.accessibilityBike = 1.; // deliberately wrong for testing
 						expected.accessibilityWalk = 1.7719146868026079;
-						//						expected.accessibilityPt = 0.461863556339195;
+						expected.accessibilityPt = 0.461863556339195;
+//						expected.accessibilityPt = 1.; // deliberately wrong for testing
 					} else if(x == 150 && y == 150){
 						expected.accessibilityFreespeed = 2.2055702759681273;
 						expected.accessibilityCar = 2.2055702759681273;
 						expected.accessibilityBike = 2.2637376515333636;
 						expected.accessibilityWalk = 1.851165291193725;
-						//						expected.accessibilityPt = 0.624928280738513;
+						expected.accessibilityPt = 0.624928280738513;
 					}
 
 					final AccessibilityResults actual = new AccessibilityResults();
-					//					actual.accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freespeed).getValue(new Coord(x, y));
-					//					actual.accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new Coord(x, y));
-					//					actual.accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new Coord(x, y));
-					//					actual.accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new Coord(x, y));
-					//					actual.accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new Coord(x, y));
+//					actual.accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freespeed).getValue(new Coord(x, y));
+//					actual.accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new Coord(x, y));
+//					actual.accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new Coord(x, y));
+//					actual.accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new Coord(x, y));
+					// actual.accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new Coord(x, y));
 					actual.accessibilityFreespeed = spatialGrids.get("freespeed").getValue(new Coord(x, y));
 					actual.accessibilityCar = spatialGrids.get(TransportMode.car).getValue(new Coord(x, y));
 					actual.accessibilityBike = spatialGrids.get(TransportMode.bike).getValue(new Coord(x, y));
 					actual.accessibilityWalk = spatialGrids.get(TransportMode.walk).getValue(new Coord(x, y));
-					//					actual.accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new Coord(x, y));
+					actual.accessibilityPt = spatialGrids.get("matrixBasedPt").getValue(new Coord(x, y));
+					// actual.accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new Coord(x, y));
 
 					Assert.assertTrue(
 							"accessibility at coord " + x + "," + y + " does not match for "+
@@ -499,7 +485,7 @@ public class AccessibilityIntegrationTest {
 	private static Scenario createTestScenario(final Config config) {
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 
-		// creating test opportunities (facilities)
+		// Creating test opportunities (facilities)
 		final ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
 			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
