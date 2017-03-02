@@ -20,13 +20,12 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.data.TaxiRequests;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
-import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.LongEnumAdder;
 
@@ -39,7 +38,7 @@ public class TaxiTimeProfiles {
 			@Override
 			public Integer calcValue() {
 				return Iterables.size(Iterables.filter(fleet.getVehicles().values(),
-						TaxiSchedulerUtils.createIsIdle(scheduleInquiry)));
+						ScheduleInquiries.createIsIdle(scheduleInquiry)));
 			}
 		};
 	}

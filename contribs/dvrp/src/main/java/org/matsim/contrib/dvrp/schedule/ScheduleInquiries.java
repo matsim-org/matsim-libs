@@ -17,14 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.scheduler;
+package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 
 import com.google.common.base.Predicate;
 
-public class TaxiSchedulerUtils {
+/**
+ * @author michalm
+ */
+public class ScheduleInquiries {
 	public static Predicate<Vehicle> createIsIdle(final ScheduleInquiry scheduleInquiry) {
 		return new Predicate<Vehicle>() {
 			public boolean apply(Vehicle vehicle) {

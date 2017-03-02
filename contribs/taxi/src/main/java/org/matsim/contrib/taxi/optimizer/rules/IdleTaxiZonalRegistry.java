@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
 import org.matsim.contrib.zone.*;
 
 import com.google.common.base.Predicate;
@@ -45,7 +44,7 @@ public class IdleTaxiZonalRegistry {
 		this.zonalSystem = zonalSystem;
 		zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
 
-		isIdle = TaxiSchedulerUtils.createIsIdle(scheduleInquiry);
+		isIdle = ScheduleInquiries.createIsIdle(scheduleInquiry);
 
 		vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
