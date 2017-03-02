@@ -25,9 +25,4 @@ import org.matsim.contrib.drt.DrtRequest;
 
 public interface DrtTaskWithRequests extends DrtTask {
 	Set<DrtRequest> getRequests();
-
-	// called (when removing a task) in order to update the request2task assignment
-	void removeRequest(DrtRequest request);
-
-	void removeAllRequests();
 }

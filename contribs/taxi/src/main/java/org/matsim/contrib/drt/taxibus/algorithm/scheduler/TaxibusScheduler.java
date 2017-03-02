@@ -280,7 +280,7 @@ public class TaxibusScheduler {
 				continue;
 			}
 			double endTime = beginTime + params.dropoffDuration;
-			bestSched.addTask(new DrtDropoffTask(beginTime, endTime, req));
+			bestSched.addTask(new DrtDropoffTask(beginTime, endTime, Collections.singleton(req)));
 			// log.info("schedule dropoff" +
 			// req.getPassenger().getId().toString()+ " at link
 			// "+req.getToLink().getId());
@@ -301,7 +301,7 @@ public class TaxibusScheduler {
 			if (pickedUp.contains(req))
 				continue;
 			double t3 = Math.max(beginTime, req.getT0()) + params.pickupDuration;
-			bestSched.addTask(new DrtPickupTask(beginTime, t3, req));
+			bestSched.addTask(new DrtPickupTask(beginTime, t3, Collections.singleton(req)));
 			// log.info("schedule pickup" +
 			// req.getPassenger().getId().toString() + " at link "+req.getFromLink().getId());
 			onBoard.add(req);
@@ -319,7 +319,7 @@ public class TaxibusScheduler {
 		// path.getTravelTime(), path.getTravelCost(), path.getLinks(),
 		// path.getLinkTTs());
 
-		DrtDriveWithPassengersTask task = new DrtDriveWithPassengersTask(onBoard, path);
+		DrtDriveWithPassengersTask task = new DrtDriveWithPassengersTask(path, onBoard);
 		task.setBeginTime(lastEndtime);
 		// for (int i = 0; i < path.getLinkCount(); i++) {
 		// log.info(path.getLink(i).getId().toString());
@@ -459,7 +459,7 @@ public class TaxibusScheduler {
 
 				case PICKUP: {
 					task.setBeginTime(t);// t == taxi's arrival time
-					double t0 = ((DrtPickupTask)task).getRequest().getT0();// t0
+					double t0 = ((DrtPickupTask)task).getRequests().iterator().next().getT0();// t0
 																			// ==
 																			// passenger's
 																			// departure
