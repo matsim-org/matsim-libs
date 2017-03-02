@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-public class TaxibusRequestCreator implements PassengerRequestCreator {
+public class DrtRequestCreator implements PassengerRequestCreator {
 	@Override
 	public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double t0, double t1, double now) {
