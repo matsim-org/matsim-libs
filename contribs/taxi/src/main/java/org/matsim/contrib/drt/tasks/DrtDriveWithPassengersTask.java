@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.drt.tasks;
 
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -34,7 +34,7 @@ public class DrtDriveWithPassengersTask extends DriveTaskImpl implements DrtTask
 
 	public DrtDriveWithPassengersTask(VrpPathWithTravelData path, Set<DrtRequest> requests) {
 		super(path);
-		this.requests = requests;
+		this.requests = new HashSet<>(requests);
 	}
 
 	@Override
@@ -44,6 +44,6 @@ public class DrtDriveWithPassengersTask extends DriveTaskImpl implements DrtTask
 
 	@Override
 	public Set<DrtRequest> getRequests() {
-		return requests;
+		return Collections.unmodifiableSet(requests);
 	}
 }
