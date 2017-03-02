@@ -95,8 +95,8 @@ public class TreebasedTransitRouterImpl implements TransitRouter {
         // find possible end stops
         Map<Node, TransitLeastCostPathTree.InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toFacility.getCoord(), departureTime);
 
-        if (!this.fromFacility.getCoord().equals(fromFacility.getCoord())) {
-            transitLeastCostPathTree = new TransitLeastCostPathTree(this.transitNetwork,this.travelDisutility,
+        if (this.fromFacility == null || !this.fromFacility.getCoord().equals(fromFacility.getCoord())) {
+            transitLeastCostPathTree = new TransitLeastCostPathTree(this.transitNetwork, this.travelDisutility,
                     this.travelTime, wrappedFromNodes, person);
         }
 
