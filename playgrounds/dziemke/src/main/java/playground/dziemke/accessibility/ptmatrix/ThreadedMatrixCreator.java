@@ -1,9 +1,6 @@
 package playground.dziemke.accessibility.ptmatrix;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -20,7 +17,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 
@@ -67,9 +63,9 @@ class ThreadedMatrixCreator implements Runnable {
 //		transitRouterConfig.setBeelineWalkSpeed(beelineWalkSpeed);
 //		transitRouterConfig.setExtensionRadius(extensionRadius);
 //		transitRouterConfig.setSearchRadius(200);
-		
-		TransitRouter transitRouter = new TransitRouterImpl(transitRouterConfig, transitSchedule);
-	    
+
+		TransitRouter transitRouter = new TreebasedTransitRouterImpl(transitRouterConfig, transitSchedule);
+
 	    final CSVFileWriter travelTimeMatrixWriter = new CSVFileWriter(
 	    		this.outputRoot + "travelTimeMatrix_" + this.threadName + ".csv", this.separator);
 	    final CSVFileWriter travelDistanceMatrixWriter = new CSVFileWriter(
@@ -99,8 +95,6 @@ class ThreadedMatrixCreator implements Runnable {
 				
 //				Coord fromCoord = locationFacilitiesFromMap.get(fromLocation);
 //				Coord toCoord = locationFacilitiesToMap.get(toLocation);
-				Coord fromCoord = fromFac.getCoord() ;
-				Coord toCoord = toFac.getCoord() ;
 				
 				// legList = list of legs sequentially travelled on a OD relation, e.g. transit_walk ...  pt ... transit_walk
 				List<Leg> legList = transitRouter.calcRoute(fromFac, toFac, departureTime, null);
@@ -131,7 +125,7 @@ class ThreadedMatrixCreator implements Runnable {
 						String mode = leg.getMode();
 						
 						if (legRoute == null) {
-							if (mode != TransportMode.transit_walk) {
+							if (!Objects.equals(mode, TransportMode.transit_walk)) {
 								throw new RuntimeException("The only route that can be null is a \"route\" that belongs to a transit walk.");
 							} else { // i.e. mode == TransportMode.transit_walk; this is the case for network access and egress
 								
@@ -144,7 +138,7 @@ class ThreadedMatrixCreator implements Runnable {
 								travelDistance = travelDistance + transitWalkDistance;
 							}			
 						} else { // i.e. route != null
-							if (mode == TransportMode.pt) {
+							if (Objects.equals(mode, TransportMode.pt)) {
 								counterTransitLegs++;
 								
 								// have to cast the route to ExperimenalTransitRoute since otherwise the method getRouteId will not be available
@@ -190,7 +184,7 @@ class ThreadedMatrixCreator implements Runnable {
 										travelDistance = travelDistance + beelineDistanceFactor * egressGap;
 									}
 									
-									if (considerLink == true) {
+									if (considerLink) {
 										// accessGap = beeline distance b/w currentLocation=accessStopCoord and fromNode
 										// of the next link
 										double accessGap = Math.sqrt(Math.pow(currentLocation.getX() - fromNodeCoord.getX(), 2) + 
@@ -206,7 +200,7 @@ class ThreadedMatrixCreator implements Runnable {
 									}
 								}
 								
-							} else if (mode == TransportMode.transit_walk) {
+							} else if (Objects.equals(mode, TransportMode.transit_walk)) {
 								// This (route != null and mode = transit_walk) is the case for intermediate transit walks between stops)
 								double beelineWalkSpeed = transitRouterConfig.getBeelineWalkSpeed();
 								double transitWalkDistance = beelineWalkSpeed * beelineDistanceFactor * leg.getTravelTime();
@@ -256,10 +250,10 @@ class ThreadedMatrixCreator implements Runnable {
 	 */
 	private Map<Id<TransitRoute>, List<Id<Link>>> createRoutesNetworkLinksMap(TransitSchedule transitSchedule) {
 		log.info("Start generating transitRouteNetworkLinksMap -- thread = " + threadName);
-		Map<Id<TransitRoute>, List<Id<Link>>> transitRouteNetworkLinksMap = new HashMap<Id<TransitRoute>, List<Id<Link>>>();
+		Map<Id<TransitRoute>, List<Id<Link>>> transitRouteNetworkLinksMap = new HashMap<>();
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				List<Id<Link>> fullLinkIdList = new LinkedList<Id<Link>>();
+				List<Id<Link>> fullLinkIdList = new LinkedList<>();
 				fullLinkIdList.add(transitRoute.getRoute().getStartLinkId()); //start link
 				fullLinkIdList.addAll(transitRoute.getRoute().getLinkIds()); // intermediate links
 				fullLinkIdList.add(transitRoute.getRoute().getEndLinkId()); // end link
@@ -271,7 +265,7 @@ class ThreadedMatrixCreator implements Runnable {
 		return transitRouteNetworkLinksMap;
 	}
 
-	public Thread getThread() {
+	Thread getThread() {
 		return thread;
 	}
 }
