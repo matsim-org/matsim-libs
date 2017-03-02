@@ -76,13 +76,13 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 		try {
 			writer.write( "currSample\ttryNr\t" +
 					"duration_ms\tpopulationSize\t" +
-					"cliqueSizeMin\tcliqueSizeQ1\tcliqueSizeMedian\tcliqueSizeQ3\tcliqueSizeMax\t" +
-					"degreeMin\tdegreeQ1\tdegreeMedian\tdegreeQ3\tdegreeMax\t" +
-					"distanceMin\tdistanceQ1\tdistanceMedian\tdistanceQ3\tdistanceMax\t" +
-					"overlapMin\toverlapQ1\toverlapMedian\toverlapQ3\toverlapMax\t" +
+					"cliqueSizeMin\tcliqueSizeQ1\tcliqueSizeMedian\tcliqueSizeQ3\tcliqueSizeMax\tcliqueSizeAvg\t" +
+					"degreeMin\tdegreeQ1\tdegreeMedian\tdegreeQ3\tdegreeMax\tdegreeAvg\t" +
+					"distanceMin\tdistanceQ1\tdistanceMedian\tdistanceQ3\tdistanceMax\tdistanceAvg\t" +
+					"overlapMin\toverlapQ1\toverlapMedian\toverlapQ3\toverlapMax\toverlapAvg\t" +
 					"nConnectedComponents\t" +
-					"componentSizeMin\tcomponentSizeQ1\tcomponentSizeMedian\tcomponentSizeQ3\tcomponentSizeMax\t" +
-					"socialDistanceMin\tsocialDistanceQ1\tsocialDistanceMedian\tsocialDistanceQ3\tsocialDistanceMax\t" +
+					"componentSizeMin\tcomponentSizeQ1\tcomponentSizeMedian\tcomponentSizeQ3\tcomponentSizeMax\tcomponentSizeAvg\t" +
+					"socialDistanceMin\tsocialDistanceQ1\tsocialDistanceMedian\tsocialDistanceQ3\tsocialDistanceMax\tsocialDistanceAvg\t" +
 					"peakMemoryUsage_bytes" );
 		}
 		catch ( IOException e ) {
@@ -205,7 +205,9 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 		double q3 = arr[ 3 * last / 4 ];
 		double max = arr[ last ];
 
-		writer.write( min+"\t"+q1+"\t"+median+"\t"+q3+"\t"+max );
+		double avg = Arrays.stream( arr ).average().orElse( Double.NaN );
+
+		writer.write( min+"\t"+q1+"\t"+median+"\t"+q3+"\t"+max+"\t"+avg );
 	}
 
 	@Override
