@@ -12,6 +12,7 @@ nbactions.xml
 .idea/
 
 */test/output
+*/output
 bin
 .settings
 bin
