@@ -8,15 +8,15 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="src/main/ressources/network.xml" />
+		<param name="inputNetworkFile" value="network.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="src/main/ressources/oneplan.xml" />
+		<param name="inputPlansFile" value="oneplan.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output" />
+		<param name="outputDirectory" value="output/parkingChoice" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name="mobsim" value="qsim" />

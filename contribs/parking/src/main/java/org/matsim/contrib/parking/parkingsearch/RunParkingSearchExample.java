@@ -30,7 +30,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -44,8 +43,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunParkingSearchExample {
 
 	public static void main(String[] args) {
-		// set to false, if you don't require visualisation, then the example will run for 10 iterations
-		new RunParkingSearchExample().run(false);
+		// set to false, if you don't require visualisation, then the example will run for 10 iterations. 
+		new RunParkingSearchExample().run(true);
 
 	}
 
@@ -56,10 +55,9 @@ public class RunParkingSearchExample {
 	 */
 	public void run(boolean otfvis) {
 		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", new DvrpConfigGroup());
-		config.plans().setInputFile("population100.xml");
-		config.facilities().setInputFile("parkingFacilities.xml");
-		config.controler().setOutputDirectory("output");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		//all further input files are set in the config.
+		
+
 		if (otfvis) {
 			config.controler().setLastIteration(0);
 		} else {
