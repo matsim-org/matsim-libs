@@ -1,44 +1,43 @@
 package playground.joel.data;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.TreeMap;
-
-import org.jdom.input.SAXBuilder;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-
 import playground.clruch.utils.HelperPredicates;
 
-import playground.joel.data.EventFileToDataXML;
+import java.io.File;
+import java.util.*;
+
 /**
  * Created by Joel on 28.02.2017.
  */
-class TravelTimes extends AbstractData {
+class BinnedTravelTimes extends AbstractData {
     // TODO: implement recording of rebalancing journeys for visualization
 
     //NavigableMap<String, NavigableMap<Double, AVStatus>> travelTimes = new TreeMap<>();
     NavigableMap<String, NavigableMap<Double, Double>> travelTimes = new TreeMap<>();
+    NavigableMap<String, NavigableMap<Double, Double>> traveledTime = new TreeMap<>(); // map in map necessary? NavigableMap<String,  Double> traveledTime = new TreeMap<>();
+    NavigableMap<String, NavigableMap<Double, Double>> binnedData = new TreeMap<>(); // map in map necessary? NavigableMap<String, Double> binnedData = new TreeMap<>();
     HashMap<String, Set<Id<Person>>> vehicleCustomers = new HashMap<>();
     HashMap<String, Double> avTripStart = new HashMap<>();
     double totalTimeWithCust = 0;
     double totalTimeRatio;
     int numAVs = 0;
+    double binSize = 300;
+
+    double getBinStart(double time) {
+        double binStart = 0;
+        while (binStart < time) binStart += binSize;
+        binStart -= binSize;
+        return binStart;
+    }
+
+    String writeKey(double binStart) {
+        String key = String.valueOf(binStart) + " - " + String.valueOf(binStart + binSize);
+        return key;
+    }
 
     void calculateTimeRatio() {
 
@@ -47,6 +46,15 @@ class TravelTimes extends AbstractData {
             totalTimeRatio = totalTimeWithCust / (numAVs * 108000);
         } else System.out.println("no AVs found while calculating the time ratio");
 
+    }
+
+    double calculateTimeRatio(double deltaT) {
+        double ratio = 0;
+        if(!(numAVs == 0)) {
+            // get number of AVs with avTripStart.size()
+            ratio = deltaT / (numAVs * 108000);
+        } else System.out.println("no AVs found while calculating the time ratio");
+        return ratio;
     }
 
     private void setStartTime(PersonEntersVehicleEvent event){
@@ -66,7 +74,17 @@ class TravelTimes extends AbstractData {
         if (!travelTimes.containsKey(vehicle))
             travelTimes.put(vehicle, new TreeMap<>());
         //travelTimes.get(vehicle).put(startTime, avStatus);
-        travelTimes.get(vehicle).put(startTime, endTime);
+        if(endTime < getBinStart(startTime) + binSize) {
+            travelTimes.get(vehicle).put(startTime, endTime);
+        } else {
+            double nextBin = getBinStart(startTime) + binSize;
+            travelTimes.get(vehicle).put(startTime, nextBin);
+            while (endTime > nextBin + binSize) {
+                travelTimes.get(vehicle).put(nextBin, nextBin + binSize);
+                nextBin += binSize;
+            }
+            travelTimes.get(vehicle).put(nextBin, endTime);
+        }
         if (endTime <= 108000) {
             totalTimeWithCust += endTime - startTime;
         } else{
@@ -222,10 +240,10 @@ class TravelTimes extends AbstractData {
     @Override
     void writeXML(File directory) {
 
-        File fileExport = new File(directory, "travelTimes.xml");
+        File fileExport1 = new File(directory, "binnedTravelTimes.xml");
 
         // export to node-based XML file
-        new TravelTimesXML().generate(travelTimes, fileExport);
+        new TravelTimesXML().generate(travelTimes, fileExport1);
 
         //System.out.println("combined time with customers: " + totalTimeWithCust);
         numAVs = avTripStart.size();

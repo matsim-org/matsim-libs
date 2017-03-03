@@ -61,7 +61,7 @@ class TravelTimes extends AbstractData {
         return avTripStart.get(event.getVehicleId().toString());
     }
 
-    //private void put(String vehicle, double startTime, AVStatus avStatus)
+    //private void put(String vehicle, double startTime, double endTime)
     private void put(String vehicle, double startTime, double endTime) {
         if (!travelTimes.containsKey(vehicle))
             travelTimes.put(vehicle, new TreeMap<>());

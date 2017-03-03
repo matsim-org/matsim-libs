@@ -11,9 +11,6 @@ import org.matsim.core.events.MatsimEventsReader;
 //import playground.clruch.export.VehicleLocation;
 //import playground.clruch.export.VehicleStatus;
 //import playground.clruch.export.WaitingCustomers;
-import playground.clruch.utils.HelperPredicates;
-
-import playground.joel.data.TravelTimes;
 
 
 /**
@@ -60,11 +57,16 @@ public class EventFileToDataXML {
                 VehicleLocation vehicleLocation = new VehicleLocation();
                 vehicleLocation.initialize(events);
                 */
-                // add event handlers to create VehicleStatus file
+                // add event handlers to create TravelTimes file
                 TravelTimes travelTimes = new TravelTimes();
                 travelTimes.initialize(events);
 
-                // create TotalData file
+                // add event handlers to create travelTimes file
+                BinnedTravelTimes binnedTravelTimes = new BinnedTravelTimes();
+                binnedTravelTimes.initialize(events);
+
+
+                // create TotalData file binnedTravelTimes file
                 TotalData totalData = new TotalData();
 
                 // run the events reader
@@ -73,6 +75,7 @@ public class EventFileToDataXML {
 
                 // write XML files
                 travelTimes.writeXML(data);
+                binnedTravelTimes.writeXML(data);
 
                 File totalDataDir = new File(data, "totalData.xml");
                 totalData.generate("0", String.valueOf(travelTimes.totalTimeRatio), "0", "0", totalDataDir);
