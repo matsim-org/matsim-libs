@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.vehicles.Vehicle;
@@ -121,7 +121,7 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(TaxiModule.TAXI_MODE)){
+		if (event.getLegMode().equals(TaxiOptimizerModules.TAXI_MODE)){
 			waitingPax.add(event.getPersonId());
 			if (!dailyFeeCharged.contains(event.getPersonId())){
 				dailyFeeCharged.add(event.getPersonId());

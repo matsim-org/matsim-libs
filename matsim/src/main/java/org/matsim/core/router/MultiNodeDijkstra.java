@@ -60,7 +60,7 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
  * 
  * @author cdobler
  */
-public class MultiNodeDijkstra extends Dijkstra {
+public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculator {
 	
 	private final static Logger log = Logger.getLogger(MultiNodeDijkstra.class);
 	
@@ -85,11 +85,11 @@ public class MultiNodeDijkstra extends Dijkstra {
 		this.searchAllEndNodes = searchAllEndNodes;
 	}
 	
-	public ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes) {
+	public static ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes) {
 		return new ImaginaryNode(nodes);
 	}
 	
-	public ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes, Coord coord) {
+	public static ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes, Coord coord) {
 		return new ImaginaryNode(nodes, coord);
 	}
 	

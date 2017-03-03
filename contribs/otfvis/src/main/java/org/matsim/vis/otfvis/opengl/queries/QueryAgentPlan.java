@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
@@ -116,7 +115,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public OTFQueryResult query() {
-		Plan plan = simulationView.getPlans().get(this.agentId);
+		MobsimAgent agent = simulationView.getMobsimAgents().get(this.agentId);
+		Plan plan = simulationView.getPlan(agent);
 		Result result = new Result();
 		result.agentId = this.agentId.toString();
 		if (plan != null) {
@@ -140,9 +140,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		} else {
 			log.error("No plan found for id " + this.agentId);
 		}
-		MobsimAgent mobsimAgent = simulationView.getAgents().get(this.agentId);
-		if (mobsimAgent != null && mobsimAgent.getState() == MobsimAgent.State.ACTIVITY && mobsimAgent instanceof PlanAgent ) {
-			Activity act = (Activity) ((PlanAgent) mobsimAgent).getCurrentPlanElement();
+		
+		Activity act = simulationView.getCurrentActivity(agent);
+		if (act != null) {
 			Coord c2 = getCoord(act);
 			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
 				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
@@ -191,12 +191,16 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		}
 
 		private void buildRoute(Plan plan, Id<Person> agentId, Network net, Level level) {
+		    List<PlanElement> planElements = plan.getPlanElements();
+		    if (planElements.isEmpty()) {
+		        return;//non-plan agents may do not have a meaningful plan to be shown
+		    }
 			Color carColor = Color.ORANGE;
 			Color actColor = Color.BLUE;
 			Color ptColor = Color.YELLOW;
 			Color walkColor = Color.MAGENTA;
 			Color otherColor = Color.PINK;
-			for (PlanElement planElement : plan.getPlanElements()) {
+			for (PlanElement planElement : planElements) {
 				if (planElement instanceof Activity) {
 					Activity act = (Activity) planElement;
 					Coord coord = act.getCoord();
@@ -257,7 +261,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						}
 					}
 				}
-			} 
+			}
+			
 			this.vert = Buffers.newDirectFloatBuffer(vertex.size()*2);
 			this.vert.rewind();
 			for (Coord coord : this.vertex) {

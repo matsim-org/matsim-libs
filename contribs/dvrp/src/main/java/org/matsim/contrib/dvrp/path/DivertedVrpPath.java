@@ -26,6 +26,12 @@ import org.matsim.api.core.v01.network.Link;
 import com.google.common.collect.Iterators;
 
 
+/**
+ * A DivertedVrpPath is a VrpPath which additionally keeps information about the original path, where the new path deviates from the
+ * original one, and at which link index they diverted.
+ * 
+ * @author (of documentation) nagel
+ */
 public class DivertedVrpPath
     implements VrpPath
 {

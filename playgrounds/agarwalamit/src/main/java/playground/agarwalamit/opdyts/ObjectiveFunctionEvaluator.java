@@ -75,8 +75,8 @@ public class ObjectiveFunctionEvaluator {
             for ( int ii=0 ; ii < realValue.length ; ii++ ) {
                 double diff ;
 
-                if(realValue==null) diff = simValue[ii];
-                else if (simValue == null) diff = realValue[ii];
+                // realValue cant be null here.
+                if (simValue == null) diff = realValue[ii];
                 else if(realValue.length != simValue.length) {
                     throw new RuntimeException("The length of the real ("+realValue.length+") and sim value ("+simValue.length+ ") arrays for the mode "+mode+" are not same " +
                             "i.e. one of the distance class is missing. The simulation is aborting, because not sure, which bin is missing.");

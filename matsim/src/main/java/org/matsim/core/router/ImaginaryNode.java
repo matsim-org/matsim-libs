@@ -41,12 +41,12 @@ public class ImaginaryNode implements Node {
 	/*package*/ final Collection<? extends InitialNode> initialNodes;
 	/*package*/ final Coord coord;
 	
-	public ImaginaryNode(Collection<? extends InitialNode> initialNodes, Coord coord) {
+	 ImaginaryNode(Collection<? extends InitialNode> initialNodes, Coord coord) {
 		this.initialNodes = initialNodes;
 		this.coord = coord;
 	}
 	
-	public ImaginaryNode(Collection<? extends InitialNode> initialNodes) {
+	 ImaginaryNode(Collection<? extends InitialNode> initialNodes) {
 		this.initialNodes = initialNodes;
 		
 		double sumX = 0.0;

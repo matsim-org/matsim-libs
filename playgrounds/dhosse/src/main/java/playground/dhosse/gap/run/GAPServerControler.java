@@ -181,25 +181,25 @@ public class GAPServerControler {
 	private static void addChangeExp(final Controler controler, double weight){
 		
 		StrategySettings changeExp = new StrategySettings();
-		changeExp.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+		changeExp.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExp.setSubpopulation(null);
 		changeExp.setWeight(weight);
 		controler.getConfig().strategy().addStrategySettings(changeExp);
 		
 		StrategySettings changeExpCarUser = new StrategySettings();
-		changeExpCarUser.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+		changeExpCarUser.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpCarUser.setSubpopulation(Global.GP_CAR);
 		changeExpCarUser.setWeight(weight);
 		controler.getConfig().strategy().addStrategySettings(changeExpCarUser);
 		
 		StrategySettings changeExpLicenseOwner = new StrategySettings();
-		changeExpLicenseOwner.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+		changeExpLicenseOwner.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpLicenseOwner.setSubpopulation(Global.LICENSE_OWNER);
 		changeExpLicenseOwner.setWeight(weight);
 		controler.getConfig().strategy().addStrategySettings(changeExpLicenseOwner);
 		
 		StrategySettings changeExpCommmuter = new StrategySettings();
-		changeExpCommmuter.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+		changeExpCommmuter.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpCommmuter.setSubpopulation(Global.COMMUTER);
 		changeExpCommmuter.setWeight(weight);
 		controler.getConfig().strategy().addStrategySettings(changeExpCommmuter);

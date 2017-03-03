@@ -38,7 +38,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
  * @author nagel
  *
  */
-public class ControlerDefaults {
+public final class ControlerDefaults {
 	
 	private ControlerDefaults(){} // should not be instantiated
 

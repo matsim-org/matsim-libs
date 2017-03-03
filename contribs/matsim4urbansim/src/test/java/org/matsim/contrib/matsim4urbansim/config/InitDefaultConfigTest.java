@@ -61,7 +61,7 @@ public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 			
 			// this creates a default MATSim4UrbanSim configuration including an external config
 			CreateTestM4UConfig testConfig = new CreateTestM4UConfig(CreateTestM4UConfig.COLD_START, path, externalConfigLocation);
-			String configLocation = testConfig.generateConfigV3();
+			String configLocation = testConfig.generateM4UConfigV3();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){

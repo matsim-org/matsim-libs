@@ -23,8 +23,9 @@ import java.awt.*;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
@@ -36,14 +37,17 @@ import com.google.inject.*;
 public class TaxiStatusTimeProfileCollectorProvider
     implements Provider<MobsimListener>
 {
-    private final TaxiData taxiData;
+    private final Fleet fleet;
+    private final SubmittedTaxiRequestsCollector requestCollector;
     private final MatsimServices matsimServices;
 
 
     @Inject
-    public TaxiStatusTimeProfileCollectorProvider(TaxiData taxiData, MatsimServices matsimServices)
+    public TaxiStatusTimeProfileCollectorProvider(Fleet fleet, MatsimServices matsimServices,
+            SubmittedTaxiRequestsCollector requestCollector)
     {
-        this.taxiData = taxiData;
+        this.fleet = fleet;
+        this.requestCollector = requestCollector;
         this.matsimServices = matsimServices;
     }
 
@@ -52,9 +56,9 @@ public class TaxiStatusTimeProfileCollectorProvider
     public MobsimListener get()
     {
         ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
-                TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
-                TaxiTimeProfiles.createRequestsWithStatusCounter(taxiData,
-                        TaxiRequestStatus.UNPLANNED));
+                TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(fleet), //
+                TaxiTimeProfiles.createRequestsWithStatusCounter(
+                        requestCollector.getRequests().values(), TaxiRequestStatus.UNPLANNED));
 
         TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
                 "taxi_status_time_profiles", matsimServices);
@@ -73,7 +77,6 @@ public class TaxiStatusTimeProfileCollectorProvider
                 if (chartType == ChartType.StackedArea) {
                     ((DefaultTableXYDataset)chart.getXYPlot().getDataset()).removeSeries(5);
                 }
-
             }
         });
 

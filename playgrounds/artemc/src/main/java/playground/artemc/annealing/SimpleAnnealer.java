@@ -9,6 +9,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.GenericPlanStrategy;
@@ -244,13 +245,16 @@ ControlerListener {
 			// --- begin new ---
 			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
 				boolean innovative = true ;
-				for ( DefaultSelector sel : DefaultPlanStrategiesModule.DefaultSelector.values() ) {
-					System.out.flush();
-					if ( moduleName.equals( sel.toString() ) ) {
-						innovative = false ;
-						break ;
-					}
+				if ( true ) {
+					throw new RuntimeException(Gbl.COPY_PASTE_FROM_CORE_NO_LONGER_WORKING) ;
 				}
+//				for ( DefaultSelector sel : DefaultPlanStrategiesModule.DefaultSelector.values() ) {
+//					System.out.flush();
+//					if ( moduleName.equals( sel.toString() ) ) {
+//						innovative = false ;
+//						break ;
+//					}
+//				}
 				if ( innovative ) {
 					maxIter = globalInnovationDisableAfter;	
 				}				

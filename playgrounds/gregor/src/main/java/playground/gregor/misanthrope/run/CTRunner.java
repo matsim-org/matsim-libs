@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.misanthrope.router.CTRoutingModule;
 import playground.gregor.misanthrope.simulation.CTMobsimFactory;
+import playground.gregor.misanthrope.simulation.physics.CTLink;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -44,7 +45,6 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer
 
 public class CTRunner implements IterationStartsListener {
     private static final Logger log = Logger.getLogger(CTRunner.class);
-    public static double WIDTH = 3;
     public static boolean DEBUG = false;
 
     private MatsimServices controller;
@@ -56,7 +56,7 @@ public class CTRunner implements IterationStartsListener {
             System.exit(-1);
         }
         if (args.length >= 3) {
-            WIDTH = Double.parseDouble(args[2]);
+            CTLink.DESIRED_WIDTH_IN_CELLS = Double.parseDouble(args[2]);
         }
         String qsimConf = args[0];
 
@@ -70,32 +70,9 @@ public class CTRunner implements IterationStartsListener {
         final Scenario sc = ScenarioUtils.loadScenario(c);
 
 
-//        sc.getPopulation().getPersons().entrySet().removeIf(p -> MatsimRandom.getRandom().nextDouble() < );
-
         sc.getPopulation().getPersons().values().parallelStream().flatMap(p -> p.getPlans().stream()).forEach(pl -> {
             Activity a0 = (Activity) pl.getPlanElements().get(0);
-
             Leg leg = (Leg) pl.getPlanElements().get(1);
-//
-//
-//            Id<Link> frst = a0.getLinkId();
-//            Link frstL = sc.getNetwork().getLinks().get(frst);
-//            if (((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().size() == 0) {
-//                leg.setRoute(null);
-//                leg.setMode("walkct");
-//                a0.setType("pre-evac");
-//                Activity a1 = (Activity) pl.getPlanElements().get(2);
-//                a1.setType("post-evac");
-//                log.warn("route length is 0");
-//                return;
-//            }
-//            Id<Link> scnd = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().get(0);
-//            Link scndL = sc.getNetwork().getLinks().get(scnd);
-//
-//            if (frstL.getFromNode() == scndL.getToNode()) { //U-turn
-//                a0.setLinkId(scnd);
-//            }
-
             leg.setRoute(null);
             leg.setMode("walkct");
             a0.setType("pre-evac");
@@ -142,6 +119,7 @@ public class CTRunner implements IterationStartsListener {
 
             @Override
             public void install() {
+                addEventHandlerBinding().to(ArrivalCounter.class);
                 addControlerListenerBinding().to(UTurnCleaner.class);
                 if (getConfig().controler().getMobsim().equals("ctsim")) {
                     bind(Mobsim.class).toProvider(new Provider<Mobsim>() {

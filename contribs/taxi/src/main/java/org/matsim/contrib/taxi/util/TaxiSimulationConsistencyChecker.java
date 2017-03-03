@@ -20,8 +20,10 @@
 package org.matsim.contrib.taxi.util;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -34,30 +36,32 @@ import com.google.inject.Inject;
 public class TaxiSimulationConsistencyChecker
     implements AfterMobsimListener
 {
-    private final TaxiData taxiData;
+    private final SubmittedTaxiRequestsCollector requestCollector;
     private final TaxiConfigGroup tcg;
 
 
     @Inject
-    public TaxiSimulationConsistencyChecker(TaxiData taxiData, Config config)
+    public TaxiSimulationConsistencyChecker(SubmittedTaxiRequestsCollector requestCollector,
+            Config config)
     {
-        this.taxiData = taxiData;
+        this.requestCollector = requestCollector;
         this.tcg = TaxiConfigGroup.get(config);
     }
 
 
     public void addCheckAllRequestsPerformed()
     {
-        for (TaxiRequest r : taxiData.getTaxiRequests().values()) {
-            if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
+        for (Request r : requestCollector.getRequests().values()) {
+            TaxiRequest tr = (TaxiRequest)r;
+            if (tr.getStatus() != TaxiRequestStatus.PERFORMED) {
                 if (tcg.isBreakSimulationIfNotAllRequestsServed()) {
                     throw new IllegalStateException();
                 }
                 else {
                     Logger.getLogger(getClass())
                             .warn("Taxi request not performed. Request time:\t"
-                                    + Time.writeTime(r.getT0()) + "\tPassenger:\t"
-                                    + r.getPassenger().getId());
+                                    + Time.writeTime(tr.getT0()) + "\tPassenger:\t"
+                                    + tr.getPassenger().getId());
                 }
             }
         }

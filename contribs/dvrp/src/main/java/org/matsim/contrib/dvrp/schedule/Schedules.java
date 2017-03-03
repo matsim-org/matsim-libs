@@ -23,7 +23,6 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -32,16 +31,18 @@ import com.google.common.collect.Iterables;
 public class Schedules
 {
     public static final Predicate<Task> STAY_TASK_PREDICATE = new Predicate<Task>() {
+        @Override
         public boolean apply(Task input)
         {
-            return input.getType() == TaskType.STAY;
+            return (input instanceof StayTask);
         };
     };
 
     public static final Predicate<Task> DRIVE_TASK_PREDICATE = new Predicate<Task>() {
+        @Override
         public boolean apply(Task input)
         {
-            return input.getType() == TaskType.DRIVE;
+            return (input instanceof DriveTask);
         };
     };
 
@@ -58,28 +59,28 @@ public class Schedules
     };
 
 
-    public static <T extends Task> T getFirstTask(Schedule<T> schedule)
+    public static Task getFirstTask(Schedule schedule)
     {
         return schedule.getTasks().get(0);
     }
 
 
-    public static <T extends Task> T getSecondTask(Schedule<T> schedule)
+    public static Task getSecondTask(Schedule schedule)
     {
         return schedule.getTasks().get(1);
     }
 
 
-    public static <T extends Task> T getNextToLastTask(Schedule<T> schedule)
+    public static Task getNextToLastTask(Schedule schedule)
     {
-        List<T> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         return tasks.get(tasks.size() - 2);
     }
 
 
-    public static <T extends Task> T getLastTask(Schedule<T> schedule)
+    public static Task getLastTask(Schedule schedule)
     {
-        List<T> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         return tasks.get(tasks.size() - 1);
     }
 
@@ -108,27 +109,27 @@ public class Schedules
     }
 
 
-    public static <T extends Task> T getNextTask(Schedule<T> schedule)
+    public static Task getNextTask(Schedule schedule)
     {
         int taskIdx = schedule.getStatus() == ScheduleStatus.PLANNED ? //
                 0 : schedule.getCurrentTask().getTaskIdx() + 1;
-        
+
         return schedule.getTasks().get(taskIdx);
     }
 
 
-    public static <T extends Task> T getPreviousTask(Schedule<T> schedule)
+    public static Task getPreviousTask(Schedule schedule)
     {
         int taskIdx = schedule.getStatus() == ScheduleStatus.COMPLETED ? //
                 schedule.getTaskCount() - 1 : schedule.getCurrentTask().getTaskIdx() - 1;
-        
+
         return schedule.getTasks().get(taskIdx);
     }
 
 
-    public static <T extends Task> Link getLastLinkInSchedule(Schedule<T> schedule)
+    public static Link getLastLinkInSchedule(Schedule schedule)
     {
-        List<T> tasks = schedule.getTasks();
+        List<? extends Task> tasks = schedule.getTasks();
         return tasks.isEmpty() ? //
                 schedule.getVehicle().getStartLink() : //
                 Tasks.getEndLink(tasks.get(tasks.size() - 1));
@@ -136,21 +137,21 @@ public class Schedules
 
 
     @SuppressWarnings("unchecked")
-    public static Iterable<StayTask> createStayTaskIter(Schedule<?> schedule)
+    public static Iterable<StayTask> createStayTaskIter(Schedule schedule)
     {
         return (Iterable<StayTask>)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
     }
 
 
     @SuppressWarnings("unchecked")
-    public static Iterable<DriveTask> createDriveTaskIter(Schedule<?> schedule)
+    public static Iterable<DriveTask> createDriveTaskIter(Schedule schedule)
     {
         return (Iterable<DriveTask>)createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
     }
 
 
-    public static Iterable<? extends Task> createTaskFilterIter(Schedule<?> schedule,
-            Predicate<Task> taskPredicate)
+    public static Iterable<? extends Task> createTaskFilterIter(Schedule schedule,
+            Predicate<? super Task> taskPredicate)
     {
         return Iterables.filter(schedule.getTasks(), taskPredicate);
     }

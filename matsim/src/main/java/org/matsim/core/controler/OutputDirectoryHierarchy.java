@@ -34,7 +34,7 @@ import javax.inject.Inject;
  * @author dgrether, michaz
  *
  */
-public class OutputDirectoryHierarchy {
+public final class OutputDirectoryHierarchy {
 
 	public enum OverwriteFileSetting {failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists}
 

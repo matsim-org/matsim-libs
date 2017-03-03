@@ -36,7 +36,7 @@ import com.google.inject.Provides;
 public class DynQSimModule<T extends Mobsim>
     extends AbstractModule
 {
-    private Class<? extends javax.inject.Provider<? extends T>> providerClass;
+    private final Class<? extends javax.inject.Provider<? extends T>> providerClass;
 
 
     public DynQSimModule(Class<? extends javax.inject.Provider<? extends T>> providerClass)

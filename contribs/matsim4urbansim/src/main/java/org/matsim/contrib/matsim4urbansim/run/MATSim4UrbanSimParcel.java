@@ -48,7 +48,7 @@ import org.matsim.contrib.accessibility.ConstantSpeedAccessibilityExpContributio
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.NetworkModeAccessibilityExpContributionCalculator;
-import org.matsim.contrib.accessibility.PtMatrixAccessibilityContributionCalculator;
+import org.matsim.contrib.accessibility.PtMatrixAccessibilityUtils;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -375,7 +375,8 @@ class MATSim4UrbanSimParcel{
 				}
 
 				if(computeZoneBasedAccessibilities){
-					// creates zone based table of log sums
+					// yy the following should better use AccessibilityModule().  kai, feb'17
+
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject private Map<String,TravelTime> travelTimes ;
 						@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
@@ -404,9 +405,9 @@ class MATSim4UrbanSimParcel{
 									Gbl.assertNotNull(travelDisutilityFactory);
 									calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
 									break; }
-								case pt:
+								case matrixBasedPt:
 									if ( ptMatrix != null ) {
-										calc = PtMatrixAccessibilityContributionCalculator.create(ptMatrix, config) ;
+										calc = PtMatrixAccessibilityUtils.createPtMatrixAccessibilityCalculator(ptMatrix, config) ;
 									} else {
 										continue ;
 									}
@@ -414,10 +415,14 @@ class MATSim4UrbanSimParcel{
 								case walk:
 									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 									break;
+									//$CASES-OMITTED$
 								default:
-									throw new RuntimeException("not implemented") ;
+									log.warn("Accessibility computation not implemented for mode=" + mode + ". Since this is matsim4urbansim, which is deprecated, we will continue anyways.") ;
+									calc=null ;
 								}
-								accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								if ( calc != null ) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								}
 							}
 
 							final UrbanSimParameterConfigModuleV3 urbanSimConfig = ConfigUtils.addOrGetModule( getConfig(), UrbanSimParameterConfigModuleV3.class);
@@ -441,6 +446,8 @@ class MATSim4UrbanSimParcel{
 				}
 
 				if(computeGridBasedAccessibility){
+					// yy the following should better use AccessibilityModule().  kai, feb'17
+
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject private Map<String,TravelTime> travelTimes ;
 						@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
@@ -494,7 +501,7 @@ class MATSim4UrbanSimParcel{
 									break; }
 								case pt:
 									if ( ptMatrix != null ) {
-										calc = PtMatrixAccessibilityContributionCalculator.create(ptMatrix, config) ;
+										calc = PtMatrixAccessibilityUtils.createPtMatrixAccessibilityCalculator(ptMatrix, config) ;
 									} else {
 										continue ;
 									}
@@ -503,9 +510,12 @@ class MATSim4UrbanSimParcel{
 									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
 									break;
 								default:
-									throw new RuntimeException("not implemented") ;
+									log.warn("Accessibility computation not implemented for mode=" + mode + ". Since this is matsim4urbansim, which is deprecated, we will continue anyways.") ;
+									calc=null ;
 								}
-								accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								if ( calc != null ) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								}
 							}
 							
 							final GridBasedAccessibilityShutdownListenerV3 gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, boundingBox, cellSize_m);

@@ -2,7 +2,6 @@ package playground.clruch.dispatcher.core;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -16,7 +15,13 @@ import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
-class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
+/**
+ * for vehicles that are currently driving, but should go to a new destination:
+ *  1) change path of current drive task
+ *  2) remove former stay task with old destination
+ *  3) append new stay task
+ */
+final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
     DriveVehicleDiversionDirective(VehicleLinkPair vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
         super(vehicleLinkPair, destination, futurePathContainer);
@@ -24,15 +29,20 @@ class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
-        AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
-        final AVDriveTask avDriveTask = (AVDriveTask) abstractTask;
-        {
-            TaskTracker taskTracker = avDriveTask.getTaskTracker();
-            OnlineDriveTaskTrackerImpl onlineDriveTaskTrackerImpl = (OnlineDriveTaskTrackerImpl) taskTracker;
-            final int diversionLinkIndex = onlineDriveTaskTrackerImpl.getDiversionLinkIndex();
-            final int lengthOfDiversion = vrpPathWithTravelData.getLinkCount();
-            OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+        final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
+        final AVDriveTask avDriveTask = (AVDriveTask) schedule.getCurrentTask(); // <- implies that task is started
+        final AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
+        final double scheduleEndTime = avStayTask.getEndTime();
+
+        TaskTracker taskTracker = avDriveTask.getTaskTracker();
+        OnlineDriveTaskTrackerImpl onlineDriveTaskTrackerImpl = (OnlineDriveTaskTrackerImpl) taskTracker;
+        final int diversionLinkIndex = onlineDriveTaskTrackerImpl.getDiversionLinkIndex();
+        final int lengthOfDiversion = vrpPathWithTravelData.getLinkCount();
+        OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+        final double newEndTime = vrpPathWithTravelData.getArrivalTime();
+
+        if (newEndTime < scheduleEndTime) {
+
             onlineDriveTaskTracker.divertPath(vrpPathWithTravelData);
             GlobalAssert.that(VrpPathUtils.isConsistent(avDriveTask.getPath()));
 
@@ -41,15 +51,13 @@ class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
             if (diversionLinkIndex + lengthOfDiversion != lengthOfCombination)
                 throw new RuntimeException("mismatch " + diversionLinkIndex + "+" + lengthOfDiversion + " != " + lengthOfCombination);
 
-        }
-        final double scheduleEndTime;
-        {
-            AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
-            scheduleEndTime = avStayTask.getEndTime();
-        }
-        schedule.removeLastTask(); // remove stay task
-        
-        ScheduleUtils.makeWhole(vehicleLinkPair.avVehicle, avDriveTask.getEndTime(), scheduleEndTime, destination);
+            GlobalAssert.that(avDriveTask.getEndTime() == newEndTime);
+
+            schedule.removeLastTask(); // remove former stay task with old destination
+            ScheduleUtils.makeWhole(vehicleLinkPair.avVehicle, newEndTime, scheduleEndTime, destination);
+
+        } else
+            reportExecutionBypass(newEndTime - scheduleEndTime);
     }
 
 }

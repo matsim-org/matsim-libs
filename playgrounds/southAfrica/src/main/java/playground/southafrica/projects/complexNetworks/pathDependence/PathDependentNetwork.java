@@ -41,6 +41,7 @@ import org.matsim.core.utils.misc.Counter;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 
 public class PathDependentNetwork {
@@ -144,7 +145,7 @@ public class PathDependentNetwork {
 		previousNodeId = currentNodeId == null ? Id.create("unknown", Node.class) : currentNodeId;
 
 		/* Process the remainder of the (minor) activity pairs. */
-		for(int i = 1; i < chain.size()-1; i++){
+		for(int i = 1; i < activities.size()-1; i++){
 			currentNodeId = Id.create(activities.get(i).getFacilityId(), Node.class);
 			nextNodeId = Id.create(activities.get(i+1).getFacilityId(), Node.class);
 
@@ -175,7 +176,7 @@ public class PathDependentNetwork {
 		 * just have to make sure it is indicated as sink. This is only 
 		 * necessary if the node already exists in the network. If not, it means
 		 * it was never part of a link that was added to the network anyway. */
-		currentNodeId = Id.create(activities.get(chain.size()-1).getFacilityId(), Node.class);
+		currentNodeId = Id.create(activities.get(activities.size()-1).getFacilityId(), Node.class);
 		if(currentNodeId != null && this.network.containsKey(currentNodeId)){
 			this.network.get(currentNodeId).setAsSink(previousNodeId);
 		}
@@ -227,6 +228,33 @@ public class PathDependentNetwork {
 	}
 	
 	
+	public void buildNetwork(DigicoreVehicles vehicles){
+		LOG.info("Building network... number of vehicle files to process: " + vehicles.getVehicles().size());
+		Counter xmlCounter = new Counter("   vehicles completed: ");
+		
+		buildStartTime = System.currentTimeMillis();
+		for(DigicoreVehicle vehicle : vehicles.getVehicles().values()){
+			/* Process vehicle's chains. */
+			for(DigicoreChain dc : vehicle.getChains()){
+				this.processActivityChain(dc);
+			}
+			xmlCounter.incCounter();
+		}
+		
+		xmlCounter.printCounter();
+		buildEndTime = System.currentTimeMillis();
+		
+		writeNetworkStatisticsToConsole();
+	}
+	
+	/**
+	 * Thos method uses a list of files, which is now deprecated since a single
+	 * {@link DigicoreVehicles} container is available. This is kept for backward
+	 * compatibility. Instead use {@link #buildNetwork(DigicoreVehicles)}.
+	 * 
+	 * @param fileList
+	 */
+	@Deprecated
 	public void buildNetwork(List<File> fileList) {
 		LOG.info("Building network... number of vehicle files to process: " + fileList.size());
 		Counter xmlCounter = new Counter("   vehicles completed: ");

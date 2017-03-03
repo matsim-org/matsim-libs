@@ -22,7 +22,7 @@
 
 package org.matsim.contrib.otfvis;
 
-import javax.inject.Inject;
+
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,9 +32,12 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
+
+import com.google.inject.Inject;
 
 public class OTFVisLiveModule extends AbstractModule {
-
+    
 	@Override
 	public void install() {
 		this.addMobsimListenerBinding().to( OTFVisMobsimListener.class ) ;
@@ -43,10 +46,11 @@ public class OTFVisLiveModule extends AbstractModule {
 	private static class OTFVisMobsimListener implements MobsimInitializedListener{
 		@Inject Scenario scenario ;
 		@Inject EventsManager events ;
+		@Inject(optional=true) NonPlanAgentQueryHelper nonPlanAgentQueryHelper;
 		@Override 
 		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 			QSim qsim = (QSim) e.getQueueSimulation() ; 
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim( scenario.getConfig(), scenario, events, qsim);
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim( scenario.getConfig(), scenario, events, qsim, nonPlanAgentQueryHelper);
 			OTFClientLive.run(scenario.getConfig(), server);
 		}
 	}

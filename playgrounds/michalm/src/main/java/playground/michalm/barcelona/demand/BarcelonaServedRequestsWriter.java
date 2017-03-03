@@ -33,6 +33,7 @@ public class BarcelonaServedRequestsWriter
     }
 
 
+    @SuppressWarnings("deprecation")
     public void writeFile(String file)
     {
         try (PrintWriter pw = new PrintWriter(new File(file))) {

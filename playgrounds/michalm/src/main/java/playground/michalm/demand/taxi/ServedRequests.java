@@ -35,6 +35,7 @@ public class ServedRequests
     {
         SUN, MON, TUE, WED, THU, FRI, SAT;//weird ordering imposed by Date
 
+        @SuppressWarnings("deprecation")
         public static WeekDay getWeekDay(Date date)
         {
             return WeekDay.values()[date.getDay()];
@@ -103,6 +104,7 @@ public class ServedRequests
             final int zeroHour)
     {
         Predicate<ServedRequest> predicate = new Predicate<ServedRequest>() {
+            @SuppressWarnings("deprecation")
             public boolean apply(ServedRequest request)
             {
                 WeekDay wd = WeekDay.getWeekDay(request.getStartTime());

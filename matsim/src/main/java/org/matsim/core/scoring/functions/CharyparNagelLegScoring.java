@@ -40,6 +40,7 @@ import org.matsim.pt.PtConstants;
  * @author rashid_waraich
  */
 public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
+	// yyyy URL in above javadoc is broken.  kai, feb'17
 
 	protected double score;
 

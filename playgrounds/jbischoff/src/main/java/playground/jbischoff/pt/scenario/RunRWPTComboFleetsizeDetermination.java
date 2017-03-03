@@ -23,26 +23,23 @@
 package playground.jbischoff.pt.scenario;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.contrib.av.flow.AvIncreasedCapacityModule;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
+import org.matsim.contrib.av.intermodal.router.config.*;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
+import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.*;
 
 /**
  * @author  jbischoff
@@ -54,18 +51,21 @@ import org.matsim.vehicles.*;
 public class RunRWPTComboFleetsizeDetermination {
 public static void main(String[] args) {
 	
-		if (args.length!=3){
+		if (args.length!=4){
 			throw new RuntimeException("Wrong arguments");
 		}
 		String configfile = args[0];
 		String RUNID = args[1];
 		String taxisFile = args[2];
-	
-		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup());
+		int avfactor = Integer.parseInt(args[3]);
+		
+		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new DvrpConfigGroup());
 		config.controler().setRunId(RUNID);
 		String outPutDir = config.controler().getOutputDirectory()+"/"+RUNID+"/"; 
 		config.controler().setOutputDirectory(outPutDir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		DvrpConfigGroup.get(config).setMode("taxi");
 		
 		TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
 		tcg.setTaxisFile(taxisFile);
@@ -73,13 +73,12 @@ public static void main(String[] args) {
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		
 		
-		walk.setDistance(1000);
+		walk.setDistance(500);
 		walk.setTeleported(true);
 		walk.setMode("walk");
 		
 		config.global().setNumberOfThreads(4);
 
-	
 		
 		VariableAccessModeConfigGroup taxi = new VariableAccessModeConfigGroup();
 		taxi.setDistance(200000);
@@ -91,7 +90,7 @@ public static void main(String[] args) {
 		vacfg.setAccessModeGroup(walk);
 		
 		config.addModule(vacfg);
-		config.transitRouter().setSearchRadius(3000);
+		config.transitRouter().setSearchRadius(5000);
 		config.transitRouter().setExtensionRadius(0);
 		
 	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
@@ -101,18 +100,14 @@ public static void main(String[] args) {
        config.checkConsistency();
 
        Scenario scenario = ScenarioUtils.loadScenario(config);
-       TaxiData taxiData = new TaxiData();
-       new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
+       FleetImpl fleet = new FleetImpl();
+       new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
+       controler.addOverridingModule(new AvIncreasedCapacityModule(avfactor));
+       controler.addOverridingModule(new TaxiOutputModule());
 
-       VehicleType avVehType = new VehicleTypeImpl(Id.create("avVehicleType", VehicleType.class));
-       avVehType.setFlowEfficiencyFactor(2);
-       controler.addOverridingModule(new TaxiModule(taxiData, avVehType));
+       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
-       double expAveragingAlpha = 0.05;//from the AV flow paper 
-       controler.addOverridingModule(
-               VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-       controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
 //       controler.addOverridingModule(new OTFVisLiveModule());

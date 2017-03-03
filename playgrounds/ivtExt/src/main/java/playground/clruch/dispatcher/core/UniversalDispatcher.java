@@ -6,20 +6,17 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.clruch.dispatcher.AVTaskAdapter;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.GlobalAssert;
@@ -65,7 +62,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * 
      * @return collection of all requests that have not been matched
      */
-    protected final Collection<AVRequest> getAVRequests() {
+    protected synchronized final Collection<AVRequest> getAVRequests() {
         pendingRequests.removeAll(matchedRequests);
         matchedRequests.clear();
         return Collections.unmodifiableCollection(pendingRequests);
@@ -91,13 +88,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest
      *            provided by getAVRequests()
      */
-    protected final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+    protected synchronized final Void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
-        
+
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
 
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
+        final Schedule schedule = avVehicle.getSchedule();
         GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule)); // check that current task is last task in schedule
 
         final double endPickupTime = getTimeNow() + pickupDurationPerStop;
@@ -106,20 +103,24 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         assignDirective(avVehicle, new AcceptRequestDirective( //
                 avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
+        return null;
     }
 
     /**
      * assigns new destination to vehicle.
      * if vehicle is already located at destination, nothing happens.
      * 
+     * in one pass of redispatch(...), the function setVehicleDiversion(...)
+     * may only be invoked once for a single vehicle (specified in vehicleLinkPair).
+     *
      * @param vehicleLinkPair
      *            is provided from super.getDivertableVehicles()
      * @param destination
      */
-    protected final void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
-        final Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) vehicleLinkPair.avVehicle.getSchedule();
-        AbstractTask abstractTask = schedule.getCurrentTask(); // <- implies that task is started
-        new AVTaskAdapter(abstractTask) {
+    protected final Void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+        final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
+        Task task = schedule.getCurrentTask(); // <- implies that task is started
+        new AVTaskAdapter(task) {
             @Override
             public void handle(AVDriveTask avDriveTask) {
                 if (!avDriveTask.getPath().getToLink().equals(destination)) { // ignore when vehicle is already going there
@@ -144,8 +145,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     assignDirective(vehicleLinkPair.avVehicle, new EmptyDirective());
             }
         };
+        return null;
     }
 
+    protected final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {
+        setVehicleDiversion(entry.getKey(), entry.getValue());
+    }
+
+    @Override
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
         // default implementation: for now, do nothing
     }
@@ -162,14 +169,15 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     /**
-     * @return debug information
+     * @return debug information about status of this instance of {@link UniversalDispatcher}
      */
     public final String getUniversalDispatcherStatusString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#requests " + getAVRequests().size());
         stringBuilder.append(", #stay " + //
                 getStayVehicles().values().stream().flatMap(Queue::stream).count());
-        stringBuilder.append(", #divert " + getDivertableVehicles().size());
+        stringBuilder.append(", #divert " + //
+                getDivertableVehicles().size());
         return stringBuilder.toString();
     }
 

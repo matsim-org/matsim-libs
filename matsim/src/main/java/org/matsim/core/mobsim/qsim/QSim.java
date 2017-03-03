@@ -598,11 +598,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	}
 
 	@Override
-	public Collection<MobsimAgent> getAgents() {
-		return Collections.unmodifiableCollection(this.agents.values());
-	}
-
-	public Map< Id<Person>, MobsimAgent> getAgentMap() {
+	public Map<Id<Person>, MobsimAgent> getAgents() {
 		return Collections.unmodifiableMap(this.agents);
 	}
 

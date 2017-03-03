@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -20,7 +19,6 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.clruch.dispatcher.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -32,12 +30,12 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 /**
  * The purpose of VehicleMaintainer is to register {@link AVVehicle}
  * and provide the collection of available vehicles to derived class.
- * 
+ * <p>
  * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s.
  * path computations attached to assignments are computed in parallel
  * {@link ParallelLeastCostPathCalculator}.
  */
-public abstract class VehicleMaintainer implements AVDispatcher {
+abstract class VehicleMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;
 
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
@@ -45,27 +43,26 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
 
-    protected VehicleMaintainer(EventsManager eventsManager) {
+    VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
     }
 
     /**
      * maps given {@link AVVehicle} to given {@link AbstractDirective}
-     * 
+     *
      * @param avVehicle
      * @param abstractDirective
      */
-    /* package */ void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
+    /* package */ synchronized void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective(avVehicle));
         private_vehicleDirectives.put(avVehicle, abstractDirective);
     }
 
     /**
-     * 
      * @param avVehicle
      * @return true if given {@link AVVehicle} doesn't have a {@link AbstractDirective} assigned to it
      */
-    private boolean isWithoutDirective(AVVehicle avVehicle) {
+    private synchronized boolean isWithoutDirective(AVVehicle avVehicle) {
         return !private_vehicleDirectives.containsKey(avVehicle);
     }
 
@@ -78,16 +75,16 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     /**
      * function call leaves the state of the {@link UniversalDispatcher} unchanged.
      * successive calls to the function return the identical collection.
-     * 
+     *
      * @return collection of all vehicles that currently are in the last task, which is of type STAY
      */
-    protected final Map<Link, Queue<AVVehicle>> getStayVehicles() {
+    public final Map<Link, Queue<AVVehicle>> getStayVehicles() {
         Map<Link, Queue<AVVehicle>> map = new HashMap<>();
         for (AVVehicle avVehicle : getFunctioningVehicles())
             if (isWithoutDirective(avVehicle)) {
-                AbstractTask abstractTask = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
-                if (abstractTask.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
-                    new AVTaskAdapter(abstractTask) {
+                Task task = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
+                if (task.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
+                    new AVTaskAdapter(task) {
                         @Override
                         public void handle(AVStayTask avStayTask) { // <- type of task is STAY
                             final Link link = avStayTask.getLink();
@@ -101,23 +98,25 @@ public abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
-     * @return collection of cars that are in the driving state without customer, or stay task
+     * @return collection of cars that are in the driving state without customer, or stay task.
+     * if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
+     * that invoke assignDirective(...), the vehicle is not included in the successive call to
+     * getDivertableVehicles() until it becomes <i>divertable</i> again.
      */
     protected final Collection<VehicleLinkPair> getDivertableVehicles() {
         Collection<VehicleLinkPair> collection = new LinkedList<>();
         for (AVVehicle avVehicle : getFunctioningVehicles())
             if (isWithoutDirective(avVehicle)) {
-                Schedule<AbstractTask> schedule = (Schedule<AbstractTask>) avVehicle.getSchedule();
-                AbstractTask abstractTask = schedule.getCurrentTask();
-                new AVTaskAdapter(abstractTask) { // TODO don't use abstractTask beyond this point!!! 
+                Schedule schedule = avVehicle.getSchedule();
+                new AVTaskAdapter(schedule.getCurrentTask()) {
                     @Override
                     public void handle(AVDriveTask avDriveTask) {
                         // for empty cars the drive task is second to last task
-                        if (Schedules.isNextToLastTask(abstractTask)) {
+                        if (Schedules.isNextToLastTask(avDriveTask)) {
                             TaskTracker taskTracker = avDriveTask.getTaskTracker();
                             OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
                             LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
-                            if (linkTimePair != null) // TODO treat null case ?
+                            if (linkTimePair != null)
                                 collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
                         }
                     }
@@ -125,11 +124,11 @@ public abstract class VehicleMaintainer implements AVDispatcher {
                     @Override
                     public void handle(AVStayTask avStayTask) {
                         // for empty vehicles the current task has to be the last task
-                        if (Schedules.isLastTask(abstractTask))
-                            if (avStayTask.getBeginTime() <= getTimeNow()) { // TODO comment on condition
-                                LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
-                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
-                            }
+                        if (Schedules.isLastTask(avStayTask)) {
+                            GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self evident?
+                            LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
+                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                        }
                     }
                 };
             }
@@ -157,7 +156,6 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     /**
      * @return time of current re-dispatching iteration step
-     * 
      * @throws NullPointerException
      *             if dispatching has not started yet
      */
@@ -167,7 +165,10 @@ public abstract class VehicleMaintainer implements AVDispatcher {
 
     public abstract void redispatch(double now);
 
-    public String getVehicleMaintainerStatusString() { // TODO still needs to evaluate
+    /**
+     * @return debug information about status of this instance of {@link VehicleMaintainer}
+     */
+    public synchronized String getVehicleMaintainerStatusString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("#directives " + private_vehicleDirectives.size() + ", ");
         stringBuilder.append("total routingTime=" + (routingTimeNano * 1e-9) + " sec");

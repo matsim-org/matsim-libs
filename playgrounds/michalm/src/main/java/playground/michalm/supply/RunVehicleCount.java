@@ -35,12 +35,12 @@ public class RunVehicleCount
         throws IOException
     {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        VrpData data = new VrpDataImpl();
-        VehicleReader reader = new VehicleReader(scenario.getNetwork(), data);
+        FleetImpl fleet = new FleetImpl();
+        VehicleReader reader = new VehicleReader(scenario.getNetwork(), fleet);
         reader.readFile(
                 "d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");
 
-        VehicleCounter counter = new VehicleCounter(data.getVehicles().values());
+        VehicleCounter counter = new VehicleCounter(fleet.getVehicles().values());
         List<Integer> counts = counter.countVehiclesOverTime(5 * 60);
 
         File file = new File(

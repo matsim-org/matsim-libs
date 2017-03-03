@@ -36,7 +36,6 @@ public class CTPed {
 	private CTCell currentCell;
 	private double dir;
 	private CTCell tentativeNextCell;
-	private int currentIdx = 1;
 
 	public CTPed(CTCell cell, DriverAgent driverAgent) {
 		this.currentCell = cell;
@@ -69,10 +68,6 @@ public class CTPed {
 		if (this.tentativeNextCell.jumpOnPed(this, time)) {
 
 
-//            EventsManager em = this.currentCell.getNet().getEventsManager();
-//            JumpEvent e = new JumpEvent(time, driver.getId(), this.dir, this.currentCell.id, this.tentativeNextCell.id);
-//            em.processEvent(e);
-//			System.out.println(time + "," + driver.getId() + "," + dir + "," + this.currentCell.id + "," + this.tentativeNextCell.id);
             this.currentCell.jumpOffPed(this, time);
 			this.currentCell = tentativeNextCell;
 
@@ -80,10 +75,6 @@ public class CTPed {
 
 		}
 		return this.currentCell;
-	}
-
-	public CTCell getTentativeNextCell() {
-		return tentativeNextCell;
 	}
 
 	public void setTentativeNextCell(CTCell tentativeNextCell) {
@@ -111,10 +102,7 @@ public class CTPed {
 			}
 		}
 		throw new RuntimeException("error in node-link plan logic");
-
-
 	}
-
 
 	public Id<Link> getNextLinkId() {
 		return this.driver.chooseNextLinkId();
