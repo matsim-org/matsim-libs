@@ -1,5 +1,7 @@
 package cba.resampling;
 
+import org.matsim.api.core.v01.population.Plan;
+
 /**
  * 
  * @author Gunnar Flötteröd
@@ -75,6 +77,12 @@ class DummySampersAlternative implements Alternative {
 	public void setMATSimTimeScore(double score) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Plan getMATSimPlan() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
