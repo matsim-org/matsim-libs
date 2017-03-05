@@ -79,8 +79,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         travelTimes = travelTimesIn;
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         this.initiateLP();
-        numberOfAVs = (int) generatorConfig.getNumberOfVehicles();//Integer.parseInt(config.getParams().get("numberOfVehicles"));
-        REBALANCING_PERIOD = Integer.parseInt(config.getParams().get("rebalancingPeriod"));//5*60;//Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
+        REBALANCING_PERIOD = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
     }
 
 
@@ -89,8 +89,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         // A: outside rebalancing periods, permanently assign vehicles to requests if they have arrived at a customer
         //    i.e. stay on the same link
         total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
-        Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableVehicles();
+        Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
         Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
+
+
+
 
         // B: redispatch all vehicles
         final long round_now = Math.round(now);
@@ -103,8 +106,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             for (List<AVRequest> avRequests : requests.values()) {
                 num_requests = num_requests + avRequests.size();
             }
-            // TODO add number of vehicles, remove hard-coded 1000
-            int vi_desired_num = (int) ((1000.0 - num_requests) / (double) virtualNetwork.getVirtualNodes().size());
+
+            int vi_desired_num = (int) ((numberOfAVs - num_requests) / (double) virtualNetwork.getVirtualNodes().size());
             Map<VirtualNode, Integer> vi_desired = new HashMap<>();
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
                 vi_desired.put(virtualNode, vi_desired_num);
@@ -182,6 +185,18 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 if (sizeL > sizeV)
                     throw new RuntimeException("rebalancing inconsistent " + sizeL + " > " + sizeV);
             }
+
+            // 2.4 send rebalancing vehicles using the setVehicleRebalance command
+            for(VirtualNode virtualNode : destinationLinks.keySet()){
+                Map<VehicleLinkPair,Link> rebalanceMatching =  vehicleDestMatcher.match(availableVehicles.get(virtualNode),destinationLinks.get(virtualNode));
+                for(VehicleLinkPair vehicleLinkPair : rebalanceMatching.keySet()){
+                    setVehicleRebalance(vehicleLinkPair,rebalanceMatching.get(vehicleLinkPair));
+                }
+            }
+            destinationLinks.clear();
+            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
+                destinationLinks.put(virtualNode, new ArrayList<>());
+
 
             // fill request destinations
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
