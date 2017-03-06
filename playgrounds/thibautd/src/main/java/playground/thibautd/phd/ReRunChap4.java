@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunMatsim2010SocialScenario.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,10 +16,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsimusages.run;
+package playground.thibautd.phd;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
@@ -38,14 +36,12 @@ import org.matsim.contrib.socnetsim.usage.replanning.DefaultGroupStrategyRegistr
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import playground.ivt.matsim2030.Matsim2030Utils;
-import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
-import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils;
-import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils.DilutionType;
+import playground.thibautd.socnetsimusages.run.KtiInputFilesConfigGroup;
+import playground.thibautd.socnetsimusages.run.ZurichScenarioUtils;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityConfigGroup;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityStrategiesModule;
 import playground.thibautd.socnetsimusages.traveltimeequity.KtiScoringWithEquityModule;
@@ -53,9 +49,8 @@ import playground.thibautd.socnetsimusages.traveltimeequity.KtiScoringWithEquity
 /**
  * @author thibautd
  */
-public class RunMatsim2010SocialScenario {
-	private static final Logger log =
-		Logger.getLogger(RunMatsim2010SocialScenario.class);
+public class ReRunChap4 {
+	private static final Logger log = Logger.getLogger( ReRunChap4.class );
 
 	public static void main(final String[] args) {
 		OutputDirectoryLogging.catchLogEntries();
@@ -118,24 +113,10 @@ public class RunMatsim2010SocialScenario {
 		new SocialNetworkReader( scenario ).readFile( snConf.getInputFile() );
 
 		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
-		for ( Id p : scenario.getPopulation().getPersons().keySet() ) {
-			if ( !sn.getEgos().contains( p ) ) sn.addEgo( p );
-		}
+		scenario.getPopulation().getPersons().keySet().stream()
+				.filter( sn.getEgos()::contains )
+				.forEach( sn::addEgo );
 
-		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
-			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
-		if ( mergingGroup.getPerformDilution() ) {
-			final SocialDilutionConfigGroup dilutionConfig = (SocialDilutionConfigGroup)
-				config.getModule( SocialDilutionConfigGroup.GROUP_NAME );
-			log.info( "performing \"dilution\" with method "+dilutionConfig.getDilutionType() );
-			SocialNetworkedPopulationDilutionUtils.dilute(
-					dilutionConfig.getDilutionType(),
-					scenario,
-					mergingGroup.getDilutionCenter(),
-					mergingGroup.getDilutionRadiusM() );
-		}
-
-		assert sn.getEgos().size() == scenario.getPopulation().getPersons().size() : sn.getEgos().size() +" != "+ scenario.getPopulation().getPersons().size();
 		return scenario;
 	}
 
@@ -146,31 +127,8 @@ public class RunMatsim2010SocialScenario {
 		RunUtils.addConfigGroups( config );
 		// some redundancy here... just add scenarioMerging "by hand"
 		//Matsim2030Utils.addDefaultGroups( config );
-		config.addModule( new ScenarioMergingConfigGroup() );
-		config.addModule( new SocialDilutionConfigGroup() );
 		config.addModule( new EquityConfigGroup() );
 		new ConfigReader( config ).readFile( configFile );
 		return config;
-	}
-
-	private static class SocialDilutionConfigGroup extends ReflectiveConfigGroup {
-		public static final String GROUP_NAME = "socialDilution";
-
-		// this is the most efficient (it removes the most agents)
-		private DilutionType dilutionType = DilutionType.areaOnly;
-
-		public SocialDilutionConfigGroup() {
-			super( GROUP_NAME );
-		}
-
-		@StringGetter( "dilutionType" )
-		public DilutionType getDilutionType() {
-			return this.dilutionType;
-		}
-
-		@StringSetter( "dilutionType" )
-		public void setDilutionType(DilutionType dilutionType) {
-			this.dilutionType = dilutionType;
-		}
 	}
 }
