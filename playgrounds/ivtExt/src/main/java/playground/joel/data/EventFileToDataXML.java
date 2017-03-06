@@ -34,7 +34,12 @@ public class EventFileToDataXML {
      *            of the project folder
      */
 
+    static String path = "C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs"; //used for test purpose in main()
+
+
     public static void convert(final File dir) {
+        path = dir.toString();
+
         File output = new File(dir, "output");
         if (output.exists()) { // check if output folder exists
 
@@ -61,7 +66,7 @@ public class EventFileToDataXML {
                 TravelTimes travelTimes = new TravelTimes();
                 travelTimes.initialize(events);
 
-                // add event handlers to create travelTimes file
+                // add event handlers to create binnedTravelTimes file
                 BinnedTravelTimes binnedTravelTimes = new BinnedTravelTimes();
                 binnedTravelTimes.initialize(events);
 
@@ -95,7 +100,7 @@ public class EventFileToDataXML {
         //convert(new File(args[0]));
 
         //make sure path suits your needs otherwise it may overwrite stuff!
-        convert(new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_23_Sioux_onlyUnitCapacityAVs"));
+        convert(new File(path));
     }
 }
 

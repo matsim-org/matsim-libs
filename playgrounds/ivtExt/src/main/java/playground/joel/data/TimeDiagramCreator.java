@@ -11,6 +11,7 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.chart.ChartUtilities;
+import playground.clruch.utils.GlobalAssert;
 
 /**
  * Created by Joel on 04.03.2017.
@@ -23,18 +24,20 @@ public class TimeDiagramCreator {
         return Double.parseDouble(asd[0]);
     }
 
-    public static void createDiagram(String fileTitle, String diagramTitle, NavigableMap<String, Double> map)throws Exception
+    public static void createDiagram(File directory, String fileTitle, String diagramTitle, NavigableMap<String, Double> map)throws Exception
     {
-        final TimeSeries series = new TimeSeries( "time series" );
+        final TimeSeries series = new TimeSeries( "time series");
         for(String key: map.keySet()) {
             try
             {
                 int hours = (int) (keyToTime(key)/3600);
                 int minutes = (int) (keyToTime(key)/60) - hours*60;
                 int seconds = (int) keyToTime(key) - minutes*60 - hours*3600;
-                series.add(new Second(seconds, minutes, seconds, 0, 0, 0), map.get(key));
+                Second time = new Second(seconds, minutes, hours, 1, 1, 2017); // day, month and year can not be zero
+                series.add(time, map.get(key));
+                GlobalAssert.that(!series.isEmpty());
             }
-            catch ( SeriesException e )
+            catch ( SeriesException e  )
             {
                 System.err.println( "Error adding to series" );
             }
@@ -62,7 +65,9 @@ public class TimeDiagramCreator {
 
         int width = 800; /* Width of the image */
         int height = 600; /* Height of the image */
-        File timeChart = new File( fileTitle + ".png" );
+        File timeChart = new File( directory,fileTitle + ".png" );
         ChartUtilities.saveChartAsPNG( timeChart, timechart, width, height );
+        GlobalAssert.that(timeChart.exists() && !timeChart.isDirectory());
+        System.out.println("exported " + fileTitle + ".png");
     }
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
+import java.text.*;
 
 import org.jdom.input.SAXBuilder;
 import org.matsim.api.core.v01.Id;
@@ -38,13 +39,17 @@ class TravelTimes extends AbstractData {
     HashMap<String, Double> avTripStart = new HashMap<>();
     double totalTimeWithCust = 0;
     double totalTimeRatio;
-    int numAVs = 0;
+    static int numAVs = 0;
+
+    // cut the total time ratio
+    DecimalFormat ratioForm = new DecimalFormat("#.####");
+
 
     void calculateTimeRatio() {
-
        if(!(numAVs == 0)) {
             // get number of AVs with avTripStart.size()
-            totalTimeRatio = totalTimeWithCust / (numAVs * 108000);
+            //totalTimeRatio = totalTimeWithCust / (numAVs * 108000);
+            totalTimeRatio = Double.parseDouble(ratioForm.format(totalTimeWithCust / (numAVs * 108000)));
         } else System.out.println("no AVs found while calculating the time ratio");
 
     }
