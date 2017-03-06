@@ -25,25 +25,29 @@ import org.matsim.api.core.v01.Identifiable;
  * @author michalm
  */
 public interface Request extends Identifiable<Request> {
+
+	/**
+	 * @return the amount of people/goods to serve/transport (see: {@link Vehicle#getCapacity()})
+	 */
 	double getQuantity();
 
 	/**
-	 * Design comments:
-	 * <ul>
-	 * <li>Rename to <code>getEarliestStartTime()</code>? kai, feb'17
-	 * </ul>
+	 * @return begining of the time window (inclusive) - earliest time when the request can be served
 	 */
-	double getT0();// earliest start time
+	double getEarliestStartTime();
 
 	/**
-	 * Design comments:
-	 * <ul>
-	 * <li>Rename to <code>getLatestStartTime()</code>? kai, feb'17
-	 * </ul>
+	 * @return end of the time window (exclusive) - time by which the request should be served
 	 */
-	double getT1();// latest start time
+	double getLatestStartTime();
 
+	/**
+	 * @return time at which the request was submitted
+	 */
 	double getSubmissionTime();
 
+	/**
+	 * @return indicates whether the request has been rejected by the service provider (optimizer/dispatcher)
+	 */
 	boolean isRejected();
 }

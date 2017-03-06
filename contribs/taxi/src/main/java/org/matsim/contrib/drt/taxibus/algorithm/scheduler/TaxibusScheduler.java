@@ -52,7 +52,7 @@ public class TaxibusScheduler {
 
 		for (Vehicle veh : this.vrpData.getVehicles().values()) {
 			Schedule schedule = veh.getSchedule();
-			schedule.addTask(new DrtStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+			schedule.addTask(new DrtStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
 		}
 	}
 
@@ -68,7 +68,7 @@ public class TaxibusScheduler {
 	}
 
 	public boolean isStarted(Vehicle vehicle) {
-		if (timer.getTimeOfDay() >= vehicle.getT1() || vehicle.getSchedule().getStatus() != ScheduleStatus.STARTED) {
+		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || vehicle.getSchedule().getStatus() != ScheduleStatus.STARTED) {
 			return false;
 		} else
 			return true;
@@ -86,7 +86,7 @@ public class TaxibusScheduler {
 	}
 
 	public LinkTimePair getEarliestIdleness(Vehicle veh) {
-		if (timer.getTimeOfDay() >= veh.getT1()) {// time window T1 exceeded
+		if (timer.getTimeOfDay() >= veh.getServiceEndTime()) {// time window T1 exceeded
 			return null;
 		}
 
@@ -148,11 +148,11 @@ public class TaxibusScheduler {
 	}
 
 	private LinkTimePair filterValidLinkTimePair(LinkTimePair pair, Vehicle veh) {
-		return pair.time >= veh.getT1() ? null : pair;
+		return pair.time >= veh.getServiceEndTime() ? null : pair;
 	}
 
 	private LinkTimePair createValidLinkTimePair(Link link, double time, Vehicle veh) {
-		return time >= veh.getT1() ? null : new LinkTimePair(link, time);
+		return time >= veh.getServiceEndTime() ? null : new LinkTimePair(link, time);
 	}
 
 	// =========================================================================================
@@ -300,7 +300,7 @@ public class TaxibusScheduler {
 		for (DrtRequest req : pickUpsForLink) {
 			if (pickedUp.contains(req))
 				continue;
-			double t3 = Math.max(beginTime, req.getT0()) + params.pickupDuration;
+			double t3 = Math.max(beginTime, req.getEarliestStartTime()) + params.pickupDuration;
 			bestSched.addTask(new DrtPickupTask(beginTime, t3, Collections.singleton(req)));
 			// log.info("schedule pickup" +
 			// req.getPassenger().getId().toString() + " at link "+req.getFromLink().getId());
@@ -385,7 +385,7 @@ public class TaxibusScheduler {
 
 	protected void appendStayTask(Schedule schedule) {
 		double tBegin = schedule.getEndTime();
-		double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());// even
+		double tEnd = Math.max(tBegin, schedule.getVehicle().getServiceEndTime());// even
 																		// 0-second
 																		// WAIT
 		Link link = Schedules.getLastLinkInSchedule(schedule);
@@ -459,7 +459,7 @@ public class TaxibusScheduler {
 
 				case PICKUP: {
 					task.setBeginTime(t);// t == taxi's arrival time
-					double t0 = ((DrtPickupTask)task).getRequests().iterator().next().getT0();// t0
+					double t0 = ((DrtPickupTask)task).getRequests().iterator().next().getEarliestStartTime();// t0
 																			// ==
 																			// passenger's
 																			// departure

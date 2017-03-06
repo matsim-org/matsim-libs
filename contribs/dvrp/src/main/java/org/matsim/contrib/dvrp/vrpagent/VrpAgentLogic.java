@@ -87,7 +87,7 @@ public class VrpAgentLogic implements DynAgentLogic {
 					case PLANNED:
 						return s.getBeginTime();
 					case UNPLANNED:
-						return vehicle.getT1();
+						return vehicle.getServiceEndTime();
 					default:
 						throw new IllegalStateException();
 				}

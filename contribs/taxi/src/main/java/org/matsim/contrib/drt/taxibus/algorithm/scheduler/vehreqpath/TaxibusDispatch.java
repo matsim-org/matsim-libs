@@ -43,7 +43,7 @@ public class TaxibusDispatch {
 		this.requests.add(request);
 		this.vehicle = vehicle;
 		this.path.add(path);
-		this.earliestNextDeparture = Math.max(request.getT0(), path.getArrivalTime());
+		this.earliestNextDeparture = Math.max(request.getEarliestStartTime(), path.getArrivalTime());
 
 	}
 
@@ -68,7 +68,7 @@ public class TaxibusDispatch {
 		this.requests.add(request);
 		// System.out.println(requests);
 		this.path.add(path);
-		this.earliestNextDeparture = Math.max(request.getT0(), path.getArrivalTime());
+		this.earliestNextDeparture = Math.max(request.getEarliestStartTime(), path.getArrivalTime());
 	}
 
 	public void addPath(VrpPathWithTravelData path) {

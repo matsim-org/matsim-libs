@@ -58,9 +58,9 @@ public class DrtRequest extends RequestImpl implements PassengerRequest {
 	private DrtPickupTask pickupTask = null;
 	private DrtDropoffTask dropoffTask = null;;
 
-	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double t0,
-			double submissionTime) {
-		super(id, 1, t0, t0, submissionTime);
+	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+			double earliestStartTime, double latestStartTime, double submissionTime) {
+		super(id, 1, earliestStartTime, latestStartTime, submissionTime);
 		this.passenger = passenger;
 		this.fromLink = fromLink;
 		this.toLink = toLink;

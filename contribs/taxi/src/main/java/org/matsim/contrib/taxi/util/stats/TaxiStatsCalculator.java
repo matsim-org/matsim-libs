@@ -77,8 +77,8 @@ public class TaxiStatsCalculator {
 
 			if (tt.getTaxiTaskType() == TaxiTaskType.PICKUP) {
 				Request req = ((TaxiPickupTask)t).getRequest();
-				double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
-				int hour = TaxiStatsCalculators.getHour(req.getT0());
+				double waitTime = Math.max(t.getBeginTime() - req.getEarliestStartTime(), 0);
+				int hour = TaxiStatsCalculators.getHour(req.getEarliestStartTime());
 				hourlyStats[hour].passengerWaitTime.addValue(waitTime);
 				dailyStats.passengerWaitTime.addValue(waitTime);
 			}

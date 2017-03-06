@@ -30,9 +30,9 @@ public class PickupDeliveryRequestImpl extends RequestImpl implements PickupDeli
 	private PickupDeliveryTask pickupTask;
 	private PickupDeliveryTask deliveryTask;
 
-	public PickupDeliveryRequestImpl(Id<Request> id, double quantity, double t0, double t1, double submissionTime,
-			Link fromLink, Link toLink) {
-		super(id, quantity, t0, t1, submissionTime);
+	public PickupDeliveryRequestImpl(Id<Request> id, double quantity, double earliestStartTime, double latestStartTime,
+			double submissionTime, Link fromLink, Link toLink) {
+		super(id, quantity, earliestStartTime, latestStartTime, submissionTime);
 		this.fromLink = fromLink;
 		this.toLink = toLink;
 	}

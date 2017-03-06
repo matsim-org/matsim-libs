@@ -27,8 +27,8 @@ public class VehicleWriter extends MatsimXmlWriter {
 			List<Tuple<String, String>> atts = new ArrayList<>();
 			atts.add(new Tuple<String, String>("id", veh.getId().toString()));
 			atts.add(new Tuple<String, String>("start_link", veh.getStartLink().getId().toString()));
-			atts.add(new Tuple<String, String>("t_0", veh.getT0() + ""));
-			atts.add(new Tuple<String, String>("t_1", veh.getT1() + ""));
+			atts.add(new Tuple<String, String>("t_0", veh.getServiceBeginTime() + ""));
+			atts.add(new Tuple<String, String>("t_1", veh.getServiceEndTime() + ""));
 			writeStartTag("vehicle", atts, true);
 		}
 	}

@@ -122,7 +122,7 @@ public class InclusionRuleBasedTaxiOptimizer
         Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(schedule);
-            if (lastTask.getBeginTime() < schedule.getVehicle().getT1()) {
+            if (lastTask.getBeginTime() < schedule.getVehicle().getServiceEndTime()) {
                 idleTaxiRegistry.removeVehicle(schedule.getVehicle());
             }
         }

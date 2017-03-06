@@ -44,13 +44,13 @@ public class AggregatedRequest {
             return null;
         }
 
-        double distance1 = estimator.getDistance(candidate.getToLink(), master.getToLink(), master.getT0());
+        double distance1 = estimator.getDistance(candidate.getToLink(), master.getToLink(), master.getEarliestStartTime());
 
         if (distance1 > distanceThreshold) {
             return null;
         }
 
-        double distance2 = estimator.getDistance(candidate.getFromLink(), master.getFromLink(), master.getT0());
+        double distance2 = estimator.getDistance(candidate.getFromLink(), master.getFromLink(), master.getEarliestStartTime());
 
         if (distance2 > distanceThreshold) {
             return null;

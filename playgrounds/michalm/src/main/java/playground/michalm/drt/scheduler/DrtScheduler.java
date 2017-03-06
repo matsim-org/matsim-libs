@@ -68,14 +68,14 @@ public class DrtScheduler implements ScheduleInquiry {
 		((FleetImpl)fleet).resetSchedules();
 
 		for (Vehicle veh : fleet.getVehicles().values()) {
-			veh.getSchedule().addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+			veh.getSchedule().addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
 		}
 	}
 
 	@Override
 	public boolean isIdle(Vehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
-		if (timer.getTimeOfDay() >= vehicle.getT1() || schedule.getStatus() != ScheduleStatus.STARTED) {
+		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || schedule.getStatus() != ScheduleStatus.STARTED) {
 			return false;
 		}
 

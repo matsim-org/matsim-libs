@@ -33,7 +33,7 @@ public class NPersonsPickupActivity implements PassengerPickupActivity {
 		for(TaxiRequest request : requests){
 			passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
 			if (passengerAboard) n++;
-			if(request.getT0() > maxT0) maxT0 = request.getT0();
+			if(request.getEarliestStartTime() > maxT0) maxT0 = request.getEarliestStartTime();
 		}
 		
 		passengerAboard = n == requests.size();

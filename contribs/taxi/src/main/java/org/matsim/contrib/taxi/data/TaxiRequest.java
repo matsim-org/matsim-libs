@@ -53,14 +53,14 @@ public class TaxiRequest extends RequestImpl implements PassengerRequest {
 	private TaxiPickupTask pickupTask;
 	private TaxiDropoffTask dropoffTask;
 
-	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, double t0,
+	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, double startTime,
 			double submissionTime) {
-		this(id, passenger, fromLink, null, t0, submissionTime);
+		this(id, passenger, fromLink, null, startTime, submissionTime);
 	}
 
-	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double t0,
+	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double startTime,
 			double submissionTime) {
-		super(id, 1, t0, t0, submissionTime);
+		super(id, 1, startTime, startTime, submissionTime);
 		this.passenger = passenger;
 		this.fromLink = fromLink;
 		this.toLink = toLink;

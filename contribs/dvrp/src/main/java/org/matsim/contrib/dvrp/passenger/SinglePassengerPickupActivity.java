@@ -66,7 +66,7 @@ public class SinglePassengerPickupActivity extends AbstractDynActivity implement
 
 	private void setEndTimeIfWaitingForPassenger(double now) {
 		// try to predict the passenger's arrival time
-		endTime = Math.max(now, request.getT0()) + pickupDuration;
+		endTime = Math.max(now, request.getEarliestStartTime()) + pickupDuration;
 
 		if (endTime == now) {// happens only if pickupDuration == 0
 			endTime += 1; // to prevent the driver departing now (before picking up the passenger)

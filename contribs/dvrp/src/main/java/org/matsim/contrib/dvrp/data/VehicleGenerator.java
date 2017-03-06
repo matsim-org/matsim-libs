@@ -82,7 +82,7 @@ public class VehicleGenerator {
 
 	private void removeVehiclesOnT1() {
 		while (!activeVehicles.isEmpty()) {
-			if (activeVehicles.peek().getT1() >= currentTime) {
+			if (activeVehicles.peek().getServiceEndTime() >= currentTime) {
 				return;
 			}
 

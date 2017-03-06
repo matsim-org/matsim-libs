@@ -44,8 +44,8 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
     			passengersAboard++;
     		}
     		
-    		if (request.getT0() > maximumRequestT0) {
-    			maximumRequestT0 = request.getT0();
+    		if (request.getEarliestStartTime() > maximumRequestT0) {
+    			maximumRequestT0 = request.getEarliestStartTime();
     		}
         }
         

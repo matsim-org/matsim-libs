@@ -102,7 +102,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 		if ((e.getSimulationTime() % (context.clustering_period_min * 60)) == 0) {
 			Set<DrtRequest> dueRequests = new HashSet<>();
 			for (DrtRequest r : unplannedRequests) {
-				if (e.getSimulationTime() >= r.getT0() - context.prebook_period_min * 60) {
+				if (e.getSimulationTime() >= r.getEarliestStartTime() - context.prebook_period_min * 60) {
 					dueRequests.add(r);
 				}
 			}
@@ -149,7 +149,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 										req.getToLink().getCoord().getY()))
 								.build();
 
-						double pickupOffSet = Math.max(e.getSimulationTime(), req.getT0());
+						double pickupOffSet = Math.max(e.getSimulationTime(), req.getEarliestStartTime());
 						Shipment shipment = Shipment.Builder.newInstance(rId).addSizeDimension(0, 1)
 								.setPickupLocation(fromLoc).setDeliveryLocation(toLoc)
 								.setPickupTimeWindow(TimeWindow.newInstance(pickupOffSet, pickupOffSet + 3600)).build();

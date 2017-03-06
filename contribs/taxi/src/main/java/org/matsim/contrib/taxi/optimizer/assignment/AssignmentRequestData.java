@@ -32,7 +32,7 @@ class AssignmentRequestData extends AssignmentDestinationData<TaxiRequest> {
 
 		int idx = 0;
 		for (TaxiRequest r : unplannedRequests) {
-			double t0 = r.getT0();
+			double t0 = r.getEarliestStartTime();
 			if (t0 > maxT0) {// beyond the planning horizon
 				continue;
 			}

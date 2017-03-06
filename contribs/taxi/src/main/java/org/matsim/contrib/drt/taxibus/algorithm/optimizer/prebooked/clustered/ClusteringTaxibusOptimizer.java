@@ -83,7 +83,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 		if ((e.getSimulationTime() % (context.clustering_period_min * 60)) == 0) {
 			Set<DrtRequest> dueRequests = new HashSet<>();
 			for (DrtRequest r : unplannedRequests) {
-				if (e.getSimulationTime() >= r.getT0() - context.prebook_period_min * 60) {
+				if (e.getSimulationTime() >= r.getEarliestStartTime() - context.prebook_period_min * 60) {
 					dueRequests.add(r);
 				}
 			}

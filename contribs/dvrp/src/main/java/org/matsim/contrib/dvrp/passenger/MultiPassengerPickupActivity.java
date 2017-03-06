@@ -56,8 +56,8 @@ public class MultiPassengerPickupActivity extends AbstractDynActivity implements
 				passengersAboard++;
 			}
 
-			if (request.getT0() > maxRequestT0) {
-				maxRequestT0 = request.getT0();
+			if (request.getEarliestStartTime() > maxRequestT0) {
+				maxRequestT0 = request.getEarliestStartTime();
 			}
 		}
 

@@ -42,7 +42,7 @@ public class VehicleCounter {
 		while (!waitingVehicles.isEmpty() || !activeVehicles.isEmpty()) {
 			// move waiting->active
 			while (!waitingVehicles.isEmpty()) {
-				if (waitingVehicles.peek().getT0() > currentTime) {
+				if (waitingVehicles.peek().getServiceBeginTime() > currentTime) {
 					break;
 				}
 
@@ -52,7 +52,7 @@ public class VehicleCounter {
 
 			// remove from active
 			while (!activeVehicles.isEmpty()) {
-				if (activeVehicles.peek().getT1() > currentTime) {
+				if (activeVehicles.peek().getServiceEndTime() > currentTime) {
 					break;
 				}
 
