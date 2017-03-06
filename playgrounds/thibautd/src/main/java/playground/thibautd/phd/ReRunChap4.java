@@ -86,6 +86,7 @@ public class ReRunChap4 {
 						install(new JointTripsModule());
 						install(new SocialNetworkModule());
 						install(new EquityStrategiesModule());
+						install( new StartingPointRandomizerModule() );
 					}
 				});
 		controller.addOverridingModule(
