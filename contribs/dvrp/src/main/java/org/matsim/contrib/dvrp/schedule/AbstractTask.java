@@ -21,6 +21,9 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
+/**
+ * @author michalm
+ */
 public abstract class AbstractTask implements Task {
 	// ==== BEGIN: fields managed by ScheduleImpl
 	Schedule schedule;

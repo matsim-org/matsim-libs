@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
  * might not be better expressed by removing the interfaces and simply have the implementation. kai, feb'17
  * </ul>
  * 
+ * @author michalm
  * @author (of documentation) nagel
  *
  */
