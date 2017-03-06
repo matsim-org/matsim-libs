@@ -2,6 +2,7 @@ package playground.dhosse.prt.optimizer;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -69,9 +70,9 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	}
 	
 	@Override
-	public void nextLinkEntered(DriveTask driveTask)
+	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink)
 	{
-		scheduler.updateTimeline(driveTask.getSchedule());
+		scheduler.updateTimeline(vehicle.getSchedule());
 	}
 	
 	protected void scheduleUnplannedRequests()

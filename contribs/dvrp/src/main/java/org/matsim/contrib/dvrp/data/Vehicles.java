@@ -23,6 +23,9 @@ import java.util.Comparator;
 
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
+/**
+ * @author michalm
+ */
 public class Vehicles {
 	public static final Comparator<Vehicle> T0_COMPARATOR = new Comparator<Vehicle>() {
 		public int compare(Vehicle v1, Vehicle v2) {

@@ -28,6 +28,9 @@ import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
+/**
+ * @author michalm
+ */
 public class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final PassengerEngine passengerEngine;
 	private final MobsimTimer timer;

@@ -28,6 +28,9 @@ import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+/**
+ * @author michalm
+ */
 public class TaxiRequest extends RequestImpl implements PassengerRequest {
 	public enum TaxiRequestStatus {
 		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)

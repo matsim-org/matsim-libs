@@ -24,6 +24,9 @@ import java.util.*;
 import org.apache.commons.math3.stat.descriptive.rank.Max;
 import org.matsim.contrib.util.random.*;
 
+/**
+ * @author michalm
+ */
 public class VehicleGenerator {
 	private final UniformRandom uniform = RandomUtils.getGlobalUniform();
 	private final List<Vehicle> vehicles = new ArrayList<>();

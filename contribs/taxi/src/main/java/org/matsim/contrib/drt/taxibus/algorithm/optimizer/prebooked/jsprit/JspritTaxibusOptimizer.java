@@ -78,7 +78,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 	}
 
 	@Override
-	public void nextLinkEntered(DriveTask driveTask) {
+	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
 
 	}
 

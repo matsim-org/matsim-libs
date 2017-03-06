@@ -25,10 +25,13 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+/**
+ * @author michalm
+ */
 public class OneTaxiRequestCreator implements PassengerRequestCreator {
 	@Override
 	public OneTaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-			double t0, double t1, double now) {
-		return new OneTaxiRequest(id, passenger, fromLink, toLink, now);
+			double earliestStartTime, double latestStartTime, double submissionTime) {
+		return new OneTaxiRequest(id, passenger, fromLink, toLink, submissionTime);
 	}
 }

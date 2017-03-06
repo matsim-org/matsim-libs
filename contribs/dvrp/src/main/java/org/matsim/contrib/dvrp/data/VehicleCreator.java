@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.dvrp.data;
 
+/**
+ * @author michalm
+ */
 public interface VehicleCreator {
 	Vehicle createVehicle(double t0, double t1);
 }

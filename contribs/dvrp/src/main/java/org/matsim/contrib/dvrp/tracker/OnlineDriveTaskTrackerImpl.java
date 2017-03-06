@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -26,6 +27,9 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+/**
+ * @author michalm
+ */
 class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	private final DriveTask driveTask;
 	private final VrpLeg vrpDynLeg;
@@ -62,10 +66,10 @@ class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
 	}
 
 	@Override
-	public void movedOverNode() {
+	public void movedOverNode(Link nextLink) {
 		currentLinkIdx++;
 		linkEnterTime = timer.getTimeOfDay();
-		optimizer.nextLinkEntered(driveTask);
+		optimizer.vehicleEnteredNextLink(driveTask.getSchedule().getVehicle(), nextLink);
 	}
 
 	/**

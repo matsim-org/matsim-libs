@@ -27,6 +27,9 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+/**
+ * @author michalm
+ */
 public class VehicleReader extends MatsimXmlParser {
 	private static final String VEHICLE = "vehicle";
 

@@ -25,6 +25,9 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+/**
+ * @author michalm
+ */
 public class OneTaxiRequest extends RequestImpl implements PassengerRequest {
 	private final MobsimPassengerAgent passenger;
 	private final Link fromLink;

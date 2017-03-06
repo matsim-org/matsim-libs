@@ -5,6 +5,9 @@ import java.util.Comparator;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 
+/**
+ * @author michalm
+ */
 public class Requests {
 	public static final Comparator<Request> T0_COMPARATOR = new Comparator<Request>() {
 		public int compare(Request r1, Request r2) {

@@ -25,6 +25,7 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
@@ -59,7 +60,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	}
 
 	@Override
-	public void nextLinkEntered(DriveTask driveTask) {
+	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
 
 	}
 

@@ -3,6 +3,7 @@
  */
 package org.matsim.contrib.av.intermodal;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
@@ -19,7 +20,7 @@ final class MyTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	@Override
 	public TaxiOptimizer get() {
 		TaxiOptimizer optimizer = new TaxiOptimizer(){
-			@Override public void nextLinkEntered(DriveTask driveTask) {
+			@Override public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
 				// I guess this is how taxis notify of their progress to the dispatch?  kai, jan'17
 				
 				// TODO Auto-generated method stub

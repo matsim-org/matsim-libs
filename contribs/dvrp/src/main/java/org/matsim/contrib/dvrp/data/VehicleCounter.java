@@ -21,6 +21,9 @@ package org.matsim.contrib.dvrp.data;
 
 import java.util.*;
 
+/**
+ * @author michalm
+ */
 public class VehicleCounter {
 	private final Collection<? extends Vehicle> vehicles;
 	private final Queue<Vehicle> waitingVehicles;

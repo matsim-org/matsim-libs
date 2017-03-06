@@ -21,6 +21,9 @@ package org.matsim.contrib.dvrp.data.file;
 
 import org.xml.sax.Attributes;
 
+/**
+ * @author michalm
+ */
 public class ReaderUtils {
 	public static double getDouble(Attributes atts, String qName, double defaultValue) {
 		String val = atts.getValue(qName);

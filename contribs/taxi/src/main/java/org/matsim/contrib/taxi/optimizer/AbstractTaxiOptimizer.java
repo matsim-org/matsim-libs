@@ -21,6 +21,7 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -113,9 +114,10 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 		return !destinationKnown && newCurrentTask.getTaxiTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
 	}
 
+	
 	@Override
-	public void nextLinkEntered(DriveTask driveTask) {
-		optimContext.scheduler.updateTimeline(driveTask.getSchedule());
+	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
+		optimContext.scheduler.updateTimeline(vehicle.getSchedule());
 
 		// TODO we may here possibly decide whether or not to reoptimize
 		// if (delays/speedups encountered) {requiresReoptimization = true;}

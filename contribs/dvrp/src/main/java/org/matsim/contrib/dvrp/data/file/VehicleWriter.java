@@ -6,6 +6,9 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
+/**
+ * @author michalm
+ */
 public class VehicleWriter extends MatsimXmlWriter {
 	private Iterable<? extends Vehicle> vehicles;
 
