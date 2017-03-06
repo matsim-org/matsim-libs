@@ -180,10 +180,6 @@ public class RunBerlinMinExtCostAV {
 				this.bind(DecongestionInfo.class).toInstance(info);
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 				
-//				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
-//				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
-//				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
-				
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
 				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
 				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
@@ -202,12 +198,6 @@ public class RunBerlinMinExtCostAV {
 		FleetImpl fleet = new FleetImpl();
 		new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
-			}
-		});
 		controler.addOverridingModule(new TaxiOutputModule());
         controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
@@ -223,8 +213,6 @@ public class RunBerlinMinExtCostAV {
 												
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 				
-//				this.bind(AgentFilter.class).to(AVAgentFilter.class);
-
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);
