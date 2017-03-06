@@ -18,14 +18,6 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>conveyal</id>
-			<name>Conveyal Maven Repository</name>
-			<url>http://maven.conveyal.com/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
