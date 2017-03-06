@@ -146,7 +146,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			case COMPLETED:
 				return null;
 
-			case UNPLANNED:// there is always at least one WAIT task in a schedule
+			case UNPLANNED:// there is always at least one STAY task in a schedule
 			default:
 				throw new IllegalStateException();
 		}
@@ -167,7 +167,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 
 		TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
-		// we can divert vehicle whose current task is an empty drive at the end of the schedule
+		// no prebooking ==> we can divert vehicle whose current task is an empty drive at the end of the schedule
 		if (!Schedules.isLastTask(currentTask) || currentTask.getTaxiTaskType() != TaxiTaskType.EMPTY_DRIVE) {
 			return null;
 		}

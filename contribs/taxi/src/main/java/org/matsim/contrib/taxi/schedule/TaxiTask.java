@@ -26,8 +26,7 @@ public interface TaxiTask extends Task {
 		EMPTY_DRIVE, // not directly related to any customer (although may be related to serving a customer; e.g. a
 						// pickup drive)
 		PICKUP, OCCUPIED_DRIVE, DROPOFF, // serving a customer (TaxiTaskWithRequest)
-		STAY;// not directly related to any customer (although may be related to serving a customer; e.g. a pickup
-				// drive)
+		STAY;// not directly related to any customer
 	}
 
 	TaxiTaskType getTaxiTaskType();

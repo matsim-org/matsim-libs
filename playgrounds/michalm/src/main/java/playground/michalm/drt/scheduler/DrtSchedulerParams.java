@@ -21,6 +21,9 @@ package playground.michalm.drt.scheduler;
 
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 
+/**
+ * @author michalm
+ */
 public class DrtSchedulerParams {
 	public final boolean vehicleDiversion;
 	public final double pickupDuration;//TODO per passenger??
