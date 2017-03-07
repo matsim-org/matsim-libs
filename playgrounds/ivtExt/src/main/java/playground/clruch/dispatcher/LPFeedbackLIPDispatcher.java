@@ -122,10 +122,10 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
                 HashMap<VirtualNode, Set<AVVehicle>> v_ij_cust = getVirtualNodeArrivingWCustomerVehicles();
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
-                    if(v_ij_cust.get(virtualNode).size()>0){
+                    if (v_ij_cust.get(virtualNode).size() > 0) {
                         System.out.println("Customer is travelling");
                     }
-                     vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size()
+                    vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size()
                             + v_ij_reb.get(virtualNode).size()
                             + v_ij_cust.get(virtualNode).size()
                             - requests.get(virtualNode).size());
@@ -133,6 +133,13 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
                 // 1) solve the linear program with updated right-hand side
                 Map<VirtualLink, Integer> rebalanceCount = solveUpdatedLP(vi_excess, vi_desired);
+
+                // DEBUGGING STARTED
+                long number_reb_commands = rebalanceCount.values().stream().mapToInt(Number::intValue).sum();
+                if(number_reb_commands>0){
+                    System.out.println("Sending rebalancing vehicles");
+                }
+                // DEBUGGING ENDED
 
                 // 2) rebalance the vehicles according to the LP
                 // create a Map that contains all the outgoing vLinks for a vNode
@@ -201,9 +208,24 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 for (VirtualNode virtualNode : destinationLinks.keySet()) {
                     Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
                     for (VehicleLinkPair vehicleLinkPair : rebalanceMatching.keySet()) {
+                        // DEBUGGING STARTED
+                        /*
+                        for(Set<AVVehicle> avset : rebvehiclesdebug.values()){
+                            if(avset.contains(vehicleLinkPair.avVehicle)){
+                                System.out.println("trying to add rebalancing vehicle");
+                            }
+
+                        }
+                        */
+                        // DEBUGGING ENDED
                         setVehicleRebalance(vehicleLinkPair, rebalanceMatching.get(vehicleLinkPair));
                     }
                 }
+
+                // DEBUGGING STARTED
+                availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+                System.out.println("Stuff");
+                // DEBUGGING ENDED
             }
 
             {
@@ -291,11 +313,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         }
 
         // if exists primal feasible solution, return it, otherwise return empty set.
-        if(ret == 0){
+        if (ret == 0) {
             return rebalanceOrder;
-        }else{
-            rebalanceOrder.keySet().stream().forEach(v->rebalanceOrder.put(v,0));
-            return  rebalanceOrder;
+        } else {
+            rebalanceOrder.keySet().stream().forEach(v -> rebalanceOrder.put(v, 0));
+            return rebalanceOrder;
         }
 
 
@@ -304,6 +326,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
     private void initiateLP() {
         // assign a numbering to the virtual nodes
+        // TODO Solve this using the indexes in the VirtualLink instead of map
         int nodeNum = 0;
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
             nodeNum = nodeNum + 1;

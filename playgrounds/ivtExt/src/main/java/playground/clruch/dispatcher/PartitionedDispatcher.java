@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
     //private final Set<AVVehicle> rebalancingVehicles = new HashSet<>();
-    private final HashMap<VirtualNode, Set<AVVehicle>> rebalancingVehicles = new HashMap<>();
+    private final Map<VirtualNode, Set<AVVehicle>> rebalancingVehicles = new HashMap<>();
 
     public PartitionedDispatcher( //
                                   AVDispatcherConfig config, //
@@ -37,7 +37,10 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
 
     // TODO call this function instead of  "setVehicleDiversion"  whenever the cause for rerouting is "rebalance"
     // <- not final code design
+    // This function has to be called only after getVirtualNodeRebalancingVehicles
     protected synchronized final void setVehicleRebalance(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+        updateRebVehicles();
+
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(vehicleLinkPair, destination);
         eventsManager.processEvent(new RebalanceEvent(destination, vehicleLinkPair.avVehicle, getTimeNow()));
@@ -77,20 +80,22 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     // TODO currently the vehicles are removed when arriving at final link, could be removed as soon as they reach rebalancing destination virtualNode instead
     private synchronized void updateRebVehicles() {
         // TODO see if this can be implemented more smoothly without the loop :: STREAM() :))
+        // TODO getStayVehicles() outside loop
         for (VirtualNode virtualNode : rebalancingVehicles.keySet()) {
-            this.getStayVehicles().values().stream().flatMap(q -> q.stream()).forEach(rebalancingVehicles.get(virtualNode)::remove);
+            getStayVehicles().values().stream().flatMap(q -> q.stream()).forEach(rebalancingVehicles.get(virtualNode)::remove);
         }
     }
 
     /**
+     *
      * @return
      */
-    protected synchronized HashMap<VirtualNode, Set<AVVehicle>> getVirtualNodeRebalancingToVehicles() {
+    protected synchronized Map<VirtualNode, Set<AVVehicle>> getVirtualNodeRebalancingToVehicles() {
         // update the list of rebalancing vehicles
         updateRebVehicles();
 
         // return set
-        return rebalancingVehicles;
+        return Collections.unmodifiableMap(rebalancingVehicles);
 
     }
 
@@ -121,9 +126,12 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         Map<VirtualNode, List<VehicleLinkPair>> rebalanceMap = new HashMap<>();
 
         // remove vehicles which are rebalancing
+        Set<AVVehicle> set = rebalancingVehicles.values().stream().flatMap(l->l.stream()).collect(Collectors.toSet());
+
         for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
-            rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !rebalancingVehicles.get(entry.getKey()).contains(v.avVehicle)).collect(Collectors.toList()));
+            rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !set.contains(v.avVehicle)).collect(Collectors.toList()));
         }
+
 
         return rebalanceMap;
     }
