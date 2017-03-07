@@ -28,6 +28,10 @@ import org.matsim.contrib.util.random.*;
  * @author michalm
  */
 public class VehicleGenerator {
+	public interface VehicleCreator {//move to generator
+		Vehicle createVehicle(double t0, double t1);
+	}
+	
 	private final UniformRandom uniform = RandomUtils.getGlobalUniform();
 	private final List<VehicleImpl> vehicles = new ArrayList<>();
 

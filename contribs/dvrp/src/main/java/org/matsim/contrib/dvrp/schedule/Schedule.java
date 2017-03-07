@@ -73,7 +73,7 @@ public interface Schedule {
 	// schedule modification functionality:
 
 	/**
-	 * Add a Task to the Schedule. This should set the back pointer of the Task to the Schedule.
+	 * Add a Task to the Schedule.
 	 */
 	void addTask(Task task);
 

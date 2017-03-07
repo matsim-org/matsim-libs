@@ -39,8 +39,7 @@ import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 import com.vividsolutions.jts.geom.Point;
 
 
-public class BerlinTaxiCreator
-    implements VehicleCreator
+public class BerlinTaxiCreator implements VehicleGenerator.VehicleCreator
 {
     private static final Logger log = Logger.getLogger(BerlinTaxiCreator.class);
     private static final Random RND = new Random(42);

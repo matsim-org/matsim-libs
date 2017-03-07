@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.prep.PreparedPolygon;
 
 import playground.michalm.barcelona.BarcelonaZones;
 
-public class BarcelonaTaxiCreator implements VehicleCreator {
+public class BarcelonaTaxiCreator implements VehicleGenerator.VehicleCreator {
 	private static final int PAXPERCAR = 4;
 
 	private final Network network;

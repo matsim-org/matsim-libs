@@ -56,14 +56,14 @@ public interface Vehicle extends Identifiable<Vehicle> {
 	/**
 	 * Design comment(s):
 	 * <ul>
-	 * <li>The Schedule is meant to be changed only by the optimizer. Note, however, that the present design does not
-	 * prevent other classes to change it, so be careful to not do that. kai, feb'17
+	 * <li>Typically, the Schedule is meant to be changed only by the optimizer. Note, however, that the present design
+	 * does not prevent other classes to change it, so be careful. kai, feb'17
 	 * </ul>
 	 */
 	Schedule getSchedule();
 
 	/**
-	 * In the only existing implementation, this re-creates the Schedule object by calling a new constructor.
+	 * Resets the schedule. For instance, by creating a new Schedule object.
 	 */
 	void resetSchedule();
 }
