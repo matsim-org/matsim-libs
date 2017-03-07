@@ -1,6 +1,8 @@
 package playground.sebhoerl.avtaxi.vrpagent;
 
 import com.google.inject.Inject;
+
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.StayTask;
@@ -33,8 +35,9 @@ public class AVActionCreator implements VrpAgentLogic.DynActionCreator {
     private Double pickupDuration;
 
     @Override
-    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now)
     {
+		Task task = vehicle.getSchedule().getCurrentTask(); 
     	if (task instanceof AVTask) {
     		switch (((AVTask) task).getAVTaskType()) {
     			case PICKUP:

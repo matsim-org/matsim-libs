@@ -20,6 +20,7 @@
 package playground.michalm.drt.vrpagent;
 
 import org.matsim.contrib.drt.tasks.DrtStayTask;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
@@ -42,10 +43,9 @@ public class NDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, final Task task, double now) {
-		NDrtTask tt = (NDrtTask)task;
-
-		switch (tt.getDrtTaskType()) {
+	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+		NDrtTask task = (NDrtTask)vehicle.getSchedule().getCurrentTask();
+		switch (task.getDrtTaskType()) {
 			case DRIVE:
 				return legCreator.createLeg((DriveTask)task);
 

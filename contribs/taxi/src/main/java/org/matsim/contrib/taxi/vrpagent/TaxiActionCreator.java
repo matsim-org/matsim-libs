@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.taxi.vrpagent;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -30,6 +31,9 @@ import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
+/**
+ * @author michalm
+ */
 public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	public static final String PICKUP_ACTIVITY_TYPE = "TaxiPickup";
 	public static final String DROPOFF_ACTIVITY_TYPE = "TaxiDropoff";
@@ -54,10 +58,9 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, final Task task, double now) {
-		TaxiTask tt = (TaxiTask)task;
-
-		switch (tt.getTaxiTaskType()) {
+	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+		TaxiTask task = (TaxiTask)vehicle.getSchedule().getCurrentTask();
+		switch (task.getTaxiTaskType()) {
 			case EMPTY_DRIVE:
 			case OCCUPIED_DRIVE:
 				return legCreator.createLeg((DriveTask)task);
