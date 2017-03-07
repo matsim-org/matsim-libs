@@ -68,7 +68,8 @@ public class TaxibusScheduler {
 	}
 
 	public boolean isStarted(Vehicle vehicle) {
-		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || vehicle.getSchedule().getStatus() != ScheduleStatus.STARTED) {
+		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime()
+				|| vehicle.getSchedule().getStatus() != ScheduleStatus.STARTED) {
 			return false;
 		} else
 			return true;
@@ -102,17 +103,14 @@ public class TaxibusScheduler {
 				switch (lastTask.getDrtTaskType()) {
 					case STAY:
 						link = ((StayTask)lastTask).getLink();
-						time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());// TODO
-																						// very
-																						// optimistic!!!
+						time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());// TODO very optimistic!!!
 						return createValidLinkTimePair(link, time, veh);
 
 					case PICKUP:
 						if (!params.destinationKnown) {
 							return null;
 						}
-						// otherwise: IllegalStateException -- the schedule should end
-						// with WAIT
+						// otherwise: IllegalStateException -- the schedule should end with WAIT
 
 					default:
 						throw new IllegalStateException();
@@ -242,8 +240,7 @@ public class TaxibusScheduler {
 
 		}
 		// last path, we might have some people to still drop off. Would not
-		// be the case if last path is an empty ride, i.e. back to the
-		// depot:
+		// be the case if last path is an empty ride, i.e. back to the depot:
 		dropOffsForLink = best.getDropOffsForLink(path.getToLink());
 
 		if (dropOffsForLink != null) {
@@ -270,8 +267,8 @@ public class TaxibusScheduler {
 		// log.info("Done Scheduling");
 	}
 
-	private double scheduleDropOffs(Schedule bestSched, Set<DrtRequest> onBoard,
-			TreeSet<DrtRequest> dropOffsForLink, Set<DrtRequest> droppedOff, double beginTime) {
+	private double scheduleDropOffs(Schedule bestSched, Set<DrtRequest> onBoard, TreeSet<DrtRequest> dropOffsForLink,
+			Set<DrtRequest> droppedOff, double beginTime) {
 		for (DrtRequest req : dropOffsForLink) {
 			if (!onBoard.contains(req)) {
 				continue;
@@ -335,20 +332,16 @@ public class TaxibusScheduler {
 		switch (lastTask.getStatus()) {
 			case STARTED:
 				// bus is already idle
-				lastTask.setEndTime(path.getDepartureTime());// shortening the WAIT
-																// task
+				lastTask.setEndTime(path.getDepartureTime());// shortening the WAIT task
 				break;
 
 			case PLANNED:
 
-				if (lastTask.getBeginTime() == path.getDepartureTime()) { // waiting
-																			// for 0
-																			// seconds!!!
+				if (lastTask.getBeginTime() == path.getDepartureTime()) { // waiting for 0 seconds!!!
 					bestSched.removeLastTask();// remove WaitTask
 				} else {
 					// actually this WAIT task will not be performed
-					lastTask.setEndTime(path.getDepartureTime());// shortening the
-																	// WAIT task
+					lastTask.setEndTime(path.getDepartureTime());// shortening the WAIT task
 				}
 				break;
 
@@ -385,9 +378,7 @@ public class TaxibusScheduler {
 
 	protected void appendStayTask(Schedule schedule) {
 		double tBegin = schedule.getEndTime();
-		double tEnd = Math.max(tBegin, schedule.getVehicle().getServiceEndTime());// even
-																		// 0-second
-																		// WAIT
+		double tEnd = Math.max(tBegin, schedule.getVehicle().getServiceEndTime());// even 0-second WAIT
 		Link link = Schedules.getLastLinkInSchedule(schedule);
 		schedule.addTask(new DrtStayTask(tBegin, tEnd, link));
 	}
@@ -421,18 +412,14 @@ public class TaxibusScheduler {
 					if (i == tasks.size() - 1) {// last task
 						task.setBeginTime(t);
 
-						if (task.getEndTime() < t) {// may happen if the previous
-													// task is delayed
-							task.setEndTime(t);// do not remove this task!!! A taxi
-												// schedule should end with WAIT
+						if (task.getEndTime() < t) {// may happen if the previous task is delayed
+							task.setEndTime(t);// do not remove this task!!! A taxi schedule should end with WAIT
 						}
 					} else {
-						// if this is not the last task then some other task (e.g.
-						// DRIVE or PICKUP)
+						// if this is not the last task then some other task (e.g. DRIVE or PICKUP)
 						// must have been added at time submissionTime <= t
 						double endTime = task.getEndTime();
-						if (endTime <= t) {// may happen if the previous task is
-											// delayed
+						if (endTime <= t) {// may happen if the previous task is delayed
 							schedule.removeTask(task);
 							i--;
 						} else {
@@ -446,12 +433,10 @@ public class TaxibusScheduler {
 
 				case DRIVE_EMPTY:
 				case DRIVE_WITH_PASSENGERS: {
-					// cannot be shortened/lengthen, therefore must be moved
-					// forward/backward
+					// cannot be shortened/lengthen, therefore must be moved forward/backward
 					task.setBeginTime(t);
 					VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath();
-					t += path.getTravelTime(); // TODO one may consider
-												// recalculation of SP!!!!
+					t += path.getTravelTime(); // TODO one may consider recalculation of SP!!!!
 					task.setEndTime(t);
 
 					break;
@@ -459,21 +444,15 @@ public class TaxibusScheduler {
 
 				case PICKUP: {
 					task.setBeginTime(t);// t == taxi's arrival time
-					double t0 = ((DrtPickupTask)task).getRequests().iterator().next().getEarliestStartTime();// t0
-																			// ==
-																			// passenger's
-																			// departure
-																			// time
-					t = Math.max(t, t0) + params.pickupDuration; // the true pickup
-																	// starts at
-																	// max(t, t0)
+					double t0 = ((DrtPickupTask)task).getRequests().iterator().next().getEarliestStartTime();
+					// t0 == passenger's departure time
+					t = Math.max(t, t0) + params.pickupDuration; // the true pickup starts at max(t, t0)
 					task.setEndTime(t);
 
 					break;
 				}
 				case DROPOFF: {
-					// cannot be shortened/lengthen, therefore must be moved
-					// forward/backward
+					// cannot be shortened/lengthen, therefore must be moved forward/backward
 					task.setBeginTime(t);
 					t += params.dropoffDuration;
 					task.setEndTime(t);

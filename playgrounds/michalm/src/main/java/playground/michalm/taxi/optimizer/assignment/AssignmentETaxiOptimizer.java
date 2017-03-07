@@ -146,7 +146,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			if (schedule.getCurrentTask() instanceof ETaxiChargingTask) {
-				if (scheduledForCharging.remove(schedule.getVehicle().getId()) == null) {
+				if (scheduledForCharging.remove(vehicle.getId()) == null) {
 					throw new IllegalStateException();
 				}
 			}
