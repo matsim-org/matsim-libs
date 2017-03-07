@@ -213,7 +213,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 				return;
 
 			case STAY:
-				scheduleDrive((TaxiStayTask)lastTask, vrpPath);
+				scheduleDrive(schedule, (TaxiStayTask)lastTask, vrpPath);
 				return;
 
 			default:
@@ -229,12 +229,11 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		((OnlineDriveTaskTracker)lastTask.getTaskTracker()).divertPath(vrpPath);
 	}
 
-	protected void scheduleDrive(TaxiStayTask lastTask, VrpPathWithTravelData vrpPath) {
-		Schedule bestSched = lastTask.getSchedule();
+	protected void scheduleDrive(Schedule schedule, TaxiStayTask lastTask, VrpPathWithTravelData vrpPath) {
 		switch (lastTask.getStatus()) {
 			case PLANNED:
 				if (lastTask.getBeginTime() == vrpPath.getDepartureTime()) { // waiting for 0 seconds!!!
-					bestSched.removeLastTask();// remove WaitTask
+					schedule.removeLastTask();// remove WaitTask
 				} else {
 					// actually this WAIT task will not be performed
 					lastTask.setEndTime(vrpPath.getDepartureTime());// shortening the WAIT task
@@ -251,7 +250,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 
 		if (vrpPath.getLinkCount() > 1) {
-			bestSched.addTask(new TaxiEmptyDriveTask(vrpPath));
+			schedule.addTask(new TaxiEmptyDriveTask(vrpPath));
 		}
 	}
 

@@ -23,9 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.schedule.*;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
@@ -36,9 +34,6 @@ public class TaxiRequest extends RequestImpl implements PassengerRequest {
 		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
 		PLANNED, // planned - included into one of the routes
-
-		// we have started serving the request but we may still divert the cab
-		TAXI_DISPATCHED,
 
 		// we have to carry out the request
 		PICKUP, RIDE, DROPOFF,
@@ -111,16 +106,6 @@ public class TaxiRequest extends RequestImpl implements PassengerRequest {
 
 		switch (pickupTask.getStatus()) {
 			case PLANNED:
-				if (pickupTask.getSchedule().getStatus() == ScheduleStatus.PLANNED) {
-					return TaxiRequestStatus.PLANNED;
-				}
-
-				TaxiTask currentTask = (TaxiTask)pickupTask.getSchedule().getCurrentTask();
-				if (currentTask.getTaxiTaskType() == TaxiTaskType.EMPTY_DRIVE && //
-						pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
-					return TaxiRequestStatus.TAXI_DISPATCHED;
-				}
-
 				return TaxiRequestStatus.PLANNED;
 
 			case STARTED:

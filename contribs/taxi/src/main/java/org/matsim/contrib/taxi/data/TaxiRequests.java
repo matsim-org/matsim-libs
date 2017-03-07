@@ -33,9 +33,6 @@ public class TaxiRequests {
 
 	public static final Predicate<TaxiRequest> IS_PLANNED = new TaxiRequestStatusPredicate(TaxiRequestStatus.PLANNED);
 
-	public static final Predicate<TaxiRequest> IS_TAXI_DISPATCHED = new TaxiRequestStatusPredicate(
-			TaxiRequestStatus.TAXI_DISPATCHED);
-
 	public static final Predicate<TaxiRequest> IS_PICKUP = new TaxiRequestStatusPredicate(TaxiRequestStatus.PICKUP);
 
 	public static final Predicate<TaxiRequest> IS_RIDE = new TaxiRequestStatusPredicate(TaxiRequestStatus.RIDE);
