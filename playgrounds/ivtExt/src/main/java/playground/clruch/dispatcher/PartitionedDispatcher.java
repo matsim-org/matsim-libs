@@ -1,15 +1,8 @@
 package playground.clruch.dispatcher;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
-
 import playground.clruch.dispatcher.core.RebalanceEvent;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
@@ -19,8 +12,10 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
@@ -67,6 +62,15 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         this.getStayVehicles().values().stream().flatMap(q -> q.stream()).forEach(rebalancingVehicles::remove);
     }
 
+    /**
+     *
+     * @return
+     */
+    protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeRebalancingToVehicles(){
+        // update the list of rebalancing vehicles
+        // TODO implement this.
+
+    }
 
     // same as getVirtualNodeAvailableVehicles() but returns only vehicles which are currently not in a rebalancing task
     protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableNotRebalancingVehicles() {
@@ -76,18 +80,14 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
 
         // return list of vehicles
         Map<VirtualNode, List<VehicleLinkPair>> returnMap = getVirtualNodeAvailableVehicles();
+        Map<VirtualNode, List<VehicleLinkPair>> rebalanceMap = new HashMap<>();
 
         // remove vehicles which are rebalancing
-        for(List<VehicleLinkPair> lvlinkpair : returnMap.values()){
-            for(VehicleLinkPair vehicleLinkPair : lvlinkpair){
-                if(rebalancingVehicles.contains(vehicleLinkPair.avVehicle)){
-                    boolean wasRemoved = lvlinkpair.remove(vehicleLinkPair);
-                    GlobalAssert.that(wasRemoved);
-                }
-            }
+        for(Map.Entry<VirtualNode,List<VehicleLinkPair>> entry : returnMap.entrySet()){
+            rebalanceMap.put(entry.getKey(),entry.getValue().stream().filter(v->!rebalancingVehicles.contains(v.avVehicle)).collect(Collectors.toList()));
         }
 
-        return returnMap;
+        return rebalanceMap;
     }
 
 

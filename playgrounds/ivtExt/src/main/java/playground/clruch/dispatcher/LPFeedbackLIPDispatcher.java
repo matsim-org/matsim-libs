@@ -89,150 +89,157 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         // A: outside rebalancing periods, permanently assign vehicles to requests if they have arrived at a customer
         //    i.e. stay on the same link
         total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
-        Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
-        Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
-
-
+        //Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
 
 
         // B: redispatch all vehicles
         final long round_now = Math.round(now);
         if (round_now % REBALANCING_PERIOD == 0) {
-            System.out.println("LPFeedbackLIPDispatcher @" + round_now + " mr = " + total_matchedRequests);
+            Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
+            {
+                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
 
-            // 0) count vi_excess vehicles and vi_desired vehicles
-            // TODO (write as stream())
-            int num_requests = 0;
-            for (List<AVRequest> avRequests : requests.values()) {
-                num_requests = num_requests + avRequests.size();
-            }
+                System.out.println("LPFeedbackLIPDispatcher @" + round_now + " mr = " + total_matchedRequests);
 
-            int vi_desired_num = (int) ((numberOfAVs - num_requests) / (double) virtualNetwork.getVirtualNodes().size());
-            Map<VirtualNode, Integer> vi_desired = new HashMap<>();
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-                vi_desired.put(virtualNode, vi_desired_num);
-            }
-
-
-            // TODO add + sum_j v_ji(t) (concept of vi_own vehicles)
-
-            Map<VirtualNode, Integer> vi_excess = new HashMap<>();
-            for (VirtualNode virtualNode : availableVehicles.keySet()) {
-                vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size() - requests.get(virtualNode).size());
-            }
-
-            // 1) solve the linear program with updated right-hand side
-            Map<VirtualLink, Integer> rebalanceCount = solveUpdatedLP(vi_excess, vi_desired);
-
-            // 2) rebalance the vehicles according to the LP
-            // create a Map that contains all the outgoing vLinks for a vNode
-            Map<VirtualNode, List<VirtualLink>> vLinkShareFromvNode = virtualNetwork.getVirtualLinks().stream().collect(Collectors.groupingBy(VirtualLink::getFrom));
-
-            // ensure that not more vehicles are sent away than available
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-
-                // count outgoing vehicles from this node:
-                int totRebVehicles = 0;
-                for (VirtualLink vLink : vLinkShareFromvNode.get(virtualNode)) {
-                    totRebVehicles = totRebVehicles + rebalanceCount.get(vLink);
+                // 0) count vi_excess vehicles and vi_desired vehicles
+                // TODO (write as stream())
+                int num_requests = 0;
+                for (List<AVRequest> avRequests : requests.values()) {
+                    num_requests = num_requests + avRequests.size();
                 }
 
-                // not enough available vehicles
-                if (availableVehicles.get(virtualNode).size() < totRebVehicles) {
-                    // calculate by how much to shrink
-                    double shrinkingFactor = ((double) availableVehicles.get(virtualNode).size()) / ((double) totRebVehicles);
-                    // remove rebalancing vehicles
-                    for (VirtualLink virtualLink : vLinkShareFromvNode.get(virtualNode)) {
-                        if (rebalanceCount.get(virtualLink) > 0) {
-                            double newRebCountTot = rebalanceCount.get(virtualLink) * shrinkingFactor;
-                            int newIntRebCount = (int) Math.floor(newRebCountTot);
-                            int newLeftOver = rebalanceCount.get(virtualLink) - newIntRebCount;
+                int vi_desired_num = (int) ((numberOfAVs - num_requests) / (double) virtualNetwork.getVirtualNodes().size());
+                Map<VirtualNode, Integer> vi_desired = new HashMap<>();
+                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+                    vi_desired.put(virtualNode, vi_desired_num);
+                }
 
-                            rebalanceCount.put(virtualLink, newIntRebCount);
-                            rebalanceFloating.put(virtualLink, rebalanceFloating.get(virtualLink) + newLeftOver);
-                            VirtualLink oppositeLink = virtualNetwork.getVirtualLinks().stream().filter(v -> (v.getFrom().equals(virtualLink.getTo()) && v.getTo().equals(virtualLink.getFrom()))).findFirst().get();
-                            rebalanceCount.put(oppositeLink, 0);
-                            rebalanceFloating.put(oppositeLink, rebalanceFloating.get(oppositeLink) - newLeftOver);
+
+                // TODO add + sum_j v_ji(t) (concept of vi_own vehicles)
+
+                Map<VirtualNode, Integer> vi_excess = new HashMap<>();
+                for (VirtualNode virtualNode : availableVehicles.keySet()) {
+                    vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size() - requests.get(virtualNode).size());
+                }
+
+                // 1) solve the linear program with updated right-hand side
+                Map<VirtualLink, Integer> rebalanceCount = solveUpdatedLP(vi_excess, vi_desired);
+
+                // 2) rebalance the vehicles according to the LP
+                // create a Map that contains all the outgoing vLinks for a vNode
+                Map<VirtualNode, List<VirtualLink>> vLinkShareFromvNode = virtualNetwork.getVirtualLinks().stream().collect(Collectors.groupingBy(VirtualLink::getFrom));
+
+                // ensure that not more vehicles are sent away than available
+                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+
+                    // count outgoing vehicles from this node:
+                    int totRebVehicles = 0;
+                    for (VirtualLink vLink : vLinkShareFromvNode.get(virtualNode)) {
+                        totRebVehicles = totRebVehicles + rebalanceCount.get(vLink);
+                    }
+
+                    // TODO CHECK, REWRITE AND EXTERNALIZE THIS METHOD
+                    // not enough available vehicles
+                    if (availableVehicles.get(virtualNode).size() < totRebVehicles) {
+                        // calculate by how much to shrink
+                        double shrinkingFactor = ((double) availableVehicles.get(virtualNode).size()) / ((double) totRebVehicles);
+                        // remove rebalancing vehicles
+                        for (VirtualLink virtualLink : vLinkShareFromvNode.get(virtualNode)) {
+                            if (rebalanceCount.get(virtualLink) > 0) {
+                                double newRebCountTot = rebalanceCount.get(virtualLink) * shrinkingFactor;
+                                int newIntRebCount = (int) Math.floor(newRebCountTot);
+                                int newLeftOver = rebalanceCount.get(virtualLink) - newIntRebCount;
+
+                                rebalanceCount.put(virtualLink, newIntRebCount);
+                                rebalanceFloating.put(virtualLink, rebalanceFloating.get(virtualLink) + newLeftOver);
+                                VirtualLink oppositeLink = virtualNetwork.getVirtualLinks().stream().filter(v -> (v.getFrom().equals(virtualLink.getTo()) && v.getTo().equals(virtualLink.getFrom()))).findFirst().get();
+                                rebalanceCount.put(oppositeLink, 0);
+                                rebalanceFloating.put(oppositeLink, rebalanceFloating.get(oppositeLink) - newLeftOver);
+                            }
                         }
+                    }
+                }
+
+                // 2 generate routing instructions for vehicles
+                // 2.1 gather the destination links
+                Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
+                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
+                    destinationLinks.put(virtualNode, new ArrayList<>());
+
+                // 2.2 fill rebalancing destinations
+                // TODO size negative?
+                for (Map.Entry<VirtualLink, Integer> entry : rebalanceCount.entrySet()) {
+                    final VirtualLink virtualLink = entry.getKey();
+                    final int size = entry.getValue();
+                    final VirtualNode fromNode = virtualLink.getFrom();
+                    // Link origin = fromNode.getLinks().iterator().next(); //
+                    VirtualNode toNode = virtualLink.getTo();
+
+                    List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, size);
+
+                    destinationLinks.get(fromNode).addAll(rebalanceTargets);
+                }
+
+                // 2.3 consistency check: rebalancing destination links must not exceed available vehicles in virtual node
+                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+                    int sizeV = availableVehicles.get(virtualNode).size();
+                    int sizeL = destinationLinks.get(virtualNode).size();
+                    if (sizeL > sizeV)
+                        throw new RuntimeException("rebalancing inconsistent " + sizeL + " > " + sizeV);
+                }
+
+                // 2.4 send rebalancing vehicles using the setVehicleRebalance command
+                for (VirtualNode virtualNode : destinationLinks.keySet()) {
+                    Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
+                    for (VehicleLinkPair vehicleLinkPair : rebalanceMatching.keySet()) {
+                        setVehicleRebalance(vehicleLinkPair, rebalanceMatching.get(vehicleLinkPair));
                     }
                 }
             }
 
-            // 2 generate routing instructions for vehicles
-            // 2.1 gather the destination links
-            Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-                destinationLinks.put(virtualNode, new ArrayList<>());
-
-            // 2.2 fill rebalancing destinations
-            // TODO size negative?
-            for (Map.Entry<VirtualLink, Integer> entry : rebalanceCount.entrySet()) {
-                final VirtualLink virtualLink = entry.getKey();
-                final int size = entry.getValue();
-                final VirtualNode fromNode = virtualLink.getFrom();
-                // Link origin = fromNode.getLinks().iterator().next(); //
-                VirtualNode toNode = virtualLink.getTo();
-
-                List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, size);
-
-                destinationLinks.get(fromNode).addAll(rebalanceTargets);
-            }
-
-            // 2.3 consistency check: rebalancing destination links must not exceed available vehicles in virtual node
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-                int sizeV = availableVehicles.get(virtualNode).size();
-                int sizeL = destinationLinks.get(virtualNode).size();
-                if (sizeL > sizeV)
-                    throw new RuntimeException("rebalancing inconsistent " + sizeL + " > " + sizeV);
-            }
-
-            // 2.4 send rebalancing vehicles using the setVehicleRebalance command
-            for(VirtualNode virtualNode : destinationLinks.keySet()){
-                Map<VehicleLinkPair,Link> rebalanceMatching =  vehicleDestMatcher.match(availableVehicles.get(virtualNode),destinationLinks.get(virtualNode));
-                for(VehicleLinkPair vehicleLinkPair : rebalanceMatching.keySet()){
-                    setVehicleRebalance(vehicleLinkPair,rebalanceMatching.get(vehicleLinkPair));
-                }
-            }
-            destinationLinks.clear();
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-                destinationLinks.put(virtualNode, new ArrayList<>());
-
-
-            // fill request destinations
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-                // number of vehicles that can be matched to requests
-                int size = Math.min( //
-                        availableVehicles.get(virtualNode).size() - destinationLinks.get(virtualNode).size(), //
-                        requests.get(virtualNode).size());
-
-                Collection<AVRequest> collection = requestSelector.selectRequests( //
-                        availableVehicles.get(virtualNode), //
-                        requests.get(virtualNode), //
-                        size);
-
-                // TODO
-
-                destinationLinks.get(virtualNode).addAll( // stores from links
-                        collection.stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
-            }
-
-
-            // 2.4 assign destinations to the available vehicles
             {
-                GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
-                GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
-
-                long tic = System.nanoTime(); // DO NOT PUT PARALLEL anywhere in this loop !
+                Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-                    vehicleDestMatcher //
-                            .match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode)) //
-                            .entrySet().stream().forEach(this::setVehicleDiversion);
-                long dur = System.nanoTime() - tic;
-            }
+                    destinationLinks.put(virtualNode, new ArrayList<>());
 
-            // 2.5 define action for leftover vehicles
-            // no action taken here, possible to send leftover vehicles to new destination in
-            // virtual node where they currently stay.
+                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+                // fill request destinations
+                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+                    // number of vehicles that can be matched to requests
+                    int size = Math.min( //
+                            availableVehicles.get(virtualNode).size() - destinationLinks.get(virtualNode).size(), //
+                            requests.get(virtualNode).size());
+
+                    Collection<AVRequest> collection = requestSelector.selectRequests( //
+                            availableVehicles.get(virtualNode), //
+                            requests.get(virtualNode), //
+                            size);
+
+                    // TODO
+
+                    destinationLinks.get(virtualNode).addAll( // stores from links
+                            collection.stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
+                }
+
+
+                // 2.4 assign destinations to the available vehicles
+                {
+                    GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
+                    GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
+
+                    long tic = System.nanoTime(); // DO NOT PUT PARALLEL anywhere in this loop !
+                    for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
+                        vehicleDestMatcher //
+                                .match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode)) //
+                                .entrySet().stream().forEach(this::setVehicleDiversion);
+                    long dur = System.nanoTime() - tic;
+                }
+
+                // 2.5 define action for leftover vehicles
+                // no action taken here, possible to send leftover vehicles to new destination in
+                // virtual node where they currently stay.
+
+            }
         }
     }
 
@@ -244,8 +251,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         // update LP // TODO make this more elegant
         int eq = 0;
         for (VirtualNode virtualNode : vi_excess.keySet()) {
-            for(int key : num_vNodeMap.keySet()){
-                if(num_vNodeMap.get(key).equals(virtualNode)){
+            for (int key : num_vNodeMap.keySet()) {
+                if (num_vNodeMap.get(key).equals(virtualNode)) {
                     eq = key;
                     GLPK.glp_set_row_bnds(lp, eq, GLPKConstants.GLP_LO, (double) (vi_desired.get(virtualNode) - vi_excess.get(virtualNode)), 0.0);
                 }
@@ -435,51 +442,49 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     }
 
 
-public static class Factory implements AVDispatcherFactory {
-    @Inject
-    @Named(AVModule.AV_MODE)
-    private ParallelLeastCostPathCalculator router;
+    public static class Factory implements AVDispatcherFactory {
+        @Inject
+        @Named(AVModule.AV_MODE)
+        private ParallelLeastCostPathCalculator router;
 
-    @Inject
-    @Named(AVModule.AV_MODE)
-    private TravelTime travelTime;
+        @Inject
+        @Named(AVModule.AV_MODE)
+        private TravelTime travelTime;
 
-    @Inject
-    private EventsManager eventsManager;
+        @Inject
+        private EventsManager eventsManager;
 
-    @Inject
-    private Network network;
+        @Inject
+        private Network network;
 
-    public static VirtualNetwork virtualNetwork;
-    public static Map<VirtualLink, Double> travelTimes;
+        public static VirtualNetwork virtualNetwork;
+        public static Map<VirtualLink, Double> travelTimes;
 
-    @Override
-    public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        @Override
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
-        AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-        AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
-        AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
-        // TODO relate to general directory given in argument of main function
-
-
+            AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
+            AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
+            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
+            // TODO relate to general directory given in argument of main function
 
 
-        // TODO:
+            // TODO:
 
-        return new LPFeedbackLIPDispatcher(
-                config,
-                generatorConfig,
-                travelTime,
-                router,
-                eventsManager,
-                virtualNetwork,
-                abstractVirtualNodeDest,
-                abstractRequestSelector,
-                abstractVehicleDestMatcher,
-                travelTimes
-        );
+            return new LPFeedbackLIPDispatcher(
+                    config,
+                    generatorConfig,
+                    travelTime,
+                    router,
+                    eventsManager,
+                    virtualNetwork,
+                    abstractVirtualNodeDest,
+                    abstractRequestSelector,
+                    abstractVehicleDestMatcher,
+                    travelTimes
+            );
+        }
     }
-}
 
 
 }
