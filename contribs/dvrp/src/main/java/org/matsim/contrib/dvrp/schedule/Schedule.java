@@ -21,8 +21,6 @@ package org.matsim.contrib.dvrp.schedule;
 
 import java.util.List;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-
 /**
  * A Schedule contains Tasks. <br/>
  * <br/>
@@ -40,11 +38,6 @@ public interface Schedule {
 	public enum ScheduleStatus {
 		UNPLANNED, PLANNED, STARTED, COMPLETED;
 	};
-
-	/**
-	 * Back pointer to the vehicle that contains the schedule. Set in constructor of ScheduleImpl.
-	 */
-	Vehicle getVehicle();
 
 	/**
 	 * Tasks in the schedule.
