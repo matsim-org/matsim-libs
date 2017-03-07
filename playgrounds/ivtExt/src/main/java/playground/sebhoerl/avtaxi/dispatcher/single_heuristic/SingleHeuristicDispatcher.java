@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -162,7 +163,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         private ParallelLeastCostPathCalculator router;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             return new SingleHeuristicDispatcher(
                     config.getParent().getId(),
                     eventsManager,
