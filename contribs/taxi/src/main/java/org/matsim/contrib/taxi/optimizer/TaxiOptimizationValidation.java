@@ -23,7 +23,7 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiries;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.data.TaxiRequests;
-import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 
 import com.google.common.collect.Iterables;
 

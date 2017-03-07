@@ -32,8 +32,7 @@ import org.matsim.contrib.util.LongEnumAdder;
 import com.google.common.collect.Iterables;
 
 public class TaxiTimeProfiles {
-	public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet,
-			final ScheduleInquiry scheduleInquiry) {
+	public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet, final ScheduleInquiry scheduleInquiry) {
 		return new TimeProfiles.SingleValueProfileCalculator("Idle") {
 			@Override
 			public Integer calcValue() {

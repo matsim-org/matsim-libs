@@ -26,7 +26,7 @@ import org.matsim.contrib.dynagent.*;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
- * Multiple passenger dropoff and pickup activity 
+ * Multiple passenger dropoff and pickup activity
  * 
  * @author michalm
  */

@@ -31,7 +31,8 @@ public class Requests {
 	// (TreeSet uses comparisons instead of Object.equals(Object))
 	public static final Comparator<Request> ABSOLUTE_COMPARATOR = new Comparator<Request>() {
 		public int compare(Request r1, Request r2) {
-			return ComparisonChain.start().compare(r1.getEarliestStartTime(), r2.getEarliestStartTime()).compare(r1.getLatestStartTime(), r2.getLatestStartTime())
+			return ComparisonChain.start().compare(r1.getEarliestStartTime(), r2.getEarliestStartTime())
+					.compare(r1.getLatestStartTime(), r2.getLatestStartTime())
 					.compare(r1.getSubmissionTime(), r2.getSubmissionTime()).compare(r1.getId(), r2.getId()).result();
 		}
 	};

@@ -28,7 +28,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunTaxibusScenarioTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testRunSharedTaxiExample() {
@@ -38,6 +39,7 @@ public class RunTaxibusScenarioTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		new RunSharedTaxiExample().run(config, false);
 	}
+
 	@Test
 	public void testRunTaxibusJspritExample() {
 		String configFile = "./src/main/resources/taxibus_example/configClustered.xml";
@@ -46,6 +48,7 @@ public class RunTaxibusScenarioTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		new RunTaxibusExample().run(config, false);
 	}
+
 	@Test
 	public void testRunTaxibusClusteredExample() {
 		String configFile = "./src/main/resources/taxibus_example/configJsprit.xml";

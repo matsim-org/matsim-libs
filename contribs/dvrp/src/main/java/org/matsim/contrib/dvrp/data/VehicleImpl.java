@@ -31,7 +31,7 @@ public class VehicleImpl implements Vehicle {
 	private Link startLink;
 	private final double capacity;
 
-	//time window
+	// time window
 	private final double serviceBeginTime;
 	private double serviceEndTime;
 

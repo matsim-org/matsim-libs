@@ -58,8 +58,8 @@ public class OneTaxiOptimizer implements VrpOptimizer {
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.resetSchedule();
-		vehicle.getSchedule()
-				.addTask(new StayTaskImpl(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(), vehicle.getStartLink(), "wait"));
+		vehicle.getSchedule().addTask(new StayTaskImpl(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+				vehicle.getStartLink(), "wait"));
 	}
 
 	@Override
