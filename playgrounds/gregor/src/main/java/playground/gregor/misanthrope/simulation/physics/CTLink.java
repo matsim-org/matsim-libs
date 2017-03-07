@@ -66,6 +66,8 @@ public class CTLink implements CTNetworkEntity {
 
         LineSegment ls = LineSegment.createFromLink(this.dsLink);
 
+
+        double tmp = ls.width / DESIRED_WIDTH_IN_CELLS;
         if (this.dsLink.getId().toString().contains("el")) {
             if (EL_WRN_CNT++ < 10) {
                 log.warn("evacuation link needs to have unlimited flow cap! this is not implemented yet. Setting width to 50m, should be ok for most scenarios");
@@ -77,10 +79,10 @@ public class CTLink implements CTNetworkEntity {
             ls.y1 = ls.y0 += 20 * ls.dy;
             ls.length = 20;
             ls.width = 50;
+            tmp = 5;
         }
 
 
-        double tmp = ls.width / DESIRED_WIDTH_IN_CELLS;
         if (tmp < MIN_CELL_WIDTH) {
             tmp = ls.width;
         } else if (tmp > MAX_CELL_WIDTH) {

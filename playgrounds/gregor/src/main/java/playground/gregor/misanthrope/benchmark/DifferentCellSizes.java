@@ -67,40 +67,69 @@ public class DifferentCellSizes {
 
     private static final double WIDTH = 20;
     private static double AGENTS_LR = 10000;
-    private static double AGENTS_RL = 10000;
+    private static double AGENTS_RL = 0;
     private static double INV_INFLOW = 0.25;
     private static double LL = 500;
 
     public static void main(String[] args) throws IOException {
+        CTRunner.DEBUG = false;
 
-        List<String> res = new ArrayList<>();
-        res.add("#width in cells, max inflow, avg 1, var 1, avg 2, var 2");
-
+        List<String> resH = new ArrayList<>();
+        List<String> resL = new ArrayList<>();
+        resH.add("#width in cells, a , max inflow, avg 1, var 1, avg 2, var 2");
+        List<String> texRes = new ArrayList<>();
         for (int widthInCells = 2; widthInCells <= 10; widthInCells++) {
             CTLink.DESIRED_WIDTH_IN_CELLS = widthInCells;
             INV_INFLOW = 0.25; //30 min
             TravelTimeObserver obs = new TravelTimeObserver();
-            runAll(obs);
-            res.add(widthInCells + "," + INV_INFLOW + "," + obs.getV1().getMean() + "," + obs.getV1().getVar() + "," + obs.getV2().getMean() + "," + obs.getV2().getVar());
+            for (int i = 0; i < 1; i++) {
+                runAll(obs);
+            }
+            resL.add(widthInCells + "," + getA(widthInCells) + "," + INV_INFLOW + "," + obs.getV1().getMean() + "," + obs.getV1().getVar() + "," + obs.getV2().getMean() + "," + obs.getV2().getVar());
+            texRes.add("low&" + getA(widthInCells) + "&" + obs.getV1().getMean() + "&" + obs.getV1().getVar() + "&" + obs.getV2().getMean() + "&" + obs.getV2().getVar() + "\\\\");
 
             INV_INFLOW = 1. / 10000; //max
             obs = new TravelTimeObserver();
-            runAll(obs);
-            res.add(widthInCells + "," + INV_INFLOW + "," + obs.getV1().getMean() + "," + obs.getV1().getVar() + "," + obs.getV2().getMean() + "," + obs.getV2().getVar());
-            res.forEach(System.out::println);
+            for (int i = 0; i < 1; i++) {
+                runAll(obs);
+            }
+            resH.add(widthInCells + "," + getA(widthInCells) + "," + INV_INFLOW + "," + obs.getV1().getMean() + "," + obs.getV1().getVar() + "," + obs.getV2().getMean() + "," + obs.getV2().getVar());
+            resH.forEach(System.out::println);
+            texRes.add("high&" + getA(widthInCells) + "&" + obs.getV1().getMean() + "&" + obs.getV1().getVar() + "&" + obs.getV2().getMean() + "&" + obs.getV2().getVar() + "\\\\");
         }
 
-        BufferedWriter bw = new BufferedWriter(new FileWriter(new File("/Users/laemmel/scenarios/misanthrope/paper/different_cell_sizes_bi")));
-        res.forEach(System.out::println);
-        res.forEach(s -> {
-            try {
-                bw.append(s).append("\n");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        bw.close();
+        {
 
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File("/Users/laemmel/scenarios/misanthrope/paper/different_cell_sizes_uni_h")));
+            resH.forEach(System.out::println);
+            resH.forEach(s -> {
+                try {
+                    bw.append(s).append("\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            bw.close();
+        }
+        {
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File("/Users/laemmel/scenarios/misanthrope/paper/different_cell_sizes_uni_l")));
+            resL.forEach(System.out::println);
+            resL.forEach(s -> {
+                try {
+                    bw.append(s).append("\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            bw.close();
+        }
+    }
+
+    private static double getA(int widthInCells) {
+        double cellWidth = WIDTH / widthInCells;
+        double a = cellWidth / 2;
+        return a;
     }
 
     private static void runAll(TravelTimeObserver obs) {
@@ -120,7 +149,7 @@ public class DifferentCellSizes {
 
         EventsManager em = controller.getEvents();
         //DEBUG
-        CTRunner.DEBUG = false;
+
         //		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
         //		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
         //
