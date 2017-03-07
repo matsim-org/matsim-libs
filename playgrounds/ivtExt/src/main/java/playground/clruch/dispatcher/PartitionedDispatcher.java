@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
-    private final Set<AVVehicle> rebalancingVehicles = new HashSet<>();
+    //private final Set<AVVehicle> rebalancingVehicles = new HashSet<>();
+    private final HashMap<VirtualNode, Set<AVVehicle>> rebalancingVehicles = new HashMap<>();
 
     public PartitionedDispatcher( //
                                   AVDispatcherConfig config, //
@@ -29,6 +30,9 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
                                   VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+            rebalancingVehicles.put(virtualNode, new HashSet<>());
+        }
     }
 
     // TODO call this function instead of  "setVehicleDiversion"  whenever the cause for rerouting is "rebalance"
@@ -37,7 +41,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(vehicleLinkPair, destination);
         eventsManager.processEvent(new RebalanceEvent(destination, vehicleLinkPair.avVehicle, getTimeNow()));
-        boolean successAdded = rebalancingVehicles.add(vehicleLinkPair.avVehicle);
+        boolean successAdded = rebalancingVehicles.get(virtualNetwork.getVirtualNode(destination)).add(vehicleLinkPair.avVehicle);
         GlobalAssert.that(successAdded);
     }
 
@@ -56,19 +60,23 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         return returnMap;
     }
 
-
+    // TODO currently the vehicles are removed when arriving at final link, could be removed as soon as they reach rebalancing destination virtualNode instead
     private synchronized void updateRebVehicles() {
-        // TODO currently the vehicles are removed when arriving at final link, could be removed as soon as they reach rebalancing destination virtualNode instead
-        this.getStayVehicles().values().stream().flatMap(q -> q.stream()).forEach(rebalancingVehicles::remove);
+        // TODO see if this can be implemented more smoothly without the loop :: STREAM() :))
+        for (VirtualNode virtualNode : rebalancingVehicles.keySet()) {
+            this.getStayVehicles().values().stream().flatMap(q -> q.stream()).forEach(rebalancingVehicles.get(virtualNode)::remove);
+        }
     }
 
     /**
-     *
      * @return
      */
-    protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeRebalancingToVehicles(){
+    protected synchronized HashMap<VirtualNode, Set<AVVehicle>> getVirtualNodeRebalancingToVehicles() {
         // update the list of rebalancing vehicles
-        // TODO implement this.
+        updateRebVehicles();
+
+        // return set
+        return rebalancingVehicles;
 
     }
 
@@ -83,8 +91,8 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         Map<VirtualNode, List<VehicleLinkPair>> rebalanceMap = new HashMap<>();
 
         // remove vehicles which are rebalancing
-        for(Map.Entry<VirtualNode,List<VehicleLinkPair>> entry : returnMap.entrySet()){
-            rebalanceMap.put(entry.getKey(),entry.getValue().stream().filter(v->!rebalancingVehicles.contains(v.avVehicle)).collect(Collectors.toList()));
+        for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
+            rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !rebalancingVehicles.get(entry.getKey()).contains(v.avVehicle)).collect(Collectors.toList()));
         }
 
         return rebalanceMap;
