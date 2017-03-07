@@ -26,6 +26,7 @@ import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVUtils;
@@ -115,11 +116,13 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
 
 
-                // TODO add + sum_j v_ji(t) (concept of vi_own vehicles)
 
+                // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
+                // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
                 Map<VirtualNode, Integer> vi_excess = new HashMap<>();
+                Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
-                    vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size() - requests.get(virtualNode).size());
+                    vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size() - requests.get(virtualNode).size());
                 }
 
                 // 1) solve the linear program with updated right-hand side
