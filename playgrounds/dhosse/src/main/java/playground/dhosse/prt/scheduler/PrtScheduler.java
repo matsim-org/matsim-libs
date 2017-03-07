@@ -87,7 +87,7 @@ public class PrtScheduler
 
         if (params.destinationKnown) {
             appendOccupiedDriveAndDropoff(bestSched);
-            appendTasksAfterDropoff(bestSched);
+            appendTasksAfterDropoff(best.vehicle);
         }
 
     }
@@ -139,17 +139,17 @@ public class PrtScheduler
 
 
     @Override
-    protected void appendTasksAfterDropoff(Schedule schedule)
+    protected void appendTasksAfterDropoff(Vehicle vehicle)
     {
         NPersonsDropoffStayTask dropoffStayTask = (NPersonsDropoffStayTask)Schedules
-                .getLastTask(schedule);
+                .getLastTask(vehicle.getSchedule());
 
         // addWaitTime at the end (even 0-second WAIT)
         double t5 = dropoffStayTask.getEndTime();
-        double tEnd = Math.max(t5, schedule.getVehicle().getServiceEndTime());
+        double tEnd = Math.max(t5, vehicle.getServiceEndTime());
         Link link = dropoffStayTask.getLink();
 
-        schedule.addTask(new TaxiStayTask(t5, tEnd, link));
+        vehicle.getSchedule().addTask(new TaxiStayTask(t5, tEnd, link));
     }
 
 

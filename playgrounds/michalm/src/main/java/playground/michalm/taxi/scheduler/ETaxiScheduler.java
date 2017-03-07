@@ -45,13 +45,13 @@ public class ETaxiScheduler extends TaxiScheduler {
 	}
 
 	@Override
-	protected double calcNewEndTime(TaxiTask task, double newBeginTime) {
+	protected double calcNewEndTime(Vehicle vehicle, TaxiTask task, double newBeginTime) {
 		if (task instanceof ETaxiChargingTask) {
 			// FIXME underestimated due to the ongoing AUX/drive consumption
 			double duration = task.getEndTime() - task.getBeginTime();
 			return newBeginTime + duration;
 		} else {
-			return super.calcNewEndTime(task, newBeginTime);
+			return super.calcNewEndTime(vehicle, task, newBeginTime);
 		}
 	}
 
@@ -68,7 +68,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 				+ logic.estimateChargeTime(ev);
 		schedule.addTask(new ETaxiChargingTask(vrpPath.getArrivalTime(), chargingEndTime, charger, ev));
 
-		appendStayTask(schedule);
+		appendStayTask(vehicle);
 	}
 
 	// =========================================================================================
@@ -122,7 +122,8 @@ public class ETaxiScheduler extends TaxiScheduler {
 	//
 	// Maybe for a more complex algos we would like to interrupt charging tasks as well.
 	@Override
-	protected void removePlannedTasks(Schedule schedule, int newLastTaskIdx) {
+	protected void removePlannedTasks(Vehicle vehicle, int newLastTaskIdx) {
+		Schedule schedule = vehicle.getSchedule();
 		List<? extends Task> tasks = schedule.getTasks();
 
 		for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
@@ -133,7 +134,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 			}
 
 			schedule.removeTask(task);
-			taskRemovedFromSchedule(schedule, (TaxiTask)task);
+			taskRemovedFromSchedule(vehicle, (TaxiTask)task);
 		}
 
 		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
@@ -154,12 +155,12 @@ public class ETaxiScheduler extends TaxiScheduler {
 	}
 
 	@Override
-	protected void taskRemovedFromSchedule(Schedule schedule, TaxiTask task) {
+	protected void taskRemovedFromSchedule(Vehicle vehicle, TaxiTask task) {
 		if (task instanceof ETaxiChargingTask) {
 			((ETaxiChargingTask)task).removeFromChargerLogic();
-			vehiclesWithUnscheduledCharging.add(schedule.getVehicle());
+			vehiclesWithUnscheduledCharging.add(vehicle);
 		} else {
-			super.taskRemovedFromSchedule(schedule, task);
+			super.taskRemovedFromSchedule(vehicle, task);
 		}
 	}
 }

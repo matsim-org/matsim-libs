@@ -73,7 +73,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		((FleetImpl)fleet).resetSchedules();
 
 		for (Vehicle veh : fleet.getVehicles().values()) {
-			veh.getSchedule().addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
+			veh.getSchedule()
+					.addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
 		}
 	}
 
@@ -194,12 +195,13 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		Schedule schedule = vehicle.getSchedule();
 		divertOrAppendDrive(schedule, vrpPath);
 
-		double pickupEndTime = Math.max(vrpPath.getArrivalTime(), request.getEarliestStartTime()) + params.pickupDuration;
+		double pickupEndTime = Math.max(vrpPath.getArrivalTime(), request.getEarliestStartTime())
+				+ params.pickupDuration;
 		schedule.addTask(new TaxiPickupTask(vrpPath.getArrivalTime(), pickupEndTime, request));
 
 		if (params.destinationKnown) {
 			appendOccupiedDriveAndDropoff(schedule);
-			appendTasksAfterDropoff(schedule);
+			appendTasksAfterDropoff(vehicle);
 		}
 	}
 
@@ -269,12 +271,12 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 	}
 
-	public void stopVehicle(Vehicle veh) {
+	public void stopVehicle(Vehicle vehicle) {
 		if (!params.vehicleDiversion) {
 			throw new RuntimeException("Diversion must be on");
 		}
 
-		Schedule schedule = veh.getSchedule();
+		Schedule schedule = vehicle.getSchedule();
 		TaxiEmptyDriveTask driveTask = (TaxiEmptyDriveTask)Schedules.getLastTask(schedule);
 
 		OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker)driveTask.getTaskTracker();
@@ -282,14 +284,16 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		tracker.divertPath(
 				new VrpPathWithTravelDataImpl(stopPoint.time, 0, new Link[] { stopPoint.link }, new double[] { 0 }));
 
-		appendStayTask(schedule);
+		appendStayTask(vehicle);
 	}
 
 	/**
 	 * Check and decide if the schedule should be updated due to if vehicle is Update timings (i.e. beginTime and
 	 * endTime) of all tasks in the schedule.
 	 */
-	public void updateBeforeNextTask(Schedule schedule) {
+	public void updateBeforeNextTask(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
+
 		// Assumption: there is no delay as long as the schedule has not been started (PLANNED)
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return;
@@ -298,12 +302,12 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		double endTime = timer.getTimeOfDay();
 		TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
 
-		updateTimelineImpl(schedule, endTime);
+		updateTimelineImpl(vehicle, endTime);
 
 		if (!params.destinationKnown) {
 			if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
 				appendOccupiedDriveAndDropoff(schedule);
-				appendTasksAfterDropoff(schedule);
+				appendTasksAfterDropoff(vehicle);
 			}
 		}
 	}
@@ -329,27 +333,30 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		return VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router, travelTime);
 	}
 
-	protected void appendTasksAfterDropoff(Schedule schedule) {
-		appendStayTask(schedule);
+	protected void appendTasksAfterDropoff(Vehicle vehicle) {
+		appendStayTask(vehicle);
 	}
 
-	protected void appendStayTask(Schedule schedule) {
+	protected void appendStayTask(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
 		double tBegin = schedule.getEndTime();
-		double tEnd = Math.max(tBegin, schedule.getVehicle().getServiceEndTime());// even 0-second WAIT
-		Link link = Schedules.getLastLinkInSchedule(schedule);
+		double tEnd = Math.max(tBegin, vehicle.getServiceEndTime());// even 0-second WAIT
+		Link link = Schedules.getLastLinkInSchedule(vehicle);
 		schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
 	}
 
-	public void updateTimeline(Schedule schedule) {
+	public void updateTimeline(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return;
 		}
 
 		double predictedEndTime = TaskTrackers.predictEndTime(schedule.getCurrentTask(), timer.getTimeOfDay());
-		updateTimelineImpl(schedule, predictedEndTime);
+		updateTimelineImpl(vehicle, predictedEndTime);
 	}
 
-	private void updateTimelineImpl(Schedule schedule, double newEndTime) {
+	private void updateTimelineImpl(Vehicle vehicle, double newEndTime) {
+		Schedule schedule = vehicle.getSchedule();
 		Task currentTask = schedule.getCurrentTask();
 		if (currentTask.getEndTime() == newEndTime) {
 			return;
@@ -363,7 +370,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 
 		for (int i = startIdx; i < tasks.size(); i++) {
 			TaxiTask task = (TaxiTask)tasks.get(i);
-			double calcEndTime = calcNewEndTime(task, newBeginTime);
+			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
 
 			if (calcEndTime == Time.UNDEFINED_TIME) {
 				schedule.removeTask(task);
@@ -378,12 +385,12 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 	}
 
-	protected double calcNewEndTime(TaxiTask task, double newBeginTime) {
+	protected double calcNewEndTime(Vehicle vehicle, TaxiTask task, double newBeginTime) {
 		switch (task.getTaxiTaskType()) {
 			case STAY: {
 				if (Schedules.isLastTask(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A taxi schedule should end with WAIT
-					return Math.max(newBeginTime, task.getSchedule().getVehicle().getServiceEndTime());
+					return Math.max(newBeginTime, vehicle.getServiceEndTime());
 				} else {
 					// if this is not the last task then some other task (e.g. DRIVE or PICKUP)
 					// must have been added at time submissionTime <= t
@@ -405,7 +412,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			}
 
 			case PICKUP: {
-				double t0 = ((TaxiPickupTask)task).getRequest().getEarliestStartTime();// t0 == passenger's departure time
+				double t0 = ((TaxiPickupTask)task).getRequest().getEarliestStartTime();// t0 == passenger's departure
+																						// time
 				// the actual pickup starts at max(t, t0)
 				return Math.max(newBeginTime, t0) + params.pickupDuration;
 			}
@@ -429,19 +437,20 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules() {
 		removedRequests = new ArrayList<>();
 		for (Vehicle veh : fleet.getVehicles().values()) {
-			removeAwaitingRequestsImpl(veh.getSchedule());
+			removeAwaitingRequestsImpl(veh);
 		}
 
 		return removedRequests;
 	}
 
-	public List<TaxiRequest> removeAwaitingRequests(Schedule schedule) {
+	public List<TaxiRequest> removeAwaitingRequests(Vehicle vehicle) {
 		removedRequests = new ArrayList<>();
-		removeAwaitingRequestsImpl(schedule);
+		removeAwaitingRequestsImpl(vehicle);
 		return removedRequests;
 	}
 
-	private void removeAwaitingRequestsImpl(Schedule schedule) {
+	private void removeAwaitingRequestsImpl(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
 		switch (schedule.getStatus()) {
 			case STARTED:
 				Integer unremovableTasksCount = countUnremovablePlannedTasks(schedule);
@@ -450,13 +459,13 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 				}
 
 				int newLastTaskIdx = schedule.getCurrentTask().getTaskIdx() + unremovableTasksCount;
-				removePlannedTasks(schedule, newLastTaskIdx);
-				cleanupScheduleAfterTaskRemoval(schedule);
+				removePlannedTasks(vehicle, newLastTaskIdx);
+				cleanupScheduleAfterTaskRemoval(vehicle);
 				return;
 
 			case PLANNED:
-				removePlannedTasks(schedule, -1);
-				cleanupScheduleAfterTaskRemoval(schedule);
+				removePlannedTasks(vehicle, -1);
+				cleanupScheduleAfterTaskRemoval(vehicle);
 				return;
 
 			case COMPLETED:
@@ -498,16 +507,17 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 	}
 
-	protected void removePlannedTasks(Schedule schedule, int newLastTaskIdx) {
+	protected void removePlannedTasks(Vehicle vehicle, int newLastTaskIdx) {
+		Schedule schedule = vehicle.getSchedule();
 		List<? extends Task> tasks = schedule.getTasks();
 		for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
 			TaxiTask task = (TaxiTask)tasks.get(i);
 			schedule.removeTask(task);
-			taskRemovedFromSchedule(schedule, task);
+			taskRemovedFromSchedule(vehicle, task);
 		}
 	}
 
-	protected void taskRemovedFromSchedule(Schedule schedule, TaxiTask task) {
+	protected void taskRemovedFromSchedule(Vehicle vehicle, TaxiTask task) {
 		if (task instanceof TaxiTaskWithRequest) {
 			TaxiRequest request = ((TaxiTaskWithRequest)task).getRequest();
 
@@ -521,17 +531,18 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	}
 
 	// only for planned/started schedule
-	private void cleanupScheduleAfterTaskRemoval(Schedule schedule) {
+	private void cleanupScheduleAfterTaskRemoval(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
-			Vehicle veh = schedule.getVehicle();
-			schedule.addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
+			schedule.addTask(new TaxiStayTask(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+					vehicle.getStartLink()));
 			return;
 		}
 		// else: PLANNED, STARTED
 
 		TaxiTask lastTask = (TaxiTask)Schedules.getLastTask(schedule);
 		double tBegin = schedule.getEndTime();
-		double tEnd = Math.max(tBegin, schedule.getVehicle().getServiceEndTime());
+		double tEnd = Math.max(tBegin, vehicle.getServiceEndTime());
 
 		switch (lastTask.getTaxiTaskType()) {
 			case STAY:
@@ -539,7 +550,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 				return;
 
 			case DROPOFF:
-				Link link = Schedules.getLastLinkInSchedule(schedule);
+				Link link = Schedules.getLastLinkInSchedule(vehicle);
 				schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
 				return;
 

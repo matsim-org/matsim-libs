@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -63,7 +63,7 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 			// perhaps by checking if there are any unplanned requests??
 			if (doUnscheduleAwaitingRequests) {
 				for (Vehicle v : optimContext.fleet.getVehicles().values()) {
-					optimContext.scheduler.updateTimeline(v.getSchedule());
+					optimContext.scheduler.updateTimeline(v);
 				}
 			}
 
@@ -100,10 +100,9 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 
 	@Override
 	public void nextTask(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		optimContext.scheduler.updateBeforeNextTask(schedule);
+		optimContext.scheduler.updateBeforeNextTask(vehicle);
 
-		Task newCurrentTask = schedule.nextTask();
+		Task newCurrentTask = vehicle.getSchedule().nextTask();
 
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
 			requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
@@ -114,10 +113,9 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 		return !destinationKnown && newCurrentTask.getTaxiTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
 	}
 
-	
 	@Override
 	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
-		optimContext.scheduler.updateTimeline(vehicle.getSchedule());
+		optimContext.scheduler.updateTimeline(vehicle);
 
 		// TODO we may here possibly decide whether or not to reoptimize
 		// if (delays/speedups encountered) {requiresReoptimization = true;}

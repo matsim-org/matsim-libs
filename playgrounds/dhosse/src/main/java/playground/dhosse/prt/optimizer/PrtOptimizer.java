@@ -58,21 +58,19 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 
 	@Override
 	public void nextTask(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-        this.scheduler.updateBeforeNextTask(schedule);
-        Task newCurrentTask = schedule.nextTask();
+        this.scheduler.updateBeforeNextTask(vehicle);
+        Task newCurrentTask = vehicle.getSchedule().nextTask();
 
         if (newCurrentTask != null // schedule != COMPLETED
                 && ((TaxiTask)newCurrentTask).getTaxiTaskType() == TaxiTask.TaxiTaskType.STAY) {
             requiresReoptimization = true;
         }
-
 	}
 	
 	@Override
 	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink)
 	{
-		scheduler.updateTimeline(vehicle.getSchedule());
+		scheduler.updateTimeline(vehicle);
 	}
 	
 	protected void scheduleUnplannedRequests()
@@ -80,7 +78,6 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
         initIdleVehicles();
 
         scheduleUnplannedRequestsImpl();//reduce T_W (regular NOS)
-        
     }
 	
 	private void initIdleVehicles()

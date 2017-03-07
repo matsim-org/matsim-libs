@@ -262,7 +262,7 @@ public class TaxibusScheduler {
 			// we forgot a customer?
 		}
 
-		appendTasksAfterDropoff(bestSched);
+		appendTasksAfterDropoff(best.vehicle);
 
 		// log.info("Done Scheduling");
 	}
@@ -372,14 +372,15 @@ public class TaxibusScheduler {
 
 	}
 
-	protected void appendTasksAfterDropoff(Schedule schedule) {
-		appendStayTask(schedule);
+	protected void appendTasksAfterDropoff(Vehicle vehicle) {
+		appendStayTask(vehicle);
 	}
 
-	protected void appendStayTask(Schedule schedule) {
+	protected void appendStayTask(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
 		double tBegin = schedule.getEndTime();
-		double tEnd = Math.max(tBegin, schedule.getVehicle().getServiceEndTime());// even 0-second WAIT
-		Link link = Schedules.getLastLinkInSchedule(schedule);
+		double tEnd = Math.max(tBegin, vehicle.getServiceEndTime());// even 0-second WAIT
+		Link link = Schedules.getLastLinkInSchedule(vehicle);
 		schedule.addTask(new DrtStayTask(tBegin, tEnd, link));
 	}
 

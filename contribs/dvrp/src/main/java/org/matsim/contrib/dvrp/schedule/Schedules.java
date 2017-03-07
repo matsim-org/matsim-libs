@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.schedule;
 import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import com.google.common.base.Predicate;
@@ -101,10 +102,10 @@ public class Schedules {
 		return schedule.getTasks().get(taskIdx);
 	}
 
-	public static Link getLastLinkInSchedule(Schedule schedule) {
-		List<? extends Task> tasks = schedule.getTasks();
+	public static Link getLastLinkInSchedule(Vehicle vehicle) {
+		List<? extends Task> tasks = vehicle.getSchedule().getTasks();
 		return tasks.isEmpty() ? //
-				schedule.getVehicle().getStartLink() : //
+				vehicle.getStartLink() : //
 				Tasks.getEndLink(tasks.get(tasks.size() - 1));
 	}
 

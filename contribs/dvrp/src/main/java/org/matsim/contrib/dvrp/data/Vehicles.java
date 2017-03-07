@@ -40,6 +40,6 @@ public class Vehicles {
 	};
 
 	public static void changeStartLinkToLastLinkInSchedule(Vehicle vehicle) {
-		vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle.getSchedule()));
+		vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle));
 	}
 }
