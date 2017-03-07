@@ -26,8 +26,8 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
  */
 public class DrtSchedulerParams {
 	public final boolean vehicleDiversion;
-	public final double pickupDuration;//TODO per passenger??
-	public final double dropoffDuration;//TODO per passenger??
+	public final double pickupDuration;// TODO per passenger??
+	public final double dropoffDuration;// TODO per passenger??
 	public final double AStarEuclideanOverdoFactor;
 
 	public DrtSchedulerParams(TaxiConfigGroup taxiCfg) {

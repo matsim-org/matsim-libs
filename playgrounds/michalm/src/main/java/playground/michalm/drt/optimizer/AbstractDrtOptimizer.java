@@ -23,5 +23,4 @@ package playground.michalm.drt.optimizer;
  * @author michalm
  */
 public class AbstractDrtOptimizer {
-
 }

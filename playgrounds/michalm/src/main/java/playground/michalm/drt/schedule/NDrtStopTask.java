@@ -30,8 +30,11 @@ import playground.michalm.drt.data.NDrtRequest;
  * @author michalm
  */
 public class NDrtStopTask extends StayTaskImpl implements NDrtTask {
-	private final Set<NDrtRequest> pickupRequests = new HashSet<>();
 	private final Set<NDrtRequest> dropoffRequests = new HashSet<>();
+	private final Set<NDrtRequest> pickupRequests = new HashSet<>();
+
+	private double maxArrivalTime = Double.MAX_VALUE;// relating to max pass drive time (for dropoff requests)
+	private double maxDepartureTime = Double.MAX_VALUE;// relating to pass max wait time (for pickup requests)
 
 	public NDrtStopTask(double beginTime, double endTime, Link link) {
 		super(beginTime, endTime, link);
@@ -42,12 +45,38 @@ public class NDrtStopTask extends StayTaskImpl implements NDrtTask {
 		return NDrtTaskType.STOP;
 	}
 
+	public Set<NDrtRequest> getDropoffRequests() {
+		return Collections.unmodifiableSet(dropoffRequests);
+	}
+
 	public Set<NDrtRequest> getPickupRequests() {
 		return Collections.unmodifiableSet(pickupRequests);
 	}
 
-	public Set<NDrtRequest> getDropoffRequests() {
-		return Collections.unmodifiableSet(dropoffRequests);
+	public void addDropoffRequest(NDrtRequest request) {
+		dropoffRequests.add(request);
+
+		double reqMaxArrivalTime = request.getEarliestStartTime() + 3600;// TODO temp
+		if (reqMaxArrivalTime < maxArrivalTime) {
+			maxArrivalTime = reqMaxArrivalTime;
+		}
+	}
+
+	public void addPickupRequest(NDrtRequest request) {
+		pickupRequests.add(request);
+
+		double reqMaxDepartureTime = request.getEarliestStartTime() + 1200;// TODO temp
+		if (reqMaxDepartureTime < maxDepartureTime) {
+			maxDepartureTime = reqMaxDepartureTime;
+		}
+	}
+
+	public double getMaxArrivalTime() {
+		return maxArrivalTime;
+	}
+
+	public double getMaxDepartureTime() {
+		return maxDepartureTime;
 	}
 
 	@Override

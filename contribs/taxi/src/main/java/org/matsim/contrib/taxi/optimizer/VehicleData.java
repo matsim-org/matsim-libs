@@ -26,6 +26,9 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
+/**
+ * @author michalm
+ */
 public class VehicleData {
 	public static class Entry extends LinkTimePair {
 		public final int idx;
@@ -76,8 +79,7 @@ public class VehicleData {
 			LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
 
 			if (departure != null && departure.time <= maxDepartureTime) {
-				boolean idle = departure.time == currTime // (small optimization to avoid unnecessary calls to
-															// Scheduler.isIdle())
+				boolean idle = departure.time == currTime // to avoid unnecessary calls to Scheduler.isIdle()
 						&& scheduleInquiry.isIdle(v);
 				entries.add(new Entry(idx++, v, departure.link, departure.time, idle));
 				if (idle) {

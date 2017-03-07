@@ -20,8 +20,6 @@
 package playground.michalm.drt.scheduler;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.tasks.DrtTask;
-import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -30,6 +28,9 @@ import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
+
+import playground.michalm.drt.schedule.NDrtTask;
+import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
 
 /**
  * @author michalm
@@ -73,6 +74,10 @@ public class DrtScheduler implements ScheduleInquiry {
 		}
 	}
 
+	public DrtSchedulerParams getParams() {
+		return params;
+	}
+
 	@Override
 	public boolean isIdle(Vehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
@@ -80,8 +85,8 @@ public class DrtScheduler implements ScheduleInquiry {
 			return false;
 		}
 
-		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 //last task
-				&& currentTask.getDrtTaskType() == DrtTaskType.STAY;
+		NDrtTask currentTask = (NDrtTask)schedule.getCurrentTask();
+		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task (because no prebooking)
+				&& currentTask.getDrtTaskType() == NDrtTaskType.STAY;
 	}
 }

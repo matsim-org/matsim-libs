@@ -30,7 +30,7 @@ import playground.michalm.drt.data.NDrtRequest;
  * @author michalm
  */
 public class NDrtDriveTask extends DriveTaskImpl implements NDrtTask {
-	private final Set<NDrtRequest> onBoardRequests = new HashSet<>();
+	private final Set<NDrtRequest> onBoardRequests = new HashSet<>();// TODO really needed??
 
 	public NDrtDriveTask(VrpPathWithTravelData path) {
 		super(path);
@@ -43,6 +43,10 @@ public class NDrtDriveTask extends DriveTaskImpl implements NDrtTask {
 
 	public Set<NDrtRequest> getOnBoardRequests() {
 		return Collections.unmodifiableSet(onBoardRequests);
+	}
+
+	public void addOnBoardRequest(NDrtRequest request) {
+		onBoardRequests.add(request);
 	}
 
 	public boolean isEmpty() {
