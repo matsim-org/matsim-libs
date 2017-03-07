@@ -79,7 +79,7 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
         schedule.nextTask();
 
         if (nextTask != null) {
-            ((AVVehicle) schedule.getVehicle()).getDispatcher().onNextTaskStarted(nextTask);
+            ((AVVehicle) vehicle).getDispatcher().onNextTaskStarted((AVVehicle) vehicle);
         }
 
         if (nextTask != null && nextTask instanceof AVDropoffTask) {

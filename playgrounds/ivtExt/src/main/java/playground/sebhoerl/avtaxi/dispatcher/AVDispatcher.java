@@ -9,7 +9,7 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 
 public interface AVDispatcher {
     void onRequestSubmitted(AVRequest request);
-    void onNextTaskStarted(AVTask task);
+    void onNextTaskStarted(AVVehicle vehicle);
     void onNextTimestep(double now);
 
     void addVehicle(AVVehicle vehicle);

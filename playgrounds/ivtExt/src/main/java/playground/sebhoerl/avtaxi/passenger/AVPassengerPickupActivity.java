@@ -2,6 +2,7 @@ package playground.sebhoerl.avtaxi.passenger;
 
 import java.util.Set;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -21,10 +22,10 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
     private double endTime = 0.0;
     private int passengersAboard = 0;
     
-	public AVPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask, Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
+	public AVPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, Vehicle vehicle, StayTask pickupTask, Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
         super(activityType);
         
-        if (requests.size() > pickupTask.getSchedule().getVehicle().getCapacity()) {
+        if (requests.size() > vehicle.getCapacity()) {
         	// Number of requests exceeds number of seats
         	throw new IllegalStateException();
         }
