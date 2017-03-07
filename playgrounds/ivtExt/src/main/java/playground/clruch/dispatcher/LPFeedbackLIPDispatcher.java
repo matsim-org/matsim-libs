@@ -116,13 +116,19 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
 
 
-
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
                 Map<VirtualNode, Integer> vi_excess = new HashMap<>();
                 Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
+                HashMap<VirtualNode, Set<AVVehicle>> v_ij_cust = getVirtualNodeArrivingWCustomerVehicles();
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
-                    vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size() - requests.get(virtualNode).size());
+                    if(v_ij_cust.get(virtualNode).size()>0){
+                        System.out.println("Customer is travelling");
+                    }
+                     vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size()
+                            + v_ij_reb.get(virtualNode).size()
+                            + v_ij_cust.get(virtualNode).size()
+                            - requests.get(virtualNode).size());
                 }
 
                 // 1) solve the linear program with updated right-hand side
@@ -284,7 +290,15 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             }
         }
 
-        return rebalanceOrder;
+        // if exists primal feasible solution, return it, otherwise return empty set.
+        if(ret == 0){
+            return rebalanceOrder;
+        }else{
+            rebalanceOrder.keySet().stream().forEach(v->rebalanceOrder.put(v,0));
+            return  rebalanceOrder;
+        }
+
+
     }
 
 

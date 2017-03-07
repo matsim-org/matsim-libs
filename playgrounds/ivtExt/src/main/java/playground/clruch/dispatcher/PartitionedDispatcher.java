@@ -42,6 +42,20 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         setVehicleDiversion(vehicleLinkPair, destination);
         eventsManager.processEvent(new RebalanceEvent(destination, vehicleLinkPair.avVehicle, getTimeNow()));
         boolean successAdded = rebalancingVehicles.get(virtualNetwork.getVirtualNode(destination)).add(vehicleLinkPair.avVehicle);
+
+        // DEBUGGING
+
+
+        VirtualNode vNodeDebug = virtualNetwork.getVirtualNode(destination);
+        Set<AVVehicle> testset = rebalancingVehicles.get(virtualNetwork.getVirtualNode(destination));
+        VehicleLinkPair somevehicleLinkparir = vehicleLinkPair;
+        AVVehicle myAVVehicle = vehicleLinkPair.avVehicle;
+
+        if(!successAdded){
+            System.out.println("could not add rebalancing vehicle");
+        }
+
+        // DEBUGGING ENDED
         GlobalAssert.that(successAdded);
     }
 
@@ -80,7 +94,23 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
 
     }
 
-    // same as getVirtualNodeAvailableVehicles() but returns only vehicles which are currently not in a rebalancing task
+    protected synchronized HashMap<VirtualNode,Set<AVVehicle>> getVirtualNodeArrivingWCustomerVehicles(){
+        Collection<VehicleLinkPair> customVehicles  = getVehiclesWithCustomer();
+        HashMap<VirtualNode, Set<AVVehicle>> customVehiclesMap = new HashMap<>();
+
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+            customVehiclesMap.put(virtualNode, new HashSet<>());
+        }
+
+        customVehicles.stream().forEach(v->customVehiclesMap.get(virtualNetwork.getVirtualNode(v.getCurrentDriveDestination())).add(v.avVehicle));
+        return customVehiclesMap;
+    }
+
+
+    /**
+     * // same as getVirtualNodeAvailableVehicles() but returns only vehicles which are currently not in a rebalancing task
+     * @return
+     */
     protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableNotRebalancingVehicles() {
 
         // update the list of rebalancing vehicles

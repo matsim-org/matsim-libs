@@ -112,23 +112,27 @@ abstract class VehicleMaintainer implements AVDispatcher {
             if (isWithoutDirective(avVehicle)) {
                 Schedule schedule = avVehicle.getSchedule();
                 int n = schedule.getTaskCount();
-                AVTask avTask = (AVTask) schedule.getTasks().get(n - 2); // Dropoff task
-                if(avTask instanceof AVDropoffTask){
-                    new AVTaskAdapter(schedule.getCurrentTask()) {
-                        @Override
-                        public void handle(AVDriveTask avDriveTask) {
-                            // for empty cars the drive task is second to last task
-                            if (Schedules.isNextToLastTask(avDriveTask)) {
-                                TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                                OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                                LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
-                                if (linkTimePair != null)
-                                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                if (n > 1) { // take care that array bounds are respected, schedules with n = 1 are staying AVs and not of interest.
+                    AVTask avTask = (AVTask) schedule.getTasks().get(n - 2); // Dropoff task
+                    if (avTask instanceof AVDropoffTask) {
+                        new AVTaskAdapter(schedule.getCurrentTask()) {
+                            @Override
+                            public void handle(AVDriveTask avDriveTask) {
+                                // for empty cars the drive task is second to last task
+                                if (Schedules.isNextToLastTask(avDriveTask)) {
+                                    TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                                    OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                                    LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
+                                    if (linkTimePair != null)
+                                        collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                                }
                             }
-                        }
 
-                    };
+                        };
+                    }
+
                 }
+
             }
         return collection;
     }
