@@ -29,13 +29,13 @@ import org.matsim.contrib.util.random.*;
  */
 public class VehicleGenerator {
 	private final UniformRandom uniform = RandomUtils.getGlobalUniform();
-	private final List<Vehicle> vehicles = new ArrayList<>();
+	private final List<VehicleImpl> vehicles = new ArrayList<>();
 
 	private final double minWorkTime;
 	private final double maxWorkTime;
 	private final VehicleCreator vehicleCreator;
 
-	private Queue<Vehicle> activeVehicles;
+	private Queue<VehicleImpl> activeVehicles;
 	private double previousTime;
 	private double currentTime;
 
@@ -105,7 +105,7 @@ public class VehicleGenerator {
 		for (int i = 0; i < count; i++) {
 			double t0 = Math.floor(uniform.nextDouble(previousTime, currentTime));
 			double workTime = Math.round(uniform.nextDouble(minWorkTime, maxWorkTime));
-			Vehicle veh = vehicleCreator.createVehicle(t0, t0 + workTime);
+			VehicleImpl veh = (VehicleImpl)vehicleCreator.createVehicle(t0, t0 + workTime);
 			activeVehicles.add(veh);
 			vehicles.add(veh);
 		}
@@ -113,13 +113,13 @@ public class VehicleGenerator {
 
 	private void removeVehiclesBeforeT1(int count) {
 		for (int i = 0; i < count; i++) {
-			Vehicle veh = activeVehicles.poll();
+			VehicleImpl veh = activeVehicles.poll();
 			double t1 = Math.floor(uniform.nextDouble(previousTime, currentTime));
-			veh.setT1(t1);
+			veh.setServiceEndTime(t1);
 		}
 	}
 
-	public List<Vehicle> getVehicles() {
+	public List<? extends Vehicle> getVehicles() {
 		return vehicles;
 	}
 }

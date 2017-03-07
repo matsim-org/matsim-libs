@@ -35,7 +35,7 @@ public class ScheduleBuilder {
 	private TaxiRequest currentRequest = null;
 
 	ScheduleBuilder(FleetImpl fleet, Id<Person> personId, Link link, double t0) {
-		Vehicle vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0, Double.NaN);
+		VehicleImpl vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0, Double.NaN);
 		fleet.addVehicle(vehicle);
 		schedule = vehicle.getSchedule();
 	}
@@ -78,12 +78,12 @@ public class ScheduleBuilder {
 		currentRequest = request;
 	}
 
-	void endSchedule(double t1) {
+	void endSchedule(double endTime) {
 		if (currentRequest != null) {
 			throw new IllegalStateException();
 		}
 
-		schedule.getVehicle().setT1(t1);
+		((VehicleImpl)schedule.getVehicle()).setServiceEndTime(endTime);
 		schedule = null;// just to make sure no modifications will be made
 	}
 

@@ -54,11 +54,6 @@ public interface Vehicle extends Identifiable<Vehicle> {
 	double getServiceEndTime();
 
 	/**
-	 * See {@link Vehicle#getServiceEndTime()}
-	 */
-	void setT1(double t1);
-
-	/**
 	 * Design comment(s):
 	 * <ul>
 	 * <li>The Schedule is meant to be changed only by the optimizer. Note, however, that the present design does not

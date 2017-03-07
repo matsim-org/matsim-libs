@@ -45,7 +45,7 @@ public class BarcelonaTaxiCreator implements VehicleCreator {
 	}
 
 	@Override
-	public Vehicle createVehicle(double t0, double t1) {
+	public VehicleImpl createVehicle(double t0, double t1) {
 		Id<Vehicle> vehId = Id.create("taxi" + currentVehicleId++, Vehicle.class);
 		Point p = RandomPointUtils.getRandomPointInGeometry(preparedPolygon);
 		Link link = NetworkUtils.getNearestLinkExactly(network, MGC.point2Coord(p));

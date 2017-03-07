@@ -88,9 +88,8 @@ public class VehicleImpl implements Vehicle {
 		return "Vehicle_" + id;
 	}
 
-	@Override
-	public void setT1(double t1) {
-		this.serviceEndTime = t1;
+	public void setServiceEndTime(double serviceEndTime) {
+		this.serviceEndTime = serviceEndTime;
 	}
 
 	@Override
