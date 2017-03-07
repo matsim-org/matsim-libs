@@ -61,10 +61,14 @@ public class TaxibusScheduler {
 	}
 
 	public boolean isIdle(Vehicle vehicle) {
-		if (!isStarted(vehicle))
+		if (!isStarted(vehicle)) {
 			return false;
-		DrtTask currentTask = (DrtTask)vehicle.getSchedule().getCurrentTask();
-		return Schedules.isLastTask(currentTask) && currentTask.getDrtTaskType() == DrtTaskType.STAY;
+		}
+
+		Schedule schedule = vehicle.getSchedule();
+		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
+		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task
+				&& currentTask.getDrtTaskType() == DrtTaskType.STAY;
 	}
 
 	public boolean isStarted(Vehicle vehicle) {
@@ -137,7 +141,8 @@ public class TaxibusScheduler {
 		}
 
 		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-		if (!Schedules.isLastTask(currentTask) || currentTask.getDrtTaskType() != DrtTaskType.DRIVE_EMPTY) {
+		if (currentTask.getTaskIdx() != schedule.getTaskCount() - 1 // not last task
+				|| currentTask.getDrtTaskType() != DrtTaskType.DRIVE_EMPTY) {
 			return null;
 		}
 

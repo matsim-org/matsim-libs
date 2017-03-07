@@ -59,11 +59,6 @@ public interface Task {
 	double getEndTime();
 
 	/**
-	 * Back pointer the schedule that contains the task. Set by ScheduleImpl through a package-protected variable.
-	 */
-	Schedule getSchedule();
-
-	/**
 	 * Index of the task in the schedule. Managed by ScheduleImpl through a package-protected variable.
 	 */
 	int getTaskIdx();

@@ -164,7 +164,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 		} else if (getOptimContext().scheduler.isIdle(vehicle)) {
 			idleTaxiRegistry.addVehicle(vehicle);
 		} else {
-			if (!Schedules.isFirstTask(schedule.getCurrentTask())) {
+			if (schedule.getCurrentTask().getTaskIdx() != 0) {//not first task
 				TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
 				if (isWaitStay(previousTask)) {
 					idleTaxiRegistry.removeVehicle(vehicle);

@@ -21,7 +21,6 @@ package playground.jbischoff.taxi.inclusion.optimizer;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -130,7 +129,7 @@ public class InclusionRuleBasedTaxiOptimizer
             idleTaxiRegistry.addVehicle(vehicle);
         }
         else {
-            if (!Schedules.isFirstTask(schedule.getCurrentTask())) {
+            if (schedule.getCurrentTask().getTaskIdx() != 0) {//not first task
                 TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
                 if (isWaitStay(previousTask)) {
                     idleTaxiRegistry.removeVehicle(vehicle);

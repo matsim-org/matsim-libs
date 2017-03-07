@@ -90,7 +90,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 
 		TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
-		return Schedules.isLastTask(currentTask) && currentTask.getTaxiTaskType() == TaxiTaskType.STAY;
+		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task
+				&& currentTask.getTaxiTaskType() == TaxiTaskType.STAY;
 	}
 
 	/**
@@ -169,7 +170,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 
 		TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
 		// no prebooking ==> we can divert vehicle whose current task is an empty drive at the end of the schedule
-		if (!Schedules.isLastTask(currentTask) || currentTask.getTaxiTaskType() != TaxiTaskType.EMPTY_DRIVE) {
+		if (currentTask.getTaskIdx() != schedule.getTaskCount() - 1 // not last task
+				|| currentTask.getTaxiTaskType() != TaxiTaskType.EMPTY_DRIVE) {
 			return null;
 		}
 
@@ -387,7 +389,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	protected double calcNewEndTime(Vehicle vehicle, TaxiTask task, double newBeginTime) {
 		switch (task.getTaxiTaskType()) {
 			case STAY: {
-				if (Schedules.isLastTask(task)) {// last task
+				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A taxi schedule should end with WAIT
 					return Math.max(newBeginTime, vehicle.getServiceEndTime());
 				} else {

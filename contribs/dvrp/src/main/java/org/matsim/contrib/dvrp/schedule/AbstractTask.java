@@ -26,9 +26,7 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
  */
 public abstract class AbstractTask implements Task {
 	// ==== BEGIN: fields managed by ScheduleImpl
-	Schedule schedule;
 	int taskIdx;
-
 	TaskStatus status;
 	// ==== END: fields managed by ScheduleImpl
 
@@ -54,11 +52,6 @@ public abstract class AbstractTask implements Task {
 	@Override
 	public final int getTaskIdx() {
 		return taskIdx;
-	}
-
-	@Override
-	public final Schedule getSchedule() {
-		return schedule;
 	}
 
 	@Override

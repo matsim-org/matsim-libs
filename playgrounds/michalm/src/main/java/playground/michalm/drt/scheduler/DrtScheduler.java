@@ -68,7 +68,8 @@ public class DrtScheduler implements ScheduleInquiry {
 		((FleetImpl)fleet).resetSchedules();
 
 		for (Vehicle veh : fleet.getVehicles().values()) {
-			veh.getSchedule().addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
+			veh.getSchedule()
+					.addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
 		}
 	}
 
@@ -80,7 +81,7 @@ public class DrtScheduler implements ScheduleInquiry {
 		}
 
 		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-		return Schedules.isLastTask(currentTask) && currentTask.getDrtTaskType() == DrtTaskType.STAY;
+		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 //last task
+				&& currentTask.getDrtTaskType() == DrtTaskType.STAY;
 	}
-
 }

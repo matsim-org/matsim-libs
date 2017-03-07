@@ -65,7 +65,6 @@ public class ScheduleImpl implements Schedule {
 
 		AbstractTask t = (AbstractTask)task;
 		tasks.add(taskIdx, t);
-		t.schedule = this;
 		t.taskIdx = taskIdx;
 		t.status = TaskStatus.PLANNED;
 
