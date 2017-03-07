@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
@@ -36,10 +37,10 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class TaskTrackers {
-	public static void initOnlineDriveTaskTracking(DriveTask driveTask, VrpLeg vrpDynLeg,
+	public static void initOnlineDriveTaskTracking(Vehicle vehicle, VrpLeg vrpDynLeg,
 			VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer) {
-		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(driveTask, vrpDynLeg, optimizer, timer);
-
+		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(vehicle, vrpDynLeg, optimizer, timer);
+		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		driveTask.initTaskTracker(onlineTracker);
 		vrpDynLeg.initOnlineTracking(onlineTracker);
 	}

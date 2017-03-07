@@ -49,7 +49,7 @@ public class AVActionCreator implements VrpAgentLogic.DynActionCreator {
     				return new AVPassengerDropoffActivity(passengerEngine, dynAgent, vehicle, mdt, mdt.getRequests(),
                             DROPOFF_ACTIVITY_TYPE);
                 case DRIVE:
-    				return legCreator.createLeg((DriveTask)task);
+    				return legCreator.createLeg(vehicle);
                 case STAY:
                     return new VrpActivity(STAY_ACTIVITY_TYPE, (StayTask) task);
     	    	default:

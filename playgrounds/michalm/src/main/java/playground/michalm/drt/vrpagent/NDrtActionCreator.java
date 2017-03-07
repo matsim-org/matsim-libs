@@ -22,7 +22,6 @@ package playground.michalm.drt.vrpagent;
 import org.matsim.contrib.drt.tasks.DrtStayTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.*;
 
@@ -47,12 +46,12 @@ public class NDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 		NDrtTask task = (NDrtTask)vehicle.getSchedule().getCurrentTask();
 		switch (task.getDrtTaskType()) {
 			case DRIVE:
-				return legCreator.createLeg((DriveTask)task);
+				return legCreator.createLeg(vehicle);
 
 			case STOP:
 				NDrtStopTask t = (NDrtStopTask)task;
-				return new BusStopActivity(passengerEngine, dynAgent, t, t.getDropoffRequests(),
-						t.getPickupRequests(), DRT_STOP_NAME);
+				return new BusStopActivity(passengerEngine, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests(),
+						DRT_STOP_NAME);
 
 			case STAY:
 				return new VrpActivity(DRT_STAY_NAME, (DrtStayTask)task);

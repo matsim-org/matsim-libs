@@ -22,7 +22,6 @@ package org.matsim.contrib.drt;
 import org.matsim.contrib.drt.tasks.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.*;
 
@@ -46,7 +45,7 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 		switch (task.getDrtTaskType()) {
 			case DRIVE_EMPTY:
 			case DRIVE_WITH_PASSENGERS:
-				return legCreator.createLeg((DriveTask)task);
+				return legCreator.createLeg(vehicle);
 
 			case PICKUP:
 				final DrtPickupTask pst = (DrtPickupTask)task;
