@@ -138,7 +138,7 @@ public class AccessibilityComputationKiberaTest {
 		// QGis
 		if (createQGisOutput) {
 			final boolean includeDensityLayer = false;
-			final Integer range = 9; // In the current implementation, this need always be 9
+			final Integer range = 9; // In the current implementation, this must always be 9
 			final Double lowerBound = 0.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
 			final Double upperBound = 3.5;
 			final int populationThreshold = (int) (50 / (1000/cellSize * 1000/cellSize));
