@@ -397,7 +397,8 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
-		
+		config.addModule(decongestionSettings);
+
 		DecongestionInfo info = new DecongestionInfo();
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
