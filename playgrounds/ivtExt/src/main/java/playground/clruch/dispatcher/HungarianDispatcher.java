@@ -70,6 +70,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
                                 .map(AVRequest::getFromLink)
                                 .collect(Collectors.toList());
 
+
                 // find the Euclidean bipartite matching for all vehicles using the Hungarian method
                 System.out.println("optimizing over "+divertableVehicles.size()+" vehicles and "+requestlocs.size() + " requests.");
                 Map<VehicleLinkPair, Link> hungarianmatches = abstractVehicleDestMatcher.match(divertableVehicles, requestlocs);
