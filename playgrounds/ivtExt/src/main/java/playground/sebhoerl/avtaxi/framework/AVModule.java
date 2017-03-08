@@ -106,9 +106,9 @@ public class AVModule extends AbstractModule {
 
         
         /** dispatchers for PartitionedDispatcher */
-        bind(ConsensusDispatcher.Factory.class);
+        bind(ConsensusDispatcherDFR.Factory.class);
         bind(LPFeedbackLIPDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcher.class.getSimpleName()).to(ConsensusDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
     }
 

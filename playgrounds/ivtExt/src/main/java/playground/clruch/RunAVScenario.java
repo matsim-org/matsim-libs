@@ -12,6 +12,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.clruch.dispatcher.ConsensusDispatcherDFR;
 import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
 import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.netdata.LinkWeights;
@@ -37,6 +38,7 @@ public class RunAVScenario {
         System.out.println("Population size:" + scenario.getPopulation().getPersons().values().size());
 
 
+        // TODO clean up this input for both ConsensusDispatcherDFR and for LinearDispatcher
         // Debugging
         File linkWeightFile = new File(dir + "/consensusWeights.xml");
         File virtualnetworkXML = new File(dir + "/virtualNetwork.xml");
@@ -44,8 +46,8 @@ public class RunAVScenario {
         ConsensusDispatcher.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
         ConsensusDispatcher.Factory.linkWeights = LinkWeights.fillLinkWeights(linkWeightFile,ConsensusDispatcher.Factory.virtualNetwork);
         */
-        LPFeedbackLIPDispatcher.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
-        LPFeedbackLIPDispatcher.Factory.travelTimes = LinkWeights.fillLinkWeights(linkWeightFile, LPFeedbackLIPDispatcher.Factory.virtualNetwork);
+        ConsensusDispatcherDFR.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
+        ConsensusDispatcherDFR.Factory.travelTimes = LinkWeights.fillLinkWeights(linkWeightFile, ConsensusDispatcherDFR.Factory.virtualNetwork);
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
