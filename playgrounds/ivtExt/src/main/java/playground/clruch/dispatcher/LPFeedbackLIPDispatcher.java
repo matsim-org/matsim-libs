@@ -110,6 +110,12 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
 
                 int vi_desired_num = (int) ((numberOfAVs - num_requests) / (double) virtualNetwork.getVirtualNodes().size());
+                // DEBUGGING START
+                if(vi_desired_num > 250){
+                    System.out.println("vi desired too large. ");
+                }
+                // DEBUGGING END
+
                 Map<VirtualNode, Integer> vi_desired = new HashMap<>();
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
                     vi_desired.put(virtualNode, vi_desired_num);

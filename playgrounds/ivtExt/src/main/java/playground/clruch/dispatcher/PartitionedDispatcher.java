@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
     //private final Set<AVVehicle> rebalancingVehicles = new HashSet<>();
-    private final Map<VirtualNode, Set<AVVehicle>> rebalancingVehicles = new HashMap<>();
+    //private final Map<VirtualNode, Set<AVVehicle>> rebalancingVehicles = new HashMap<>();
+    private final Map<AVVehicle, Link> rebalancingVEHicles = new HashMap<>();
 
     public PartitionedDispatcher( //
                                   AVDispatcherConfig config, //

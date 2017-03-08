@@ -119,13 +119,11 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             @Override
                             public void handle(AVDriveTask avDriveTask) {
                                 // for empty cars the drive task is second to last task
-                                if (Schedules.isNextToLastTask(avDriveTask)) {
-                                    TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                                    OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                                    LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
-                                    if (linkTimePair != null)
-                                        collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
-                                }
+                                TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                                OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                                LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
+                                if (linkTimePair != null)
+                                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
                             }
 
                         };
