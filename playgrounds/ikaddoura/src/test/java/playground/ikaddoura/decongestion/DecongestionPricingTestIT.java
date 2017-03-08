@@ -72,10 +72,7 @@ public class DecongestionPricingTestIT {
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		config.controler().setOutputDirectory(outputDirectory);
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
-		Controler controler = new Controler(scenario);
-
+		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
 		decongestionSettings.setKp(0.0123);
@@ -85,7 +82,11 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		config.addModule(decongestionSettings);
 		
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+	
 		DecongestionInfo info = new DecongestionInfo();
 		
 		// congestion toll computation
@@ -161,10 +162,7 @@ public class DecongestionPricingTestIT {
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		config.controler().setOutputDirectory(outputDirectory);
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
-		Controler controler = new Controler(scenario);
-
+		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
 		decongestionSettings.setKp(2.0);
@@ -174,7 +172,11 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		config.addModule(decongestionSettings);
 		
+		final Scenario scenario = ScenarioUtils.loadScenario(config);		
+		Controler controler = new Controler(scenario);
+
 		DecongestionInfo info = new DecongestionInfo();
 		
 		// congestion toll computation
@@ -249,9 +251,6 @@ public class DecongestionPricingTestIT {
 
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		config.controler().setOutputDirectory(outputDirectory);
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
-		Controler controler = new Controler(scenario);
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
@@ -262,6 +261,10 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		config.addModule(decongestionSettings);
+
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
 		
 		DecongestionInfo info = new DecongestionInfo();
 		
@@ -325,22 +328,22 @@ public class DecongestionPricingTestIT {
 		System.out.println(testUtils.getPackageInputDirectory());
 		
 		final String configFile = testUtils.getPackageInputDirectory() + "/config.xml";
+		Config config = ConfigUtils.loadConfig(configFile);
+
+		String outputDirectory = testUtils.getOutputDirectory() + "/";
+		config.controler().setOutputDirectory(outputDirectory);
 		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		config.addModule(decongestionSettings);
+
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
 		
 		DecongestionInfo info = new DecongestionInfo();
 		
-		Config config = ConfigUtils.loadConfig(configFile);
-
-		String outputDirectory = testUtils.getOutputDirectory() + "/";
-		config.controler().setOutputDirectory(outputDirectory);
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
-		Controler controler = new Controler(scenario);
-
 		// decongestion pricing
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -385,7 +388,11 @@ public class DecongestionPricingTestIT {
 		System.out.println(testUtils.getPackageInputDirectory());
 		
 		final String configFile = testUtils.getPackageInputDirectory() + "/config.xml";
-		
+		Config config = ConfigUtils.loadConfig(configFile);
+
+		String outputDirectory = testUtils.getOutputDirectory() + "/";
+		config.controler().setOutputDirectory(outputDirectory);
+
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
@@ -393,12 +400,7 @@ public class DecongestionPricingTestIT {
 		
 		DecongestionInfo info = new DecongestionInfo();
 		
-		Config config = ConfigUtils.loadConfig(configFile);
-
-		String outputDirectory = testUtils.getOutputDirectory() + "/";
-		config.controler().setOutputDirectory(outputDirectory);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-				
 		Controler controler = new Controler(scenario);
 
 		// decongestion pricing
