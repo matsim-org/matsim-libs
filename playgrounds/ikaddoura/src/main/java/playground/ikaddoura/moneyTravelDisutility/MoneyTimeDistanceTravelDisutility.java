@@ -41,7 +41,7 @@ import playground.ikaddoura.moneyTravelDisutility.data.TimeBin;
 */
 
 public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
-	
+
 	private final TravelDisutility travelDisutility;
 	private final double sigma;	
 	private final double timeBinSize;
@@ -93,12 +93,18 @@ public class MoneyTimeDistanceTravelDisutility implements TravelDisutility {
 				
 		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person, vehicle);
 		double randomizedTollDisutility = linkExpectedTollDisutility * logNormalRnd;
+				
 		return travelDisutility + randomizedTollDisutility;
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return link.getLength() / link.getFreespeed();
+		
+		if (this.travelDisutility != null) {
+			return this.travelDisutility.getLinkMinimumTravelDisutility(link);
+		} else {
+			return 0.;
+		}
 	}
 
 	private double calculateExpectedTollDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
