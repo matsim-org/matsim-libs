@@ -43,8 +43,14 @@ public class RunAVScenario {
         // Debugging
         File linkWeightFile = new File(dir, "consensusWeights.xml");
         File virtualnetworkXML = new File(dir, "virtualNetwork.xml");
+
+        /*
         ConsensusDispatcherDFR.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
         ConsensusDispatcherDFR.Factory.travelTimes = LinkWeights.fillLinkWeights(linkWeightFile, ConsensusDispatcherDFR.Factory.virtualNetwork);
+
+        LPFeedbackLIPDispatcher.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
+        LPFeedbackLIPDispatcher.Factory.travelTimes = LinkWeights.fillLinkWeights(linkWeightFile, LPFeedbackLIPDispatcher.Factory.virtualNetwork);
+        */
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));

@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * Created by Claudio on 2/24/2017.
  */
 
-
+@ Deprecated
 public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
     public static final int REBALANCING_PERIOD = 5 * 60; // TODO
     final AbstractVirtualNodeDest virtualNodeDest;
