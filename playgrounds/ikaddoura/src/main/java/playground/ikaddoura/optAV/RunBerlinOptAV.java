@@ -128,6 +128,18 @@ public class RunBerlinOptAV {
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 		
+		DecongestionConfigGroup decongestionConfigGroup = new DecongestionConfigGroup();
+		decongestionConfigGroup.setKp(kP);
+		decongestionConfigGroup.setKi(0.);
+		decongestionConfigGroup.setKd(0.);
+		decongestionConfigGroup.setTOLERATED_AVERAGE_DELAY_SEC(1.0);
+		decongestionConfigGroup.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionConfigGroup.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionConfigGroup.setMsa(false);
+		decongestionConfigGroup.setRUN_FINAL_ANALYSIS(false);
+		decongestionConfigGroup.setWRITE_LINK_INFO_CHARTS(false);
+		config.addModule(decongestionConfigGroup);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
@@ -162,26 +174,12 @@ public class RunBerlinOptAV {
 		// #############################
 		// congestion pricing
 		// #############################
-
-		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setKp(kP);
-		decongestionSettings.setKi(0.);
-		decongestionSettings.setKd(0.);
-		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(1.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-		decongestionSettings.setMsa(false);
-		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-		log.info(decongestionSettings.toString());
-			
-		DecongestionInfo info = new DecongestionInfo();
-		
+					
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
-				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionInfo.class).asEagerSingleton();
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 				
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);

@@ -148,6 +148,87 @@ public class DecongestionPricingTestIT {
 	}
 	
 	/**
+	 * Kp = 0.0123, other syntax
+	 * 
+	 */
+	@Test
+	public final void test0amodified() {
+		
+		System.out.println(testUtils.getPackageInputDirectory());
+		
+		final String configFile = testUtils.getPackageInputDirectory() + "/config0.xml";
+		
+		Config config = ConfigUtils.loadConfig(configFile);
+
+		String outputDirectory = testUtils.getOutputDirectory() + "/";
+		config.controler().setOutputDirectory(outputDirectory);
+		
+		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setKp(0.0123);
+		decongestionSettings.setKd(0.0);
+		decongestionSettings.setKi(0.0);
+		decongestionSettings.setMsa(false);
+		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		config.addModule(decongestionSettings);
+		
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+			
+		// congestion toll computation
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				
+				this.bind(DecongestionInfo.class).asEagerSingleton();
+				
+				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				
+				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+			}
+		});
+		
+		// toll-adjusted routing
+		
+		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
+		travelDisutilityFactory.setSigma(0.);
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+			}
+		});	
+		
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        controler.run();   
+		
+        double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
+        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
+        
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 150.5, tt1, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt2, MatsimTestUtils.EPSILON);
+				
+		final int index = config.controler().getLastIteration() - config.controler().getFirstIteration();
+		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
+		Assert.assertEquals("Wrong average executed score. The tolls seem to have changed.", -33.940316666666666, avgScore, MatsimTestUtils.EPSILON);
+	}
+	
+	/**
 	 * Kp = 2
 	 * 
 	 */
@@ -234,6 +315,87 @@ public class DecongestionPricingTestIT {
 
 		Assert.assertEquals("Wrong average delay (capacity is set in a way that one of the two agents has to wait 101 sec. Thus the average is 50.5", 50.5, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2avgDelay().get(84), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong toll.", 50.5 * 2, info.getlinkInfos().get(Id.createLinkId("link12")).getTime2toll().get(84), MatsimTestUtils.EPSILON);
+	}
+	
+	/**
+	 * Kp = 2
+	 * 
+	 */
+	@Test
+	public final void test0bmodified() {
+		
+		System.out.println(testUtils.getPackageInputDirectory());
+		
+		final String configFile = testUtils.getPackageInputDirectory() + "/config0.xml";
+		
+		Config config = ConfigUtils.loadConfig(configFile);
+
+		String outputDirectory = testUtils.getOutputDirectory() + "/";
+		config.controler().setOutputDirectory(outputDirectory);
+		
+		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setKp(2.0);
+		decongestionSettings.setKd(0.0);
+		decongestionSettings.setKi(0.0);
+		decongestionSettings.setMsa(false);
+		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		config.addModule(decongestionSettings);
+		
+		final Scenario scenario = ScenarioUtils.loadScenario(config);		
+		Controler controler = new Controler(scenario);
+		
+		// congestion toll computation
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				
+				this.bind(DecongestionInfo.class).asEagerSingleton();
+				
+				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
+				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+				
+				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.bind(PersonVehicleTracker.class).asEagerSingleton();
+								
+				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+				
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+			}
+		});
+		
+		// toll-adjusted routing
+		
+		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
+		travelDisutilityFactory.setSigma(0.);
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+			}
+		});	
+		
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        controler.run();   
+		
+        double tt0 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 6 * 3600 + 50. * 60, null, null);
+        double tt1 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 63, null, null);
+        double tt2 = controler.getLinkTravelTimes().getLinkTravelTime(scenario.getNetwork().getLinks().get(Id.createLinkId("link12")), 7 * 3600 + 15. * 60, null, null);
+        
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 150.5, tt1, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time. The run output seems to have changed.", 100.0, tt2, MatsimTestUtils.EPSILON);
+				
+		final int index = config.controler().getLastIteration() - config.controler().getFirstIteration();
+		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
+		Assert.assertEquals("Wrong average executed score. The tolls seem to have changed.", -134.31916666666666, avgScore, MatsimTestUtils.EPSILON);
 	}
 	
 	/**

@@ -142,8 +142,6 @@ public class DecongestionRun {
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-
-		
 		
 		// #############################################################
 		
@@ -153,7 +151,7 @@ public class DecongestionRun {
 			@Override
 			public void install() {
 				
-				this.bind(DecongestionInfo.class) ;
+				this.bind(DecongestionInfo.class).asEagerSingleton();
 				
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);

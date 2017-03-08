@@ -299,11 +299,6 @@ public class OptAVTestIT {
 		config2.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config2.checkConsistency();
 		
-		Scenario scenario2 = ScenarioUtils.loadScenario(config2);
-		Controler controler2 = new Controler(scenario2);
-		
-		// congestion pricing
-		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setMsa(true);
 		decongestionSettings.setTOLL_BLEND_FACTOR(0.);
@@ -315,14 +310,18 @@ public class OptAVTestIT {
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+		config2.addModule(decongestionSettings);
 		
-		DecongestionInfo info = new DecongestionInfo();
+		Scenario scenario2 = ScenarioUtils.loadScenario(config2);
+		Controler controler2 = new Controler(scenario2);
+		
+		// congestion pricing
 		
 		controler2.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
-				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionInfo.class).asEagerSingleton();
 				
 				this.bind(AgentFilter.class).to(AVAgentFilter.class);
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);			

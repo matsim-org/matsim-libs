@@ -271,6 +271,15 @@ public final class RunBraessSimulation {
 
 		config.controler().setCreateGraphs(true);
 
+		// decongestion relevant parameters
+		DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setTOLL_ADJUSTMENT(0.1);
+		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
+		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		config.addModule(decongestionSettings);
+		
 		return config;
 	}
 
@@ -403,19 +412,11 @@ public final class RunBraessSimulation {
 			
 		} else if (PRICING_TYPE.equals(PricingType.INTERVALBASED)) {
 			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
-			decongestionSettings.setTOLL_ADJUSTMENT(0.1);
-			decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
-			decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
-			decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-			final DecongestionInfo info = new DecongestionInfo();
-			
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					
-					this.bind(DecongestionInfo.class).toInstance(info);
+					this.bind(DecongestionInfo.class).asEagerSingleton();
 					
 					this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 					this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);

@@ -127,6 +127,15 @@ public class RunBerlinMinExtCostAV {
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 		
+		final DecongestionConfigGroup decongestionConfigGroup = new DecongestionConfigGroup();
+		decongestionConfigGroup.setKp(kP);
+		decongestionConfigGroup.setKi(0.);
+		decongestionConfigGroup.setKd(0.);
+		decongestionConfigGroup.setMsa(true);
+		decongestionConfigGroup.setRUN_FINAL_ANALYSIS(false);
+		decongestionConfigGroup.setWRITE_LINK_INFO_CHARTS(false);
+		config.addModule(decongestionConfigGroup);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
@@ -161,22 +170,12 @@ public class RunBerlinMinExtCostAV {
 		// #############################
 		// congestion pricing
 		// #############################
-
-		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setKp(kP);
-		decongestionSettings.setKi(0.);
-		decongestionSettings.setKd(0.);
-		decongestionSettings.setMsa(true);
-		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-		
-		DecongestionInfo info = new DecongestionInfo();
-		
+				
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
-				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionInfo.class).asEagerSingleton();
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 				
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
