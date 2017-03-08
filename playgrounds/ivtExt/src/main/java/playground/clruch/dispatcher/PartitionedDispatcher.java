@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
-    private final Map<AVVehicle, Link> rebalancingVEHicles = new HashMap<>(); // TODO correct case
+    private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>(); // TODO correct case
 
     public PartitionedDispatcher( //
                                   AVDispatcherConfig config, //
@@ -39,7 +39,8 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(vehicleLinkPair, destination);
         eventsManager.processEvent(new RebalanceEvent(destination, vehicleLinkPair.avVehicle, getTimeNow()));
-        rebalancingVEHicles.put(vehicleLinkPair.avVehicle, destination); // TODO global assert that put changed map
+        Link returnVal = rebalancingVehicles.put(vehicleLinkPair.avVehicle, destination);
+        GlobalAssert.that(returnVal == null);
     }
 
 
@@ -60,7 +61,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     // TODO currently the vehicles are removed when arriving at final link, could be removed as soon as they reach rebalancing destination virtualNode instead
     private synchronized void updateRebVehicles() {
         getStayVehicles().values().stream() //
-            .flatMap(q -> q.stream()).forEach(rebalancingVEHicles::remove);
+            .flatMap(q -> q.stream()).forEach(rebalancingVehicles::remove);
     }
 
     /**
@@ -75,8 +76,8 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
             returnMap.put(virtualNode, new HashSet<>());
         }
-        for (AVVehicle avVehicle : rebalancingVEHicles.keySet()) {
-            boolean successAdd = returnMap.get(virtualNetwork.getVirtualNode(rebalancingVEHicles.get(avVehicle))).add(avVehicle);
+        for (AVVehicle avVehicle : rebalancingVehicles.keySet()) {
+            boolean successAdd = returnMap.get(virtualNetwork.getVirtualNode(rebalancingVehicles.get(avVehicle))).add(avVehicle);
             GlobalAssert.that(successAdd);
         }
 
@@ -88,8 +89,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     /**
      * @return
      */
-    // TODO change return type to Map<...> instead of HashMap
-    protected synchronized HashMap<VirtualNode, Set<AVVehicle>> getVirtualNodeArrivingWCustomerVehicles() {
+    protected synchronized Map<VirtualNode, Set<AVVehicle>> getVirtualNodeArrivingWCustomerVehicles() {
         Collection<VehicleLinkPair> customVehicles = getVehiclesWithCustomer();
         HashMap<VirtualNode, Set<AVVehicle>> customVehiclesMap = new HashMap<>();
 
@@ -116,12 +116,8 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         Map<VirtualNode, List<VehicleLinkPair>> rebalanceMap = new HashMap<>();
 
         // remove vehicles which are rebalancing
-        Set<AVVehicle> set = rebalancingVEHicles.keySet();
-        // TODO this was too complicated:
-        //Set<AVVehicle> set = rebalancingVEHicles.keySet().stream().collect(Collectors.toSet());
-
         for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
-            rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !set.contains(v.avVehicle)).collect(Collectors.toList()));
+            rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)).collect(Collectors.toList()));
         }
 
 

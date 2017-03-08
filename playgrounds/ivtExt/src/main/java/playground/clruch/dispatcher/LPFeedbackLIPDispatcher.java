@@ -122,7 +122,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
                 Map<VirtualNode, Integer> vi_excess = new HashMap<>();
                 Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
-                HashMap<VirtualNode, Set<AVVehicle>> v_ij_cust = getVirtualNodeArrivingWCustomerVehicles();
+                Map<VirtualNode, Set<AVVehicle>> v_ij_cust = getVirtualNodeArrivingWCustomerVehicles();
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
                     if (v_ij_cust.get(virtualNode).size() > 0) {
                         System.out.println("Customer is travelling");
