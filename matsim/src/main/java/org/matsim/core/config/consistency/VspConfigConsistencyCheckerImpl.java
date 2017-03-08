@@ -234,6 +234,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		switch( config.qsim().getTrafficDynamics() ) {
 		case withHoles:
+		case KWM:
 			break;
 		case queue:
 		default:
