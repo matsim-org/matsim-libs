@@ -24,7 +24,6 @@ import java.util.Collection;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -39,7 +38,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 
 	private boolean requiresReoptimization = false;
 
-	public AbstractDrtOptimizer(DrtOptimizerContext optimContext, AbstractTaxiOptimizerParams params,
+	public AbstractDrtOptimizer(DrtOptimizerContext optimContext, AbstractDrtOptimizerParams params,
 			Collection<NDrtRequest> unplannedRequests) {
 		this.optimContext = optimContext;
 		this.unplannedRequests = unplannedRequests;
