@@ -64,6 +64,10 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility, travelTime,
 				params.AStarEuclideanOverdoFactor, fastRouterFactory);
 
+		initFleet(scenario);
+	}
+
+	private void initFleet(Scenario scenario) {
 		if (TaxiConfigGroup.get(scenario.getConfig()).isChangeStartLinkToLastLinkInSchedule()) {
 			for (Vehicle veh : fleet.getVehicles().values()) {
 				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
@@ -71,7 +75,6 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 
 		((FleetImpl)fleet).resetSchedules();
-
 		for (Vehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
 					.addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
@@ -294,18 +297,15 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 */
 	public void updateBeforeNextTask(Vehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
-
 		// Assumption: there is no delay as long as the schedule has not been started (PLANNED)
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return;
 		}
 
-		double endTime = timer.getTimeOfDay();
-		TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
-
-		updateTimelineImpl(vehicle, endTime);
+		updateTimelineImpl(vehicle, timer.getTimeOfDay());
 
 		if (!params.destinationKnown) {
+			TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
 			if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
 				appendOccupiedDriveAndDropoff(schedule);
 				appendTasksAfterDropoff(vehicle);
@@ -413,8 +413,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			}
 
 			case PICKUP: {
-				double t0 = ((TaxiPickupTask)task).getRequest().getEarliestStartTime();// t0 == passenger's departure
-																						// time
+				double t0 = ((TaxiPickupTask)task).getRequest().getEarliestStartTime();
 				// the actual pickup starts at max(t, t0)
 				return Math.max(newBeginTime, t0) + params.pickupDuration;
 			}
