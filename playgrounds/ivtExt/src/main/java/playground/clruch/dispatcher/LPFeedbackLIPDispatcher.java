@@ -12,6 +12,7 @@ package playground.clruch.dispatcher;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import jdk.nashorn.internal.objects.Global;
 import org.gnu.glpk.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -110,12 +111,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
 
                 int vi_desired_num = (int) ((numberOfAVs - num_requests) / (double) virtualNetwork.getVirtualNodes().size());
-                // DEBUGGING START
-                if(vi_desired_num > 250){
-                    System.out.println("vi desired too large. ");
-                }
-                // DEBUGGING END
-
+                GlobalAssert.that(vi_desired_num*virtualNetwork.getVirtualNodes().size() <= numberOfAVs);
                 Map<VirtualNode, Integer> vi_desired = new HashMap<>();
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
                     vi_desired.put(virtualNode, vi_desired_num);
@@ -220,6 +216,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                             if(avset.contains(vehicleLinkPair.avVehicle)){
                                 System.out.println("trying to add rebalancing vehicle");
                             }
+
 
                         }
                         */
