@@ -12,18 +12,17 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
 import playground.clruch.export.EventFileToProcessingXML;
-import playground.clruch.netdata.LinkWeights;
-import playground.clruch.netdata.VirtualNetworkLoader;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
 /**
  * main entry point
+ * for first Euler test
+ * with hungarian dispatcher
  */
-public class RunAVScenario {
+public class RunAVEuler {
     public static void main(String[] args) throws MalformedURLException {
         File configFile = new File(args[0]);
         final File dir = configFile.getParentFile();
@@ -34,16 +33,6 @@ public class RunAVScenario {
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         System.out.println("Population size:" + scenario.getPopulation().getPersons().values().size());
-
-        // Debugging
-        File linkWeightFile = new File(dir, "consensusWeights.xml");
-        File virtualnetworkXML = new File(dir, "virtualNetwork.xml");
-        /*
-         * ConsensusDispatcher.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
-         * ConsensusDispatcher.Factory.linkWeights = LinkWeights.fillLinkWeights(linkWeightFile,ConsensusDispatcher.Factory.virtualNetwork);
-         */
-        LPFeedbackLIPDispatcher.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
-        LPFeedbackLIPDispatcher.Factory.travelTimes = LinkWeights.fillLinkWeights(linkWeightFile, LPFeedbackLIPDispatcher.Factory.virtualNetwork);
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
