@@ -222,7 +222,7 @@ public class CNEIntegration {
 				decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 				decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 				
-				DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+				DecongestionInfo info = new DecongestionInfo();
 				
 				controler.addOverridingModule(new AbstractModule() {
 					@Override

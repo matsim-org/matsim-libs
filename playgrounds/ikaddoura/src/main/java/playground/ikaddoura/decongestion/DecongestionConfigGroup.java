@@ -19,14 +19,21 @@
 
 package playground.ikaddoura.decongestion;
 
+import org.matsim.core.config.ReflectiveConfigGroup;
+
 /**
  * Contains the input parameters, e.g. how often the interval-based output is written out, the number of iterations for which the price is kept constant, ...
  * 
  * @author ikaddoura
  */
 
-public class DecongestionConfigGroup {
+public class DecongestionConfigGroup extends ReflectiveConfigGroup {
+	private static final String GROUP_NAME ="decongestion" ;
 	
+	public DecongestionConfigGroup() {
+		super(GROUP_NAME);
+	}
+
 	// BangBang approach
 	private double INITIAL_TOLL = 10.0;
 	private double TOLL_ADJUSTMENT = 1.0; // default: 0.1
@@ -139,16 +146,16 @@ public class DecongestionConfigGroup {
 		FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = fRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT;
 	}
 
-	@Override
-	public String toString() {
-		return "DecongestionConfigGroup [INITIAL_TOLL=" + INITIAL_TOLL + ", TOLL_ADJUSTMENT=" + TOLL_ADJUSTMENT
-				+ ", TOLL_BLEND_FACTOR=" + TOLL_BLEND_FACTOR + ", Kp=" + Kp
-				+ ", Ki=" + Ki + ", Kd=" + Kd + ", UPDATE_PRICE_INTERVAL=" + UPDATE_PRICE_INTERVAL
-				+ ", WRITE_OUTPUT_ITERATION=" + WRITE_OUTPUT_ITERATION + ", TOLERATED_AVERAGE_DELAY_SEC="
-				+ TOLERATED_AVERAGE_DELAY_SEC + ", FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT="
-				+ FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT + ", FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT="
-				+ FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "DecongestionConfigGroup [INITIAL_TOLL=" + INITIAL_TOLL + ", TOLL_ADJUSTMENT=" + TOLL_ADJUSTMENT
+//				+ ", TOLL_BLEND_FACTOR=" + TOLL_BLEND_FACTOR + ", Kp=" + Kp
+//				+ ", Ki=" + Ki + ", Kd=" + Kd + ", UPDATE_PRICE_INTERVAL=" + UPDATE_PRICE_INTERVAL
+//				+ ", WRITE_OUTPUT_ITERATION=" + WRITE_OUTPUT_ITERATION + ", TOLERATED_AVERAGE_DELAY_SEC="
+//				+ TOLERATED_AVERAGE_DELAY_SEC + ", FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT="
+//				+ FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT + ", FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT="
+//				+ FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT + "]";
+//	}
 
 	public boolean isRUN_FINAL_ANALYSIS() {
 		return RUN_FINAL_ANALYSIS;

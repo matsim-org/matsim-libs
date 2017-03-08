@@ -343,7 +343,7 @@ public class OptAVTestIT {
 		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 		
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionInfo info = new DecongestionInfo();
 		
 		controler2.addOverridingModule(new AbstractModule() {
 			@Override

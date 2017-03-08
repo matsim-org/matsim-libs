@@ -86,7 +86,7 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionInfo info = new DecongestionInfo();
 		
 		// congestion toll computation
 		controler.addOverridingModule(new AbstractModule() {
@@ -175,7 +175,7 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionInfo info = new DecongestionInfo();
 		
 		// congestion toll computation
 		controler.addOverridingModule(new AbstractModule() {
@@ -263,7 +263,7 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionInfo info = new DecongestionInfo();
 		
 		// congestion toll computation
 		controler.addOverridingModule(new AbstractModule() {
@@ -331,7 +331,7 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionInfo info = new DecongestionInfo();
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 
@@ -391,7 +391,7 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionInfo info = new DecongestionInfo();
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 

@@ -93,7 +93,8 @@ public class DecongestionRun {
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 		
 		Config config = ConfigUtils.loadConfig(configFile);
-
+		config.addModule(decongestionSettings);
+		
 		double weight = Double.NEGATIVE_INFINITY;
 		for (StrategySettings settings : config.strategy().getStrategySettings()) {
 			if (settings.getStrategyName().equals("TimeAllocationMutator")) {
@@ -133,10 +134,16 @@ public class DecongestionRun {
 		log.info("Output directory: " + outputDirectory);
 		
 		config.controler().setOutputDirectory(outputDirectory + "/");
+		
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.6);
+		config.controler().setLastIteration(500);
+		
+		// ---
+		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		
 		
 		// #############################################################
 		
@@ -146,7 +153,7 @@ public class DecongestionRun {
 			@Override
 			public void install() {
 				
-				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionInfo.class) ;
 				
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);

@@ -175,7 +175,7 @@ public class RunBerlinOptAV {
 		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 		log.info(decongestionSettings.toString());
 			
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		DecongestionInfo info = new DecongestionInfo();
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

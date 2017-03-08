@@ -187,7 +187,7 @@ public class BerlinControler {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			
-			final DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+			final DecongestionInfo info = new DecongestionInfo();
 			
 			// congestion toll computation
 			

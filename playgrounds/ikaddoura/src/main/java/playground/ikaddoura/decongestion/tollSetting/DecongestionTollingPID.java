@@ -75,6 +75,10 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 					// artificial reset to zero if congestion is eliminated
 					if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
 						totalDelay = 0.0;
+						// Ideen:
+						// --> letzten positiven averageDelay merken, und dann totalDelay -= lastAverageDelay ;
+						// --> Mittel über die letzten positven averageDelays (exponential smoothing probably ok: lastAverageDelay = (1-alpha)*lastAvDelay + alpha*averageDelay ; )
+						// --> \propto * (1/flow - 1/cap, so etwas wie die "headway reserve" oder "unused time headway")
 					} else {
 						totalDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr) + averageDelay;
 					}
