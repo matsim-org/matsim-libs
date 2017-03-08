@@ -80,7 +80,6 @@ public class TaxiOptimizerTests {
 
 	public static Map<String, String> createAbstractOptimParams(OptimizerType type) {
 		Map<String, String> params = new HashMap<>();
-		params.put(AbstractTaxiOptimizerParams.ID, type.name());
 		params.put(DefaultTaxiOptimizerProvider.TYPE, type.name());
 		return params;
 	}
