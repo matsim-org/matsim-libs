@@ -1,15 +1,8 @@
 package playground.clruch.dispatcher;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
-
 import playground.clruch.dispatcher.core.RebalanceEvent;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
@@ -19,12 +12,14 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
-    private final Set<AVVehicle> rebalancingVehicles = new HashSet<>();
+    private final Map<AVVehicle, Link> rebalancingVEHicles = new HashMap<>();
 
     public PartitionedDispatcher( //
                                   AVDispatcherConfig config, //
@@ -38,12 +33,13 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
 
     // TODO call this function instead of  "setVehicleDiversion"  whenever the cause for rerouting is "rebalance"
     // <- not final code design
+    // This function has to be called only after getVirtualNodeRebalancingVehicles
     protected synchronized final void setVehicleRebalance(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+        updateRebVehicles();
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(vehicleLinkPair, destination);
         eventsManager.processEvent(new RebalanceEvent(destination, vehicleLinkPair.avVehicle, getTimeNow()));
-        boolean successAdded = rebalancingVehicles.add(vehicleLinkPair.avVehicle);
-        GlobalAssert.that(successAdded);
+        rebalancingVEHicles.put(vehicleLinkPair.avVehicle, destination);
     }
 
 
@@ -61,33 +57,73 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         return returnMap;
     }
 
-
+    // TODO currently the vehicles are removed when arriving at final link, could be removed as soon as they reach rebalancing destination virtualNode instead
+    // TODO getStayVehicles() outside loop
     private synchronized void updateRebVehicles() {
-        // TODO currently the vehicles are removed when arriving at final link, could be removed as soon as they reach rebalancing destination virtualNode instead
-        this.getStayVehicles().values().stream().flatMap(q -> q.stream()).forEach(rebalancingVehicles::remove);
+        getStayVehicles().values().stream().flatMap(q -> q.stream()).forEach(rebalancingVEHicles::remove);
+    }
+
+    /**
+     * @return <VirtualNode, Set<AVVehicle>> with the rebalancing vehicles AVVehicle rebalancing to every node VirtualNode
+     */
+    protected synchronized Map<VirtualNode, Set<AVVehicle>> getVirtualNodeRebalancingToVehicles() {
+        // update the list of rebalancing vehicles
+        updateRebVehicles();
+
+        // create set
+        Map<VirtualNode, Set<AVVehicle>> returnMap = new HashMap<>();
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+            returnMap.put(virtualNode, new HashSet<>());
+        }
+        for (AVVehicle avVehicle : rebalancingVEHicles.keySet()) {
+            boolean successAdd = returnMap.get(virtualNetwork.getVirtualNode(rebalancingVEHicles.get(avVehicle))).add(avVehicle);
+            GlobalAssert.that(successAdd);
+        }
+
+        // return set
+        return Collections.unmodifiableMap(returnMap);
+
+    }
+
+    /**
+     * @return
+     */
+    protected synchronized HashMap<VirtualNode, Set<AVVehicle>> getVirtualNodeArrivingWCustomerVehicles() {
+        Collection<VehicleLinkPair> customVehicles = getVehiclesWithCustomer();
+        HashMap<VirtualNode, Set<AVVehicle>> customVehiclesMap = new HashMap<>();
+
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+            customVehiclesMap.put(virtualNode, new HashSet<>());
+        }
+
+        customVehicles.stream().forEach(v -> customVehiclesMap.get(virtualNetwork.getVirtualNode(v.getCurrentDriveDestination())).add(v.avVehicle));
+        return customVehiclesMap;
     }
 
 
-    // same as getVirtualNodeAvailableVehicles() but returns only vehicles which are currently not in a rebalancing task
+    /**
+     * // same as getVirtualNodeAvailableVehicles() but returns only vehicles which are currently not in a rebalancing task
+     *
+     * @return
+     */
     protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableNotRebalancingVehicles() {
-
         // update the list of rebalancing vehicles
         updateRebVehicles();
 
         // return list of vehicles
         Map<VirtualNode, List<VehicleLinkPair>> returnMap = getVirtualNodeAvailableVehicles();
+        Map<VirtualNode, List<VehicleLinkPair>> rebalanceMap = new HashMap<>();
 
         // remove vehicles which are rebalancing
-        for(List<VehicleLinkPair> lvlinkpair : returnMap.values()){
-            for(VehicleLinkPair vehicleLinkPair : lvlinkpair){
-                if(rebalancingVehicles.contains(vehicleLinkPair.avVehicle)){
-                    boolean wasRemoved = lvlinkpair.remove(vehicleLinkPair);
-                    GlobalAssert.that(wasRemoved);
-                }
-            }
+        Set<AVVehicle> set = rebalancingVEHicles.keySet().stream().collect(Collectors.toSet());
+
+
+        for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
+            rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !set.contains(v.avVehicle)).collect(Collectors.toList()));
         }
 
-        return returnMap;
+
+        return rebalanceMap;
     }
 
 

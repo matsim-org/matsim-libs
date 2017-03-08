@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -24,7 +25,9 @@ import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
+import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
@@ -53,7 +56,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * @param avVehicle
      * @param abstractDirective
      */
-    /* package */ synchronized void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
+    /* package */
+    synchronized void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective(avVehicle));
         private_vehicleDirectives.put(avVehicle, abstractDirective);
     }
@@ -96,6 +100,41 @@ abstract class VehicleMaintainer implements AVDispatcher {
             }
         return Collections.unmodifiableMap(map);
     }
+
+
+    /**
+     * @return collection of cars that are in the driving state with a customer, i.e. their
+     * second last task is an AVDropoff Task (followed by AVStay task)
+     */
+    protected final Collection<VehicleLinkPair> getVehiclesWithCustomer() {
+        Collection<VehicleLinkPair> collection = new LinkedList<>();
+        for (AVVehicle avVehicle : getFunctioningVehicles())
+            if (isWithoutDirective(avVehicle)) {
+                Schedule schedule = avVehicle.getSchedule();
+                int n = schedule.getTaskCount();
+                if (n > 1) { // take care that array bounds are respected, schedules with n = 1 are staying AVs and not of interest.
+                    AVTask avTask = (AVTask) schedule.getTasks().get(n - 2); // Dropoff task
+                    if (avTask instanceof AVDropoffTask) {
+                        new AVTaskAdapter(schedule.getCurrentTask()) {
+                            @Override
+                            public void handle(AVDriveTask avDriveTask) {
+                                // for empty cars the drive task is second to last task
+                                TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                                OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                                LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
+                                if (linkTimePair != null)
+                                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                            }
+
+                        };
+                    }
+
+                }
+
+            }
+        return collection;
+    }
+
 
     /**
      * @return collection of cars that are in the driving state without customer, or stay task.
@@ -156,8 +195,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     /**
      * @return time of current re-dispatching iteration step
-     * @throws NullPointerException
-     *             if dispatching has not started yet
+     * @throws NullPointerException if dispatching has not started yet
      */
     protected final double getTimeNow() {
         return private_now;
