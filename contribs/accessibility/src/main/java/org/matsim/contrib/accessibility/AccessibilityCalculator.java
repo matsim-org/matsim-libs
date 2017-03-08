@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -193,6 +194,7 @@ public final class AccessibilityCalculator {
 
 				// --------------------------------------------------------------------------------------------------------------
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate/add their exp(U) contributions:
+				Gbl.assertIf( this.aggregatedOpportunities.length>0);
 				for (final AggregationObject aggregatedFacility : this.aggregatedOpportunities) {
 					computeAndAddExpUtilContributions( expSums, origin, aggregatedFacility, departureTime );
 					// yyyy might be nicer to not pass expSums into the method. kai, oct'16
@@ -222,6 +224,11 @@ public final class AccessibilityCalculator {
 						LOG.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
 					}
 				}
+				
+				if ( true ) {
+					throw new RuntimeException("stop here for debug" ) ;
+				}
+				
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
 				}
@@ -262,12 +269,17 @@ public final class AccessibilityCalculator {
 		return aggregatedOrigins;
 	}
 
+	private static int cnt4 = 0 ;
 
 	//	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
 	private void computeAndAddExpUtilContributions(Map<String, ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
 		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
 			//			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
 			String mode = calculatorEntry.getKey();
+			if ( cnt4<10 ) {
+				cnt4++ ;
+				LOG.info("mode=" + mode ) ;
+		}
 
 			// new
 			//			if ( !this.acg.getIsComputingMode().contains(mode) ) {

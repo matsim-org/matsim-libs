@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -55,6 +56,8 @@ import javax.inject.Provider;
  * @author thibautd
  */
 public final class TripRouter implements MatsimExtensionPoint {
+	private static final Logger log = Logger.getLogger(TripRouter.class );
+	
 	private final Map<String, RoutingModule> routingModules = new HashMap<>();
 	
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
@@ -174,7 +177,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 		Gbl.assertNotNull( toFacility );
 		
 		RoutingModule module = routingModules.get( mainMode );
-
+		
 		if (module != null) {
 			final List<? extends PlanElement> trip =
 					module.calcRoute(

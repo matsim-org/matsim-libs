@@ -42,7 +42,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -105,6 +107,8 @@ public final class AccessibilityModule extends AbstractModule {
 			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
 			@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 			@Inject private Map<String,TravelTime> travelTimes ;
+			
+			@Inject TripRouter tripRouter ;
 			
 			@Override
 			public ControlerListener get() {
@@ -173,7 +177,9 @@ public final class AccessibilityModule extends AbstractModule {
 						break;
 						//$CASES-OMITTED$
 					default:
-						calc = new TripRouterAccessibilityContributionCalculator(mode.toString()) ;
+//						TravelTime timeCalculator = this.travelTimes.get( mode.toString() ) ;
+//						TravelDisutility travelDisutility = this.travelDisutilityFactories.get(mode.toString()).createTravelDisutility(timeCalculator) ;
+						calc = new TripRouterAccessibilityContributionCalculator(mode.toString(), tripRouter, config.planCalcScore()) ;
 					}
 					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
 				}

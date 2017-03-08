@@ -4,23 +4,24 @@
 package org.matsim.contrib.accessibility;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
-import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.router.FakeFacility;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
@@ -29,12 +30,13 @@ import org.matsim.vehicles.Vehicle;
 public class TripRouterAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	
 	private TripRouter tripRouter ;
-	private TravelDisutility travelDisutility ;
 	private String mode;
-	private Network network ;
+	private PlanCalcScoreConfigGroup scoreConfig;
 	
-	public TripRouterAccessibilityContributionCalculator( String mode ) {
+	public TripRouterAccessibilityContributionCalculator( String mode, TripRouter tripRouter, PlanCalcScoreConfigGroup scoreConfig ) {
 		this.mode = mode ;
+		this.tripRouter = tripRouter;
+		this.scoreConfig = scoreConfig;
 	}
 
 	@Override
@@ -43,27 +45,43 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 	}
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
+	public double computeContributionOfOpportunity(ActivityFacility origin, final AggregationObject destination, Double departureTime) {
 		Person person = null ; // I think that this is ok
-		Facility<?> destinationFacility = new FakeFacility( destination.getNearestNode().getCoord() ) ;
+		 Facility<?> destinationFacility = new Facility(){
+			@Override public Coord getCoord() { return destination.getNearestNode().getCoord() ; }
+			@Override public Id getId() { return null; }
+			@Override public Map<String, Object> getCustomAttributes() { return null; }
+			@Override public Id getLinkId() {
+				for ( Id<Link> id : destination.getNearestNode().getInLinks().keySet() ) {
+					return id ;
+				} 
+				return null ;
+			}
+		 } ;
+		
+		Gbl.assertNotNull(tripRouter);
 		List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, person) ;
 		
-		Vehicle vehicle = null ; // I think that this is ok
+//		Vehicle vehicle = null ; // I think that this is ok
 		double sum = 0. ;
-		for ( Leg leg : TripStructureUtils.getLegs(plan) ) {
-			if ( leg.getRoute() instanceof NetworkRoute ) {
-				for ( Id<Link> linkId :  ((NetworkRoute) leg.getRoute()).getLinkIds() ) {
-					Link link = network.getLinks().get( linkId ) ;
-					sum += travelDisutility.getLinkTravelDisutility(link, departureTime, person, vehicle) ;
-				}
-			} else {
-				leg.getRoute().getDistance() ;
-				leg.getRoute().getTravelTime() ;
-				// yyyyyy put together!
-				throw new RuntimeException("not implemented") ;
-				// yyyy money is missing
+		List<Leg> legs = TripStructureUtils.getLegs(plan);
+		Gbl.assertIf( !legs.isEmpty() );
+		for ( Leg leg : legs ) {
+//			if ( leg.getRoute() instanceof NetworkRoute ) {
+//				for ( Id<Link> linkId :  ((NetworkRoute) leg.getRoute()).getLinkIds() ) {
+//					Link link = network.getLinks().get( linkId ) ;
+//					sum += travelDisutility.getLinkTravelDisutility(link, departureTime, person, vehicle) ;
+//				}
+//			} else {
+				sum += leg.getRoute().getDistance() * scoreConfig.getModes().get( leg.getMode() ).getMarginalUtilityOfDistance() ;
+				sum += leg.getRoute().getTravelTime() * scoreConfig.getModes().get( leg.getMode() ).getMarginalUtilityOfTraveling() ;
+				sum += leg.getRoute().getTravelTime() * scoreConfig.getPerforming_utils_hr() / 3600. ;
 			}
+//		}
+		if ( sum==0. ) {
+			Logger.getLogger(this.getClass()).warn("sum=0");
 		}
+		
 		return Math.exp(sum) ; // yyyyyy beta??
 	}
 
