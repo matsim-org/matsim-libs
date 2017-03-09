@@ -76,7 +76,7 @@ public class VirtualNetworkLoader {
                 Document document = (Document) builder.build(file);
                 Element rootNode = document.getRootElement();
                 Element virtualLinksXML = rootNode.getChild("virtualLinks");
-                List<Element> list = virtualLinksXML.getChildren("virtuallink");
+                List<Element> list = virtualLinksXML.getChildren("virtualLink");
                 for (Element virtualLinkXML : list) {
                     String virtualLinkId = virtualLinkXML.getAttributeValue("id");
                     String virtualLinkfrom = virtualLinkXML.getAttributeValue("from");
