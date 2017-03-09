@@ -13,8 +13,8 @@ public class HungarianTester {
         System.out.println("Hungarian Bipartite Matching Running now");
 
         // initialize distance matrix
-        int n = 999; // number of workers
-        int m = 1; // number of jobs
+        int n = 10; // number of workers
+        int m = 2; // number of jobs
 
         final double distancematrix[][] = new double[n][m];
         for(int i = 0; i<n; ++i){
@@ -25,7 +25,8 @@ public class HungarianTester {
 
 
 
-        distancematrix[15][0] = 0.2;
+        distancematrix[8][0] = 0.2;
+        distancematrix[5][1] = 0.2;
         /*
         distancematrix[1][0] = 3.0;
         distancematrix[1][1] = 1.5;

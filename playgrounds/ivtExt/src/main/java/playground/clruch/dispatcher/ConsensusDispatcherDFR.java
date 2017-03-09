@@ -235,12 +235,21 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 // calculate by how much to shrink
                 double shrinkingFactor = ((double) availableVehicles.get(virtualNode).size()) / ((double) totRebVecFromvNode);
                 // remove rebalancing vehicles
-                for (VirtualLink virtualLink : vLinkSameFromVNode.get(virtualNode)) {
-                    int newIntRebCount = (int) Math.floor(rebalanceInput.get(virtualLink) * shrinkingFactor);
-                    int newLeftOver = rebalanceInput.get(virtualLink) - newIntRebCount;
-                    feasibleRebalance.put(virtualLink, newIntRebCount);
-                    double oldRebFloating = rebalanceFloating.get(virtualLink);
-                    rebalanceFloating.put(virtualLink, oldRebFloating + (double) newLeftOver);
+                for (VirtualLink vLink : rebalanceInput.keySet()) {
+                    if(vLink.getFrom().equals(virtualNode) || rebalanceInput.get(vLink)>=0){
+                        int newIntRebCount = (int) Math.floor(rebalanceInput.get(vLink) * shrinkingFactor);
+                        int newLeftOver = rebalanceInput.get(vLink) - newIntRebCount;
+                        feasibleRebalance.put(vLink, newIntRebCount);
+                        double oldRebFloating = rebalanceFloating.get(vLink);
+                        rebalanceFloating.put(vLink, oldRebFloating + (double) newLeftOver);
+                    }
+                    if (vLink.getTo().equals(virtualNode) || rebalanceInput.get(vLink)<0){
+                        int newIntRebCount = (int) Math.floor(rebalanceInput.get(vLink) * shrinkingFactor);
+                        int newLeftOver = rebalanceInput.get(vLink) - newIntRebCount;
+                        feasibleRebalance.put(vLink, newIntRebCount);
+                        double oldRebFloating = rebalanceFloating.get(vLink);
+                        rebalanceFloating.put(vLink, oldRebFloating + (double) newLeftOver);
+                    }
                 }
             }
         }

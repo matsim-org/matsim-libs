@@ -31,6 +31,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
     final DrivebyRequestStopper drivebyRequestStopper;
+    final AbstractVehicleDestMatcher abstractVehicleDestMatcher;
 
     private HungarianDispatcher( //
                                  AVDispatcherConfig avDispatcherConfig, //
@@ -44,6 +45,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         DISPATCH_PERIOD = Integer.parseInt(avDispatcherConfig.getParams().get("dispatchPeriod"));
         drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
+        abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
     }
 
     int total_matchedRequests = 0;
@@ -66,14 +68,12 @@ public class HungarianDispatcher extends UniversalDispatcher {
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
                 // Save request in list which is needed for abstractVehicleDestMatcher
-                AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
                 List<Link> requestlocs =
                         requests.values()
                                 .stream()
-                                .flatMap(List::stream)
-                                .map(AVRequest::getFromLink)
+                                .flatMap(List::stream) // all requests
+                                .map(AVRequest::getFromLink) // all from links of all requests with multiplicity
                                 .collect(Collectors.toList());
-
 
                 // find the Euclidean bipartite matching for all vehicles using the Hungarian method
                 System.out.println("optimizing over "+divertableVehicles.size()+" vehicles and "+requestlocs.size() + " requests.");
