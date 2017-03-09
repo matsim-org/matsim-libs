@@ -88,7 +88,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         // PART II: redispatch all vehicles
         final long round_now = Math.round(now);
         if (round_now % REBALANCING_PERIOD == 0) {
-            System.out.println("LPFeedbackLIPDispatcher @" + round_now + " mr = " + total_matchedRequests);
+            System.out.println(getClass().getSimpleName() + " @" + round_now + " mr = " + total_matchedRequests);
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
             // II.i compute rebalancing vehicles and send to virtualNodes
             {

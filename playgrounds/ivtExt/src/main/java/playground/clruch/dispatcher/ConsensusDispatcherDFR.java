@@ -96,11 +96,12 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
         // B: redispatch all vehicles
         final long round_now = Math.round(now);
         if (round_now % REBALANCING_PERIOD == 0) {
+            System.out.println("ConsensusDispatcherDFR @" + round_now + " mr = " + total_matchedRequests);
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
             {
                 // TODO: ensure that a rebalanced vehicle is then under the control of the to-virtualNode and can be dispatched there.
                 Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
-                System.out.println("ConsensusDispatcherDFR @" + round_now + " mr = " + total_matchedRequests);
+                System.out.println(getClass().getSimpleName() + " @" + round_now + " mr = " + total_matchedRequests);
 
 
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i

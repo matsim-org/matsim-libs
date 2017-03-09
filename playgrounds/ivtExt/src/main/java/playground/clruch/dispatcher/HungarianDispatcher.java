@@ -50,12 +50,16 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
     @Override
     public void redispatch(double now) {
-        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
-
         final long round_now = Math.round(now);
+        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+        System.out.println(getClass().getSimpleName() + " @" + round_now + " mr = " + total_matchedRequests);
+
 
         if (round_now % DISPATCH_PERIOD == 0) {
-            { // for all remaining vehicles and requests, perform a bipartite matching
+            {   // match a vehicle at a customer
+
+
+                // for all remaining vehicles and requests, perform a bipartite matching
 
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
                 // call getDivertableVehicles again to get remaining vehicles
