@@ -25,7 +25,7 @@ abstract class FuturePathDirective extends AbstractDirective {
     abstract void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData);
 
     protected void reportExecutionBypass(double excess) {
-        System.out.println(" \\- bypass " + getClass().getSimpleName() + ", exceeds EndTime by " + excess + " sec");
+//        System.out.println(" \\- bypass " + getClass().getSimpleName() + ", exceeds EndTime by " + excess + " sec");
     }
 
 }

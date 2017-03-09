@@ -123,7 +123,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                                 OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
                                 LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
                                 if (linkTimePair != null)
-                                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
                             }
 
                         };
@@ -156,7 +156,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
                             LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
                             if (linkTimePair != null)
-                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
                         }
                     }
 
@@ -166,7 +166,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                         if (Schedules.isLastTask(avStayTask)) {
                             GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self evident?
                             LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
-                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
                         }
                     }
                 };
