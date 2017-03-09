@@ -330,7 +330,7 @@ class BinnedTravelTimes extends AbstractData {
         NavigableMap<String, NavigableMap<String, Double>> binnedRatios = new TreeMap<>();
         checkFull(binnedData);
         binnedRatios.put("bins", binnedData);
-        new BinnedTimeRatiosXML().generate(binnedRatios, fileExport2);
+        new BinnedRatiosXML("binnedTimeRatio").generate(binnedRatios, fileExport2);
 
         // export to time series diagram PNG
         TimeDiagramCreator diagram = new TimeDiagramCreator();

@@ -18,15 +18,17 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Set;
 
-class BinnedTimeRatiosXML<Type> {
+class BinnedRatiosXML<Type> {
     String xmlTitle = "SimulationResult";
-    String L1ElName = "binnedTimeRatio";
+    String L1ElName;
     //String L1AttrName = "attribute";
     String L2ElName = "data";
     String L2Attr1Name = "start-end";
     String L2Attr2Name = "ratio";
 
-    public BinnedTimeRatiosXML() {}
+    public BinnedRatiosXML(String name) {
+        L1ElName = name;
+    }
 
     // Take the Map timeStepData which for some IDs contains series of changes for times Double
     // in the data format Type. Save them in an XML with the structure:

@@ -2,7 +2,14 @@ package playground.joel.data;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -37,6 +44,7 @@ public class EventFileToDataXML {
     static String path = "C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs"; //used for test purpose in main()
 
 
+
     public static void convert(final File dir) {
         path = dir.toString();
 
@@ -49,19 +57,7 @@ public class EventFileToDataXML {
                 File fileImport = new File(dir, "output/output_events.xml");
 
                 EventsManager events = EventsUtils.createEventsManager();
-                /*
-                // add event handlers to create waitingCustomers file
-                WaitingCustomers waitingCustomers = new WaitingCustomers();
-                waitingCustomers.initialize(events);
 
-                // add event handlers to create VehicleStatus file
-                VehicleStatus vehicleStatus = new VehicleStatus();
-                vehicleStatus.initialize(events);
-
-                // add vehicle location reader
-                VehicleLocation vehicleLocation = new VehicleLocation();
-                vehicleLocation.initialize(events);
-                */
                 // add event handlers to create TravelTimes file
                 TravelTimes travelTimes = new TravelTimes();
                 travelTimes.initialize(events);
@@ -69,6 +65,10 @@ public class EventFileToDataXML {
                 // add event handlers to create binnedTravelTimes file
                 BinnedTravelTimes binnedTravelTimes = new BinnedTravelTimes();
                 binnedTravelTimes.initialize(events);
+
+                // add event handlers to create binnedTravelTimes file
+                BinnedTravelDistances binnedTravelDistances = new BinnedTravelDistances();
+                binnedTravelDistances.initialize(events);
 
 
                 // create TotalData file binnedTravelTimes file
@@ -81,14 +81,12 @@ public class EventFileToDataXML {
                 // write XML files
                 travelTimes.writeXML(data);
                 binnedTravelTimes.writeXML(data);
+                binnedTravelDistances.writeXML(data);
 
                 File totalDataDir = new File(data, "totalData.xml");
-                totalData.generate("0", String.valueOf(travelTimes.totalTimeRatio), "0", "0", totalDataDir);
-                /*
-                waitingCustomers.writeXML(directory);
-                vehicleStatus.writeXML(directory);
-                vehicleLocation.writeXML(directory);
-                */
+                totalData.generate("0", String.valueOf(travelTimes.totalTimeRatio),
+                        String.valueOf(binnedTravelDistances.totalDistanceRatio),
+                        "0", totalDataDir);
             } else
                 new RuntimeException("data directory does not exist").printStackTrace();
         } else

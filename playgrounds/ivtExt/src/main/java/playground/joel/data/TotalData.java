@@ -44,18 +44,22 @@ public class TotalData <Type> {
             Document doc = new Document(results);
             doc.setRootElement(results);
 
+            // mode share
             Element element1 = new Element(L1ElName);
             element1.setAttribute(new Attribute(L1AttrName, value1));
             doc.getRootElement().addContent(element1);
 
+            // time ratio
             Element element2 = new Element(L2ElName);
             element2.setAttribute(new Attribute(L2AttrName, value2));
             doc.getRootElement().addContent(element2);
 
+            // distance ratio
             Element element3 = new Element(L3ElName);
             element3.setAttribute(new Attribute(L3AttrName, value3));
             doc.getRootElement().addContent(element3);
 
+            // waiting times
             Element element4 = new Element(L4ElName);
             element4.setAttribute(new Attribute(L4AttrName, value4));
             doc.getRootElement().addContent(element4);

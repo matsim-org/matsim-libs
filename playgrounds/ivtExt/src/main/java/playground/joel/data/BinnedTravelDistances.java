@@ -28,7 +28,8 @@ class BinnedTravelDistances extends AbstractData {
     NavigableMap<String, Double> traveledDistance = new TreeMap<>();
     NavigableMap<String, Double> traveledDistanceWithCust = new TreeMap<>();
     NavigableMap<String, Double> binnedData = new TreeMap<>();
-    NavigableMap<String, Integer> vehicleStatus = new TreeMap<>(); // 0 -> empty, 1 -> occupied,
+    NavigableMap<String, Integer> vehicleStatus = new TreeMap<>(); // 0 -> empty, 1 -> occupied
+    NavigableMap<String, Double> linkLengths = new TreeMap<>();
     HashMap<String, Set<Id<Person>>> vehicleCustomers = new HashMap<>();
     HashMap<String, Double> avLinkStart = new HashMap<>();
     NavigableMap<Double, String> keyMap = new TreeMap<>();
@@ -45,30 +46,32 @@ class BinnedTravelDistances extends AbstractData {
 
 
     double getLinkLength(Id<Link> linkId) {
+        return linkLengths.get(linkId.toString());
+    }
+
+    void readLinkLengths() {
         // open the network file and parse the parameter values
         SAXBuilder builder = new SAXBuilder();
         File file = new File(EventFileToDataXML.path, "network.xml");
-        double linkLength = 0;
         try {
             Document document = (Document) builder.build(file);
             Element rootNode = document.getRootElement();
             Element linksXML = rootNode.getChild("links");
             List<Element> linkXML = linksXML.getChildren("link");
+            for (Element linkelem : linkXML) {
+                String linkID = linkelem.getAttributeValue("id");
+                Double length = Double.parseDouble(linkelem.getAttributeValue("length"));
 
-            // find the virtual link with the corresponding ID and assign the weight to it.
-            List<Element> links = linkXML.stream().filter(vl -> vl.getAttributeValue("id").equals(linkId.toString())).collect(Collectors.toList());
-            if (links.size() != 1) {
-                System.out.println("links has the size " + links.size());
-                throw new IllegalStateException();
+                // find the link with the corresponding ID and assign the length to it.
+                //linkLengths.put(linkXML.stream().filter(vl -> vl.getAttributeValue("id").equals(linkID)).findFirst().get().toString(), length);
+                linkLengths.put(linkID, length);
+                //System.out.println("added " + linkID + ", " + length + " to linkLengths");
             }
-
-            linkLength = Double.parseDouble(links.get(0).getAttributeValue("length"));
         } catch (JDOMException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return linkLength;
     }
 
     double interpolateLinkLength(double start, double end, double deltaT, Id<Link> linkId) {
@@ -107,12 +110,12 @@ class BinnedTravelDistances extends AbstractData {
 
     private void setStartTime(LinkEnterEvent event) {
         avLinkStart.put(event.getVehicleId().toString(), event.getTime());
-        System.out.println("added " + event.getVehicleId().toString() + ", " + event.getTime() + " to avLinkStart");
+        //System.out.println("added " + event.getVehicleId().toString() + ", " + event.getTime() + " to avLinkStart");
     }
 
     private void setStartTime(VehicleEntersTrafficEvent event) {
         avLinkStart.put(event.getPersonId().toString(), event.getTime());
-        System.out.println("added " + event.getPersonId().toString() + ", " + event.getTime() + " to avLinkStart");
+        //System.out.println("added " + event.getPersonId().toString() + ", " + event.getTime() + " to avLinkStart");
     }
 
     private double getStartTime(LinkLeaveEvent event) {
@@ -146,6 +149,9 @@ class BinnedTravelDistances extends AbstractData {
     }
 
     private void put(Id linkId, String vehicle, double startTime, double endTime) {
+        totalDistance += getLinkLength(linkId);
+        if (vehicleStatus.get(vehicle) == 1) totalDistanceWithCust += getLinkLength(linkId);
+
         if (!travelDistances.containsKey(vehicle))
             travelDistances.put(vehicle, new TreeMap<>());
 
@@ -210,6 +216,8 @@ class BinnedTravelDistances extends AbstractData {
                 binStart += binSize;
             }
 
+            readLinkLengths();
+
             // activitystart
             events.addHandler(new ActivityStartEventHandler() {
                 // <event time="0.0" type="actstart" person="av_av_op1_174" link="237756569_3" actType="AVStay" />
@@ -257,6 +265,7 @@ class BinnedTravelDistances extends AbstractData {
                 }
             });
 
+            // TODO: what is the second if for? Is putDriveWithCustomer right there?
             // personleavesvehicle
             events.addHandler(new PersonLeavesVehicleEventHandler() {
                 // <event time="21796.0" type="PersonLeavesVehicle" person="27114_1" vehicle="av_av_op1_174" />
@@ -267,7 +276,7 @@ class BinnedTravelDistances extends AbstractData {
                     if (HelperPredicates.isHuman(person)) {
                         Set<Id<Person>> set = getCustomerSet(vehicle);
                         set.remove(person);
-                        putDriveToCustomer(event);
+                        putDriveToCustomer(event); // change vehicle status
                         if (set.isEmpty()) { // last customer has left the car
                             if (firstCustomerEntersVehicleEvent.containsKey(vehicle)) { // change vehicle status
                                 putDriveWithCustomer(firstCustomerEntersVehicleEvent.get(vehicle));
@@ -395,7 +404,9 @@ class BinnedTravelDistances extends AbstractData {
         File fileExport = new File(directory, "binnedDistanceRatios.xml");
 
         calculateDistanceRatio();
-        //System.out.println("total distance ratio: " + totalTimeRatio);
+        //System.out.println("total distance: " + totalDistance);
+        //System.out.println("total distance with customer: " + totalDistanceWithCust);
+        //System.out.println("total distance ratio: " + totalDistanceRatio);
 
         // work around since getNumAVs does not work
         for(String key: traveledDistanceWithCust.keySet()) {
