@@ -1,9 +1,5 @@
 package playground.clruch;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -11,22 +7,26 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.clruch.dispatcher.ConsensusDispatcher;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
-import playground.clruch.netdata.LinkWeights;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkLoader;
+import playground.clruch.netdata.vLinkDataReader;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.Map;
+
 /**
  * Created by Claudio on 2/9/2017.
  */
+@Deprecated
 public class RunVirtualNetworkConsensusDispatcherTest {
     public static void main(String[] args) throws MalformedURLException {
         File configFile = new File(args[0]);
@@ -54,7 +54,7 @@ public class RunVirtualNetworkConsensusDispatcherTest {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = null;
             File linkWeightFile = new File(dir + "/consensusWeights.xml");
             final Map<VirtualLink, Double> linkWeights;
-            linkWeights = LinkWeights.fillLinkWeights(linkWeightFile,virtualNetwork);
+            linkWeights = vLinkDataReader.fillvLinkData(linkWeightFile,virtualNetwork,"weight");
 
             ConsensusDispatcher consensusDispatcher = new ConsensusDispatcher(
                     AVDconfig,
