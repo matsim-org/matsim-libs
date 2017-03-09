@@ -33,8 +33,8 @@ public class EdgyDispatcher extends UniversalDispatcher {
     /**
      * a large value of DISPATCH_PERIOD helps to quickly test the EdgyDispatcher
      */
-    private static final int DISPATCH_PERIOD = 1;
-    private static final boolean DEBUG_SHOWSCHEDULE = true;
+    private final int DISPATCH_PERIOD;
+    private static final boolean DEBUG_SHOWSCHEDULE = false;
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
     final Network network; // <- for verifying link references
@@ -54,6 +54,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
+        DISPATCH_PERIOD = Integer.parseInt(avDispatcherConfig.getParams().get("dispatchPeriod"));
     }
 
     /** verify that link references are present in the network */
@@ -85,12 +86,15 @@ public class EdgyDispatcher extends UniversalDispatcher {
         // if (1e9 < tic - toc_lastPrint)
         {
             toc_lastPrint = tic;
-            System.out.println(String.format("%s BEG @%6d   MR=%6d   at=%6d   do=%6d", //
+            System.out.println(String.format("%s BEG @%6d   MR=%6d   AT=%6d   do=%6d   um=%6d == %6d", //
                     getClass().getSimpleName().substring(0, 8), //
                     round_now, //
                     total_matchedRequests, //
                     total_abortTrip, //
-                    total_driveOrder));
+                    total_driveOrder, //
+                    getAVRequestsAtLinks().values().stream().flatMap(s->s.stream()).count(), //
+                    getAVRequestsAtLinks().values().stream().mapToInt(List::size).sum() //
+                    ));
         }
 
         if (DEBUG_SHOWSCHEDULE) {
@@ -140,16 +144,19 @@ public class EdgyDispatcher extends UniversalDispatcher {
 
         {
             toc_lastPrint = tic;
-            System.out.println(String.format("%s END @%6d   MR=%6d   at=%6d   do=%6d", //
+            System.out.println(String.format("%s END @%6d   MR=%6d   AT=%6d   do=%6d   um=%6d == %6d", //
                     getClass().getSimpleName().substring(0, 8), //
                     round_now, //
                     total_matchedRequests, //
                     total_abortTrip, //
-                    total_driveOrder));
+                    total_driveOrder, //
+                    getAVRequestsAtLinks().values().stream().flatMap(s->s.stream()).count(), //
+                    getAVRequestsAtLinks().values().stream().mapToInt(List::size).sum() //
+            ));
         }
 
-        if (5 < total_abortTrip)
-            System.exit(0);
+//        if (5 < total_abortTrip)
+//            System.exit(0);
 
     }
 

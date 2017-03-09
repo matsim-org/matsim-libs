@@ -56,6 +56,17 @@ public class HungarianDispatcher extends UniversalDispatcher {
         total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
         System.out.println(getClass().getSimpleName() + " @" + round_now + " mr = " + total_matchedRequests);
 
+        {
+            System.out.println(String.format("%s BEG @%6d   MR=%6d   AT=%6d   do=%6d   um=%6d == %6d", //
+                    getClass().getSimpleName().substring(0, 8), //
+                    round_now, //
+                    total_matchedRequests, //
+                    0,0, //
+                    getAVRequestsAtLinks().values().stream().flatMap(s->s.stream()).count(), //
+                    getAVRequestsAtLinks().values().stream().mapToInt(List::size).sum() //
+            ));
+        }
+
 
         if (round_now % DISPATCH_PERIOD == 0) {
             {   // match a vehicle at a customer
@@ -83,6 +94,20 @@ public class HungarianDispatcher extends UniversalDispatcher {
                 hungarianmatches.entrySet().forEach(this::setVehicleDiversion);
             }
         }
+
+        {
+            System.out.println(String.format("%s END @%6d   MR=%6d   AT=%6d   do=%6d   um=%6d == %6d", //
+                    getClass().getSimpleName().substring(0, 8), //
+                    round_now, //
+                    total_matchedRequests, //
+                    0,0,//
+                    getAVRequestsAtLinks().values().stream().flatMap(s->s.stream()).count(), //
+                    getAVRequestsAtLinks().values().stream().mapToInt(List::size).sum() //
+            ));
+        }
+
+
+
     }
     public static class Factory implements AVDispatcherFactory {
         @Inject
