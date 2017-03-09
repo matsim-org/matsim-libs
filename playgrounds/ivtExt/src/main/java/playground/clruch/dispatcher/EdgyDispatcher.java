@@ -24,12 +24,14 @@ import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class EdgyDispatcher extends UniversalDispatcher {
-    private static final int DISPATCH_PERIOD = 5 * 60;
+    /**
+     * a large value of DISPATCH_PERIOD helps to quickly test the EdgyDispatcher
+     */
+    private static final int DISPATCH_PERIOD = 1;
 
     final Network network; // <- for verifying link references
     final Collection<Link> linkReferences; // <- for verifying link references
@@ -66,6 +68,8 @@ public class EdgyDispatcher extends UniversalDispatcher {
     }
 
     int total_matchedRequests = 0;
+    int total_abortTrip = 0;
+    int total_driveOrder = 0;
 
     @Override
     public void redispatch(double now) {
@@ -76,33 +80,29 @@ public class EdgyDispatcher extends UniversalDispatcher {
         final long round_now = Math.round(now);
         if (round_now % DISPATCH_PERIOD == 0) {
 
-            int num_abortTrip = 0;
-            int num_driveOrder = 0;
-
-            num_abortTrip += drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
+            total_abortTrip += drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
 
             { // TODO this should be replaceable by some naive matcher
                 Iterator<AVRequest> requestIterator = getAVRequests().iterator();
-                Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
-
-                for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
+                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
                     Link dest = vehicleLinkPair.getCurrentDriveDestination();
                     if (dest == null) { // vehicle in stay task
                         if (requestIterator.hasNext()) {
                             Link link = requestIterator.next().getFromLink();
                             setVehicleDiversion(vehicleLinkPair, link);
-                            ++num_driveOrder;
+                            ++total_driveOrder;
                         } else
                             break;
                     }
                 }
             }
 
-            System.out.println(String.format("@%6d   MR=%6d   at=%6d   do=%6d", //
+            System.out.println(String.format("%s @%6d   MR=%6d   at=%6d   do=%6d", //
+                    getClass().getSimpleName().substring(0, 8), //
                     round_now, //
                     total_matchedRequests, //
-                    num_abortTrip, //
-                    num_driveOrder));
+                    total_abortTrip, //
+                    total_driveOrder));
         }
 
     }
