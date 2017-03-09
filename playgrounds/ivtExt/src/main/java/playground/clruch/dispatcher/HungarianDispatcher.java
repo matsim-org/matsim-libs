@@ -31,6 +31,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
     final DrivebyRequestStopper drivebyRequestStopper;
+    final AbstractVehicleDestMatcher abstractVehicleDestMatcher;
 
     private HungarianDispatcher( //
                                  AVDispatcherConfig avDispatcherConfig, //
@@ -44,32 +45,35 @@ public class HungarianDispatcher extends UniversalDispatcher {
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         DISPATCH_PERIOD = Integer.parseInt(avDispatcherConfig.getParams().get("dispatchPeriod"));
         drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
+        abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
     }
 
     int total_matchedRequests = 0;
 
     @Override
     public void redispatch(double now) {
-        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
-
         final long round_now = Math.round(now);
+        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+        System.out.println(getClass().getSimpleName() + " @" + round_now + " mr = " + total_matchedRequests);
+
 
         if (round_now % DISPATCH_PERIOD == 0) {
-            { // for all remaining vehicles and requests, perform a bipartite matching
+            {   // match a vehicle at a customer
+
+
+                // for all remaining vehicles and requests, perform a bipartite matching
 
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
                 // call getDivertableVehicles again to get remaining vehicles
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
                 // Save request in list which is needed for abstractVehicleDestMatcher
-                AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
                 List<Link> requestlocs =
                         requests.values()
                                 .stream()
-                                .flatMap(List::stream)
-                                .map(AVRequest::getFromLink)
+                                .flatMap(List::stream) // all requests
+                                .map(AVRequest::getFromLink) // all from links of all requests with multiplicity
                                 .collect(Collectors.toList());
-
 
                 // find the Euclidean bipartite matching for all vehicles using the Hungarian method
                 System.out.println("optimizing over "+divertableVehicles.size()+" vehicles and "+requestlocs.size() + " requests.");

@@ -20,7 +20,7 @@ public class vLinkDataReader {
             Document document = (Document) builder.build(file);
             Element rootNode = document.getRootElement();
             Element virtualNodesXML = rootNode.getChild("virtualLinks");
-            List<Element> virtualLinkXML = virtualNodesXML.getChildren("virtuallink");
+            List<Element> virtualLinkXML = virtualNodesXML.getChildren("virtualLink");
             for (Element vLinkelem : virtualLinkXML) {
                 String vlinkID = vLinkelem.getAttributeValue("id");
                 Double weight = Double.parseDouble(vLinkelem.getAttributeValue(datastring));
