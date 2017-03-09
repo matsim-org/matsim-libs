@@ -156,6 +156,9 @@ public class AccessibilityComputationNairobiTest {
 //		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		
 		config.transit().setUseTransit(true);
+		//
+		config.transit().setTransitScheduleFile("../../..//shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16/schedule.xml.gz");
+		//
 		{
 			ModeRoutingParams walkPars = new ModeRoutingParams( TransportMode.walk ) ;
 			walkPars.setBeelineDistanceFactor(1.3);
