@@ -26,7 +26,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
     final Collection<Link> linkReferences; // <- for verifying link references
 
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
-    final DrivebyRequestStopper drivebyRequestStopper;
+    final RequestStopsDrivebyVehicles drivebyRequestStopper;
     final AbstractVehicleDestMatcher abstractVehicleDestMatcher;
     final AbstractRequestSelector requestSelector;
     final int MAXMATCHNUMBER;
@@ -44,7 +44,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         DISPATCH_PERIOD = Integer.parseInt(avDispatcherConfig.getParams().get("dispatchPeriod"));
-        drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
+        drivebyRequestStopper = new RequestStopsDrivebyVehicles(); // FIXME
         abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
         this.requestSelector = abstractRequestSelector;
         MAXMATCHNUMBER = Integer.parseInt(avDispatcherConfig.getParams().get("maxMatchNumber"));
