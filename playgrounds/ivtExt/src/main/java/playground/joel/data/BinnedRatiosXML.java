@@ -30,6 +30,11 @@ class BinnedRatiosXML<Type> {
         L1ElName = name;
     }
 
+    public BinnedRatiosXML(String name, String attrName) {
+        L1ElName = name;
+        L2Attr2Name = attrName;
+    }
+
     // Take the Map timeStepData which for some IDs contains series of changes for times Double
     // in the data format Type. Save them in an XML with the structure:
     // <xmlTitle>

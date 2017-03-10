@@ -41,7 +41,7 @@ public class EventFileToDataXML {
      *            of the project folder
      */
 
-    static String path = "C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs"; //used for test purpose in main()
+    static String path = "C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_23_Sioux_onlyUnitCapacityAVs"; //used for test purpose in main()
 
 
 
@@ -70,6 +70,10 @@ public class EventFileToDataXML {
                 BinnedTravelDistances binnedTravelDistances = new BinnedTravelDistances();
                 binnedTravelDistances.initialize(events);
 
+                // add event handlers to create binnedWaitingTimes files
+                BinnedWaitingTimes binnedWaitingTimes = new BinnedWaitingTimes();
+                binnedWaitingTimes.initialize(events);
+
 
                 // create TotalData file binnedTravelTimes file
                 TotalData totalData = new TotalData();
@@ -82,8 +86,10 @@ public class EventFileToDataXML {
                 travelTimes.writeXML(data);
                 binnedTravelTimes.writeXML(data);
                 binnedTravelDistances.writeXML(data);
+                binnedWaitingTimes.writeXML(data);
 
                 File totalDataDir = new File(data, "totalData.xml");
+                // TODO: rewrite totalData.generate to operate with quantiles and mean
                 totalData.generate("0", String.valueOf(travelTimes.totalTimeRatio),
                         String.valueOf(binnedTravelDistances.totalDistanceRatio),
                         "0", totalDataDir);

@@ -24,16 +24,17 @@ public class TimeDiagramCreator {
         return Double.parseDouble(asd[0]);
     }
 
-    public static void createDiagram(File directory, String fileTitle, String diagramTitle, NavigableMap<String, Double> map)throws Exception
+    public static void createDiagram(File directory, String fileTitle, String diagramTitle, NavigableMap<String, Double> map) throws Exception
     {
         final TimeSeries series = new TimeSeries( "time series");
         for(String key: map.keySet()) {
             try
             {
-                int hours = (int) (keyToTime(key)/3600);
-                int minutes = (int) (keyToTime(key)/60) - hours*60;
-                int seconds = (int) keyToTime(key) - minutes*60 - hours*3600;
-                Second time = new Second(seconds, minutes, hours, 1, 1, 2017); // day, month and year can not be zero
+                int days = (int) (keyToTime(key)/86400) + 1;
+                int hours = (int) (keyToTime(key)/3600) - (days - 1)*24;
+                int minutes = (int) (keyToTime(key)/60) - hours*60 - (days - 1)*1440;
+                int seconds = (int) keyToTime(key) - minutes*60 - hours*3600 - (days - 1)*86400;
+                Second time = new Second(seconds, minutes, hours, days, 1, 2017); // month and year can not be zero
                 series.add(time, map.get(key));
                 GlobalAssert.that(!series.isEmpty());
             }
@@ -43,24 +44,53 @@ public class TimeDiagramCreator {
             }
         }
 
-        /* example from https://www.tutorialspoint.com/jfreechart/jfreechart_timeseries_chart.htm
-        Second current = new Second();
-        double value = 100.0;
-        for ( int i = 0 ; i < 4000 ; i++ )
-        {
+
+        final XYDataset dataset=( XYDataset )new TimeSeriesCollection(series);
+        JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Seconds", "Value", dataset,false,false,false);
+
+        int width = 800; /* Width of the image */
+        int height = 600; /* Height of the image */
+        File timeChart = new File( directory,fileTitle + ".png" );
+        ChartUtilities.saveChartAsPNG( timeChart, timechart, width, height );
+        GlobalAssert.that(timeChart.exists() && !timeChart.isDirectory());
+        System.out.println("exported " + fileTitle + ".png");
+    }
+
+    public static void createDiagram(File directory, String fileTitle, String diagramTitle,
+                                     NavigableMap<String, Double> map1, NavigableMap<String, Double> map2, NavigableMap<String, Double> map3) throws Exception
+    {
+        final TimeSeriesCollection dataset = new TimeSeriesCollection();
+        final TimeSeries series1 = new TimeSeries( "time series 1");
+        final TimeSeries series2 = new TimeSeries( "time series 2");
+        final TimeSeries series3 = new TimeSeries( "time series 3");
+
+        GlobalAssert.that((map1.keySet().size() == map2.keySet().size()) && (map1.keySet().size() == map3.keySet().size()));
+        for(String key: map1.keySet()) {
             try
             {
-                value = value + Math.random( ) - 0.5;
-                series.add( current , new Double( value ) );
-                current = ( Second ) current.next( );
+                int days = (int) (keyToTime(key)/86400) + 1;
+                int hours = (int) (keyToTime(key)/3600) - (days - 1)*24;
+                int minutes = (int) (keyToTime(key)/60) - hours*60 - (days - 1)*1440;
+                int seconds = (int) keyToTime(key) - minutes*60 - hours*3600 - (days - 1)*86400;
+                Second time = new Second(seconds, minutes, hours, days, 1, 2017); // month and year can not be zero
+
+                series1.add(time, map1.get(key));
+                GlobalAssert.that(!series1.isEmpty());
+                series2.add(time, map2.get(key));
+                GlobalAssert.that(!series2.isEmpty());
+                series3.add(time, map3.get(key));
+                GlobalAssert.that(!series3.isEmpty());
+
+                dataset.addSeries(series1);
+                dataset.addSeries(series2);
+                dataset.addSeries(series3);
             }
-            catch ( SeriesException e )
+            catch ( SeriesException e  )
             {
                 System.err.println( "Error adding to series" );
             }
-        }*/
+        }
 
-        final XYDataset dataset=( XYDataset )new TimeSeriesCollection(series);
         JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Seconds", "Value", dataset,false,false,false);
 
         int width = 800; /* Width of the image */

@@ -36,12 +36,12 @@ class BinnedTravelDistances extends AbstractData {
     double totalDistance = 0;
     double totalDistanceWithCust = 0;
     double totalDistanceRatio;
-    double binSize = 300;
+    double binSize = 600;
 
     //equalize length of all key elements
     DecimalFormat keyForm = new DecimalFormat("#000000");
     // cut the total distance ratio
-    DecimalFormat ratioForm = new DecimalFormat("#.####");
+    DecimalFormat valueForm = new DecimalFormat("#.####");
 
 
 
@@ -96,7 +96,7 @@ class BinnedTravelDistances extends AbstractData {
 
     void calculateDistanceRatio() {
         if (!(totalDistance == 0)) {
-            totalDistanceRatio = Double.parseDouble(ratioForm.format(totalDistanceWithCust / totalDistance));
+            totalDistanceRatio = Double.parseDouble(valueForm.format(totalDistanceWithCust / totalDistance));
         } else System.out.println("total distance equals zero!");
     }
 

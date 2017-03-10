@@ -33,7 +33,7 @@ class BinnedTravelTimes extends AbstractData {
     double totalTimeWithCust = 0;
     double totalTimeRatio;
     int numAVs = 0;
-    double binSize = 300;
+    double binSize = 600;
 
     //equalize length of all key elements
     DecimalFormat keyForm = new DecimalFormat("#000000");
