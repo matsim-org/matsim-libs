@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.opdyts.equil;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import floetteroed.opdyts.DecisionVariableRandomizer;
@@ -42,7 +43,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,11 +58,24 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilIntegration {
 
+	private static int randomVariance = 7;
+	private static int iterationsToConvergence = 400;
+
+	private static String EQUIL_DIR = "./examples/scenarios/equil/";
+	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_holes_200its/";
 	private static final OpdytsScenario EQUIL = OpdytsScenario.EQUIL;
-	private static final String EQUIL_DIR = "./examples/scenarios/equil/";
-	private static final String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_holes_KWM_200its/";
+
+	private static final boolean isPlansRelaxed = false;
 
 	public static void main(String[] args) {
+
+		if (args.length > 0) {
+			randomVariance = Integer.valueOf(args[0]);
+			iterationsToConvergence = Integer.valueOf(args[1]);
+			EQUIL_DIR = args[2];
+			OUT_DIR = args[3]+"/equil_car,pt_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+		}
+
 		Set<String> modes2consider = new HashSet<>();
 		modes2consider.add("car");
 		modes2consider.add("pt");
@@ -68,10 +83,6 @@ public class MatsimOpdytsEquilIntegration {
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
 
-		config.controler().setOutputDirectory(OUT_DIR);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
-//		config.plans().setInputFile("relaxed_plans.xml.gz");
 		config.plans().setInputFile("plans2000.xml.gz");
 
 		//== default config has limited inputs
@@ -80,7 +91,7 @@ public class MatsimOpdytsEquilIntegration {
 
 		config.changeMode().setModes(modes2consider.toArray(new String [modes2consider.size()]));
 		StrategySettings modeChoice = new StrategySettings();
-		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name());
+		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name());
 		modeChoice.setWeight(0.1);
 		config.strategy().addStrategySettings(modeChoice);
 
@@ -89,28 +100,69 @@ public class MatsimOpdytsEquilIntegration {
 		expChangeBeta.setWeight(0.9);
 		config.strategy().addStrategySettings(expChangeBeta);
 
+		//==
+
+		//== planCalcScore params (initialize will all defaults).
 		for ( PlanCalcScoreConfigGroup.ActivityParams params : config.planCalcScore().getActivityParams() ) {
 			params.setTypicalDurationScoreComputation( PlanCalcScoreConfigGroup.TypicalDurationScoreComputation.relative );
 		}
 
-		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.KWM );
-
-//		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
-//			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
-//		}
-
-		config.qsim().setUsingFastCapacityUpdate(true);
-
-		//==
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		double time = 6*3600. ;
-		for ( Person person : scenario.getPopulation().getPersons().values() ) {
-			Plan plan = person.getSelectedPlan() ;
-			Activity activity = (Activity) plan.getPlanElements().get(0) ;
-			activity.setEndTime(time);
-			time++ ;
+		// remove other mode params
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
+		for ( PlanCalcScoreConfigGroup.ModeParams params : planCalcScoreConfigGroup.getModes().values() ) {
+			planCalcScoreConfigGroup.removeParameterSet(params);
 		}
+
+		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
+		PlanCalcScoreConfigGroup.ModeParams mpPt = new PlanCalcScoreConfigGroup.ModeParams("pt");
+
+
+		planCalcScoreConfigGroup.addModeParams(mpCar);
+		planCalcScoreConfigGroup.addModeParams(mpPt);
 		//==
+
+		//==
+		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
+		config.qsim().setUsingFastCapacityUpdate(true);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+		//==
+		if(! isPlansRelaxed) {
+
+			config.controler().setOutputDirectory(OUT_DIR+"/relaxingPlans/");
+			config.controler().setLastIteration(50);
+			config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+
+			Scenario scenarioPlansRelaxor = ScenarioUtils.loadScenario(config);
+			// following is taken from KNBerlinControler.prepareScenario(...);
+			// modify equil plans:
+			double time = 6*3600. ;
+			for ( Person person : scenarioPlansRelaxor.getPopulation().getPersons().values() ) {
+				Plan plan = person.getSelectedPlan() ;
+				Activity activity = (Activity) plan.getPlanElements().get(0) ;
+				activity.setEndTime(time);
+				time++ ;
+			}
+
+			Controler controler = new Controler(scenarioPlansRelaxor);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new EquilDistanceDistribution(EQUIL)));
+				}
+			});
+			controler.run();
+
+			// set back settings for opdyts
+			File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
+			config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
+			config.controler().setOutputDirectory(OUT_DIR);
+			config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
+		}
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		//****************************** mainly opdyts settings ******************************
 
 		// this is something like time bin generator
 		int startTime= 0;
@@ -118,7 +170,7 @@ public class MatsimOpdytsEquilIntegration {
 		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
-		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL);
+		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(EQUIL);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts
@@ -128,11 +180,11 @@ public class MatsimOpdytsEquilIntegration {
 			@Override
 			public void install() {
 				// add here whatever should be attached to matsim controler
+
 				// some stats
+				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				addControlerListenerBinding().toInstance(stasControlerListner);
 
-				// from KN
-				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
@@ -151,13 +203,13 @@ public class MatsimOpdytsEquilIntegration {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, 1.0, EQUIL,null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, Double.valueOf(randomVariance), EQUIL,null);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL);
 
 		// what would decide the convergence of the objective function
-		final int iterationsToConvergence = 200; //
+//		final int iterationsToConvergence = 200; //
 		final int averagingIterations = 10;
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
 
