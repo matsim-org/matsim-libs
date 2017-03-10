@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -17,10 +18,12 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.utils.AbstractVehicleRequestLinkMatcher;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
-import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
-import playground.clruch.dispatcher.utils.DrivebyRequestStopperNew;
+import playground.clruch.dispatcher.utils.DivertIfCurrentDestinationEmpty;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
+import playground.clruch.dispatcher.utils.RequestStopsDrivebyVehicles;
+import playground.clruch.dispatcher.utils.ReserveVehiclesStoppingOnLink;
 import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -31,10 +34,6 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class EdgyDispatcher extends UniversalDispatcher {
-    /**
-     * a large value of DISPATCH_PERIOD helps to quickly test the EdgyDispatcher
-     */
-    private final int DISPATCH_PERIOD;
     private static final boolean DEBUG_SHOWSCHEDULE = false;
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
@@ -42,7 +41,9 @@ public class EdgyDispatcher extends UniversalDispatcher {
     final Collection<Link> linkReferences; // <- for verifying link references
 
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
-    final DrivebyRequestStopperNew drivebyRequestStopperNew;
+    final AbstractVehicleRequestLinkMatcher reserveVehiclesStoppingOnLink;
+    final AbstractVehicleRequestLinkMatcher requestStopsDrivebyVehicles;
+    final AbstractVehicleRequestLinkMatcher divertIfCurrentDestinationEmpty;
 
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -54,13 +55,15 @@ public class EdgyDispatcher extends UniversalDispatcher {
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
-        drivebyRequestStopperNew = new DrivebyRequestStopperNew();
-        DISPATCH_PERIOD = Integer.parseInt(avDispatcherConfig.getParams().get("dispatchPeriod"));
+        reserveVehiclesStoppingOnLink = new ReserveVehiclesStoppingOnLink();
+        requestStopsDrivebyVehicles = new RequestStopsDrivebyVehicles();
+        divertIfCurrentDestinationEmpty = new DivertIfCurrentDestinationEmpty();
+        // dispatchPeriod = Integer.parseInt(avDispatcherConfig.getParams().get("dispatchPeriod"));
     }
 
     /** verify that link references are present in the network */
     @SuppressWarnings("unused") // for verifying link references
-    private void verifyLinkReferencesInvariant() {
+    private void _verifyLinkReferencesInvariant() {
         List<Link> testset = getDivertableVehicles().stream() //
                 .map(VehicleLinkPair::getCurrentDriveDestination) //
                 .filter(Objects::nonNull) //
@@ -73,109 +76,71 @@ public class EdgyDispatcher extends UniversalDispatcher {
             System.out.println("network " + linkReferences.size() + " contains all " + testset.size());
     }
 
-    int total_matchedRequests = 0;
-    int total_abortTrip = 0;
-    int total_driveOrder = 0;
+    private void _printSchedule(String string) {
+        if (DEBUG_SHOWSCHEDULE) {
+            System.out.println(string);
+            for (AVVehicle avVehicle : getFunctioningVehicles())
+                if (avVehicle.getId().toString().equals(DEBUG_AVVEHICLE))
+                    System.out.println(ScheduleUtils.scheduleOf(avVehicle));
+        }
+    }
 
-    long toc_lastPrint = System.nanoTime();
+    int reserveVehicles = 0;
+    int abortTrip = 0;
+    int driveOrder = 0;
+    int emptyDrive = 0;
 
     @Override
     public void redispatch(double now) {
-        final long round_now = Math.round(now);
-        // verifyReferences(); // <- debugging only
-        final long tic = System.nanoTime();
-        // if (1e9 < tic - toc_lastPrint)
+
+        _printSchedule("before matching");
+
+        vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+
+        final Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
         {
-            toc_lastPrint = tic;
-            System.out.println(String.format("%s BEG @%6d   MR=%6d   AT=%6d   do=%6d   um=%6d == %6d", //
-                    getClass().getSimpleName().substring(0, 8), //
-                    round_now, //
-                    total_matchedRequests, //
-                    total_abortTrip, //
-                    total_driveOrder, //
-                    getAVRequestsAtLinks().values().stream().flatMap(s->s.stream()).count(), //
-                    getAVRequestsAtLinks().values().stream().mapToInt(List::size).sum() //
-                    ));
+            Map<VehicleLinkPair, Link> pass1 = reserveVehiclesStoppingOnLink.match(requests, getDivertableVehicles());
+            pass1.entrySet().stream().forEach(this::setVehicleDiversion); // prevents vehicles from being redirected
+            reserveVehicles = pass1.size();
+
+            Map<VehicleLinkPair, Link> pass2 = requestStopsDrivebyVehicles.match(requests, getDivertableVehicles());
+            pass2.entrySet().stream().forEach(this::setVehicleDiversion);
+
+            abortTrip = pass2.size();
         }
 
-        if (DEBUG_SHOWSCHEDULE) {
-            System.out.println(" --- schedule before matching --- ");
-            for (AVVehicle avVehicle : getFunctioningVehicles())
-                if (avVehicle.getId().toString().equals(DEBUG_AVVEHICLE))
-                    System.out.println(ScheduleUtils.scheduleOf(avVehicle));
-        }
+        _printSchedule("after stopping");
 
-        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+        driveOrder = 0;
+        emptyDrive = 0;
 
-        // System.out.println(" --- schedule before stopping --- ");
-        {
-
-            // TODO remove this later
-            // OLD IMPLEMENTATION
-            /*
-            Collection<VehicleLinkPair> list = //
-                    drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
-            */
-            // OLD IMPLEMENTATION END
-
-
-            // NEW IMPLEMENTATION
-            Collection<VehicleLinkPair> list = drivebyRequestStopperNew.match(getAVRequestsAtLinks(),getDivertableVehicles());
-            list.stream().forEach(v->setVehicleDiversion(v,v.getDivertableLocation()));
-            // NEW IMPLEMENTATION END
-
-
-
-
-
-            list.stream() //
-                    .map(vlp -> "STOP " + vlp.avVehicle.getOperator().getId().toString()) //
-                    .forEach(System.out::println);
-            total_abortTrip += list.size();
-        }
-
-        if (DEBUG_SHOWSCHEDULE) {
-            System.out.println(" --- schedule after stopping --- ");
-            for (AVVehicle avVehicle : getFunctioningVehicles())
-                if (avVehicle.getId().toString().equals(DEBUG_AVVEHICLE))
-                    System.out.println(ScheduleUtils.scheduleOf(avVehicle));
-        }
-
-        if (round_now % DISPATCH_PERIOD == 0) {
-
-            { // TODO this should be replaceable by some naive matcher
-                Iterator<AVRequest> requestIterator = getAVRequests().iterator();
-                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-                    Link dest = vehicleLinkPair.getCurrentDriveDestination();
-                    if (dest == null) { // vehicle in stay task
-                        if (requestIterator.hasNext()) {
-                            Link link = requestIterator.next().getFromLink();
-                            setVehicleDiversion(vehicleLinkPair, link);
-                            ++total_driveOrder;
-                        } else
-                            break;
-                    }
+        // Map<VehicleLinkPair, Link> pass3 = divertIfCurrentDestinationEmpty.match(requests, getDivertableVehicles());
+        // pass3.entrySet().stream().forEach(this::setVehicleDiversion);
+        { // TODO this should be replaceable by some naive matcher
+            Iterator<AVRequest> requestIterator = getAVRequests().iterator();
+            for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                Link dest = vehicleLinkPair.getCurrentDriveDestination();
+                if (dest == null) { // vehicle in stay task
+                    if (requestIterator.hasNext()) {
+                        Link link = requestIterator.next().getFromLink();
+                        setVehicleDiversion(vehicleLinkPair, link);
+                        ++driveOrder;
+                    } else
+                        break;
                 }
             }
-
         }
 
-        {
-            toc_lastPrint = tic;
-            System.out.println(String.format("%s END @%6d   MR=%6d   AT=%6d   do=%6d   um=%6d == %6d", //
-                    getClass().getSimpleName().substring(0, 8), //
-                    round_now, //
-                    total_matchedRequests, //
-                    total_abortTrip, //
-                    total_driveOrder, //
-                    getAVRequestsAtLinks().values().stream().flatMap(s->s.stream()).count(), //
-                    getAVRequestsAtLinks().values().stream().mapToInt(List::size).sum() //
-            ));
-        }
+    }
 
-//        if (5 < total_abortTrip)
-//            System.exit(0);
-
+    @Override
+    public String getInfoStringBeg() {
+        return String.format("%s rv=%3d at=%3d do=%3d ed=%4d", //
+                super.getInfoStringBeg(), //
+                reserveVehicles, //
+                abortTrip, //
+                driveOrder, //
+                emptyDrive);
     }
 
     public static class Factory implements AVDispatcherFactory {
