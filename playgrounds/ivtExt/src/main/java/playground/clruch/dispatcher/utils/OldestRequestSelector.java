@@ -24,23 +24,4 @@ public class OldestRequestSelector extends AbstractRequestSelector {
                 .limit(size) //
                 .collect(Collectors.toList());
     }
-
-    /**
-     * the purpose of the main function is to demonstrate the ordering when using
-     * Double::compare
-     */
-    public static void main(String[] args) {
-        List<Double> list = new ArrayList<>();
-        list.add(7.);
-        list.add(2.);
-        list.add(4.);
-        Collections.sort(list, new Comparator<Double>() {
-            @Override
-            public int compare(Double d1, Double d2) {
-                return Double.compare(d1, d2);
-            }
-        });
-        System.out.println(list);
-    }
-
 }
