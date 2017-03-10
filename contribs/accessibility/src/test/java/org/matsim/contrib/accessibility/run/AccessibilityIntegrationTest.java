@@ -255,8 +255,58 @@ public class AccessibilityIntegrationTest {
 		 * This is now in principle working; I fixed at least one bug.  But pointFile.csv is empty. --> disabling the test.  kai, feb'17
 		 */
 	}
+	
+	
+	private Config createTestConfig() {
+		final Config config = ConfigUtils.createConfig();
+
+		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setCellSizeCellBasedAccessibility(100);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
+		
+		// modify config according to needs
+		Network network = CreateTestNetwork.createTestNetwork(); // this is a little odd. kai, dec'16
+		String networkFile = utils.getOutputDirectory() + "network.xml";
+		new NetworkWriter(network).write(networkFile);
+		config.network().setInputFile(networkFile);
+
+		config.transit().setUseTransit(true);
+
+		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
+		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");
+		mbConfig.setPtTravelDistancesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
+		mbConfig.setPtTravelTimesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
+		mbConfig.setUsingPtStops(true);
+		mbConfig.setUsingTravelTimesAndDistances(true);
+		config.addModule(mbConfig);
+
+		config.controler().setLastIteration(10);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+
+		return config;
+	}
 
 	
+	private static Scenario createTestScenario(final Config config) {
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// Creating test opportunities (facilities)
+		final ActivityFacilities opportunities = scenario.getActivityFacilities();
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
+			Coord coord = link.getCoord();
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
+			opportunities.addActivityFacility(facility);
+		}
+		return scenario;
+	}
+
 	
 	/**
 	 * This is called by the GridBasedAccessibilityListener and gets the resulting SpatialGrids. This test checks if the 
@@ -294,9 +344,9 @@ public class AccessibilityIntegrationTest {
 				String mode = modeEnum.toString(); // TODO only temporarily
 				LOG.info("mode=" + mode);
 				Gbl.assertNotNull(spatialGrids);
-//				if (this.isComputingMode.get(mode) != null) {
+				if (this.isComputingMode.get(mode) != null) {
 					// this was without the !=null yesterday but I cannot say what it was doing or why it was working or not.  kai, dec'16
-				if (this.isComputingMode.get(mode)) { // I think it should check for "not false" rather than "not null". dz, mar'17
+//				if (this.isComputingMode.get(mode)) { // I think it should check for "not false" rather than "not null". dz, mar'17
 					Assert.assertNotNull(spatialGrids.get(mode));
 				} else {
 					Assert.assertNull(spatialGrids.get(mode));
@@ -307,28 +357,32 @@ public class AccessibilityIntegrationTest {
 				for(double y = 50; y < 200; y += 100){
 					final AccessibilityResults expected = new AccessibilityResults();
 
-					if( (x == 50 || x == 150) && y == 50){
+					if ((x == 50 || x == 150) && y == 50) {
 						expected.accessibilityFreespeed = 2.1486094237531126;
 						expected.accessibilityCar = 2.14860942375311;
 						expected.accessibilityBike = 2.2257398663221;
 						expected.accessibilityWalk = 1.70054725728361;
-//						expected.accessibilityPt = 0.;
+						if (x == 50) {
+							expected.accessibilityPt = -658.4303723055468;
+						} else {
+							expected.accessibilityPt = -659.1235194861068;
+						}
 						expected.accessibilityMatrixBasedPt = 0.461863556339195;
-					} else if(x == 50 && y == 150){
+					} else if (x == 50 && y == 150) {
 						expected.accessibilityFreespeed = 2.1766435716006005;
 						expected.accessibilityCar = 2.1766435716006005;
 						expected.accessibilityBike = 2.2445468698643367;
 						// expected.accessibilityBike = 1.; // deliberately wrong for testing
 						expected.accessibilityWalk = 1.7719146868026079;
-//						expected.accessibilityPt = 0.;
+						expected.accessibilityPt = -658.7180543779986;
 						expected.accessibilityMatrixBasedPt = 0.461863556339195;
 						// expected.accessibilityMatrixBasedPt = 1.; // deliberately wrong for testing
-					} else if(x == 150 && y == 150){
+					} else if (x == 150 && y == 150) {
 						expected.accessibilityFreespeed = 2.2055702759681273;
 						expected.accessibilityCar = 2.2055702759681273;
 						expected.accessibilityBike = 2.2637376515333636;
 						expected.accessibilityWalk = 1.851165291193725;
-//						expected.accessibilityPt = 0.;
+						expected.accessibilityPt = -659.1235194861068;
 						expected.accessibilityMatrixBasedPt = 0.624928280738513;
 					}
 
@@ -337,7 +391,7 @@ public class AccessibilityIntegrationTest {
 					actual.accessibilityCar = spatialGrids.get(TransportMode.car).getValue(new Coord(x, y));
 					actual.accessibilityBike = spatialGrids.get(TransportMode.bike).getValue(new Coord(x, y));
 					actual.accessibilityWalk = spatialGrids.get(TransportMode.walk).getValue(new Coord(x, y));
-//					actual.accessibilityPt = spatialGrids.get(TransportMode.pt).getValue(new Coord(x, y));
+					actual.accessibilityPt = spatialGrids.get(TransportMode.pt).getValue(new Coord(x, y));
 					actual.accessibilityMatrixBasedPt = spatialGrids.get("matrixBasedPt").getValue(new Coord(x, y));
 
 					Assert.assertTrue(
@@ -434,56 +488,5 @@ public class AccessibilityIntegrationTest {
 					", accessibilityMatrixBasedPt=" + accessibilityMatrixBasedPt +
 					'}';
 		}
-	}
-	
-	
-	private Config createTestConfig() {
-		final Config config = ConfigUtils.createConfig();
-
-		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		acg.setCellSizeCellBasedAccessibility(100);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
-		
-		// modify config according to needs
-		Network network = CreateTestNetwork.createTestNetwork(); // this is a little odd. kai, dec'16
-		String networkFile = utils.getOutputDirectory() + "network.xml";
-		new NetworkWriter(network).write(networkFile);
-		config.network().setInputFile(networkFile);
-
-		config.transit().setUseTransit(true);
-
-		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
-		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");
-		mbConfig.setPtTravelDistancesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
-		mbConfig.setPtTravelTimesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
-		mbConfig.setUsingPtStops(true);
-		mbConfig.setUsingTravelTimesAndDistances(true);
-		config.addModule(mbConfig);
-
-		config.controler().setLastIteration(10);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
-		return config;
-	}
-
-	
-	private static Scenario createTestScenario(final Config config) {
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		// Creating test opportunities (facilities)
-		final ActivityFacilities opportunities = scenario.getActivityFacilities();
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
-			Coord coord = link.getCoord();
-			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
-			opportunities.addActivityFacility(facility);
-		}
-		return scenario;
 	}
 }
