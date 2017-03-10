@@ -90,20 +90,20 @@ public class AccessibilityComputationNairobiTest {
 		// Input (if pre-downloaded)
 //		String folderStructure = "../../";
 //		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
-////		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network_modified_policy.xml";
-////		String networkFile = "../shared-svn/projects/maxess/data/kenya/network/2016-10-19_network_detailed.xml";
+//		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network_modified_policy.xml";
+//		String networkFile = "../shared-svn/projects/maxess/data/kenya/network/2016-10-19_network_detailed.xml";
 //		// Adapt folder structure that may be different on different machines, in particular on server
 //		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 //		config.network().setInputFile(folderStructure + networkFile);
 //		
-////		config.facilities().setInputFile(folderStructure + "matsimExamples/countries/ke/nairobi/2016-07-09_facilities_airports.xml"); //airports
-////		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
-////		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilities.xml";
+//		config.facilities().setInputFile(folderStructure + "matsimExamples/countries/ke/nairobi/2016-07-09_facilities_airports.xml"); //airports
+//		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
+//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilities.xml";
 //		config.facilities().setInputFile("../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/facilities.xml");
-////		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml";
-////		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/facilities/04/facilities.xml"; //airports
+//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml";
+//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/facilities/04/facilities.xml"; //airports
 //
-////		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/27/";
+//		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/27/";
 		
 		// Input (directly from OSM)
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(scenarioCRS, "EPSG:4326");
@@ -157,7 +157,7 @@ public class AccessibilityComputationNairobiTest {
 		
 		config.transit().setUseTransit(true);
 		//
-		config.transit().setTransitScheduleFile("../../..//shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16/schedule.xml.gz");
+		config.transit().setTransitScheduleFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16/schedule.xml.gz");
 		//
 		{
 			ModeRoutingParams walkPars = new ModeRoutingParams( TransportMode.walk ) ;
