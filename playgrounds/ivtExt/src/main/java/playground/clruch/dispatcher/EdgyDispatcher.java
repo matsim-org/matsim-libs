@@ -19,6 +19,7 @@ import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
+import playground.clruch.dispatcher.utils.DrivebyRequestStopperNew;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -41,7 +42,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
     final Collection<Link> linkReferences; // <- for verifying link references
 
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
-    final DrivebyRequestStopper drivebyRequestStopper;
+    final DrivebyRequestStopperNew drivebyRequestStopperNew;
 
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -53,7 +54,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
-        drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
+        drivebyRequestStopperNew = new DrivebyRequestStopperNew();
         DISPATCH_PERIOD = Integer.parseInt(avDispatcherConfig.getParams().get("dispatchPeriod"));
     }
 
@@ -108,8 +109,25 @@ public class EdgyDispatcher extends UniversalDispatcher {
 
         // System.out.println(" --- schedule before stopping --- ");
         {
+
+            // TODO remove this later
+            // OLD IMPLEMENTATION
+            /*
             Collection<VehicleLinkPair> list = //
                     drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
+            */
+            // OLD IMPLEMENTATION END
+
+
+            // NEW IMPLEMENTATION
+            Collection<VehicleLinkPair> list = drivebyRequestStopperNew.match(getAVRequestsAtLinks(),getDivertableVehicles());
+            list.stream().forEach(v->setVehicleDiversion(v,v.getDivertableLocation()));
+            // NEW IMPLEMENTATION END
+
+
+
+
+
             list.stream() //
                     .map(vlp -> "STOP " + vlp.avVehicle.getOperator().getId().toString()) //
                     .forEach(System.out::println);
