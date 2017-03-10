@@ -32,9 +32,8 @@ public class TripAnalyzerV2Extended {
 	public static final Logger log = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
 	/* Parameters */
-//	private static final String runId = "run_200";	// <----------
-	private static final String runId = "be_118";	// <----------
-	private static final String usedIteration = "300"; // most frequently used value: 150 // <----------
+	private static final String runId = "be_119";	// <----------
+	private static final String usedIteration = "300"; // most frequently used values: 150 or 300 // <----------
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
@@ -43,9 +42,9 @@ public class TripAnalyzerV2Extended {
 	private static final String specificMode = TransportMode.car;
 	
 	private static final boolean onlyInterior = false; // "int"
-	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis // <----------
+	private static final boolean onlyBerlinBased = false; // "ber"; usually varied for analysis // <----------
 	
-	private static final boolean useDistanceFilter = true; // "dist"; usually varied for analysis // <----------
+	private static final boolean useDistanceFilter = false; // "dist"; usually varied for analysis // <----------
 	// private static final double double minDistance = 0;
 	private static final double maxDistance_km = 100;
 
@@ -65,7 +64,7 @@ public class TripAnalyzerV2Extended {
 	private static final int binWidthSpeed_km_h = 1;
 
 	/* Input and output */
-	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml"; // <----------
+	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network.xml.gz"; // <----------
 //	private static final String networkFile = "../../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz"; // <----------
 	private static final String eventsFile = "../../../runs-svn/berlin_scenario_2016/" + runId + "/" + runId + ".output_events.xml.gz";
 //	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" + runId + "." + usedIteration + ".events.xml.gz";
