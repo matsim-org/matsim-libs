@@ -175,7 +175,9 @@ public class KtiActivityPersonalizedScoring implements ActivityScoring, ScoringF
 
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
 			// assume facility is always open
-			final ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
+			String actType = act.getType();
+			String type = actType.split("_")[0]; 
+			final ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(type);
 
 			if (actOpt == null) {
 				logger.error("Agent wants to perform an activity whose type is not available in the planned facility.");
