@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	private static final  String runId = "be_118"; // <----------
+	private static final  String runId = "be_109e"; // <----------
 	private static final  int numberOfIterations = 300; // <----------
 	private static final  int plansFileInterval = 300; // <----------
 	private static final  boolean useInterimPlans = false;
