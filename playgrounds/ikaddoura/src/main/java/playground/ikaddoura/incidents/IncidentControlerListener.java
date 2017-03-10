@@ -28,8 +28,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.NetworkChangeEventsParser;
 
 /**
 * @author ikaddoura
