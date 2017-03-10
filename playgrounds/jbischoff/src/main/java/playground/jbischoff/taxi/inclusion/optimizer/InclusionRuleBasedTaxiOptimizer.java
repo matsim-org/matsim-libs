@@ -53,7 +53,7 @@ public class InclusionRuleBasedTaxiOptimizer
     public InclusionRuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext,
     		InclusionRuleBasedTaxiOptimizerParams params, ZonalSystem zonalSystem)
     {
-        super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false);
+        super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
 
         this.params = params;
 

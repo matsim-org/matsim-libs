@@ -31,6 +31,9 @@ import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.zone.*;
 
+/**
+ * @author michalm
+ */
 public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 	private final BestDispatchFinder dispatchFinder;
 
@@ -45,7 +48,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 
 	public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext, RuleBasedTaxiOptimizerParams params,
 			ZonalSystem zonalSystem) {
-		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false);
+		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
 
 		this.params = params;
 

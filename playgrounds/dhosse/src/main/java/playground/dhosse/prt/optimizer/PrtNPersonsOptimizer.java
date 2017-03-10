@@ -11,7 +11,7 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 	
 	public PrtNPersonsOptimizer(TaxiOptimizerContext optimContext) {
 		
-		super(optimContext, null, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), false);
+		super(optimContext, null, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), false, false);
 		
 	}
 	

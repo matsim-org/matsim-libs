@@ -33,6 +33,9 @@ import org.matsim.core.router.util.*;
 
 import com.google.common.collect.Iterables;
 
+/**
+ * @author michalm
+ */
 public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 	private final AssignmentTaxiOptimizerParams params;
 	private final FastMultiNodeDijkstra router;
@@ -42,7 +45,7 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 	private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
 
 	public AssignmentTaxiOptimizer(TaxiOptimizerContext optimContext, AssignmentTaxiOptimizerParams params) {
-		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
+		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true, true);
 		this.params = params;
 
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
