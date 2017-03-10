@@ -49,7 +49,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.opdyts.*;
+import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
 /**
@@ -153,6 +155,8 @@ public class MatsimOpdytsEquilIntegration {
 			});
 			controler.run();
 
+			FileUtils.deleteIntermediateIterations(OUT_DIR,controler.getConfig().controler().getFirstIteration(), controler.getConfig().controler().getLastIteration());
+
 			// set back settings for opdyts
 			File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
 			config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
@@ -234,5 +238,11 @@ public class MatsimOpdytsEquilIntegration {
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
+
+		// remove the unused iterations
+		for (int index =0; index < maxIterations; index++) {
+			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
+			IOUtils.deleteDirectory(new File(dir2remove));
+		}
 	}
 }
