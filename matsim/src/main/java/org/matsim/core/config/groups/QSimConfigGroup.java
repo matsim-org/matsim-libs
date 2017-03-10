@@ -53,7 +53,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String SIM_ENDTIME_INTERPRETATION = "simEndtimeInterpretation";
 	
 	public static enum TrafficDynamics { queue, withHoles,
-		KWM //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
+		kinematicWaves //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
 	} ;
 	
 	public static enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime } ;

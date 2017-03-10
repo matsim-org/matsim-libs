@@ -248,7 +248,7 @@ public final class KNBerlinControler {
 			config.qsim().setFlowCapFactor(100);
 			config.qsim().setStorageCapFactor(100);
 		} else {
-			config.qsim().setTrafficDynamics( TrafficDynamics.KWM ); // this means, using with holes AND constraining inflow from maxFlowFromFdiag.
+			config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves); // this means, using with holes AND constraining inflow from maxFlowFromFdiag.
 
 //			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
 //				config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);

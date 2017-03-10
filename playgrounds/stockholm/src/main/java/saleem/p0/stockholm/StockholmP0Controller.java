@@ -55,7 +55,7 @@ public class StockholmP0Controller {
 		
 //		controler.getConfig().qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
 //		controler.getConfig().qsim().setTrafficDynamics(TrafficDynamics.withHoles);
-		controler.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.KWM); // this means, using with holes AND constraining inflow from maxFlowFromFdiag.
+		controler.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves); // this means, using with holes AND constraining inflow from maxFlowFromFdiag.
 //		
 		
 		controler.addControlerListener(new StockholmP0ControlListener(scenario, (Network) scenario.getNetwork(), incominglinks, outgoinglinks));

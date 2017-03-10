@@ -292,7 +292,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		
-        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
+        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.kinematicWaves) {
 			// uncongested branch: q = vmax * rho
 			// congested branch: q = vhole * (rhojam - rho)
 			// equal: rho * (vmax + vhole) = vhole * rhojam
@@ -372,7 +372,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	final boolean doSimStep( ) {
-        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
+        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.kinematicWaves) {
             this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowFromFdiag, maxFlowFromFdiag);
         }
 
@@ -541,7 +541,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// * reduced by entering vehicles
 		// * increased by holes arriving at upstream end of link
 		
-        if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.KWM ) {
+        if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.kinematicWaves) {
 			return true ;
 		}
 		
@@ -707,7 +707,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
         if ( context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue ) {
 			remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
 		}
-        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.KWM ) {
+        if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.kinematicWaves) {
 			this.accumulatedInflowCap -= veh.getFlowCapacityConsumptionInEquivalents() ;
 		}
 	}
