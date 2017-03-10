@@ -49,7 +49,7 @@ public class CemdapMatsimCadytsControllerConfig {
 		final Config config = ConfigUtils.loadConfig(args[0]);
 		final double cadytsScoringWeight = Double.parseDouble(args[1]) * config.planCalcScore().getBrainExpBeta();
 		
-		final Scenario scenario = prepareScenario(config, Boolean.getBoolean(args[2]), Double.parseDouble(args[3]));
+		final Scenario scenario = prepareScenario(config, Boolean.parseBoolean(args[2]), Double.parseDouble(args[3]));
 		
 		final Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new CadytsCarModule());
