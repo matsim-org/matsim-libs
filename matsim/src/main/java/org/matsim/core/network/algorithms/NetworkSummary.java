@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.misc.Time;
 
-public class NetworkSummary implements NetworkRunnable {
+public final class NetworkSummary implements NetworkRunnable {
 
 	private int network_capacity = 0;
 	private double minX = Double.POSITIVE_INFINITY;

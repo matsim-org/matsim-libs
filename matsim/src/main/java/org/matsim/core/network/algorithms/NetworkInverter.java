@@ -23,7 +23,7 @@ import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
  * @author aneumann
  * @author dgrether
  */
-public class NetworkInverter {
+public final class NetworkInverter {
 
 	final private static Logger log = Logger.getLogger(NetworkInverter.class);
 

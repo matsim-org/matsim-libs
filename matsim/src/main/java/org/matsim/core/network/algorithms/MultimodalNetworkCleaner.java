@@ -45,7 +45,7 @@ import org.matsim.api.core.v01.network.Node;
  *
  * @author mrieser
  */
-public class MultimodalNetworkCleaner {
+public final class MultimodalNetworkCleaner {
 
 	private final static Logger log = Logger.getLogger(MultimodalNetworkCleaner.class);
 
