@@ -92,17 +92,19 @@ public class AnalysisControlerListener implements IterationEndsListener {
 		
 		PersonTripNoiseAnalysis analysis = new PersonTripNoiseAnalysis();
 		
-		log.info("Print trip information...");
-		analysis.printTripInformation(outputPathAnalysisIteration, TaxiOptimizerModules.TAXI_MODE, basicHandler, noiseHandler);
-		analysis.printTripInformation(outputPathAnalysisIteration, TransportMode.car, basicHandler, noiseHandler);
-		analysis.printTripInformation(outputPathAnalysisIteration, null, basicHandler, noiseHandler);
-		log.info("Print trip information... Done.");
+		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
+			log.info("Print trip information...");
+			analysis.printTripInformation(outputPathAnalysisIteration, TaxiOptimizerModules.TAXI_MODE, basicHandler, noiseHandler);
+			analysis.printTripInformation(outputPathAnalysisIteration, TransportMode.car, basicHandler, noiseHandler);
+			analysis.printTripInformation(outputPathAnalysisIteration, null, basicHandler, noiseHandler);
+			log.info("Print trip information... Done.");
 
-		log.info("Print person information...");
-		analysis.printPersonInformation(outputPathAnalysisIteration, TaxiOptimizerModules.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);	
-		analysis.printPersonInformation(outputPathAnalysisIteration, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);	
-		analysis.printPersonInformation(outputPathAnalysisIteration, null, personId2userBenefit, basicHandler, noiseHandler);	
-		log.info("Print person information... Done.");
+			log.info("Print person information...");
+			analysis.printPersonInformation(outputPathAnalysisIteration, TaxiOptimizerModules.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);	
+			analysis.printPersonInformation(outputPathAnalysisIteration, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);	
+			analysis.printPersonInformation(outputPathAnalysisIteration, null, personId2userBenefit, basicHandler, noiseHandler);	
+			log.info("Print person information... Done.");
+		}
 
 		analysis.printAggregatedResults(outputPathAnalysisIteration, TaxiOptimizerModules.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);
 		analysis.printAggregatedResults(outputPathAnalysisIteration, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
