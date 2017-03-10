@@ -36,7 +36,6 @@ public class LinkInfo {
 	
 	private final Map<Integer, Double> time2toll = new HashMap<>();
 	private Map<Integer, Double> time2avgDelay = new HashMap<>();
-	private final Map<Integer, Double> time2weight = new HashMap<>();
 	
 	public LinkInfo(Id<Link> linkId) {
 		this.linkId = linkId;
@@ -56,10 +55,6 @@ public class LinkInfo {
 
 	public void setTime2avgDelay(Map<Integer, Double> time2avgDelay) {
 		this.time2avgDelay = time2avgDelay;
-	}
-
-	public Map<Integer, Double> getTime2value() {
-		return time2weight;
 	}
 
 }
