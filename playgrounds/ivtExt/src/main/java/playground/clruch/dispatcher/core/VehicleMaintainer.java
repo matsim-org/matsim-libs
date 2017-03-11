@@ -44,14 +44,14 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
-    private boolean showInfo = false;
+    private int infoLinePeriod = 0;
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
     }
 
-    public final void setShowInfo(boolean showInfo) {
-        this.showInfo = showInfo;
+    public final void setInfoLinePeriod(int infoLinePeriod) { // TODO rename
+        this.infoLinePeriod = infoLinePeriod;
     }
 
     /**
@@ -187,7 +187,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
 
-        if (showInfo)
+        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0)
             System.out.println(getInfoStringBeg());
 
         redispatch(now);

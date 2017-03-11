@@ -1,20 +1,22 @@
 package playground.clruch.dispatcher.utils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.HungarianAlgorithm;
 
-import java.util.*;
+import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.utils.HungarianAlgorithm;
 
 /**
  * array matching with Euclidean distance as criteria
  *
  */
 public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
-
-//    public static Coord getLocation
 
     @Override
     protected Map<VehicleLinkPair, Link> protected_match(Collection<VehicleLinkPair> vehicleLinkPairs, List<Link> links) {

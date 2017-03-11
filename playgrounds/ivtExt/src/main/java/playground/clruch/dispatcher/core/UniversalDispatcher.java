@@ -60,8 +60,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         pickupDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getPickupDurationPerStop();
         dropoffDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getDropoffDurationPerStop();
 
-        String string = avDispatcherConfig.getParams().get("showInfo");
-        setShowInfo(string != null && string.equalsIgnoreCase("true"));
+        try {
+            String string = avDispatcherConfig.getParams().get("infoLinePeriod");
+            if (string != null)
+                setInfoLinePeriod(Integer.parseInt(string));
+        } catch (Exception e) {
+            System.out.println("can't parse infoLinePeriod");
+            e.printStackTrace();
+        }
     }
 
     /**
