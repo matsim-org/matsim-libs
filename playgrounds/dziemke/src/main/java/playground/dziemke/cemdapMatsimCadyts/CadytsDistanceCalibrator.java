@@ -4,6 +4,7 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.demand.PlanBuilder;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.supply.SimResults;
+import org.apache.commons.math.util.MathUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,8 +42,7 @@ import playground.dziemke.cemdapMatsimCadyts.measurement.PersoDistHistoModule;
 import playground.dziemke.cemdapMatsimCadyts.measurement.PersoDistHistogram;
 
 import javax.inject.Inject;
-import java.util.EnumMap;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * @author gthunig on 21.02.2017.
@@ -51,11 +51,30 @@ public class CadytsDistanceCalibrator {
 
     private static final Logger log = Logger.getLogger(CadytsDistanceCalibrator.class ) ;
 
-    enum HistogramBin {
-        B89000, B89200, B89400, B89600, B89800, B90000, B90200, B90400, B90600, B90800, B91000
-    }
+//    enum HistogramBin {
+//        B89000, B89200, B89400, B89600, B89800, B90000, B90200, B90400, B90600, B90800, B91000
+//    }
 
     public static void main(String[] args) {
+
+        int poicum = 0;
+        for (int i = 0; i < 10; i++) {
+            double poisson = poisson(1, i);
+            System.out.println("poisson(4," + i + ") " + poisson);
+            poicum += poisson*1000;
+        }
+        System.out.println("poicum = " + poicum);
+
+
+//        CadytsDistanceCalibrator calibrator = new CadytsDistanceCalibrator();
+//        calibrator.run(args);
+    }
+
+    private static double poisson(int averqageValue, int k) {
+        return (Math.pow(averqageValue, k) / MathUtils.factorial(k)) * Math.pow(Math.E, -averqageValue);
+    }
+
+    public void run(String[] args) {
 
         // Parameters
         Config config;
@@ -67,13 +86,13 @@ public class CadytsDistanceCalibrator {
 //		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000.xml";
         String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000_routes5.xml";
         String countsFileName = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/counts100-200_full.xml";
-        String runId = "withoutCalibration";
+        String runId = "testGT5poisson";
         String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/" + runId + "";
 
         if (args.length == 0) {
             // Config
             config = ConfigUtils.createConfig();
-            config.controler().setLastIteration(100);
+            config.controler().setLastIteration(50);
             config.controler().setWritePlansInterval(10);
             config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
             config.controler().setOutputDirectory(outputDirectory);
@@ -135,13 +154,16 @@ public class CadytsDistanceCalibrator {
         Controler controler = new Controler(scenario);
 
         cadytsWeightLinks = 0;
-        cadytsWeightHistogram = 0;
+        cadytsWeightHistogram = 1000;
 
-        calibrate(controler, cadytsWeightLinks, cadytsWeightHistogram, 90000);
+//        calibrate(controler, cadytsWeightLinks, cadytsWeightHistogram, 89200);
+
+        DistanceBinContainer container = new DistanceBinContainer(89200, 91000, 200, 89400, scenario.getPopulation().getPersons().size());
+        calibrateWithDistanceBins(controler, cadytsWeightLinks, cadytsWeightHistogram, container);
         PersonDistHistoAnalyzer.analyze(runId);
     }
 
-    private static void calibrate(Controler controler, double cadytsWeightLinks ,double cadytsWeightHistogram, double distanceAverage) {
+    private void calibrate(Controler controler, double cadytsWeightLinks ,double cadytsWeightHistogram, double distanceAverage) {
 
         // Randomizing router: Randomizes relation of time- and distance-based disutilities
 //		final RandomizingTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
@@ -214,7 +236,7 @@ public class CadytsDistanceCalibrator {
         controler.run();
     }
 
-    private static void calibrateWithDistanceBins(Controler controler, double cadytsWeightLinks ,double cadytsWeightHistogram, double distanceAverage) {
+    private void calibrateWithDistanceBins(Controler controler, double cadytsWeightLinks , double cadytsWeightHistogram, DistanceBinContainer container) {
 
         // Randomizing router: Randomizes relation of time- and distance-based disutilities
 //		final RandomizingTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
@@ -239,24 +261,16 @@ public class CadytsDistanceCalibrator {
         // Add StartUpListener
         controler.addControlerListener((StartupListener) startupEvent -> {
 
-            AnalyticalCalibrator<HistogramBin> calibrator = new AnalyticalCalibrator<>(startupEvent.getServices().getConfig().controler().getOutputDirectory() + "/cadyts-histogram.txt", MatsimRandom.getRandom().nextLong(), 24*60*60);
+            AnalyticalCalibrator<DistanceBin> calibrator = new AnalyticalCalibrator<>(startupEvent.getServices().getConfig().controler().getOutputDirectory() + "/cadyts-histogram.txt", MatsimRandom.getRandom().nextLong(), 24*60*60);
             calibrator.setStatisticsFile(startupEvent.getServices().getControlerIO().getOutputFilename("histogram-calibration-stats.txt"));
-            calibrator.addMeasurement(HistogramBin.B89000, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B89200, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B89400, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B89600, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B89800, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B90000, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B90200, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B90400, 0, 24*60*60, 333, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B90600, 0, 24*60*60, 333, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B90800, 0, 24*60*60, 333, SingleLinkMeasurement.TYPE.COUNT_VEH);
-            calibrator.addMeasurement(HistogramBin.B91000, 0, 24*60*60, 0, SingleLinkMeasurement.TYPE.COUNT_VEH);
+            for (DistanceBin bin : container.getDistanceBins()) {
+                calibrator.addMeasurement(bin, 0, 24*60*60, bin.getValue(), SingleLinkMeasurement.TYPE.COUNT_VEH);
+            }
 
             // Add BeforeMobsimListener
             startupEvent.getServices().addControlerListener((BeforeMobsimListener) beforeMobsimEvent -> {
                 for (Person person : beforeMobsimEvent.getServices().getScenario().getPopulation().getPersons().values()) {
-                    PlanBuilder<HistogramBin> planBuilder = new PlanBuilder<>();
+                    PlanBuilder<DistanceBin> planBuilder = new PlanBuilder<>();
                     // TODO implement this also for distance checks for single trips
                     double totalPlannedDistance = 0.0;
                     for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
@@ -265,7 +279,7 @@ public class CadytsDistanceCalibrator {
                             totalPlannedDistance += ((Leg) planElement).getRoute().getDistance();
                         }
                     }
-                    HistogramBin bin = HistogramBin.values()[(int) ((Math.min(totalPlannedDistance, 91000) - 89000) / 200)];
+                    DistanceBin bin = container.getBinFromDistance((int)totalPlannedDistance);
                     planBuilder.addTurn(bin, 0);
                     calibrator.addToDemand(planBuilder.getResult());
                 }
@@ -274,27 +288,35 @@ public class CadytsDistanceCalibrator {
             // Add AfterMobsimListener
             startupEvent.getServices().addControlerListener((AfterMobsimListener) afterMobsimEvent -> {
                 PersoDistHistogram distService = afterMobsimEvent.getServices().getInjector().getInstance(PersoDistHistogram.class);
-                EnumMap<HistogramBin, Integer> frequencies = new EnumMap<>(HistogramBin.class);
-                for (HistogramBin bin : HistogramBin.values()) {
+                Map<DistanceBin, Integer> frequencies = new HashMap<>();
+                for (DistanceBin bin : container.getDistanceBins()) {
                     frequencies.put(bin, 0);
                 }
                 HashMap<Id<Person>, Double> distances = distService.getDistances();
                 distances.values().forEach(v -> {
-                    HistogramBin bin = HistogramBin.values()[(int) ((Math.min(v, 91000) - 89000)/ 200)];
+                    DistanceBin bin = container.getBinFromDistance(v.intValue());
                     frequencies.put(bin, frequencies.get(bin) + 1);
                 });
-                calibrator.afterNetworkLoading(new SimResults<HistogramBin>() {
+                calibrator.afterNetworkLoading(new SimResults<DistanceBin>() {
                     @Override
-                    public double getSimValue(HistogramBin histogramBin, int startTime_s, int endTime_s, SingleLinkMeasurement.TYPE type) {
+                    public double getSimValue(DistanceBin histogramBin, int startTime_s, int endTime_s, SingleLinkMeasurement.TYPE type) {
                         return frequencies.get(histogramBin);
                     }
                 });
                 distances.forEach((personId, v) -> {
-                    PlanBuilder<HistogramBin> planBuilder = new PlanBuilder<>();
-                    planBuilder.addTurn(HistogramBin.values()[(int) ((Math.min(v, 91000) - 89000) / 200)], 0);
-                    double offset = calibrator.calcLinearPlanEffect(planBuilder.getResult());
+                    DistanceBin bin = container.getBinFromDistance(v.intValue());
+                    int actualValue = frequencies.get(bin);
+                    int desiredValue = bin.getValue();
+                    double displacement = actualValue-desiredValue;
+                    afterMobsimEvent.getServices().getEvents().processEvent(new PersonMoneyEvent(Time.UNDEFINED_TIME, personId,
+                            -cadytsWeightHistogram * displacement));
+
+
+//                    PlanBuilder<HistogramBin> planBuilder = new PlanBuilder<>();
+//                    planBuilder.addTurn(HistogramBin.values()[(int) ((Math.min(v, 91000) - 89000) / 200)], 0);
+//                    double offset = calibrator.calcLinearPlanEffect(planBuilder.getResult());
 //					log.info("########## Offset = " + offset + " -- personId = " + personId + " -- v = " + v);
-                    afterMobsimEvent.getServices().getEvents().processEvent(new PersonMoneyEvent(Time.UNDEFINED_TIME, personId, cadytsWeightHistogram * offset));
+//                    afterMobsimEvent.getServices().getEvents().processEvent(new PersonMoneyEvent(Time.UNDEFINED_TIME, personId, cadytsWeightHistogram * offset));
                 });
 //                distances.forEach((personId, v) -> {
 //                    double displacement = Math.abs(v-distanceAverage);
@@ -337,5 +359,71 @@ public class CadytsDistanceCalibrator {
         });
 
         controler.run();
+    }
+
+    public class DistanceBinContainer {
+
+        private final int fromDist;
+        private final int binSize;
+        private final List<DistanceBin> distanceBins;
+
+        public DistanceBinContainer(int fromDist, int toDist, int binSize, int averageValue, int personNumber) {
+            this.fromDist = fromDist;
+            this.binSize = binSize;
+            distanceBins = new ArrayList<>();
+            int numberOfDistanceBins = (toDist - fromDist) / binSize;
+            for (int i = 0; i < numberOfDistanceBins; i++) {
+                int fromI = fromDist + (i * binSize);
+                int averageI = (averageValue - fromDist) / binSize;
+                double poisson = poisson(averageI, i);
+                DistanceBin bin = new DistanceBin("B" + Integer.toString(fromI), i, (int) (poisson * personNumber));
+                distanceBins.add(bin);
+            }
+        }
+
+        DistanceBin getBinFromDistance(int distance) {
+            int binNumber = ((distance - fromDist) / binSize);
+            return get(binNumber);
+        }
+
+        DistanceBin get(int binNumer) {
+            for (DistanceBin bin : distanceBins) {
+                if (bin.getBinNumer() == binNumer) return bin;
+            }
+            return null;
+        }
+
+        List<DistanceBin> getDistanceBins() {
+            return distanceBins;
+        }
+
+        private double poisson(int averqageValue, int k) {
+            return (Math.pow(averqageValue, k) / MathUtils.factorial(k)) * Math.pow(Math.E, -averqageValue);
+        }
+    }
+
+    private class DistanceBin {
+
+        private final String name;
+        private final int binNumer;
+        private final int value;
+
+        DistanceBin (String name, int binNumer, int value) {
+            this.name = name;
+            this.binNumer = binNumer;
+            this.value = value;
+        }
+
+        String getName() {
+            return name;
+        }
+
+        int getBinNumer() {
+            return binNumer;
+        }
+
+        int getValue() {
+            return value;
+        }
     }
 }
