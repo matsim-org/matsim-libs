@@ -34,7 +34,7 @@ import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDisp
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.router.Dijkstra;
@@ -78,7 +78,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 	}
 
 	@Override
-	public void nextLinkEntered(DriveTask driveTask) {
+	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
 
 	}
 
@@ -102,7 +102,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 		if ((e.getSimulationTime() % (context.clustering_period_min * 60)) == 0) {
 			Set<DrtRequest> dueRequests = new HashSet<>();
 			for (DrtRequest r : unplannedRequests) {
-				if (e.getSimulationTime() >= r.getT0() - context.prebook_period_min * 60) {
+				if (e.getSimulationTime() >= r.getEarliestStartTime() - context.prebook_period_min * 60) {
 					dueRequests.add(r);
 				}
 			}
@@ -149,7 +149,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 										req.getToLink().getCoord().getY()))
 								.build();
 
-						double pickupOffSet = Math.max(e.getSimulationTime(), req.getT0());
+						double pickupOffSet = Math.max(e.getSimulationTime(), req.getEarliestStartTime());
 						Shipment shipment = Shipment.Builder.newInstance(rId).addSizeDimension(0, 1)
 								.setPickupLocation(fromLoc).setDeliveryLocation(toLoc)
 								.setPickupTimeWindow(TimeWindow.newInstance(pickupOffSet, pickupOffSet + 3600)).build();

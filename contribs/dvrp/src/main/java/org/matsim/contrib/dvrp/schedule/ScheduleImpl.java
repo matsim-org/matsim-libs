@@ -26,6 +26,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 
+/**
+ * @author michalm
+ */
 public class ScheduleImpl implements Schedule {
 	private final Vehicle vehicle;
 
@@ -37,11 +40,6 @@ public class ScheduleImpl implements Schedule {
 
 	public ScheduleImpl(Vehicle vehicle) {
 		this.vehicle = vehicle;
-	}
-
-	@Override
-	public Vehicle getVehicle() {
-		return vehicle;
 	}
 
 	@Override
@@ -67,7 +65,6 @@ public class ScheduleImpl implements Schedule {
 
 		AbstractTask t = (AbstractTask)task;
 		tasks.add(taskIdx, t);
-		t.schedule = this;
 		t.taskIdx = taskIdx;
 		t.status = TaskStatus.PLANNED;
 

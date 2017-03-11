@@ -29,6 +29,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+/**
+ * @author michalm
+ */
 public class RunOneTaxiExample {
 	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
 	private static final String TAXIS_FILE = "./src/main/resources/one_taxi/one_taxi_vehicles.xml";

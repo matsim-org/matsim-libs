@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,14 +20,16 @@
 package org.matsim.contrib.taxi.scheduler;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-public interface TaxiScheduleInquiry {
+/**
+ * @author michalm
+ */
+public interface TaxiScheduleInquiry extends ScheduleInquiry {
 	LinkTimePair getImmediateDiversion(Vehicle veh);
 
 	LinkTimePair getEarliestIdleness(Vehicle veh);
 
 	LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh);
-
-	boolean isIdle(Vehicle vehicle);
 }

@@ -27,8 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -90,7 +88,6 @@ public class OptAVTestIT {
 				new TaxiConfigGroup(),
 				new DvrpConfigGroup(),
 				new OTFVisConfigGroup(),
-				new TaxiFareConfigGroup(),
 				new NoiseConfigGroup());
 		
 		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc1");
@@ -115,13 +112,6 @@ public class OptAVTestIT {
 		FleetImpl fleet = new FleetImpl();
 		new VehicleReader(scenario1.getNetwork(), fleet).readFile(taxiCfg1.getTaxisFileUrl(config1.getContext()).getFile());
 		
-		controler1.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
-			}
-		});
-
 		controler1.addOverridingModule(new TaxiOutputModule());
 		controler1.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
         
@@ -158,7 +148,6 @@ public class OptAVTestIT {
 				new TaxiConfigGroup(),
 				new DvrpConfigGroup(),
 				new OTFVisConfigGroup(),
-				new TaxiFareConfigGroup(),
 				new NoiseConfigGroup());
 		
 		config2.controler().setOutputDirectory(testUtils.getOutputDirectory() + "n");
@@ -176,13 +165,6 @@ public class OptAVTestIT {
 
 		FleetImpl fleet2 = new FleetImpl();
 		new VehicleReader(scenario2.getNetwork(), fleet2).readFile(taxiCfg2.getTaxisFileUrl(config2.getContext()).getFile());
-		
-		controler2.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
-			}
-		});
 		
 		controler2.addOverridingModule(new TaxiOutputModule());
         controler2.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
@@ -254,7 +236,6 @@ public class OptAVTestIT {
 				new TaxiConfigGroup(),
 				new DvrpConfigGroup(),
 				new OTFVisConfigGroup(),
-				new TaxiFareConfigGroup(),
 				new NoiseConfigGroup());
 		
 		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc2");
@@ -272,13 +253,6 @@ public class OptAVTestIT {
 
 		FleetImpl fleet1 = new FleetImpl();
 		new VehicleReader(scenario1.getNetwork(), fleet1).readFile(taxiCfg1.getTaxisFileUrl(config1.getContext()).getFile());
-		
-		controler1.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
-			}
-		});
 		
 		controler1.addOverridingModule(new TaxiOutputModule());
         controler1.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet1));
@@ -315,8 +289,7 @@ public class OptAVTestIT {
 		Config config2 = ConfigUtils.loadConfig(configFile,
 				new TaxiConfigGroup(),
 				new DvrpConfigGroup(),
-				new OTFVisConfigGroup(),
-				new TaxiFareConfigGroup());
+				new OTFVisConfigGroup());
 		
 		DvrpConfigGroup.get(config2).setMode(TaxiOptimizerModules.TAXI_MODE);
 		
@@ -325,11 +298,6 @@ public class OptAVTestIT {
 		TaxiConfigGroup taxiCfg2 = TaxiConfigGroup.get(config2);
 		config2.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config2.checkConsistency();
-		
-		Scenario scenario2 = ScenarioUtils.loadScenario(config2);
-		Controler controler2 = new Controler(scenario2);
-		
-		// congestion pricing
 		
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setMsa(true);
@@ -342,14 +310,18 @@ public class OptAVTestIT {
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+		config2.addModule(decongestionSettings);
 		
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+		Scenario scenario2 = ScenarioUtils.loadScenario(config2);
+		Controler controler2 = new Controler(scenario2);
+		
+		// congestion pricing
 		
 		controler2.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
-				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionInfo.class).asEagerSingleton();
 				
 				this.bind(AgentFilter.class).to(AVAgentFilter.class);
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);			
@@ -370,13 +342,6 @@ public class OptAVTestIT {
 
 		FleetImpl fleet2 = new FleetImpl();
 		new VehicleReader(scenario1.getNetwork(), fleet2).readFile(taxiCfg2.getTaxisFileUrl(config2.getContext()).getFile());
-		
-		controler2.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
-			}
-		});
 		
 		controler2.addOverridingModule(new TaxiOutputModule());
         controler2.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet2));

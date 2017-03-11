@@ -2,6 +2,7 @@ package playground.dhosse.prt.optimizer;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -57,21 +58,19 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 
 	@Override
 	public void nextTask(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-        this.scheduler.updateBeforeNextTask(schedule);
-        Task newCurrentTask = schedule.nextTask();
+        this.scheduler.updateBeforeNextTask(vehicle);
+        Task newCurrentTask = vehicle.getSchedule().nextTask();
 
         if (newCurrentTask != null // schedule != COMPLETED
                 && ((TaxiTask)newCurrentTask).getTaxiTaskType() == TaxiTask.TaxiTaskType.STAY) {
             requiresReoptimization = true;
         }
-
 	}
 	
 	@Override
-	public void nextLinkEntered(DriveTask driveTask)
+	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink)
 	{
-		scheduler.updateTimeline(driveTask.getSchedule());
+		scheduler.updateTimeline(vehicle);
 	}
 	
 	protected void scheduleUnplannedRequests()
@@ -79,7 +78,6 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
         initIdleVehicles();
 
         scheduleUnplannedRequestsImpl();//reduce T_W (regular NOS)
-        
     }
 	
 	private void initIdleVehicles()

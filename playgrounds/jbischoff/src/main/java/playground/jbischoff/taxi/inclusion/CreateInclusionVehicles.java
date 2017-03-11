@@ -64,7 +64,7 @@ public class CreateInclusionVehicles {
 			for (int z = 0; z<i;z++){
 				
 				Vehicle v = allVehicles.remove(z);
-				Vehicle nv = new VehicleImpl(Id.create("hc_"+v.getId().toString(), Vehicle.class), v.getStartLink(), v.getCapacity(), v.getT0(), v.getT1());
+				Vehicle nv = new VehicleImpl(Id.create("hc_"+v.getId().toString(), Vehicle.class), v.getStartLink(), v.getCapacity(), v.getServiceBeginTime(), v.getServiceEndTime());
 				newVehicles.add(nv);
 			}
 			newVehicles.addAll(allVehicles);

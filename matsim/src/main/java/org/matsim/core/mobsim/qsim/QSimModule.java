@@ -35,7 +35,7 @@ public class QSimModule extends AbstractModule {
 //					break;
 				case queue:
 				case withHoles:
-				case KWM:
+				case kinematicWaves:
 					bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
 					break;
 				default:

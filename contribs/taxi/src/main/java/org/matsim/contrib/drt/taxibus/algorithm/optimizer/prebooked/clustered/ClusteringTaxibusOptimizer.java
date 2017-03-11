@@ -25,12 +25,13 @@ package org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.clustered;
 import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.TaxibusOptimizer;
 import org.matsim.contrib.drt.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
 import org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath.TaxibusDispatch;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -59,7 +60,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 	}
 
 	@Override
-	public void nextLinkEntered(DriveTask driveTask) {
+	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
 
 	}
 
@@ -83,7 +84,7 @@ public class ClusteringTaxibusOptimizer implements TaxibusOptimizer {
 		if ((e.getSimulationTime() % (context.clustering_period_min * 60)) == 0) {
 			Set<DrtRequest> dueRequests = new HashSet<>();
 			for (DrtRequest r : unplannedRequests) {
-				if (e.getSimulationTime() >= r.getT0() - context.prebook_period_min * 60) {
+				if (e.getSimulationTime() >= r.getEarliestStartTime() - context.prebook_period_min * 60) {
 					dueRequests.add(r);
 				}
 			}

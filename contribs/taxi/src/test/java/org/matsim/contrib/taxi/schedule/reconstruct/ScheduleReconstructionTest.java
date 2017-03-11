@@ -88,8 +88,8 @@ public class ScheduleReconstructionTest {
 			Assert.assertEquals(o.getId(), r.getId());
 			Assert.assertEquals(o.getStartLink(), r.getStartLink());
 			Assert.assertEquals(o.getCapacity(), r.getCapacity(), 0);
-			Assert.assertEquals(o.getT0(), r.getT0(), 0);
-			Assert.assertEquals(o.getT1(), r.getT1(), 0);
+			Assert.assertEquals(o.getServiceBeginTime(), r.getServiceBeginTime(), 0);
+			Assert.assertEquals(o.getServiceEndTime(), r.getServiceEndTime(), 0);
 
 			Schedule oSchedule = o.getSchedule();
 			Schedule rSchedule = r.getSchedule();
@@ -136,8 +136,8 @@ public class ScheduleReconstructionTest {
 			Assert.assertEquals(o.getToLink(), r.getToLink());
 			Assert.assertEquals(o.getQuantity(), r.getQuantity(), 0);
 			Assert.assertEquals(o.getSubmissionTime(), r.getSubmissionTime(), 0);
-			Assert.assertEquals(o.getT0(), r.getT0(), 0);
-			Assert.assertEquals(o.getT1(), r.getT1(), 0);
+			Assert.assertEquals(o.getEarliestStartTime(), r.getEarliestStartTime(), 0);
+			Assert.assertEquals(o.getLatestStartTime(), r.getLatestStartTime(), 0);
 
 			Assert.assertEquals(TaxiRequestStatus.PERFORMED, o.getStatus());
 			Assert.assertEquals(TaxiRequestStatus.PLANNED, r.getStatus());

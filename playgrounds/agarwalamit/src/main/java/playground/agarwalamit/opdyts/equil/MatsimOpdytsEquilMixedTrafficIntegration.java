@@ -49,7 +49,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.opdyts.*;
+import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
 /**
@@ -73,7 +75,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			randomVariance = Integer.valueOf(args[0]);
 			iterationsToConvergence = Integer.valueOf(args[1]);
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
 		}
 
 		Set<String> modes2consider = new HashSet<>();
@@ -91,7 +93,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		config.changeMode().setModes( modes2consider.toArray(new String [modes2consider.size()]));
 		StrategySettings modeChoice = new StrategySettings();
-		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name()); // dont know, how it will work
+		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name());
 		modeChoice.setWeight(0.1);
 		config.strategy().addStrategySettings(modeChoice);
 
@@ -115,6 +117,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
 		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
+		mpBike.setMarginalUtilityOfTraveling(0.);
 
 
 		planCalcScoreConfigGroup.addModeParams(mpCar);
@@ -122,13 +125,9 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		//==
 
 		//==
-		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.KWM );
-
-//		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
-//			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
-//		}
-
+		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(true);
+
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		//==
 
@@ -153,10 +152,12 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new EquilDistanceDistribution(OpdytsScenario.EQUIL_MIXEDTRAFFIC)));
+					addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new EquilDistanceDistribution(EQUIL_MIXEDTRAFFIC)));
 				}
 			});
 			controler.run();
+
+			FileUtils.deleteIntermediateIterations(OUT_DIR,controler.getConfig().controler().getFirstIteration(), controler.getConfig().controler().getLastIteration());
 
 			// set back settings for opdyts
 			File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
@@ -175,7 +176,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
-		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL_MIXEDTRAFFIC);
+		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(EQUIL_MIXEDTRAFFIC);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts
@@ -241,5 +242,11 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
+
+		// remove the unused iterations
+		for (int index =0; index < maxIterations; index++) {
+			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
+				IOUtils.deleteDirectory(new File(dir2remove));
+		}
 	}
 }

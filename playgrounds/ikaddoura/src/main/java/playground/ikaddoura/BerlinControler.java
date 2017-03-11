@@ -153,6 +153,32 @@ public class BerlinControler {
 					+ "_actDurBin" +  activityDurationBin + "_tolerance" + tolerance + "_pricing-" + pricingApproach.toString() + "_tollBlendFactor" + blendFactor + "_" + dateTime + "/";
 		
 		config.controler().setOutputDirectory(outputDirectory);
+		
+		// decongestion parameters
+		
+		double kp = 2 *
+				((config.planCalcScore().getPerforming_utils_hr() - config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling())
+						/ config.planCalcScore().getMarginalUtilityOfMoney()) / 3600.;
+		log.info("Kp: " + kp);
+		
+		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setKp(kp);
+		decongestionSettings.setKi(0.);
+		decongestionSettings.setKd(0.);
+		
+		if (blendFactor == 0.) {
+			log.info("blend factor is ignored. Using MSA instead.");
+			decongestionSettings.setMsa(true);
+		} else {
+			log.info("Using blend factor " + blendFactor);
+			decongestionSettings.setTOLL_BLEND_FACTOR(blendFactor);
+		}
+		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+		config.addModule(decongestionSettings);
+		
+		// scenario + controler
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 				
@@ -164,38 +190,18 @@ public class BerlinControler {
 		}
 				
 		if (pricingApproach.toString().equals(PricingApproach.NoPricing.toString())) {
-		
+			
+			// no pricing
+			
 		} else if (pricingApproach.toString().equals(PricingApproach.PID.toString())) {
-					
-			double kp = 2 *
-					((config.planCalcScore().getPerforming_utils_hr() - config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling())
-							/ config.planCalcScore().getMarginalUtilityOfMoney()) / 3600.;
-			log.info("Kp: " + kp);
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setKp(kp);
-			decongestionSettings.setKi(0.);
-			decongestionSettings.setKd(0.);
-			
-			if (blendFactor == 0.) {
-				log.info("blend factor is ignored. Using MSA instead.");
-				decongestionSettings.setMsa(true);
-			} else {
-				log.info("Using blend factor " + blendFactor);
-				decongestionSettings.setTOLL_BLEND_FACTOR(blendFactor);
-			}
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			
-			final DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-			
+						
 			// congestion toll computation
 			
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					
-					this.bind(DecongestionInfo.class).toInstance(info);
+					this.bind(DecongestionInfo.class).asEagerSingleton();
 					
 					this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 					this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);

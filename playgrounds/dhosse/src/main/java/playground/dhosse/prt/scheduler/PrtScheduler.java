@@ -81,13 +81,13 @@ public class PrtScheduler
 
         bestSched.addTask(new NPersonsPickupDriveTask(best.path, req));
 
-        double t3 = Math.max(best.path.getArrivalTime(), best.destination.getT0())
+        double t3 = Math.max(best.path.getArrivalTime(), best.destination.getEarliestStartTime())
                 + params.pickupDuration;
         bestSched.addTask(new NPersonsPickupStayTask(best.path.getArrivalTime(), t3, req));
 
         if (params.destinationKnown) {
             appendOccupiedDriveAndDropoff(bestSched);
-            appendTasksAfterDropoff(bestSched);
+            appendTasksAfterDropoff(best.vehicle);
         }
 
     }
@@ -139,17 +139,17 @@ public class PrtScheduler
 
 
     @Override
-    protected void appendTasksAfterDropoff(Schedule schedule)
+    protected void appendTasksAfterDropoff(Vehicle vehicle)
     {
         NPersonsDropoffStayTask dropoffStayTask = (NPersonsDropoffStayTask)Schedules
-                .getLastTask(schedule);
+                .getLastTask(vehicle.getSchedule());
 
         // addWaitTime at the end (even 0-second WAIT)
         double t5 = dropoffStayTask.getEndTime();
-        double tEnd = Math.max(t5, schedule.getVehicle().getT1());
+        double tEnd = Math.max(t5, vehicle.getServiceEndTime());
         Link link = dropoffStayTask.getLink();
 
-        schedule.addTask(new TaxiStayTask(t5, tEnd, link));
+        vehicle.getSchedule().addTask(new TaxiStayTask(t5, tEnd, link));
     }
 
 
@@ -165,10 +165,10 @@ public class PrtScheduler
         Link nearestRank = veh.getStartLink();
 
         VrpPathWithTravelData path = calcPath(currentLink, nearestRank, time);
-        if (path.getArrivalTime() > veh.getT1())
+        if (path.getArrivalTime() > veh.getServiceEndTime())
             return; // no rank return if vehicle is going out of service anyway
         sched.addTask(new TaxiEmptyDriveTask(path));
-        sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
+        sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getServiceEndTime(), nearestRank));
 
     }
 }

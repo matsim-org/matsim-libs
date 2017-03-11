@@ -1,6 +1,8 @@
 package playground.sebhoerl.avtaxi.vrpagent;
 
 import com.google.inject.Inject;
+
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.StayTask;
@@ -33,20 +35,21 @@ public class AVActionCreator implements VrpAgentLogic.DynActionCreator {
     private Double pickupDuration;
 
     @Override
-    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now)
     {
+		Task task = vehicle.getSchedule().getCurrentTask(); 
     	if (task instanceof AVTask) {
     		switch (((AVTask) task).getAVTaskType()) {
     			case PICKUP:
     				AVPickupTask mpt = (AVPickupTask) task;
-    	    		return new AVPassengerPickupActivity(passengerEngine, dynAgent, mpt, mpt.getRequests(),
+    	    		return new AVPassengerPickupActivity(passengerEngine, dynAgent, vehicle, mpt, mpt.getRequests(),
     	                    pickupDuration, PICKUP_ACTIVITY_TYPE);
                 case DROPOFF:
     				AVDropoffTask mdt = (AVDropoffTask) task;
-    				return new AVPassengerDropoffActivity(passengerEngine, dynAgent, mdt, mdt.getRequests(),
+    				return new AVPassengerDropoffActivity(passengerEngine, dynAgent, vehicle, mdt, mdt.getRequests(),
                             DROPOFF_ACTIVITY_TYPE);
                 case DRIVE:
-    				return legCreator.createLeg((DriveTask)task);
+    				return legCreator.createLeg(vehicle);
                 case STAY:
                     return new VrpActivity(STAY_ACTIVITY_TYPE, (StayTask) task);
     	    	default:

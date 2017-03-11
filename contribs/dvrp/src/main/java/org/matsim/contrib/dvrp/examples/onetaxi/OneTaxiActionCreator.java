@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
@@ -28,6 +29,9 @@ import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
 
+/**
+ * @author michalm
+ */
 public class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final PassengerEngine passengerEngine;
 	private final MobsimTimer timer;
@@ -39,9 +43,10 @@ public class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, final Task task, double now) {
+	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+		Task task = vehicle.getSchedule().getCurrentTask(); 
 		if (task instanceof DriveTask) {
-			return VrpLegs.createLegWithOfflineTracker((DriveTask)task, timer);
+			return VrpLegs.createLegWithOfflineTracker(vehicle, timer);
 		} else if (task instanceof OneTaxiServeTask) { // PICKUP or DROPOFF
 			final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
 

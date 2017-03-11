@@ -14,7 +14,9 @@ import playground.gregor.misanthrope.simulation.CTEventsPaulPriorityQueue;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static playground.gregor.misanthrope.simulation.physics.CTCell.MIN_CELL_WIDTH;
@@ -105,13 +107,13 @@ public class CTNetwork {
             }
         });
 
-        this.links.values().parallelStream().forEach(CTLink::init);
+        this.links.values().forEach(CTLink::init);
         this.filter = new BountingBoxFilter(650608, 651253, 9893743, 9894168);
 
 //        this.links.values().stream().filter(l -> this.filter.test(l.getDsLink().getFromNode())).forEach(CTLink::debug);
 //        this.links.values().stream().filter(l -> l.getDsLink().getId().toString().contains("el")).forEach(CTLink::debug);
         this.links.values().forEach(CTLink::debug);
-        this.nodes.values().parallelStream().forEach(CTNode::init);
+        this.nodes.values().forEach(CTNode::init);
 
         log.info("verifying network");
         checkNetwork();
@@ -129,6 +131,7 @@ public class CTNetwork {
     }
 
     private void checkNetwork() {
+        Set<CTCell> allCells = new HashSet<>();
         for (CTNode n : this.nodes.values()) {
             for (CTCellFace face : n.getCTCell().getFaces()) {
                 if (face.nb == null) {
@@ -136,6 +139,7 @@ public class CTNetwork {
                 }
             }
             for (CTCell ctCell : n.getCTCell().getNeighbors()) {
+                allCells.add(ctCell);
                 if (!ctCell.getNeighbors().contains(n.getCTCell())) {
                     throw new RuntimeException("missing backward pointer!");
                 }
@@ -149,12 +153,14 @@ public class CTNetwork {
                     }
                 }
                 for (CTCell ctCell : c.getNeighbors()) {
+                    allCells.add(ctCell);
                     if (!ctCell.getNeighbors().contains(c)) {
                         throw new RuntimeException("missing backward pointer!");
                     }
                 }
             }
         }
+        log.info("Network consists of " + allCells.size() + " cells");
     }
 
     public CTNetsimEngine getEngine() {

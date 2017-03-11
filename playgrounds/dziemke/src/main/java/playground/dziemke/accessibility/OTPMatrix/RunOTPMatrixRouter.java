@@ -26,6 +26,6 @@ public class RunOTPMatrixRouter {
         arguments[7] = inputCRS;
         arguments[8] = outputCRS;
 
-        OTPMatrixRouter.main(arguments);
+//        OTPMatrixRouter.main(arguments);
     }
 }

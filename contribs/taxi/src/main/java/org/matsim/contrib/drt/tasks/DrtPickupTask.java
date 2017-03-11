@@ -43,7 +43,7 @@ public class DrtPickupTask extends StayTaskImpl implements DrtTaskWithRequests {
 
 	@Override
 	public Set<DrtRequest> getRequests() {
-		return requests;
+		return Collections.unmodifiableSet(requests);
 	}
 
 	@Override

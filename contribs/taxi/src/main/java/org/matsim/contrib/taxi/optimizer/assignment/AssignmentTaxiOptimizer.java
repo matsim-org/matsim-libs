@@ -22,17 +22,20 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiries;
 import org.matsim.contrib.locationchoice.router.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
-import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 
 import com.google.common.collect.Iterables;
 
+/**
+ * @author michalm
+ */
 public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 	private final AssignmentTaxiOptimizerParams params;
 	private final FastMultiNodeDijkstra router;
@@ -42,7 +45,7 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 	private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
 
 	public AssignmentTaxiOptimizer(TaxiOptimizerContext optimContext, AssignmentTaxiOptimizerParams params) {
-		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
+		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true, true);
 		this.params = params;
 
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
@@ -100,7 +103,7 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 
 	private VehicleData initVehicleData(AssignmentRequestData rData) {
 		int idleVehs = Iterables.size(Iterables.filter(getOptimContext().fleet.getVehicles().values(),
-				TaxiSchedulerUtils.createIsIdle(getOptimContext().scheduler)));
+				ScheduleInquiries.createIsIdle(getOptimContext().scheduler)));
 		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
 				params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
 		return new VehicleData(getOptimContext(), getOptimContext().fleet.getVehicles().values(), vehPlanningHorizon);

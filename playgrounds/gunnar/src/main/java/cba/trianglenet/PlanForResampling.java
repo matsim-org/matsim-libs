@@ -95,4 +95,10 @@ class PlanForResampling implements Alternative {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public Plan getMATSimPlan() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

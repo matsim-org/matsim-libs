@@ -120,4 +120,10 @@ class PlanForResampling implements Alternative {
 		return result.toString();
 	}
 
+	@Override
+	public Plan getMATSimPlan() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

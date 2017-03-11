@@ -79,7 +79,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		qSim.addQueueSimulationListeners(optimizer);
 
 		TaxibusPassengerEngine passengerEngine = new TaxibusPassengerEngine(TaxibusUtils.TAXIBUS_MODE, events,
-				new TaxibusRequestCreator(), optimizer, scenario.getNetwork());
+				new DrtRequestCreator(), optimizer, scenario.getNetwork());
 		qSim.addMobsimEngine(passengerEngine);
 		qSim.addDepartureHandler(passengerEngine);
 		if (orderManager != null) {

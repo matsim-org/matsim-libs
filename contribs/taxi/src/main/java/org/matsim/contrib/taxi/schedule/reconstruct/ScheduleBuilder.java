@@ -24,27 +24,25 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.reconstruct.StayRecorder.Stay;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
 public class ScheduleBuilder {
-	private Schedule schedule;
+	private VehicleImpl vehicle;
 	private TaxiRequest currentRequest = null;
 
 	ScheduleBuilder(FleetImpl fleet, Id<Person> personId, Link link, double t0) {
-		Vehicle vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0, Double.NaN);
+		vehicle = new VehicleImpl(Id.create(personId, Vehicle.class), link, 1, t0, Double.NaN);
 		fleet.addVehicle(vehicle);
-		schedule = vehicle.getSchedule();
 	}
 
 	void addDrive(VrpPathWithTravelData vrpPath) {
 		if (currentRequest != null) {
-			schedule.addTask(new TaxiOccupiedDriveTask(vrpPath, currentRequest));
+			vehicle.getSchedule().addTask(new TaxiOccupiedDriveTask(vrpPath, currentRequest));
 		} else {
-			schedule.addTask(new TaxiEmptyDriveTask(vrpPath));
+			vehicle.getSchedule().addTask(new TaxiEmptyDriveTask(vrpPath));
 		}
 	}
 
@@ -52,19 +50,19 @@ public class ScheduleBuilder {
 		switch (stay.activityType) {
 			case TaxiActionCreator.STAY_ACTIVITY_TYPE:
 			case "Stay":// old naming (TODO to be removed soon)
-				schedule.addTask(new TaxiStayTask(stay.startTime, stay.endTime, stay.link));
+				vehicle.getSchedule().addTask(new TaxiStayTask(stay.startTime, stay.endTime, stay.link));
 				return;
 
 			case TaxiActionCreator.PICKUP_ACTIVITY_TYPE:
 			case "PassengerPickup":// old naming (TODO to be removed soon)
-				schedule.addTask(new TaxiPickupTask(stay.startTime, stay.endTime, currentRequest));
+				vehicle.getSchedule().addTask(new TaxiPickupTask(stay.startTime, stay.endTime, currentRequest));
 				return;
 
 			case TaxiActionCreator.DROPOFF_ACTIVITY_TYPE:
 			case "PassengerDropoff":// old naming (TODO to be removed soon)
 				currentRequest.setToLink(stay.link);// TODO this should be moved to RequestRecorder once the events are
 													// re-ordered
-				schedule.addTask(new TaxiDropoffTask(stay.startTime, stay.endTime, currentRequest));
+				vehicle.getSchedule().addTask(new TaxiDropoffTask(stay.startTime, stay.endTime, currentRequest));
 
 				currentRequest = null;
 				return;
@@ -78,16 +76,16 @@ public class ScheduleBuilder {
 		currentRequest = request;
 	}
 
-	void endSchedule(double t1) {
+	void endSchedule(double endTime) {
 		if (currentRequest != null) {
 			throw new IllegalStateException();
 		}
 
-		schedule.getVehicle().setT1(t1);
-		schedule = null;// just to make sure no modifications will be made
+		vehicle.setServiceEndTime(endTime);
+		vehicle = null;// just to make sure no modifications will be made
 	}
 
 	boolean isScheduleBuilt() {
-		return schedule == null;
+		return vehicle == null;
 	}
 }

@@ -8,20 +8,20 @@
   <groupId>playground</groupId>
   <artifactId>dziemke</artifactId>
   <name>dziemke</name>
-  <repositories>
+  <!-- <repositories>  -->
   	<!-- For OpenTripPlanner -->
-  	<repository>
+  	<!-- <repository>
    	 	<id>Conveyal</id>
    	 	<name>Conveyal Maven Repository</name>
    	 	<url>http://maven.conveyal.com/</url> 
  	</repository>
-  </repositories>
+  </repositories>  -->
   <dependencies>
- 	<dependency>
+ 	<!-- <dependency>
   		<groupId>org.opentripplanner</groupId>
   		<artifactId>otp</artifactId>
   		<version>0.19.0</version>
-	</dependency>
+	</dependency>  -->
   	<dependency>
 		<groupId>org.matsim.contrib</groupId>
 		<artifactId>otfvis</artifactId>

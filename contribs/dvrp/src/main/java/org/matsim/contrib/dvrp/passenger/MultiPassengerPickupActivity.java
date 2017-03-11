@@ -33,16 +33,12 @@ public class MultiPassengerPickupActivity extends AbstractDynActivity implements
 
 	private double maxRequestT0;
 
-	private int passengersAboard;
+	private int passengersPickedUp;
 	private double endTime;
 
 	public MultiPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
 			Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
 		super(activityType);
-
-		if (requests.size() > pickupTask.getSchedule().getVehicle().getCapacity()) {
-			throw new IllegalStateException("Number of requests exceeds number of seats");
-		}
 
 		this.passengerEngine = passengerEngine;
 		this.driver = driver;
@@ -53,15 +49,15 @@ public class MultiPassengerPickupActivity extends AbstractDynActivity implements
 
 		for (PassengerRequest request : requests) {
 			if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
-				passengersAboard++;
+				passengersPickedUp++;
 			}
 
-			if (request.getT0() > maxRequestT0) {
-				maxRequestT0 = request.getT0();
+			if (request.getEarliestStartTime() > maxRequestT0) {
+				maxRequestT0 = request.getEarliestStartTime();
 			}
 		}
 
-		if (passengersAboard == requests.size()) {
+		if (passengersPickedUp == requests.size()) {
 			endTime = now + pickupDuration;
 		} else {
 			setEndTimeIfWaitingForPassengers(now);
@@ -75,7 +71,7 @@ public class MultiPassengerPickupActivity extends AbstractDynActivity implements
 
 	@Override
 	public void doSimStep(double now) {
-		if (passengersAboard < requests.size()) {
+		if (passengersPickedUp < requests.size()) {
 			setEndTimeIfWaitingForPassengers(now);// TODO use DynActivityEngine.END_ACTIVITY_LATER instead?
 		}
 	}
@@ -97,12 +93,12 @@ public class MultiPassengerPickupActivity extends AbstractDynActivity implements
 		}
 
 		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
-			passengersAboard++;
+			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
 		}
 
-		if (passengersAboard == requests.size()) {
+		if (passengersPickedUp == requests.size()) {
 			endTime = now + pickupDuration;
 		}
 	}

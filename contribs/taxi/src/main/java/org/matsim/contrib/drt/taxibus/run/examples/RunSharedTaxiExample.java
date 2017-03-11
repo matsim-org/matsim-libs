@@ -39,13 +39,14 @@ public class RunSharedTaxiExample {
 
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig("taxibus_example/configShared.xml", new TaxibusConfigGroup(), new DvrpConfigGroup());
-		//set to "false", if you do not require OTFVis visualisation
+		Config config = ConfigUtils.loadConfig("taxibus_example/configShared.xml", new TaxibusConfigGroup(),
+				new DvrpConfigGroup());
+		// set to "false", if you do not require OTFVis visualisation
 		new RunSharedTaxiExample().run(config, true);
-		
+
 	}
-	
-	public void run(Config config, boolean otfvis){
+
+	public void run(Config config, boolean otfvis) {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 
@@ -61,8 +62,8 @@ public class RunSharedTaxiExample {
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 
-		if (otfvis){
-		controler.addOverridingModule(new OTFVisLiveModule());
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		controler.run();
 

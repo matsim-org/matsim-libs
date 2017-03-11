@@ -6,21 +6,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.router.TransitActsRemover;
 import playground.gleich.av_bus.FilePaths;
-import playground.gthunig.utils.CSVWriter;
 import playground.jbischoff.utils.JbUtils;
 
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
@@ -94,7 +91,7 @@ public class ExtractAgentsInAreaStreamReading {
 			String outputPopulationPath = FilePaths.PATH_POPULATION_BERLIN__10PCT_FILTERED;
 			boolean selectAgentsByRoutesThroughArea = true;
 			boolean selectAgentsByActivitiesInArea = true;
-			String outputLinksInAreaShpPath = FilePaths.PATH_BERLIN__10PCT_SHP_LINKS_ENCLOSED_IN_AREA;
+			String outputLinksInAreaShpPath = FilePaths.PATH_SHP_LINKS_ENCLOSED_IN_AREA_BERLIN__10PCT;
 			String outputLinksInAreaShpCoordinateSystem = "DHDN_GK4";
 			extractor = new ExtractAgentsInAreaStreamReading(inputNetworkPath, inputPopulationPath, studyAreaShpPath, 
 					studyAreaShpKey, studyAreaShpElement, outputPopulationPath, selectAgentsByActivitiesInArea, 

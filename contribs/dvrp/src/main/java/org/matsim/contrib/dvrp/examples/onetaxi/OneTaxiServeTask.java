@@ -22,6 +22,9 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
+/**
+ * @author michalm
+ */
 public class OneTaxiServeTask extends StayTaskImpl {
 	private final OneTaxiRequest request;
 	private final boolean isPickup;// pickup or dropoff

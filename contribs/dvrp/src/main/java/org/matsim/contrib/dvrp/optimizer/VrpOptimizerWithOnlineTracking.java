@@ -19,24 +19,16 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
 /**
+ * @author michalm
  * @author (of documentation) nagel
- *
  */
 public interface VrpOptimizerWithOnlineTracking extends VrpOptimizer {
 	/**
-	 * Notifies the optimizer that the next link was entered. <br/>
-	 * <br/>
-	 * Design comments:
-	 * <ul>
-	 * <li>Would be nice if it contained information of the link that was entered (as
-	 * {@link DriverAgent#notifyMoveOverNode(org.matsim.api.core.v01.Id)} does). Otherwise we have to guess, or listen
-	 * to events in addition. Note that it is in principle even possible that the mobsim puts the vehicle into a link
-	 * that is not in the plan. kai, feb'17
-	 * </ul>
+	 * Notifies the optimizer that the next link was entered.
 	 */
-	void nextLinkEntered(DriveTask driveTask);
+	void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink);
 }

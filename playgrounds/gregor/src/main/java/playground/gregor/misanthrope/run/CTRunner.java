@@ -65,7 +65,8 @@ public class CTRunner implements IterationStartsListener {
 
         Config c = ConfigUtils.loadConfig(qsimConf);
 
-        c.controler().setWriteEventsInterval(1);
+//        c.controler().setLastIteration(0);
+        c.controler().setWriteEventsInterval(20);
         c.controler().setMobsim("ctsim");
         final Scenario sc = ScenarioUtils.loadScenario(c);
 
@@ -73,7 +74,7 @@ public class CTRunner implements IterationStartsListener {
         sc.getPopulation().getPersons().values().parallelStream().flatMap(p -> p.getPlans().stream()).forEach(pl -> {
             Activity a0 = (Activity) pl.getPlanElements().get(0);
             Leg leg = (Leg) pl.getPlanElements().get(1);
-            leg.setRoute(null);
+//            leg.setRoute(null);
             leg.setMode("walkct");
             a0.setType("pre-evac");
             Activity a1 = (Activity) pl.getPlanElements().get(2);
@@ -120,7 +121,7 @@ public class CTRunner implements IterationStartsListener {
             @Override
             public void install() {
                 addEventHandlerBinding().to(ArrivalCounter.class);
-                addControlerListenerBinding().to(UTurnCleaner.class);
+//                addControlerListenerBinding().to(UTurnCleaner.class);
                 if (getConfig().controler().getMobsim().equals("ctsim")) {
                     bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
                         @Override

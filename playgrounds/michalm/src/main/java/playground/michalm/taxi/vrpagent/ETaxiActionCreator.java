@@ -19,6 +19,7 @@
 
 package playground.michalm.taxi.vrpagent;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -31,6 +32,9 @@ import com.google.inject.Inject;
 
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
+/**
+ * @author michalm
+ */
 public class ETaxiActionCreator extends TaxiActionCreator {
 	@Inject
 	public ETaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer,
@@ -39,11 +43,12 @@ public class ETaxiActionCreator extends TaxiActionCreator {
 	}
 
 	@Override
-	public DynAction createAction(DynAgent dynAgent, Task task, double now) {
+	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+		Task task = vehicle.getSchedule().getCurrentTask();
 		if (task instanceof ETaxiChargingTask) {
 			return new ETaxiAtChargerActivity((ETaxiChargingTask)task);
 		}
 
-		return super.createAction(dynAgent, task, now);
+		return super.createAction(dynAgent, vehicle, now);
 	}
 }

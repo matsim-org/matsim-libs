@@ -198,6 +198,8 @@ public class FundamentalDiagramDataGenerator {
 			for (int index = 0; index< this.travelModes.length; index++){
 				this.modalShareInPCU[index] = 1.0;
 			}
+		} else if (this.modalShareInPCU.length != this.travelModes.length) {
+			throw new RuntimeException("Number of modes is not equal to the provided modal share (in PCU). Aborting...");
 		}
 	}
 

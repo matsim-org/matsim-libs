@@ -1,7 +1,7 @@
 package playground.dhosse.prt.launch;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.*;
@@ -26,14 +26,13 @@ public class NPersonsActionCreator extends TaxiActionCreator{
 	}
 	
 	@Override
-    public DynAction createAction(DynAgent dynAgent, final Task task, double now)
+    public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now)
     {
-        TaxiTask tt = (TaxiTask)task;
-
-        switch (tt.getTaxiTaskType()) {
+        TaxiTask task = (TaxiTask)vehicle.getSchedule().getCurrentTask();
+        switch (task.getTaxiTaskType()) {
             case EMPTY_DRIVE:
             case OCCUPIED_DRIVE:
-                return legCreator.createLeg((DriveTask)task);
+                return legCreator.createLeg(vehicle);
 
             case PICKUP:
                 final NPersonsPickupStayTask pst = (NPersonsPickupStayTask)task;

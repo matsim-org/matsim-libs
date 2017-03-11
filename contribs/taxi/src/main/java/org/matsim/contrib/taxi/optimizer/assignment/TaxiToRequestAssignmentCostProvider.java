@@ -66,7 +66,7 @@ public class TaxiToRequestAssignmentCostProvider {
 						// more fairness, lower throughput
 						// this will work different than than ARRIVAL_TIME at undersupply -> will reduce unfairness and
 						// throughput
-						return pickupBeginTime - reqEntry.destination.getT0();
+						return pickupBeginTime - reqEntry.destination.getEarliestStartTime();
 
 					default:
 						throw new IllegalStateException();
@@ -89,6 +89,6 @@ public class TaxiToRequestAssignmentCostProvider {
 		double travelTime = pathData == null ? //
 				params.nullPathCost : // no path (too far away)
 				pathData.firstAndLastLinkTT + pathData.path.travelTime;
-		return Math.max(reqEntry.destination.getT0(), departure.time + travelTime);
+		return Math.max(reqEntry.destination.getEarliestStartTime(), departure.time + travelTime);
 	}
 }

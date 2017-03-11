@@ -23,23 +23,27 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.*;
 
+/**
+ * @author michalm
+ */
 public class VehicleImpl implements Vehicle {
 	private final Id<Vehicle> id;
 	private Link startLink;
 	private final double capacity;
 
-	// TW for vehicle
-	private final double t0;
-	private double t1;
+	// time window
+	private final double serviceBeginTime;
+	private double serviceEndTime;
 
 	private Schedule schedule;
 
-	public VehicleImpl(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1) {
+	public VehicleImpl(Id<Vehicle> id, Link startLink, double capacity, double serviceBeginTime,
+			double serviceEndTime) {
 		this.id = id;
 		this.startLink = startLink;
 		this.capacity = capacity;
-		this.t0 = t0;
-		this.t1 = t1;
+		this.serviceBeginTime = serviceBeginTime;
+		this.serviceEndTime = serviceEndTime;
 
 		schedule = new ScheduleImpl(this);
 	}
@@ -65,13 +69,13 @@ public class VehicleImpl implements Vehicle {
 	}
 
 	@Override
-	public double getT0() {
-		return t0;
+	public double getServiceBeginTime() {
+		return serviceBeginTime;
 	}
 
 	@Override
-	public double getT1() {
-		return t1;
+	public double getServiceEndTime() {
+		return serviceEndTime;
 	}
 
 	@Override
@@ -84,9 +88,8 @@ public class VehicleImpl implements Vehicle {
 		return "Vehicle_" + id;
 	}
 
-	@Override
-	public void setT1(double t1) {
-		this.t1 = t1;
+	public void setServiceEndTime(double serviceEndTime) {
+		this.serviceEndTime = serviceEndTime;
 	}
 
 	@Override

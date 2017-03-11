@@ -61,7 +61,7 @@ public class CreateSharedTaxiVehicles {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfile);
 		List<Id<Link>> allLinks = new ArrayList<>();
 		allLinks.addAll(scenario.getNetwork().getLinks().keySet());
-		for (int numberofVehicles = 100; numberofVehicles<=1000; numberofVehicles+=100){
+		for (int numberofVehicles = 25; numberofVehicles<=500; numberofVehicles+=50){
 		
 		String taxisFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/vehicles/taxis_"+numberofVehicles+".xml.gz";
 		for (int i = 0; i< numberofVehicles;i++){

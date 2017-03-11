@@ -17,7 +17,7 @@ import java.util.*;
 public abstract class CTCell {
 
 
-    public static final double MAX_CELL_WIDTH = 10;
+    public static final double MAX_CELL_WIDTH = 20;
     public static final double RHO_M = 4.97;
     public static final double V_0 = 1.14;
     public static final double GAMMA = 0.55;
@@ -28,7 +28,7 @@ public abstract class CTCell {
     private static double Q;
 
     static {
-        MIN_CELL_WIDTH = 2 * Math.sqrt((V_0 / GAMMA + 1) / (1.5 * Math.sqrt(3) * RHO_M));
+        MIN_CELL_WIDTH = 2 * 2 * Math.sqrt((V_0 / GAMMA + 1) / (1.5 * Math.sqrt(3) * RHO_M));
     }
 
     static {

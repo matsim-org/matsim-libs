@@ -21,8 +21,6 @@ package org.matsim.contrib.dvrp.schedule;
 
 import java.util.List;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-
 /**
  * A Schedule contains Tasks. <br/>
  * <br/>
@@ -32,6 +30,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
  * might not be better expressed by removing the interfaces and simply have the implementation. kai, feb'17
  * </ul>
  * 
+ * @author michalm
  * @author (of documentation) nagel
  *
  */
@@ -39,11 +38,6 @@ public interface Schedule {
 	public enum ScheduleStatus {
 		UNPLANNED, PLANNED, STARTED, COMPLETED;
 	};
-
-	/**
-	 * Back pointer to the vehicle that contains the schedule. Set in constructor of ScheduleImpl.
-	 */
-	Vehicle getVehicle();
 
 	/**
 	 * Tasks in the schedule.
@@ -79,7 +73,7 @@ public interface Schedule {
 	// schedule modification functionality:
 
 	/**
-	 * Add a Task to the Schedule. This should set the back pointer of the Task to the Schedule.
+	 * Add a Task to the Schedule.
 	 */
 	void addTask(Task task);
 

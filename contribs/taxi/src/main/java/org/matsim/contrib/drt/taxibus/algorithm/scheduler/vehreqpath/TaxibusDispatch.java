@@ -21,7 +21,6 @@ package org.matsim.contrib.drt.taxibus.algorithm.scheduler.vehreqpath;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.DrtRequest;
 import org.matsim.contrib.drt.DrtRequest.DrtRequestStatus;
@@ -43,7 +42,7 @@ public class TaxibusDispatch {
 		this.requests.add(request);
 		this.vehicle = vehicle;
 		this.path.add(path);
-		this.earliestNextDeparture = Math.max(request.getT0(), path.getArrivalTime());
+		this.earliestNextDeparture = Math.max(request.getEarliestStartTime(), path.getArrivalTime());
 
 	}
 
@@ -68,7 +67,7 @@ public class TaxibusDispatch {
 		this.requests.add(request);
 		// System.out.println(requests);
 		this.path.add(path);
-		this.earliestNextDeparture = Math.max(request.getT0(), path.getArrivalTime());
+		this.earliestNextDeparture = Math.max(request.getEarliestStartTime(), path.getArrivalTime());
 	}
 
 	public void addPath(VrpPathWithTravelData path) {
@@ -101,17 +100,6 @@ public class TaxibusDispatch {
 		for (DrtRequest request : this.requests) {
 			if (request.getStatus() != DrtRequestStatus.UNPLANNED) {
 				throw new IllegalStateException();
-			}
-		}
-	}
-
-	public void failIfRequestNotUnplannedOrDispatched() {
-		for (DrtRequest request : this.requests) {
-			if (request.getStatus() != DrtRequestStatus.UNPLANNED) {
-				if (request.getStatus() != DrtRequestStatus.DISPATCHED) {
-					Logger.getLogger(getClass()).error(request.toString() + " S: " + request.getStatus());
-					throw new IllegalStateException();
-				}
 			}
 		}
 	}

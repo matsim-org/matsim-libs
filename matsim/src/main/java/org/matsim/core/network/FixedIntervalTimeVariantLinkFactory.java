@@ -24,6 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 
 
+/**
+ * A link that is able to store time-dependent information, using a fixed interval (i.e. array) data structure underneath.
+ * 
+ * @author (of documentation) nagel
+ *
+ */
 public final class FixedIntervalTimeVariantLinkFactory
     implements LinkFactory
 {

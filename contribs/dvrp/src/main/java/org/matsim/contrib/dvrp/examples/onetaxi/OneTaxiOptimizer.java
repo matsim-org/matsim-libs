@@ -58,8 +58,8 @@ public class OneTaxiOptimizer implements VrpOptimizer {
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.resetSchedule();
-		vehicle.getSchedule()
-				.addTask(new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(), "wait"));
+		vehicle.getSchedule().addTask(new StayTaskImpl(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+				vehicle.getStartLink(), "wait"));
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class OneTaxiOptimizer implements VrpOptimizer {
 		Link toLink = req.getToLink();
 
 		double t0 = schedule.getStatus() == ScheduleStatus.UNPLANNED ? //
-				Math.max(vehicle.getT0(), currentTime) : //
+				Math.max(vehicle.getServiceBeginTime(), currentTime) : //
 				Schedules.getLastTask(schedule).getEndTime();
 
 		VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0, router,
@@ -106,7 +106,7 @@ public class OneTaxiOptimizer implements VrpOptimizer {
 		schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, false, req));
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
-		double tEnd = Math.max(t4, vehicle.getT1());
+		double tEnd = Math.max(t4, vehicle.getServiceEndTime());
 		schedule.addTask(new StayTaskImpl(t4, tEnd, toLink, "wait"));
 	}
 
@@ -151,7 +151,7 @@ public class OneTaxiOptimizer implements VrpOptimizer {
 			Task waitTask = tasks.get(tasks.size() - 1);
 			waitTask.setBeginTime(waitTask.getBeginTime() + diff);
 
-			double tEnd = Math.max(waitTask.getBeginTime(), vehicle.getT1());
+			double tEnd = Math.max(waitTask.getBeginTime(), vehicle.getServiceEndTime());
 			waitTask.setEndTime(tEnd);
 		}
 	}

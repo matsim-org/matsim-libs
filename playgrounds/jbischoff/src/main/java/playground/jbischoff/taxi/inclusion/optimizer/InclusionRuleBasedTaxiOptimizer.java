@@ -21,7 +21,6 @@ package playground.jbischoff.taxi.inclusion.optimizer;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -54,7 +53,7 @@ public class InclusionRuleBasedTaxiOptimizer
     public InclusionRuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext,
     		InclusionRuleBasedTaxiOptimizerParams params, ZonalSystem zonalSystem)
     {
-        super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false);
+        super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
 
         this.params = params;
 
@@ -122,18 +121,18 @@ public class InclusionRuleBasedTaxiOptimizer
         Schedule schedule = vehicle.getSchedule();
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(schedule);
-            if (lastTask.getBeginTime() < schedule.getVehicle().getT1()) {
-                idleTaxiRegistry.removeVehicle(schedule.getVehicle());
+            if (lastTask.getBeginTime() < vehicle.getServiceEndTime()) {
+                idleTaxiRegistry.removeVehicle(vehicle);
             }
         }
-        else if (getOptimContext().scheduler.isIdle(schedule.getVehicle())) {
-            idleTaxiRegistry.addVehicle(schedule.getVehicle());
+        else if (getOptimContext().scheduler.isIdle(vehicle)) {
+            idleTaxiRegistry.addVehicle(vehicle);
         }
         else {
-            if (!Schedules.isFirstTask(schedule.getCurrentTask())) {
+            if (schedule.getCurrentTask().getTaskIdx() != 0) {//not first task
                 TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
                 if (isWaitStay(previousTask)) {
-                    idleTaxiRegistry.removeVehicle(schedule.getVehicle());
+                    idleTaxiRegistry.removeVehicle(vehicle);
                 }
             }
         }

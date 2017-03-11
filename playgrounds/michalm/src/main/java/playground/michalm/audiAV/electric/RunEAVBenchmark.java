@@ -47,7 +47,8 @@ import playground.michalm.taxi.run.*;
  */
 public class RunEAVBenchmark {
 	public static void run(String configFile, int runs) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(), new EvConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
+				new EvConfigGroup());
 		createControler(config, runs).run();
 	}
 

@@ -175,7 +175,7 @@ public class SharedTaxiDispatchFinder {
 						dispatch.addPath(VrpPaths.createPath(firstRequest.getToLink(), req.getToLink(),
 								currTime + ttFirstCustomer + optimContext.tbcg.getDropoffDuration(),
 								firstDestToSecondDest, optimContext.travelTime));
-						if (dispatch.getLastPathAdded().getArrivalTime() < veh.getT1()) {
+						if (dispatch.getLastPathAdded().getArrivalTime() < veh.getServiceEndTime()) {
 							bestSharedPath = dispatch;
 						}
 					}
@@ -202,7 +202,7 @@ public class SharedTaxiDispatchFinder {
 										+ optimContext.tbcg.getDropoffDuration(),
 								secondDestToFirstDest, optimContext.travelTime));
 						bestSharedPath = dispatch;
-						if (dispatch.getLastPathAdded().getArrivalTime() < veh.getT1()) {
+						if (dispatch.getLastPathAdded().getArrivalTime() < veh.getServiceEndTime()) {
 							bestSharedPath = dispatch;
 						}
 					}

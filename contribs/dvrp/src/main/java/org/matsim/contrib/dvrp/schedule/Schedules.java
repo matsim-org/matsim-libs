@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.schedule;
 import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import com.google.common.base.Predicate;
@@ -45,10 +46,6 @@ public class Schedules {
 	public static final Comparator<Task> TASK_SCHEDULE_IDX_COMPARATOR = new Comparator<Task>() {
 		@Override
 		public int compare(Task t1, Task t2) {
-			if (t1.getSchedule().equals(t2.getSchedule())) {
-				throw new IllegalArgumentException("Cannot compare tasks from different schedules");
-			}
-
 			return t1.getTaskIdx() - t2.getTaskIdx();
 		}
 	};
@@ -71,22 +68,6 @@ public class Schedules {
 		return tasks.get(tasks.size() - 1);
 	}
 
-	public static boolean isFirstTask(Task task) {
-		return task.getTaskIdx() == 0;
-	}
-
-	public static boolean isSecondTask(Task task) {
-		return task.getTaskIdx() == 1;
-	}
-
-	public static boolean isNextToLastTask(Task task) {
-		return task.getTaskIdx() == task.getSchedule().getTaskCount() - 2;
-	}
-
-	public static boolean isLastTask(Task task) {
-		return task.getTaskIdx() == task.getSchedule().getTaskCount() - 1;
-	}
-
 	public static Task getNextTask(Schedule schedule) {
 		int taskIdx = schedule.getStatus() == ScheduleStatus.PLANNED ? //
 				0 : schedule.getCurrentTask().getTaskIdx() + 1;
@@ -101,10 +82,10 @@ public class Schedules {
 		return schedule.getTasks().get(taskIdx);
 	}
 
-	public static Link getLastLinkInSchedule(Schedule schedule) {
-		List<? extends Task> tasks = schedule.getTasks();
+	public static Link getLastLinkInSchedule(Vehicle vehicle) {
+		List<? extends Task> tasks = vehicle.getSchedule().getTasks();
 		return tasks.isEmpty() ? //
-				schedule.getVehicle().getStartLink() : //
+				vehicle.getStartLink() : //
 				Tasks.getEndLink(tasks.get(tasks.size() - 1));
 	}
 

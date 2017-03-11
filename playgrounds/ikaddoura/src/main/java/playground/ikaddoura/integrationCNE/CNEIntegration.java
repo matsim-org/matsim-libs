@@ -101,6 +101,7 @@ public class CNEIntegration {
 	public CNEIntegration(String configFile, String outputDirectory) {
 		
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup());
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		this.controler = new Controler(scenario);
 		
@@ -213,7 +214,7 @@ public class CNEIntegration {
 				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV9(controler.getEvents(), controler.getScenario())));
 				
 			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
-			
+							
 				final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 				decongestionSettings.setKp(kP);
 				decongestionSettings.setKi(0.);
@@ -221,14 +222,13 @@ public class CNEIntegration {
 				decongestionSettings.setMsa(true);
 				decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 				decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-				
-				DecongestionInfo info = new DecongestionInfo(decongestionSettings);
+				controler.getConfig().addModule(decongestionSettings);
 				
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
 						
-						this.bind(DecongestionInfo.class).toInstance(info);
+						this.bind(DecongestionInfo.class).asEagerSingleton();
 						
 						this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 						this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);

@@ -21,18 +21,23 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
+/**
+ * @author michalm
+ */
 public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 	private final TaxiOptimizerContext optimContext;
 	private final Collection<TaxiRequest> unplannedRequests;
 
-	private final boolean doUnscheduleAwaitingRequests;// PLANNED or TAXI_DISPATCHED
+	private final boolean doUnscheduleAwaitingRequests;// PLANNED
+	private final boolean doUpdateTimelines;// PLANNED
 	private final boolean destinationKnown;
 	private final boolean vehicleDiversion;
 	private final int reoptimizationTimeStep;
@@ -40,10 +45,12 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 	private boolean requiresReoptimization = false;
 
 	public AbstractTaxiOptimizer(TaxiOptimizerContext optimContext, AbstractTaxiOptimizerParams params,
-			Collection<TaxiRequest> unplannedRequests, boolean doUnscheduleAwaitingRequests) {
+			Collection<TaxiRequest> unplannedRequests, boolean doUnscheduleAwaitingRequests,
+			boolean doUpdateTimelines) {
 		this.optimContext = optimContext;
 		this.unplannedRequests = unplannedRequests;
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
+		this.doUpdateTimelines = doUpdateTimelines;
 
 		destinationKnown = optimContext.scheduler.getParams().destinationKnown;
 		vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
@@ -57,12 +64,11 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 				unscheduleAwaitingRequests();
 			}
 
-			// TODO (1) use a seperate variable to decide upon updating the timeline??
-			// TODO (2) update timeline only if the algo really wants to reschedule in this time step,
+			// TODO update timeline only if the algo really wants to reschedule in this time step,
 			// perhaps by checking if there are any unplanned requests??
-			if (doUnscheduleAwaitingRequests) {
+			if (doUpdateTimelines) {
 				for (Vehicle v : optimContext.fleet.getVehicles().values()) {
-					optimContext.scheduler.updateTimeline(v.getSchedule());
+					optimContext.scheduler.updateTimeline(v);
 				}
 			}
 
@@ -99,10 +105,9 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 
 	@Override
 	public void nextTask(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		optimContext.scheduler.updateBeforeNextTask(schedule);
+		optimContext.scheduler.updateBeforeNextTask(vehicle);
 
-		Task newCurrentTask = schedule.nextTask();
+		Task newCurrentTask = vehicle.getSchedule().nextTask();
 
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
 			requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
@@ -114,8 +119,9 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 	}
 
 	@Override
-	public void nextLinkEntered(DriveTask driveTask) {
-		optimContext.scheduler.updateTimeline(driveTask.getSchedule());
+	public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
+		// TODO do we really need this??? timeline is updated always before reoptimisation
+		optimContext.scheduler.updateTimeline(vehicle);// TODO comment this out...
 
 		// TODO we may here possibly decide whether or not to reoptimize
 		// if (delays/speedups encountered) {requiresReoptimization = true;}

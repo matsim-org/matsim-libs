@@ -2,7 +2,7 @@ package playground.dhosse.prt.request;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -110,12 +110,12 @@ public class NPersonsVehicleRequestPathFinder
 
                 double begin = task.getBeginTime();
 
-                double t0 = req.getT0();
+                double t0 = req.getEarliestStartTime();
 
                 if (t0 < begin && task.getStatus() != TaskStatus.PERFORMED
                         && task.getStatus() != TaskStatus.STARTED) {
 
-                    departure = t0 >= veh.getT1() ? null : new LinkTimePair(req.getFromLink(), t0);
+                    departure = t0 >= veh.getServiceEndTime() ? null : new LinkTimePair(req.getFromLink(), t0);
 
                 }
             }

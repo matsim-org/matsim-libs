@@ -22,10 +22,8 @@ package org.matsim.contrib.drt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.tasks.*;
-import org.matsim.contrib.drt.tasks.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
@@ -37,9 +35,6 @@ public class DrtRequest extends RequestImpl implements PassengerRequest {
 		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
 		PLANNED, // planned - included into one of the routes
-
-		// we have started serving the request but we may still divert the cab
-		DISPATCHED,
 
 		// we have to carry out the request
 		// - difference between taxi and taxibus seems to minimal, but the actual tasks are different, because
@@ -58,9 +53,9 @@ public class DrtRequest extends RequestImpl implements PassengerRequest {
 	private DrtPickupTask pickupTask = null;
 	private DrtDropoffTask dropoffTask = null;;
 
-	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double t0,
-			double submissionTime) {
-		super(id, 1, t0, t0, submissionTime);
+	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+			double earliestStartTime, double latestStartTime, double submissionTime) {
+		super(id, 1, earliestStartTime, latestStartTime, submissionTime);
 		this.passenger = passenger;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
@@ -104,16 +99,6 @@ public class DrtRequest extends RequestImpl implements PassengerRequest {
 
 		switch (pickupTask.getStatus()) {
 			case PLANNED:
-				if (pickupTask.getSchedule().getStatus() == ScheduleStatus.PLANNED) {
-					return DrtRequestStatus.PLANNED;
-				}
-
-				DrtTask currentTask = (DrtTask)pickupTask.getSchedule().getCurrentTask();
-				if (currentTask.getDrtTaskType() == DrtTaskType.DRIVE_EMPTY && //
-						pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
-					return DrtRequestStatus.DISPATCHED;
-				}
-
 				return DrtRequestStatus.PLANNED;
 
 			case STARTED:

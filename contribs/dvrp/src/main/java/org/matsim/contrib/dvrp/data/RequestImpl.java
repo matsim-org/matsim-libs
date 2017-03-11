@@ -27,17 +27,18 @@ import org.matsim.api.core.v01.Id;
 public class RequestImpl implements Request {
 	private final Id<Request> id;
 	private final double quantity;
-	private final double t0;// earliest start time
-	private final double t1;// latest start time
+	private final double earliestStartTime;
+	private final double latestStartTime;
 	private final double submissionTime;
 
 	private boolean rejected = false;
 
-	public RequestImpl(Id<Request> id, double quantity, double t0, double t1, double submissionTime) {
+	public RequestImpl(Id<Request> id, double quantity, double earliestStartTime, double latestStartTime,
+			double submissionTime) {
 		this.id = id;
 		this.quantity = quantity;
-		this.t0 = t0;
-		this.t1 = t1;
+		this.earliestStartTime = earliestStartTime;
+		this.latestStartTime = latestStartTime;
 		this.submissionTime = submissionTime;
 	}
 
@@ -52,13 +53,13 @@ public class RequestImpl implements Request {
 	}
 
 	@Override
-	public double getT0() {
-		return t0;
+	public double getEarliestStartTime() {
+		return earliestStartTime;
 	}
 
 	@Override
-	public double getT1() {
-		return t1;
+	public double getLatestStartTime() {
+		return latestStartTime;
 	}
 
 	@Override
@@ -77,6 +78,6 @@ public class RequestImpl implements Request {
 
 	@Override
 	public String toString() {
-		return "Request_" + id + " [S=(" + t0 + ", ???, " + t1 + "), F=???]";
+		return "Request_" + id + " [S=(" + earliestStartTime + ", ???, " + latestStartTime + "), F=???]";
 	}
 }

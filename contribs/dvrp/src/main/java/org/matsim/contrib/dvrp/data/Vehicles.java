@@ -23,20 +23,23 @@ import java.util.Comparator;
 
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
+/**
+ * @author michalm
+ */
 public class Vehicles {
 	public static final Comparator<Vehicle> T0_COMPARATOR = new Comparator<Vehicle>() {
 		public int compare(Vehicle v1, Vehicle v2) {
-			return Double.compare(v1.getT0(), v2.getT0());
+			return Double.compare(v1.getServiceBeginTime(), v2.getServiceBeginTime());
 		}
 	};
 
 	public static final Comparator<Vehicle> T1_COMPARATOR = new Comparator<Vehicle>() {
 		public int compare(Vehicle v1, Vehicle v2) {
-			return Double.compare(v1.getT1(), v2.getT1());
+			return Double.compare(v1.getServiceEndTime(), v2.getServiceEndTime());
 		}
 	};
 
 	public static void changeStartLinkToLastLinkInSchedule(Vehicle vehicle) {
-		vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle.getSchedule()));
+		vehicle.setStartLink(Schedules.getLastLinkInSchedule(vehicle));
 	}
 }

@@ -57,12 +57,12 @@ public class AccessibilityComputationKiberaTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 //	@Test
-//	public void testQuick() {
+//	public void testQuick() throws IOException, InterruptedException{
 //		run(1000., false, false);
 //	}
 //	@Test
-//	public void testLocal() {
-//		run(10., false, true);
+//	public void testLocal() throws IOException, InterruptedException{
+//		run(50., true, true);
 //	}
 	@Test
 	public void testOnServer() throws IOException, InterruptedException{
@@ -72,8 +72,8 @@ public class AccessibilityComputationKiberaTest {
 	public void run(Double cellSize, boolean push2Geoserver, boolean createQGisOutput) throws IOException, InterruptedException {
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
-		Envelope envelope = new Envelope(252000, 256000, 9854000, 9856000);
-		String scenarioCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		Envelope envelope = new Envelope(252000, 256000, 9854000, 9856000); // Notation: minX, maxX, minY, maxY
+		String scenarioCRS = "EPSG:21037"; // EPSG:21037 = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 				
 		// Input (if pre-downloaded)
 //		String folderStructure = "../../";
@@ -89,7 +89,7 @@ public class AccessibilityComputationKiberaTest {
 		Coord northeast = transformation.transform(new Coord(envelope.getMaxX(), envelope.getMaxY()));
 		URL osm = new URL("http://api.openstreetmap.org/api/0.6/map?bbox=" + southwest.getX() + "," + southwest.getY() + "," + northeast.getX() + "," + northeast.getY());
 		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
-		HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO Might be more elegant without downloading this twice
+		HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO There might be more elegant option without creating this twice
 		
 	    Network network = CreateNetwork.createNetwork(connection.getInputStream(), scenarioCRS);
 	    
@@ -101,18 +101,17 @@ public class AccessibilityComputationKiberaTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
-		config.controler().setRunId("ke_kibera_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0]);
+		config.controler().setRunId("ke_kibera_" + cellSize.toString().split("\\.")[0]);
 		
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setCellSizeCellBasedAccessibility(cellSize.intValue());
-		acg.setEnvelope(new Envelope(252000, 256000, 9854000, 9856000));
+		acg.setEnvelope(envelope);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
-		acg.setOutputCrs("EPSG:21037"); // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		acg.setOutputCrs(scenarioCRS);
 		
 		ConfigUtils.setVspDefaults(config);
 		
-//		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		scenario.setNetwork(network);
 		scenario.setActivityFacilities(facilities);
@@ -139,7 +138,7 @@ public class AccessibilityComputationKiberaTest {
 		// QGis
 		if (createQGisOutput) {
 			final boolean includeDensityLayer = false;
-			final Integer range = 9; // In the current implementation, this need always be 9
+			final Integer range = 9; // In the current implementation, this must always be 9
 			final Double lowerBound = 0.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
 			final Double upperBound = 3.5;
 			final int populationThreshold = (int) (50 / (1000/cellSize * 1000/cellSize));
@@ -149,8 +148,7 @@ public class AccessibilityComputationKiberaTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
-					// TODO maybe use envelope and crs from above
-					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(252000, 256000, 9854000, 9856000), workingDirectory, "EPSG:21037", includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode.toString(), envelope, workingDirectory, scenarioCRS, includeDensityLayer,
 							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}

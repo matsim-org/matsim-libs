@@ -27,6 +27,8 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
+ *
+ * @author michalm
  */
 public class VrpLeg implements DivertibleLeg {
 	private OnlineDriveTaskTracker onlineTracker;
@@ -58,12 +60,13 @@ public class VrpLeg implements DivertibleLeg {
 		currentLinkIdx++;
 		askedAboutNextLink = false;
 
-		if (path.getLink(currentLinkIdx).getId() != newLinkId) {
+		Link currentLink = path.getLink(currentLinkIdx);
+		if (currentLink.getId() != newLinkId) {
 			throw new IllegalStateException();
 		}
 
 		if (onlineTracker != null) {
-			onlineTracker.movedOverNode();
+			onlineTracker.movedOverNode(currentLink);
 		}
 	}
 

@@ -25,7 +25,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -128,6 +127,15 @@ public class RunBerlinMinExtCostAV {
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 		
+		final DecongestionConfigGroup decongestionConfigGroup = new DecongestionConfigGroup();
+		decongestionConfigGroup.setKp(kP);
+		decongestionConfigGroup.setKi(0.);
+		decongestionConfigGroup.setKd(0.);
+		decongestionConfigGroup.setMsa(true);
+		decongestionConfigGroup.setRUN_FINAL_ANALYSIS(false);
+		decongestionConfigGroup.setWRITE_LINK_INFO_CHARTS(false);
+		config.addModule(decongestionConfigGroup);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
@@ -162,27 +170,13 @@ public class RunBerlinMinExtCostAV {
 		// #############################
 		// congestion pricing
 		// #############################
-
-		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setKp(kP);
-		decongestionSettings.setKi(0.);
-		decongestionSettings.setKd(0.);
-		decongestionSettings.setMsa(true);
-		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-		
-		DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-		
+				
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				
-				this.bind(DecongestionInfo.class).toInstance(info);
+				this.bind(DecongestionInfo.class).asEagerSingleton();
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-				
-//				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
-//				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
-//				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
 				
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
 				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
@@ -202,12 +196,6 @@ public class RunBerlinMinExtCostAV {
 		FleetImpl fleet = new FleetImpl();
 		new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
-			}
-		});
 		controler.addOverridingModule(new TaxiOutputModule());
         controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 
@@ -223,8 +211,6 @@ public class RunBerlinMinExtCostAV {
 												
 				addTravelDisutilityFactoryBinding(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER).toInstance(dvrpTravelDisutilityFactory);
 				
-//				this.bind(AgentFilter.class).to(AVAgentFilter.class);
-
 				this.bind(MoneyEventAnalysis.class).asEagerSingleton();
 				this.addControlerListenerBinding().to(MoneyEventAnalysis.class);
 				this.addEventHandlerBinding().to(MoneyEventAnalysis.class);

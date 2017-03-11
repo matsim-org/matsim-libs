@@ -98,21 +98,6 @@
 		
 	</module>
 	
-	<module name="taxifare">
-
-		<!-- Basefare per Trip (fare = positive value) -->
-		<param name="basefare" value="0.0" />
-
-		<!-- Daily subscription fee (fee = positive value) -->
-		<param name="dailySubscriptionFee" value="0.0" />
-
-		<!-- taxi fare per meter (fee = positive value) -->
-		<param name="distanceFare_m" value="0.0" />
-
-		<!-- taxi fare per hour (fee = positive value) -->
-		<param name="timeFare_h" value="0.0" />
-	</module>
-	
 	<module name="taxi">
 
 		<!-- Used in AStarEuclidean for shortest path search for occupied drives. 

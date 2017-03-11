@@ -31,6 +31,9 @@ import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.zone.*;
 
+/**
+ * @author michalm
+ */
 public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 	private final BestDispatchFinder dispatchFinder;
 
@@ -45,7 +48,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 
 	public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext, RuleBasedTaxiOptimizerParams params,
 			ZonalSystem zonalSystem) {
-		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false);
+		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
 
 		this.params = params;
 
@@ -158,16 +161,16 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
 			TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(schedule);
-			if (lastTask.getBeginTime() < schedule.getVehicle().getT1()) {
-				idleTaxiRegistry.removeVehicle(schedule.getVehicle());
+			if (lastTask.getBeginTime() < vehicle.getServiceEndTime()) {
+				idleTaxiRegistry.removeVehicle(vehicle);
 			}
-		} else if (getOptimContext().scheduler.isIdle(schedule.getVehicle())) {
-			idleTaxiRegistry.addVehicle(schedule.getVehicle());
+		} else if (getOptimContext().scheduler.isIdle(vehicle)) {
+			idleTaxiRegistry.addVehicle(vehicle);
 		} else {
-			if (!Schedules.isFirstTask(schedule.getCurrentTask())) {
+			if (schedule.getCurrentTask().getTaskIdx() != 0) {//not first task
 				TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
 				if (isWaitStay(previousTask)) {
-					idleTaxiRegistry.removeVehicle(schedule.getVehicle());
+					idleTaxiRegistry.removeVehicle(vehicle);
 				}
 			}
 		}

@@ -5,16 +5,19 @@ import java.util.Comparator;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 
+/**
+ * @author michalm
+ */
 public class Requests {
 	public static final Comparator<Request> T0_COMPARATOR = new Comparator<Request>() {
 		public int compare(Request r1, Request r2) {
-			return Double.compare(r1.getT0(), r2.getT0());
+			return Double.compare(r1.getEarliestStartTime(), r2.getEarliestStartTime());
 		}
 	};
 
 	public static final Comparator<Request> T1_COMPARATOR = new Comparator<Request>() {
 		public int compare(Request r1, Request r2) {
-			return Double.compare(r1.getT1(), r2.getT1());
+			return Double.compare(r1.getLatestStartTime(), r2.getLatestStartTime());
 		}
 	};
 
@@ -28,7 +31,8 @@ public class Requests {
 	// (TreeSet uses comparisons instead of Object.equals(Object))
 	public static final Comparator<Request> ABSOLUTE_COMPARATOR = new Comparator<Request>() {
 		public int compare(Request r1, Request r2) {
-			return ComparisonChain.start().compare(r1.getT0(), r2.getT0()).compare(r1.getT1(), r2.getT1())
+			return ComparisonChain.start().compare(r1.getEarliestStartTime(), r2.getEarliestStartTime())
+					.compare(r1.getLatestStartTime(), r2.getLatestStartTime())
 					.compare(r1.getSubmissionTime(), r2.getSubmissionTime()).compare(r1.getId(), r2.getId()).result();
 		}
 	};
@@ -46,7 +50,7 @@ public class Requests {
 	}
 
 	public static final boolean isUrgent(Request request, double now) {
-		return request.getT0() <= now;
+		return request.getEarliestStartTime() <= now;
 	}
 
 	public static int countRequests(Iterable<? extends Request> requests, Predicate<Request> predicate) {

@@ -67,9 +67,16 @@ import analysis.signals.TtSignalAnalysisWriter;
 //import matsimConnector.congestionpricing.MSATollHandler;
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
-import playground.ikaddoura.decongestion.Decongestion;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
+import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
+import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
+import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -264,6 +271,15 @@ public final class RunBraessSimulation {
 
 		config.controler().setCreateGraphs(true);
 
+		// decongestion relevant parameters
+		DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
+		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
+		decongestionSettings.setTOLL_ADJUSTMENT(0.1);
+		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
+		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		config.addModule(decongestionSettings);
+		
 		return config;
 	}
 
@@ -396,16 +412,40 @@ public final class RunBraessSimulation {
 			
 		} else if (PRICING_TYPE.equals(PricingType.INTERVALBASED)) {
 			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
-			decongestionSettings.setTOLL_ADJUSTMENT(0.1);
-			decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
-			decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
-			decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
-			final DecongestionInfo info = new DecongestionInfo(decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					
+					this.bind(DecongestionInfo.class).asEagerSingleton();
+					
+					this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
+					this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
+					
+					this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
+					this.bind(DelayAnalysis.class).asEagerSingleton();
+					this.bind(PersonVehicleTracker.class).asEagerSingleton();
+									
+					this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
+					this.addEventHandlerBinding().to(DelayAnalysis.class);
+					this.addEventHandlerBinding().to(PersonVehicleTracker.class);
+					
+					this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+
+				}
+			});
 			
+			// toll-adjusted routing
+			
+			final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
+			travelDisutilityFactory.setSigma(0.);
+			
+			controler.addOverridingModule(new AbstractModule(){
+				@Override
+				public void install() {
+					this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+				}
+			});
+						
 		} else { // no pricing
 			
 			// adapt sigma for randomized routing

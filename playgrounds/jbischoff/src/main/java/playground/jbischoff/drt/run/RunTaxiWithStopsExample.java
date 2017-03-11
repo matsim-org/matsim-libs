@@ -37,28 +37,16 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.Binder;
 import com.google.inject.name.Names;
 
 import playground.jbischoff.drt.config.DRTConfigGroup;
 import playground.jbischoff.drt.routingModule.StopBasedDRTRoutingModule;
 
-/**
- * This class runs an example robotaxi scenario including scoring. The
- * simulation runs for 10 iterations, this takes quite a bit time (25 minutes or
- * so). You may switch on OTFVis visualisation in the main method below.
- * The scenario should run out of the box without any additional files.
- * If required, you may find all input files in the resource path 
- * or in the jar maven has downloaded).
- * There are two vehicle files: 2000 vehicles and 5000, which may be set in the config.
- * Different fleet sizes can be created using {@link org.matsim.contrib.CreateSharedTaxiVehicles.vehicles.CreateTaxiVehicles}
- * 
- * 
- */
+
 public class RunTaxiWithStopsExample {
 
 	public static void main(String[] args) {
-		String configFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/configPM120.10.xml";
+		String configFile = "../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/testconfig.xml";
 		RunTaxiWithStopsExample.run(configFile, false);
 	}
 
@@ -88,7 +76,7 @@ public class RunTaxiWithStopsExample {
 			controler.addOverridingModule(new TaxiOutputModule());
 
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(scenario2).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/stopsWRS_300m.xml");
+		new TransitScheduleReader(scenario2).readFile("../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/stopsWRS_300m.xml");
 		
 		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
         controler.addOverridingModule(new AbstractModule() {

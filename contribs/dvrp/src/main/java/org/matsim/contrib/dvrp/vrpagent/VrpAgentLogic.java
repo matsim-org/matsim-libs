@@ -21,16 +21,19 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dynagent.*;
 
+/**
+ * @author michalm
+ */
 public class VrpAgentLogic implements DynAgentLogic {
 	public static final String BEFORE_SCHEDULE_ACTIVITY_TYPE = "BeforeVrpSchedule";
 	public static final String AFTER_SCHEDULE_ACTIVITY_TYPE = "AfterVrpSchedule";
 
 	public interface DynActionCreator {
-		DynAction createAction(DynAgent dynAgent, Task task, double now);
+		DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now);
 	}
 
 	private final VrpOptimizer optimizer;
@@ -41,7 +44,6 @@ public class VrpAgentLogic implements DynAgentLogic {
 	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, Vehicle vehicle) {
 		this.optimizer = optimizer;
 		this.dynActionCreator = dynActionCreator;
-
 		this.vehicle = vehicle;
 	}
 
@@ -72,8 +74,7 @@ public class VrpAgentLogic implements DynAgentLogic {
 			return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
 		}
 
-		Task task = schedule.getCurrentTask();
-		DynAction action = dynActionCreator.createAction(agent, task, now);
+		DynAction action = dynActionCreator.createAction(agent, vehicle, now);
 
 		return action;
 	}
@@ -87,7 +88,7 @@ public class VrpAgentLogic implements DynAgentLogic {
 					case PLANNED:
 						return s.getBeginTime();
 					case UNPLANNED:
-						return vehicle.getT1();
+						return vehicle.getServiceEndTime();
 					default:
 						throw new IllegalStateException();
 				}

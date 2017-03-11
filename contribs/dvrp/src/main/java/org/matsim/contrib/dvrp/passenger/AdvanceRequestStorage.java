@@ -60,7 +60,7 @@ class AdvanceRequestStorage {
 					// TODO should we verify if abs(T0-currTime) <= threshold
 					passengerAdvReqs.poll();
 					return req;
-				} else if (now > req.getT0()) {
+				} else if (now > req.getEarliestStartTime()) {
 					// TODO do we have to somehow handle it?
 					// Currently this is not a problem; we do not have cases of not turning up...
 					throw new IllegalStateException("Seems that the agent has skipped a previously submitted request");

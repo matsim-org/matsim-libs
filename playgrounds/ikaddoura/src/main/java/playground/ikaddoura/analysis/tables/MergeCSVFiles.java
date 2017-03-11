@@ -54,7 +54,7 @@ public class MergeCSVFiles {
 	
 	private static final Logger log = Logger.getLogger(MergeCSVFiles.class);
 	
-	private static final String directory = "/Users/ihab/Desktop/ils4a/kaddoura/optAV/output/";
+	private static final String directory = "/Users/ihab/Desktop/ils4i/kaddoura/optAV/output/";
 	private static final String fileName = "aggregated_info_all_transport_modes";
 	private static final String separator = ";";
 	private static final int finalIteration = 10;

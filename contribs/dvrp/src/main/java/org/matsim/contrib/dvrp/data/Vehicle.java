@@ -27,47 +27,43 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
  * @author michalm
  */
 public interface Vehicle extends Identifiable<Vehicle> {
+
+	/**
+	 * @return the link at which vehicle starts operating (i.e. depot)
+	 */
 	Link getStartLink();
 
 	void setStartLink(Link link);
 
 	/**
-	 * Design comment(s):
-	 * <ul>
-	 * <li>Does not use the MATSim vehicle model, so I cannot tell if this is with or without driver. kai, feb'17
-	 * </ul>
+	 * @return the amount of people/goods that can be served/transported at the same time (see:
+	 *         {@link Request#getQuantity()})
 	 */
 	double getCapacity();
 
-	// vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
 	/**
-	 * Earliest time when vehicle is available (inclusive)
+	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from
+	 *         {@link Schedule#getBeginTime()}
 	 */
-	double getT0();
-	// "getServiceStartTime()"?
+	double getServiceBeginTime();
 
 	/**
-	 * Earliest time when vehicle is <i>no longer</i> available
+	 * @return (desired) time by which the vehicle should stop operating (exclusive); can be different from
+	 *         {@link Schedule#getEndTime()}
 	 */
-	double getT1();
-	// "getServiceEndTime()"?
-
-	/**
-	 * See {@link Vehicle#getT1()}
-	 */
-	void setT1(double t1);
+	double getServiceEndTime();
 
 	/**
 	 * Design comment(s):
 	 * <ul>
-	 * <li>The Schedule is meant to be changed only by the optimizer. Note, however, that the present design does not
-	 * prevent other classes to change it, so be careful to not do that. kai, feb'17
+	 * <li>Typically, the Schedule is meant to be changed only by the optimizer. Note, however, that the present design
+	 * does not prevent other classes to change it, so be careful. kai, feb'17
 	 * </ul>
 	 */
 	Schedule getSchedule();
 
 	/**
-	 * In the only existing implementation, this re-creates the Schedule object by calling a new constructor.
+	 * Resets the schedule. For instance, by creating a new Schedule object.
 	 */
 	void resetSchedule();
 }

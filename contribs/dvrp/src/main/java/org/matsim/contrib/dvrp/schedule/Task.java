@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
  * united this again. kai, feb'17
  * </ul>
  * 
+ * @author michalm
  * @author (of documentation) nagel
  */
 public interface Task {
@@ -41,41 +42,24 @@ public interface Task {
 
 	TaskStatus getStatus();
 
-	// inclusive
 	/**
-	 * Returns the begin time of the task. Design comments:
-	 * <ul>
-	 * <li>I don't know in which cases this is not the end time of the previous task. kai, feb'17
-	 * </ul>
+	 * Returns the begin time of the task (inclusive). Should be equal to the end time of the previous task.
 	 */
 	double getBeginTime();
 
-	// exclusive
 	/**
-	 * Returns the end time of the task. <br/>
+	 * Returns the end time of the task (exclusive). Should be equal to the begin time of the next task.<br/>
 	 * <br/>
-	 * Design comment(s):
-	 * <ul>
-	 * <li>I cannot say what the difference to getTaskTracker().predictEndTime() is. Possibly, getEndTime() is the time
-	 * when the task actually ends, either because it is a stay task, or because the end time is only set when it ends.
-	 * kai, feb'17
-	 * </ul>
+	 * This is a scheduled (planned) end time. To get a more precise estimate on the expected end time of the current
+	 * task, use {@link TaskTracker#predictEndTime()}. The actual end time is a result of simulation.<br/>
+	 * <br/>
+	 * When the task ends, its end time (and the begin/end times of the following tasks) should be updated accordingly
+	 * (see {@link Task#setBeginTime(double)} and {@link Task#setEndTime(double)}).
 	 */
 	double getEndTime();
 
 	/**
-	 * Back pointer the schedule that contains the task. Set by ScheduleImpl through a package-protected variable.
-	 */
-	Schedule getSchedule();
-
-	/**
-	 * Index of the task in the schedule. Managed by ScheduleImpl through a package-protected variable. <br/>
-	 * <br/>
-	 * Design comment(s):
-	 * <ul>
-	 * <li>Should we really have this in the interface? {@link java.util.List} has an <code>indexOf(...)</code> method
-	 * that is able to pull out indices (given that the same task object is never entered twice). kai, feb'17
-	 * </ul>
+	 * Index of the task in the schedule. Managed by ScheduleImpl through a package-protected variable.
 	 */
 	int getTaskIdx();
 
@@ -84,17 +68,13 @@ public interface Task {
 	void setEndTime(double endTime);
 
 	/**
-	 * A TaskTracker predicts the task end time. <br/>
-	 * <br/>
-	 * Design notes:
-	 * <ul>
-	 * <li>I cannot say what the difference to getEndTime is. kai, feb'17
-	 * </ul>
+	 * A TaskTracker predicts the task end time. The prediction may be different than the planned and actual end times.
 	 */
 	TaskTracker getTaskTracker();
 
 	/**
-	 * adds the TaskTracker to the Task. The existing implementation accepts this only when the Task is already started.
+	 * adds the TaskTracker to the ongoing Task (preferably at the beginning of its execution). Only ongoing tasks
+	 * (TaskStatus == STARTED) can be tracked.
 	 */
 	void initTaskTracker(TaskTracker taskTracker);
 }

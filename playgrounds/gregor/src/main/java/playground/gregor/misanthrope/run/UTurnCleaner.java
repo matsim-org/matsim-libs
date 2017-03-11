@@ -49,7 +49,7 @@ public class UTurnCleaner implements BeforeMobsimListener {
 
 //        route.set
 
-        if (frstL.getFromNode() == scndL.getToNode() && frstL.getToNode().getOutLinks().size() == 1) { //U-turn in dead end street
+        if (frstL.getFromNode() == scndL.getToNode()) {//&& frstL.getToNode().getOutLinks().size() == 1) { //U-turn in dead end street
             a0.setLinkId(scnd);
             LinkNetworkRouteImpl newRoute = new LinkNetworkRouteImpl(route.getLinkIds().get(0), route.getLinkIds().subList(1, route.getLinkIds().size()), route.getEndLinkId());
 //            newRoute.setRouteDescription(route.getRouteDescription());

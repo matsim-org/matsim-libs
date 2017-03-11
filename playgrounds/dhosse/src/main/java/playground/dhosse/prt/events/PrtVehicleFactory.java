@@ -41,7 +41,7 @@ public class PrtVehicleFactory {
 			
 			for(Vehicle vehicle : this.fleet.getVehicles().values()){
 				vData.addVehicle(new VehicleImpl(Id.create(vehicle.getId(), Vehicle.class),
-						vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(), vehicle.getT1()));
+						vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getServiceBeginTime(), vehicle.getServiceEndTime()));
 			}
 			
 			double maxWTime = Double.NEGATIVE_INFINITY;

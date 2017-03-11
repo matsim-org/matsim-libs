@@ -59,7 +59,7 @@ public class RunTaxiPTIntermodalExample {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		// yyyy in the long run, traffic dynamics should be "KWM" (or whatever it will be eventually called), and snapshotStyle should be set accordingly. kai, jan'17
+		// yyyy in the long run, traffic dynamics should be "kinematicWaves" (or whatever it will be eventually called), and snapshotStyle should be set accordingly. kai, jan'17
 
 		// yyyy Could you please javadoc the following?  EmissionsConfigGroup has an example how the explanatory strings
 		// can be kept consistent between config file dump and javadoc.  Thx.  kai, jan'17
