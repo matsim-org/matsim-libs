@@ -29,8 +29,8 @@ public class TripAnalyzerV2Extended {
 	public static final Logger log = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
 	/* Parameters */
-	private static final String runId = "be_118";	// <----------
-	private static final String usedIteration = "300"; // most frequently used value: 150 // <----------
+	private static String runId = "be_118";	// <----------
+	private static String usedIteration = "300"; // most frequently used value: 150 // <----------
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
