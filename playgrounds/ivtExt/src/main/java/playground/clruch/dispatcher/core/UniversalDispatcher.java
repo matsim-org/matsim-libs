@@ -23,6 +23,7 @@ import org.matsim.core.router.util.TravelTime;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -60,14 +61,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         pickupDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getPickupDurationPerStop();
         dropoffDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getDropoffDurationPerStop();
 
-        try {
-            String string = avDispatcherConfig.getParams().get("infoLinePeriod");
-            if (string != null)
-                setInfoLinePeriod(Integer.parseInt(string));
-        } catch (Exception e) {
-            System.out.println("can't parse infoLinePeriod");
-            e.printStackTrace();
-        }
+        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
+        setInfoLinePeriod(safeConfig.getInteger("infoLinePeriod", 10));
     }
 
     /**
