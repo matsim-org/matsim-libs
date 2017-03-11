@@ -20,6 +20,7 @@ import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestLinkMatcher;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
+import playground.clruch.dispatcher.utils.AnyReqestDivertsVehicles;
 import playground.clruch.dispatcher.utils.DivertIfCurrentDestinationEmpty;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.RequestStopsDrivebyVehicles;
@@ -85,10 +86,10 @@ public class EdgyDispatcher extends UniversalDispatcher {
         }
     }
 
-    int reserveVehicles = 0;
-    int abortTrip = 0;
-    int driveOrder = 0;
-    int emptyDrive = 0;
+    int total_reserveVehicles = 0;
+    int total_abortTrip = 0;
+    int total_driveOrder = 0;
+    int total_emptyDrive = 0;
 
     @Override
     public void redispatch(double now) {
@@ -99,20 +100,25 @@ public class EdgyDispatcher extends UniversalDispatcher {
 
         final Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
         {
-            Map<VehicleLinkPair, Link> pass1 = reserveVehiclesStoppingOnLink.match(requests, getDivertableVehicles());
+            Map<VehicleLinkPair, Link> pass1 = new AnyReqestDivertsVehicles().match(requests, getDivertableVehicles());
             pass1.entrySet().stream().forEach(this::setVehicleDiversion); // prevents vehicles from being redirected
-            reserveVehicles = pass1.size();
-
-            Map<VehicleLinkPair, Link> pass2 = requestStopsDrivebyVehicles.match(requests, getDivertableVehicles());
-            pass2.entrySet().stream().forEach(this::setVehicleDiversion);
-
-            abortTrip = pass2.size();
+            total_reserveVehicles += pass1.size();
+            total_abortTrip += pass1.size();
         }
+//        {
+//            Map<VehicleLinkPair, Link> pass1 = reserveVehiclesStoppingOnLink.match(requests, getDivertableVehicles());
+//            pass1.entrySet().stream().forEach(this::setVehicleDiversion); // prevents vehicles from being redirected
+//            reserveVehicles = pass1.size();
+//
+//            Map<VehicleLinkPair, Link> pass2 = requestStopsDrivebyVehicles.match(requests, getDivertableVehicles());
+//            pass2.entrySet().stream().forEach(this::setVehicleDiversion);
+//
+//            abortTrip = pass2.size();
+//        }
 
         _printSchedule("after stopping");
 
-        driveOrder = 0;
-        emptyDrive = 0;
+        total_emptyDrive = 0;
 
         // Map<VehicleLinkPair, Link> pass3 = divertIfCurrentDestinationEmpty.match(requests, getDivertableVehicles());
         // pass3.entrySet().stream().forEach(this::setVehicleDiversion);
@@ -124,7 +130,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
                     if (requestIterator.hasNext()) {
                         Link link = requestIterator.next().getFromLink();
                         setVehicleDiversion(vehicleLinkPair, link);
-                        ++driveOrder;
+                        ++total_driveOrder;
                     } else
                         break;
                 }
@@ -135,12 +141,12 @@ public class EdgyDispatcher extends UniversalDispatcher {
 
     @Override
     public String getInfoStringBeg() {
-        return String.format("%s rv=%3d at=%3d do=%3d ed=%4d", //
+        return String.format("%s RV=%3d AT=%3d do=%3d ed=%4d", //
                 super.getInfoStringBeg(), //
-                reserveVehicles, //
-                abortTrip, //
-                driveOrder, //
-                emptyDrive);
+                total_reserveVehicles, //
+                total_abortTrip, //
+                total_driveOrder, //
+                total_emptyDrive);
     }
 
     public static class Factory implements AVDispatcherFactory {
