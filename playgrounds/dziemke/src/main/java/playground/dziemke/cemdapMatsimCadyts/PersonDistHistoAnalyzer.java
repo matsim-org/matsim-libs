@@ -16,7 +16,7 @@ public class PersonDistHistoAnalyzer {
     }
 
     public static void analyze(String runName) {
-        String analysisDir = "../../../shared-svn/projects\\cemdapMatsimCadyts\\cadyts\\equil\\output\\" + runName + "/ITERS/it.100/";
+        String analysisDir = "../../../shared-svn/projects\\cemdapMatsimCadyts\\cadyts\\equil\\output\\" + runName + "/ITERS/it.50/";
         String persoDistHosto = analysisDir + "perso-dist-histo.txt";
         String outputFile = analysisDir + "perso-dist-histo-bins.txt";
         CSVReader reader = new CSVReader(persoDistHosto, "x");
@@ -25,9 +25,9 @@ public class PersonDistHistoAnalyzer {
         ArrayList<String> file = reader.readFile();
         for (String line : file) System.out.println("line = " + line);
         for (String line : file) {
-            System.out.println("line = " + line);
+//            System.out.println("line = " + line);
             String dist = line.split("\t")[1];
-            System.out.println("dist = " + dist);
+//            System.out.println("dist = " + dist);
             switch (dist) {
                 case "89200,00":
                     bins[0]++;
