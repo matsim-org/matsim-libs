@@ -26,8 +26,9 @@ import java.util.stream.Collectors;
  * Created by Claudio on 2/24/2017.
  */
 
-@ Deprecated
-public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
+
+@Deprecated
+public class ConsensusDispatcherDFRv_2_0 extends PartitionedDispatcher {
     public static final int REBALANCING_PERIOD = 5 * 60; // TODO
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
@@ -37,16 +38,16 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
 
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
 
-    public ConsensusDispatcherDFRv20( //
-                                      AVDispatcherConfig config, //
-                                      TravelTime travelTime, //
-                                      ParallelLeastCostPathCalculator router, //
-                                      EventsManager eventsManager, //
-                                      VirtualNetwork virtualNetwork, //
-                                      AbstractVirtualNodeDest abstractVirtualNodeDest, //
-                                      AbstractRequestSelector abstractRequestSelector, //
-                                      AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-                                      Map<VirtualLink, Double> linkWeightsIn
+    public ConsensusDispatcherDFRv_2_0( //
+                                        AVDispatcherConfig config, //
+                                        TravelTime travelTime, //
+                                        ParallelLeastCostPathCalculator router, //
+                                        EventsManager eventsManager, //
+                                        VirtualNetwork virtualNetwork, //
+                                        AbstractVirtualNodeDest abstractVirtualNodeDest, //
+                                        AbstractRequestSelector abstractRequestSelector, //
+                                        AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
+                                        Map<VirtualLink, Double> linkWeightsIn
     ) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         this.virtualNodeDest = abstractVirtualNodeDest;
@@ -245,7 +246,7 @@ public class ConsensusDispatcherDFRv20 extends PartitionedDispatcher {
 
             // TODO:
 
-            return new ConsensusDispatcherDFRv20(
+            return new ConsensusDispatcherDFRv_2_0(
                     config,
                     travelTime,
                     router,

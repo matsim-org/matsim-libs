@@ -1,92 +1,116 @@
 package playground.clruch.dispatcher;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
-import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
+import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
+import playground.clruch.dispatcher.utils.ImmobilizeVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
+import playground.clruch.dispatcher.utils.OldestRequestSelector;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class HungarianDispatcher extends UniversalDispatcher {
-    private static final int DISPATCH_PERIOD = 30;
 
-    final Network network; // <- for verifying link references
-    final Collection<Link> linkReferences; // <- for verifying link references
-
-    final AbstractVehicleRequestMatcher vehicleRequestMatcher;
-    final DrivebyRequestStopper drivebyRequestStopper;
+    private final int dispatchPeriod;
+    private final int maxMatchNumber; // implementation may not use this
 
     private HungarianDispatcher( //
-                                 AVDispatcherConfig avDispatcherConfig, //
-                                 TravelTime travelTime, //
-                                 ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-                                 EventsManager eventsManager, //
-                                 Network network) {
+            AVDispatcherConfig avDispatcherConfig, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+            EventsManager eventsManager, //
+            Network network, AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
-        this.network = network;
-        linkReferences = new HashSet<>(network.getLinks().values());
-        vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
-        drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
+        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
+        maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
     }
 
-    int total_matchedRequests = 0;
+    int ori_sizeV = 0;
+    int ori_sizeR = 0;
+
+    int sizeV = 0;
+    int sizeR = 0;
 
     @Override
     public void redispatch(double now) {
-        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
-
         final long round_now = Math.round(now);
-        if (round_now % DISPATCH_PERIOD == 0) {
 
-            int num_abortTrip = 0;
-            int num_driveOrder = 0;
-            
-            // see if any car is driving by a request. if so, then stay there to be matched!
-            num_abortTrip += drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
+        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
+                .match(getStayVehicles(), getAVRequestsAtLinks());
 
-            { // for all remaining vehicles and requests, perform a bipartite matching
+        if (round_now % dispatchPeriod == 0) {
+            { // assign new destination to vehicles with bipartite matching
 
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
-                // call getDivertableVehicles again to get remaining vehicles
-                Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
-                // Save request in list which is needed for abstractVehicleDestMatcher
-                AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
-                List<Link> requestlocs =
-                        requests.values()
-                                .stream()
-                                .flatMap(List::stream)
-                                .map(AVRequest::getFromLink)
-                                .collect(Collectors.toList());
+                // reduce the number of requests for a smaller running time
+                // take out and match request-vehicle pairs with distance zero
+                List<Link> requestlocs = requests.values().stream() //
+                        .flatMap(List::stream) // all from links of all requests with
+                        .map(AVRequest::getFromLink) // multiplicity
+                        .collect(Collectors.toList());
 
-                // find the Euclidean bipartite matching for all vehicles using the Hungarian method
-                System.out.println("optimizing over "+divertableVehicles.size()+" vehicles and "+requestlocs.size() + " requests.");
-                Map<VehicleLinkPair, Link> hungarianmatches = abstractVehicleDestMatcher.match(divertableVehicles, requestlocs);
+                {
+                    // call getDivertableVehicles again to get remaining vehicles
+                    Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
-                // use the result to setVehicleDiversion
-                hungarianmatches.entrySet().forEach(this::setVehicleDiversion);
-                // TODO remove commented code below, since the line above does the job
-//                for (VehicleLinkPair vehicleLinkPair : hungarianmatches.keySet()) {
-//                    setVehicleDiversion(vehicleLinkPair, hungarianmatches.get(vehicleLinkPair));
-//                }
+                    ori_sizeV = divertableVehicles.size();
+                    ori_sizeR = requestlocs.size();
+
+                    // this call removes the matched links from requestlocs
+                    new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestlocs) //
+                            .entrySet().forEach(this::setVehicleDiversion);
+                }
+
+                /*
+                 * // only select MAXMATCHNUMBER of oldest requests
+                 * Collection<AVRequest> avRequests = requests.values().stream().flatMap(v -> v.stream()).collect(Collectors.toList());
+                 * Collection<AVRequest> avRequestsReduced = requestSelector.selectRequests(divertableVehicles, avRequests, MAXMATCHNUMBER);
+                 */
+
+                {
+                    // call getDivertableVehicles again to get remaining vehicles
+                    Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
+
+                    sizeV = divertableVehicles.size();
+                    sizeR = requestlocs.size();
+                    // find the Euclidean bipartite matching for all vehicles using the Hungarian method
+                    new HungarBiPartVehicleDestMatcher().match(divertableVehicles, requestlocs) //
+                            .entrySet().forEach(this::setVehicleDiversion);
+                }
             }
         }
     }
+
+    @Override
+    public String getInfoLine() {
+        return String.format("%s H[%d x %d] => H[%d x %d]", //
+                super.getInfoLine(), //
+                ori_sizeV, ori_sizeR, //
+                sizeV, sizeR //
+        );
+    }
+
     public static class Factory implements AVDispatcherFactory {
         @Inject
         @Named(AVModule.AV_MODE)
@@ -103,9 +127,10 @@ public class HungarianDispatcher extends UniversalDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+            AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             return new HungarianDispatcher( //
-                    config, travelTime, router, eventsManager, network);
+                    config, travelTime, router, eventsManager, network, abstractRequestSelector);
         }
     }
 }

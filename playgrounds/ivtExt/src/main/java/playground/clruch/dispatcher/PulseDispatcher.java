@@ -19,6 +19,7 @@ import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
@@ -66,8 +67,6 @@ public class PulseDispatcher extends UniversalDispatcher {
                     index %= links.size();
                 }
             }
-
-            System.out.println(getVehicleMaintainerStatusString());
         }
     }
 
@@ -92,7 +91,7 @@ public class PulseDispatcher extends UniversalDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             return new PulseDispatcher(config, travelTime, router, eventsManager, network);
         }
     }

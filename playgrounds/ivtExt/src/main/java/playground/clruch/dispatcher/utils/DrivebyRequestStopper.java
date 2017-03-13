@@ -11,7 +11,8 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /**
- * 
+ * this class is used for testing old functionality
+ * the class is superseded by DivertIfCurrentDestinationEmpty etc.
  */
 public class DrivebyRequestStopper {
 

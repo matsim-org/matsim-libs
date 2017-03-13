@@ -11,19 +11,19 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-public class LinkWeights {
-    public static Map<VirtualLink, Double> fillLinkWeights(File file, VirtualNetwork virtualNetwork) {
+public class vLinkDataReader {
+    public static Map<VirtualLink, Double> fillvLinkData(File file, VirtualNetwork virtualNetwork, String datastring) {
         // open the linkWeightFile and parse the parameter values
         SAXBuilder builder = new SAXBuilder();
         try {
             Map<VirtualLink, Double> linkWeights = new HashMap<>();
             Document document = (Document) builder.build(file);
             Element rootNode = document.getRootElement();
-            Element virtualNodesXML = rootNode.getChild("weights");
-            List<Element> virtualLinkXML = virtualNodesXML.getChildren("virtuallink");
+            Element virtualNodesXML = rootNode.getChild("virtualLinks");
+            List<Element> virtualLinkXML = virtualNodesXML.getChildren("virtualLink");
             for (Element vLinkelem : virtualLinkXML) {
                 String vlinkID = vLinkelem.getAttributeValue("id");
-                Double weight = Double.parseDouble(vLinkelem.getAttributeValue("weight"));
+                Double weight = Double.parseDouble(vLinkelem.getAttributeValue(datastring));
 
 
                 // find the virtual link with the corresponding ID and assign the weight to it.

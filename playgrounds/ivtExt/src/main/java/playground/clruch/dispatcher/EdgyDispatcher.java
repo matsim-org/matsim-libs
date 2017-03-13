@@ -20,14 +20,16 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class EdgyDispatcher extends UniversalDispatcher {
-    private static final int DISPATCH_PERIOD = 5 * 60;
+    private final int dispatchPeriod;
 
     final Network network; // <- for verifying link references
     final Collection<Link> linkReferences; // <- for verifying link references
@@ -42,10 +44,13 @@ public class EdgyDispatcher extends UniversalDispatcher {
             EventsManager eventsManager, //
             Network network) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
+
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
     }
 
     /** verify that link references are present in the network */
@@ -63,46 +68,46 @@ public class EdgyDispatcher extends UniversalDispatcher {
             System.out.println("network " + linkReferences.size() + " contains all " + testset.size());
     }
 
-    int total_matchedRequests = 0;
+    int total_abortTrip = 0;
+    int total_driveOrder = 0;
 
     @Override
     public void redispatch(double now) {
         // verifyReferences(); // <- debugging only
 
-        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+        vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
 
         final long round_now = Math.round(now);
-        if (round_now % DISPATCH_PERIOD == 0) {
+        if (round_now % dispatchPeriod == 0) {
 
-            int num_abortTrip = 0;
-            int num_driveOrder = 0;
-
-            num_abortTrip += drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
+            total_abortTrip += drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
 
             { // TODO this should be replaceable by some naive matcher
                 Iterator<AVRequest> requestIterator = getAVRequests().iterator();
-                Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
-
-                for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
+                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
                     Link dest = vehicleLinkPair.getCurrentDriveDestination();
                     if (dest == null) { // vehicle in stay task
                         if (requestIterator.hasNext()) {
                             Link link = requestIterator.next().getFromLink();
                             setVehicleDiversion(vehicleLinkPair, link);
-                            ++num_driveOrder;
+                            ++total_driveOrder;
                         } else
                             break;
                     }
                 }
             }
 
-            System.out.println(String.format("@%6d   MR=%6d   at=%6d   do=%6d", //
-                    round_now, //
-                    total_matchedRequests, //
-                    num_abortTrip, //
-                    num_driveOrder));
         }
 
+    }
+
+    @Override
+    public String getInfoLine() {
+        return String.format("%s AT=%5d do=%5d", //
+                super.getInfoLine(), //
+                total_abortTrip, //
+                total_driveOrder //
+        );
     }
 
     public static class Factory implements AVDispatcherFactory {
@@ -121,7 +126,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             return new EdgyDispatcher( //
                     config, travelTime, router, eventsManager, network);
         }

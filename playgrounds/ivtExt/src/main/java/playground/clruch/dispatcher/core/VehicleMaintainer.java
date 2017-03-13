@@ -24,7 +24,9 @@ import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
+import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
@@ -42,9 +44,14 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
+    private int infoLinePeriod = 0;
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
+    }
+
+    public final void setInfoLinePeriod(int infoLinePeriod) { // TODO rename
+        this.infoLinePeriod = infoLinePeriod;
     }
 
     /**
@@ -53,7 +60,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * @param avVehicle
      * @param abstractDirective
      */
-    /* package */ synchronized void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
+    /* package */
+    synchronized void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective(avVehicle));
         private_vehicleDirectives.put(avVehicle, abstractDirective);
     }
@@ -98,10 +106,44 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
+     * @return collection of cars that are in the driving state with a customer, i.e. their
+     *         second last task is an AVDropoff Task (followed by AVStay task)
+     */
+    @Deprecated
+    protected final Collection<VehicleLinkPair> getVehiclesWithCustomer() {
+        Collection<VehicleLinkPair> collection = new LinkedList<>();
+        for (AVVehicle avVehicle : getFunctioningVehicles())
+            if (isWithoutDirective(avVehicle)) {
+                Schedule schedule = avVehicle.getSchedule();
+                int n = schedule.getTaskCount();
+                if (n > 1) { // take care that array bounds are respected, schedules with n = 1 are staying AVs and not of interest.
+                    AVTask avTask = (AVTask) schedule.getTasks().get(n - 2); // Dropoff task
+                    if (avTask instanceof AVDropoffTask) {
+                        new AVTaskAdapter(schedule.getCurrentTask()) {
+                            @Override
+                            public void handle(AVDriveTask avDriveTask) {
+                                // for empty cars the drive task is second to last task
+                                TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                                OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                                LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
+                                if (linkTimePair != null)
+                                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
+                            }
+
+                        };
+                    }
+
+                }
+
+            }
+        return collection;
+    }
+
+    /**
      * @return collection of cars that are in the driving state without customer, or stay task.
-     * if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
-     * that invoke assignDirective(...), the vehicle is not included in the successive call to
-     * getDivertableVehicles() until it becomes <i>divertable</i> again.
+     *         if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
+     *         that invoke assignDirective(...), the vehicle is not included in the successive call to
+     *         getDivertableVehicles() until it becomes <i>divertable</i> again.
      */
     protected final Collection<VehicleLinkPair> getDivertableVehicles() {
         Collection<VehicleLinkPair> collection = new LinkedList<>();
@@ -117,7 +159,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
                             LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
                             if (linkTimePair != null)
-                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
                         }
                     }
 
@@ -127,7 +169,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                         if (Schedules.isLastTask(avStayTask)) {
                             GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self evident?
                             LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
-                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair));
+                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
                         }
                     }
                 };
@@ -141,9 +183,21 @@ abstract class VehicleMaintainer implements AVDispatcher {
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
+    private String previousInfoMarker = "";
+
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
+
+        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
+            String infoLine = getInfoLine();
+            String marker = infoLine.substring(16);
+            if (!marker.equals(previousInfoMarker)) {
+                previousInfoMarker = marker;
+                System.out.println(infoLine);
+            }
+        }
+
         redispatch(now);
         private_now = null; // <- time unavailable
         long tic = System.nanoTime();
@@ -155,6 +209,21 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
+     * derived classes should override this function to add details
+     * 
+     * @return
+     */
+    public String getInfoLine() {
+        final String string = getClass().getSimpleName() + "        ";
+        return String.format("%s@%6d V=(%4ds,%4dd)", //
+                string.substring(0, 6), //
+                (long) getTimeNow(), //
+                getStayVehicles().values().stream().mapToInt(Queue::size).sum(), //
+                getDivertableVehicles().size() //
+        );
+    }
+
+    /**
      * @return time of current re-dispatching iteration step
      * @throws NullPointerException
      *             if dispatching has not started yet
@@ -163,15 +232,10 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return private_now;
     }
 
-    public abstract void redispatch(double now);
-
     /**
-     * @return debug information about status of this instance of {@link VehicleMaintainer}
+     * derived classes should override this function
+     * 
+     * @param now
      */
-    public synchronized String getVehicleMaintainerStatusString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("#directives " + private_vehicleDirectives.size() + ", ");
-        stringBuilder.append("total routingTime=" + (routingTimeNano * 1e-9) + " sec");
-        return stringBuilder.toString();
-    }
+    protected abstract void redispatch(double now);
 }

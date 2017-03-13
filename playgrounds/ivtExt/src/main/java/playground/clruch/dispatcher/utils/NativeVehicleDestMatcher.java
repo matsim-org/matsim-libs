@@ -24,12 +24,6 @@ public class NativeVehicleDestMatcher extends AbstractVehicleDestMatcher {
             if (iterator.hasNext()) {
                 map.put(vehicleLinkPair, iterator.next());
             }
-            // TODO remove this after debugging:
-            /*
-            else {
-                map.put(vehicleLinkPair, (Link) vehicleLinkPair.getDivertableLocation());
-            }
-            */
         }
 
         return map;
