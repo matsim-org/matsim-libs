@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.opdyts.patna;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import floetteroed.opdyts.DecisionVariableRandomizer;
@@ -40,9 +41,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
-import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.opdyts.*;
@@ -168,5 +170,11 @@ public class PatnaJointOpdytsCalibrator {
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
+
+		// remove the unused iterations
+		for (int index =0; index < maxIterations; index++) {
+			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
+			IOUtils.deleteDirectory(new File(dir2remove));
+		}
 	}
 }
