@@ -177,6 +177,31 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 					this.linkId2time2totalDelayAllIterations.get(linkId).put(intervalNr, totalDelayAllIterations);				
 					toll += K_i * totalDelayAllIterations;
 				
+				} else if (congestionInfo.getDecongestionConfigGroup().getIntegralApproach().toString().equals(IntegralApproach.Zero.toString())) {
+					
+					// update the total delay over all iterations
+					double totalDelayAllIterations = 0.;
+					if (linkId2time2totalDelayAllIterations.get(linkId) == null) {	
+						totalDelayAllIterations = averageDelay;
+						this.linkId2time2totalDelayAllIterations.put(linkId, new HashMap<>());
+					
+					} else {
+						
+						if (this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr) == null) {
+							totalDelayAllIterations = averageDelay;
+						
+						} else {	
+													
+							if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+								totalDelayAllIterations = 0.;
+							} else {
+								totalDelayAllIterations = this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr) + averageDelay;
+							}
+						}
+					}
+					this.linkId2time2totalDelayAllIterations.get(linkId).put(intervalNr, totalDelayAllIterations);				
+					toll += K_i * totalDelayAllIterations;
+					
 				} else {
 					throw new RuntimeException("Unknown integral approach. Aborting...");
 				}

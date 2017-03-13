@@ -84,13 +84,13 @@ public class DecongestionRun {
 	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setMsa(false);
+		decongestionSettings.setMsa(true);
 		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
 		decongestionSettings.setKd(0.);
-		decongestionSettings.setKi(0.05);
+		decongestionSettings.setKi(0.0);
 		decongestionSettings.setKp(0.05);
 		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
-		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(1.0);
+		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
 		
 		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
 		decongestionSettings.setINITIAL_TOLL(1.0);
@@ -194,8 +194,8 @@ public class DecongestionRun {
 		
 		// #############################################################
 	
-//      controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+//      controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
         controler.run();
         
