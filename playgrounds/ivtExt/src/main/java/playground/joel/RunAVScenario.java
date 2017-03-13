@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
@@ -12,10 +13,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
 import playground.clruch.export.EventFileToProcessingXML;
-import playground.clruch.netdata.LinkWeights;
-import playground.clruch.netdata.VirtualNetworkLoader;
+import playground.clruch.prep.TheApocalypse;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -36,18 +35,9 @@ public class RunAVScenario {
 
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        System.out.println("Population size:" + scenario.getPopulation().getPersons().values().size());
+        final Population population = scenario.getPopulation();
 
-
-        // Debugging
-        File linkWeightFile = new File(dir + "/consensusWeights.xml");
-        File virtualnetworkXML = new File(dir + "/virtualNetwork.xml");
-        /*
-        ConsensusDispatcher.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
-        ConsensusDispatcher.Factory.linkWeights = LinkWeights.fillLinkWeights(linkWeightFile,ConsensusDispatcher.Factory.virtualNetwork);
-        */
-        LPFeedbackLIPDispatcher.Factory.virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
-        LPFeedbackLIPDispatcher.Factory.travelTimes = LinkWeights.fillLinkWeights(linkWeightFile, LPFeedbackLIPDispatcher.Factory.virtualNetwork);
+        TheApocalypse.decimatesThe(population).toNoMoreThan(5000).people();
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
