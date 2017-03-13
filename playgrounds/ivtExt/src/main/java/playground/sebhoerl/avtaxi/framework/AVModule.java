@@ -99,11 +99,16 @@ public class AVModule extends AbstractModule {
         // ---
         /** dispatchers for UniversalDispatcher */
         bind(PulseDispatcher.Factory.class);
-        bind(EdgyDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
+        
+        bind(EdgyDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
+        
+        bind(SlickDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), SlickDispatcher.class.getSimpleName()).to(SlickDispatcher.Factory.class);
+        
+        bind(HungarianDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), HungarianDispatcher.class.getSimpleName()).to(HungarianDispatcher.Factory.class);
-
         
         /** dispatchers for PartitionedDispatcher */
         bind(ConsensusDispatcherDFR.Factory.class);

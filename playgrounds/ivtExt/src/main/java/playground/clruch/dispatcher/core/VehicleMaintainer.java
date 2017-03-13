@@ -183,12 +183,20 @@ abstract class VehicleMaintainer implements AVDispatcher {
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
+    private String previousInfoMarker = "";
+
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
 
-        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0)
-            System.out.println(getInfoStringBeg());
+        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
+            String infoLine = getInfoLine();
+            String marker = infoLine.substring(16);
+            if (!marker.equals(previousInfoMarker)) {
+                previousInfoMarker = marker;
+                System.out.println(infoLine);
+            }
+        }
 
         redispatch(now);
         private_now = null; // <- time unavailable
@@ -205,7 +213,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * 
      * @return
      */
-    public String getInfoStringBeg() {
+    public String getInfoLine() {
         final String string = getClass().getSimpleName() + "        ";
         return String.format("%s@%6d V=(%4ds,%4dd)", //
                 string.substring(0, 6), //
