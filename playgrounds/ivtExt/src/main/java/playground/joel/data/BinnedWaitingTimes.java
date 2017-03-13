@@ -23,7 +23,7 @@ import playground.clruch.utils.HelperPredicates;
 /**
  * Created by Joel on 10.03.2017.
  */
-public class BinnedWaitingTimes extends AbstractData {
+class BinnedWaitingTimes extends AbstractData {
 
     // From the existing output_events file, load the data
     List<Event> relevantEvents = new ArrayList<>();
@@ -36,9 +36,9 @@ public class BinnedWaitingTimes extends AbstractData {
     NavigableMap<String, Double> quantile95 = new TreeMap<>();
     NavigableMap<String, Double> mean = new TreeMap<>();
 
-    double totalQuantile50 = 0;
-    double totalQuantile95 = 0;
-    double totalMean = 0;
+    static double totalQuantile50 = 0;
+    static double totalQuantile95 = 0;
+    static double totalMean = 0;
     double binSize = 600;
 
     //equalize length of all key elements

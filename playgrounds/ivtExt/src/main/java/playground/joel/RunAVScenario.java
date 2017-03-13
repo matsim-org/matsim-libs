@@ -27,7 +27,7 @@ import playground.joel.data.EventFileToDataXML;
  */
 public class RunAVScenario {
     public static void main(String[] args) throws MalformedURLException {
-        File configFile = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs/av_config.xml");
+        File configFile = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_28_Sioux_Hungarian/av_config.xml");
         final File dir = configFile.getParentFile();
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
@@ -37,7 +37,7 @@ public class RunAVScenario {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
 
-        TheApocalypse.decimatesThe(population).toNoMoreThan(5000).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(10000).people();
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
