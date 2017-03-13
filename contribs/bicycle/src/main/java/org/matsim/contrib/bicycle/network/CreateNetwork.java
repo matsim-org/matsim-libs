@@ -50,12 +50,12 @@ public class CreateNetwork {
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS); //TransformationFactory.WGS84
 
-		BicycleCustomizedOsmNetworkReader bikeNetworkReader = new BicycleCustomizedOsmNetworkReader(bikeNetwork, ct);
+		BicycleOsmNetworkReader bikeNetworkReader = new BicycleOsmNetworkReader(bikeNetwork, ct);
 		bikeNetworkReader.constructBikeNetwork(inputOSM); 
 		
 		new ObjectAttributesXmlWriter(bikeNetworkReader.getBikeAttributes()).writeFile(outputBikeXML);
 
-		BicycleCustomizedOsmNetworkReader networkReader = new BicycleCustomizedOsmNetworkReader(carNetwork,ct);
+		BicycleOsmNetworkReader networkReader = new BicycleOsmNetworkReader(carNetwork,ct);
 		networkReader.constructCarNetwork(inputOSM);
 		
 		new NetworkCleaner().run(bikeNetwork);

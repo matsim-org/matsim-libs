@@ -92,9 +92,9 @@ import org.xml.sax.InputSource;
  *
  * @author mrieser, aneumann
  */
-public class BicycleCustomizedOsmNetworkReader implements MatsimSomeReader {
+public class BicycleOsmNetworkReader implements MatsimSomeReader {
 
-	private final static Logger log = Logger.getLogger(BicycleCustomizedOsmNetworkReader.class);
+	private final static Logger log = Logger.getLogger(BicycleOsmNetworkReader.class);
 
 	private final static String TAG_LANES = "lanes";
 	private final static String TAG_HIGHWAY = "highway";
@@ -159,7 +159,7 @@ public class BicycleCustomizedOsmNetworkReader implements MatsimSomeReader {
 	 * @param network An empty network where the converted OSM data will be stored.
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 */
-	public BicycleCustomizedOsmNetworkReader(final Network network, final CoordinateTransformation transformation) {
+	public BicycleOsmNetworkReader(final Network network, final CoordinateTransformation transformation) {
 		this(network, transformation, true);
 	}
 
@@ -170,7 +170,7 @@ public class BicycleCustomizedOsmNetworkReader implements MatsimSomeReader {
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
-	public BicycleCustomizedOsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
+	public BicycleOsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
 		this.network = network;
 		this.transform = transformation;
 
@@ -1200,17 +1200,17 @@ public class BicycleCustomizedOsmNetworkReader implements MatsimSomeReader {
 			if ("way".equals(name)) {
 				if (!this.currentWay.nodes.isEmpty()) {
 					boolean used = false;
-					OsmHighwayDefaults osmHighwayDefaults = BicycleCustomizedOsmNetworkReader.this.highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
+					OsmHighwayDefaults osmHighwayDefaults = BicycleOsmNetworkReader.this.highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
 					if (osmHighwayDefaults != null) {
 						int hierarchy = osmHighwayDefaults.hierarchy;
 						this.currentWay.hierarchy = hierarchy;
-						if (BicycleCustomizedOsmNetworkReader.this.hierarchyLayers.isEmpty()) {
+						if (BicycleOsmNetworkReader.this.hierarchyLayers.isEmpty()) {
 							used = true;
 						}
 						if (this.collectNodes) {
 							used = true;
 						} else {
-							for (OsmFilter osmFilter : BicycleCustomizedOsmNetworkReader.this.hierarchyLayers) {
+							for (OsmFilter osmFilter : BicycleOsmNetworkReader.this.hierarchyLayers) {
 								for (Long nodeId : this.currentWay.nodes) {
 									OsmNode node = this.nodes.get(nodeId);
 									if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
