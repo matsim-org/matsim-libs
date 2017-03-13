@@ -29,9 +29,6 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class EdgyDispatcher extends UniversalDispatcher {
-    /**
-     * a large value of DISPATCH_PERIOD helps to quickly test the EdgyDispatcher
-     */
     private final int dispatchPeriod;
 
     final Network network; // <- for verifying link references
@@ -52,8 +49,8 @@ public class EdgyDispatcher extends UniversalDispatcher {
         linkReferences = new HashSet<>(network.getLinks().values());
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
-        
-        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);        
+
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
     }
 
     /** verify that link references are present in the network */
@@ -71,7 +68,6 @@ public class EdgyDispatcher extends UniversalDispatcher {
             System.out.println("network " + linkReferences.size() + " contains all " + testset.size());
     }
 
-    int total_matchedRequests = 0;
     int total_abortTrip = 0;
     int total_driveOrder = 0;
 
@@ -79,7 +75,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
     public void redispatch(double now) {
         // verifyReferences(); // <- debugging only
 
-        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+        vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
 
         final long round_now = Math.round(now);
         if (round_now % dispatchPeriod == 0) {
@@ -101,14 +97,17 @@ public class EdgyDispatcher extends UniversalDispatcher {
                 }
             }
 
-            System.out.println(String.format("%s @%6d   MR=%6d   at=%6d   do=%6d", //
-                    getClass().getSimpleName().substring(0, 8), //
-                    round_now, //
-                    total_matchedRequests, //
-                    total_abortTrip, //
-                    total_driveOrder));
         }
 
+    }
+
+    @Override
+    public String getInfoLine() {
+        return String.format("%s AT=%5d do=%5d", //
+                super.getInfoLine(), //
+                total_abortTrip, //
+                total_driveOrder //
+        );
     }
 
     public static class Factory implements AVDispatcherFactory {

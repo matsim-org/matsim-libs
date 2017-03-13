@@ -6,9 +6,12 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import java.util.*;
 
 /**
+ * this call removes the matched links from links
+ * 
  * Created by Claudio on 3/10/2017.
  */
 public class ImmobilizeVehicleDestMatcher extends AbstractVehicleDestMatcher {
+ 
     @Override
     protected Map<VehicleLinkPair, Link> protected_match(Collection<VehicleLinkPair> vehicleLinkPairs, List<Link> links) {
         Map<VehicleLinkPair, Link> returnmap = new HashMap<>();

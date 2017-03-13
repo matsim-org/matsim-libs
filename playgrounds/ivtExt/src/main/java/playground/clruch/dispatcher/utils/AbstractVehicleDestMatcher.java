@@ -12,7 +12,7 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 public abstract class AbstractVehicleDestMatcher {
     public final Map<VehicleLinkPair, Link> match(
             Collection<VehicleLinkPair> vehicleLinkPairs, List<Link> links) {
-        if (vehicleLinkPairs.isEmpty())
+        if (vehicleLinkPairs.isEmpty()) // TODO possibly add check if links.isEmpty() !?
             return Collections.emptyMap();
         return protected_match(vehicleLinkPairs, links);
     }
