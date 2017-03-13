@@ -48,6 +48,17 @@ public class VirtualNetwork {
         return linkVNodeMap.get(link);
     }
 
+    /**
+     *
+     * @param index
+     * @return the virtualLink belonging to a certain index.
+     */
+    public final VirtualLink getVirtualLink(int index){
+        return  this.getVirtualLinks().stream().filter(v->v.getIndex() == index).findAny().get();
+    }
+
+
+
     /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn) {
         VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn);
         virtualNodes.add(virtualNode);

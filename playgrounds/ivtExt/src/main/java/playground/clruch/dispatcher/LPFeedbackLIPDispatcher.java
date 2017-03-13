@@ -12,6 +12,7 @@ package playground.clruch.dispatcher;
 
 import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.alg.Floor;
 import ch.ethz.idsc.tensor.alg.LinearSolve;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.Pretty;
@@ -107,10 +108,6 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 int num_requests = requests.values().stream().mapToInt(List::size).sum();
                 int vi_desired_num = (int) ((numberOfAVs - num_requests) / (double) virtualNetwork.getVirtualNodes().size());
                 GlobalAssert.that(vi_desired_num * virtualNetwork.getVirtualNodes().size() <= numberOfAVs);
-                Map<VirtualNode, Integer> vi_desired = new HashMap<>();
-                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-                    vi_desired.put(virtualNode, vi_desired_num);
-                }
                 Tensor vi_desiredT = Tensors.vector(i -> RationalScalar.of(vi_desired_num, 1), numvNodes);
 
 
@@ -150,30 +147,30 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 // solve the linear program with updated right-hand side
                 Tensor rebalanceCount = solveUpdatedLP(vi_excessT, vi_desiredT);
                 // TODO this should never become active, can be removed later (nonnegative solution)
-                /*
-                for(int i = 1; i<rebalanceCount.length():)
+                for(int i = 0; i<rebalanceCount.length();++i){
+                    GlobalAssert.that(rebalanceCount.Get(i).getAbsDouble()>=0);
+                }
 
-                GlobalAssert.that(!rebalanceCount.values().stream().filter(v -> v < 0).findAny().isPresent());
-                GlobalAssert.that(rebalanceCount.);
-                */
 
                 // ensure that not more vehicles are sent away than available
-                /*
-                Map<VirtualLink, Integer> feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCount, availableVehicles);
-                /*
+                Tensor feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCount, availableVehicles);
                 // TODO see why LP returns infeasible solutions, extend LP if it is possible to keep totally unimodular matrix
-                */
-                /*
+
                 // generate routing instructions for rebalancing vehicles
                 Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
                     destinationLinks.put(virtualNode, new ArrayList<>());
 
                 // fill rebalancing destinations
-                for (Map.Entry<VirtualLink, Integer> entry : feasibleRebalanceCount.entrySet()) {
-                    List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(entry.getKey().getTo(), entry.getValue());
-                    destinationLinks.get(entry.getKey().getFrom()).addAll(rebalanceTargets);
+                for(int i = 1; i<numvLinks; ++i){
+                    VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
+                    VirtualNode toNode = virtualLink.getTo();
+                    VirtualNode fromNode = virtualLink.getFrom();
+                    int numreb = (int) ((RealScalar) feasibleRebalanceCount.Get(i)).getRealDouble();
+                    List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
+                    destinationLinks.get(fromNode).addAll(rebalanceTargets);
                 }
+
 
                 // consistency check: rebalancing destination links must not exceed available vehicles in virtual node
                 Map<VirtualNode, List<VehicleLinkPair>> finalAvailableVehicles = availableVehicles;
@@ -187,7 +184,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                     Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
                     rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v, rebalanceMatching.get(v)));
                 }
-                */
+
             }
 
             // II.ii if vehilces remain in vNode, send to customers
@@ -220,24 +217,27 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         }
     }
 
-    private Map<VirtualLink, Integer> returnFeasibleRebalance(Map<VirtualLink, Integer> rebalanceInput, Map<VirtualNode, List<VehicleLinkPair>> availableVehicles) {
-        Map<VirtualLink, Integer> feasibleRebalance = new HashMap<>();
-        feasibleRebalance = rebalanceInput;
+    private Tensor returnFeasibleRebalance(Tensor rebalanceInput, Map<VirtualNode, List<VehicleLinkPair>> availableVehicles) {
+        Tensor feasibleRebalance = Array.zeros(numvLinks);
 
         // for every vNode check if enough vehicles are available to rebalance
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
             // count outgoing rebalancing vehicles from the vNode
-            int totRebVehicles = vLinkSameFromVNode.get(virtualNode).stream().mapToInt(v -> rebalanceInput.get(v)).sum();
+            double totRebVehiclesD = 0.0;
+            for(VirtualLink virtualLink: vLinkSameFromVNode.get(virtualNode)){
+                totRebVehiclesD = totRebVehiclesD + rebalanceInput.Get(virtualLink.getIndex()).getAbsDouble();
+            }
+            int totRebVehicles = (int) totRebVehiclesD;
+
             // adapt number of vehicles to be sent
             if (availableVehicles.get(virtualNode).size() < totRebVehicles) {
                 // calculate by how much to shrink
-                double shrinkingFactor = ((double) availableVehicles.get(virtualNode).size()) / ((double) totRebVehicles);
+                long shrinkingFactor = ((long) availableVehicles.get(virtualNode).size()) / ((long) totRebVehicles);
                 // remove rebalancing vehicles
-                for (VirtualLink virtualLink : vLinkSameFromVNode.get(virtualNode)) {
-                    int newIntRebCount = (int) Math.floor(rebalanceInput.get(virtualLink) * shrinkingFactor);
-                    int newLeftOver = rebalanceInput.get(virtualLink) - newIntRebCount;
-                    feasibleRebalance.put(virtualLink, newIntRebCount);
-
+                for (int i = 1; i<numvLinks; ++i) {
+                    Scalar scalar = rebalanceInput.Get(i).multiply(RationalScalar.of(shrinkingFactor,1));
+                    Scalar newIntRebCount = Floor.of(scalar);
+                    feasibleRebalance.set(newIntRebCount, virtualNode.index);
                 }
             }
         }
