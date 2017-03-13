@@ -475,7 +475,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		for ( Person person : pop.getPersons().values() ) {
 			String subPopType = (String) pop.getPersonAttributes().getAttribute( person.getId().toString(), SUBPOPULATION ) ;
 			Double payment = (Double) pop.getPersonAttributes().getAttribute( person.getId().toString(), PAYMENTS ) ;
-			if (payment==null) continue ;
+			if (payment==null || subPopType == null) continue ;
 			int bin = (int) (payment/binSize) ;
 			sum.get(subPopType)[bin] += payment ;
 			cnt.get(subPopType)[bin] ++ ;
