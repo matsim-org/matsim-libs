@@ -89,7 +89,7 @@ public class RunBerlinAV {
 			
 		} else {
 			configFile = "/Users/ihab/Documents/workspace/runs-svn/optAV/input/config_be_10pct_test.xml";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_test_2taxiTrips/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/baseCase_test_2taxiTrips_monetDistanceRate0.0002/";
 			analyzeNoise = false;
 			agentBasedActivityScheduling = false;
 			otfvis = false;

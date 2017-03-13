@@ -135,7 +135,7 @@ public class AnalysisControlerListener implements IterationEndsListener {
 		chart1.addSeries("Total travel time", iterations1, values1a);
 		chart1.saveAsPng(runDirectory + "totalTravelTime.png", 800, 600);
 		
-		XYLineChart chart2 = new XYLineChart("System welfare, user benefits, noise damages and toll revenues", "Iteration", "Monetary units");
+		XYLineChart chart2 = new XYLineChart("System welfare, user benefits, noise damages and toll revenues", "Iteration", "EUR");
 		double[] iterations2 = new double[event.getIteration() + 1];
 		double[] values2a = new double[event.getIteration() + 1];
 		double[] values2b = new double[event.getIteration() + 1];
@@ -155,7 +155,7 @@ public class AnalysisControlerListener implements IterationEndsListener {
 		chart2.addSeries("Noise damages", iterations2, values2d);
 		chart2.saveAsPng(runDirectory + "systemWelfare_userBenefits_noiseDamages_tollRevenues.png", 800, 600);
 		
-		XYLineChart chart3 = new XYLineChart("Noise damages [EUR]", "Iteration", "Hours");
+		XYLineChart chart3 = new XYLineChart("Noise damages [EUR]", "Iteration", "EUR");
 		double[] iterations3 = new double[event.getIteration() + 1];
 		double[] values3 = new double[event.getIteration() + 1];
 		for (int i = this.scenario.getConfig().controler().getFirstIteration(); i <= event.getIteration(); i++) {
