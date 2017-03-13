@@ -41,7 +41,7 @@ public class EventFileToDataXML {
      *            of the project folder
      */
 
-    static String path = "C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_23_Sioux_onlyUnitCapacityAVs"; //used for test purpose in main()
+    static String path = "C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs"; //used for test purpose in main()
 
 
 
@@ -91,8 +91,9 @@ public class EventFileToDataXML {
                 File totalDataDir = new File(data, "totalData.xml");
                 // TODO: rewrite totalData.generate to operate with quantiles and mean
                 totalData.generate("0", String.valueOf(travelTimes.totalTimeRatio),
-                        String.valueOf(binnedTravelDistances.totalDistanceRatio),
-                        "0", totalDataDir);
+                        String.valueOf(binnedTravelDistances.totalDistanceRatio), /*String.valueOf(BinnedWaitingTimes.totalMean),
+                        String.valueOf(BinnedWaitingTimes.totalQuantile50), String.valueOf(BinnedWaitingTimes.totalQuantile95),*/
+                        "0", "0", "0", totalDataDir);
             } else
                 new RuntimeException("data directory does not exist").printStackTrace();
         } else

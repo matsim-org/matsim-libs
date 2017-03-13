@@ -228,5 +228,11 @@ public class BinnedWaitingTimes extends AbstractData {
             System.out.println("Error creating the diagram");
         }
 
+        //System.out.println("50% quantile: " + totalQuantile50);
+        //System.out.println("95% quantile: " + totalQuantile95);
+        //System.out.println("mean: " + totalMean);
+
+        if (waitStart.size() != 0) System.out.println("there remain " + waitStart.size() + " waiting customers after the simulation has ended");
+        else System.out.println("no remaining customers waiting at the end of the simulation");
     }
 }

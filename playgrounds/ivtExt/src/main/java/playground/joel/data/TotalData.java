@@ -26,7 +26,9 @@ public class TotalData <Type> {
     String L3ElName = "TotalDistanceRatio";
     String L3AttrName = "DistanceRatio";
     String L4ElName = "TotalWaitingTime";
-    String L4AttrName = "WaitingTime";
+    String L4Attr1Name = "WaitingTimeMean";
+    String L4Attr2Name = "WaitingTime50Quantile";
+    String L4Attr3Name = "WaitingTime95Quantile";
 
     public TotalData() {}
 
@@ -38,7 +40,7 @@ public class TotalData <Type> {
     // <L2ElName L2AttrName="String2">
     // </L1ElName>
     // ...
-    public final void generate(String value1, String value2, String value3, String value4, File file) {
+    public final void generate(String value1, String value2, String value3, String value4, String value5, String value6, File file) {
         try {
             Element results = new Element(xmlTitle);
             Document doc = new Document(results);
@@ -61,7 +63,9 @@ public class TotalData <Type> {
 
             // waiting times
             Element element4 = new Element(L4ElName);
-            element4.setAttribute(new Attribute(L4AttrName, value4));
+            element4.setAttribute(new Attribute(L4Attr1Name, value4));
+            element4.setAttribute(new Attribute(L4Attr2Name, value5));
+            element4.setAttribute(new Attribute(L4Attr3Name, value6));
             doc.getRootElement().addContent(element4);
 
             // output the XML

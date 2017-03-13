@@ -46,7 +46,7 @@ public class TimeDiagramCreator {
 
 
         final XYDataset dataset=( XYDataset )new TimeSeriesCollection(series);
-        JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Seconds", "Value", dataset,false,false,false);
+        JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Time", "Value", dataset,false,false,false);
 
         int width = 800; /* Width of the image */
         int height = 600; /* Height of the image */
@@ -91,7 +91,7 @@ public class TimeDiagramCreator {
             }
         }
 
-        JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Seconds", "Value", dataset,false,false,false);
+        JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Time", "Value", dataset,false,false,false);
 
         int width = 800; /* Width of the image */
         int height = 600; /* Height of the image */
