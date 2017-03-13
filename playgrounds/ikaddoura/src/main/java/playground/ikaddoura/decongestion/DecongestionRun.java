@@ -88,6 +88,12 @@ public class DecongestionRun {
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setKi(0.05);
 		decongestionSettings.setKp(0.05);
+		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
+		
+		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
+		decongestionSettings.setINITIAL_TOLL(1.0);
+		
+		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(20.);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.8);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
@@ -124,14 +130,16 @@ public class DecongestionRun {
 //						"_init" + decongestionSettings.getINITIAL_TOLL() +
 //						"_adj" + decongestionSettings.getTOLL_ADJUSTMENT();
 			
-		// PID
+//		// PID
 		outputDirectory = outputDirectory +
 						"_Kp" + decongestionSettings.getKp() +
 						"_Ki" + decongestionSettings.getKi() +
 						"_Kd" + decongestionSettings.getKd() +
 						"_tollMSA" + decongestionSettings.isMsa() + 
 						"_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() + 
-						"_unusedHeadway_10.0";
+						"_integral" + decongestionSettings.getIntegralApproach() + 
+						"_alpha" + decongestionSettings.getIntegralApproachAverageAlpha() + 
+						"_factor" + decongestionSettings.getIntegralApproachUnusedHeadwayFactor();
 					
 		log.info("Output directory: " + outputDirectory);
 		

@@ -44,6 +44,9 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	private double Kp = 1.0;
 	private double Kd = 1.0;
 	private double Ki = 1.0;
+	private IntegralApproach integralApproach = IntegralApproach.Average;
+	private double integralApproachAverageAlpha = 0.1;
+	private double integralApproachUnusedHeadwayFactor = 10.;
 	
 	// General parameters
 	private boolean RUN_FINAL_ANALYSIS = true;
@@ -55,6 +58,10 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0; // set below 1.0 to disable price adjustment for final iterations
 	
 	// ######################################################################################
+	
+	public enum IntegralApproach {
+		Average, UnusedHeadway
+	}
 	
 	@StringGetter( "Kp" )
 	public double getKp() {
@@ -206,6 +213,36 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "msa" )
 	public void setMsa(boolean msa) {
 		this.msa = msa;
+	}
+
+	@StringGetter( "integralApproach" )
+	public IntegralApproach getIntegralApproach() {
+		return integralApproach;
+	}
+
+	@StringSetter( "integralApproach" )
+	public void setIntegralApproach(IntegralApproach integralApproach) {
+		this.integralApproach = integralApproach;
+	}
+
+	@StringGetter( "integralApproachAverageAlpha" )
+	public double getIntegralApproachAverageAlpha() {
+		return integralApproachAverageAlpha;
+	}
+
+	@StringSetter( "integralApproachAverageAlpha" )
+	public void setIntegralApproachAverageAlpha(double integralApproachAverageAlpha) {
+		this.integralApproachAverageAlpha = integralApproachAverageAlpha;
+	}
+
+	@StringGetter( "integralApproachUnusedHeadwayFactor" )
+	public double getIntegralApproachUnusedHeadwayFactor() {
+		return integralApproachUnusedHeadwayFactor;
+	}
+
+	@StringSetter( "integralApproachUnusedHeadwayFactor" )
+	public void setIntegralApproachUnusedHeadwayFactor(double integralApproachUnusedHeadwayFactor) {
+		this.integralApproachUnusedHeadwayFactor = integralApproachUnusedHeadwayFactor;
 	}
 			
 }

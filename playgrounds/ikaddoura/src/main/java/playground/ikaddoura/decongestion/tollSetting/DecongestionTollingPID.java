@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import com.google.inject.Inject;
 
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.IntegralApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
 
@@ -50,17 +51,8 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 	private int tollUpdateCounter = 0;
 	private final Map<Id<Link>, Map<Integer, Double>> linkId2time2totalDelayAllIterations = new HashMap<>();	
 	
-//	private IntegralApproach approach = IntegralApproach.AveragePositiveDelayOverAllIterations;
-	private final Map<Id<Link>, Map<Integer, Double>> linkId2time2avgDelayAllIterations = new HashMap<>();
-	private final double alpha = 0.1;
-	
-	private IntegralApproach approach = IntegralApproach.UnusedHeadway;
+	private final Map<Id<Link>, Map<Integer, Double>> linkId2time2avgDelayAllIterations = new HashMap<>();	
 	private final Map<Id<Link>, Map<Integer, Integer>> linkId2time2leavingAgents = new HashMap<>();
-	private final double unusedHeadwayFactor = 10.;
-		
-	private enum IntegralApproach {
-		AveragePositiveDelayOverAllIterations, UnusedHeadway
-	}
 
 	@Override
 	public void updateTolls() {
@@ -91,7 +83,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 				// --> Mittel über die letzten positven averageDelays (exponential smoothing probably ok: lastAverageDelay = (1-alpha)*lastAvDelay + alpha*averageDelay ; ) --> DONE
 				// --> \propto * (1/flow - 1/cap, so etwas wie die "headway reserve" oder "unused time headway") --> DONE
 				
-				if (approach.toString().equals(IntegralApproach.AveragePositiveDelayOverAllIterations.toString())) {
+				if (congestionInfo.getDecongestionConfigGroup().getIntegralApproach().toString().equals(IntegralApproach.Average.toString())) {
 					// update the average delay over all iterations
 					double avgDelayAllIterations = 0.;
 					if (averageDelay > congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
@@ -106,7 +98,8 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 								avgDelayAllIterations = averageDelay;
 							
 							} else {
-								avgDelayAllIterations =  (1 - alpha) * this.linkId2time2avgDelayAllIterations.get(linkId).get(intervalNr) + alpha * averageDelay;
+								avgDelayAllIterations =  (1 - congestionInfo.getDecongestionConfigGroup().getIntegralApproachAverageAlpha()) * this.linkId2time2avgDelayAllIterations.get(linkId).get(intervalNr)
+										+ congestionInfo.getDecongestionConfigGroup().getIntegralApproachAverageAlpha() * averageDelay;
 							}
 						}
 						this.linkId2time2avgDelayAllIterations.get(linkId).put(intervalNr, avgDelayAllIterations);
@@ -139,7 +132,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 					this.linkId2time2totalDelayAllIterations.get(linkId).put(intervalNr, totalDelayAllIterations);				
 					toll += K_i * totalDelayAllIterations;
 					
-				} else if (approach.toString().equals(IntegralApproach.UnusedHeadway.toString())) {
+				} else if (congestionInfo.getDecongestionConfigGroup().getIntegralApproach().toString().equals(IntegralApproach.UnusedHeadway.toString())) {
 					
 					// compute unused headway
 					
@@ -174,7 +167,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 							if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
 																
 								totalDelayAllIterations = this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr)
-										- (unusedHeadwayFactor * unusedHeadway);
+										- (congestionInfo.getDecongestionConfigGroup().getIntegralApproachUnusedHeadwayFactor() * unusedHeadway);
 							} else {
 								totalDelayAllIterations = this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr) 
 										+ averageDelay;
