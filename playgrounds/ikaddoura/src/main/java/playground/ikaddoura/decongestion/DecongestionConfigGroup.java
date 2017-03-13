@@ -44,7 +44,7 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	private double Kp = 1.0;
 	private double Kd = 1.0;
 	private double Ki = 1.0;
-	private IntegralApproach integralApproach = IntegralApproach.Average;
+	private IntegralApproach integralApproach = IntegralApproach.UnusedHeadway;
 	private double integralApproachAverageAlpha = 0.1;
 	private double integralApproachUnusedHeadwayFactor = 10.;
 	

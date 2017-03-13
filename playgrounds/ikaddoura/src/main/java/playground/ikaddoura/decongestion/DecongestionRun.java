@@ -37,6 +37,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisRun;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.IntegralApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
@@ -88,7 +89,8 @@ public class DecongestionRun {
 		decongestionSettings.setKd(0.);
 		decongestionSettings.setKi(0.05);
 		decongestionSettings.setKp(0.05);
-		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
+		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
+		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(1.0);
 		
 		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
 		decongestionSettings.setINITIAL_TOLL(1.0);
