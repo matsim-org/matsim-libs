@@ -188,7 +188,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
         private_now = now; // <- time available to derived class via getTimeNow()
 
         if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0)
-            System.out.println(getInfoStringBeg());
+            System.out.println(getInfoLine());
 
         redispatch(now);
         private_now = null; // <- time unavailable
@@ -205,7 +205,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * 
      * @return
      */
-    public String getInfoStringBeg() {
+    public String getInfoLine() {
         final String string = getClass().getSimpleName() + "        ";
         return String.format("%s@%6d V=(%4ds,%4dd)", //
                 string.substring(0, 6), //

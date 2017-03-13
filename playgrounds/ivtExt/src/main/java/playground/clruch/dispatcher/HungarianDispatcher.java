@@ -49,12 +49,12 @@ public class HungarianDispatcher extends UniversalDispatcher {
             EventsManager eventsManager, //
             Network network, AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
-        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         drivebyRequestStopper = new RequestStopsDrivebyVehicles(); // FIXME
         abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
         this.requestSelector = abstractRequestSelector;
 
+        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
     }

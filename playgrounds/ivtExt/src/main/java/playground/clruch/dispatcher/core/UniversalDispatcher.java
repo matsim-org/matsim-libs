@@ -180,9 +180,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     @Override
-    public String getInfoStringBeg() {
+    public String getInfoLine() {
         return String.format("%s R=(%5d) MR=%6d", //
-                super.getInfoStringBeg(), //
+                super.getInfoLine(), //
                 getAVRequests().size(), //
                 total_matchedRequests);
     }
