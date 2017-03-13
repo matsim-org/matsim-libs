@@ -44,6 +44,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
     final int numberOfAVs;
     //Map<VirtualNode, List<VirtualLink>> vLinkSameFromVNode = virtualNetwork.getVirtualLinks()
     //        .stream().collect(Collectors.groupingBy(VirtualLink::getFrom));
+    int rebCount = 0;
 
 
     public ConsensusDispatcherDFR( //
@@ -91,15 +92,6 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 // TODO: ensure that a rebalanced vehicle is then under the control of the to-virtualNode and can be dispatched there.
                 Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
 
-                // DEBUGGING STARTED
-                if(round_now > 4929){
-                    System.out.println("half an hour has passed. ");
-                    Map<VirtualNode, List<VehicleLinkPair>> availableVehicless = getVirtualNodeAvailableVehicles();
-                    String asd = availableVehicless.toString()+"123";
-                }
-
-                // DEBUGGING ENDED
-
 
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
@@ -107,9 +99,6 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
                 Map<VirtualNode, Set<AVVehicle>> v_ij_cust = getVirtualNodeArrivingWCustomerVehicles();
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
-                    if (v_ij_cust.get(virtualNode).size() > 0) {
-                        System.out.println("Customer is travelling");
-                    }
                     vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size()
                             + v_ij_reb.get(virtualNode).size()
                             - requests.get(virtualNode).size());
@@ -141,11 +130,29 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                     }
                 }
 
+                {
+                    if(rebalanceCount.values().stream().mapToInt(v->v).sum()>0){
+                        System.out.println("starting to rebalance");
+                    };
+                }
 
                 // ensure that not more vehicles are sent away than available
-                Map<VirtualLink, Integer> feasibleRebalanceCount = new HashMap<>();
+                Map<VirtualLink, Integer> feasibleRebalanceCount = rebalanceCount; //new HashMap<>();
+                /*
                 feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCount, availableVehicles);
-                // TODO see why LP returns infeasible solutions, extend LP if it is possible to keep totally unimodular matrix
+                */
+                {
+                    int posReb = feasibleRebalanceCount.values().stream().filter(v-> v>0).mapToInt(v->v).sum();
+                    int negReb = feasibleRebalanceCount.values().stream().filter(v-> v<0).mapToInt(v->v).sum();
+                    System.out.println("Rebalancing  " + (posReb - negReb) + " vehicles.");
+                    rebCount = rebCount + (posReb - negReb);
+                    if(rebCount>0){
+                        System.out.println("starting to rebalance");
+                    }
+                    System.out.println("Rebalanced a total of " + rebCount + " vehicles");
+
+                }
+                // DEBUGGING ENd
 
 
                 // generate routing instructions for rebalancing vehicles
@@ -159,16 +166,17 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                         List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(entry.getKey().getTo(), entry.getValue());
                         destinationLinks.get(entry.getKey().getFrom()).addAll(rebalanceTargets);
                     } else {
-                        List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(entry.getKey().getFrom(), - entry.getValue());
+                        List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(entry.getKey().getFrom(), -entry.getValue());
                         destinationLinks.get(entry.getKey().getTo()).addAll(rebalanceTargets);
                     }
                 }
 
                 // consistency check: rebalancing destination links must not exceed available vehicles in virtual node
-                Map<VirtualNode, List<VehicleLinkPair>> finalAvailableVehicles = availableVehicles;
-                GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream()
-                        .filter(v -> finalAvailableVehicles.get(v).size() < destinationLinks.get(v).size())
-                        .findAny().isPresent());
+                if (virtualNetwork.getVirtualNodes().stream()
+                        .filter(v -> availableVehicles.get(v).size() < destinationLinks.get(v).size())
+                        .findAny().isPresent()) {
+                    System.out.print("too many verhilces sent;");
+                }
 
 
                 // send rebalancing vehicles using the setVehicleRebalance command
@@ -221,10 +229,10 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             // count outgoing rebalancing vehicles from the vNode
             int totRebVecFromvNode = 0;
             for (VirtualLink vLink : rebalanceInput.keySet()) {
-                if(vLink.getFrom().equals(virtualNode) || rebalanceInput.get(vLink)>=0){
+                if (vLink.getFrom().equals(virtualNode) || rebalanceInput.get(vLink) >= 0) {
                     totRebVecFromvNode = totRebVecFromvNode + rebalanceInput.get(vLink);
                 }
-                if (vLink.getTo().equals(virtualNode) || rebalanceInput.get(vLink)<0){
+                if (vLink.getTo().equals(virtualNode) || rebalanceInput.get(vLink) < 0) {
                     totRebVecFromvNode = totRebVecFromvNode - rebalanceInput.get(vLink);
                 }
             }
@@ -236,14 +244,14 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 double shrinkingFactor = ((double) availableVehicles.get(virtualNode).size()) / ((double) totRebVecFromvNode);
                 // remove rebalancing vehicles
                 for (VirtualLink vLink : rebalanceInput.keySet()) {
-                    if(vLink.getFrom().equals(virtualNode) || rebalanceInput.get(vLink)>=0){
+                    if (vLink.getFrom().equals(virtualNode) || rebalanceInput.get(vLink) >= 0) {
                         int newIntRebCount = (int) Math.floor(rebalanceInput.get(vLink) * shrinkingFactor);
                         int newLeftOver = rebalanceInput.get(vLink) - newIntRebCount;
                         feasibleRebalance.put(vLink, newIntRebCount);
                         double oldRebFloating = rebalanceFloating.get(vLink);
                         rebalanceFloating.put(vLink, oldRebFloating + (double) newLeftOver);
                     }
-                    if (vLink.getTo().equals(virtualNode) || rebalanceInput.get(vLink)<0){
+                    if (vLink.getTo().equals(virtualNode) || rebalanceInput.get(vLink) < 0) {
                         int newIntRebCount = (int) Math.floor(rebalanceInput.get(vLink) * shrinkingFactor);
                         int newLeftOver = rebalanceInput.get(vLink) - newIntRebCount;
                         feasibleRebalance.put(vLink, newIntRebCount);
@@ -282,12 +290,10 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
-            // TODO get this directory from config / generatorConfig, remove hardcode
-            File virtualnetworkXML = new File("C:/Users/Claudio/Documents/matsim_Simulations/2017_03_08_Consensus/virtualNetwork.xml");
-            File consensusWeightsXML = new File("C:/Users/Claudio/Documents/matsim_Simulations/2017_03_08_Consensus/consensusWeights.xml");
+            File virtualnetworkXML = new File(config.getParams().get("virtualNetworkFile"));
+            File linkWeightsXML = new File(config.getParams().get("linkWeightsFile"));
             virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkXML);
-            linkWeights = vLinkDataReader.fillvLinkData(consensusWeightsXML, virtualNetwork, "weight");
-
+            linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
 
             return new ConsensusDispatcherDFR(
                     config,
