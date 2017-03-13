@@ -15,6 +15,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 /**
  * 
  */
+@ Deprecated
 public class DrivebyRequestStopper {
 
     final BiFunction<VehicleLinkPair, Link, Void> biFunction;

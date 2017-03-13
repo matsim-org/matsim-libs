@@ -10,6 +10,11 @@
 
 package playground.clruch.dispatcher;
 
+import ch.ethz.idsc.tensor.*;
+import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.alg.LinearSolve;
+import ch.ethz.idsc.tensor.alg.Transpose;
+import ch.ethz.idsc.tensor.io.Pretty;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.gnu.glpk.*;
@@ -34,13 +39,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
-    public final int REBALANCING_PERIOD;
+    public final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
     private int total_matchedRequests = 0;
+    final int numvNodes;
+    final int numvLinks;
     // setup linear program
     glp_prob lp;
     glp_smcp parm;
@@ -74,7 +81,9 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         this.initiateLP();
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
-        REBALANCING_PERIOD = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        numvNodes = virtualNetwork.getVirtualNodes().size();
+        numvLinks = virtualNetwork.getVirtualLinks().size();
     }
 
 
@@ -87,7 +96,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
         // PART II: redispatch all vehicles
         final long round_now = Math.round(now);
-        if (round_now % REBALANCING_PERIOD == 0) {
+        if (round_now % rebalancingPeriod == 0) {
             System.out.println(getClass().getSimpleName() + " @" + round_now + " mr = " + total_matchedRequests);
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
             // II.i compute rebalancing vehicles and send to virtualNodes
@@ -102,18 +111,53 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
                     vi_desired.put(virtualNode, vi_desired_num);
                 }
+                Tensor vi_desiredT = Tensors.vector(i-> RationalScalar.of(vi_desired_num,1),numvNodes);
+
 
 
                 // calculate excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 Map<VirtualNode, Integer> vi_excess = new HashMap<>();
                 Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
                 Map<VirtualNode, Set<AVVehicle>> v_ij_cust = getVirtualNodeArrivingWCustomerVehicles();
+                //OLD START
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
                     vi_excess.put(virtualNode, availableVehicles.get(virtualNode).size()
                             + v_ij_reb.get(virtualNode).size()
                             + v_ij_cust.get(virtualNode).size()
                             - requests.get(virtualNode).size());
                 }
+                // OLD END
+                Tensor vi_excessT = Array.zeros(numvNodes);
+                for (VirtualNode virtualNode : availableVehicles.keySet()) {
+                    int viExcessVal = availableVehicles.get(virtualNode).size()
+                            + v_ij_reb.get(virtualNode).size()
+                            + v_ij_cust.get(virtualNode).size()
+                            - requests.get(virtualNode).size();
+                    vi_excessT.set(RationalScalar.of(viExcessVal,1),virtualNode.index);
+                }
+
+                // SOME TENSOR TESTING START
+
+                Tensor myMatrix = Tensors.matrix((i,j)->RationalScalar.of(1,1),20,30);
+                myMatrix.set(RationalScalar.of(3,2),5,6);
+                System.out.println(myMatrix);
+                System.out.println(Pretty.of(myMatrix));
+
+                Transpose.of(myMatrix).get(0); // erste spalte
+                myMatrix.get(0); // erste Zeile
+
+
+                Tensor difference = vi_desiredT.subtract(vi_excessT);
+                vi_desiredT.multiply(DoubleScalar.of(23.123));
+
+                Tensor asd = LinearSolve.of(myMatrix,vi_desiredT);
+
+
+                // SOME TENSOR TESTING END
+
+
+
+
                 if (round_now > 0) {
                     // TODO this condition should never be true, check why not fulfilled at few timesteps and if possible insert GlobalAssert.
                     if (vi_excess.values().stream().mapToInt(v -> v).sum() + num_requests != numberOfAVs) {
@@ -386,11 +430,15 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     }
 
 
-    // TODO find out if this needs to be eplicitely called or if it is taken care of by the JAVA garbage collector
-    private void closeLP() {
-        // Free memory
+
+    // TODO assure no memory leaks happen if MATSim done for multiple iterations
+    @Override
+    public void finalize() {
+        // release storage allocated for LP
         GLPK.glp_delete_prob(lp);
+        System.out.println("Book instance is getting destroyed");
     }
+
 
     /**
      * write simplex solution
@@ -445,7 +493,9 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
             // TODO get this directory from config / generatorConfig, remove hardcode
-            File virtualnetworkXML = new File("C:/Users/Claudio/Documents/matsim_Simulations/2017_02_28_Sioux_LP/virtualNetwork.xml");
+            // C:/Users/Claudio/Documents/matsim_Simulations/2017_02_28_Sioux_LP/
+            File virtualnetworkXML = new File("virtualNetwork.xml");
+            System.out.println(""+virtualnetworkXML.getAbsoluteFile());
             virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkXML);
             travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkXML, virtualNetwork,"Ttime");
 

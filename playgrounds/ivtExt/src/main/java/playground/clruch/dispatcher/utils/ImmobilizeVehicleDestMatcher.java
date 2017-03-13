@@ -14,13 +14,12 @@ public class ImmobilizeVehicleDestMatcher extends AbstractVehicleDestMatcher {
         Map<VehicleLinkPair, Link> returnmap = new HashMap<>();
         for (VehicleLinkPair vehicleLinkPair : vehicleLinkPairs) {
             int i = 0;
-            boolean foundmatch = false;
-            while (i < links.size() && !foundmatch) {
+            while (i < links.size()) {
                 Link link = links.get(i);
                 if (link.equals(vehicleLinkPair.getCurrentDriveDestination())) {
                     returnmap.put(vehicleLinkPair, link);
                     links.remove(i);
-                    foundmatch = true;
+                    break;
                 } else {
                     i = i + 1;
                 }

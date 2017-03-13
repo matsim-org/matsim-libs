@@ -42,8 +42,8 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
     private int total_matchedRequests = 0;
     final Map<VirtualLink, Double> vLinkWeights;
     final int numberOfAVs;
-    Map<VirtualNode, List<VirtualLink>> vLinkSameFromVNode = virtualNetwork.getVirtualLinks()
-            .stream().collect(Collectors.groupingBy(VirtualLink::getFrom));
+    //Map<VirtualNode, List<VirtualLink>> vLinkSameFromVNode = virtualNetwork.getVirtualLinks()
+    //        .stream().collect(Collectors.groupingBy(VirtualLink::getFrom));
 
 
     public ConsensusDispatcherDFR( //

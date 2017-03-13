@@ -78,10 +78,14 @@ public class HungarianDispatcher extends UniversalDispatcher {
                 // call getDivertableVehicles again to get remaining vehicles
                 Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
 
+
+
+
                 // reduce the number of requests for a smaller running time
                 // take out and match request-vehilce pairs with distance zero
+                long maxSize = divertableVehicles.size();
                 List<Link> requestlocs = requests.values()
-                        .stream().flatMap(v -> v.stream())
+                        .stream().flatMap(v -> v.stream().limit(maxSize))
                         .map(AVRequest::getFromLink) // all from links of all requests with multiplicity
                         .collect(Collectors.toList());
                 ImmobilizeVehicleDestMatcher immobilizeVehicleDestMatcher = new ImmobilizeVehicleDestMatcher();
