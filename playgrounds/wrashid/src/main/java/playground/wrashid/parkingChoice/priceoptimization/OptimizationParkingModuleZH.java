@@ -55,7 +55,12 @@ public class OptimizationParkingModuleZH implements IterationStartsListener,
 		this.controler = controler;
 		controler.addControlerListener(this);
 
-		SetupParkingForOptimizationScenario.prepare(this,controler);
+		try {
+			SetupParkingForOptimizationScenario.prepare(this,controler);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 	
