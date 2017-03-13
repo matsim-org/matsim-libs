@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -45,9 +44,14 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
+    private int infoLinePeriod = 0;
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
+    }
+
+    public final void setInfoLinePeriod(int infoLinePeriod) { // TODO rename
+        this.infoLinePeriod = infoLinePeriod;
     }
 
     /**
@@ -101,11 +105,11 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return Collections.unmodifiableMap(map);
     }
 
-
     /**
      * @return collection of cars that are in the driving state with a customer, i.e. their
-     * second last task is an AVDropoff Task (followed by AVStay task)
+     *         second last task is an AVDropoff Task (followed by AVStay task)
      */
+    @Deprecated
     protected final Collection<VehicleLinkPair> getVehiclesWithCustomer() {
         Collection<VehicleLinkPair> collection = new LinkedList<>();
         for (AVVehicle avVehicle : getFunctioningVehicles())
@@ -135,12 +139,11 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return collection;
     }
 
-
     /**
      * @return collection of cars that are in the driving state without customer, or stay task.
-     * if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
-     * that invoke assignDirective(...), the vehicle is not included in the successive call to
-     * getDivertableVehicles() until it becomes <i>divertable</i> again.
+     *         if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
+     *         that invoke assignDirective(...), the vehicle is not included in the successive call to
+     *         getDivertableVehicles() until it becomes <i>divertable</i> again.
      */
     protected final Collection<VehicleLinkPair> getDivertableVehicles() {
         Collection<VehicleLinkPair> collection = new LinkedList<>();
@@ -180,9 +183,21 @@ abstract class VehicleMaintainer implements AVDispatcher {
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
+    private String previousInfoMarker = "";
+
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
+
+        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
+            String infoLine = getInfoLine();
+            String marker = infoLine.substring(16);
+            if (!marker.equals(previousInfoMarker)) {
+                previousInfoMarker = marker;
+                System.out.println(infoLine);
+            }
+        }
+
         redispatch(now);
         private_now = null; // <- time unavailable
         long tic = System.nanoTime();
@@ -194,22 +209,33 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
+     * derived classes should override this function to add details
+     * 
+     * @return
+     */
+    public String getInfoLine() {
+        final String string = getClass().getSimpleName() + "        ";
+        return String.format("%s@%6d V=(%4ds,%4dd)", //
+                string.substring(0, 6), //
+                (long) getTimeNow(), //
+                getStayVehicles().values().stream().mapToInt(Queue::size).sum(), //
+                getDivertableVehicles().size() //
+        );
+    }
+
+    /**
      * @return time of current re-dispatching iteration step
-     * @throws NullPointerException if dispatching has not started yet
+     * @throws NullPointerException
+     *             if dispatching has not started yet
      */
     protected final double getTimeNow() {
         return private_now;
     }
 
-    public abstract void redispatch(double now);
-
     /**
-     * @return debug information about status of this instance of {@link VehicleMaintainer}
+     * derived classes should override this function
+     * 
+     * @param now
      */
-    public synchronized String getVehicleMaintainerStatusString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("#directives " + private_vehicleDirectives.size() + ", ");
-        stringBuilder.append("total routingTime=" + (routingTimeNano * 1e-9) + " sec");
-        return stringBuilder.toString();
-    }
+    protected abstract void redispatch(double now);
 }

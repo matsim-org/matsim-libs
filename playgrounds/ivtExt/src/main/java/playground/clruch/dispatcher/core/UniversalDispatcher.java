@@ -12,7 +12,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
@@ -20,6 +23,7 @@ import org.matsim.core.router.util.TravelTime;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -43,6 +47,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final double pickupDurationPerStop;
     private final double dropoffDurationPerStop;
 
+    private int total_matchedRequests = 0;
+
     protected UniversalDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
@@ -54,6 +60,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         pickupDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getPickupDurationPerStop();
         dropoffDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getDropoffDurationPerStop();
+
+        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
+        setInfoLinePeriod(safeConfig.getInteger("infoLinePeriod", 10));
     }
 
     /**
@@ -103,6 +112,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         assignDirective(avVehicle, new AcceptRequestDirective( //
                 avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
+
+        ++total_matchedRequests;
         return null;
     }
 
@@ -166,6 +177,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     @Override
     public final void onNextTaskStarted(AVTask task) {
         // intentionally empty
+    }
+
+    @Override
+    public String getInfoLine() {
+        return String.format("%s R=(%5d) MR=%6d", //
+                super.getInfoLine(), //
+                getAVRequests().size(), //
+                total_matchedRequests);
     }
 
     /**

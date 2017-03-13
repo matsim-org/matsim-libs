@@ -124,25 +124,6 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
 
 
-                // SOME TENSOR TESTING START
-
-                Tensor myMatrix = Tensors.matrix((i, j) -> RationalScalar.of(1, 1), 20, 30);
-                myMatrix.set(RationalScalar.of(3, 2), 5, 6);
-                System.out.println(myMatrix);
-                System.out.println(Pretty.of(myMatrix));
-
-                Transpose.of(myMatrix).get(0); // erste spalte
-                myMatrix.get(0); // erste Zeile
-
-
-                Tensor difference = vi_desiredT.subtract(vi_excessT);
-                vi_desiredT.multiply(DoubleScalar.of(23.123));
-
-                Tensor asd = LinearSolve.of(myMatrix, vi_desiredT);
-
-
-                // SOME TENSOR TESTING END
-
 
                 // solve the linear program with updated right-hand side
                 Tensor rebalanceCount = solveUpdatedLP(vi_excessT, vi_desiredT);
@@ -151,10 +132,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                     GlobalAssert.that(rebalanceCount.Get(i).getAbsDouble()>=0);
                 }
 
+                Collection<VirtualLink> debuggingLinks = virtualNetwork.getVirtualLinks();
+
 
                 // ensure that not more vehicles are sent away than available
                 Tensor feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCount, availableVehicles);
-                // TODO see why LP returns infeasible solutions, extend LP if it is possible to keep totally unimodular matrix
 
                 // generate routing instructions for rebalancing vehicles
                 Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
@@ -218,7 +200,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     }
 
     private Tensor returnFeasibleRebalance(Tensor rebalanceInput, Map<VirtualNode, List<VehicleLinkPair>> availableVehicles) {
-        Tensor feasibleRebalance = Array.zeros(numvLinks);
+        Tensor feasibleRebalance = rebalanceInput.copy();
 
         // for every vNode check if enough vehicles are available to rebalance
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
@@ -234,10 +216,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 // calculate by how much to shrink
                 long shrinkingFactor = ((long) availableVehicles.get(virtualNode).size()) / ((long) totRebVehicles);
                 // remove rebalancing vehicles
-                for (int i = 1; i<numvLinks; ++i) {
+                for(VirtualLink virtualLink: vLinkSameFromVNode.get(virtualNode)){
+                    int i = virtualLink.getIndex();
                     Scalar scalar = rebalanceInput.Get(i).multiply(RationalScalar.of(shrinkingFactor,1));
                     Scalar newIntRebCount = Floor.of(scalar);
-                    feasibleRebalance.set(newIntRebCount, virtualNode.index);
+                    feasibleRebalance.set(newIntRebCount, virtualLink.index);
                 }
             }
         }
@@ -248,12 +231,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     private Tensor solveUpdatedLP(Tensor vi_excessT, Tensor vi_desiredT) {
 
         // fill right-hand-side
-        int eq = 0;
         for (int i = 0; i < vi_excessT.length(); ++i) {
-            Scalar s1 = vi_desiredT.Get(i);
-            double d1 = s1.getAbsDouble();
-            GLPK.glp_set_row_bnds(lp, eq, GLPKConstants.GLP_LO, vi_desiredT.Get(i).getAbsDouble() - vi_excessT.Get(i).getAbsDouble(), 0.0);
-            eq = eq + 1;
+            double v1desired = vi_desiredT.Get(i).getAbsDouble();
+            double v1excess = vi_excessT.Get(i).getAbsDouble();
+            double rhs = v1desired - v1excess;
+            GLPK.glp_set_row_bnds(lp, i+1, GLPKConstants.GLP_LO, rhs, 0.0);
         }
 
 
@@ -266,15 +248,16 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         // Retrieve solution
         // TODO check if ret == 0 functions properly or not
         if (ret == 0) {
-            write_lp_solution(lp);
+            System.out.println("successfully solved LP");
+            //write_lp_solution(lp);
         } else {
             System.out.println("The problem could not be solved");
         }
 
         // fill result vector
         Tensor rebalanceOrder = Array.zeros(numvLinks);
-        for (int i = 1; i <= numvLinks; ++i) {
-            rebalanceOrder.set(RationalScalar.of((int) GLPK.glp_get_col_prim(lp, i), 1), i);
+        for (int i = 0; i < numvLinks; ++i) {
+            rebalanceOrder.set(RationalScalar.of((int) GLPK.glp_get_col_prim(lp, i+1), 1), i);
         }
 
 
