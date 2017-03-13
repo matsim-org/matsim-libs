@@ -47,7 +47,6 @@ public class SocialNetworkSampler {
 	private final EgoCharacteristicsDistribution egoDistribution;
 	private final CliquesFiller cliquesFiller;
 	private final EgoLocator egoLocator;
-	private final SocialNetworkSamplingConfigGroup configGroup;
 	private final SpatialCollectionUtils.Metric<double[]> metric;
 
 	private Consumer<Set<Ego>> cliquesListener = (e) -> {};
@@ -58,13 +57,11 @@ public class SocialNetworkSampler {
 			final EgoCharacteristicsDistribution degreeDistribution,
 			final CliquesFiller cliquesFiller,
 			final EgoLocator egoLocator,
-			final SocialNetworkSamplingConfigGroup configGroup,
 			final SpatialCollectionUtils.Metric<double[]> metric ) {
 		this.population = population;
 		this.egoDistribution = degreeDistribution;
 		this.cliquesFiller = cliquesFiller;
 		this.egoLocator = egoLocator;
-		this.configGroup = configGroup;
 		this.metric = metric;
 	}
 
