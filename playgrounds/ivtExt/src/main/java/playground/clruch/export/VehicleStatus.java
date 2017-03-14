@@ -22,6 +22,8 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.dispatcher.core.RebalanceVehicleEvent;
+import playground.clruch.dispatcher.core.RebalanceVehicleEventHandler;
 import playground.clruch.utils.HelperPredicates;
 
 /**
@@ -30,6 +32,7 @@ import playground.clruch.utils.HelperPredicates;
 class VehicleStatus extends AbstractExport {
     // TODO: implement recording of rebalancing journeys for visualization
 
+    // vehicle -> (time -> status)
     NavigableMap<String, NavigableMap<Double, AVStatus>> vehicleStatus = new TreeMap<>();
     HashMap<String, Set<Id<Person>>> vehicleCustomers = new HashMap<>();
 
@@ -46,11 +49,14 @@ class VehicleStatus extends AbstractExport {
     private void putDriveToCustomer(PersonDepartureEvent event) {
         put(event.getPersonId().toString(), event.getTime(), AVStatus.DRIVETOCUSTMER);
     }
+    
+    private void putRebalanceDrive(RebalanceVehicleEvent event) {
+//        put(event.getEventType(), AVStatus.REBALANCEDRIVE);
+    }
 
     private Set<Id<Person>> getCustomerSet(String vehicle) {
         if (!vehicleCustomers.containsKey(vehicle))
             vehicleCustomers.put(vehicle, new HashSet<>());
-
         return vehicleCustomers.get(vehicle);
     }
 
@@ -172,6 +178,20 @@ class VehicleStatus extends AbstractExport {
                     // intentionally empty
 
                 }
+            });
+            
+            events.addHandler(new RebalanceVehicleEventHandler() {
+                
+                @Override
+                public void handleEvent(RebalanceVehicleEvent event) {
+                    System.out.println("Reb");
+                    
+                }
+                @Override
+                public void reset(int iteration) {
+                    // intentionally empty                    
+                }
+                
             });
 
         }
