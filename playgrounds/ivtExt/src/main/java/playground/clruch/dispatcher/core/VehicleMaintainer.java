@@ -50,7 +50,12 @@ abstract class VehicleMaintainer implements AVDispatcher {
         this.eventsManager = eventsManager;
     }
 
-    public final void setInfoLinePeriod(int infoLinePeriod) { // TODO rename
+    /**
+     * @param infoLinePeriod
+     *            positive values determine the period,
+     *            negative values or 0 will disable the printout
+     */
+    public final void setInfoLinePeriod(int infoLinePeriod) {
         this.infoLinePeriod = infoLinePeriod;
     }
 
