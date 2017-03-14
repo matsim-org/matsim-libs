@@ -87,7 +87,7 @@ public class DecongestionRun {
 		decongestionSettings.setMsa(true);
 		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
 		decongestionSettings.setKd(0.);
-		decongestionSettings.setKi(0.0);
+		decongestionSettings.setKi(0.05);
 		decongestionSettings.setKp(0.05);
 		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
 		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
