@@ -33,6 +33,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConsensusDispatcherDFR extends PartitionedDispatcher {
+    public static final String KEY_VIRTUALNETWORKFILE="virtualNetworkFile";
+    public static final String KEY_LINKWEIGHTSFILE = "linkWeightsFile";
+    
+    
     public final int REBALANCING_PERIOD;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
@@ -290,8 +294,12 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
+            GlobalAssert.that(config.getParams().containsKey(KEY_VIRTUALNETWORKFILE));
+            GlobalAssert.that(config.getParams().containsKey(KEY_LINKWEIGHTSFILE));
             File virtualnetworkXML = new File(config.getParams().get("virtualNetworkFile"));
+            GlobalAssert.that(virtualnetworkXML.exists());
             File linkWeightsXML = new File(config.getParams().get("linkWeightsFile"));
+            GlobalAssert.that(linkWeightsXML.exists());
             virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkXML);
             linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
 
