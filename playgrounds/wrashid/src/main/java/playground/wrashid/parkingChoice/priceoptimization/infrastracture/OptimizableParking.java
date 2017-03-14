@@ -10,6 +10,7 @@ import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingCostModel;
 
 public class OptimizableParking extends PublicParking {
 	
+	private boolean blueZone = false;
 	private double costPerHourNormal = 0.5;
 	private double[] costPerEachHour;
 	private double costPerHourPeak = 0.5;
@@ -25,6 +26,8 @@ public class OptimizableParking extends PublicParking {
 		super(id, capacity, coord, parkingCostModel, groupName);
 		this.costPerHourNormal = costPerHourNormal;
 		this.costPerHourPeak = costPerHourPeak;
+		if (costPerHourNormal == 0.0)
+			this.blueZone = true;
 		this.costPerEachHour = new double[48];
 		for (int i = 0; i < 24; i++) {
 			this.costPerEachHour[i] = costPerHourNormal;
@@ -69,7 +72,10 @@ public class OptimizableParking extends PublicParking {
 	
 	@Override
 	public double getCost(Id<Person> personId, double arrivalTime, double parkingDurationInSecond){
-		
+		/*
+		 * Based on the personId see if he has a permit to park in the blue zone if he is parking there
+		 * 
+		 */
 		double departureTime = arrivalTime + parkingDurationInSecond;
 		int startIndex = (int) (arrivalTime / 3600.0);
 		int endIndex = (int) ((arrivalTime + parkingDurationInSecond) / 3600.0);
@@ -95,7 +101,7 @@ public class OptimizableParking extends PublicParking {
 		}
 		else {
 			
-			if (this.highTariff) {
+			if (this.highTariff && !this.blueZone) {
 				
 				if (parkingDurationInSecond < 30 * 60)
 					return 0.5;
@@ -207,6 +213,10 @@ public class OptimizableParking extends PublicParking {
 	public double getCostPerHour(int i) {
 		// TODO Auto-generated method stub
 		return this.costPerEachHour[i];
+	}
+
+	public boolean isBlueZone() {
+		return blueZone;
 	}
 
 }

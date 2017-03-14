@@ -5,15 +5,18 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.parkingchoice.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
+import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.utils.io.IOUtils;
@@ -22,23 +25,84 @@ import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageW
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
 import playground.wrashid.parkingChoice.priceoptimization.analysis.ArrivalDepartureParkingHandler;
 import playground.wrashid.parkingChoice.priceoptimization.infrastracture.OptimizableParking;
+import playground.wrashid.parkingChoice.priceoptimization.simulation.ParkingChoiceSimulation;
+import playground.wrashid.parkingChoice.priceoptimization.simulation.ParkingInfrastructureManager;
 
-public class OptimizationParkingModuleZH extends GeneralParkingModule implements IterationStartsListener, 
-	IterationEndsListener{
+public class OptimizationParkingModuleZH implements IterationStartsListener, 
+	IterationEndsListener, StartupListener, BeforeMobsimListener {
 	
 	private AverageWalkDistanceStatsZH averageWalkDistanceStatsZH;
 	private ParkingGroupOccupanciesZH parkingGroupOccupanciesZH;
 	private ArrivalDepartureParkingHandler arrivalDepartureParkingHandler;
 	private EventsManager eventsManager;
 	private EventWriterXML eventsWriter;
-	private Controler controler;
+	private Controler controler;	
 	
+	
+	private ParkingScoreManager parkingScoreManager;
+	public final ParkingScoreManager getParkingScoreManager() {
+		return parkingScoreManager;
+	}
+
+	public final void setParkingScoreManager(ParkingScoreManager parkingScoreManager) {
+		this.parkingScoreManager = parkingScoreManager;
+	}
+
+	private ParkingInfrastructureManager parkingInfrastructureManager;
+	private ParkingChoiceSimulation parkingSimulation;
+
 	public OptimizationParkingModuleZH(Controler controler) {
-		super(controler);
 		this.controler = controler;
+		controler.addControlerListener(this);
+
 		SetupParkingForOptimizationScenario.prepare(this,controler);
 
 	}
+	
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		parkingSimulation = new ParkingChoiceSimulation(controler.getScenario(), parkingInfrastructureManager);
+		controler.getEvents().addHandler(parkingSimulation);
+//		controler.addControlerListener(parkingSimulation);
+		// was not doing anything there. kai, jul'15
+	}
+
+	public final ParkingInfrastructureManager getParkingInfrastructure() {
+		return parkingInfrastructureManager;
+	}
+	
+	public final void setParkingInfrastructurManager(ParkingInfrastructureManager parkingInfrastructureManager) {
+		this.parkingInfrastructureManager = parkingInfrastructureManager;
+	}
+
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		parkingScoreManager.prepareForNewIteration();
+		parkingInfrastructureManager.reset();
+		parkingSimulation.prepareForNewIteration();
+	}
+
+	protected final ParkingInfrastructureManager getParkingInfrastructureManager() {
+		return parkingInfrastructureManager;
+	}
+	
+	protected final ParkingChoiceSimulation getParkingSimulation() {
+		return parkingSimulation;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 		
 	@Override
@@ -114,11 +178,6 @@ public class OptimizationParkingModuleZH extends GeneralParkingModule implements
 		getParkingInfrastructure().setEventsManager(eventsManager);
 	}
 	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		super.notifyStartup(event);
-		
-	}
 	
 	/*@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {

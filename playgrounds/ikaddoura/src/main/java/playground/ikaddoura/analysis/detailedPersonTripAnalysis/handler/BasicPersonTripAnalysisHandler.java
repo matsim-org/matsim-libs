@@ -101,6 +101,9 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private int warnCnt0 = 0;
 	private int warnCnt1 = 0;
 	private int warnCnt2 = 0;
+	private int warnCnt3 = 0;
+	private int warnCnt4 = 0;
+
 	
 	public void setScenario(Scenario scenario) {
 		this.scenario = scenario;
@@ -463,14 +466,9 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-		
-		log.info("### Person is stucking. ###");
-		log.info(event.toString());
-		
+				
 		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == this.scenario.getConfig().qsim().getEndTime()) { // scenario end time
-			
-			log.warn("A person is stucking... This may affect the travel time calculation.");
-			
+						
 			if (this.personId2currentTripNumber.containsKey(event.getPersonId())) {
 				int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());	
 				
@@ -486,13 +484,27 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 										
 				double traveltime = 0.;
 				if (event.getTime() == this.scenario.getConfig().qsim().getEndTime()) {
-					log.warn("The stuck event is thrown at the end of the simulation. Computing the travel time for this trip as follows: simulation end time - trip departure time");
 					traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
+					if (warnCnt3 <= 5) {
+						log.warn("The stuck event is thrown at the end of the simulation. Computing the travel time for this trip as follows: simulation end time - trip departure time");
+						log.warn("The travel time is set to " + traveltime);
+						if (warnCnt3 == 5) {
+							log.warn("Further warnings of this type are not printed out.");
+						}
+					}
+					warnCnt3++;
 				} else {
-					log.warn("Stucking vehicle will be removed and teleported to the destination activity. The travel time cannot be interpreted.");
 					traveltime = Double.POSITIVE_INFINITY;
+
+					if (warnCnt4 <= 5) {
+						log.warn("Stucking vehicle will be removed and teleported to the destination activity. The travel time cannot be interpreted.");
+						log.warn("The travel time is set to " + traveltime);
+						if (warnCnt4 == 5) {
+							log.warn("Further warnings of this type are not printed out.");
+						}
+					}
+					warnCnt4++;
 				}
-				log.warn("The travel time is set to " + traveltime);
 				
 				tripNumber2travelTime.put(currentTripNumber, traveltime);
 				this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);

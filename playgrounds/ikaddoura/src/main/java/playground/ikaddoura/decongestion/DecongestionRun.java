@@ -37,6 +37,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisRun;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.IntegralApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
@@ -72,7 +73,7 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output2/";
+			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output-NEW-1000.output_plans-asInput/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -84,10 +85,17 @@ public class DecongestionRun {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
 		decongestionSettings.setMsa(true);
-		decongestionSettings.setTOLL_BLEND_FACTOR(0.);
+		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
 		decongestionSettings.setKd(0.);
-		decongestionSettings.setKi(0.);
+		decongestionSettings.setKi(0.0);
 		decongestionSettings.setKp(0.05);
+		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
+		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
+		
+		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
+		decongestionSettings.setINITIAL_TOLL(1.0);
+		
+		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(20.);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.8);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
@@ -103,13 +111,14 @@ public class DecongestionRun {
 		}
 		
 		String outputDirectory = outputBaseDirectory +
-				"total" + config.controler().getLastIteration() + "it" +
+				"iter" + config.controler().getLastIteration() +
 				"_plans" + config.strategy().getMaxAgentPlanMemorySize() +
-				"_ScoreMSA" + config.planCalcScore().getFractionOfIterationsToStartScoreMSA() +
-				"_timeBinSize" + config.travelTimeCalculator().getTraveltimeBinSize() +
-				"_BrainExpBeta" + config.planCalcScore().getBrainExpBeta() +
-				"_timeMutationWeight" + weight +
-				"_timeMutationRange" + config.timeAllocationMutator().getMutationRange();
+				"_scoreMSA" + config.planCalcScore().getFractionOfIterationsToStartScoreMSA() +
+				"_disInnovStrat" + config.strategy().getFractionOfIterationsToDisableInnovation() +
+				"_timeBin" + config.travelTimeCalculator().getTraveltimeBinSize() +
+				"_brain" + config.planCalcScore().getBrainExpBeta() +
+				"_timeWeight" + weight +
+				"_timeRange" + config.timeAllocationMutator().getMutationRange();
 		
 		// General pricing settings
 		outputDirectory = outputDirectory
@@ -123,21 +132,21 @@ public class DecongestionRun {
 //						"_init" + decongestionSettings.getINITIAL_TOLL() +
 //						"_adj" + decongestionSettings.getTOLL_ADJUSTMENT();
 			
-		// PID
+//		// PID
 		outputDirectory = outputDirectory +
 						"_Kp" + decongestionSettings.getKp() +
 						"_Ki" + decongestionSettings.getKi() +
 						"_Kd" + decongestionSettings.getKd() +
 						"_tollMSA" + decongestionSettings.isMsa() + 
-						"_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR();
+						"_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() + 
+						"_integral" + decongestionSettings.getIntegralApproach() + 
+						"_alpha" + decongestionSettings.getIntegralApproachAverageAlpha() + 
+						"_factor" + decongestionSettings.getIntegralApproachUnusedHeadwayFactor();
 					
 		log.info("Output directory: " + outputDirectory);
 		
 		config.controler().setOutputDirectory(outputDirectory + "/");
-		
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.6);
-		config.controler().setLastIteration(500);
-		
+				
 		// ---
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -152,6 +161,7 @@ public class DecongestionRun {
 			public void install() {
 				
 				this.bind(DecongestionInfo.class).asEagerSingleton();
+				this.bind(DecongestionTollingPID.class).asEagerSingleton();
 				
 				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
 				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
@@ -160,6 +170,7 @@ public class DecongestionRun {
 				this.bind(DelayAnalysis.class).asEagerSingleton();
 				this.bind(PersonVehicleTracker.class).asEagerSingleton();
 								
+				this.addEventHandlerBinding().to(DecongestionTollingPID.class);
 				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
 				this.addEventHandlerBinding().to(DelayAnalysis.class);
 				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
@@ -183,7 +194,9 @@ public class DecongestionRun {
 		
 		// #############################################################
 	
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+//      controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
         controler.run();
         
         PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(outputDirectory);

@@ -34,10 +34,8 @@ public class CompanyContainer {
 		return this.carsharingContainers.get(carsharingType);
 	}
 	
-	public void reserveVehicle(CSVehicle vehicle) {
-	
-		this.carsharingContainers.get(vehicle.getCsType()).reserveVehicle(vehicle);
-		
+	public boolean reserveVehicle(CSVehicle vehicle) {
+		return this.carsharingContainers.get(vehicle.getCsType()).reserveVehicle(vehicle);
 	}
 	
 	public void parkVehicle(CSVehicle vehicle, Link link) {

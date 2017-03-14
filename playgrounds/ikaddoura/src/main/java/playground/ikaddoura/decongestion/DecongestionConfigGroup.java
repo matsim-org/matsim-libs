@@ -44,6 +44,9 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	private double Kp = 1.0;
 	private double Kd = 1.0;
 	private double Ki = 1.0;
+	private IntegralApproach integralApproach = IntegralApproach.Zero;
+	private double integralApproachAverageAlpha = 0.1;
+	private double integralApproachUnusedHeadwayFactor = 10.;
 	
 	// General parameters
 	private boolean RUN_FINAL_ANALYSIS = true;
@@ -56,91 +59,116 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	
 	// ######################################################################################
 	
+	public enum IntegralApproach {
+		Average, UnusedHeadway, Zero
+	}
+	
+	@StringGetter( "Kp" )
 	public double getKp() {
 		return Kp;
 	}
 
+	@StringSetter( "Kp" )
 	public void setKp(double kp) {
 		Kp = kp;
 	}
 
+	@StringGetter( "Ki" )
 	public double getKi() {
 		return Ki;
 	}
 
+	@StringSetter( "Ki" )
 	public void setKi(double ki) {
 		Ki = ki;
 	}
 
+	@StringGetter( "Kd" )
 	public double getKd() {
 		return Kd;
 	}
 
+	@StringSetter( "Kd" )
 	public void setKd(double kd) {
 		Kd = kd;
 	}
 	
+	@StringGetter( "WRITE_OUTPUT_ITERATION" )
 	public int getWRITE_OUTPUT_ITERATION() {
 		return WRITE_OUTPUT_ITERATION;
 	}
 
+	@StringGetter( "UPDATE_PRICE_INTERVAL" )
 	public int getUPDATE_PRICE_INTERVAL() {
 		return UPDATE_PRICE_INTERVAL;
 	}
 
+	@StringGetter( "TOLERATED_AVERAGE_DELAY_SEC" )
 	public double getTOLERATED_AVERAGE_DELAY_SEC() {
 		return TOLERATED_AVERAGE_DELAY_SEC;
 	}
 
+	@StringGetter( "TOLL_ADJUSTMENT" )
 	public double getTOLL_ADJUSTMENT() {
 		return TOLL_ADJUSTMENT;
 	}
 
+	@StringGetter( "FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT" )
 	public double getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT() {
 		return FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT;
 	}
 
-
+	@StringGetter( "TOLL_BLEND_FACTOR" )
 	public double getTOLL_BLEND_FACTOR() {
 		return TOLL_BLEND_FACTOR;
 	}
 
+	@StringSetter( "TOLL_ADJUSTMENT" )
 	public void setTOLL_ADJUSTMENT(double tOLL_ADJUSTMENT) {
 		TOLL_ADJUSTMENT = tOLL_ADJUSTMENT;
 	}
-
+	
+	@StringSetter( "UPDATE_PRICE_INTERVAL" )
 	public void setUPDATE_PRICE_INTERVAL(int uPDATE_PRICE_INTERVAL) {
 		UPDATE_PRICE_INTERVAL = uPDATE_PRICE_INTERVAL;
 	}
 
+	@StringSetter( "TOLL_BLEND_FACTOR" )
 	public void setTOLL_BLEND_FACTOR(double tOLL_BLEND_FACTOR) {
 		TOLL_BLEND_FACTOR = tOLL_BLEND_FACTOR;
 	}
 
+	@StringSetter( "WRITE_OUTPUT_ITERATION" )
 	public void setWRITE_OUTPUT_ITERATION(int wRITE_OUTPUT_ITERATION) {
 		WRITE_OUTPUT_ITERATION = wRITE_OUTPUT_ITERATION;
 	}
 
+	@StringSetter( "TOLERATED_AVERAGE_DELAY_SEC" )
 	public void setTOLERATED_AVERAGE_DELAY_SEC(double tOLERATED_AVERAGE_DELAY_SEC) {
 		TOLERATED_AVERAGE_DELAY_SEC = tOLERATED_AVERAGE_DELAY_SEC;
 	}
 
+	@StringSetter( "FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT" )
 	public void setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(double fRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT) {
 		FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = fRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT;
 	}
 
+	@StringGetter( "INITIAL_TOLL" )
 	public double getINITIAL_TOLL() {
 		return INITIAL_TOLL;
 	}
 
+	@StringSetter( "INITIAL_TOLL" )
 	public void setINITIAL_TOLL(double iNITIAL_TOLL) {
 		INITIAL_TOLL = iNITIAL_TOLL;
 	}
 
+	@StringGetter( "FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT" )
 	public double getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT() {
 		return FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT;
 	}
 
+	@StringSetter( "FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT" )
 	public void setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(
 			double fRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT) {
 		FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = fRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT;
@@ -157,28 +185,64 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 //				+ FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT + "]";
 //	}
 
+	@StringGetter( "RUN_FINAL_ANALYSIS" )
 	public boolean isRUN_FINAL_ANALYSIS() {
 		return RUN_FINAL_ANALYSIS;
 	}
 
+	@StringSetter( "RUN_FINAL_ANALYSIS" )
 	public void setRUN_FINAL_ANALYSIS(boolean rUN_FINAL_ANALYSIS) {
 		RUN_FINAL_ANALYSIS = rUN_FINAL_ANALYSIS;
 	}
 
+	@StringGetter( "WRITE_LINK_INFO_CHARTS" )
 	public boolean isWRITE_LINK_INFO_CHARTS() {
 		return WRITE_LINK_INFO_CHARTS;
 	}
 
+	@StringSetter( "WRITE_LINK_INFO_CHARTS" )
 	public void setWRITE_LINK_INFO_CHARTS(boolean wRITE_CHARTS) {
 		WRITE_LINK_INFO_CHARTS = wRITE_CHARTS;
 	}
 
+	@StringGetter( "msa" )
 	public boolean isMsa() {
 		return msa;
 	}
 
+	@StringSetter( "msa" )
 	public void setMsa(boolean msa) {
 		this.msa = msa;
+	}
+
+	@StringGetter( "integralApproach" )
+	public IntegralApproach getIntegralApproach() {
+		return integralApproach;
+	}
+
+	@StringSetter( "integralApproach" )
+	public void setIntegralApproach(IntegralApproach integralApproach) {
+		this.integralApproach = integralApproach;
+	}
+
+	@StringGetter( "integralApproachAverageAlpha" )
+	public double getIntegralApproachAverageAlpha() {
+		return integralApproachAverageAlpha;
+	}
+
+	@StringSetter( "integralApproachAverageAlpha" )
+	public void setIntegralApproachAverageAlpha(double integralApproachAverageAlpha) {
+		this.integralApproachAverageAlpha = integralApproachAverageAlpha;
+	}
+
+	@StringGetter( "integralApproachUnusedHeadwayFactor" )
+	public double getIntegralApproachUnusedHeadwayFactor() {
+		return integralApproachUnusedHeadwayFactor;
+	}
+
+	@StringSetter( "integralApproachUnusedHeadwayFactor" )
+	public void setIntegralApproachUnusedHeadwayFactor(double integralApproachUnusedHeadwayFactor) {
+		this.integralApproachUnusedHeadwayFactor = integralApproachUnusedHeadwayFactor;
 	}
 			
 }

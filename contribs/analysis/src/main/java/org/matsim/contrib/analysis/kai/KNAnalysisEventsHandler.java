@@ -22,39 +22,15 @@ package org.matsim.contrib.analysis.kai;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-import org.matsim.analysis.TransportPlanningMainModeIdentifier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -483,7 +459,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 				maxPayment = payment ;
 			}
 			String subPopType = (String) pop.getPersonAttributes().getAttribute( person.getId().toString(), SUBPOPULATION ) ;
-			subPopTypes.add(subPopType) ;
+			if (subPopType!=null) subPopTypes.add(subPopType) ;
 		}
 
 		final int nBins = 100 ;
@@ -499,7 +475,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		for ( Person person : pop.getPersons().values() ) {
 			String subPopType = (String) pop.getPersonAttributes().getAttribute( person.getId().toString(), SUBPOPULATION ) ;
 			Double payment = (Double) pop.getPersonAttributes().getAttribute( person.getId().toString(), PAYMENTS ) ;
-			if (payment==null) continue ;
+			if (payment==null || subPopType == null) continue ;
 			int bin = (int) (payment/binSize) ;
 			sum.get(subPopType)[bin] += payment ;
 			cnt.get(subPopType)[bin] ++ ;

@@ -30,8 +30,13 @@ public class OneWayContainer implements VehiclesContainer{
 		this.vehicleToStationMap = vehicleToStationMap;
 	}
 
-	public void reserveVehicle(CSVehicle vehicle) {
+	public boolean reserveVehicle(CSVehicle vehicle) {
 		Link link = this.owvehiclesMap.get(vehicle);
+
+		if (link == null) {
+			return false;
+		}
+
 		Coord coord = link.getCoord();
 		this.owvehiclesMap.remove(vehicle);			
 		
@@ -46,6 +51,8 @@ public class OneWayContainer implements VehiclesContainer{
 			}
 
 		}	
+
+		return true;
 	}
 
 	public void parkVehicle(CSVehicle vehicle, Link link) {

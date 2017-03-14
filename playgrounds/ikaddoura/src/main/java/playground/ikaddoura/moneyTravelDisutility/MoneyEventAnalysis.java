@@ -148,10 +148,10 @@ public class MoneyEventAnalysis implements PersonLinkMoneyEventHandler, LinkEnte
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		Id<Person> personId = this.vehicleId2driverIdToBeCharged.get(vehicleId);
 		
-		if (linkId2info.containsKey(linkId)) {
+		if (linkId2info.get(linkId) != null) {
 			LinkInfo linkMoneyInfo = linkId2info.get(linkId);
 			
-			if (linkMoneyInfo.getTimeBinNr2timeBin().containsKey(timeBinNr)) {
+			if (linkMoneyInfo.getTimeBinNr2timeBin().get(timeBinNr) != null) {
 				TimeBin timeBin = linkMoneyInfo.getTimeBinNr2timeBin().get(timeBinNr);
 				timeBin.getEnteringAgents().add(personId);
 				
