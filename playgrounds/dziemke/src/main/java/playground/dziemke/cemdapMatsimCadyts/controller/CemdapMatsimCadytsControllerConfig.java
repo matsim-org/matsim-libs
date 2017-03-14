@@ -40,6 +40,9 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 
+import playground.dziemke.analysis.SelectedPlansAnalyzer;
+import playground.dziemke.analysis.TripAnalyzerV2Extended;
+
 /**
  * @author dziemke
  */
@@ -75,9 +78,14 @@ public class CemdapMatsimCadytsControllerConfig {
 		});
 
 		controler.run();
+		
+		if (Boolean.parseBoolean(args[4])) {
+			runAnalyses(config, args[5]);
+		}
+		
 	}
 	
-	public static Scenario prepareScenario(Config config, final boolean modifyNetwork, final double speedFactor) {
+	private static Scenario prepareScenario(Config config, final boolean modifyNetwork, final double speedFactor) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		if (modifyNetwork) {
@@ -93,5 +101,28 @@ public class CemdapMatsimCadytsControllerConfig {
 			}
 		}
 		return scenario;
+	}
+	
+	private static void runAnalyses(Config config, String planningAreaShapeFile) {
+		String outputDirectory = config.controler().getOutputDirectory();
+		String runId = config.controler().getRunId();
+		String networkFile = outputDirectory + "/" + runId + ".output_config.xml.gz"; // args[0];
+		String eventsFile = outputDirectory + "/" + runId + ".output_events.xml.gz"; // args[1];
+		String usedIteration = Integer.toString(config.controler().getLastIteration()); // usedIteration = args[5];
+		// onlySpecificMode = args[6]; onlyBerlinBased = args[7]; useDistanceFilter = args[8]
+		
+		TripAnalyzerV2Extended.main(new String[]{networkFile, eventsFile, planningAreaShapeFile, outputDirectory, runId, usedIteration, "false", "false", "false"});
+		TripAnalyzerV2Extended.main(new String[]{networkFile, eventsFile, planningAreaShapeFile, outputDirectory, runId, usedIteration, "false", "false", "true"});
+		TripAnalyzerV2Extended.main(new String[]{networkFile, eventsFile, planningAreaShapeFile, outputDirectory, runId, usedIteration, "false", "true", "false"});
+		TripAnalyzerV2Extended.main(new String[]{networkFile, eventsFile, planningAreaShapeFile, outputDirectory, runId, usedIteration, "false", "true", "true"});
+		TripAnalyzerV2Extended.main(new String[]{networkFile, eventsFile, planningAreaShapeFile, outputDirectory, runId, usedIteration, "true", "false", "false"});
+		TripAnalyzerV2Extended.main(new String[]{networkFile, eventsFile, planningAreaShapeFile, outputDirectory, runId, usedIteration, "true", "false", "true"});
+		TripAnalyzerV2Extended.main(new String[]{networkFile, eventsFile, planningAreaShapeFile, outputDirectory, runId, usedIteration, "true", "true", "false"});
+		TripAnalyzerV2Extended.main(new String[]{networkFile, eventsFile, planningAreaShapeFile, outputDirectory, runId, usedIteration, "true", "true", "true"});
+		
+		String plansInterval = Integer.toString(config.controler().getWritePlansInterval());
+		
+		SelectedPlansAnalyzer.main(new String[]{outputDirectory, runId, usedIteration, plansInterval, "false", "true"});
+		// useInterimPlans = args[4]; useOutputPlans = args[5]
 	}
 }
