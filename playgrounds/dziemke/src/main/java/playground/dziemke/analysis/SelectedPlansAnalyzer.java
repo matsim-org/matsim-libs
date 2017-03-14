@@ -162,7 +162,7 @@ public class SelectedPlansAnalyzer {
 		if (alternativeOutputDir != null)
 			path = alternativeOutputDir + "/analysis";
 
-		if (new File(path).mkdir()) {
+		if (new File(path).mkdirs()) {
 			log.info(path + " was created");
 		} else {
 			log.warn(path + " was not created");
