@@ -100,7 +100,7 @@ public final class WelfareCarefulMultiPlanOperator implements Operator {
 
 	private double getWelfareCorrection(PPlan plan) {
 		Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);
-		return welfareAnalyzer.getLineId2welfareCorrection(pplanId);
+		return welfareAnalyzer.getWelfareCorrection(pplanId);
 	}
 
 	@Override

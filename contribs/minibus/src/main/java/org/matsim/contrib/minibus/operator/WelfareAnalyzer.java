@@ -65,6 +65,7 @@ public class WelfareAnalyzer {
 	private Set<Id<PPlan>> currentPPlanIds;
 	
 	public WelfareAnalyzer(String initialScoresFile){
+		// yyyy I am not happy with passing a string here and having the reader inside this method.  kai, mar'17
 		
 		//get initial scores from the given file and store the values
 		this.personId2initialBenefits = new HashMap<>();
@@ -84,7 +85,9 @@ public class WelfareAnalyzer {
 	}
 	
 	public void computeWelfare(Scenario scenario) {
-
+		// yyyy welfare should be computed based on executed plans, not planned plans.  --> use ExecutedPlansService
+		// When this is injected, we do not need scenario as an argument here so every implementor can do what she wants.
+		
 		// Initialize all maps.
 		this.personId2usedPPlanIds = new HashMap<>();
 		this.personId2benefits = new HashMap<>();
@@ -179,7 +182,7 @@ public class WelfareAnalyzer {
 		}	
 	}
 	
-	public double getLineId2welfareCorrection(Id<PPlan> id) {
+	public double getWelfareCorrection(Id<PPlan> id) {
 		
 		if (this.planId2welfareCorrection.containsKey(id)){
 			
@@ -194,6 +197,7 @@ public class WelfareAnalyzer {
 	}
 
 	public void writeToFile(ScoringEvent event) {
+		// yyyy find other solution.  This would force every implementer to implement something here. 
 		
 		String delimiter = ";";
 		
@@ -255,7 +259,7 @@ public class WelfareAnalyzer {
 				planStatsWriter.newLine();
 				
 				String id = pplanId.toString();
-				String value = Double.toString(this.getLineId2welfareCorrection(pplanId));
+				String value = Double.toString(this.getWelfareCorrection(pplanId));
 				
 				StringBuffer stB = new StringBuffer();
 				

@@ -63,7 +63,7 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 			for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
 				totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
 			}
-			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), totalFareOfAgent));
+			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), -totalFareOfAgent));
 		}
 	}
 
