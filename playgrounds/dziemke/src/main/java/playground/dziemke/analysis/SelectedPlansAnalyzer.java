@@ -27,7 +27,7 @@ public class SelectedPlansAnalyzer {
 	public static final Logger log = Logger.getLogger(SelectedPlansAnalyzer.class);
 
 	// Parameters
-	private static String runId = "be_119"; // <----------
+	private static String runId = "be_104"; // <----------
 	private static int numberOfIterations = 300; // <----------
 	private static int plansFileInterval = 300; // <----------
 	private static boolean useInterimPlans = false;
@@ -36,6 +36,8 @@ public class SelectedPlansAnalyzer {
 	// Input/output
 //	private static final  String directoryRoot = "../../../runs-svn/cemdapMatsimCadyts/" + runId;
 	private static String directoryRoot = "../../../runs-svn/berlin_scenario_2016/" + runId;
+
+	private static String alternativeOutputDir = null;
 
 	private static final  Map<Integer, Integer> stayHomePlansMap = new HashMap<>();
 	private static final  Map<Integer, Integer> otherPlansMap = new HashMap<>();
@@ -52,6 +54,8 @@ public class SelectedPlansAnalyzer {
 			plansFileInterval = Integer.valueOf(args[3]);
 			useInterimPlans = Boolean.valueOf(args[4]);
 			useOutputPlans = Boolean.valueOf(args[5]);
+			if (args[6] != null)
+				alternativeOutputDir = args[6];
 		}
 		run();
 	}
@@ -153,6 +157,9 @@ public class SelectedPlansAnalyzer {
 	private static void writeFile() {
 
 		String path = directoryRoot + "/analysis";
+		if (alternativeOutputDir != null)
+			path = alternativeOutputDir + "/analysis";
+
 		if (new File(path).mkdir()) {
 			log.info(path + " was created");
 		} else {
