@@ -3,7 +3,7 @@ package playground.clruch.dispatcher;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
-import playground.clruch.dispatcher.core.RebalanceEvent;
+import playground.clruch.dispatcher.core.RebalanceVehicleEvent;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.netdata.VirtualNetwork;
@@ -38,7 +38,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         updateRebVehicles();
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(vehicleLinkPair, destination);
-        eventsManager.processEvent(new RebalanceEvent(destination, vehicleLinkPair.avVehicle, getTimeNow()));
+        eventsManager.processEvent(new RebalanceVehicleEvent(destination, vehicleLinkPair.avVehicle, getTimeNow()));
         Link returnVal = rebalancingVehicles.put(vehicleLinkPair.avVehicle, destination);
         GlobalAssert.that(returnVal == null);
     }

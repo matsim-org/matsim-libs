@@ -7,7 +7,7 @@ public enum AVStatus {
     STAY("stay"), //
     DRIVETOCUSTMER("d2c"), //
     DRIVEWITHCUSTOMER("del"), //
-    REBDRIVE("reb");
+    REBALANCEDRIVE("reb");
 
     public final String xmlTag;
 
