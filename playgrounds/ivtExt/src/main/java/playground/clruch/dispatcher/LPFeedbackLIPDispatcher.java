@@ -10,12 +10,12 @@
 
 package playground.clruch.dispatcher;
 
-import ch.ethz.idsc.tensor.*;
+import ch.ethz.idsc.tensor.RationalScalar;
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Floor;
-import ch.ethz.idsc.tensor.alg.LinearSolve;
-import ch.ethz.idsc.tensor.alg.Transpose;
-import ch.ethz.idsc.tensor.io.Pretty;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.gnu.glpk.*;
@@ -34,7 +34,6 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
-import sun.plugin2.message.GetAppletMessage;
 
 import java.io.File;
 import java.util.*;
@@ -47,15 +46,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
     final AbstractVehicleRequestMatcher vehicleRequestMatcher;
-    private int total_matchedRequests = 0;
     final int numvNodes;
     final int numvLinks;
-    // setup linear program
-    glp_prob lp;
-    glp_smcp parm;
-    SWIGTYPE_p_int ind;
-    SWIGTYPE_p_double val;
-    int ret;
     Map<Integer, String> numij_vLinkMap = new LinkedHashMap<>(); // LinkedHashMap chosen as the ordering should remain the same for iterating several times over the keyset.
     Map<Integer, VirtualNode> num_vNodeMap = new LinkedHashMap<>();
     final int numberOfAVs;
@@ -81,7 +73,6 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
         vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
-        this.initiateLP();
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         numvNodes = virtualNetwork.getVirtualNodes().size();
@@ -91,15 +82,44 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
     @Override
     public void redispatch(double now) {
+        vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+
         // Part I: outside rebalancing periods, permanently assign vehicles to requests if they have arrived at a customer i.e. stay on the same link
-        total_matchedRequests += vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
-        //Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+        // in the identical vNode match customers to requests
+        {
+            Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
+            // collect destinations per vNode
+            Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
+            virtualNetwork.getVirtualNodes().stream().forEach(v -> destinationLinks.put(v, new ArrayList<>()));
+            for (VirtualNode vNode : virtualNetwork.getVirtualNodes()) {
+                destinationLinks.get(vNode).addAll( // stores from links
+                        requests.get(vNode).stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
+            }
+
+            // collect available vehicles per vNode
+            Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+
+
+            // assign destinations to the available vehicles
+            {
+                GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
+                GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
+
+                // DO NOT PUT PARALLEL anywhere in this loop !
+                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
+                    vehicleDestMatcher //
+                            .match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode)) //
+                            .entrySet().stream().forEach(this::setVehicleDiversion);
+            }
+        }
 
 
         // PART II: redispatch all vehicles
         final long round_now = Math.round(now);
         if (round_now % rebalancingPeriod == 0) {
-            System.out.println(getClass().getSimpleName() + " @" + round_now + " mr = " + total_matchedRequests);
+            // setup linear program
+            glp_prob lp = this.initiateLP();
+
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
@@ -121,25 +141,24 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                             + v_ij_reb.get(virtualNode).size()
                             + v_ij_cust.get(virtualNode).size()
                             - requests.get(virtualNode).size();
-                    vi_excessT.set(RationalScalar.of(viExcessVal, 1), virtualNode.index);
+                    vi_excessT.set(RealScalar.of(viExcessVal), virtualNode.index);
                 }
 
 
                 // solve the linear program with updated right-hand side
-                Tensor rebalanceCount = solveUpdatedLP(vi_excessT, vi_desiredT);
+                Tensor rebalanceCount = solveUpdatedLP(lp, vi_excessT, vi_desiredT);
                 // TODO this should never become active, can be removed later (nonnegative solution)
                 for (int i = 0; i < numvNodes; ++i) {
                     for (int j = 0; j < numvNodes; ++j) {
-                        Tensor rebRow = rebalanceCount.get(i);
-                        RealScalar value = (RealScalar) rebRow.Get(j);
-                        double entry = value.getAbsDouble();
+                        RealScalar value = (RealScalar) rebalanceCount.Get(i, j);
+                        double entry = value.getRealDouble();
                         GlobalAssert.that(entry >= 0);
                     }
                 }
 
 
                 // ensure that not more vehicles are sent away than available
-                Tensor feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCount, availableVehicles);
+                Tensor feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCount.unmodifiable(), availableVehicles);
 
                 // generate routing instructions for rebalancing vehicles
                 Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
@@ -151,7 +170,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                     VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
                     VirtualNode toNode = virtualLink.getTo();
                     VirtualNode fromNode = virtualLink.getFrom();
-                    int numreb = (int) ((RealScalar) feasibleRebalanceCount.get(fromNode.index).Get(toNode.index)).getAbsDouble();
+                    int numreb = (int) ((RealScalar) feasibleRebalanceCount.Get(fromNode.index, toNode.index)).getRealDouble();
                     List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
                     destinationLinks.get(fromNode).addAll(rebalanceTargets);
                 }
@@ -171,34 +190,9 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
 
             }
-
-            // II.ii if vehilces remain in vNode, send to customers
-            {
-                // collect destinations per vNode
-                Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
-                virtualNetwork.getVirtualNodes().stream().forEach(v -> destinationLinks.put(v, new ArrayList<>()));
-                for (VirtualNode vNode : virtualNetwork.getVirtualNodes()) {
-                    destinationLinks.get(vNode).addAll( // stores from links
-                            requests.get(vNode).stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
-                }
-
-                // collect available vehicles per vNode
-                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
-
-
-                // assign destinations to the available vehicles
-                {
-                    GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
-                    GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
-
-                    long tic = System.nanoTime(); // DO NOT PUT PARALLEL anywhere in this loop !
-                    for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-                        vehicleDestMatcher //
-                                .match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode)) //
-                                .entrySet().stream().forEach(this::setVehicleDiversion);
-                    long dur = System.nanoTime() - tic;
-                }
-            }
+            // close the LP to avoid data leaks
+            // TODO can this be taken out to not delete the LP in every instance?
+            this.closeLP(lp);
         }
     }
 
@@ -216,7 +210,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             double outgoingNmrvNode = 0.0;
             Tensor outgoingVehicles = rebalanceInput.get(i);
             for (int j = 0; j < numvNodes; ++j) {
-                outgoingNmrvNode = outgoingNmrvNode + ((RealScalar) outgoingVehicles.Get(j)).getAbsDouble();
+                outgoingNmrvNode = outgoingNmrvNode + ((RealScalar) outgoingVehicles.Get(j)).getRealDouble();
             }
             int outgoingVeh = (int) outgoingNmrvNode;
             int finalI = i;
@@ -224,32 +218,28 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             // if number of outoing vehicles too small, reduce proportionally
             if (availableVehvNode < outgoingVeh) {
                 long shrinkingFactor = ((long) availableVehvNode / ((long) outgoingVeh));
-                Tensor newRow = Floor.of(rebalanceInput.get(i).multiply(RealScalar.of(shrinkingFactor))).copy();
-                for (int j = 0; j < numvNodes; ++j) {
-                    feasibleRebalance.get(i).set(newRow.Get(j), j);
-                }
+                Tensor newRow = Floor.of(rebalanceInput.get(i).multiply(RealScalar.of(shrinkingFactor)));
+                feasibleRebalance.set(newRow, i);
             }
         }
         return feasibleRebalance;
     }
 
 
-    private Tensor solveUpdatedLP(Tensor vi_excessT, Tensor vi_desiredT) {
+    private Tensor solveUpdatedLP(glp_prob lp, Tensor vi_excessT, Tensor vi_desiredT) {
 
         // fill right-hand-side
+        Tensor rhs = vi_desiredT.subtract(vi_excessT);
         for (int i = 0; i < vi_excessT.length(); ++i) {
-            double v1desired = vi_desiredT.Get(i).getAbsDouble();
-            double v1excess = vi_excessT.Get(i).getAbsDouble();
-            double rhs = v1desired - v1excess;
-            GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, rhs, 0.0);
+            GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((RealScalar) (rhs.Get(i))).getRealDouble(), 0.0);
         }
 
 
         // Solve model
         GLPK.glp_write_lp(lp, null, "networklinearprogram_updated.lp");
-        parm = new glp_smcp();
+        glp_smcp parm = new glp_smcp();
         GLPK.glp_init_smcp(parm);
-        ret = GLPK.glp_simplex(lp, parm);
+        int ret = GLPK.glp_simplex(lp, parm);
 
         // Retrieve solution
         // TODO check if ret == 0 functions properly or not
@@ -277,7 +267,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     }
 
 
-    private void initiateLP() {
+    private glp_prob initiateLP() {
+        glp_prob lp = null;
         // assign a numbering to the virtual nodes
         // TODO Solve this using the indexes in the VirtualLink instead of map
         int nodeNum = 0;
@@ -347,6 +338,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             // Create rows
             GLPK.glp_add_rows(lp, n);
 
+
+            SWIGTYPE_p_int ind;
+            SWIGTYPE_p_double val;
+
+
             // Set row details
             int eq = 0;
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
@@ -397,14 +393,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             GLPK.glp_write_lp(lp, null, "networklinearprogram_initial.lp");
         } catch (GlpkException ex) {
             ex.printStackTrace();
-            ret = 1;
         }
+        return lp;
     }
 
-
-    // TODO assure no memory leaks happen if MATSim done for multiple iterations
-    @Override
-    public void finalize() {
+    private void closeLP(glp_prob lp) {
         // release storage allocated for LP
         GLPK.glp_delete_prob(lp);
         System.out.println("Book instance is getting destroyed");
