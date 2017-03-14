@@ -32,4 +32,6 @@ public class VirtualLink {
     public VirtualNode getTo() {
         return to;
     }
+
+    public int getIndex() {return  index; }
 }
