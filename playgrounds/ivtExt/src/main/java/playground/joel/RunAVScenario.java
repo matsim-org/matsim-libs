@@ -1,36 +1,43 @@
 package playground.joel;
 
-
-
 import java.io.File;
 import java.net.MalformedURLException;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.clruch.export.EventFileToProcessingXML;
+import playground.clruch.prep.TheApocalypse;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
-import javax.inject.*;
+import playground.joel.data.EventFileToDataXML;
 
 
+/**
+ * main entry point
+ */
 public class RunAVScenario {
-    public static Network NETWORKINSTANCE;
-
     public static void main(String[] args) throws MalformedURLException {
-        //File configFile = new File(args[0]);
-        File configFile = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs/av_config.xml");
+        File configFile = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_28_Sioux_Hungarian/av_config.xml");
+        final File dir = configFile.getParentFile();
 
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup());
+        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
+
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        NETWORKINSTANCE = scenario.getNetwork();
+        final Population population = scenario.getPopulation();
 
-        System.out.println("Population size:" + scenario.getPopulation().getPersons().values().size());
+        TheApocalypse.decimatesThe(population).toNoMoreThan(10000).people();
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
@@ -39,6 +46,8 @@ public class RunAVScenario {
 
         controler.run();
 
-        System.out.println("RunAVScenario finished!");
+        EventFileToProcessingXML.convert(dir);
+        EventFileToDataXML.convert(dir);
     }
 }
+
