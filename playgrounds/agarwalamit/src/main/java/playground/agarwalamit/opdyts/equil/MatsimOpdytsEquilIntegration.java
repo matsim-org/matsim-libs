@@ -22,15 +22,7 @@ package playground.agarwalamit.opdyts.equil;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.utils.TimeDiscretization;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -48,9 +40,25 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.opdyts.*;
+
+import floetteroed.opdyts.DecisionVariableRandomizer;
+import floetteroed.opdyts.ObjectiveFunction;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
+import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
+import opdytsintegration.MATSimSimulator;
+import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.utils.TimeDiscretization;
+import playground.agarwalamit.opdyts.DistanceDistribution;
+import playground.agarwalamit.opdyts.ModeChoiceDecisionVariable;
+import playground.agarwalamit.opdyts.ModeChoiceObjectiveFunction;
+import playground.agarwalamit.opdyts.ModeChoiceRandomizer;
+import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
+import playground.agarwalamit.opdyts.OpdytsScenario;
+import playground.agarwalamit.opdyts.RandomizedUtilityParametersChoser;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
@@ -168,9 +176,6 @@ public class MatsimOpdytsEquilIntegration {
 
 		//****************************** mainly opdyts settings ******************************
 
-		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL);
-		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
-
 		// this is something like time bin generator
 		int startTime= 0;
 		int binSize = 3600; // can this be scenario simulation end time.
@@ -193,7 +198,7 @@ public class MatsimOpdytsEquilIntegration {
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				addControlerListenerBinding().toInstance(stasControlerListner);
 
-				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+				bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
 
