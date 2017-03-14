@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -46,7 +46,7 @@ public class CharyparNagelLegScoring2 implements org.matsim.core.scoring.SumScor
 
 	protected double score;
 
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
 	private boolean currentLegIsPtLeg = false;
@@ -56,7 +56,7 @@ public class CharyparNagelLegScoring2 implements org.matsim.core.scoring.SumScor
 	
 	TravelDisutility disutility ;
 	
-	public CharyparNagelLegScoring2(final CharyparNagelScoringParameters params) {
+	public CharyparNagelLegScoring2(final ScoringParameters params) {
 		this.params = params;
 		this.nextEnterVehicleIsFirstOfTrip = true ;
 		this.nextStartPtLegIsFirstOfTrip = true ;

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
+import org.matsim.core.scoring.functions.ScoringParameters.Builder;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import floetteroed.utilities.Units;
@@ -35,20 +35,20 @@ import floetteroed.utilities.Units;
 /**
  * @author gunnar based on thibautd
  */
-public class RandomizedCharyparNagelScoringParameters implements
-		CharyparNagelScoringParametersForPerson {
+public class RandomizedScoringParameters implements
+		ScoringParametersForPerson {
 	private final PlanCalcScoreConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final ObjectAttributes personAttributes;
 	private final String subpopulationAttributeName;
 	// private final Map<String, CharyparNagelScoringParameters> params = new
 	// HashMap<>();
-	private final Map<Person, CharyparNagelScoringParameters> params = new LinkedHashMap<>();
+	private final Map<Person, ScoringParameters> params = new LinkedHashMap<>();
 
-	private CharyparNagelScoringParameters defaultParameters = null;
+	private ScoringParameters defaultParameters = null;
 
 	// @Inject
-	RandomizedCharyparNagelScoringParameters(PlansConfigGroup plansConfigGroup,
+	RandomizedScoringParameters(PlansConfigGroup plansConfigGroup,
 			PlanCalcScoreConfigGroup planCalcScoreConfigGroup,
 			ScenarioConfigGroup scenarioConfigGroup, Population population) {
 		this.config = planCalcScoreConfigGroup;
@@ -58,14 +58,14 @@ public class RandomizedCharyparNagelScoringParameters implements
 				.getSubpopulationAttributeName();
 	}
 
-	public RandomizedCharyparNagelScoringParameters(Scenario scenario) {
+	public RandomizedScoringParameters(Scenario scenario) {
 		this(scenario.getConfig().plans(),
 				scenario.getConfig().planCalcScore(), scenario.getConfig()
 						.scenario(), scenario.getPopulation());
 	}
 
 	@Override
-	public CharyparNagelScoringParameters getScoringParameters(Person person) {
+	public ScoringParameters getScoringParameters(Person person) {
 		final String subpopulation = (String) personAttributes.getAttribute(
 				person.getId().toString(), subpopulationAttributeName);
 

@@ -29,9 +29,9 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 /**
  * Generates {@link CharyparNagelWeekActivityScoring}s.
@@ -40,19 +40,19 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  */
 public class CharyparNagelWeekScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private CharyparNagelScoringParametersForPerson parametersForPerson;
+	private ScoringParametersForPerson parametersForPerson;
     private Scenario scenario;
 	private PlanCalcScoreConfigGroup config;
 
     public CharyparNagelWeekScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
     	this.config = config;
 		this.scenario = scenario;
-		this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.parametersForPerson = new SubpopulationScoringParameters( scenario );
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
+		final ScoringParameters params = parametersForPerson.getScoringParameters( person );
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new CharyparNagelWeekActivityScoring(params, scenario.getActivityFacilities()));

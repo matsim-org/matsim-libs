@@ -123,7 +123,7 @@ public class PatnaJointOpdytsCalibrator {
 				this.bind(ModalTripTravelTimeHandler.class);
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
-				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+				bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
 

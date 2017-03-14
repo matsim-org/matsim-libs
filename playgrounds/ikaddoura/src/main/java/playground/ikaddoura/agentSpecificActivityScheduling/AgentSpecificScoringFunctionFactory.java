@@ -31,9 +31,9 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 /**
 * The default {@link CharyparNagelScoringFunctionFactory} except that activities are scored for each agent individually.
@@ -44,16 +44,16 @@ import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParame
 public class AgentSpecificScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	protected Network network;
-	private final CharyparNagelScoringParametersForPerson params;
+	private final ScoringParametersForPerson params;
 	private final CountActEventHandler actCount;
 	private double tolerance;
 		
 	public AgentSpecificScoringFunctionFactory( final Scenario sc, final CountActEventHandler actCount, double tolerance) {
-		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() , actCount , tolerance);
+		this( new SubpopulationScoringParameters( sc ) , sc.getNetwork() , actCount , tolerance);
 	}
 	
 	@Inject
-	AgentSpecificScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network, CountActEventHandler actCount, double tolerance) {
+	AgentSpecificScoringFunctionFactory(final ScoringParametersForPerson params, Network network, CountActEventHandler actCount, double tolerance) {
 		this.params = params;
 		this.network = network;
 		this.actCount = actCount;
@@ -63,7 +63,7 @@ public class AgentSpecificScoringFunctionFactory implements ScoringFunctionFacto
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 				
-		final CharyparNagelScoringParameters parameters = params.getScoringParameters( person );
+		final ScoringParameters parameters = params.getScoringParameters( person );
 				
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new AgentSpecificActivityScoring(parameters, person, actCount, tolerance));

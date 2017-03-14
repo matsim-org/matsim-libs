@@ -34,7 +34,7 @@ public final class CharyparNagelMoneyScoring implements SumScoringFunction.Money
 
 	private final double marginalUtilityOfMoney;
 
-	public CharyparNagelMoneyScoring(final CharyparNagelScoringParameters params) {
+	public CharyparNagelMoneyScoring(final ScoringParameters params) {
 		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
 	}
 

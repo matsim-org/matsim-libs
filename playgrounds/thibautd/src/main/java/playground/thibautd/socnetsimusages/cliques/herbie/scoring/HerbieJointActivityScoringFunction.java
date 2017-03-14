@@ -27,7 +27,7 @@ import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.Config;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
@@ -58,7 +58,7 @@ org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
 	private final Config config;
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	private final Plan plan;
 
 	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
@@ -69,7 +69,7 @@ org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	private static final Logger logger = Logger.getLogger(HerbieJointActivityScoringFunction.class);
 
-	public HerbieJointActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities, Config config) {
+	public HerbieJointActivityScoringFunction(Plan plan, ScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities, Config config) {
 		super(params);
 		this.params = params;
 		this.plan = plan;

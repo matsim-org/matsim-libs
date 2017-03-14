@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
@@ -42,12 +42,12 @@ class SubpopTravelDisutilityIncludingToll implements TravelDisutility {
 	private final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelDisutility normalTravelDisutility;
-	private CharyparNagelScoringParametersForPerson parameters;
+	private ScoringParametersForPerson parameters;
 	// no sigma required, we wanna go for the subpops' marginal utility of money!
 	//private final double sigma ;
 
 	public SubpopTravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, 
-			final RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters, double sigma) {
+			final RoadPricingScheme scheme, ScoringParametersForPerson parameters, double sigma) {
 		this.scheme = scheme;
 		//this.sigma = sigma;
 		this.parameters = parameters;

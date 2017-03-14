@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import java.util.TreeSet;
 
@@ -63,7 +63,7 @@ public class LegScoringFunction extends org.matsim.deprecated.scoring.functions.
 	TravelScoringFunction travelScoring;
 	private Plan plan;
 	public LegScoringFunction(Plan plan,
-			CharyparNagelScoringParameters params,
+			ScoringParameters params,
 			Config config,
 			Network network,
 			HerbieConfigGroup ktiConfigGroup) {

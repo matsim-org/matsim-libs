@@ -19,7 +19,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.collections.QuadTree;
 
 import com.google.inject.Inject;
@@ -37,7 +37,7 @@ public class ActivityChainModifierStrategy implements PlanStrategy{
 			   @Named("leisureQuadTree") QuadTree leisureFacilityQuadTree,
 			   LeastCostPathCalculatorFactory pathCalculatorFactory, Map<String,TravelTime> travelTimes,
 			   Map<String,TravelDisutilityFactory> travelDisutilityFactories, ScoringFunctionFactory scoringFunctionFactory,
-			   @Named("scoreChangeMap") HashMap scoreChange, CharyparNagelScoringParametersForPerson parametersForPerson) {
+			   @Named("scoreChangeMap") HashMap scoreChange, ScoringParametersForPerson parametersForPerson) {
 		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
 		
 		

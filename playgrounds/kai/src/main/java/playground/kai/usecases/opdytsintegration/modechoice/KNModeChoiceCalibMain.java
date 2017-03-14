@@ -11,7 +11,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
@@ -104,7 +104,7 @@ class KNModeChoiceCalibMain {
 		AbstractModule overrides = KNBerlinControler.prepareOverrides(assignment);
 		overrides = AbstractModule.override(Arrays.asList(overrides), new AbstractModule(){
 			@Override public void install() {
-				bind( CharyparNagelScoringParametersForPerson.class ).to( EveryIterationScoringParameters.class ) ;
+				bind( ScoringParametersForPerson.class ).to( EveryIterationScoringParameters.class ) ;
 			}
 		}  ) ;
 

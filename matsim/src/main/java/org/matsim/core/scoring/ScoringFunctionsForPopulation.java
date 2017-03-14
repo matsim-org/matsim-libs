@@ -20,26 +20,6 @@
 
 package org.matsim.core.scoring;
 
-import com.google.inject.Inject;
-import gnu.trove.TDoubleCollection;
-import gnu.trove.iterator.TDoubleIterator;
-import gnu.trove.list.array.TDoubleArrayList;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.HasPersonId;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,6 +27,32 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
+
+import gnu.trove.TDoubleCollection;
+import gnu.trove.iterator.TDoubleIterator;
+import gnu.trove.list.array.TDoubleArrayList;
 
 /**
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
@@ -58,11 +64,10 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
 
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
-	private final PlansConfigGroup plansConfigGroup;
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-	private Network network;
 
 	/*
 	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
@@ -77,23 +82,32 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
+	
+	/**
+	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
+	 * kai, mar'17
+	 */
+	private static boolean passLinkEventsToPerson = false ;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	@Inject
 	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-								  PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
+								  Population population, ScoringFunctionFactory scoringFunctionFactory) {
 		controlerListenerManager.addControlerListener(new IterationStartsListener() {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				init();
 			}
 		});
-		this.plansConfigGroup = plansConfigGroup;
-		this.network = network;
 		this.population = population;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		eventsManager.addHandler(this);
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
+		if ( passLinkEventsToPerson ) {
+			eventsManager.addHandler(delegate);
+		}
 	}
 
 	private void init() {
@@ -118,10 +132,32 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 					scoringFunction.agentStuck(o.getTime());
 				} else if (o instanceof PersonMoneyEvent) {
 					scoringFunction.addMoney(((PersonMoneyEvent) o).getAmount());
-				} else {
+					// yy looking at this, I am a bit skeptic if it truly makes sense to not pass this additionally into the general events handling function below.
+					// A use case might be different utilities of money by money transaction type (e.g. toll, fare, reimbursement, ...).  kai, mar'17
+				} 
+//				else {
 					scoringFunction.handleEvent(o);
+					// passing this on in any case, see comment above.  kai, mar'17
+//				}
+			}
+		}
+		if ( passLinkEventsToPerson ) {
+			if ( o instanceof LinkEnterEvent ) {
+				Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId() ;
+				Id<Person> driverId = delegate.getDriverOfVehicle(vehicleId) ;
+				ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
+				// (this will NOT do the scoring function lookup twice since LinkEnterEvent is not an instance of HasPersonId.  kai, mar'17)
+				if (scoringFunction != null) {
+					scoringFunction.handleEvent(o) ;
 				}
 			}
+			/*
+			 * (This shouldn't really be more expensive than passing the link events to the router: here, we have a map lookup
+			 * for agentId, there we have a map lookup for linkId. Should be somewhat similar in terms of average
+			 * computational complexity. In BetaTravelTest, 194sec w/ "false", 193sec w/ "true". However, the experienced
+			 * plans service in fact does the same thing, so we should be able to get away without having to do this twice.
+			 * kai, mar'17)
+			 */
 		}
 	}
 

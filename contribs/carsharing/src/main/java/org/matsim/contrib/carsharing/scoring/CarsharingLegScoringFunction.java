@@ -16,7 +16,7 @@ import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContain
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -37,7 +37,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	private static final  Set<String> carsharingLegs = ImmutableSet.of("oneway_vehicle", "twoway_vehicle",
 			"freefloating_vehicle");
 	
-	public CarsharingLegScoringFunction(CharyparNagelScoringParameters params, 
+	public CarsharingLegScoringFunction(ScoringParameters params, 
 			Config config,  Network network, DemandHandler demandHandler,
 			CostsCalculatorContainer costsCalculatorContainer, CarsharingSupplyInterface carsharingSupplyContainer,
 			Person person)

@@ -193,7 +193,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				addControlerListenerBinding().toInstance(stasControlerListner);
 
-				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+				bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
 

@@ -13,7 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.RandomizedCharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.RandomizedScoringFunctionFactory;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
@@ -182,7 +182,7 @@ class OptimizeRoadpricing {
 				);
 		matsimSimulator.setReplacingModules(roadpricingModule);
 		matsimSimulator
-				.setScoringFunctionFactory(new RandomizedCharyparNagelScoringFunctionFactory(
+				.setScoringFunctionFactory(new RandomizedScoringFunctionFactory(
 						scenario));
 
 		/*

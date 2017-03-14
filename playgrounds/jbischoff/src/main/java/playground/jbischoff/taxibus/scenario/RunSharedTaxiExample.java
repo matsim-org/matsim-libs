@@ -37,7 +37,7 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import playground.jbischoff.sharedTaxi.SharedTaxiContolerListener;
 import playground.jbischoff.sharedTaxi.SharedTaxiTripAnalyzer;
@@ -69,8 +69,8 @@ public class RunSharedTaxiExample {
 				@Override
 				public ScoringFunction createNewScoringFunction(Person person) {
 					SumScoringFunction sumScoringFunction = new SumScoringFunction();
-					final CharyparNagelScoringParameters params =
-							new CharyparNagelScoringParameters.Builder(scenario, person.getId()).build();
+					final ScoringParameters params =
+							new ScoringParameters.Builder(scenario, person.getId()).build();
 					sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 					sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 					sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));

@@ -25,7 +25,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 
 /**
@@ -37,9 +37,9 @@ public class ScoringFromEmissions implements BasicScoring, WarmEmissionEventHand
 	
 	private static final Logger logger = Logger.getLogger(ScoringFromEmissions.class);
 
-	CharyparNagelScoringParameters params;
+	ScoringParameters params;
 
-	public ScoringFromEmissions(CharyparNagelScoringParameters params) {
+	public ScoringFromEmissions(ScoringParameters params) {
 		this.params = params;
 		logger.info("using " + ScoringFromEmissions.class.getName() + "...");
 	}

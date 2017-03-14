@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.pt.PtConstants;
 
@@ -57,11 +57,11 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 	private static final double INITIAL_SCORE = 0.0;
 
 	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters charyparNagelParameters;
+	protected final ScoringParameters charyparNagelParameters;
 	protected final BvgScoringFunctionParameters bvgParameters;
 	protected final Double utilityOfLineSwitch;
 
-	public BvgLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters charyparNagelParameters, final BvgScoringFunctionParameters bvgParameters, Double utilityOfLineSwitch, Network network) {
+	public BvgLegScoringFunction(final Plan plan, final ScoringParameters charyparNagelParameters, final BvgScoringFunctionParameters bvgParameters, Double utilityOfLineSwitch, Network network) {
 		this.charyparNagelParameters = charyparNagelParameters;
 		this.bvgParameters = bvgParameters;
 		this.utilityOfLineSwitch = utilityOfLineSwitch;

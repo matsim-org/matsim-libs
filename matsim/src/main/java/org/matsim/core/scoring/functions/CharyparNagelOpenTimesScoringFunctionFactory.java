@@ -33,11 +33,11 @@ import org.matsim.core.scoring.SumScoringFunction;
  */
 public final class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final CharyparNagelScoringParametersForPerson params;
+	private final ScoringParametersForPerson params;
     private final Scenario scenario;
 
     public CharyparNagelOpenTimesScoringFunctionFactory(
-			final CharyparNagelScoringParametersForPerson params,
+			final ScoringParametersForPerson params,
 			final Scenario scenario) {
 		this.params = params;
 		this.scenario = scenario;
@@ -45,13 +45,13 @@ public final class CharyparNagelOpenTimesScoringFunctionFactory implements Scori
 
 	public CharyparNagelOpenTimesScoringFunctionFactory(
 			final Scenario scenario) {
-		this.params = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.params = new SubpopulationScoringParameters( scenario );
 		this.scenario = scenario;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		final CharyparNagelScoringParameters parameters = params.getScoringParameters( person );
+		final ScoringParameters parameters = params.getScoringParameters( person );
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(parameters, new FacilityOpeningIntervalCalculator(scenario.getActivityFacilities())));

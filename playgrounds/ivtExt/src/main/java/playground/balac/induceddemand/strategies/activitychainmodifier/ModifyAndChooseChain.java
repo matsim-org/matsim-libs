@@ -9,7 +9,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class ModifyAndChooseChain implements PlanAlgorithm {
@@ -17,7 +17,7 @@ public class ModifyAndChooseChain implements PlanAlgorithm {
 	private NeighboursCreator nc;
 	public ModifyAndChooseChain(Random localInstance, StageActivityTypes stageActivityTypes, Scenario scenario, 
 			LeastCostPathCalculator pathCalculator, QuadTree shopFacilityQuadTree, QuadTree leisureFacilityQuadTree,
-			ScoringFunctionFactory scoringFunctionFactory, HashMap scoreChange, CharyparNagelScoringParametersForPerson parametersForPerson) {
+			ScoringFunctionFactory scoringFunctionFactory, HashMap scoreChange, ScoringParametersForPerson parametersForPerson) {
 		nc = new NeighboursCreator(stageActivityTypes, shopFacilityQuadTree, leisureFacilityQuadTree, 
 				scenario, pathCalculator, scoringFunctionFactory, scoreChange, parametersForPerson);
 	}	

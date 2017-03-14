@@ -168,6 +168,9 @@ public class MatsimOpdytsEquilIntegration {
 
 		//****************************** mainly opdyts settings ******************************
 
+		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL);
+		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
+
 		// this is something like time bin generator
 		int startTime= 0;
 		int binSize = 3600; // can this be scenario simulation end time.
@@ -178,7 +181,8 @@ public class MatsimOpdytsEquilIntegration {
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts
-		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
+		MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>(new MATSimStateFactoryImpl<>(), 
+				scenario, new TimeDiscretization(startTime, binSize, binCount));
 		simulator.addOverridingModule(new AbstractModule() {
 
 			@Override

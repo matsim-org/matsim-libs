@@ -52,10 +52,10 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
 	protected Network network;
 
-	private final CharyparNagelScoringParametersForPerson params;
+	private final ScoringParametersForPerson params;
 
 	public MyScoringFunctionFactory(final Scenario sc) {
-		this(new SubpopulationCharyparNagelScoringParameters(sc), sc
+		this(new SubpopulationScoringParameters(sc), sc
 				.getNetwork());
 	}
 
@@ -75,7 +75,7 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
 	@Inject
 	MyScoringFunctionFactory(
-			final CharyparNagelScoringParametersForPerson params,
+			final ScoringParametersForPerson params,
 			Network network) {
 		this.params = params;
 		this.network = network;
@@ -105,7 +105,7 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 
-		final CharyparNagelScoringParameters parameters = this.params
+		final ScoringParameters parameters = this.params
 				.getScoringParameters(person);
 
 		// >>>>> TODO NEW >>>>>

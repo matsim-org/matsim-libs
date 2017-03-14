@@ -22,7 +22,7 @@ package playground.ikaddoura.agentSpecificActivityScheduling;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 /**
 *
@@ -37,13 +37,13 @@ public class AgentSpecificActivityScoring implements org.matsim.core.scoring.Sum
 	private final CharyparNagelActivityScoring delegate;
 	private final AgentSpecificOpeningIntervalCalculator openingIntervalCalculator;
 	private final CountActEventHandler actCounter;
-	private final CharyparNagelScoringParameters parameters;
+	private final ScoringParameters parameters;
 	private final Person person;
 	private final double tolerance;
 	
 	private double lateArrivalScore = 0.;
 		
-	public AgentSpecificActivityScoring(CharyparNagelScoringParameters parameters, Person person, CountActEventHandler actCounter, double tolerance) {
+	public AgentSpecificActivityScoring(ScoringParameters parameters, Person person, CountActEventHandler actCounter, double tolerance) {
 		this.parameters = parameters;
 		this.person = person;
 		this.actCounter = actCounter;

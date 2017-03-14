@@ -28,7 +28,7 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -45,7 +45,7 @@ public class DCActivityScoringFunction extends org.matsim.deprecated.scoring.fun
 	private DestinationScoring destinationChoiceScoring;	
 	private final ActivityFacilities facilities;
 	private Plan plan;
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	public static final int DEFAULT_PRIORITY = 1;
 	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private ActTypeConverter converter;

@@ -27,19 +27,19 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 
 public class OptimizationScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final CharyparNagelScoringParametersForPerson params;
+	private final ScoringParametersForPerson params;
 	private final double STUCKING_SCORE;
 	private Network network;
 	
 
 	public OptimizationScoringFunctionFactory( Scenario scenario, double stuckScore) {
-		this.params = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.params = new SubpopulationScoringParameters( scenario );
 		this.network = network;
 		this.STUCKING_SCORE = stuckScore;
 	}

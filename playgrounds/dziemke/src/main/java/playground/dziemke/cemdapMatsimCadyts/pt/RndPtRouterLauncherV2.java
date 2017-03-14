@@ -156,9 +156,9 @@ public class RndPtRouterLauncherV2 {
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject private CadytsPtContext2 cadytsContext;
-			@Inject CharyparNagelScoringParametersForPerson parameters;
+			@Inject ScoringParametersForPerson parameters;
 			@Override public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+				final ScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));

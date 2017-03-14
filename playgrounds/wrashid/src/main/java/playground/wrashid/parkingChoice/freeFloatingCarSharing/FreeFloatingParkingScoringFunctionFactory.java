@@ -15,8 +15,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 import com.google.inject.Inject;
 
@@ -24,7 +24,7 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 
 	private ParkingScoreManager parkingScoreManager;
 	private Scenario scenario;
-	private CharyparNagelScoringParametersForPerson parameters;
+	private ScoringParametersForPerson parameters;
 
 	//@Inject
 	//private ScoreTrackingListener tracker;
@@ -34,7 +34,7 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 			Scenario scenario, ParkingScoreManager parkingScoreManager) {
 		this.scenario = scenario;
 		this.parkingScoreManager = parkingScoreManager;
-		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.parameters = new SubpopulationScoringParameters( scenario );
 	}
 
 	@Override

@@ -23,7 +23,7 @@ package playground.benjamin.scoring.income.old;
 import org.apache.log4j.Logger;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.MoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -50,9 +50,9 @@ public class ScoringFromToll implements MoneyScoring, BasicScoring {
 	
 	
 	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
+	protected final ScoringParameters params;
 
-	public ScoringFromToll(final CharyparNagelScoringParameters params, double householdIncomePerDay) {
+	public ScoringFromToll(final ScoringParameters params, double householdIncomePerDay) {
 		this.params = params;
 		this.incomePerDay = householdIncomePerDay;
 	}	

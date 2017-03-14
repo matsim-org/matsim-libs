@@ -23,6 +23,6 @@ import org.matsim.api.core.v01.population.Person;
 /**
  * @author thibautd
  */
-public interface CharyparNagelScoringParametersForPerson {
-	CharyparNagelScoringParameters getScoringParameters(Person person);
+public interface ScoringParametersForPerson {
+	ScoringParameters getScoringParameters(Person person);
 }

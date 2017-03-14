@@ -35,16 +35,16 @@ import java.util.Map;
 /**
  * @author thibautd
  */
-public class SubpopulationCharyparNagelScoringParameters implements CharyparNagelScoringParametersForPerson {
+public class SubpopulationScoringParameters implements ScoringParametersForPerson {
 	private final PlanCalcScoreConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
 	private final ObjectAttributes personAttributes;
 	private final String subpopulationAttributeName;
-	private final Map<String, CharyparNagelScoringParameters> params = new HashMap<>();
+	private final Map<String, ScoringParameters> params = new HashMap<>();
 
 	@Inject
-	SubpopulationCharyparNagelScoringParameters(PlansConfigGroup plansConfigGroup, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, Population population, TransitConfigGroup transitConfigGroup) {
+	SubpopulationScoringParameters(PlansConfigGroup plansConfigGroup, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, Population population, TransitConfigGroup transitConfigGroup) {
 		this.config = planCalcScoreConfigGroup;
 		this.scConfig = scenarioConfigGroup;
 		this.transitConfigGroup = transitConfigGroup;
@@ -52,12 +52,12 @@ public class SubpopulationCharyparNagelScoringParameters implements CharyparNage
 		this.subpopulationAttributeName = plansConfigGroup.getSubpopulationAttributeName();
 	}
 
-	public SubpopulationCharyparNagelScoringParameters(Scenario scenario) {
+	public SubpopulationScoringParameters(Scenario scenario) {
 		this(scenario.getConfig().plans(), scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getPopulation(), scenario.getConfig().transit());
 	}
 
 	@Override
-	public CharyparNagelScoringParameters getScoringParameters(Person person) {
+	public ScoringParameters getScoringParameters(Person person) {
 		final String subpopulation = (String) personAttributes.getAttribute(
 				person.getId().toString(),
 				subpopulationAttributeName);
@@ -68,7 +68,7 @@ public class SubpopulationCharyparNagelScoringParameters implements CharyparNage
 			 * values in them due to using the same config. Still much better from a memory performance
 			 * point of view than giving each ScoringFunction its own copy of the params.
 			 */
-			CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(this.config, this.config.getScoringParameters(subpopulation), scConfig);
+			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, this.config.getScoringParameters(subpopulation), scConfig);
 			if (transitConfigGroup.isUseTransit()) {
 				// yyyy this should go away somehow. :-)
 

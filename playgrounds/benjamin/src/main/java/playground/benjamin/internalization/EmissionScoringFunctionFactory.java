@@ -29,7 +29,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 /**
  * @author benjamin
@@ -40,14 +40,14 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	MatsimServices controler;
 	PlanCalcScoreConfigGroup configGroup;
-	CharyparNagelScoringParameters params;
+	ScoringParameters params;
 	Network network;
 	ScoringFromEmissions scoringFromEmissions;
 	
 	public EmissionScoringFunctionFactory(MatsimServices controler) {
 		this.controler = controler;
 		this.configGroup = controler.getConfig().planCalcScore();
-		this.params = new CharyparNagelScoringParameters.Builder(configGroup, configGroup.getScoringParameters(null), controler.getConfig().scenario()).build();
+		this.params = new ScoringParameters.Builder(configGroup, configGroup.getScoringParameters(null), controler.getConfig().scenario()).build();
 		this.network = controler.getScenario().getNetwork();
 		this.scoringFromEmissions = new ScoringFromEmissions(params);
 	}
@@ -56,7 +56,7 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	public ScoringFunction createNewScoringFunction(Person person) {
 		
 		PlanCalcScoreConfigGroup configGroup = controler.getConfig().planCalcScore();
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(configGroup, configGroup.getScoringParameters(null), controler.getConfig().scenario()).build();
+		ScoringParameters params = new ScoringParameters.Builder(configGroup, configGroup.getScoringParameters(null), controler.getConfig().scenario()).build();
 		Network network = controler.getScenario().getNetwork();
 		
 		ScoringFunctionAccumulator accumulator = new ScoringFunctionAccumulator();

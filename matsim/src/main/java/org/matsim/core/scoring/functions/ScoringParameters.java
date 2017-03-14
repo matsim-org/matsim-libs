@@ -20,7 +20,6 @@
 
 package org.matsim.core.scoring.functions;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -33,7 +32,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 
-public class CharyparNagelScoringParameters implements MatsimParameters {
+public class ScoringParameters implements MatsimParameters {
 
 	public final Map<String, ActivityUtilityParameters> utilParams;
 	public final Map<String, ModeUtilityParameters> modeParams;
@@ -51,7 +50,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	
 	public final double simulationPeriodInDays;
 
-	private CharyparNagelScoringParameters(
+	private ScoringParameters(
 			final Map<String, ActivityUtilityParameters> utilParams,
 			final Map<String, ModeUtilityParameters> modeParams,
 			final double marginalUtilityOfWaiting_s,
@@ -221,7 +220,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			return this;
 		}
 
-		public CharyparNagelScoringParameters build() {
+		public ScoringParameters build() {
 			final Map<String, ModeUtilityParameters> modes = new TreeMap<>();
 			for ( Map.Entry<String, ModeUtilityParameters.Builder> e : modeParams.entrySet() ) {
 				modes.put( e.getKey() , e.getValue().build() );
@@ -232,7 +231,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 				acts.put( e.getKey() , e.getValue().build() );
 			}
 
-			return new CharyparNagelScoringParameters(
+			return new ScoringParameters(
 					acts,
 					modes,
 					marginalUtilityOfWaiting_s,

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
@@ -43,7 +43,7 @@ public class LineChangeScoringFunction implements ArbitraryEventScoring, Scoring
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
 
-	public LineChangeScoringFunction(final CharyparNagelScoringParameters config) {
+	public LineChangeScoringFunction(final ScoringParameters config) {
 		this( new LineChangeScoringParameters( config ) );
 	}
 
@@ -113,7 +113,7 @@ public class LineChangeScoringFunction implements ArbitraryEventScoring, Scoring
 		private final double marginalUtilityOfTraveling_s;
 
 		public LineChangeScoringParameters(
-				final CharyparNagelScoringParameters config ) {
+				final ScoringParameters config ) {
 			this( config.modeParams.get( TransportMode.pt ).constant,
 				config.utilityOfLineSwitch,
 				config.marginalUtilityOfWaitingPt_s,

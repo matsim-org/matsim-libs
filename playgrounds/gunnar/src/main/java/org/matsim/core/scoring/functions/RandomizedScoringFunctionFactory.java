@@ -41,19 +41,19 @@ import org.matsim.core.scoring.SumScoringFunction;
  * 
  * @author gunnar based on rashid_waraich
  */
-public final class RandomizedCharyparNagelScoringFunctionFactory implements
+public final class RandomizedScoringFunctionFactory implements
 		ScoringFunctionFactory {
 
 	protected Network network;
 
-	private final CharyparNagelScoringParametersForPerson params;
+	private final ScoringParametersForPerson params;
 
-	public RandomizedCharyparNagelScoringFunctionFactory(final Scenario sc) {
-		this(new RandomizedCharyparNagelScoringParameters(sc), sc.getNetwork());
+	public RandomizedScoringFunctionFactory(final Scenario sc) {
+		this(new RandomizedScoringParameters(sc), sc.getNetwork());
 	}
 
-	RandomizedCharyparNagelScoringFunctionFactory(
-			final CharyparNagelScoringParametersForPerson params,
+	RandomizedScoringFunctionFactory(
+			final ScoringParametersForPerson params,
 			Network network) {
 		this.params = params;
 		this.network = network;
@@ -83,7 +83,7 @@ public final class RandomizedCharyparNagelScoringFunctionFactory implements
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 
-		final CharyparNagelScoringParameters parameters = params
+		final ScoringParameters parameters = params
 				.getScoringParameters(person);
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();

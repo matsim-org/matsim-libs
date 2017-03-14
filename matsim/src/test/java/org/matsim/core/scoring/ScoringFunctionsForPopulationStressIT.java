@@ -32,7 +32,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		EventsManager events = EventsUtils.createEventsManager(config);
 		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
 		ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), config.plans(), scenario.getNetwork(), scenario.getPopulation(), throwingScoringFunctionFactory);
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), throwingScoringFunctionFactory);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4));
 		scoringFunctionsForPopulation.finishScoringFunctions();
@@ -151,7 +151,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				};
 			}
 		};
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), config.plans(), scenario.getNetwork(), scenario.getPopulation(), scoringFunctionFactory);
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), scoringFunctionFactory);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
@@ -260,7 +260,7 @@ public class ScoringFunctionsForPopulationStressIT {
 			}
 		};
 		ControlerListenerManagerImpl controlerListenerManager = new ControlerListenerManagerImpl();
-		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), config.plans(), scenario.getNetwork(), scenario.getPopulation(), scoringFunctionFactory);
+		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(controlerListenerManager, events, new EventsToActivities(controlerListenerManager, events), new EventsToLegs(scenario.getNetwork(), events), scenario.getPopulation(), scoringFunctionFactory);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		int MAX = 10;
 		events.initProcessing();

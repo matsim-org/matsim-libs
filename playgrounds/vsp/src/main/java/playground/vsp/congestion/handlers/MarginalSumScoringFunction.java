@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -35,7 +35,7 @@ public class MarginalSumScoringFunction {
 	CharyparNagelActivityScoring activityScoringA;
 	CharyparNagelActivityScoring activityScoringB;
 	
-	public MarginalSumScoringFunction(CharyparNagelScoringParameters params) {
+	public MarginalSumScoringFunction(ScoringParameters params) {
 		activityScoringA = new CharyparNagelActivityScoring(params);
 		activityScoringB = new CharyparNagelActivityScoring(params);
 	}

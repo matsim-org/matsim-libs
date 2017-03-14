@@ -55,9 +55,9 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 import playground.jbischoff.analysis.TripHistogramModule;
@@ -102,12 +102,12 @@ public class CreateBasecase {
 
 				// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
 				controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-					private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
+					private final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( scenario );
 					@Inject CadytsContext cContext;
 					@Override
 					public ScoringFunction createNewScoringFunction(Person person) {
 
-						final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+						final ScoringParameters params = parameters.getScoringParameters( person );
 						
 						SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));

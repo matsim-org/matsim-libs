@@ -19,6 +19,8 @@ public final class TransportPlanningMainModeIdentifier implements MainModeIdenti
 	// I am against other people changing this lightheartedly since some of my analysis depends on it.  So either please discuss,
 	// or use your own variant.  kai, sep'16
 
+	// yyyyyy some variant of this (maybe not exactly this one here) should be able to deal with multi-leg trips.  kai/amit, mar'17
+
 	private final List<String> modeHierarchy = new ArrayList<>() ;
 
 	public TransportPlanningMainModeIdentifier() {
