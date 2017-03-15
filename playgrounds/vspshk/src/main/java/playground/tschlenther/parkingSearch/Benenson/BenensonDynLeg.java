@@ -76,8 +76,7 @@ public class BenensonDynLeg extends ParkingDynLeg{
 				this.firstDestLinkEnterTime = timer.getTimeOfDay();
 			}
 			else{
-				boolean freeSlotOnLink = memorizeParkingSituationAndIsSomethingFree();
-				if(freeSlotOnLink){
+				if(memorizeParkingSituationAndIsSomethingFree()){
 					double pUnoccupied = 0;
 					if(this.totalObservedParkingSpaces > 0){
 						pUnoccupied = this.observedFreeParkingSpaces / this.totalObservedParkingSpaces;
@@ -141,10 +140,10 @@ public class BenensonDynLeg extends ParkingDynLeg{
 
 				Id<Link> nextLinkId;
 				if(this.legStage == ParkingMode.SEARCH_FOR_NEXT){
-					nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkPhase3(currentLinkId, this.route.getEndLinkId(), vehicleId, firstDestLinkEnterTime, this.timer.getTimeOfDay());
+					nextLinkId = ((BenensonParkingSearchLogic) this.logic).getNextLinkRandomInAcceptableDistance(currentLinkId, this.route.getEndLinkId(), vehicleId, firstDestLinkEnterTime, this.timer.getTimeOfDay());
 				}
 				else{
-					nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkPhase2(currentLinkId, route.getEndLinkId(), vehicleId, false);
+					nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkBenensonRouting(currentLinkId, route.getEndLinkId(), vehicleId);
 				}
 //				if(nextLinkId.equals(route.getEndLinkId()) && this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
 //						this.legStage = ParkingMode.SEARCH_FOR_NEXT;

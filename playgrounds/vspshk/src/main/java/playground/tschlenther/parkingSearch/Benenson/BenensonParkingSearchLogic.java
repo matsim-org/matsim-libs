@@ -70,8 +70,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * @param hasTriedDestLinkBefore
 	 * @return
 	 */
-	// sollte unbenannt werden: wird in PHASE 1 und 2 benutzt
-	public Id<Link> getNextLinkPhase2(Id<Link> currentLinkId, Id<Link> destinationLinkId, Id<Vehicle> vehicleId, boolean hasTriedDestLinkBefore) {
+	public Id<Link> getNextLinkBenensonRouting(Id<Link> currentLinkId, Id<Link> destinationLinkId, Id<Vehicle> vehicleId) {
 		Link currentLink = network.getLinks().get(currentLinkId);
 		//List<Id<Link>> nextNodes = new ArrayList<>();
 		
@@ -84,7 +83,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 
 		for (Id<Link> outlinkId : currentLink.getToNode().getOutLinks().keySet()){
 			if(outlinkId.equals(destinationLinkId)){
-				if(!hasTriedDestLinkBefore) return outlinkId;			//TODO: nicht nötig wenn nextLink methoden nach Phasen aufgeteilt
+				return outlinkId;
 			}
 			nextNode = network.getLinks().get(outlinkId).getToNode();
 			double dd = NetworkUtils.getEuclideanDistance(destination.getCoord(),nextNode.getCoord());
@@ -101,12 +100,12 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		return nextLinkId;
 	}
 
-	public Id<Link> getNextLinkPhase3(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay) {
-		//throw new RuntimeException("i don't want this to happen");
+	public Id<Link> getNextLinkRandomInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay) {
+
 		Id<Link> nextLink = null;
 		Link currentLink = network.getLinks().get(currentLinkId);
+		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
 		do{
-			List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
 			if(!(nextLink == null)) keys.remove(keys.indexOf(nextLink));
 			nextLink= keys.get(random.nextInt(keys.size()));	
 		}
