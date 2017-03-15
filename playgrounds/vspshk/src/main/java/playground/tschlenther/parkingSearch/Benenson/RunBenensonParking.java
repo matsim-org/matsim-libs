@@ -40,7 +40,7 @@ public class RunBenensonParking {
 		Config config = ConfigUtils.loadConfig(inputDir + "config.xml", new DvrpConfigGroup());
 		config.plans().setInputFile(inputDir + "population10_neuesVideo.xml");
 		config.facilities().setInputFile(inputDir + "parkingFacilities_full_workNames.xml");
-		config.controler().setOutputDirectory("C:/Users/Work/Bachelor Arbeit/RUNS/BenensonParking/Phasenuebergang_Luftdistanz/");
+		config.controler().setOutputDirectory("C:/Users/Work/Bachelor Arbeit/RUNS/BenensonParking/Phasenuebergang_alleInMovedOverNode/");
 		config.network().setInputFile(inputDir + "grid_network_length200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		if (otfvis) {
