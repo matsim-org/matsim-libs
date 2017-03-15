@@ -57,6 +57,7 @@ public class EventFileToProcessingXML {
 
     public static void main(String[] args) {
         //convert(new File(args[0]));
-        convert(new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs"));
+        //convert(new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_07_Sioux_onlyUnitCapacityAVs"));
+        convert(new File("/media/datahaki/data/ethz/2017_03_14_Sioux_consensus"));
     }
 }

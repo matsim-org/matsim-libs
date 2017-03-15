@@ -22,6 +22,8 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.dispatcher.core.RebalanceVehicleEvent;
+import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.HelperPredicates;
 
 /**
@@ -30,6 +32,7 @@ import playground.clruch.utils.HelperPredicates;
 class VehicleStatus extends AbstractExport {
     // TODO: implement recording of rebalancing journeys for visualization
 
+    // vehicle -> (time -> status)
     NavigableMap<String, NavigableMap<Double, AVStatus>> vehicleStatus = new TreeMap<>();
     HashMap<String, Set<Id<Person>>> vehicleCustomers = new HashMap<>();
 
@@ -44,13 +47,21 @@ class VehicleStatus extends AbstractExport {
     }
 
     private void putDriveToCustomer(PersonDepartureEvent event) {
-        put(event.getPersonId().toString(), event.getTime(), AVStatus.DRIVETOCUSTMER);
+        final String vehicle = event.getPersonId().toString();
+        final double time = event.getTime();
+        if (vehicleStatus.containsKey(vehicle) && vehicleStatus.get(vehicle).containsKey(time)) {
+            GlobalAssert.that(vehicleStatus.get(vehicle).get(time).equals(AVStatus.REBALANCEDRIVE));
+        } else
+            put(vehicle, time, AVStatus.DRIVETOCUSTMER);
+    }
+
+    private void putRebalanceDrive(ActivityStartEvent event) {
+        put(event.getPersonId().toString(), event.getTime(), AVStatus.REBALANCEDRIVE);
     }
 
     private Set<Id<Person>> getCustomerSet(String vehicle) {
         if (!vehicleCustomers.containsKey(vehicle))
             vehicleCustomers.put(vehicle, new HashSet<>());
-
         return vehicleCustomers.get(vehicle);
     }
 
@@ -70,6 +81,14 @@ class VehicleStatus extends AbstractExport {
                         final String vehicle = event.getPersonId().toString(); // = vehicle id!
                         final double time = event.getTime();
                         put(vehicle, time, AVStatus.STAY);
+                    }
+
+                    if (event.getActType().equals(RebalanceVehicleEvent.ACTTYPE)) {
+                        putRebalanceDrive(event);
+                        // final String vehicle = event.getPersonId().toString(); // = vehicle id!
+                        // final double time = event.getTime();
+                        // System.out.println(time + " " + vehicle);
+                        // put(vehicle, time, AVStatus.REBALANCEDRIVE);
                     }
                 }
 
@@ -139,7 +158,7 @@ class VehicleStatus extends AbstractExport {
                 @Override
                 public void handleEvent(PersonDepartureEvent event) {
                     // only departure events of avs are considered.
-                    if(HelperPredicates.isPersonAV(event.getPersonId())){
+                    if (HelperPredicates.isPersonAV(event.getPersonId())) {
                         potentialEmptyDriveEvent.put(event.getPersonId().toString(), event);
                     }
                 }
@@ -162,8 +181,8 @@ class VehicleStatus extends AbstractExport {
                         if (potentialEmptyDriveEvent.containsKey(vehicle)) // only previously registered true vehicles are considered
                             putDriveToCustomer(potentialEmptyDriveEvent.get(vehicle));
 
-                        //else
-                        //    new RuntimeException("should have value").printStackTrace();
+                        // else
+                        // new RuntimeException("should have value").printStackTrace();
                     }
                 }
 
@@ -188,5 +207,3 @@ class VehicleStatus extends AbstractExport {
 
     }
 }
-
-

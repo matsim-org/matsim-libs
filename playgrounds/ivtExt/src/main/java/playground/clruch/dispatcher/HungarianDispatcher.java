@@ -63,6 +63,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
                 Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
 
+
                 // reduce the number of requests for a smaller running time
                 // take out and match request-vehicle pairs with distance zero
                 List<Link> requestlocs = requests.values().stream() //
