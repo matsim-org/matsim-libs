@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.clruch.dispatcher.core.RebalanceVehicleEvent;
-import playground.clruch.dispatcher.core.RebalanceVehicleEventHandler;
 import playground.clruch.utils.HelperPredicates;
 
 /**
@@ -180,20 +179,6 @@ class VehicleStatus extends AbstractExport {
                 }
             });
             
-            events.addHandler(new RebalanceVehicleEventHandler() {
-                
-                @Override
-                public void handleEvent(RebalanceVehicleEvent event) {
-                    System.out.println("Reb");
-                    
-                }
-                @Override
-                public void reset(int iteration) {
-                    // intentionally empty                    
-                }
-                
-            });
-
         }
 
     }
