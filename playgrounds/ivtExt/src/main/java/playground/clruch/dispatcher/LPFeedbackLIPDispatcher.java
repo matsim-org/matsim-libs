@@ -41,11 +41,11 @@ import java.util.stream.Collectors;
 
 public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     public final int rebalancingPeriod;
+    public final int redispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
-    final AbstractVehicleRequestMatcher vehicleRequestMatcher;
     final int numvNodes;
     final int numvLinks;
     Map<Integer, String> numij_vLinkMap = new LinkedHashMap<>(); // LinkedHashMap chosen as the ordering should remain the same for iterating several times over the keyset.
@@ -72,9 +72,9 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         this.requestSelector = abstractRequestSelector;
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
-        vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
         numvNodes = virtualNetwork.getVirtualNodes().size();
         numvLinks = virtualNetwork.getVirtualLinks().size();
     }
@@ -82,39 +82,12 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
     @Override
     public void redispatch(double now) {
-        vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
-
-        // Part I: outside rebalancing periods, permanently assign vehicles to requests if they have arrived at a customer i.e. stay on the same link
-        // in the identical vNode match customers to requests
-        {
-            Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
-            // collect destinations per vNode
-            Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
-            virtualNetwork.getVirtualNodes().stream().forEach(v -> destinationLinks.put(v, new ArrayList<>()));
-            for (VirtualNode vNode : virtualNetwork.getVirtualNodes()) {
-                destinationLinks.get(vNode).addAll( // stores from links
-                        requests.get(vNode).stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
-            }
-
-            // collect available vehicles per vNode
-            Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+        // PART 0: match vehicles at a customer link
+        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
+                .match(getStayVehicles(), getAVRequestsAtLinks());
 
 
-            // assign destinations to the available vehicles
-            {
-                GlobalAssert.that(availableVehicles.keySet().containsAll(virtualNetwork.getVirtualNodes()));
-                GlobalAssert.that(destinationLinks.keySet().containsAll(virtualNetwork.getVirtualNodes()));
-
-                // DO NOT PUT PARALLEL anywhere in this loop !
-                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-                    vehicleDestMatcher //
-                            .match(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode)) //
-                            .entrySet().stream().forEach(this::setVehicleDiversion);
-            }
-        }
-
-
-        // PART II: redispatch all vehicles
+        // PART I: rebalance all vehicles periodically
         final long round_now = Math.round(now);
         if (round_now % rebalancingPeriod == 0) {
             // setup linear program
@@ -193,6 +166,46 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             // close the LP to avoid data leaks
             // TODO can this be taken out to not delete the LP in every instance?
             this.closeLP(lp);
+        }
+
+
+        // Part II: outside rebalancing periods, permanently assign vehicles to requests if they have arrived at a customer i.e. stay on the same link
+        // in the identical vNode match customers to requests, assign desitnations to vehicles using bipartite matching
+        if (round_now % redispatchPeriod == 0) {
+
+            Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
+
+
+            // reduce the number of requests for a smaller running time
+            // take out and match request-vehicle pairs with distance zero
+            List<Link> requestlocs = requests.values().stream() //
+                    .flatMap(List::stream) // all from links of all requests with
+                    .map(AVRequest::getFromLink) // multiplicity
+                    .collect(Collectors.toList());
+
+            {
+                // call getDivertableVehicles again to get remaining vehicles
+                Collection<VehicleLinkPair> divertableVehicles = getVirtualNodeAvailableNotRebalancingVehicles().values()
+                        .stream().flatMap(v -> v.stream()).collect(Collectors.toList());
+                ;
+
+
+                // this call removes the matched links from requestlocs
+                new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestlocs) //
+                        .entrySet().forEach(this::setVehicleDiversion);
+            }
+
+
+            {
+                // call getDivertableVehicles again to get remaining vehicles
+                Collection<VehicleLinkPair> divertableVehicles = getVirtualNodeAvailableNotRebalancingVehicles().values()
+                        .stream().flatMap(v -> v.stream()).collect(Collectors.toList());
+
+
+                // find the Euclidean bipartite matching for all vehicles using the Hungarian method
+                new HungarBiPartVehicleDestMatcher().match(divertableVehicles, requestlocs) //
+                        .entrySet().forEach(this::setVehicleDiversion);
+            }
         }
     }
 
