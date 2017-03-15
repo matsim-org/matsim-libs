@@ -44,6 +44,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     }
 
 
+    // TODO rename this to getVirtualNodeDivertableVehicles
     protected Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableVehicles() {
         Map<VirtualNode, List<VehicleLinkPair>> returnMap =
                 getDivertableVehicles().stream() //
