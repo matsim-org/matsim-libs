@@ -45,25 +45,47 @@ public class PostProcessTravelTime {
 		ColectivoTraveltimesEvaluator colectivoTraveltimesEvaluator = new ColectivoTraveltimesEvaluator();
 		
 		events.addHandler(colectivoTraveltimesEvaluator);
-		System.out.println("hallo");
 		new MatsimEventsReader(events).readFile(eventsFile);
-		System.out.println("hallo2");
 		Map<Id<Person>,Double> travel = new HashMap<>();
+		HashMap<Integer,Double> averageTraveltimes = new HashMap<>();
 		travel = colectivoTraveltimesEvaluator.getTravelTimes();
-		System.out.println(travel);
+		int numberOfDepartures = 0;
+		double sumOfTimes=0.0;
+		double average=0.0;
+//		travel.values();
+//		System.out.println(travel);
+//		Id<Person> leute = travel.get(key);
+		for ( int a=1; a <382; a++ ){
+			numberOfDepartures=0;
+			sumOfTimes=0.0;
+			
+			for (Map.Entry<Id<Person>,Double> person : travel.entrySet()){
+				if (person.getKey().toString().contains("pt_co"+a+"_")){
+//					System.out.println(person.getKey() +"  "+ person.getValue());
+					numberOfDepartures++;
+					sumOfTimes = sumOfTimes+person.getValue();					
+				}
+			}
+			average= sumOfTimes/numberOfDepartures;
+			averageTraveltimes.put(a,average);
+		}
+		for (HashMap.Entry<Integer,Double> averages : averageTraveltimes.entrySet())
+			{
+			System.out.println("Linenumber:"+averages.getKey()+"  Traveltime: "+averages.getValue());
+			}
 
-
-	
+		writeHistogramData(outputFolder+"Traveltimes3.csv", averageTraveltimes);
 	}
 		
 
-	public static void writeHistogramData(String filename, HashMap lines) {
+	public static void writeHistogramData(String filename, HashMap<Integer,Double> averages) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
-			bw.write("distance;rides");
-			for (int i = 0; i < lines.size(); i++) {
+			bw.write("Linenumber ; Traveltime");
+			for (HashMap.Entry<Integer,Double> average : averages.entrySet()) {
+
 				bw.newLine();
-				bw.write(lines.toString());
+				bw.write(average.getKey()+";"+average.getValue().intValue());
 			}
 			bw.flush();
 			bw.close();
