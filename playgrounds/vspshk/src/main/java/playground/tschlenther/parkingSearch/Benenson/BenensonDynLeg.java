@@ -55,11 +55,9 @@ public class BenensonDynLeg extends ParkingDynLeg{
 				this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
 				logger.error("vehicle " + this.vehicleId + " goes into observing on link " + this.currentLinkId);
 			}
-
 		}
 		if(this.legStage == ParkingMode.OBSERVING ){
 			memorizeParkingSituationAndIsSomethingFree();
-			
 //			werde X LINKS vor dem Ziel aktiv und schätze wie viele Slots noch kommen, ggfs. parke
 //			if (this.route.getLinkIds().size() - this.currentLinkIdx == 2) {
 //				this.legStage = ParkingMode.SEARCH_WHILE_APPROACH;
@@ -73,14 +71,17 @@ public class BenensonDynLeg extends ParkingDynLeg{
 			}
 		}
 		if(this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
+			if(currentLinkId.equals(route.getEndLinkId())){
+				this.legStage = ParkingMode.SEARCH_FOR_NEXT;
+				this.firstDestLinkEnterTime = timer.getTimeOfDay();
+			}
+			else{
 				boolean freeSlotOnLink = memorizeParkingSituationAndIsSomethingFree();
 				if(freeSlotOnLink){
 					double pUnoccupied = 0;
 					if(this.totalObservedParkingSpaces > 0){
 						pUnoccupied = this.observedFreeParkingSpaces / this.totalObservedParkingSpaces;
 					}
-					
-					//wantToParkHereV2 takes the probability function into account (see Benenson paper)
 					if ( ((BenensonParkingSearchLogic)this.logic).wantToParkHere(pUnoccupied, currentLinkId, route.getEndLinkId())){
 						logger.error("vehicle " + this.vehicleId + " würde gerne auf Link " + currentLinkId + " parken.\n "
 								+ "\t pUnoccupied = " + pUnoccupied + "\n\t totalObservedParkingSpaces = " + totalObservedParkingSpaces + "\n\t observedFreeSpaces = " + this.observedFreeParkingSpaces );
@@ -90,6 +91,7 @@ public class BenensonDynLeg extends ParkingDynLeg{
 				else{
 					logger.error("nothing free for vehicle " + vehicleId + " on link " + currentLinkId);
 				}
+			}
 		}
 		if (this.legStage == ParkingMode.SEARCH_FOR_NEXT){
 			logger.error("vehicle " + this.vehicleId + " in PHASE3 auf link " + this.currentLinkId);
@@ -144,10 +146,10 @@ public class BenensonDynLeg extends ParkingDynLeg{
 				else{
 					nextLinkId = ((BenensonParkingSearchLogic) (this.logic)).getNextLinkPhase2(currentLinkId, route.getEndLinkId(), vehicleId, false);
 				}
-				if(nextLinkId.equals(route.getEndLinkId()) && this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
-						this.legStage = ParkingMode.SEARCH_FOR_NEXT;
-						this.firstDestLinkEnterTime = timer.getTimeOfDay();
-				}
+//				if(nextLinkId.equals(route.getEndLinkId()) && this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
+//						this.legStage = ParkingMode.SEARCH_FOR_NEXT;
+//						this.firstDestLinkEnterTime = timer.getTimeOfDay();
+//				}
 				currentAndNextParkLink = new Tuple<Id<Link>, Id<Link>>(currentLinkId, nextLinkId);
 				return nextLinkId;
 			}
