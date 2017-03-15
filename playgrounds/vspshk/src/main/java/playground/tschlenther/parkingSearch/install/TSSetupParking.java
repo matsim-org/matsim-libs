@@ -43,7 +43,7 @@ import playground.tschlenther.parkingSearch.Benenson.FacilityBasedBenensonParkin
 
 /**
  * @author  jbischoff
- *
+ * @author  tschlenther
  */
 /**
  *
