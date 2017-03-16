@@ -90,7 +90,7 @@ public class DecongestionRun {
 		decongestionSettings.setKi(0.05);
 		decongestionSettings.setKp(0.05);
 		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
-		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
+		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(1000.0);
 		
 		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
 		decongestionSettings.setINITIAL_TOLL(1.0);
@@ -141,7 +141,8 @@ public class DecongestionRun {
 						"_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() + 
 						"_integral" + decongestionSettings.getIntegralApproach() + 
 						"_alpha" + decongestionSettings.getIntegralApproachAverageAlpha() + 
-						"_factor" + decongestionSettings.getIntegralApproachUnusedHeadwayFactor();
+						"_factor" + decongestionSettings.getIntegralApproachUnusedHeadwayFactor() +
+						"_TEST2";
 					
 		log.info("Output directory: " + outputDirectory);
 		
