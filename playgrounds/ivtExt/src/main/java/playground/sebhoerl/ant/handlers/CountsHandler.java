@@ -27,7 +27,7 @@ public class CountsHandler extends AbstractHandler implements PersonDepartureEve
 
     @Override
     public void handleEvent(PersonDepartureEvent event) {
-        String mode = event.getLegMode().contains("pt") ? "pt" : event.getLegMode();
+        String mode = event.getLegMode().equals("transit_walk") ? "pt" : event.getLegMode();
 
         if (!data.isOrdinaryPerson(event.getPersonId())) return;
         if (!data.modes.contains(mode)) return;
@@ -37,7 +37,7 @@ public class CountsHandler extends AbstractHandler implements PersonDepartureEve
 
     @Override
     public void handleEvent(PersonArrivalEvent event) {
-        String mode = event.getLegMode().contains("pt") ? "pt" : event.getLegMode();
+        String mode = event.getLegMode().equals("transit_walk") ? "pt" : event.getLegMode();
 
         if (!data.isOrdinaryPerson(event.getPersonId())) return;
         if (!data.modes.contains(mode)) return;

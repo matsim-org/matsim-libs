@@ -1,5 +1,6 @@
 package playground.sebhoerl.ant;
 
+import com.sun.javafx.binding.StringFormatter;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -13,6 +14,7 @@ import playground.sebhoerl.av_paper.BinCalculator;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +58,7 @@ public class RunAnalysisToCSV {
         events.addHandler(new IdleHandler(dataFrame));
         events.addHandler(new OccupancyHandler(dataFrame));
         events.addHandler(new TimeHandler(dataFrame));
+        events.addHandler(new LegChainHandler(dataFrame));
 
         reader.readFile(EVENTS_PATH);
         events.resetHandlers(0);
@@ -78,6 +81,8 @@ public class RunAnalysisToCSV {
         writeInfo(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "info.txt"), dataFrame);
 
         writeOccupancy(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "occupancy.csv"), dataFrame);
+
+        writeLegChains(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "chains.csv"), dataFrame);
     }
 
     private static <T extends Number> void writeCountsByModeAndBin(BufferedWriter writer, DataFrame dataFrame, Map<String, List<T>> data) throws IOException {
@@ -184,6 +189,18 @@ public class RunAnalysisToCSV {
         writer.write(String.format("avVehicleDistance = %f\n", dataFrame.avVehicleDistance));
         writer.write(String.format("avPassengerDistance = %f\n", dataFrame.avPassengerDistance));
         writer.write(String.format("avEmptyRideDistance = %f\n", dataFrame.avEmptyRideDistance));
+        writer.close();
+    }
+
+    private static void writeLegChains(BufferedWriter writer, DataFrame dataFrame) throws IOException {
+        List<String> chainKeys = new LinkedList<>();
+        chainKeys.addAll(dataFrame.chainCounts.keySet());
+        Collections.sort(chainKeys);
+
+        for (String chain : chainKeys) {
+            writer.write(String.format("%s;%d\n", chain, dataFrame.chainCounts.get(chain)));
+        }
+
         writer.close();
     }
 }

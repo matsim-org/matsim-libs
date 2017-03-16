@@ -31,6 +31,7 @@ public class DataFrame {
     final public Map<Integer, List<Double>> occupancy;
 
     final public List<Double> avDistances;
+    final public Map<String, Long> chainCounts;
 
     final public String relevantOperator;
 
@@ -55,6 +56,7 @@ public class DataFrame {
         occupancy = initialize(Arrays.asList(0, 1, 2, 3, 4), 0.0);
 
         avDistances = initialize(0.0);
+        chainCounts = new HashMap<>();
     }
 
     public boolean isOrdinaryPerson(Id<Person> id) {
