@@ -56,7 +56,7 @@ public class DistanceHandler extends AbstractHandler implements PersonEntersVehi
         data.passengerDistance += linkLength * passengerCount.get(event.getVehicleId());
         data.vehicleDistance += linkLength;
 
-        if (event.getVehicleId().toString().startsWith("av_")) {
+        if (data.isRelevantOperator(event.getVehicleId().toString())) {
             data.avPassengerDistance += linkLength * passengerCount.get(event.getVehicleId());
             data.avVehicleDistance += linkLength;
 
@@ -71,7 +71,7 @@ public class DistanceHandler extends AbstractHandler implements PersonEntersVehi
 
     @Override
     public void handleEvent(GenericEvent event) {
-        if (event.getEventType().equals("AVTransit")) {
+        if (event.getEventType().equals("AVTransit") && data.isRelevantOperator("av_" + event.getAttributes().get("operator"))) {
             data.avDistances.add(Double.parseDouble(event.getAttributes().get("distance")));
         }
     }

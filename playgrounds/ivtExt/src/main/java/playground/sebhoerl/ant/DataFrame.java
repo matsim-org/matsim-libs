@@ -32,7 +32,14 @@ public class DataFrame {
 
     final public List<Double> avDistances;
 
+    final public String relevantOperator;
+
     public DataFrame(BinCalculator binCalculator) {
+        this(binCalculator, null);
+    }
+
+    public DataFrame(BinCalculator binCalculator, String relevantOperator) {
+        this.relevantOperator = relevantOperator;
         this.binCalculator = binCalculator;
 
         departureCount = initialize(modes, 0);
@@ -54,6 +61,14 @@ public class DataFrame {
         if (id.toString().startsWith("av_")) return false;
         if (id.toString().startsWith("pt_")) return false;
         return true;
+    }
+
+    public boolean isAV(String id) {
+        return id.startsWith("av_");
+    }
+
+    public boolean isRelevantOperator(String id) {
+        return id.startsWith("av_") && (relevantOperator == null || id.contains(relevantOperator));
     }
 
     private <T extends Number> List<List<T>> initialize() {

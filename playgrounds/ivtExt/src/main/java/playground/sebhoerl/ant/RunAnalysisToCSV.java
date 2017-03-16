@@ -22,15 +22,24 @@ public class RunAnalysisToCSV {
         double START_TIME = 0.0;
         double END_TIME = 30.0 * 3600.0;
         double INTERVAL = 300.0;
+        String RELEVANT_OPERATOR = "*";
 
         String NETWORK_PATH = args[0];
         String EVENTS_PATH = args[1];
         String OUTPUT_PATH = args[2];
 
         if (args.length > 3) {
-            START_TIME = Double.parseDouble(args[3]);
-            END_TIME = Double.parseDouble(args[4]);
-            INTERVAL = Double.parseDouble(args[5]);
+            RELEVANT_OPERATOR = args[3];
+        }
+
+        if (args.length > 4) {
+            START_TIME = Double.parseDouble(args[4]);
+            END_TIME = Double.parseDouble(args[5]);
+            INTERVAL = Double.parseDouble(args[6]);
+        }
+
+        if (RELEVANT_OPERATOR.equals("*")) {
+            RELEVANT_OPERATOR = null;
         }
 
         BinCalculator binCalculator = BinCalculator.createByInterval(START_TIME, END_TIME, INTERVAL);
@@ -41,7 +50,7 @@ public class RunAnalysisToCSV {
         EventsManager events = EventsUtils.createEventsManager();
         MatsimEventsReader reader = new MatsimEventsReader(events);
 
-        DataFrame dataFrame = new DataFrame(binCalculator);
+        DataFrame dataFrame = new DataFrame(binCalculator, RELEVANT_OPERATOR);
         events.addHandler(new CountsHandler(dataFrame));
         events.addHandler(new DistanceHandler(dataFrame, network));
         events.addHandler(new IdleHandler(dataFrame));
@@ -53,20 +62,22 @@ public class RunAnalysisToCSV {
 
         new File(OUTPUT_PATH).mkdirs();
 
-        writeCountsByModeAndBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/departures.csv"), dataFrame, dataFrame.departureCount);
-        writeCountsByModeAndBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/arrivals.csv"), dataFrame, dataFrame.arrivalCount);
-        writeCountsByModeAndBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/travelling.csv"), dataFrame, dataFrame.travellerCount);
+        String operatorPrefix = RELEVANT_OPERATOR == null ? "" : RELEVANT_OPERATOR + "_";
 
-        writeSingleCountByBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/waiting_customers.csv"), "WAITING", dataFrame, dataFrame.waitingCount);
-        writeSingleCountByBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/idle_avs.csv"), "IDLE", dataFrame, dataFrame.idleAVs);
+        writeCountsByModeAndBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "departures.csv"), dataFrame, dataFrame.departureCount);
+        writeCountsByModeAndBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "arrivals.csv"), dataFrame, dataFrame.arrivalCount);
+        writeCountsByModeAndBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "travelling.csv"), dataFrame, dataFrame.travellerCount);
 
-        writeTimesByBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/av_waiting_times.csv"), dataFrame, dataFrame.waitingTimes);
-        writeTimesByBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/av_travel_times.csv"), dataFrame, dataFrame.travelTimes);
+        writeSingleCountByBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "waiting_customers.csv"), "WAITING", dataFrame, dataFrame.waitingCount);
+        writeSingleCountByBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "idle_avs.csv"), "IDLE", dataFrame, dataFrame.idleAVs);
 
-        writeDistances(IOUtils.getBufferedWriter(OUTPUT_PATH + "/av_distances.txt"), dataFrame);
-        writeInfo(IOUtils.getBufferedWriter(OUTPUT_PATH + "/info.txt"), dataFrame);
+        writeTimesByBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "av_waiting_times.csv"), dataFrame, dataFrame.waitingTimes);
+        writeTimesByBin(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "av_travel_times.csv"), dataFrame, dataFrame.travelTimes);
 
-        writeOccupancy(IOUtils.getBufferedWriter(OUTPUT_PATH + "/occupancy.csv"), dataFrame);
+        writeDistances(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "av_distances.txt"), dataFrame);
+        writeInfo(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "info.txt"), dataFrame);
+
+        writeOccupancy(IOUtils.getBufferedWriter(OUTPUT_PATH + "/" + operatorPrefix + "occupancy.csv"), dataFrame);
     }
 
     private static <T extends Number> void writeCountsByModeAndBin(BufferedWriter writer, DataFrame dataFrame, Map<String, List<T>> data) throws IOException {
