@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.sergioo.mixedTraffic2017.qsimmixed;
 
+import java.util.*;
+import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
@@ -36,9 +38,6 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisVehicle;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 
 /**
@@ -168,8 +167,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		TreeMap<Double,QueueWithBuffer.Hole> consumableHoles = new TreeMap<>() ;
 
-		// holes, if applicable:
-		if ( QSimConfigGroup.SnapshotStyle.withHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
+		// holes or kinematicWaves, if applicable:
+		if ( QSimConfigGroup.SnapshotStyle.withHoles==scenario.getConfig().qsim().getSnapshotStyle()
+				|| QSimConfigGroup.SnapshotStyle.withHolesAndShowHoles == scenario.getConfig().qsim().getSnapshotStyle()
+				|| QSimConfigGroup.SnapshotStyle.kinematicWaves==scenario.getConfig().qsim().getSnapshotStyle() ) {
 			if ( !holes.isEmpty() ) {
 				double firstHolePosition = Double.NaN ;
 				double distanceOfHoleFromFromNode = Double.NaN ;

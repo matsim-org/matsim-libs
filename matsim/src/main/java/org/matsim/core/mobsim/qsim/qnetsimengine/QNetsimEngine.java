@@ -218,6 +218,9 @@ public class QNetsimEngine implements MobsimEngine {
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
 			// ??? kai, nov'15
 			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+		case kinematicWaves:
+			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not explicitly supported. Using \""+SnapshotStyle.withHoles+ "\" instead.");
+			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		case equiDist:
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		default:

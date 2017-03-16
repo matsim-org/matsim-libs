@@ -20,6 +20,9 @@
 
 package playground.sergioo.mixedTraffic2017.qsimmixed;
 
+import java.util.*;
+import java.util.concurrent.*;
+import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,10 +50,6 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -205,6 +204,9 @@ public class QNetsimEngine implements MobsimEngine {
 		case withHolesAndShowHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
 			// ??? kai, nov'15
+			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+		case kinematicWaves:
+			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not explicitly supported. Using \""+SnapshotStyle.withHoles+ "\" instead.");
 			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		case equiDist:
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);

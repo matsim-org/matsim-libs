@@ -177,8 +177,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		TreeMap<Double,Hole> consumableHoles = new TreeMap<>() ;
 		
-		// holes, if applicable:
-		if ( QSimConfigGroup.SnapshotStyle.withHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
+		// holes or kinematicWaves, if applicable:
+		if ( QSimConfigGroup.SnapshotStyle.withHoles==scenario.getConfig().qsim().getSnapshotStyle()
+				|| QSimConfigGroup.SnapshotStyle.withHolesAndShowHoles == scenario.getConfig().qsim().getSnapshotStyle()
+				|| QSimConfigGroup.SnapshotStyle.kinematicWaves==scenario.getConfig().qsim().getSnapshotStyle() ) {
 			if ( !holes.isEmpty() ) {
 				double firstHolePosition = Double.NaN ;
 				double distanceOfHoleFromFromNode = Double.NaN ;
