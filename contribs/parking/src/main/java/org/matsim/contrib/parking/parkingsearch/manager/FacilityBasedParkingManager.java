@@ -227,9 +227,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	public double getNrOfAllParkingSpacesOnLink (Id<Link> linkId){
 		double allSpaces = 0;
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
-		if (parkingFacilitiesAtLink == null) {
-			return 0;
-		} else {
+		if (!(parkingFacilitiesAtLink == null)) {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink){
 				allSpaces += this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
 			}
