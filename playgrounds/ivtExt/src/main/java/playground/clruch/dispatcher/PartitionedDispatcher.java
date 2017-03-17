@@ -1,12 +1,6 @@
 package playground.clruch.dispatcher;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
@@ -28,40 +22,32 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
-    private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>(); // TODO correct case
+    private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>();
 
     public PartitionedDispatcher( //
-            AVDispatcherConfig config, //
-            TravelTime travelTime, //
-            ParallelLeastCostPathCalculator router, //
-            EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork) {
+                                  AVDispatcherConfig config, //
+                                  TravelTime travelTime, //
+                                  ParallelLeastCostPathCalculator router, //
+                                  EventsManager eventsManager, //
+                                  VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
     }
 
-    // TODO call this function instead of "setVehicleDiversion" whenever the cause for rerouting is "rebalance"
-    // <- not final code design
     // This function has to be called only after getVirtualNodeRebalancingVehicles
     protected synchronized final void setVehicleRebalance(final VehicleLinkPair vehicleLinkPair, final Link destination) {
         updateRebVehicles();
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(vehicleLinkPair, destination);
-        {
-            // TODO make this cool
-            Id<Person> id = new Id<Person>() {
-                @Override
-                public String toString() {
-                    return vehicleLinkPair.avVehicle.getId().toString();
-                }
-            };
-            eventsManager.processEvent(new RebalanceVehicleEvent(getTimeNow(), id, destination.getId()));
-        }
+        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), vehicleLinkPair.avVehicle, destination));
         Link returnVal = rebalancingVehicles.put(vehicleLinkPair.avVehicle, destination);
         GlobalAssert.that(returnVal == null);
     }
 
-    // TODO rename this to getVirtualNodeDivertableVehicles
+
+    /**
+     * @return returns the divertable vehicles per virtualNode
+     */
     protected Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableVehicles() {
         Map<VirtualNode, List<VehicleLinkPair>> returnMap = getDivertableVehicles().stream() //
                 .parallel() //
@@ -123,7 +109,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
      *
      * @return
      */
-    protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableNotRebalancingVehicles() {
+    protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeDivertableNotRebalancingVehicles() {
         // update the list of rebalancing vehicles
         updateRebVehicles();
 
@@ -153,5 +139,18 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         }
         return returnMap;
     }
+
+
+    /**
+     *
+     * @return return virtualNode related HashMaps
+     */
+    protected <Type> Map<VirtualNode, List<Type>> createvNodeLinksMap() {
+        Map<VirtualNode, List<Type>> returnMap = new HashMap<>();
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
+            returnMap.put(virtualNode, new ArrayList<>());
+        return returnMap;
+    }
+
 
 }

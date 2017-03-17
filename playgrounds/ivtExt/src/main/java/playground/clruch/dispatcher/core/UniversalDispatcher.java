@@ -49,6 +49,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     private int total_matchedRequests = 0;
 
+
     protected UniversalDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
@@ -83,7 +84,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * 
      * @return list of {@link AVRequest}s grouped by link
      */
-    protected final Map<Link, List<AVRequest>> getAVRequestsAtLinks() {
+    public final Map<Link, List<AVRequest>> getAVRequestsAtLinks() {
         return getAVRequests().stream() // <- intentionally not parallel to guarantee ordering of requests
                 .collect(Collectors.groupingBy(AVRequest::getFromLink));
     }
@@ -159,7 +160,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return null;
     }
 
-    protected final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {
+    public final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {
         setVehicleDiversion(entry.getKey(), entry.getValue());
     }
 

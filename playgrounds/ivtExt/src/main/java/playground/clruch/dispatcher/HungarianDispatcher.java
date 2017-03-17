@@ -3,8 +3,12 @@ package playground.clruch.dispatcher;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -32,24 +36,21 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
     private final int dispatchPeriod;
     private final int maxMatchNumber; // implementation may not use this
+    private Tensor printVals = Tensors.empty();
 
     private HungarianDispatcher( //
-            AVDispatcherConfig avDispatcherConfig, //
-            TravelTime travelTime, //
-            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-            EventsManager eventsManager, //
-            Network network, AbstractRequestSelector abstractRequestSelector) {
+                                 AVDispatcherConfig avDispatcherConfig, //
+                                 TravelTime travelTime, //
+                                 ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+                                 EventsManager eventsManager, //
+                                 Network network, AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
     }
 
-    int ori_sizeV = 0;
-    int ori_sizeR = 0;
 
-    int sizeV = 0;
-    int sizeR = 0;
 
     @Override
     public void redispatch(double now) {
@@ -59,29 +60,37 @@ public class HungarianDispatcher extends UniversalDispatcher {
                 .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            { // assign new destination to vehicles with bipartite matching
+            printVals = globalBipartiteMatching(this, ()->getDivertableVehicles());
 
-                Map<Link, List<AVRequest>> requests = getAVRequestsAtLinks();
+        }
+    }
 
 
-                // reduce the number of requests for a smaller running time
-                // take out and match request-vehicle pairs with distance zero
-                List<Link> requestlocs = requests.values().stream() //
-                        .flatMap(List::stream) // all from links of all requests with
-                        .map(AVRequest::getFromLink) // multiplicity
-                        .collect(Collectors.toList());
+    public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier) {
+        // assign new destination to vehicles with bipartite matching
 
-                {
-                    // call getDivertableVehicles again to get remaining vehicles
-                    Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
+        Tensor returnTensor = Tensors.empty();
 
-                    ori_sizeV = divertableVehicles.size();
-                    ori_sizeR = requestlocs.size();
+        Map<Link, List<AVRequest>> requests = dispatcher.getAVRequestsAtLinks();
 
-                    // this call removes the matched links from requestlocs
-                    new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestlocs) //
-                            .entrySet().forEach(this::setVehicleDiversion);
-                }
+
+        // reduce the number of requests for a smaller running time
+        // take out and match request-vehicle pairs with distance zero
+        List<Link> requestlocs = requests.values().stream() //
+                .flatMap(List::stream) // all from links of all requests with
+                .map(AVRequest::getFromLink) // multiplicity
+                .collect(Collectors.toList());
+
+        {
+            // call getDivertableVehicles again to get remaining vehicles
+            Collection<VehicleLinkPair> divertableVehicles = supplier.get();
+
+            returnTensor.append(Tensors.vectorInt(divertableVehicles.size(),requestlocs.size()));
+
+            // this call removes the matched links from requestlocs
+            new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestlocs) //
+                    .entrySet().forEach(dispatcher::setVehicleDiversion);
+        }
 
                 /*
                  * // only select MAXMATCHNUMBER of oldest requests
@@ -89,26 +98,27 @@ public class HungarianDispatcher extends UniversalDispatcher {
                  * Collection<AVRequest> avRequestsReduced = requestSelector.selectRequests(divertableVehicles, avRequests, MAXMATCHNUMBER);
                  */
 
-                {
-                    // call getDivertableVehicles again to get remaining vehicles
-                    Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicles();
+        {
+            // call getDivertableVehicles again to get remaining vehicles
+            Collection<VehicleLinkPair> divertableVehicles = supplier.get();
 
-                    sizeV = divertableVehicles.size();
-                    sizeR = requestlocs.size();
-                    // find the Euclidean bipartite matching for all vehicles using the Hungarian method
-                    new HungarBiPartVehicleDestMatcher().match(divertableVehicles, requestlocs) //
-                            .entrySet().forEach(this::setVehicleDiversion);
-                }
-            }
+            returnTensor.append(Tensors.vectorInt(divertableVehicles.size(),requestlocs.size()));
+
+            // find the Euclidean bipartite matching for all vehicles using the Hungarian method
+            new HungarBiPartVehicleDestMatcher().match(divertableVehicles, requestlocs) //
+                    .entrySet().forEach(dispatcher::setVehicleDiversion);
         }
+
+
+        return returnTensor;
     }
+
 
     @Override
     public String getInfoLine() {
-        return String.format("%s H[%d x %d] => H[%d x %d]", //
+        return String.format("%s H=%s", //
                 super.getInfoLine(), //
-                ori_sizeV, ori_sizeR, //
-                sizeV, sizeR //
+                printVals.toString() //
         );
     }
 
