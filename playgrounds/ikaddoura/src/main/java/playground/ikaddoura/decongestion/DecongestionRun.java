@@ -93,7 +93,7 @@ public class DecongestionRun {
 		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(1.0);
 		
 		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
-		decongestionSettings.setINITIAL_TOLL(0.0);
+		decongestionSettings.setINITIAL_TOLL(1.0);
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.addModule(decongestionSettings);
