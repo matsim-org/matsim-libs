@@ -82,7 +82,11 @@ public final class WelfareCarefulMultiPlanOperator implements Operator {
 		for (PPlan plan : delegate.getAllPlans()) {
 			AbstractOperator.scorePlan(driverId2ScoreMap, plan);
 			double welfareCorrection = getWelfareCorrection(plan);
-			plan.setScore(plan.getScore() + welfareCorrection);
+			System.out.println("welfareCorrection: " + welfareCorrection);
+			System.out.println("score: " + plan.getScore());
+			double newPlanScore = welfareCorrection + plan.getScore();
+			System.out.println("newPlanScore: " + newPlanScore);
+			plan.setScore(newPlanScore);
 			
 			delegate.setScore(delegate.getScore() + plan.getScore());
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
