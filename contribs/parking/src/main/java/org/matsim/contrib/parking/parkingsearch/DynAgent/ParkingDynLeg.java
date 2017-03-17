@@ -68,6 +68,7 @@ public class ParkingDynLeg implements DriverDynLeg {
 			if (currentLinkId.equals(this.getDestinationLinkId())) {
 				this.parkingMode = true;
 				this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
+				hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
 			}
 		} else {
 			hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
