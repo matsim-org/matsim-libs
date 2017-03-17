@@ -25,7 +25,6 @@ public class PopulationConverter {
         }
         final File fileImport = new File(dir, "population.xml");
         final File fileExportGz = new File(dir, "populationupdated.xml.gz");
-        final File fileExportGzV6 = new File(dir, "populationupdatedv6.xml.gz");
         final File fileExport = new File(dir, "populationupdated.xml");
 
         // load the existing population file
@@ -34,6 +33,7 @@ public class PopulationConverter {
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         final Population population = scenario.getPopulation();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(5000).people();
         System.out.println("Population size:" + population.getPersons().values().size());
 
         // edit the configuration file - change all modes of transport to "av"
@@ -45,7 +45,6 @@ public class PopulationConverter {
             // write the modified population to file
             PopulationWriter pw = new PopulationWriter(population);
             pw.write(fileExportGz.toString());
-            pw.writeV6(fileExportGzV6.toString()); // TODO are both formats still necessary?
         }
 
         // extract the created .gz file
