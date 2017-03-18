@@ -12,17 +12,12 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.chart.ChartUtilities;
 import playground.clruch.utils.GlobalAssert;
+import playground.joel.helpers.KeyMap;
 
 /**
  * Created by Joel on 04.03.2017.
  */
 public class TimeDiagramCreator {
-
-    static double keyToTime(String key) {
-        // extracts the first number/bin start from a key of the form "xxxxxx - xxxxxx"
-        String asd[] = key.split(" ");
-        return Double.parseDouble(asd[0]);
-    }
 
     public static void createDiagram(File directory, String fileTitle, String diagramTitle, NavigableMap<String, Double> map) throws Exception
     {
@@ -30,10 +25,10 @@ public class TimeDiagramCreator {
         for(String key: map.keySet()) {
             try
             {
-                int days = (int) (keyToTime(key)/86400) + 1;
-                int hours = (int) (keyToTime(key)/3600) - (days - 1)*24;
-                int minutes = (int) (keyToTime(key)/60) - hours*60 - (days - 1)*1440;
-                int seconds = (int) keyToTime(key) - minutes*60 - hours*3600 - (days - 1)*86400;
+                int days = (int) (KeyMap.keyToTime(key)/86400) + 1;
+                int hours = (int) (KeyMap.keyToTime(key)/3600) - (days - 1)*24;
+                int minutes = (int) (KeyMap.keyToTime(key)/60) - hours*60 - (days - 1)*1440;
+                int seconds = (int) KeyMap.keyToTime(key) - minutes*60 - hours*3600 - (days - 1)*86400;
                 Second time = new Second(seconds, minutes, hours, days, 1, 2017); // month and year can not be zero
                 series.add(time, map.get(key));
                 GlobalAssert.that(!series.isEmpty());
@@ -68,10 +63,10 @@ public class TimeDiagramCreator {
         for(String key: map1.keySet()) {
             try
             {
-                int days = (int) (keyToTime(key)/86400) + 1;
-                int hours = (int) (keyToTime(key)/3600) - (days - 1)*24;
-                int minutes = (int) (keyToTime(key)/60) - hours*60 - (days - 1)*1440;
-                int seconds = (int) keyToTime(key) - minutes*60 - hours*3600 - (days - 1)*86400;
+                int days = (int) (KeyMap.keyToTime(key)/86400) + 1;
+                int hours = (int) (KeyMap.keyToTime(key)/3600) - (days - 1)*24;
+                int minutes = (int) (KeyMap.keyToTime(key)/60) - hours*60 - (days - 1)*1440;
+                int seconds = (int) KeyMap.keyToTime(key) - minutes*60 - hours*3600 - (days - 1)*86400;
                 Second time = new Second(seconds, minutes, hours, days, 1, 2017); // month and year can not be zero
 
                 series1.add(time, map1.get(key));

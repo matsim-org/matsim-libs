@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.HelperPredicates;
+import playground.joel.helpers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,30 +30,12 @@ class BinnedTravelTimes extends AbstractData {
     NavigableMap<String, Double> binnedData = new TreeMap<>();
     HashMap<String, Set<Id<Person>>> vehicleCustomers = new HashMap<>();
     HashMap<String, Double> avTripStart = new HashMap<>();
-    NavigableMap<Double, String> keyMap = new TreeMap<>();
     double totalTimeWithCust = 0;
     double totalTimeRatio;
     int numAVs = 0;
     double binSize = 600;
 
-    //equalize length of all key elements
-    DecimalFormat keyForm = new DecimalFormat("#000000");
-
-
-
-    double getBinStart(double time) {
-        return keyMap.floorKey(time);
-    }
-
-    String writeKey(double binStart) {
-        String key = String.valueOf(keyForm.format(binStart)) + " - " + String.valueOf(keyForm.format(binStart + binSize));
-        return key;
-    }
-
-    String getKey(double time) {
-        return keyMap.get(keyMap.floorKey(time));
-    }
-
+    KeyMap keyMap = new KeyMap(binSize);
 
     // TODO: fix this and use in initialize or work around with calculateTimeRatio later
     void getNumAVs() {
@@ -101,36 +84,24 @@ class BinnedTravelTimes extends AbstractData {
         return avTripStart.get(event.getVehicleId().toString());
     }
 
-    void checkFull(NavigableMap<String, Double> map) {
-        double binStart = 0;
-        boolean full = true;
-        while (binStart < 108000) {
-            if (!map.containsKey(getKey(binStart))) full = false;
-            binStart += binSize;
-        }
-        if (!full) System.out.println("not all time bins contain values\n" +
-                "\t- created bins are not continuous\n" +
-                "\t- increasing binSize could resolve this");
-    }
-
     private void put(String vehicle, double startTime, double endTime) {
         if (!travelTimes.containsKey(vehicle))
             travelTimes.put(vehicle, new TreeMap<>());
 
-        if(endTime <= getBinStart(startTime) + binSize) {
+        if(endTime <= keyMap.getBinStart(startTime) + binSize) {
             travelTimes.get(vehicle).put(startTime, endTime);
-            putAdd(traveledTime, getKey(startTime), endTime - startTime);
+            binnedHelper.putAdd(traveledTime, keyMap.getKey(startTime), endTime - startTime);
         } else {
-            double nextBin = getBinStart(startTime) + binSize;
+            double nextBin = keyMap.getBinStart(startTime) + binSize;
             travelTimes.get(vehicle).put(startTime, nextBin);
-            putAdd(traveledTime, getKey(startTime), nextBin - startTime);
+            binnedHelper.putAdd(traveledTime, keyMap.getKey(startTime), nextBin - startTime);
             while (endTime > nextBin + binSize) {
                 travelTimes.get(vehicle).put(nextBin, nextBin + binSize);
-                putAdd(traveledTime, getKey(nextBin), binSize);
+                binnedHelper.putAdd(traveledTime, keyMap.getKey(nextBin), binSize);
                 nextBin += binSize;
             }
             travelTimes.get(vehicle).put(nextBin, endTime);
-            putAdd(traveledTime, getKey(nextBin), endTime - nextBin);
+            binnedHelper.putAdd(traveledTime, keyMap.getKey(nextBin), endTime - nextBin);
         }
         if (endTime <= 108000) {
             totalTimeWithCust += endTime - startTime;
@@ -138,12 +109,6 @@ class BinnedTravelTimes extends AbstractData {
             totalTimeWithCust += 108000 - startTime;
         }
         //System.out.println("time with customer: " + totalTimeWithCust);
-    }
-
-    private void putAdd(NavigableMap<String, Double> map, String key, double value) {
-        double currValue = 0;
-        if (map.containsKey(key)) currValue = map.get(key);
-        map.put(key, currValue + value);
     }
 
     private void putDriveWithCustomer(PersonEntersVehicleEvent event) {
@@ -170,12 +135,7 @@ class BinnedTravelTimes extends AbstractData {
     void initialize(EventsManager events) {
         // add handlers to read vehicle status
         {
-            // initialize keyMap
-            double binStart = 0;
-            while (binStart < 108000) {
-                keyMap.put(binStart, writeKey(binStart));
-                binStart += binSize;
-            }
+            keyMap.initialize();
 
             //getNumAVs();
 
@@ -328,16 +288,24 @@ class BinnedTravelTimes extends AbstractData {
 
         // export to node-based XML file
         NavigableMap<String, NavigableMap<String, Double>> binnedRatios = new TreeMap<>();
-        checkFull(binnedData);
+        binnedHelper.checkFull(binnedData, binSize, keyMap);
         binnedRatios.put("bins", binnedData);
         new BinnedRatiosXML("binnedTimeRatio").generate(binnedRatios, fileExport2);
 
         // export to time series diagram PNG
         TimeDiagramCreator diagram = new TimeDiagramCreator();
         try{
-            diagram.createDiagram(directory, "binnedTimeRatios", "current time ratios", binnedData);
+            diagram.createDiagram(directory, "binnedTimeRatios", "occupancy ratio", binnedData);
         }catch (Exception e){
             System.out.println("Error creating the diagram");
+        }
+
+        // export to CSV
+        CSVcreator csv = new CSVcreator();
+        try{
+            csv.createCSV(binnedData, directory, "binnedTimeRatios");
+        }catch (Exception e){
+            System.out.println("Error creating the csv file");
         }
 
     }
