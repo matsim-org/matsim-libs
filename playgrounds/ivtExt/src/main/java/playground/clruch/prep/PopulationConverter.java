@@ -23,7 +23,7 @@ public class PopulationConverter {
             new RuntimeException("not a directory: " + dir).printStackTrace();
             System.exit(-1);
         }
-        final File fileImport = new File(dir, "population.xml");
+        final File fileImport = new File(dir, "population_handcut.xml");
         final File fileExportGz = new File(dir, "populationupdated.xml.gz");
         final File fileExport = new File(dir, "populationupdated.xml");
 
