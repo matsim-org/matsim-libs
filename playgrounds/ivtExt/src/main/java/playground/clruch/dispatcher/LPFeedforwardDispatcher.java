@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class LPFeedforwardDispatcher extends PartitionedDispatcher {
@@ -53,8 +54,8 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
     Tensor printVals = Tensors.empty();
     ArrivalInformation arrivalInformation;
     Tensor rebalancingRate;
-    Tensor rebalanceCount = Array.zeros(virtualNetwork.getvNodesCount());
-    Tensor rebalanceCountInteger = Array.zeros(virtualNetwork.getvNodesCount());
+    Tensor rebalanceCount = Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+    Tensor rebalanceCountInteger = Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
 
 
     public LPFeedforwardDispatcher( //
@@ -134,11 +135,19 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
             // redispatch integer values and remove from rebalanceCount
             // TODO check for more elegant formulation
-            for(int i = 0;i<rebalanceCount.dimensions().get(0);++i){
-                double toSend = rebalanceCount.Get(i).getAbsDouble();
-                if(toSend > 0) {
-                    rebalanceCountInteger.set(RealScalar.of(1),i);
-                    rebalanceCount.set(rebalanceCount.Get(i).subtract(RealScalar.of(1)),i);
+            for (int i = 0; i < rebalanceCount.dimensions().get(0); ++i) {
+                for (int j = 0; j < rebalanceCount.dimensions().get(1); ++j) {
+                    double toSend = rebalanceCount.get(i).Get(j).getAbsDouble();
+                    if (toSend > 1.0) {
+                        Tensor lineToUpdate = rebalanceCountInteger.get(i);
+                        lineToUpdate.set(RealScalar.of(1.0),j);
+                        rebalanceCountInteger.set(lineToUpdate,i);
+
+
+                        Tensor lineToupdate2 = rebalanceCount.get(i);
+                        lineToupdate2.set(lineToupdate2.Get(j).subtract(RealScalar.of(1.0)),j);
+                        rebalanceCount.set(lineToupdate2,i);
+                    }
                 }
             }
 
@@ -174,6 +183,9 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v, rebalanceMatching.get(v)));
             }
 
+
+            // reset vector
+            rebalanceCountInteger = Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
         }
 
 
@@ -272,13 +284,14 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
             File virtualnetworkXML = new File(config.getParams().get("virtualNetworkFile"));
-            File arrivalInformationXML = new File(config.getParams().get("lambdaPijFile"));
+            File lambdaFileXML = new File(config.getParams().get("lambdaFile"));
+            File pijFileXML = new File(config.getParams().get("pijFile"));
             System.out.println("" + virtualnetworkXML.getAbsoluteFile());
             virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkXML);
             travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkXML, virtualNetwork, "Ttime");
             ArrivalInformation arrivalInformation = null;
             try {
-                arrivalInformation = new ArrivalInformation(virtualNetwork, arrivalInformationXML);
+                arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaFileXML, pijFileXML);
             } catch (Exception e) {
                 System.out.println("something went wrong.");
             }
