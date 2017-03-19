@@ -113,8 +113,10 @@ public class AVModule extends AbstractModule {
         /** dispatchers for PartitionedDispatcher */
         bind(ConsensusDispatcherDFR.Factory.class);
         bind(LPFeedbackLIPDispatcher.Factory.class);
+        bind(LPFeedforwardDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
     }
 
     private void configureGeneratorStrategies() {

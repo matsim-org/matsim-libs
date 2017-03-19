@@ -33,8 +33,8 @@ public class LPVehicleRebalancing {
                                 Map<VirtualLink, Double> travelTimesIn) {
         virtualNetwork = virtualNetworkIn;
         travelTimes = travelTimesIn;
-        initiateLP();
         n = virtualNetwork.getvNodesCount();
+        initiateLP();
     }
 
     /**
@@ -179,16 +179,13 @@ public class LPVehicleRebalancing {
 
     /**
      * solving the LP with updated right-hand-sides
-     *
-     * @param vi_excessT  excess vehicles per virtual station
-     * @param vi_desiredT desired vehicles per virtual station
+     * @param rhs  rhs for problem, i.e. rhs = vi_desiredT - vi_excessT;
      * @return
      */
-    public Tensor solveUpdatedLP(Tensor vi_excessT, Tensor vi_desiredT) {
+    public Tensor solveUpdatedLP(Tensor rhs) {
 
-        // fill right-hand-side
-        Tensor rhs = vi_desiredT.subtract(vi_excessT);
-        for (int i = 0; i < vi_excessT.length(); ++i) {
+        // use rhs to set constraints
+        for (int i = 0; i < rhs.length(); ++i) {
             GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((RealScalar) (rhs.Get(i))).getRealDouble(), 0.0);
         }
 
