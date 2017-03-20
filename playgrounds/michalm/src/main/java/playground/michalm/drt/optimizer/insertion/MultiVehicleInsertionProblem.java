@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,20 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.scheduler;
+package playground.michalm.drt.optimizer.insertion;
+
+import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.optimizer.VehicleData;
+import playground.michalm.drt.optimizer.VehicleData.Entry;
+import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 
 /**
  * @author michalm
  */
-public class DrtSchedulerParams {
-	public final double stopDuration;
-    
-	//TODO create DrtConfigGroup 
-	// public DrtSchedulerParams(DrtConfigGroup drtCfg) {
-	// this.stopDuration = drtCfg.getStopDuration();
-	// }
+public class MultiVehicleInsertionProblem {
+	private final SingleVehicleInsertionProblem insertionProblem;
 
-	public DrtSchedulerParams(double stopDuration) {
-		this.stopDuration = stopDuration;
+	public MultiVehicleInsertionProblem(SingleVehicleInsertionProblem insertionProblem) {
+		this.insertionProblem = insertionProblem;
+	}
+
+	public BestInsertion findBestInsertion(NDrtRequest drtRequest, VehicleData vData) {
+		return selectBestInsertion(drtRequest, vData);
+	}
+
+	private BestInsertion selectBestInsertion(NDrtRequest drtRequest, VehicleData vData) {
+		double minCost = Double.MAX_VALUE;
+		BestInsertion fleetBestInsertion = null;
+		for (Entry vEntry : vData.getEntries()) {
+			BestInsertion bestInsertion = insertionProblem.findBestInsertion(drtRequest, vEntry);
+			if (bestInsertion.cost < minCost) {
+				fleetBestInsertion = bestInsertion;
+				minCost = bestInsertion.cost;
+			}
+		}
+		return fleetBestInsertion;
 	}
 }

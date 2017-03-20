@@ -86,4 +86,12 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 		// TODO we may here possibly decide whether or not to reoptimize
 		// if (delays/speedups encountered) {requiresReoptimization = true;}
 	}
+
+	protected Collection<NDrtRequest> getUnplannedRequests() {
+		return unplannedRequests;
+	}
+
+	protected DrtOptimizerContext getOptimContext() {
+		return optimContext;
+	}
 }

@@ -27,8 +27,6 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.core.router.MultiNodePathCalculator;
 
-import com.google.common.collect.Lists;
-
 import playground.michalm.drt.data.NDrtRequest;
 import playground.michalm.drt.optimizer.VehicleData;
 
@@ -37,93 +35,133 @@ import playground.michalm.drt.optimizer.VehicleData;
  */
 public class SingleVehicleInsertionProblem {
 	public static class Insertion {
-		public final int i;
-		public final int j;
+		public final int pickupIdx;
+		public final int dropoffIdx;
+		public final PathData pathToPickup;
+		public final PathData pathFromPickup;
+		public final PathData pathToDropoff;// null if dropoff inserted directly after pickup
+		public final PathData pathFromDropoff;// null if dropoff inserted at the end
 
-		public Insertion(int i, int j) {
-			this.i = i;
-			this.j = j;
+		public Insertion(int pickupIdx, int dropoffIdx, PathData pathToPickup, PathData pathFromPickup,
+				PathData pathToDropoff, PathData pathFromDropoff) {
+			this.pickupIdx = pickupIdx;
+			this.dropoffIdx = dropoffIdx;
+			this.pathToPickup = pathToPickup;
+			this.pathFromPickup = pathFromPickup;
+			this.pathToDropoff = pathToDropoff;
+			this.pathFromDropoff = pathFromDropoff;
+		}
+	}
+
+	public static class BestInsertion {
+		public final Insertion insertion;
+		public final VehicleData.Entry vehicleEntry;
+		public final double cost;
+
+		public BestInsertion(Insertion insertion, VehicleData.Entry vehicleEntry, double cost) {
+			this.insertion = insertion;
+			this.vehicleEntry = vehicleEntry;
+			this.cost = cost;
 		}
 	}
 
 	private final OneToManyPathSearch forwardPathSearch;
 	private final OneToManyPathSearch backwardPathSearch;
+	private final double stopDuration;
+	private final InsertionCostCalculator costCalculator;
 
-	private final List<Insertion> evaluatedInsertions = new ArrayList<>();
+	///
 
+	private List<Insertion> insertions;
+	private int stopCount;
+
+	// path[0] is a special entry; path[i] corresponds to stop i-1, for 1 <= i <= stopCount
 	private PathData[] pathsToPickup;
 	private PathData[] pathsFromPickup;
 	private PathData[] pathsToDropoff;
 	private PathData[] pathsFromDropoff;
 
-	public SingleVehicleInsertionProblem(MultiNodePathCalculator router,
-			BackwardMultiNodePathCalculator backwardRouter) {
+	// TODO filter out duplicated insertion when pickup/dropoff is at one of existing stops
+	// filter out stops located too far away (e.g. straight-line distance); with the exception for the last stop???
+	// filter out pickups at stops with outgoingOccupancy equal to the vehicle capacity
+	// filter out dropoffs at stops with incomingOccupancy equal to the vehicle capacity
+	// (but still we need to check the capacity constraints on all drives between the pickup and dropoff)
+	private boolean[] considerPickupInsertion;
+	private boolean[] considerDropoffInsertion;
+
+	public SingleVehicleInsertionProblem(MultiNodePathCalculator router, BackwardMultiNodePathCalculator backwardRouter,
+			double stopDuration) {
 		forwardPathSearch = OneToManyPathSearch.createForwardSearch(router);
 		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
+
+		this.stopDuration = stopDuration;
+		costCalculator = new InsertionCostCalculator(stopDuration);
 	}
 
-	public Object findBestInsertion(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
-		// TODO what if fromLink == toLink??
+	public BestInsertion findBestInsertion(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
 		initPathData(drtRequest, vEntry);
-
-		return null;
+		findPickupDropoffInsertions(drtRequest, vEntry);
+		return selectBestInsertion(costCalculator, drtRequest, vEntry);
 	}
-
-	private final double pickupDuration = 0;// TODO how to define it????????????
-	private final double dropoffDuration = 0;// TODO how to define it????????????
 
 	private void initPathData(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
-		Link[] stopLinks = new Link[vEntry.stops.size()];
-		for (int i = 0; i < stopLinks.length; i++) {
-			stopLinks[i] = vEntry.stops.get(i).task.getLink();
+		stopCount = vEntry.stops.size();
+
+		ArrayList<Link> links = new ArrayList<>(stopCount + 1);
+		links.add(null);// special link
+		for (int i = 0; i < stopCount; i++) {
+			links.add(vEntry.stops.get(i).task.getLink());
 		}
+
 		double minPickupTime = drtRequest.getEarliestStartTime();// == now (for immediate requests); over-optimistic
 
 		// calc backward dijkstra from pickup to ends of all stop + start
 		// TODO exclude inserting pickup after fully occupied stops
-		pathsToPickup = backwardPathSearch.calcPaths(drtRequest.getFromLink(),
-				Lists.asList(vEntry.start.link, stopLinks), minPickupTime);
+		links.set(0, vEntry.start.link);
+		pathsToPickup = backwardPathSearch.calcPaths(drtRequest.getFromLink(), links, minPickupTime);
 
 		// calc forward dijkstra from pickup to beginnings of all stops + dropoff
 		// TODO exclude inserting before fully occupied stops (unless the new request's dropoff is located there)
-		pathsFromPickup = forwardPathSearch.calcPaths(drtRequest.getFromLink(),
-				Lists.asList(drtRequest.getToLink(), stopLinks), minPickupTime);
+		links.set(0, drtRequest.getToLink());
+		pathsFromPickup = forwardPathSearch.calcPaths(drtRequest.getFromLink(), links, minPickupTime);
 
 		PathData pickupToDropoffPath = pathsFromPickup[0];// only if no other passengers on board (optimistic)
 		double minTravelTime = pickupToDropoffPath.path.travelTime + pickupToDropoffPath.firstAndLastLinkTT;
-		double minDropoffTime = minPickupTime + minTravelTime + pickupDuration; // over-optimistic
-		List<Link> stopLinkList = Arrays.asList(stopLinks);
+		double minDropoffTime = minPickupTime + minTravelTime + stopDuration; // uses (over-)optimistic components
 
 		// calc backward dijkstra from dropoff to ends of all stops
 		// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located there)
-		pathsToDropoff = backwardPathSearch.calcPaths(drtRequest.getToLink(), stopLinkList, minDropoffTime);
+		links.set(0, null);
+		pathsToDropoff = backwardPathSearch.calcPaths(drtRequest.getToLink(), links, minDropoffTime);
 
 		// calc forward dijkstra from dropoff to beginnings of all stops
 		// TODO exclude inserting dropoff before fully occupied stops
-		pathsFromDropoff = forwardPathSearch.calcPaths(drtRequest.getFromLink(), stopLinkList, minDropoffTime);
+		pathsFromDropoff = forwardPathSearch.calcPaths(drtRequest.getFromLink(), links, minDropoffTime);
 	}
 
-	private void iteratePickupDropoffInsertions(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
-		for (int i = 0; i < pathsToPickup.length; i++) {
+	private void findPickupDropoffInsertions(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
+		for (int i = 0; i <= stopCount; i++) {
 			// pickup is inserted after node i, where
 			// node 0 is 'start' (current position/immediate diversion point)
-			// node i>0 is (i-1)th 'stop task'
-			// replacing arc i -> i+1 with arc pair i -> pickup -> i+1 means all following stop tasks are affected
+			// node i > 0 is (i-1)th 'stop task'
+			// replacing i -> i+1 with i -> pickup -> i+1 means all following stop tasks are affected
 			// (==> calc delay for tasks i to n ==> calc cost)
 
 			int occupancy = (i == 0) ? vEntry.startOccupancy : vEntry.stops.get(i - 1).outputOccupancy;
 			if (occupancy == vEntry.vehicle.getCapacity()) {
 				// (after initPathData() is optimised, it will be also covered by pathsToPickup[i] == null)
-				continue;// skip fully loaded arc
+				continue;// skip fully loaded arcs
 			}
 			if (pathsToPickup[i] == null) {
-				continue;// skip full
+				continue;// skip fully loaded arcs
 			}
 
-			if (drtRequest.getFromLink() == vEntry.stops.get(i - 1).task.getLink()) {
-				// if the request's pickup location is at the (i-1)th stop, adding it after the stop is equivalent
-				// to adding it before this stop ==> we only evaluate the latter case
-				continue;// optimize for cases where pickup is at the same link as nodes i or i+1
+			if (i < stopCount && // has next stop
+					drtRequest.getFromLink() == vEntry.stops.get(i).task.getLink()) {// next stop is at the same link
+				// optimize for cases where the pickup is at the same link as stop i (i.e. node i+1)
+				// in this case inserting the pickup either before and after the stop is equivalent
+				// ==> only evaluate insertion _after_ stop i (node i+1)
+				continue;
 			}
 
 			iterateDropoffInsertions(drtRequest, vEntry, i);
@@ -131,55 +169,54 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private void iterateDropoffInsertions(NDrtRequest drtRequest, VehicleData.Entry vEntry, int i) {
-		for (int j = i; j < pathsToDropoff.length; i++) {
+		for (int j = i; j <= stopCount; j++) {
 			// dropoff is inserted after node j, where
 			// node j=i is 'pickup'
 			// node j>i is (j-1)th 'stop task'
 			// replacing j -> j+1 with j -> dropoff -> j+1 ==> all following stop tasks are affected
 			// (==> calc delay for tasks j to n ==> calc cost)
 
-			if (j > i) {
-				int occupancy = vEntry.stops.get(j - 1).outputOccupancy;
-				if (occupancy == vEntry.vehicle.getCapacity()) {
-					return;// stop iterating dropoffs for pickup i
+			if (j < stopCount && // has next stop
+					drtRequest.getToLink() == vEntry.stops.get(j).task.getLink()) {// next stop is at the same link
+				// optimize for cases where the dropoff is at the same link as stop j-1 (i.e. node j)
+				// in this case inserting the dropoff either before and after the stop is equivalent
+				// ==> only evaluate insertion _after_ stop j (node j+1)
+				continue;
+			}
+			if (j == i) {// i -> pickup -> dropoff -> i+1
+				// no need to check the capacity constraints
+				addInsertion(drtRequest, vEntry, i, j);
+			} else if (j > i) {// i -> pickup -> i+1 && j -> dropoff -> j+1
+				if (vEntry.stops.get(j - 1).outputOccupancy == vEntry.vehicle.getCapacity()) {
+					return;// stop iterating -- cannot insert dropoff after node j
 				}
-				evaluateInsertion(drtRequest, vEntry, i, j);
+				addInsertion(drtRequest, vEntry, i, j);
 			}
 		}
 	}
 
-	private void evaluateInsertion(NDrtRequest drtRequest, VehicleData.Entry vEntry, int i, int j) {
-		// lastLinkTT must be taken into account (may be significant for longer links)
-		double pickupInsertionStartTime = (i == 0) ? vEntry.start.time : vEntry.stops.get(i - 1).task.getEndTime();
-		double toPickupTT = pathsToPickup[i].path.travelTime + pathsToPickup[i].firstAndLastLinkTT;
+	private void addInsertion(NDrtRequest drtRequest, VehicleData.Entry vEntry, int i, int j) {
+		// i -> pickup
+		PathData toPickup = pathsToPickup[i]; // i -> pickup
+		PathData fromPickup = pathsFromPickup[i == j ? 0 : i + 1]; // pickup -> (dropoff | i+1)
+		PathData toDropoff = i == j ? null // pickup followed by dropoff
+				: pathsToDropoff[j]; // j -> dropoff
+		PathData fromDropoff = j == stopCount ? null // dropoff inserted at the end
+				: pathsFromDropoff[j + 1];
 
-		int fromPickupPathIdx = i == j ? 0 : i + 1;
-		double fromPickupTT = pathsFromPickup[fromPickupPathIdx].path.travelTime
-				+ pathsFromPickup[fromPickupPathIdx].firstAndLastLinkTT;
+		insertions.add(new Insertion(i, j, toPickup, fromPickup, toDropoff, fromDropoff));
+	}
 
-		double toDropoffTT = i == j ? 0
-				: pathsToDropoff[j - 1].path.travelTime + pathsToDropoff[j - 1].firstAndLastLinkTT;
-
-		double fromDropoffTT = j == pathsFromDropoff.length - 1 ? 0
-				: pathsFromPickup[j].path.travelTime + pathsFromPickup[j].firstAndLastLinkTT;
-
-		if (i < pathsToPickup.length - 1) {// tasks i to n are delayed by pickup inserted after i-th point
-			double pickupInsertionEndTime = vEntry.stops.get(i).task.getBeginTime();
-			double delay = (pickupInsertionEndTime - pickupInsertionStartTime) // old duration
-					+ toPickupTT + pickupDuration + fromPickupTT; // new duration
-		}
-
-		if (i == j) {
-			// ??
-		} else {
-			double dropoffInsertionStartTime = vEntry.stops.get(j - 1).task.getEndTime();
-
-			if (j < pathsToPickup.length - 1) {
-				double dropoffInsertionEndTime = vEntry.stops.get(j).task.getBeginTime();
-				double delay = (dropoffInsertionStartTime - dropoffInsertionStartTime) // old duration
-						+ toDropoffTT + dropoffDuration + fromDropoffTT; // new duration
+	private BestInsertion selectBestInsertion(InsertionCostCalculator costCalculator, NDrtRequest drtRequest,
+			VehicleData.Entry vEntry) {
+		double minCost = Double.MAX_VALUE;
+		Insertion bestInsertion = null;
+		for (Insertion insertion : insertions) {
+			double cost = costCalculator.calculate(drtRequest, vEntry, insertion);
+			if (cost < minCost) {
+				bestInsertion = insertion;
 			}
 		}
-
+		return new BestInsertion(bestInsertion, vEntry, minCost);
 	}
 }

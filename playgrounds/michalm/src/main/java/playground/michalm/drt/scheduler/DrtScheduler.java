@@ -33,6 +33,8 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.misc.Time;
 
+import playground.michalm.drt.optimizer.VehicleData;
+import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.Insertion;
 import playground.michalm.drt.schedule.NDrtTask;
 import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
 
@@ -96,8 +98,7 @@ public class DrtScheduler implements ScheduleInquiry {
 
 		updateTimelineImpl(vehicle, timer.getTimeOfDay());
 	}
-	
-	
+
 	public void updateTimeline(Vehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() != ScheduleStatus.STARTED) {
@@ -107,7 +108,6 @@ public class DrtScheduler implements ScheduleInquiry {
 		double predictedEndTime = TaskTrackers.predictEndTime(schedule.getCurrentTask(), timer.getTimeOfDay());
 		updateTimelineImpl(vehicle, predictedEndTime);
 	}
-
 
 	private void updateTimelineImpl(Vehicle vehicle, double newEndTime) {
 		Schedule schedule = vehicle.getSchedule();
@@ -173,5 +173,11 @@ public class DrtScheduler implements ScheduleInquiry {
 			default:
 				throw new IllegalStateException();
 		}
+	}
+
+	// =========================================================================================
+
+	public void insertRequest(VehicleData.Entry vehicleEntry, Insertion insertion) {
+		// TODO
 	}
 }
