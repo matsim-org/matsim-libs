@@ -186,7 +186,7 @@ public class LPVehicleRebalancing {
 
         // use rhs to set constraints
         for (int i = 0; i < rhs.length(); ++i) {
-            GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((RealScalar) (rhs.Get(i))).getRealDouble(), 0.0);
+            GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((rhs.Get(i))).number().doubleValue(), 0.0);
         }
 
 

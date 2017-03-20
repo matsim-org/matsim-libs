@@ -110,7 +110,7 @@
 	  <dependency>
 		  <groupId>ch.ethz.idsc</groupId>
 		  <artifactId>tensor</artifactId>
-		  <version>0.0.5</version>
+		  <version>0.1.1</version>
 	  </dependency>
   </dependencies>
 
@@ -124,6 +124,14 @@
 			<name>Xypron Release</name>
 			<url>https://www.xypron.de/repository</url>
 			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>tensor-mvn-repo</id>
+			<url>https://raw.github.com/idsc-frazzoli/tensor/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
 		</repository>
 	</repositories>
 

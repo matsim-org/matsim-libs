@@ -10,13 +10,10 @@
 
 package playground.clruch.dispatcher;
 
-import ch.ethz.idsc.tensor.RationalScalar;
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.alg.Floor;
-import ch.ethz.idsc.tensor.alg.Total;
+import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.idsc.tensor.sca.Floor;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Link;
@@ -120,19 +117,15 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 // fill right-hand-side
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
                 Tensor rebalanceCount = lpVehicleRebalancing.solveUpdatedLP(rhs);
-                // TODO this should never become active, can be removed later (nonnegative solution)
-                for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
-                    for (int j = 0; j < virtualNetwork.getvNodesCount(); ++j) {
-                        RealScalar value = (RealScalar) rebalanceCount.Get(i, j);
-                        double entry = value.getRealDouble();
-                        GlobalAssert.that(entry >= 0);
-                    }
-                }
+
+                // TODO this should never become active, can be possibly removed later
+                // assert that solution is integer and does not contain negative values
+                GlobalAssert.that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(Scalar::number).map(Integer.class::cast).filter(e->e<0).findAny().isPresent());
 
 
                 // ensure that not more vehicles are sent away than available
                 Tensor feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCount.unmodifiable(), availableVehicles);
-                total_rebalanceCount += (int) ((RealScalar)Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).getRealDouble();
+                total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
                 // generate routing instructions for rebalancing vehicles
                 Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
@@ -142,7 +135,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                     VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
                     VirtualNode toNode = virtualLink.getTo();
                     VirtualNode fromNode = virtualLink.getFrom();
-                    int numreb = (int) ((RealScalar) feasibleRebalanceCount.Get(fromNode.index, toNode.index)).getRealDouble();
+                    int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.index, toNode.index)).number();
                     List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
                     destinationLinks.get(fromNode).addAll(rebalanceTargets);
                 }
@@ -189,7 +182,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             double outgoingNmrvNode = 0.0;
             Tensor outgoingVehicles = rebalanceInput.get(i);
             for (int j = 0; j < virtualNetwork.getvNodesCount(); ++j) {
-                outgoingNmrvNode = outgoingNmrvNode + ((RealScalar) outgoingVehicles.Get(j)).getRealDouble();
+                outgoingNmrvNode =  outgoingNmrvNode + (Integer) ((RealScalar) outgoingVehicles.Get(j)).number();
             }
             int outgoingVeh = (int) outgoingNmrvNode;
             int finalI = i;
