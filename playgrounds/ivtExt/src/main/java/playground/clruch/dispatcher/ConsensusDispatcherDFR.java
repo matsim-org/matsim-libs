@@ -18,12 +18,16 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.alg.Array;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
@@ -44,6 +48,7 @@ import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
+import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
@@ -104,6 +109,11 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 // TODO: ensure that a rebalanced vehicle is then under the control of the to-virtualNode and can be dispatched there.
                 Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
 
+                Tensor vector = Array.zeros(availableVehicles.size());
+
+                availableVehicles.entrySet().stream().forEach(e -> vector.set(RealScalar.of(e.getValue().size()), e.getKey().index));
+                System.out.println(vector.toString());
+
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
                 Map<VirtualNode, Integer> vi_excess = new HashMap<>();
@@ -128,12 +138,14 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                         // compute the rebalancing vehicles
                         // TODO confirm that correct
 
-                        double lambda_dummy_to = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
-                        double lambda_dummy_from = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
+                        double lambdaTo = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
+                        double lambdaFrom = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
+                        // System.out.println();
+                        // lambda_dummy_to = lambda_dummy_from = 1;
                         double vehicles_From_to_To = //
                                 rebalancingPeriod * vLinkWeights.get(vLink) * ( //
-                                (double) imbalanceTo / lambda_dummy_to - //
-                                        (double) imbalanceFrom / lambda_dummy_from) + //
+                                (double) imbalanceTo / lambdaTo - //
+                                        (double) imbalanceFrom / lambdaFrom) + //
                                         rebalanceFloating.get(vLink);
 
                         int rebalanceFromTo = (int) Math.round(vehicles_From_to_To);
@@ -264,6 +276,11 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
         );
     }
 
+    /**
+     * FIXME in {@link PopulationDensityGenerator}
+     *
+     */
+
     public static class Factory implements AVDispatcherFactory {
         @Inject
         @Named(AVModule.AV_MODE)
@@ -278,6 +295,9 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
         @Inject
         private Network network;
+
+        @Inject
+        private Population population;
 
         public static VirtualNetwork virtualNetwork;
         public static Map<VirtualLink, Double> linkWeights;
@@ -317,7 +337,12 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 GlobalAssert.that(pijFile.isFile());
 
                 try {
-                    arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaXML, pijFile);
+                    long populationSize = population.getPersons().size();
+                    int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+                    arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaXML, pijFile, //
+                            populationSize, //
+                            rebalancingPeriod //
+                    );
                 } catch (Exception e) {
                     e.printStackTrace();
                     GlobalAssert.that(false);
