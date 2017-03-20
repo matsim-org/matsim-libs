@@ -98,9 +98,17 @@ public class RunHotspotPricingMunich {
 			}
 		});
 
-		InternalizeEmissionsControlerListener iecl = new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule);
+		InternalizeEmissionsControlerListener iecl = new InternalizeEmissionsControlerListener();
 		iecl.setHotspotLinks(hotspotLinksMerged);
-		controler.addControlerListener(iecl);
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().toInstance(iecl);
+			}
+		});
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

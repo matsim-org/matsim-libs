@@ -21,6 +21,7 @@ package playground.vsp.airPollution.flatEmissions;
 
 import java.util.Set;
 
+import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -45,30 +46,23 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 public class InternalizeEmissionsControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionsControlerListener.class);
 
-	MatsimServices controler;
-	EmissionModule emissionModule;
-	EmissionCostModule emissionCostModule;
+	@Inject private MatsimServices controler;
+	@Inject private EventsManager eventsManager;
+
+	private EventWriterXML emissionEventWriter;
+	private EmissionInternalizationHandler emissionInternalizationHandler;
+
+	@Inject private EmissionModule emissionModule;
+	@Inject private EmissionCostModule emissionCostModule;
+
 	String emissionEventOutputFile;
-	EventWriterXML emissionEventWriter;
-	EmissionInternalizationHandler emissionInternalizationHandler;
-	Set<Id<Link>> hotspotLinks;
+	private Set<Id<Link>> hotspotLinks;
 	
-	int iteration;
-	int firstIt;
-	int lastIt;
-
-
-
-	public InternalizeEmissionsControlerListener(EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
-		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
-	}
+	private int firstIt;
+	private int lastIt;
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getServices();
-
-		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		
@@ -78,10 +72,10 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		iteration = event.getIteration();
+		int iteration = event.getIteration();
 
 		logger.info("creating new emission internalization handler...");
-		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks);
+		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks );
 		logger.info("adding emission internalization module to emission events stream...");
 		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
 
@@ -96,6 +90,7 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		int iteration = event.getIteration();
 
 		logger.info("removing emission internalization module from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);

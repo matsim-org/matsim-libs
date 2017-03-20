@@ -50,10 +50,10 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.benjamin.internalization.EquilTestSetUp;
-import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 
 /**
  * @author amit
@@ -107,15 +107,19 @@ public class EquilEmissionTest {
 		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()),emissionModule, emissionCostModule, controler.getConfig().planCalcScore());
-//		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, sc.getConfig().planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				// emissions settings
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+
 				bindCarTravelDisutilityFactory().toInstance(emissionTducf);
 			}
 		});
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+
 
 		MyPersonMoneyEventHandler personMoneyHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyHandler);

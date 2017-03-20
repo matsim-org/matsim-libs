@@ -76,11 +76,13 @@ public class RunEmissionInternalizationMunich {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+
 				bindCarTravelDisutilityFactory().toInstance(emissionTducf);
 			}
 		});
-
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

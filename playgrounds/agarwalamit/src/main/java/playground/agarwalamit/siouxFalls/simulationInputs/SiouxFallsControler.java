@@ -31,11 +31,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -96,10 +95,12 @@ public class SiouxFallsControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
+					bind(EmissionModule.class).toInstance(emissionModule);
+					bind(EmissionCostModule.class).toInstance(emissionCostModule);
+					addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 					bindCarTravelDisutilityFactory().toInstance(emissionTducf);
 				}
 			});
-			controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 		}
 
 		if(internalizeCongestion) 

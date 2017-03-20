@@ -53,8 +53,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 
 /**
@@ -225,7 +225,14 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void installEmissionInternalizationListener() {
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+			}
+		});
 	}
 
 	private void installEmissionDisutilityCalculatorFactory() {

@@ -164,10 +164,11 @@ public class EquilMixedTrafficEmissionTest {
 			public void install() {
 				bind(EmissionModule.class).toInstance(emissionModule);
 				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+
 				bindCarTravelDisutilityFactory().to(EmissionModalTravelDisutilityCalculatorFactory.class);
 			}
 		});
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 
 		MyPersonMoneyEventHandler personMoneyHandler = new MyPersonMoneyEventHandler();
 		VehicleLinkEnterLeaveTimeEventHandler enterLeaveTimeEventHandler = new VehicleLinkEnterLeaveTimeEventHandler(Id.createLinkId("23"));
