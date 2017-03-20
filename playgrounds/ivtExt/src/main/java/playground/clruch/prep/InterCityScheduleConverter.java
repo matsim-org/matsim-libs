@@ -11,6 +11,7 @@ import org.jdom2.output.XMLOutputter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -55,6 +56,22 @@ public class InterCityScheduleConverter {
         for (Element element : childrenNodes) {
             if (element.getName().equals("transitLine")) {
                 List<Element> cchildrenNodes = element.getChildren();
+                Iterator<Element> eelementIterator = cchildrenNodes.iterator();
+                while(eelementIterator.hasNext()){
+                    List<Element> ccchildrenNodes = eelementIterator.next().getChildren();
+                    for (Element eeelement : ccchildrenNodes) {
+                        if (eeelement.getName().equals("transportMode")) {
+                            String transportMean = eeelement.getContent().get(0).getValue();
+                            if (!transportMean.equals("rail")) {
+                                eelementIterator.remove();
+                                removedelements++;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                /*
                 for (Element eelement : cchildrenNodes) {
                     List<Element> ccchildrenNodes = eelement.getChildren();
                     for (Element eeelement : ccchildrenNodes) {
@@ -67,6 +84,8 @@ public class InterCityScheduleConverter {
                         }
                     }
                 }
+
+                */
             }
         }
         System.out.println("removed " + removedelements + " which don't have transportMode rail.");
@@ -79,6 +98,36 @@ public class InterCityScheduleConverter {
         for (Element element : childrenNodes) {
             if (element.getName().equals("transitLine")) {
                 List<Element> cchildrenNodes = element.getChildren();
+                Iterator<Element> eelementIterator = cchildrenNodes.iterator();
+                while(eelementIterator.hasNext()){
+                    List<Element> ccchildrenNodes = eelementIterator.next().getChildren();
+                    for (Element eeelement : ccchildrenNodes) {
+                        // TODO add code here to remove lines with short duration
+                        System.out.println(eeelement);
+                        if (eeelement.getName().equals("routeProfile")) {
+                            List<Element> cccchildrenNodes = eeelement.getChildren();
+                            Element lastElem = cccchildrenNodes.get(cccchildrenNodes.size() - 1);
+                            for (Attribute attribute : lastElem.getAttributes()) {
+                                if (attribute.getName().equals("arrivalOffset")) {
+                                    String timeVal = attribute.getValue();
+                                    String[] parts = timeVal.split(":");
+                                    int hours = Integer.parseInt(parts[0]);
+                                    int minutes = Integer.parseInt(parts[1]);
+                                    int seconds = Integer.parseInt(parts[2]);
+                                    if ((hours * 60 + minutes + Math.round((double) seconds / 60.0)) < minMinutes) {
+                                        eelementIterator.remove();
+                                        removedelements++;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+
+                /*
                 for (Element eelement : cchildrenNodes) {
                     List<Element> ccchildrenNodes = eelement.getChildren();
                     for (Element eeelement : ccchildrenNodes) {
@@ -103,6 +152,7 @@ public class InterCityScheduleConverter {
                         }
                     }
                 }
+                */
             }
         }
         System.out.println("removed " + removedelements + " which are of duration shorter than " + minMinutes + " minutes.");
