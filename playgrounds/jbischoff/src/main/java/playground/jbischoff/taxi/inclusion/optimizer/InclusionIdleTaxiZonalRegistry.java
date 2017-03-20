@@ -53,6 +53,7 @@ public class InclusionIdleTaxiZonalRegistry
 
         isIdle = ScheduleInquiries.createIsIdle(scheduleInquiry);
         isIdleAndBarrierFree = createIsIdleAndBarrierFreePredicate(scheduleInquiry);
+        
         vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
         for (Id<Zone> id : zonalSystem.getZones().keySet()) {
             vehiclesInZones.put(id, new HashMap<Id<Vehicle>, Vehicle>());
@@ -99,10 +100,14 @@ public class InclusionIdleTaxiZonalRegistry
         Zone zone = zonalSystem.getZone(node);
         Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
         List<Vehicle> nearestVehs = new ArrayList<>();
-
         for (Zone z : zonesByDistance) {
-            Iterables.addAll(nearestVehs,
-                    Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdle));
+        	if (needsSpecialVehicle){
+        		Iterables.addAll(nearestVehs,Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdleAndBarrierFree));
+        		
+        	}
+        	else{
+        		Iterables.addAll(nearestVehs,Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdle));
+        	}
 
             if (nearestVehs.size() >= minCount) {
                 return nearestVehs;
