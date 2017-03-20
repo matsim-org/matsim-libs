@@ -47,7 +47,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
@@ -70,7 +69,6 @@ public class RunInternalizationTest {
 	private Config config;
 	private Scenario scenario;
 	private Controler controler;
-	private Vehicles emissionVehicles;
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 	
@@ -90,7 +88,7 @@ public class RunInternalizationTest {
 		this.controler = new Controler(this.scenario);
 		specifyControler();
 
-		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
+		emissionModule = new EmissionModule(scenario);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 		
@@ -245,12 +243,12 @@ public class RunInternalizationTest {
 	}
 
 	private void createVehicles() {
-		this.emissionVehicles = VehicleUtils.createVehiclesContainer();
+		Vehicles emissionVehicles = scenario.getVehicles();
 		Id<VehicleType> vehTypeId = Id.create(HbefaVehicleCategory.PASSENGER_CAR.toString(), VehicleType.class);
-		VehicleType vehicleType = this.emissionVehicles.getFactory().createVehicleType(vehTypeId);
+		VehicleType vehicleType = emissionVehicles.getFactory().createVehicleType(vehTypeId);
 		for(Person person : scenario.getPopulation().getPersons().values()){
-			Vehicle vehicle = this.emissionVehicles.getFactory().createVehicle(Id.create(person.getId(), Vehicle.class), vehicleType);
-			this.emissionVehicles.addVehicle( vehicle);
+			Vehicle vehicle = emissionVehicles.getFactory().createVehicle(Id.create(person.getId(), Vehicle.class), vehicleType);
+			emissionVehicles.addVehicle( vehicle);
 		}
 	}
 

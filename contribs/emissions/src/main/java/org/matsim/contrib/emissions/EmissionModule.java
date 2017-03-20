@@ -47,7 +47,8 @@ public class EmissionModule {
 	private final Scenario scenario;
 	private WarmEmissionHandler warmEmissionHandler;
 	private ColdEmissionHandler coldEmissionHandler;
-	public EventsManager emissionEventsManager;
+
+	private  EventsManager emissionEventsManager;
 	private Double emissionEfficiencyFactor; // i think, this can also go to EmissionsConfigGroup. Amit Sep 2016
 
 	private final EmissionsConfigGroup ecg;
@@ -77,12 +78,6 @@ public class EmissionModule {
 		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
 	}
 	
-	public EmissionModule(Scenario scenario, Vehicles emissionVehicles) { // TODO : probably we dont need this anymore. Amit sep 16
-		this.scenario = scenario;
-		this.emissionVehicles = emissionVehicles;
-		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
-	}
-
 	public void createLookupTables() {
 		logger.info("entering createLookupTables");
 		
