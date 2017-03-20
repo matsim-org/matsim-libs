@@ -3,7 +3,7 @@ package playground.clruch.dispatcher.utils;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 
 import org.matsim.api.core.v01.network.Link;
 
@@ -17,10 +17,10 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 @ Deprecated
 public class DrivebyRequestStopper {
 
-    final BiFunction<VehicleLinkPair, Link, Void> biFunction;
+    final BiConsumer<VehicleLinkPair, Link> biConsumer;
 
-    public DrivebyRequestStopper(BiFunction<VehicleLinkPair, Link, Void> biFunction) {
-        this.biFunction = biFunction;
+    public DrivebyRequestStopper(BiConsumer<VehicleLinkPair, Link> biConsumer) {
+        this.biConsumer = biConsumer;
     }
 
     /**
@@ -39,7 +39,7 @@ public class DrivebyRequestStopper {
                 List<AVRequest> requestList = requests.get(link);
                 if (!requestList.isEmpty()) {
                     requestList.remove(0);
-                    biFunction.apply(vehicleLinkPair, link);
+                    biConsumer.accept(vehicleLinkPair, link);
                     ++num_abortTrip;
                 }
             }
