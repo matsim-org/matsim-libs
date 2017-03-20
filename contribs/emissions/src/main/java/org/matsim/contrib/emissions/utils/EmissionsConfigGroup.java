@@ -50,6 +50,10 @@ extends ReflectiveConfigGroup
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	private boolean isUsingVehicleIdAsVehicleDescription = false;
 
+	private static final String IGNORING_EMISSIONS_FROM_EVENTS_FILE = "isIgnoringEmissionsFromEventsFile";
+
+	private boolean isIgnoringEmissionsFromEventsFile = false;
+
 	static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings";
 	static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
 	static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
@@ -61,13 +65,13 @@ extends ReflectiveConfigGroup
 			" - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
 			" - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
 			" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"."+
-
 			"\n" +
-
 			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n"+
 			"FALSE: vehicle description is used for the emission specifications." +
 			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
 			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
+
+	static final String IGNORING_EMISSIONS_FROM_EVENTS_FILE_CMT = "if true, emission events will not appear in the events file.";
 
 	@Override
 	public Map<String, String> getComments() {
@@ -87,6 +91,8 @@ extends ReflectiveConfigGroup
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, EMISSION_FACTORS_COLD_FILE_DETAILED_CMT);
 
 		map.put(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT);
+
+		map.put(IGNORING_EMISSIONS_FROM_EVENTS_FILE, IGNORING_EMISSIONS_FROM_EVENTS_FILE_CMT);
 
 		return map;
 	}
@@ -198,5 +204,18 @@ extends ReflectiveConfigGroup
 	@StringSetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
 	public void setUsingVehicleTypeIdAsVehicleDescription(boolean usingVehicleIdAsVehicleDescription) {
 		isUsingVehicleIdAsVehicleDescription = usingVehicleIdAsVehicleDescription;
+	}
+
+	@StringGetter(IGNORING_EMISSIONS_FROM_EVENTS_FILE)
+	public boolean isIgnoringEmissionsFromEventsFile() {
+		return isIgnoringEmissionsFromEventsFile;
+	}
+
+	/**
+	 * @param ignoringEmissionsFromEventsFile -- {@value #IGNORING_EMISSIONS_FROM_EVENTS_FILE_CMT}
+	 */
+	@StringSetter(IGNORING_EMISSIONS_FROM_EVENTS_FILE)
+	public void setIgnoringEmissionsFromEventsFile(boolean ignoringEmissionsFromEventsFile) {
+		isIgnoringEmissionsFromEventsFile = ignoringEmissionsFromEventsFile;
 	}
 }
