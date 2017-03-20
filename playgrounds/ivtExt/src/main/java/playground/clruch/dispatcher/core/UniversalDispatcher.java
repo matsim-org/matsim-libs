@@ -97,7 +97,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest
      *            provided by getAVRequests()
      */
-    protected synchronized final Void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+    protected synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
         boolean status = matchedRequests.add(avRequest);
@@ -114,7 +114,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
 
         ++total_matchedRequests;
-        return null;
     }
 
     /**
