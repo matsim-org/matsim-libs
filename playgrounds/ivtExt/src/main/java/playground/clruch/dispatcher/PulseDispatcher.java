@@ -3,12 +3,9 @@ package playground.clruch.dispatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -17,22 +14,20 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.utils.ScheduleUtils;
+import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
+import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class PulseDispatcher extends UniversalDispatcher {
-    public static final int DEBUG_PERIOD = 5 * 60;
-    public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
-
     private final List<Link> links;
     int index = 0;
-
-    Random random = new Random();
+    private final int dispatchPeriod;
+    private int total_abortTrip = 0;
 
     private PulseDispatcher(//
             AVDispatcherConfig config, //
@@ -43,32 +38,40 @@ public class PulseDispatcher extends UniversalDispatcher {
         super(config, travelTime, router, eventsManager);
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links);
+        SafeConfig safeConfig = SafeConfig.wrap(config);
+        dispatchPeriod = safeConfig.getInteger("", 120);
     }
 
     @Override
     public void redispatch(double now) {
-        if (3600 < now && Math.round(now) % DEBUG_PERIOD == 0 && now < 90000) {
-            
-            // BEGIN: debug info
-            for (AVVehicle avVehicle : getFunctioningVehicles())
-                if (avVehicle.getId().toString().equals(DEBUG_AVVEHICLE))
-                    System.out.println(ScheduleUtils.scheduleOf(avVehicle));
-            // END: debug info
 
-            for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-                if (random.nextInt(3) == 0) {
-                    // System.out.println("- diversion -");
-                    setVehicleDiversion(vehicleLinkPair, links.get(index));
-                    ++index;
-                    index %= links.size();
-                }
-            }
+        new InOrderOfArrivalMatcher(this::setAcceptRequest).match(getStayVehicles(), getAVRequestsAtLinks());
+
+        total_abortTrip += new DrivebyRequestStopper(this::setVehicleDiversion) //
+                .realize(getAVRequestsAtLinks(), getDivertableVehicles());
+
+        final long round_now = Math.round(now);
+        if (round_now % dispatchPeriod == 0 && 0 < getAVRequests().size()) {
+
+            for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles())
+                setVehicleDiversion(vehicleLinkPair, pollNextDestination());
+
         }
     }
 
+    private Link pollNextDestination() {
+        Link link = links.get(index);
+        ++index;
+        index %= links.size();
+        return link;
+    }
+
     @Override
-    public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
-        // System.out.println("moved " + avVehicle.getId() + " -> " + linkTimePair.link.getId());
+    public String getInfoLine() {
+        return String.format("%s AT=%5d", //
+                super.getInfoLine(), //
+                total_abortTrip //
+        );
     }
 
     public static class Factory implements AVDispatcherFactory {

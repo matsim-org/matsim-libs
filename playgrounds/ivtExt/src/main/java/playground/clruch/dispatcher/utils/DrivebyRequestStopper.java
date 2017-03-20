@@ -14,7 +14,6 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
  * this class is used for testing old functionality
  * the class is superseded by DivertIfCurrentDestinationEmpty etc.
  */
-@ Deprecated
 public class DrivebyRequestStopper {
 
     final BiConsumer<VehicleLinkPair, Link> biConsumer;
