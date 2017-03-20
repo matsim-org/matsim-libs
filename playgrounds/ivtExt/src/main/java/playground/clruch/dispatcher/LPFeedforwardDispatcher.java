@@ -10,10 +10,7 @@
 
 package playground.clruch.dispatcher;
 
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Floor;
@@ -101,7 +98,6 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
                 // DEBUGGING
                 for (int i = 0; i < Dimensions.of(lambdas).get(1); ++i) {
-                    System.out.println("stop");
                     if (lambdas.get(0).Get(i).number().doubleValue() > 0) {
                         System.out.println("action beginning");
                     }
@@ -134,10 +130,14 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                     for (int j = 0; j < virtualNetwork.getvNodesCount(); ++j) {
                         double entry = rebalancingRate.Get(i, j).number().doubleValue();
-                        if(entry<0){
-                            System.out.println("negative element found");
+                        if (entry < 0) {
+                            System.out.println("negative element found.");
+                            System.out.println("insert a breakpoint here.");
+                            if (Math.abs(entry) < 10E-7) {
+                                rebalancingRate.set(ZeroScalar.get(), i, j);
+                            } else
+                                GlobalAssert.that(false);
                         }
-                        GlobalAssert.that(entry >= 0);
                     }
                 }
 
@@ -155,11 +155,10 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(redispatchPeriod)));
 
 
-
             // DEBUGGING
             for (int i = 0; i < Dimensions.of(rebalanceCount).get(0); ++i) {
                 for (int j = 0; j < Dimensions.of(rebalanceCount).get(1); ++j) {
-                    int value = (Integer)rebalanceCount.get(i).Get(j).number();
+                    double value = rebalanceCount.get(i).Get(j).number().doubleValue();
                     if (value > 1.0) {
                         System.out.println("action beginning");
                     }
@@ -175,12 +174,12 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                     double toSend = rebalanceCount.get(i).Get(j).number().doubleValue();
                     if (toSend > 1.0) {
                         Tensor lineToUpdate = rebalanceCountInteger.get(i);
-                        lineToUpdate.set(RealScalar.of(1.0), j);
+                        lineToUpdate.set(RealScalar.of(1), j);
                         rebalanceCountInteger.set(lineToUpdate, i);
 
 
                         Tensor lineToupdate2 = rebalanceCount.get(i);
-                        lineToupdate2.set(lineToupdate2.Get(j).subtract(RealScalar.of(1.0)), j);
+                        lineToupdate2.set(lineToupdate2.Get(j).subtract(RealScalar.of(1)), j);
                         rebalanceCount.set(lineToupdate2, i);
                     }
                 }
@@ -189,7 +188,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             // ensure that not more vehicles are sent away than available
             Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
             Tensor feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCountInteger.unmodifiable(), availableVehicles);
-            total_rebalanceCount += (Integer) ((Scalar)Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
+            total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
             // generate routing instructions for rebalancing vehicles
             Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
@@ -199,7 +198,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
                 VirtualNode toNode = virtualLink.getTo();
                 VirtualNode fromNode = virtualLink.getFrom();
-                int numreb = (Integer) ( feasibleRebalanceCount.Get(fromNode.index, toNode.index)).number();
+                int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.index, toNode.index)).number();
                 List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
                 destinationLinks.get(fromNode).addAll(rebalanceTargets);
             }
@@ -243,7 +242,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             double outgoingNmrvNode = 0.0;
             Tensor outgoingVehicles = rebalanceInput.get(i);
             for (int j = 0; j < virtualNetwork.getvNodesCount(); ++j) {
-                outgoingNmrvNode =  outgoingNmrvNode +  (Integer) (outgoingVehicles.Get(j)).number();
+                outgoingNmrvNode = outgoingNmrvNode + (Integer) (outgoingVehicles.Get(j)).number();
             }
             int outgoingVeh = (int) outgoingNmrvNode;
             int finalI = i;
