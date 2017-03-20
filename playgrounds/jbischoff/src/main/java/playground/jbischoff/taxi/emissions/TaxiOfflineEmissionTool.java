@@ -62,9 +62,7 @@ public class TaxiOfflineEmissionTool {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());

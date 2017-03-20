@@ -98,8 +98,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 		this.emissionFile1="./output/emissionFile.txt";
 	}
 	
@@ -113,8 +111,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 	}
 	
 	private void setMinMax(Network network2) {
@@ -171,10 +167,10 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		geh = new GeneratedEmissionsHandler(0.0, timeBinSize, links2xcells, links2ycells);
-		emissionModule.emissionEventsManager.addHandler(geh);
+		emissionModule.getEmissionEventsManager().addHandler(geh);
 		
 	
-		EmissionEventsReader emissionReader = new EmissionEventsReader(emissionModule.emissionEventsManager);
+		EmissionEventsReader emissionReader = new EmissionEventsReader(emissionModule.getEmissionEventsManager());
 		
 //		SimpleWarmEmissionEventHandler weeh = new SimpleWarmEmissionEventHandler();
 //		eventsManager.addHandler(weeh);

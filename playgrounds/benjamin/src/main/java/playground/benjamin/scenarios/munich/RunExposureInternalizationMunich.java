@@ -86,8 +86,6 @@ public class RunExposureInternalizationMunich {
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 //		links2xCells = gt.mapLinks2Xcells(noOfXCells);

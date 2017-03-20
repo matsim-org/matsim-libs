@@ -94,9 +94,6 @@ public class RunEmissionToolOffline {
 		setInputFiles();
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());

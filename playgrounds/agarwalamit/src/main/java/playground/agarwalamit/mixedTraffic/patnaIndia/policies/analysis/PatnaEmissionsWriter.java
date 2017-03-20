@@ -148,8 +148,6 @@ public class PatnaEmissionsWriter {
 
         String emissionEventOutputFile = outputDir + "/output_emissions_events.xml.gz";
         EmissionModule emissionModule = new EmissionModule(scenario);
-        emissionModule.createLookupTables();
-        emissionModule.createEmissionHandler();
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         eventsManager.addHandler(emissionModule.getWarmEmissionHandler());

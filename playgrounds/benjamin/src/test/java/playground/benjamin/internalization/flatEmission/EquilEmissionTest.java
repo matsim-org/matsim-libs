@@ -101,8 +101,6 @@ public class EquilEmissionTest {
 
 		EmissionModule emissionModule = new EmissionModule(sc);
 		emissionModule.setEmissionEfficiencyFactor( 1.0 );
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 
 		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(

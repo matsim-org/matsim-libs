@@ -190,8 +190,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		specifyControler();
 
 		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 		emissionCostModule = new EmissionCostModule(100.0);
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();

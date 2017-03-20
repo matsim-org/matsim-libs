@@ -146,8 +146,6 @@ public class SubPopMunichExposureControler {
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 

@@ -66,8 +66,6 @@ public class RunEmissionInternalizationMunich {
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 
 		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 

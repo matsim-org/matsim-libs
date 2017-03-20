@@ -63,8 +63,6 @@ public class EmissionEventsWriter extends AbstractAnalysisModule{
 	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		this.emissionModule = new EmissionModule(scenario);
-		this.emissionModule.createLookupTables();
-		this.emissionModule.createEmissionHandler();
 		this.wEmiHandler = emissionModule.getWarmEmissionHandler();
 		this.cEmiHandler = emissionModule.getColdEmissionHandler();
 		this.filename = "emission.events.xml.gz";

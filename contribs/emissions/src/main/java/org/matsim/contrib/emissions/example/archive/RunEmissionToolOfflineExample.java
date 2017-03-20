@@ -63,9 +63,7 @@ public class RunEmissionToolOfflineExample {
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());

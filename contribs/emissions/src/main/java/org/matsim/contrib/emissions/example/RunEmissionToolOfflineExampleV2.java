@@ -58,9 +58,7 @@ public class RunEmissionToolOfflineExampleV2 {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());

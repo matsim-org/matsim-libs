@@ -83,9 +83,7 @@ public class SiouxFallsControler {
 		//===only emission events genertaion; used with all runs for comparisons
 		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
 		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
+
 		if(internalizeEmission)
 		{
 			//===internalization of emissions

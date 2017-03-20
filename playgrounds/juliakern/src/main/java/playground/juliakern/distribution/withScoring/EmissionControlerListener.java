@@ -81,8 +81,6 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 	}
 	
 	@Override
@@ -114,7 +112,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 		timeBinSize = simulationEndTime/noOfTimeBins;
 		
 		geh = new GeneratedEmissionsHandler(0.0, timeBinSize, links2xcells, links2ycells);
-		emissionModule.emissionEventsManager.addHandler(geh);
+		emissionModule.getEmissionEventsManager().addHandler(geh);
 	}
 
 	@Override

@@ -89,9 +89,7 @@ public class RunInternalizationTest {
 		specifyControler();
 
 		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
+
 		emissionCostModule = new EmissionCostModule(1.0, Boolean.parseBoolean("true"));
 		
 //		installScoringFunctionFactory();

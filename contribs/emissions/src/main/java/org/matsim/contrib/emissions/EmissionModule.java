@@ -75,10 +75,12 @@ public class EmissionModule {
 
 	public EmissionModule(Scenario scenario) {
 		this.scenario = scenario;
-		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
+		ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+		createLookupTables();
+		createEmissionHandler();
 	}
 	
-	public void createLookupTables() {
+	private void createLookupTables() {
 		logger.info("entering createLookupTables");
 		
 		getInputFiles();
@@ -102,8 +104,6 @@ public class EmissionModule {
 	}
 
 	private void getInputFiles() {
-	    EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
-
 		URL context = scenario.getConfig().getContext();
 
 		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFileURL(context).getFile();
@@ -117,7 +117,7 @@ public class EmissionModule {
 		}
 	}
 
-	public void createEmissionHandler() {
+	private void createEmissionHandler() {
 		logger.info("entering createEmissionHandler");
 		
 		emissionEventsManager = EventsUtils.createEventsManager();

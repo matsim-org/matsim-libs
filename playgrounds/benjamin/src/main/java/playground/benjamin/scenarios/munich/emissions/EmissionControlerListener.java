@@ -58,9 +58,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
+
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());

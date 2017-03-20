@@ -246,8 +246,6 @@ public class TestExposurePricing {
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.setEmissionEfficiencyFactor(1.0);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 //		links2xCells = gt.mapLinks2Xcells(noOfXCells);

@@ -265,8 +265,6 @@ public class CNEIntegration {
 
 			emissionModule = new EmissionModule(controler.getScenario());
 			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
-			emissionModule.createLookupTables();
-			emissionModule.createEmissionHandler();
 
 			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools);
 
