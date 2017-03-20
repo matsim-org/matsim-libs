@@ -29,7 +29,6 @@ public class PulseDispatcher extends UniversalDispatcher {
     public static final int DEBUG_PERIOD = 5 * 60;
     public static final String DEBUG_AVVEHICLE = "av_av_op1_1";
 
-    private final Network network;
     private final List<Link> links;
     int index = 0;
 
@@ -42,17 +41,14 @@ public class PulseDispatcher extends UniversalDispatcher {
             EventsManager eventsManager, //
             Network network) {
         super(config, travelTime, router, eventsManager);
-        this.network = network;
-        links = new ArrayList<>(this.network.getLinks().values());
+        links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links);
     }
 
     @Override
     public void redispatch(double now) {
         if (3600 < now && Math.round(now) % DEBUG_PERIOD == 0 && now < 90000) {
-            System.out.println("==================== TIME " + now);
-            System.out.println(getUniversalDispatcherStatusString());
-
+            
             // BEGIN: debug info
             for (AVVehicle avVehicle : getFunctioningVehicles())
                 if (avVehicle.getId().toString().equals(DEBUG_AVVEHICLE))

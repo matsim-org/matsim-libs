@@ -188,17 +188,4 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 total_matchedRequests);
     }
 
-    /**
-     * @return debug information about status of this instance of {@link UniversalDispatcher}
-     */
-    public final String getUniversalDispatcherStatusString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("#requests " + getAVRequests().size());
-        stringBuilder.append(", #stay " + //
-                getStayVehicles().values().stream().flatMap(Queue::stream).count());
-        stringBuilder.append(", #divert " + //
-                getDivertableVehicles().size());
-        return stringBuilder.toString();
-    }
-
 }
