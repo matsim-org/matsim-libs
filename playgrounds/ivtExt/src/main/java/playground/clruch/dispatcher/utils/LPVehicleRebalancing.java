@@ -207,7 +207,7 @@ public class LPVehicleRebalancing {
 
 
         // fill result vector
-        Tensor rebalanceOrder = Tensors.matrix((j, i) -> RealScalar.of((int) GLPK.glp_get_col_prim(lp, (j + 1) + (i) * n)), n, n);
+        Tensor rebalanceOrder = Tensors.matrix((j, i) -> RealScalar.of( GLPK.glp_get_col_prim(lp, (j + 1) + (i) * n)), n, n);
 
 
         // if exists primal feasible solution, return it, otherwise return empty set.

@@ -101,6 +101,17 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             {
                 // lambdas = [lambda_1, lambda_2, ... , lambda_n] where n number of virtual nodes and lambdas a row rector
                 Tensor lambdas = Tensors.matrix((i, j) -> getLambdai(now, j), 1, virtualNetwork.getvNodesCount());
+
+                // DEBUGGING
+                for (int i = 0; i < lambdas.dimensions().get(1); ++i) {
+                    System.out.println("stop");
+                    if (lambdas.get(0).Get(i).getAbsDouble() > 0) {
+                        System.out.println("action beginning");
+                    }
+                }
+                // END DEBUGGING
+
+
                 // p_ij_bar row-stochastic matrix of dimension nxn with transition probabilities from i to j
                 // p_ij = p_ij_bar with the diagonal elements set to zero
                 Tensor p_ij = Tensors.matrix((i, j) -> getPij(now, i, j), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
@@ -110,6 +121,17 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
                 // solve the linear program with updated right-hand side
                 rebalancingRate = lpVehicleRebalancing.solveUpdatedLP(rhs);
+
+                // DEBUGGING
+                for (int i = 0; i < rebalancingRate.dimensions().get(0); ++i) {
+                    for (int j = 0; j < rebalancingRate.dimensions().get(1); ++j) {
+                        if (rebalancingRate.get(i).Get(j).getAbsDouble() > 0) {
+                            System.out.println("action beginning");
+                        }
+                    }
+                }
+                // END DEBUGGING
+
 
                 // TODO this should never become active, can be removed later (nonnegative solution)
                 for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
@@ -133,6 +155,19 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             // update rebalance count
             rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(redispatchPeriod)));
 
+
+
+            // DEBUGGING
+            for (int i = 0; i < rebalanceCount.dimensions().get(0); ++i) {
+                for (int j = 0; j < rebalanceCount.dimensions().get(1); ++j) {
+                    if (rebalanceCount.get(i).Get(j).getAbsDouble() > 1.0) {
+                        System.out.println("action beginning");
+                    }
+                }
+            }
+            // END DEBUGGING
+
+
             // redispatch integer values and remove from rebalanceCount
             // TODO check for more elegant formulation
             for (int i = 0; i < rebalanceCount.dimensions().get(0); ++i) {
@@ -140,13 +175,13 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                     double toSend = rebalanceCount.get(i).Get(j).getAbsDouble();
                     if (toSend > 1.0) {
                         Tensor lineToUpdate = rebalanceCountInteger.get(i);
-                        lineToUpdate.set(RealScalar.of(1.0),j);
-                        rebalanceCountInteger.set(lineToUpdate,i);
+                        lineToUpdate.set(RealScalar.of(1.0), j);
+                        rebalanceCountInteger.set(lineToUpdate, i);
 
 
                         Tensor lineToupdate2 = rebalanceCount.get(i);
-                        lineToupdate2.set(lineToupdate2.Get(j).subtract(RealScalar.of(1.0)),j);
-                        rebalanceCount.set(lineToupdate2,i);
+                        lineToupdate2.set(lineToupdate2.Get(j).subtract(RealScalar.of(1.0)), j);
+                        rebalanceCount.set(lineToupdate2, i);
                     }
                 }
             }
