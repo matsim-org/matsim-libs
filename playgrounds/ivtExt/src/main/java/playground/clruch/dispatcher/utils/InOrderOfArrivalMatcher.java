@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 
 import org.matsim.api.core.v01.network.Link;
 
@@ -20,10 +20,10 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
  * customers who have waited longer are picked up first.
  */
 public class InOrderOfArrivalMatcher extends AbstractVehicleRequestMatcher {
-    final BiFunction<AVVehicle, AVRequest, Void> biFunction;
+    final BiConsumer<AVVehicle, AVRequest> biConsumer;
 
-    public InOrderOfArrivalMatcher(BiFunction<AVVehicle, AVRequest, Void> biFunction) {
-        this.biFunction = biFunction;
+    public InOrderOfArrivalMatcher(BiConsumer<AVVehicle, AVRequest> biConsumer) {
+        this.biConsumer = biConsumer;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class InOrderOfArrivalMatcher extends AbstractVehicleRequestMatcher {
                 Iterator<AVRequest> requestIterator = entry.getValue().iterator();
                 Queue<AVVehicle> vehicleQueue = stayVehicles.get(link);
                 while (!vehicleQueue.isEmpty() && requestIterator.hasNext()) {
-                    biFunction.apply(vehicleQueue.poll(), requestIterator.next());
+                    biConsumer.accept(vehicleQueue.poll(), requestIterator.next());
                     ++num_matchedRequests;
                 }
             }

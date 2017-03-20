@@ -34,9 +34,6 @@ public class EdgyDispatcher extends UniversalDispatcher {
     final Network network; // <- for verifying link references
     final Collection<Link> linkReferences; // <- for verifying link references
 
-    final AbstractVehicleRequestMatcher vehicleRequestMatcher;
-    final DrivebyRequestStopper drivebyRequestStopper;
-
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
@@ -47,9 +44,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
-        vehicleRequestMatcher = new InOrderOfArrivalMatcher(this::setAcceptRequest);
-        drivebyRequestStopper = new DrivebyRequestStopper(this::setVehicleDiversion);
-
+//        vehicleRequestMatcher = ;
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
     }
 
@@ -75,12 +70,12 @@ public class EdgyDispatcher extends UniversalDispatcher {
     public void redispatch(double now) {
         // verifyReferences(); // <- debugging only
 
-        vehicleRequestMatcher.match(getStayVehicles(), getAVRequestsAtLinks());
+        new InOrderOfArrivalMatcher(this::setAcceptRequest).match(getStayVehicles(), getAVRequestsAtLinks());
 
         final long round_now = Math.round(now);
         if (round_now % dispatchPeriod == 0) {
 
-            total_abortTrip += drivebyRequestStopper.realize(getAVRequestsAtLinks(), getDivertableVehicles());
+            total_abortTrip += new DrivebyRequestStopper(this::setVehicleDiversion).realize(getAVRequestsAtLinks(), getDivertableVehicles());
 
             { // TODO this should be replaceable by some naive matcher
                 Iterator<AVRequest> requestIterator = getAVRequests().iterator();

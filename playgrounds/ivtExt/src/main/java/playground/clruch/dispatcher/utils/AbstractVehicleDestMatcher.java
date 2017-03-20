@@ -11,6 +11,11 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 
 public abstract class AbstractVehicleDestMatcher {
 
+    /**
+     * @param vehicleLinkPairs
+     * @param links collection may be modified inside the matcher
+     * @return
+     */
     public final Map<VehicleLinkPair, Link> match( //
             Collection<VehicleLinkPair> vehicleLinkPairs, //
             List<Link> links) {

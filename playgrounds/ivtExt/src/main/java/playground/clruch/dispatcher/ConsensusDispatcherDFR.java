@@ -97,7 +97,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
                 // TODO: ensure that a rebalanced vehicle is then under the control of the to-virtualNode and can be dispatched there.
-                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
 
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
@@ -150,9 +150,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 // DEBUGGING ENd
 
                 // generate routing instructions for rebalancing vehicles
-                Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
-                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-                    destinationLinks.put(virtualNode, new ArrayList<>());
+                Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
 
                 // fill rebalancing destinations
                 for (Map.Entry<VirtualLink, Integer> entry : feasibleRebalanceCount.entrySet()) {
@@ -180,15 +178,15 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             // II.ii if vehilces remain in vNode, send to customers
             {
                 // collect destinations per vNode
-                Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
-                virtualNetwork.getVirtualNodes().stream().forEach(v -> destinationLinks.put(v, new ArrayList<>()));
+                Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
+
                 for (VirtualNode vNode : virtualNetwork.getVirtualNodes()) {
                     destinationLinks.get(vNode).addAll( // stores from links
                             requests.get(vNode).stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
                 }
 
                 // collect available vehicles per vNode
-                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
 
                 // assign destinations to the available vehicles
                 {
