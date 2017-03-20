@@ -28,6 +28,7 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.red.Variance;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
@@ -113,6 +114,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
                 availableVehicles.entrySet().stream().forEach(e -> vector.set(RealScalar.of(e.getValue().size()), e.getKey().index));
                 System.out.println(vector.toString());
+                System.out.println("variance="+Variance.ofVector(vector));
 
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
@@ -140,6 +142,9 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
                         double lambdaTo = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
                         double lambdaFrom = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
+                        
+                        lambdaTo = Math.max(lambdaTo, 1);
+                        lambdaFrom = Math.max(lambdaFrom, 1);
                         // System.out.println();
                         // lambda_dummy_to = lambda_dummy_from = 1;
                         double vehicles_From_to_To = //
