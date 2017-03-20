@@ -28,6 +28,7 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.ArrivalInformation;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
@@ -47,6 +48,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class ConsensusDispatcherDFR extends PartitionedDispatcher {
+    public static final String KEY_REBALANCINGPERIOD = "rebalancingPeriod";
     public static final String KEY_VIRTUALNETWORKDIRECTORY = "virtualNetworkDirectory";
     public static final String KEY_DTEXTENSION = "dtExtension";
     public static final String KEY_WEIGHTSEXTENSION = "weightsExtension";
@@ -55,6 +57,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
+    final ArrivalInformation arrivalInformation;
     private final Map<VirtualLink, Double> rebalanceFloating;
     private final Map<VirtualLink, Double> vLinkWeights;
     private int rebCount = 0;
@@ -69,7 +72,8 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRequestSelector abstractRequestSelector, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            Map<VirtualLink, Double> linkWeightsIn) {
+            Map<VirtualLink, Double> linkWeightsIn, //
+            ArrivalInformation arrivalInformation) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
 
         this.virtualNodeDest = abstractVirtualNodeDest;
@@ -79,7 +83,8 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
         for (VirtualLink virtualLink : virtualNetwork.getVirtualLinks())
             rebalanceFloating.put(virtualLink, 0.0);
         vLinkWeights = linkWeightsIn;
-        rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        this.arrivalInformation = arrivalInformation;
+        rebalancingPeriod = Integer.parseInt(config.getParams().get(KEY_REBALANCINGPERIOD));
     }
 
     @Override
@@ -121,9 +126,10 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                         int imbalanceTo = -vi_excess.get(vLink.getTo());
 
                         // compute the rebalancing vehicles
-                        // TODO replace lambda_dummy with data from XML file
-                        double lambda_dummy_to = 1.0;
-                        double lambda_dummy_from = 1.0;
+                        // TODO confirm that correct
+
+                        double lambda_dummy_to = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
+                        double lambda_dummy_from = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
                         double vehicles_From_to_To = //
                                 rebalancingPeriod * vLinkWeights.get(vLink) * ( //
                                 (double) imbalanceTo / lambda_dummy_to - //
@@ -298,15 +304,32 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             {
                 final String string = "consensusWeights_" + config.getParams().get(KEY_WEIGHTSEXTENSION) + ".xml";
                 final File linkWeightsXML = new File(virtualnetworkDir, string);
-                GlobalAssert.that(linkWeightsXML.exists());
+                GlobalAssert.that(linkWeightsXML.isFile());
                 linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
+            }
+
+            ArrivalInformation arrivalInformation = null;
+            {
+                final String ext = config.getParams().get(KEY_DTEXTENSION);
+                final File lambdaXML = new File(virtualnetworkDir, "poissonParameters_" + ext + ".xml");
+                GlobalAssert.that(lambdaXML.isFile());
+                final File pijFile = new File(virtualnetworkDir, "transitionProbabilities_" + ext + ".xml");
+                GlobalAssert.that(pijFile.isFile());
+
+                try {
+                    arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaXML, pijFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    GlobalAssert.that(false);
+                }
             }
 
             return new ConsensusDispatcherDFR(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, //
                     abstractVirtualNodeDest, //
                     abstractRequestSelector, //
                     abstractVehicleDestMatcher, //
-                    linkWeights);
+                    linkWeights, //
+                    arrivalInformation);
         }
     }
 }
