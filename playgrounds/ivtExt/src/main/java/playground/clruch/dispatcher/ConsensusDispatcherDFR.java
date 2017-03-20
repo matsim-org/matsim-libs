@@ -10,7 +10,6 @@
 package playground.clruch.dispatcher;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +47,9 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class ConsensusDispatcherDFR extends PartitionedDispatcher {
-    public static final String KEY_VIRTUALNETWORKFILE = "virtualNetworkFile";
-    public static final String KEY_LINKWEIGHTSFILE = "linkWeightsFile";
+    public static final String KEY_VIRTUALNETWORKDIRECTORY = "virtualNetworkDirectory";
+    public static final String KEY_DTEXTENSION = "dtExtension";
+    public static final String KEY_WEIGHTSEXTENSION = "weightsExtension";
 
     private final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
@@ -282,15 +282,25 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
-
-            GlobalAssert.that(config.getParams().containsKey(KEY_VIRTUALNETWORKFILE));
-            GlobalAssert.that(config.getParams().containsKey(KEY_LINKWEIGHTSFILE));
-            File virtualnetworkXML = new File(config.getParams().get(KEY_VIRTUALNETWORKFILE));
-            GlobalAssert.that(virtualnetworkXML.exists());
-            File linkWeightsXML = new File(config.getParams().get(KEY_LINKWEIGHTSFILE));
-            GlobalAssert.that(linkWeightsXML.exists());
-            virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkXML);
-            linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
+            // ---
+            GlobalAssert.that(config.getParams().containsKey(KEY_VIRTUALNETWORKDIRECTORY));
+            GlobalAssert.that(config.getParams().containsKey(KEY_DTEXTENSION));
+            // ---
+            final File virtualnetworkDir = new File(config.getParams().get(KEY_VIRTUALNETWORKDIRECTORY));
+            GlobalAssert.that(virtualnetworkDir.isDirectory());
+            // ---
+            {
+                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork_nghbr.xml");
+                GlobalAssert.that(virtualnetworkFile.isFile());
+                virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkFile);
+            }
+            // ---
+            {
+                final String string = "consensusWeights_" + config.getParams().get(KEY_WEIGHTSEXTENSION) + ".xml";
+                final File linkWeightsXML = new File(virtualnetworkDir, string);
+                GlobalAssert.that(linkWeightsXML.exists());
+                linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
+            }
 
             return new ConsensusDispatcherDFR(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, //
                     abstractVirtualNodeDest, //
