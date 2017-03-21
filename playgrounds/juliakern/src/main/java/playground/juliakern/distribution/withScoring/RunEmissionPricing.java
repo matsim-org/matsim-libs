@@ -172,13 +172,15 @@ public class RunEmissionPricing {
         System.out.println("network at run - no of links " + controler.getScenario().getNetwork().getLinks().size());
         controler.addControlerListener(ecl);
         controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(ecl, controler.getScenario()));
-		
-		EmissionCostModule emissionCostModule = new EmissionCostModule(1.0);
-		// add travel disutility
-		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionCostModule, config.planCalcScore());
+
+        ecg.setEmissionCostMultiplicationFactor(1.0);
+
+        // add travel disutility
+		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(EmissionCostModule.class).asEagerSingleton();
 				bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
 			}
 		});

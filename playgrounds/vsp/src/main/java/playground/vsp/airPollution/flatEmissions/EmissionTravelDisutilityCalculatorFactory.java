@@ -39,18 +39,12 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
     private double sigma = 0. ;
     private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
     @Inject  private EmissionModule emissionModule;
-    private final EmissionCostModule emissionCostModule;
-    private final PlanCalcScoreConfigGroup cnScoringGroup;
+    @Inject  private EmissionCostModule emissionCostModule;
+    @Inject  private PlanCalcScoreConfigGroup cnScoringGroup;
     private Set<Id<Link>> hotspotLinks = null;
 
-    public EmissionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory,
-                                                     EmissionModule emissionModule,
-                                                     EmissionCostModule emissionCostModule,
-                                                     PlanCalcScoreConfigGroup cnScoringGroup) {
+    public EmissionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory) {
         this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-//        this.emissionModule = emissionModule;
-        this.emissionCostModule = emissionCostModule;
-        this.cnScoringGroup = cnScoringGroup;
     }
 
     @Override

@@ -171,12 +171,14 @@ public class RunEmissionPricing {
 		controler.addControlerListener(ecl);
         controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(ecl, controler.getScenario()));
 
-		EmissionCostModule emissionCostModule = new EmissionCostModule(1.0);
+        ecg.setEmissionCostMultiplicationFactor(1.);
+
 		// add travel disutility
-		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionCostModule, config.planCalcScore());
+		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(EmissionCostModule.class).asEagerSingleton();
 				bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
 			}
 		});

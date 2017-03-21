@@ -52,7 +52,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 
 	private MatsimServices controler;
 	@Inject private EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
+	@Inject private EmissionCostModule emissionCostModule;
 	private String emissionEventOutputFile;
 	private EventWriterXML emissionEventWriter;
 	private EmissionInternalizationHandler emissionInternalizationHandler;
@@ -62,13 +62,11 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	int firstIt;
 	int lastIt;
 
-	private final MutableScenario scenario;
+	@Inject private MutableScenario scenario;
 	private final TollHandler tollHandler;
 	private CongestionHandlerImplV3 congestionHandler;
 
-	public InternalizeEmissionsCongestionControlerListener(EmissionCostModule emissionCostModule, MutableScenario scenario, TollHandler tollHandler) {
-		this.emissionCostModule = emissionCostModule;
-		this.scenario = scenario;
+	public InternalizeEmissionsCongestionControlerListener(TollHandler tollHandler) {
 		this.tollHandler = tollHandler;
 	}
 

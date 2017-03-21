@@ -92,23 +92,22 @@ public class EquilEmissionTest {
 		equilTestSetUp.createActiveAgents(sc);
 		equilTestSetUp.createPassiveAgents(sc);
 
-		emissionSettings(sc);
+		emissionSettings(sc, this.isConsideringCO2Costs);
 		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 
 		Controler controler = new Controler(sc);
 		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
-		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()),null, emissionCostModule, controler.getConfig().planCalcScore());
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				// emissions settings
 				bind(EmissionModule.class).asEagerSingleton();
-				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionCostModule.class).asEagerSingleton();
 				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 
 				bindCarTravelDisutilityFactory().toInstance(emissionTducf);
@@ -187,7 +186,7 @@ public class EquilEmissionTest {
 		}
 	}
 	
-	private void emissionSettings(Scenario scenario){
+	private void emissionSettings(Scenario scenario, boolean isConsideringCO2Costs){
 		
 		// since same files are used for multiple test, files are added to ONE MORE level up then the test package directory
 		String packageInputDir = helper.getPackageInputDirectory();
@@ -218,6 +217,8 @@ public class EquilEmissionTest {
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 		ecg.setEmissionEfficiencyFactor(1.0);
+		ecg.setConsideringCO2Costs(isConsideringCO2Costs);
+		ecg.setEmissionCostMultiplicationFactor(1.0);
 
 		config.addModule(ecg);
 	}

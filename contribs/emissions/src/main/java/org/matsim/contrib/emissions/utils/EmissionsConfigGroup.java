@@ -56,6 +56,12 @@ extends ReflectiveConfigGroup
 	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
 	private double emissionEfficiencyFactor = 1.0;
 
+	private static final String EMISSION_COST_MULTIPLICATION_FACTOR = "EMISSION_COST_MULTIPLICATION_FACTOR";
+	private double emissionCostMultiplicationFactor = 1.0;
+
+	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
+	private boolean consideringCO2Costs = false;
+
 	static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings";
 	static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
 	static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
@@ -77,6 +83,10 @@ extends ReflectiveConfigGroup
 
 	static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; the factor is applied to the whole fleet. ";
 
+	static final String EMISSION_COST_MULTIPLICATION_FACTOR_CMT = "A factor, by which the emission cost factors from literature (Maibach et al. (2008)) are increased.";
+
+	static final String CONSIDERING_CO2_COSTS_CMT = "if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution.";
+
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
@@ -97,6 +107,12 @@ extends ReflectiveConfigGroup
 		map.put(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT);
 
 		map.put(IGNORING_EMISSIONS_FROM_EVENTS_FILE, IGNORING_EMISSIONS_FROM_EVENTS_FILE_CMT);
+
+		map.put(EMISSION_EFFICIENCY_FACTOR, EMISSION_EFFICIENCY_FACTOR_CMT);
+
+		map.put(EMISSION_COST_MULTIPLICATION_FACTOR, EMISSION_COST_MULTIPLICATION_FACTOR_CMT);
+
+		map.put(CONSIDERING_CO2_COSTS, CONSIDERING_CO2_COSTS_CMT);
 
 		return map;
 	}
@@ -233,5 +249,27 @@ extends ReflectiveConfigGroup
 	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
 	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+	}
+	@StringGetter(EMISSION_COST_MULTIPLICATION_FACTOR)
+	public double getEmissionCostMultiplicationFactor() {
+		return emissionCostMultiplicationFactor;
+	}
+	/**
+	 * @param emissionCostMultiplicationFactor -- {@value #EMISSION_COST_MULTIPLICATION_FACTOR_CMT}
+	 */
+	@StringSetter(EMISSION_COST_MULTIPLICATION_FACTOR)
+	public void setEmissionCostMultiplicationFactor(double emissionCostMultiplicationFactor) {
+		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
+	}
+	@StringGetter(CONSIDERING_CO2_COSTS)
+	public boolean isConsideringCO2Costs() {
+		return consideringCO2Costs;
+	}
+	/**
+	 * @param consideringCO2Costs -- {@value #CONSIDERING_CO2_COSTS_CMT}
+	 */
+	@StringSetter(CONSIDERING_CO2_COSTS)
+	public void setConsideringCO2Costs(boolean consideringCO2Costs) {
+		this.consideringCO2Costs = consideringCO2Costs;
 	}
 }

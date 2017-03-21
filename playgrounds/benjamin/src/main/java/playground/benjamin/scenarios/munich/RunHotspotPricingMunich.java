@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -79,13 +80,14 @@ public class RunHotspotPricingMunich {
 		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configFile);
 
+		EmissionsConfigGroup ecg = ((EmissionsConfigGroup)config.getModules().get(EmissionsConfigGroup.GROUP_NAME));
+		ecg.setConsideringCO2Costs(Boolean.parseBoolean(considerCO2Costs));
+		ecg.setEmissionCostMultiplicationFactor(Double.parseDouble(emissionCostFactor));
+
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 
-		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-
-		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
-				emissionCostModule);
+		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory();
 		emissionTducf.setHotspotLinks(hotspotLinks);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -101,7 +103,7 @@ public class RunHotspotPricingMunich {
 			@Override
 			public void install() {
 				bind(EmissionModule.class).asEagerSingleton();
-				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionCostModule.class).asEagerSingleton();
 				addControlerListenerBinding().toInstance(iecl);
 			}
 		});

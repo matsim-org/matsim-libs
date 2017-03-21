@@ -52,18 +52,16 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 	private Map<Id<Person>, Double> pId2CongestionCosts= new HashMap<>();
 	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 	private MutableScenario scenario;
-	private final EmissionCostModule emissionCostModule;
+
+	@Inject private EmissionCostModule emissionCostModule;
+	@Inject private EmissionModule emissionModule;
 
 	private MoneyEventHandler moneyHandler;
 	private ExperiencedDelayHandler congestionCostHandler;
-	@Inject private EmissionModule emissionModule;
+
 	private CausedEmissionCostHandler emissCostHandler;
 	private double vttsCar;
 	
-	public MyEmissionCongestionMoneyEventControlerListener(final EmissionCostModule emissionCostModule) {
-		this.emissionCostModule = emissionCostModule;
-	}
-
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.scenario = (MutableScenario) event.getServices().getScenario();

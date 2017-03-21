@@ -188,7 +188,10 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.controler = new Controler(this.scenario);
 		specifyControler();
 
-		emissionCostModule = new EmissionCostModule(100.0);
+		EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
+		emissionsConfigGroup.setEmissionCostMultiplicationFactor(100.);
+
+		emissionCostModule = new EmissionCostModule(emissionsConfigGroup);
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
 		pcs.setPerforming_utils_hr(0.0);
@@ -231,7 +234,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 	private void installEmissionDisutilityCalculatorFactory() {
 		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(
-				emissionCostModule);
+        );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

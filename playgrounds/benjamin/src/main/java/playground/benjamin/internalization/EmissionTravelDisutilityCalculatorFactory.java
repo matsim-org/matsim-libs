@@ -41,12 +41,8 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 	@Inject private EmissionModule emissionModule;
 	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
 
-	private final EmissionCostModule emissionCostModule;
+	@Inject private EmissionCostModule emissionCostModule;
 	private Set<Id<Link>> hotspotLinks;
-
-	public EmissionTravelDisutilityCalculatorFactory(EmissionCostModule emissionCostModule) {
-		this.emissionCostModule = emissionCostModule;
-	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){

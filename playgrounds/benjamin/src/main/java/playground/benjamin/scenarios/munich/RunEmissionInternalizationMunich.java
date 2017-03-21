@@ -62,20 +62,22 @@ public class RunEmissionInternalizationMunich {
 		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configFile);
 
-		( (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME)).setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+		EmissionsConfigGroup ecg = ( (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME));
+		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+		ecg.setEmissionCostMultiplicationFactor(Double.parseDouble(emissionCostFactor));
+		ecg.setConsideringCO2Costs(Boolean.parseBoolean(considerCO2Costs));
 
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 
-		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
-				emissionCostModule);
+        );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(EmissionModule.class).asEagerSingleton();
-				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionCostModule.class).asEagerSingleton();
 				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 
 				bindCarTravelDisutilityFactory().toInstance(emissionTducf);

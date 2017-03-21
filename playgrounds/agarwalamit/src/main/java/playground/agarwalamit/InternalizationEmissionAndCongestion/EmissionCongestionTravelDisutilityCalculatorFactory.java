@@ -41,19 +41,18 @@ import playground.vsp.congestion.handlers.TollHandler;
 public class EmissionCongestionTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
 	@Inject private EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
+	@Inject private EmissionCostModule emissionCostModule;
+	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
+
 	private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
 	private Set<Id<Link>> hotspotLinks;
 	private final TollHandler tollHandler;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private double sigma=0.;
 	
-	public EmissionCongestionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, EmissionCostModule emissionCostModule,
-															   PlanCalcScoreConfigGroup cnScoringGroup, TollHandler tollHandler) {
+	public EmissionCongestionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory,
+															   TollHandler tollHandler) {
 		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-		this.emissionCostModule = emissionCostModule;
 		this.tollHandler = tollHandler;
-		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override

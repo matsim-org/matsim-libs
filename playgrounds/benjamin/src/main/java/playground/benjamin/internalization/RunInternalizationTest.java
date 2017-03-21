@@ -69,9 +69,7 @@ public class RunInternalizationTest {
 	private Config config;
 	private Scenario scenario;
 	private Controler controler;
-	private EmissionModule emissionModule;
-	private EmissionCostModule emissionCostModule;
-	
+
 	private void run() {
 		
 		this.config = new Config();
@@ -88,15 +86,17 @@ public class RunInternalizationTest {
 		this.controler = new Controler(this.scenario);
 		specifyControler();
 
-		emissionCostModule = new EmissionCostModule(1.0, Boolean.parseBoolean("true"));
-		
+		EmissionsConfigGroup ecg = ((EmissionsConfigGroup)controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME));
+		ecg.setConsideringCO2Costs(true);
+		ecg.setEmissionCostMultiplicationFactor(1.0);
+
 //		installScoringFunctionFactory();
 		installTravelCostCalculatorFactory();
 		this.controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(EmissionModule.class).asEagerSingleton();
-				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionCostModule.class).asEagerSingleton();
 				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 			}
 		});
@@ -105,7 +105,7 @@ public class RunInternalizationTest {
 
 	private void installTravelCostCalculatorFactory() {
 		final EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(
-                emissionCostModule);
+        );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
