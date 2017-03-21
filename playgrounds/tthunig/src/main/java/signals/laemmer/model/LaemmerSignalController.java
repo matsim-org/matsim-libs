@@ -21,12 +21,14 @@ package signals.laemmer.model;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.model.AbstractSignalController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.data.Lane;
 
 import com.google.inject.Provider;
@@ -44,6 +46,10 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 	private static final Logger log = Logger.getLogger(LaemmerSignalController.class);
 	
 	public static final String IDENTIFIER = "LaemmerSignalControl";
+
+	private Id<SignalGroup> currentGreenTimeGroupId = null;
+	private double remainingInBetweenTime = 0;
+	private double currentInBetweenTime = 0;
 	
 	public final static class SignalControlProvider implements Provider<SignalController> {
 		private final LinkSensorManager sensorManager;
@@ -85,18 +91,88 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 	
 	@Override
 	public void updateState(double timeSeconds) {
+
+		double maxIdx = 0;
+		Id<SignalGroup> grp = null;
 		
 		for (SignalGroup group : this.system.getSignalGroups().values()){
-			this.calculatePriorityIndex(timeSeconds);
-			
+			double idx = this.calculatePriorityIndex(timeSeconds, group);
+			if(idx > maxIdx) {
+				maxIdx = idx;
+				grp = group.getId();
+			}
 		}
-		
+		if(grp != null  ) {
+
+			if(remainingInBetweenTime > 0) {
+				remainingInBetweenTime--;
+			}
+
+			if( grp != currentGreenTimeGroupId) {
+				if(currentGreenTimeGroupId != null) {
+					this.system.scheduleDropping(timeSeconds, currentGreenTimeGroupId);
+				}
+				double intergreen = 0;
+				double amberTime = signalsData.getAmberTimesData().getDefaultAmber();
+				if(currentGreenTimeGroupId != null) {
+					intergreen = signalsData.getIntergreenTimesData().getIntergreensForSignalSystemDataMap()
+							.get(this.system.getId()).getIntergreenTime(currentGreenTimeGroupId, grp);
+				}
+				currentInBetweenTime = remainingInBetweenTime = intergreen + amberTime;
+				currentGreenTimeGroupId = grp;
+				this.system.scheduleOnset(timeSeconds + currentInBetweenTime, grp);
+			}
+		}
 	}
 
-	
-	private void calculatePriorityIndex(double timeSeconds) {
-		this.getNumberOfExpectedVehicles(timeSeconds);
-		
+	//TODO: add inbetweentime
+	private double calculatePriorityIndex(double timeSeconds, SignalGroup group) {
+
+		double index = 0;
+
+		Id<Link> linkId = group.getSignals().values().iterator().next().getLinkId();
+		double maxFlow = this.network.getLinks().get(linkId).getCapacity() / 3600.;
+
+		if(group.getId().equals(currentGreenTimeGroupId)) {
+			for(double i = remainingInBetweenTime ; i<= currentInBetweenTime; i++) {
+				double n = this.getNumberOfExpectedVehicles(timeSeconds+i, linkId);
+				double reqGreenTime = n / maxFlow;
+				double tempIndex = n / (i + reqGreenTime);
+				if(tempIndex > index) {
+					index = tempIndex;
+				}
+			}
+		} else {
+			double intergreen = 0;
+			double amberTime = signalsData.getAmberTimesData().getDefaultAmber();
+			if(currentGreenTimeGroupId != null) {
+				intergreen = signalsData.getIntergreenTimesData().getIntergreensForSignalSystemDataMap()
+						.get(this.system.getId())
+						.getIntergreenTime(currentGreenTimeGroupId, group.getId());
+			}
+			double inBetweenTime = intergreen + amberTime;
+			double n = this.getNumberOfExpectedVehicles(timeSeconds + inBetweenTime, linkId);
+			double reqGreenTime = n / maxFlow;
+			double penalty = calculateAbortionPenalty(timeSeconds);
+			index = n / (penalty + inBetweenTime + reqGreenTime);
+		}
+		return index;
+	}
+
+	private double calculateAbortionPenalty(double timeSeconds) {
+		if(currentGreenTimeGroupId == null) {
+			return 0;
+		}
+		Id<Link> linkId = this.system.getSignalGroups().get(currentGreenTimeGroupId).getSignals().values().iterator().next().getLinkId();
+		double waitingTimeSum = 0;
+		for(double i = remainingInBetweenTime; i <= currentInBetweenTime; i++) {
+			waitingTimeSum += (waitingTimeSum + this.getNumberOfExpectedVehicles(timeSeconds + i, linkId));
+		}
+		double n = this.getNumberOfExpectedVehicles(timeSeconds + currentInBetweenTime, linkId);
+		if(n==0) {
+			return 0;
+		}
+		return waitingTimeSum / n ;
 	}
 
 	/**
@@ -115,8 +191,9 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 	 * N_i^{exp}(t + \hat(g)_i))
 	 * 
 	 */
-	private int getNumberOfExpectedVehicles(double timeSeconds){
-		return 0;
+	private int getNumberOfExpectedVehicles(double timeSeconds, Id<Link> linkId){
+		Link link = network.getLinks().get(linkId);
+		return this.sensorManager.getNumberOfCarsInDistance(linkId, 0., timeSeconds);
 	}
 	
 	
@@ -130,7 +207,7 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 			for (Signal signal : group.getSignals().values()) {
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 					//					log.error("system: " + this.system.getId() + " signal: " + signal.getId() + " has no lanes...");
-					this.sensorManager.registerNumberOfCarsMonitoring(signal.getLinkId());
+					this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), 0.);
 				}
 				else {
 					for (Id<Lane> laneId : signal.getLaneIds()){
@@ -138,7 +215,6 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 						this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
 					}
 				}
-
 			}
 		}
 	}
