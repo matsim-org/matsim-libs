@@ -24,7 +24,6 @@ import java.util.Map;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -79,8 +78,6 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 		this.intervalHandler = new IntervalHandler();
 
         logger.warn(controler.getScenario().getNetwork().getLinks().size() + " number of links");
-		
-		Scenario scenario = controler.getScenario() ;
 	}
 	
 	@Override

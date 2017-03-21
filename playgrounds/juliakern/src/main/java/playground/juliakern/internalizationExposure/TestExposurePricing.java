@@ -244,7 +244,6 @@ public class TestExposurePricing {
 //		services.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, services.getNetwork(), ecl));
 		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
 		
-		EmissionModule emissionModule = new EmissionModule(scenario);
 		ecg.setEmissionEfficiencyFactor(1.0);
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
@@ -260,7 +259,7 @@ public class TestExposurePricing {
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
