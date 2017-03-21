@@ -162,7 +162,6 @@ public class TestExposurePricing {
 		 */
 
 		EmissionModule emissionModule = new EmissionModule(sc);
-		emissionModule.setEmissionEfficiencyFactor( 1.0 );
 
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
@@ -228,7 +227,6 @@ public class TestExposurePricing {
 		 */
 
 		EmissionModule emissionModule = new EmissionModule(sc);
-		emissionModule.setEmissionEfficiencyFactor( 1.0 );
 
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
@@ -367,6 +365,8 @@ public class TestExposurePricing {
 		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+
+		ecg.setEmissionEfficiencyFactor(1.0);
 
 		config.addModule(ecg);
 

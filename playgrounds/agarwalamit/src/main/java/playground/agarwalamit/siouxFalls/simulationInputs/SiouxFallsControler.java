@@ -82,7 +82,7 @@ public class SiouxFallsControler {
 		ecg.setUsingDetailedEmissionCalculation(false);
 		//===only emission events genertaion; used with all runs for comparisons
 		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
-		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 
 		if(internalizeEmission)
 		{

@@ -234,7 +234,7 @@ public class TestExposurePricing {
         ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
         ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
         ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
-		
+
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 //		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 //		vcg.setWritingOutputEvents(false) ;
@@ -245,7 +245,7 @@ public class TestExposurePricing {
 		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.setEmissionEfficiencyFactor(1.0);
+		ecg.setEmissionEfficiencyFactor(1.0);
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 //		links2xCells = gt.mapLinks2Xcells(noOfXCells);

@@ -153,7 +153,7 @@ public class EquilMixedTrafficEmissionTest {
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
 		EmissionModule emissionModule = new EmissionModule(sc);
-		emissionModule.setEmissionEfficiencyFactor( 1.0 );
+		( (EmissionsConfigGroup) sc.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME) ).setEmissionEfficiencyFactor(1.0);
 
 		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
 

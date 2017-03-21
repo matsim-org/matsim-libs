@@ -145,7 +145,7 @@ public class SubPopMunichExposureControler {
 		ecg.setEmissionRoadTypeMappingFile(emissionRelatedInputFilesDir + "/roadTypeMapping.txt");
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 

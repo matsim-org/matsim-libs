@@ -139,7 +139,7 @@ public class SubPopMunichControler {
 		ecg.setUsingDetailedEmissionCalculation(true);
 		//===only emission events genertaion; used with all runs for comparisons
 		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
-		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 
 		if(internalizeEmission){
 			// this is needed by *both* following modules:

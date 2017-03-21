@@ -259,12 +259,12 @@ public class CNEIntegration {
 
 		if (analyzeAirPollution) {
 
-			final double emissionEfficiencyFactor = 1.0;
+//			final double emissionEfficiencyFactor = 1.0;
 			final boolean considerCO2Costs = true;
 			final double emissionCostFactor = 1.0;
 
 			emissionModule = new EmissionModule(controler.getScenario());
-			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
+//			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor); // moved to emissionConfigGroup. Amit Mar'17
 
 			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools);
 

@@ -48,9 +48,7 @@ public class EmissionModule {
 	private WarmEmissionHandler warmEmissionHandler;
 	private ColdEmissionHandler coldEmissionHandler;
 
-	private  EventsManager emissionEventsManager;
-	private Double emissionEfficiencyFactor; // i think, this can also go to EmissionsConfigGroup. Amit Sep 2016
-
+	private EventsManager emissionEventsManager;
 	private final EmissionsConfigGroup ecg;
 
 	//===
@@ -126,8 +124,8 @@ public class EmissionModule {
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
 		
-		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager, emissionEfficiencyFactor);
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
+		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager, ecg.getEmissionEfficiencyFactor());
+		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, ecg.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -390,12 +388,6 @@ public class EmissionModule {
 	@Deprecated // use scenario.getVehicles() instead.
 	public Vehicles getEmissionVehicles() {
 		return emissionVehicles;
-	}
-
-    public void setEmissionEfficiencyFactor(Double emissionEfficiencyFactor) {
-		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-		logger.info("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
-//		logger.warn("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
 	}
 
 	public void writeEmissionInformation(String emissionEventOutputFile) {

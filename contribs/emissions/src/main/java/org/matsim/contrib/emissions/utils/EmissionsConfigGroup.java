@@ -51,8 +51,10 @@ extends ReflectiveConfigGroup
 	private boolean isUsingVehicleIdAsVehicleDescription = false;
 
 	private static final String IGNORING_EMISSIONS_FROM_EVENTS_FILE = "isIgnoringEmissionsFromEventsFile";
-
 	private boolean isIgnoringEmissionsFromEventsFile = false;
+
+	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
+	private double emissionEfficiencyFactor = 1.0;
 
 	static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings";
 	static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
@@ -72,6 +74,8 @@ extends ReflectiveConfigGroup
 			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
 
 	static final String IGNORING_EMISSIONS_FROM_EVENTS_FILE_CMT = "if true, emission events will not appear in the events file.";
+
+	static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; the factor is applied to the whole fleet. ";
 
 	@Override
 	public Map<String, String> getComments() {
@@ -217,5 +221,17 @@ extends ReflectiveConfigGroup
 	@StringSetter(IGNORING_EMISSIONS_FROM_EVENTS_FILE)
 	public void setIgnoringEmissionsFromEventsFile(boolean ignoringEmissionsFromEventsFile) {
 		isIgnoringEmissionsFromEventsFile = ignoringEmissionsFromEventsFile;
+	}
+
+	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
+	public double getEmissionEfficiencyFactor() {
+		return emissionEfficiencyFactor;
+	}
+	/**
+	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+	 */
+	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
+	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
+		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 	}
 }

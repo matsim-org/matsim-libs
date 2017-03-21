@@ -20,22 +20,21 @@
 package playground.benjamin.scenarios.munich;
 
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.InternalizeEmissionResponsibilityControlerListener;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
@@ -80,12 +79,13 @@ public class RunExposureInternalizationMunich {
 		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configFile);
 
+		( (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME)).setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 		scenario = ScenarioUtils.loadScenario(config); // TODO remove?
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 //		links2xCells = gt.mapLinks2Xcells(noOfXCells);

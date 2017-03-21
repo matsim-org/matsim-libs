@@ -100,7 +100,6 @@ public class EquilEmissionTest {
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
 		EmissionModule emissionModule = new EmissionModule(sc);
-		emissionModule.setEmissionEfficiencyFactor( 1.0 );
 
 		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
@@ -220,6 +219,7 @@ public class EquilEmissionTest {
 		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+		ecg.setEmissionEfficiencyFactor(1.0);
 
 		config.addModule(ecg);
 	}

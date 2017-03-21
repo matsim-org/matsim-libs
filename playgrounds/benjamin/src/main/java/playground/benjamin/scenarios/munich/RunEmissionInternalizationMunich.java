@@ -21,6 +21,7 @@ package playground.benjamin.scenarios.munich;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -61,11 +62,12 @@ public class RunEmissionInternalizationMunich {
 		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configFile);
 
+		( (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME)).setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 
 		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 
 		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
