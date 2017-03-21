@@ -3,6 +3,7 @@ package playground.dziemke.analysis;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -21,7 +22,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 public class TripHandler implements ActivityEndEventHandler, ActivityStartEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
-	private Map<Id<Trip>, Trip> trips = new HashMap<>();
+    public static final Logger log = Logger.getLogger(TripHandler.class);
+
+    private Map<Id<Trip>, Trip> trips = new HashMap<>();
 	
 	private Map<Id<Person>, Integer> activityEndCount = new HashMap <Id<Person>, Integer>();
 	private Map<Id<Person>, Integer> activityStartCount = new HashMap <Id<Person>, Integer>();
@@ -174,13 +177,13 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		// store information from event to variable
 		String legMode = event.getLegMode();
 		//System.out.println("Mode of current trip is " + legModeString);
-		Id<Person> personId = event.getPersonId();
-		// other information not needed
-		
-		// add information concerning leg mode to the object "Trip"
-		Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
-		trips.get(tripId).setMode(legMode);
-		
+        Id<Person> personId = event.getPersonId();
+        // other information not needed
+
+        // add information concerning leg mode to the object "Trip"
+        Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
+        trips.get(tripId).setMode(legMode);
+        log.warn("Trip mode = Arrival leg mode; assumed that every leg has the same legMode");
 		
 	}
 // --------------------------------------------------------------------------------------------------
