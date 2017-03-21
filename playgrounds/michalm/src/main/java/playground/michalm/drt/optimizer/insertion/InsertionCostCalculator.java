@@ -77,7 +77,8 @@ public class InsertionCostCalculator {
 
 	private double calculateDropoffDetourDuration(NDrtRequest drtRequest, VehicleData.Entry vEntry,
 			Insertion insertion) {
-		if (drtRequest.getToLink() == vEntry.stops.get(insertion.dropoffIdx - 1).task.getLink()) {
+		if (insertion.dropoffIdx > 0
+				&& drtRequest.getToLink() == vEntry.stops.get(insertion.dropoffIdx - 1).task.getLink()) {
 			return 0; // no detour
 		}
 
@@ -127,6 +128,6 @@ public class InsertionCostCalculator {
 		// vehicle's time window cannot be violated
 		NDrtStayTask lastTask = (NDrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
 		double lastTaskDuration = lastTask.getEndTime() - lastTask.getBeginTime();
-		return lastTaskDuration > totalTimeLoss;
+		return lastTaskDuration >= totalTimeLoss;
 	}
 }

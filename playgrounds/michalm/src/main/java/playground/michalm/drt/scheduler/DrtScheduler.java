@@ -70,7 +70,7 @@ public class DrtScheduler implements ScheduleInquiry {
 		((FleetImpl)fleet).resetSchedules();
 		for (Vehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
-					.addTask(new DrtStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
+					.addTask(new NDrtStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
 		}
 	}
 
@@ -148,7 +148,7 @@ public class DrtScheduler implements ScheduleInquiry {
 		switch (task.getDrtTaskType()) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
-					// even if endTime=beginTime, do not remove this task!!! A taxi schedule should end with WAIT
+					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT
 					return Math.max(newBeginTime, vehicle.getServiceEndTime());
 				} else {
 					// if this is not the last task then some other task (e.g. DRIVE or PICKUP)
@@ -194,10 +194,21 @@ public class DrtScheduler implements ScheduleInquiry {
 		Task driveToPickupTask;
 
 		if (insertion.pickupIdx == 0) { // divert current drive task
-			driveToPickupTask = schedule.getCurrentTask();
-			VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
-					vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
-			((OnlineDriveTaskTracker)driveToPickupTask.getTaskTracker()).divertPath(vrpPath);
+			NDrtTask currentTask = (NDrtTask)schedule.getCurrentTask();
+			switch (currentTask.getDrtTaskType()) {
+				case DRIVE:
+					driveToPickupTask = schedule.getCurrentTask();
+					VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
+							vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
+					((OnlineDriveTaskTracker)driveToPickupTask.getTaskTracker()).divertPath(vrpPath);
+					break;
+
+				case STOP:
+				case STAY:
+				default:
+					throw new UnsupportedOperationException("Still need to handle it");
+			}
+
 		} else { // insert pickup after an existing stop tasks
 			NDrtStopTask stopTask = stops.get(insertion.pickupIdx - 1).task;
 			if (request.getFromLink() == stopTask.getLink()) { // no detour; no new stop task

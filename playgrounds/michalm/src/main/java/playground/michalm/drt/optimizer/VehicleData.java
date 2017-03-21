@@ -103,8 +103,7 @@ public class VehicleData {
 	private Entry createVehicleData(Vehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		ScheduleStatus status = schedule.getStatus();
-		if (currTime >= vehicle.getServiceEndTime() || // too late
-				status != ScheduleStatus.PLANNED || status != ScheduleStatus.STARTED) {
+		if (currTime >= vehicle.getServiceEndTime() || status == ScheduleStatus.COMPLETED) {
 			return null;
 		}
 
@@ -127,7 +126,7 @@ public class VehicleData {
 					break;
 
 				case STAY:
-					NDrtStopTask stayTask = (NDrtStopTask)currentTask;
+					NDrtStayTask stayTask = (NDrtStayTask)currentTask;
 					start = new LinkTimePair(stayTask.getLink(), currTime);
 					break;
 

@@ -24,10 +24,10 @@ import java.util.Collection;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.schedule.NDrtTask;
 
 /**
  * @author michalm
@@ -71,11 +71,11 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 		Task newCurrentTask = vehicle.getSchedule().nextTask();
 
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-			requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
+			requiresReoptimization = doReoptimizeAfterNextTask((NDrtTask)newCurrentTask);
 		}
 	}
 
-	protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask) {
+	protected boolean doReoptimizeAfterNextTask(NDrtTask newCurrentTask) {
 		return false;
 	}
 

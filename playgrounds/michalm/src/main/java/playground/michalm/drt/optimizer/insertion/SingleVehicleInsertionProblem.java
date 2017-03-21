@@ -131,7 +131,9 @@ public class SingleVehicleInsertionProblem {
 
 		// calc backward dijkstra from dropoff to ends of all stops
 		// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located there)
-		links.set(0, null);
+		links.set(0, drtRequest.getFromLink());
+		//TODO change the above line into the following one (after nulls are supported by OneToManyPathSearch)
+		//links.set(0, null);
 		pathsToDropoff = backwardPathSearch.calcPaths(drtRequest.getToLink(), links, minDropoffTime);
 
 		// calc forward dijkstra from dropoff to beginnings of all stops
@@ -140,6 +142,7 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private void findPickupDropoffInsertions(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
+		insertions = new ArrayList<>();
 		for (int i = 0; i <= stopCount; i++) {
 			// pickup is inserted after node i, where
 			// node 0 is 'start' (current position/immediate diversion point)
@@ -215,6 +218,7 @@ public class SingleVehicleInsertionProblem {
 			double cost = costCalculator.calculate(drtRequest, vEntry, insertion);
 			if (cost < minCost) {
 				bestInsertion = insertion;
+				minCost = cost;
 			}
 		}
 		return new BestInsertion(bestInsertion, vEntry, minCost);
