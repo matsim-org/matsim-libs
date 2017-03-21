@@ -251,16 +251,18 @@ public class TestExposurePricing {
 //		links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
 		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0,	false, rgt);
+		ecg.setConsideringCO2Costs(false);
+		ecg.setEmissionCostMultiplicationFactor(1.0);
+
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
-                emissionCostModule, config.planCalcScore());
+        );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
 				bind(EmissionModule.class).asEagerSingleton();
-				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
 				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}

@@ -40,13 +40,8 @@ import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 	public class EmissionResponsibilityTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
 		@Inject private EmissionModule emissionModule;
-		private final EmissionResponsibilityCostModule emissionResponsibilityCostModule;
-		private final PlanCalcScoreConfigGroup cnScoringGroup;
-
-		public EmissionResponsibilityTravelDisutilityCalculatorFactory(EmissionResponsibilityCostModule emissionResponsibilityCostModule, PlanCalcScoreConfigGroup cnScoringGroup) {
-			this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;
-			this.cnScoringGroup = cnScoringGroup;
-		}
+		@Inject private EmissionResponsibilityCostModule emissionResponsibilityCostModule;
+		@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
 
 		@Override
 		public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
