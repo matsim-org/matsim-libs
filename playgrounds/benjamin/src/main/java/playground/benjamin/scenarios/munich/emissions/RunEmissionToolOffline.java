@@ -107,7 +107,7 @@ public class RunEmissionToolOffline {
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 
 	private void setInputFiles() {

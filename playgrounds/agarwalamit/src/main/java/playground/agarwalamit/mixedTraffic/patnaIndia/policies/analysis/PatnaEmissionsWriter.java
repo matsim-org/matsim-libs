@@ -162,7 +162,7 @@ public class PatnaEmissionsWriter {
 
         emissionEventWriter.closeFile();
 
-        emissionModule.writeEmissionInformation(emissionEventOutputFile);
+        emissionModule.writeEmissionInformation();
     }
 
     class PatnaEmissionVehicleCreator implements PersonDepartureEventHandler {

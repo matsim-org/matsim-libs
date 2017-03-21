@@ -71,7 +71,7 @@ public class RunEmissionToolOfflineExampleV2 {
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 
 	private static int getLastIteration() {

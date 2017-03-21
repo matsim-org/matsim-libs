@@ -93,6 +93,6 @@ public class ManteuffelEmissionToolOffline{
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventsOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 }

@@ -133,7 +133,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		this.emissionModule.writeEmissionInformation(this.emissionEventOutputFile);
+		this.emissionModule.writeEmissionInformation();
 	}
 
 	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {

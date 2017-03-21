@@ -97,7 +97,7 @@ public class EmissionEventsWriter extends AbstractAnalysisModule{
 	public void writeResults(String outputFolder) {
 		// outputFolder is required earlier and therefore not used here, move in abstract class to constructor? ik
 		this.emissionEventWriter.closeFile();
-		this.emissionModule.writeEmissionInformation(this.outputPath + this.filename);
+		this.emissionModule.writeEmissionInformation();
 	}
 	
 }

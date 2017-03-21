@@ -80,7 +80,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		if(lastIteration.equals(event.getIteration())){
 			logger.info("closing emission events file...");
 			emissionEventWriter.closeFile();
-			emissionModule.writeEmissionInformation(emissionEventOutputFile);
+			emissionModule.writeEmissionInformation();
 		}
 	}
 }

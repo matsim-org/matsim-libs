@@ -78,7 +78,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyShutdown(ShutdownEvent event) {
 		logger.info("closing emission events file...");
 		emissionEventWriter.closeFile();
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 	
 }

@@ -75,7 +75,7 @@ public class TaxiOfflineEmissionTool {
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 //		emissionModule.
 	}
 

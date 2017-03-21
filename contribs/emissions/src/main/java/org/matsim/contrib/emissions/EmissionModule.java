@@ -399,7 +399,7 @@ public class EmissionModule {
 		return emissionVehicles;
 	}
 
-	public void writeEmissionInformation(String emissionEventOutputFile) {
+	public void writeEmissionInformation() {
 		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
 				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
 		
@@ -430,6 +430,6 @@ public class EmissionModule {
 //				+ cam.getVehAttributesNotSpecified().size() + " of "
 //				+ cam.getVehicleIdSet().size() + " vehicles.");
 		
-		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
+		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
 	}
 }

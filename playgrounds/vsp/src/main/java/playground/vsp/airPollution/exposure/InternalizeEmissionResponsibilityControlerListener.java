@@ -126,7 +126,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 
 		boolean isWritingOutputEvents = event.getServices().getConfig().vspExperimental().isWritingOutputEvents();
 		if( isWritingOutputEvents) {

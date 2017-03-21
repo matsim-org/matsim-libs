@@ -36,7 +36,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.algorithms.EventWriterXML;
 
 
 /**
@@ -49,13 +48,11 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	@Inject private MatsimServices controler;
 	@Inject private EventsManager eventsManager;
 
-	private EventWriterXML emissionEventWriter;
 	private EmissionInternalizationHandler emissionInternalizationHandler;
 
 	@Inject private EmissionModule emissionModule;
 	@Inject private EmissionCostModule emissionCostModule;
 
-	String emissionEventOutputFile;
 	private Set<Id<Link>> hotspotLinks;
 	
 	private int firstIt;
@@ -78,14 +75,6 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks );
 		logger.info("adding emission internalization module to emission events stream...");
 		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
-
-		if(iteration == firstIt || iteration == lastIt){
-			emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
-			logger.info("creating new emission events writer...");
-			emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-			logger.info("adding emission events writer to emission events stream...");
-			emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
-		}
 	}
 
 	@Override
@@ -94,18 +83,11 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 
 		logger.info("removing emission internalization module from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
-
-		if(iteration == firstIt || iteration == lastIt){
-			logger.info("removing emission events writer from emission events stream...");
-			emissionModule.getEmissionEventsManager().removeHandler(emissionEventWriter);
-			logger.info("closing emission events file...");
-			emissionEventWriter.closeFile();
-		}
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 
 	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {

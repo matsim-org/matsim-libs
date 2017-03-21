@@ -214,7 +214,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		} catch (NullPointerException e) {
 			logger.warn("No file to close. Is this intended?");
 		}
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 		
 		
 	}
