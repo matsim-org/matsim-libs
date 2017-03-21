@@ -19,10 +19,13 @@
 
 package playground.michalm.drt.optimizer.insertion;
 
+import org.matsim.contrib.dvrp.schedule.Schedules;
+
 import playground.michalm.drt.data.NDrtRequest;
 import playground.michalm.drt.optimizer.VehicleData;
 import playground.michalm.drt.optimizer.VehicleData.Stop;
 import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.Insertion;
+import playground.michalm.drt.schedule.NDrtStayTask;
 
 /**
  * @author michalm
@@ -121,6 +124,9 @@ public class InsertionCostCalculator {
 			}
 		}
 
-		return true;
+		// vehicle's time window cannot be violated
+		NDrtStayTask lastTask = (NDrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
+		double lastTaskDuration = lastTask.getEndTime() - lastTask.getBeginTime();
+		return lastTaskDuration > totalTimeLoss;
 	}
 }
