@@ -40,10 +40,12 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 public class EmissionControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
 	
-	private MatsimServices controler;
 	private String emissionEventOutputFile;
 	private Integer lastIteration;
+
+	@Inject private MatsimServices controler;
 	@Inject private EmissionModule emissionModule;
+
 	private EventWriterXML emissionEventWriter;
 
 	public EmissionControlerListener() {
@@ -52,7 +54,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getServices();
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		

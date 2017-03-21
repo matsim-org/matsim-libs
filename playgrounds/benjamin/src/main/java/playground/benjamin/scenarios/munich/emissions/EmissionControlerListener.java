@@ -21,7 +21,6 @@ package playground.benjamin.scenarios.munich.emissions;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
@@ -40,11 +39,12 @@ import org.matsim.core.events.algorithms.EventWriterXML;
  */
 public class EmissionControlerListener implements StartupListener, IterationStartsListener, ShutdownListener {
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
-	
-	MatsimServices controler;
+
+	@Inject private MatsimServices controler;
+	@Inject private EmissionModule emissionModule;
+
 	String emissionEventOutputFile;
 	Integer lastIteration;
-	@Inject private EmissionModule emissionModule;
 	EventWriterXML emissionEventWriter;
 
 	public EmissionControlerListener() {
@@ -53,12 +53,9 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getServices();
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
-		Scenario scenario = controler.getScenario() ;
-
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());

@@ -21,9 +21,9 @@ package playground.juliakern.distribution.withScoringFast;
 
 import java.util.ArrayList;
 import java.util.Map;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -56,7 +56,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	MatsimServices controler;
 	String emissionEventOutputFile;
 	Integer lastIteration;
-	EmissionModule emissionModule;
+	@Inject
+	private EmissionModule emissionModule;
 	EventWriterXML emissionEventWriter;
 	IntervalHandler intervalHandler;
 	GeneratedEmissionsHandler geh;
@@ -96,8 +97,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
         setMinMax(controler.getScenario().getNetwork());
         this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		
-		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
 		this.emissionFile1="./output/emissionFile.txt";
 	}
 	
@@ -108,9 +107,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		this.eventsFile = eventsFile;
 		this.network=network;
 		this.emissionFile1=emissionFile;
-		
-		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
 	}
 	
 	private void setMinMax(Network network2) {

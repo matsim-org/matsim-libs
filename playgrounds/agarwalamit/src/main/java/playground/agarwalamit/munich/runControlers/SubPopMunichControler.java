@@ -140,6 +140,13 @@ public class SubPopMunichControler {
 		//===only emission events genertaion; used with all runs for comparisons
 		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton(); // need at many places even if not internalizing emissions
+			}
+		});
+
 		if(internalizeEmission){
 			// this is needed by *both* following modules:
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
@@ -150,7 +157,6 @@ public class SubPopMunichControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bind(EmissionModule.class).asEagerSingleton();
 					bind(EmissionCostModule.class).toInstance(emissionCostModule);
 					addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 

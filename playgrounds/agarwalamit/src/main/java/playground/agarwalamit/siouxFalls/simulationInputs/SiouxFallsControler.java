@@ -82,6 +82,13 @@ public class SiouxFallsControler {
 		//===only emission events genertaion; used with all runs for comparisons
 		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton(); // need at many places even if not internalizing emissions
+			}
+		});
+
 		if(internalizeEmission)
 		{
 			//===internalization of emissions
@@ -91,7 +98,6 @@ public class SiouxFallsControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bind(EmissionModule.class).asEagerSingleton();
 					bind(EmissionCostModule.class).toInstance(emissionCostModule);
 					addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 					bindCarTravelDisutilityFactory().toInstance(emissionTducf);

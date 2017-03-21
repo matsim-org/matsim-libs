@@ -21,6 +21,7 @@ package playground.juliakern.distribution.withScoring;
 
 import java.util.ArrayList;
 import java.util.Map;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,11 +43,11 @@ import playground.vsp.airPollution.exposure.GridTools;
 public class EmissionControlerListener implements StartupListener, IterationStartsListener, 
 ShutdownListener, ScoringListener, AfterMobsimListener{
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
-	
+
 	MatsimServices controler;
 	String emissionEventOutputFile;
 	Integer lastIteration;
-	EmissionModule emissionModule;
+	@Inject private EmissionModule emissionModule;
 	EventWriterXML emissionEventWriter;
 	IntervalHandler intervalHandler;
 	GeneratedEmissionsHandler geh;
@@ -80,7 +81,6 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
         logger.warn(controler.getScenario().getNetwork().getLinks().size() + " number of links");
 		
 		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
 	}
 	
 	@Override

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.juliakern.distribution.withScoring;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -31,11 +33,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.juliakern.distribution.ResDisFactory;
-
-import java.util.HashSet;
-import java.util.Set;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 /**
  * @author benjamin
@@ -161,17 +160,22 @@ public class RunEmissionPricing {
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 		vcg.setWritingOutputEvents(false) ;
-		
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+			}
+		});
+
 		EmissionControlerListener ecl = new EmissionControlerListener(controler);
         System.out.println("network at run - no of links " + controler.getScenario().getNetwork().getLinks().size());
-		controler.addControlerListener(ecl);
+        controler.addControlerListener(ecl);
         controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(ecl, controler.getScenario()));
 		
-		
-		EmissionModule emissionModule = ecl.emissionModule;
 		EmissionCostModule emissionCostModule = new EmissionCostModule(1.0);
 		// add travel disutility
-		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionModule, emissionCostModule, config.planCalcScore());
+		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

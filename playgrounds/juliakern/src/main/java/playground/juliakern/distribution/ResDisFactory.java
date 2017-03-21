@@ -19,6 +19,7 @@
 
 package playground.juliakern.distribution;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -37,16 +38,15 @@ public class ResDisFactory implements TravelDisutilityFactory {
 	
 	private TravelDisutilityFactory tdf;
 	private EmissionControlerListener ecl;
-	private EmissionModule emissionModule;
+	@Inject private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 	
-	public ResDisFactory(EmissionControlerListener ecl, EmissionModule emissionModule, 
-			EmissionCostModule emissionCostModule, PlanCalcScoreConfigGroup cnScoringGroup){
+	public ResDisFactory(EmissionControlerListener ecl,
+						 EmissionCostModule emissionCostModule, PlanCalcScoreConfigGroup cnScoringGroup){
 		this.tdf  = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, cnScoringGroup );
 		this.ecl = ecl;
-		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
 		this.cnScoringGroup = cnScoringGroup;
 	}
