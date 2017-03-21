@@ -55,22 +55,14 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 
 	private Set<Id<Link>> hotspotLinks;
 	
-	private int firstIt;
-	private int lastIt;
-
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
-		firstIt = controler.getConfig().controler().getFirstIteration();
-		lastIt = controler.getConfig().controler().getLastIteration();
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		int iteration = event.getIteration();
-
 		logger.info("creating new emission internalization handler...");
 		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks );
 		logger.info("adding emission internalization module to emission events stream...");
@@ -79,8 +71,6 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		int iteration = event.getIteration();
-
 		logger.info("removing emission internalization module from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
 	}
