@@ -26,7 +26,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring;
 
@@ -61,7 +61,7 @@ public class ActivityFitnessLandscape {
 
 		CharyparNagelActivityScoring testee =
 			new CharyparNagelActivityScoring(
-					new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), new ScenarioConfigGroup()).build());
+					new ScoringParameters.Builder(config, config.getScoringParameters(null), new ScenarioConfigGroup()).build());
 
 		final Activity shortAct = PopulationUtils.createActivityFromLinkId(SHORT_TYPE, Id.create( 1 , Link.class ));
 		final Activity longAct = PopulationUtils.createActivityFromLinkId(LONG_TYPE, Id.create( 1 , Link.class ));
@@ -79,7 +79,7 @@ public class ActivityFitnessLandscape {
 		for ( double shortTime = 0; shortTime < 24 * 3600; shortTime += 360 ) {
 			if ( Math.abs( shortTime - SHORT_DUR ) < 1 ) continue;
 			testee = new CharyparNagelActivityScoring(
-					new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), new ScenarioConfigGroup()).build());
+					new ScoringParameters.Builder(config, config.getScoringParameters(null), new ScenarioConfigGroup()).build());
 
 			final double longTime = 24 * 3600 - shortTime;
 			now = shortTime;

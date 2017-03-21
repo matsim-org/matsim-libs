@@ -40,8 +40,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters.Builder;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -60,7 +60,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 	private final StageActivityTypes blackList;
 
 	// very expensive to initialize:only do once!
-	private final Map<Id, CharyparNagelScoringParameters> individualParameters = new HashMap< >();
+	private final Map<Id, ScoringParameters> individualParameters = new HashMap< >();
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -87,7 +87,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 
 		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		//final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		final CharyparNagelScoringParameters params = createParams( person , config , scenario.getConfig().scenario(), personAttributes );
+		final ScoringParameters params = createParams( person , config , scenario.getConfig().scenario(), personAttributes );
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
@@ -157,7 +157,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		return scoringFunctionAccumulator;
 	}
 
-	private CharyparNagelScoringParameters createParams(
+	private ScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
 			final ScenarioConfigGroup scenarioConfig,
@@ -226,7 +226,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 					typeBuilder );
 		}
 
-		final CharyparNagelScoringParameters params =
+		final ScoringParameters params =
 				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;

@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 
@@ -76,7 +76,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
 
 	public LegScoringFunction(Plan plan,
-			CharyparNagelScoringParameters params,
+			ScoringParameters params,
 			Config config,
             Network network,
 			KtiConfigGroup ktiConfigGroup) {

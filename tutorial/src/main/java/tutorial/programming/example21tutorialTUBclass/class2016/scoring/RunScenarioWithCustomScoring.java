@@ -35,7 +35,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 
 public class RunScenarioWithCustomScoring {
@@ -77,8 +77,8 @@ public class RunScenarioWithCustomScoring {
 
 				// Score activities, legs, payments and being stuck
 				// with the default MATSim scoring based on utility parameters in the config file.
-				final CharyparNagelScoringParameters params =
-						new CharyparNagelScoringParameters.Builder(scenario, person.getId()).build();
+				final ScoringParameters params =
+						new ScoringParameters.Builder(scenario, person.getId()).build();
 				sumScoringFunction.addScoringFunction(new KindergartenActivityScoring(person.getId(), kindergartenArrivalHandler));
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));

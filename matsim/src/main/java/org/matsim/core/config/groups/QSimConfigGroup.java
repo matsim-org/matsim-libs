@@ -98,7 +98,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private VehicleBehavior vehicleBehavior = VehicleBehavior.teleport ;
 	// ---
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
-	public static enum SnapshotStyle { equiDist, queue, withHoles, withHolesAndShowHoles } ;
+	public static enum SnapshotStyle { equiDist, queue, withHoles, withHolesAndShowHoles,
+		kinematicWaves /*kinematicWaves and withHoles produce same snapshots Amit Mar'17*/ } ;
 	private SnapshotStyle snapshotStyle = SnapshotStyle.equiDist ;
 
 	// ---

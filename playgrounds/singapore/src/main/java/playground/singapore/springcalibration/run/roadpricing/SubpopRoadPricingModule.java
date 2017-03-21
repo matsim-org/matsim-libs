@@ -35,7 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import com.google.inject.Singleton;
 
 import playground.singapore.springcalibration.run.SubpopTravelDisutilityFactory;
@@ -147,11 +147,11 @@ public class SubpopRoadPricingModule extends AbstractModule {
     private static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
         private final RoadPricingScheme scheme;
-        private final CharyparNagelScoringParametersForPerson parameters;
+        private final ScoringParametersForPerson parameters;
         private final Config config;
         
         @Inject
-        TravelDisutilityIncludingTollFactoryProvider(RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters, Config config) {
+        TravelDisutilityIncludingTollFactoryProvider(RoadPricingScheme scheme, ScoringParametersForPerson parameters, Config config) {
             this.scheme = scheme;
             this.parameters = parameters;
             this.config = config;

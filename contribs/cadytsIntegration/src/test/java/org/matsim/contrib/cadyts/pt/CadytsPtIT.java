@@ -57,8 +57,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -162,12 +162,12 @@ public class CadytsPtIT {
 		controler.addOverridingModule(new CadytsPtModule());
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			@Inject CharyparNagelScoringParametersForPerson parameters;
+			@Inject ScoringParametersForPerson parameters;
 			@Inject Network network;
 			@Inject CadytsPtContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+				final ScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));

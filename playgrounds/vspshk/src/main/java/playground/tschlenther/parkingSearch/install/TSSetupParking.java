@@ -38,12 +38,11 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.StageActivityTypes;
 
-import playground.tschlenther.parkingSearch.Benenson.FacilityBasedBenensonParkingManager;
 
 
 /**
  * @author  jbischoff
- *
+ * @author  tschlenther
  */
 /**
  *

@@ -121,7 +121,8 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
         realCounts.entrySet().forEach(entry -> simCounts.put(entry.getKey(), new double[entry.getValue().length]));
 
         SortedMap<String, SortedMap<Double, Integer>> simCountsHandler = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
-        for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet() ) {
+        for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet()  ) {
+            if (! realCounts.containsKey(e.getKey())) continue;
             double [] counts = new double [realCounts.get(e.getKey()).length];
             int index = 0;
             for (Integer count : simCountsHandler.get(e.getKey()).values()) {

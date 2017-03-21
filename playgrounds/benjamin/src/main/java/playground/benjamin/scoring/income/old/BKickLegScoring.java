@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.households.Income;
 import org.matsim.households.PersonHouseholdMapping;
@@ -47,7 +47,7 @@ public class BKickLegScoring extends CharyparNagelLegScoring {
 
 	private Plan plan;
 
-	public BKickLegScoring(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb, Network network) {
+	public BKickLegScoring(final Plan plan, final ScoringParameters params, PersonHouseholdMapping hhdb, Network network) {
 		super(params, network);
 		this.plan = plan;
 		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();

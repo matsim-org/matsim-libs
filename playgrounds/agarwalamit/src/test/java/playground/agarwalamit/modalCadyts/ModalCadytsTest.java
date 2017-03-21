@@ -67,8 +67,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
@@ -148,12 +148,12 @@ public class ModalCadytsTest {
 
 
 						bindScoringFunctionFactory().toInstance(new ScoringFunctionFactory() {
-							@Inject private CharyparNagelScoringParametersForPerson parameters;
+							@Inject private ScoringParametersForPerson parameters;
 							@Inject private Network network;
 							@Inject ModalCadytsContext cadytsContext;
 							@Override
 							public ScoringFunction createNewScoringFunction(Person person) {
-								final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+								final ScoringParameters params = parameters.getScoringParameters(person);
 
 								SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 								scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));

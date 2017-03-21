@@ -37,9 +37,9 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -104,10 +104,10 @@ public class UtilityByPartsAnalyzer extends AbstractAnalysisModule {
 
 	private ScoringFunctionFactory getScoringFunctionFactory(final Scenario sc){
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
-			final CharyparNagelScoringParametersForPerson parametersForPerson = new SubpopulationCharyparNagelScoringParameters( sc );
+			final ScoringParametersForPerson parametersForPerson = new SubpopulationScoringParameters( sc );
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
+				final ScoringParameters params = parametersForPerson.getScoringParameters( person );
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				if(includeActivitScoring)
 					sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));

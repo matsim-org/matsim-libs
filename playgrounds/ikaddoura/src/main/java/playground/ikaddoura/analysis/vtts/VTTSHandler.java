@@ -47,7 +47,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 
 import playground.vsp.congestion.handlers.MarginalSumScoringFunction;
@@ -107,7 +107,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 
 		this.marginaSumScoringFunction =
 				new MarginalSumScoringFunction(
-						new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build());
+						new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build());
 
 	}
 

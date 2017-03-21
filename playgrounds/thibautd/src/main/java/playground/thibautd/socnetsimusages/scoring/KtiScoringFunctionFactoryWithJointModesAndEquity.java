@@ -40,9 +40,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.pt.PtConstants;
 import playground.ivt.analysis.scoretracking.ScoreTrackingListener;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
@@ -60,7 +60,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 
 	private final ScoringFunctionFactory delegate;
 
-	private final CharyparNagelScoringParametersForPerson parameters;
+	private final ScoringParametersForPerson parameters;
 	private final Scenario scenario;
 
 	private final ScoringFunctionConfigGroup group;
@@ -88,7 +88,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 				final Config config) {
 		this.tracker = tracker;
 		this.scenario = scenario;
-		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.parameters = new SubpopulationScoringParameters( scenario );
 		this.delegate =
 					new MATSim2010ScoringFunctionFactory(
 							scenario,
@@ -106,7 +106,7 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 		final SumScoringFunction function =
 			(SumScoringFunction) delegate.createNewScoringFunction( person );
 
-		final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+		final ScoringParameters params = parameters.getScoringParameters( person );
 
 		// joint modes
 		// XXX: do better for shared cost

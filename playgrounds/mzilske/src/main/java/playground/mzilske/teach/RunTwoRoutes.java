@@ -37,7 +37,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 public class RunTwoRoutes {
 
@@ -71,7 +71,7 @@ public class RunTwoRoutes {
             @Override
             public ScoringFunction createNewScoringFunction(Person person) {
                 SumScoringFunction sumScoringFunction = new SumScoringFunction();
-                sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build(), scenario.getNetwork()));
+                sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build(), scenario.getNetwork()));
                 return sumScoringFunction;
             }
         });

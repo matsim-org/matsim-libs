@@ -27,7 +27,7 @@ public class SelectedPlansAnalyzer {
 	public static final Logger log = Logger.getLogger(SelectedPlansAnalyzer.class);
 
 	// Parameters
-	private static String runId = "be_104"; // <----------
+	private static String runId = "be_118a"; // <----------
 	private static int numberOfIterations = 300; // <----------
 	private static int plansFileInterval = 300; // <----------
 	private static boolean useInterimPlans = false;
@@ -43,6 +43,7 @@ public class SelectedPlansAnalyzer {
 	private static final  Map<Integer, Integer> otherPlansMap = new HashMap<>();
 	private static final  Map<Integer, Integer> carPlansMap = new HashMap<>();
 	private static final  Map<Integer, Integer> ptPlansMap = new HashMap<>();
+	private static final  Map<Integer, Integer> slowPtPlansMap = new HashMap<>();
 	private static final  Map<Integer, Integer> walkPlansMap = new HashMap<>();
 	
 	
@@ -100,6 +101,7 @@ public class SelectedPlansAnalyzer {
 		int counterOtherPlans = 0;
 		int counterCarPlans = 0;
 		int counterPtPlans = 0;
+		int counterSlowPtPlans = 0;
 		int counterWalkPlans = 0;
 		String mode;
 		
@@ -128,6 +130,9 @@ public class SelectedPlansAnalyzer {
 							case "pt":
 								counterPtPlans++;
 								break;
+							case "slowPt":
+								counterSlowPtPlans++;
+								break;
 							case "walk":
 								counterWalkPlans++;
 								break;
@@ -152,6 +157,7 @@ public class SelectedPlansAnalyzer {
 		otherPlansMap.put(iteration, counterOtherPlans);
 		carPlansMap.put(iteration, counterCarPlans);
 		ptPlansMap.put(iteration, counterPtPlans);
+		slowPtPlansMap.put(iteration, counterPtPlans);
 		walkPlansMap.put(iteration, counterWalkPlans);
 	}
 
@@ -177,12 +183,13 @@ public class SelectedPlansAnalyzer {
 			
 			// Header
 			bufferedWriter.write("It." + "\t" + "stayHomePlans" + "\t" + "otherPlans" + "\t" 
-					+ "carPlans" + "\t" + "ptPlans" + "\t" + "walkPlans");
+					+ "carPlans" + "\t" + "ptPlans" + "\t" + "slowPtPlans" + "\t" + "walkPlans");
 			bufferedWriter.newLine();
 			
 			for (int iteration : stayHomePlansMap.keySet()) {
     			bufferedWriter.write(iteration + "\t" + stayHomePlansMap.get(iteration) + "\t" + otherPlansMap.get(iteration) + "\t" 
-    					+ carPlansMap.get(iteration) + "\t" + ptPlansMap.get(iteration) + "\t" + walkPlansMap.get(iteration));
+    					+ carPlansMap.get(iteration) + "\t" + ptPlansMap.get(iteration) + "\t" + slowPtPlansMap.get(iteration) + "\t"
+    					+ walkPlansMap.get(iteration));
     			bufferedWriter.newLine();
     		}    		
 	    } catch (IOException ex) {

@@ -28,7 +28,7 @@ import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityOption;
@@ -70,9 +70,9 @@ public class KtiActivtyWithoutPenaltiesScoring implements ActivityScoring, Scori
 				Double.POSITIVE_INFINITY) );
 	
 	private Plan plan;
-	private CharyparNagelScoringParameters params;
+	private ScoringParameters params;
 	
-	public KtiActivtyWithoutPenaltiesScoring(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
+	public KtiActivtyWithoutPenaltiesScoring(Plan plan, ScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
 		this.params = params;
 		this.facilityPenalties = facilityPenalties;
 		this.facilities = facilities;

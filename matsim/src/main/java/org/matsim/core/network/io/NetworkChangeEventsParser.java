@@ -21,7 +21,7 @@
 /**
  * 
  */
-package org.matsim.core.network;
+package org.matsim.core.network.io;
 
 import java.util.List;
 import java.util.Stack;
@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlParser;

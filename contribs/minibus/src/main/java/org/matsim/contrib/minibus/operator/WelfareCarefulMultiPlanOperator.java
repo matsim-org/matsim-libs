@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
  * @author ikaddoura, dhosse
  *
  */
-public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
+public final class WelfareCarefulMultiPlanOperator implements Operator {
 
 	public static final String OPERATOR_NAME = "WelfareCarefulMultiPlanOperator";
 
@@ -48,7 +48,6 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 	private WelfareAnalyzer welfareAnalyzer;
 	
 	WelfareCarefulMultiPlanOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise, WelfareAnalyzer welfareAnalyzer) {
-		super(id, pConfig, franchise);
 		delegate = new CarefulMultiPlanOperator(id, pConfig, franchise);
 		this.welfareAnalyzer = welfareAnalyzer;
 	}
@@ -76,19 +75,23 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 	@Override
 	public void score(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap) {
 				
-		delegate.scoreLastIteration = delegate.score;
-		delegate.score = 0;
+		delegate.setScoreLastIteration(delegate.getScore());
+		delegate.setScore(0);
 		
 		// score all plans
 		for (PPlan plan : delegate.getAllPlans()) {
-			scorePlan(driverId2ScoreMap, plan);
+			AbstractOperator.scorePlan(driverId2ScoreMap, plan);
 			double welfareCorrection = getWelfareCorrection(plan);
-			plan.setScore(plan.getScore() + welfareCorrection);
+			System.out.println("welfareCorrection: " + welfareCorrection);
+			System.out.println("score: " + plan.getScore());
+			double newPlanScore = welfareCorrection + plan.getScore();
+			System.out.println("newPlanScore: " + newPlanScore);
+			plan.setScore(newPlanScore);
 			
-			delegate.score += plan.getScore();
+			delegate.setScore(delegate.getScore() + plan.getScore());
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
 				StringBuffer sB = new StringBuffer();
-				sB.append(plan.toString(delegate.budget + delegate.score));
+				sB.append(plan.toString(delegate.getBudget() + delegate.getScore()));
 				sB.append(", welfare_correction: " + welfareCorrection);
 				sB.append(", expenses: " + Double.toString(welfareCorrection - plan.getScore()));
 				route.setDescription(sB.toString());
@@ -101,7 +104,7 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 
 	private double getWelfareCorrection(PPlan plan) {
 		Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);
-		return welfareAnalyzer.getLineId2welfareCorrection(pplanId);
+		return welfareAnalyzer.getWelfareCorrection(pplanId);
 	}
 
 	@Override
@@ -147,11 +150,6 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 	@Override
 	public PRouteProvider getRouteProvider() {
 		return delegate.getRouteProvider();
-	}
-
-	@Override
-	public double getCostPerVehicleSell() {
-		return delegate.getCostPerVehicleSell();
 	}
 
 	@Override

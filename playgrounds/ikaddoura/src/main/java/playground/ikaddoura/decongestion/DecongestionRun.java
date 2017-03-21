@@ -37,15 +37,9 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisRun;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.DecongestionApproach;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup.IntegralApproach;
-import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.DelayAnalysis;
-import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
-import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
-import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
 import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 
 /**
  * Starts an interval-based decongestion pricing simulation run.
@@ -84,21 +78,22 @@ public class DecongestionRun {
 	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setMsa(true);
-		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(1.);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
+		decongestionSettings.setMsa(false);
+		decongestionSettings.setTOLL_BLEND_FACTOR(0.1);
+		decongestionSettings.setDecongestionApproach(DecongestionApproach.BangBang);
+		
 		decongestionSettings.setKd(0.);
-		decongestionSettings.setKi(0.0);
+		decongestionSettings.setKi(0.05);
 		decongestionSettings.setKp(0.05);
 		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
-		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
+		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(1.0);
 		
 		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
 		decongestionSettings.setINITIAL_TOLL(1.0);
-		
-		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(20.);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.8);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
-		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.addModule(decongestionSettings);
@@ -120,29 +115,29 @@ public class DecongestionRun {
 				"_timeWeight" + weight +
 				"_timeRange" + config.timeAllocationMutator().getMutationRange();
 		
-		// General pricing settings
 		outputDirectory = outputDirectory
 					+ "_priceUpdate" + decongestionSettings.getUPDATE_PRICE_INTERVAL() + "_it"
 					+ "_toleratedDelay" + decongestionSettings.getTOLERATED_AVERAGE_DELAY_SEC()
 					+ "_start" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT()
-					+ "_end" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT();
+					+ "_end" + decongestionSettings.getFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT()
+					+ "_tollMSA" + decongestionSettings.isMsa()
+					+ "_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR();
 		
-		// BangBang
-//		outputDirectory = outputDirectory + 
-//						"_init" + decongestionSettings.getINITIAL_TOLL() +
-//						"_adj" + decongestionSettings.getTOLL_ADJUSTMENT();
-			
-//		// PID
-		outputDirectory = outputDirectory +
-						"_Kp" + decongestionSettings.getKp() +
-						"_Ki" + decongestionSettings.getKi() +
-						"_Kd" + decongestionSettings.getKd() +
-						"_tollMSA" + decongestionSettings.isMsa() + 
-						"_blendFactor" + decongestionSettings.getTOLL_BLEND_FACTOR() + 
-						"_integral" + decongestionSettings.getIntegralApproach() + 
-						"_alpha" + decongestionSettings.getIntegralApproachAverageAlpha() + 
-						"_factor" + decongestionSettings.getIntegralApproachUnusedHeadwayFactor();
-					
+		if (decongestionSettings.getDecongestionApproach().toString().equals(DecongestionApproach.BangBang.toString())) {
+			outputDirectory = outputDirectory + 
+					"_init" + decongestionSettings.getINITIAL_TOLL() +
+					"_adj" + decongestionSettings.getTOLL_ADJUSTMENT();
+		
+		} else if (decongestionSettings.getDecongestionApproach().toString().equals(DecongestionApproach.PID.toString())) {
+			outputDirectory = outputDirectory +
+					"_Kp" + decongestionSettings.getKp() +
+					"_Ki" + decongestionSettings.getKi() +
+					"_Kd" + decongestionSettings.getKd() +
+					"_integral" + decongestionSettings.getIntegralApproach() + 
+					"_alpha" + decongestionSettings.getIntegralApproachAverageAlpha() + 
+					"_factor" + decongestionSettings.getIntegralApproachUnusedHeadwayFactor();
+		}
+							
 		log.info("Output directory: " + outputDirectory);
 		
 		config.controler().setOutputDirectory(outputDirectory + "/");
@@ -156,29 +151,7 @@ public class DecongestionRun {
 		
 		// congestion toll computation
 		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				
-				this.bind(DecongestionInfo.class).asEagerSingleton();
-				this.bind(DecongestionTollingPID.class).asEagerSingleton();
-				
-				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
-				
-				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
-				this.bind(DelayAnalysis.class).asEagerSingleton();
-				this.bind(PersonVehicleTracker.class).asEagerSingleton();
-								
-				this.addEventHandlerBinding().to(DecongestionTollingPID.class);
-				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
-				this.addEventHandlerBinding().to(DelayAnalysis.class);
-				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
-				
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
-			}
-		});
+		controler.addOverridingModule(new DecongestionModule(scenario));
 		
 		// toll-adjusted routing
 		

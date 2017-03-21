@@ -17,7 +17,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class ModifyActivityChain extends AbstractMultithreadedModule{
@@ -31,12 +31,12 @@ public class ModifyActivityChain extends AbstractMultithreadedModule{
 	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private HashMap scoreChange;
-	private CharyparNagelScoringParametersForPerson parametersForPerson;
+	private ScoringParametersForPerson parametersForPerson;
 	public ModifyActivityChain(final Scenario scenario, Provider<TripRouter> tripRouterProvider,
 			 QuadTree shopFacilityQuadTree, QuadTree leisureFacilityQuadTree,
 			 LeastCostPathCalculatorFactory pathCalculatorFactory, Map<String, TravelTime> travelTimes,
 			 Map<String, TravelDisutilityFactory> travelDisutilityFactories, ScoringFunctionFactory scoringFunctionFactory,
-			 HashMap scoreChange, CharyparNagelScoringParametersForPerson parametersForPerson) {
+			 HashMap scoreChange, ScoringParametersForPerson parametersForPerson) {
 		
 		super(scenario.getConfig().global().getNumberOfThreads());
 		this.scenario = scenario;

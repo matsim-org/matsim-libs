@@ -9,8 +9,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitActsRemover;
@@ -55,11 +55,11 @@ public class BestTimeResponseStrategyFunctionality {
 	// -------------------- CONSTRUCTION --------------------
 
 	public BestTimeResponseStrategyFunctionality(final Plan plan, final Network network,
-			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
+			final ScoringParametersForPerson scoringParams, final TimeDiscretization timeDiscretization,
 			final TripTravelTimes<Facility, String> myTravelTimes) {
 		// final BestTimeResponseTravelTimes myTravelTimes) {
 
-		final CharyparNagelScoringParameters personScoringParams = scoringParams.getScoringParameters(plan.getPerson());
+		final ScoringParameters personScoringParams = scoringParams.getScoringParameters(plan.getPerson());
 
 		/*
 		 * Building the initial plan data.

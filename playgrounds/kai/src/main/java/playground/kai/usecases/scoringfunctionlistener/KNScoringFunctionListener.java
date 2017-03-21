@@ -38,9 +38,9 @@ import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import com.google.inject.Inject;
 
@@ -77,7 +77,7 @@ public class KNScoringFunctionListener {
 		});
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			private CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters(scenario);
+			private ScoringParametersForPerson parameters = new SubpopulationScoringParameters(scenario);
 			private Network network;
 
 			@Inject
@@ -85,7 +85,7 @@ public class KNScoringFunctionListener {
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final ScoringParameters params = parameters.getScoringParameters( person );
 
 				MySumScoringFunction sumScoringFunction = new MySumScoringFunction(person, listener);
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));

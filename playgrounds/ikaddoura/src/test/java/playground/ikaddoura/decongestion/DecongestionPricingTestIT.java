@@ -36,6 +36,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.DecongestionApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
@@ -178,27 +179,7 @@ public class DecongestionPricingTestIT {
 		Controler controler = new Controler(scenario);
 			
 		// congestion toll computation
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				
-				this.bind(DecongestionInfo.class).asEagerSingleton();
-				
-				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
-				
-				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
-				this.bind(DelayAnalysis.class).asEagerSingleton();
-				this.bind(PersonVehicleTracker.class).asEagerSingleton();
-								
-				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
-				this.addEventHandlerBinding().to(DelayAnalysis.class);
-				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
-				
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
-			}
-		});
+		controler.addOverridingModule(new DecongestionModule(scenario));
 		
 		// toll-adjusted routing
 		
@@ -348,27 +329,7 @@ public class DecongestionPricingTestIT {
 		Controler controler = new Controler(scenario);
 		
 		// congestion toll computation
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				
-				this.bind(DecongestionInfo.class).asEagerSingleton();
-				
-				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
-				
-				this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
-				this.bind(DelayAnalysis.class).asEagerSingleton();
-				this.bind(PersonVehicleTracker.class).asEagerSingleton();
-								
-				this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
-				this.addEventHandlerBinding().to(DelayAnalysis.class);
-				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
-				
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
-			}
-		});
+		controler.addOverridingModule(new DecongestionModule(scenario));
 		
 		// toll-adjusted routing
 		
@@ -499,6 +460,7 @@ public class DecongestionPricingTestIT {
 		decongestionSettings.setWRITE_OUTPUT_ITERATION(1);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
+		decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
 		config.addModule(decongestionSettings);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);

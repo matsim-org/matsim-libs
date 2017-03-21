@@ -207,7 +207,7 @@ public class JointCalibrationControler {
 
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( controler.getScenario() );
 			@Inject
              Network network;
 			@Inject
@@ -220,7 +220,7 @@ public class JointCalibrationControler {
              ModalCadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final ScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
@@ -246,9 +246,9 @@ public class JointCalibrationControler {
 
 				ScoringParameterSet scoringParameterSet = planCalcScoreConfigGroup.getScoringParameters( null ); // parameters set is same for all subPopulations 
 
-				CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(
+				ScoringParameters.Builder builder = new ScoringParameters.Builder(
 						planCalcScoreConfigGroup, scoringParameterSet, scenarioConfig);
-				final CharyparNagelScoringParameters modifiedParams = builder.build();
+				final ScoringParameters modifiedParams = builder.build();
 
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(modifiedParams, network));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(modifiedParams));

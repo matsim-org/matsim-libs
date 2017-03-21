@@ -42,8 +42,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -158,7 +158,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			//
 			@Inject private CadytsPtContext cadytsContext;
-			@Inject CharyparNagelScoringParametersForPerson parameters;
+			@Inject ScoringParametersForPerson parameters;
 			//
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
@@ -167,7 +167,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 				//}
 				
 				//
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+				final ScoringParameters params = parameters.getScoringParameters(person);
 				//
 
 //				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();

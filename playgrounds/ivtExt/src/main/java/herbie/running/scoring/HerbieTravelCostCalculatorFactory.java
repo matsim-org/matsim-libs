@@ -26,15 +26,15 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 public class HerbieTravelCostCalculatorFactory implements TravelDisutilityFactory {
 	
-	private CharyparNagelScoringParameters params = null;
+	private ScoringParameters params = null;
 	private HerbieConfigGroup herbieConfigGroup = null;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public HerbieTravelCostCalculatorFactory(CharyparNagelScoringParameters params, HerbieConfigGroup herbieConfigGroup,
+	public HerbieTravelCostCalculatorFactory(ScoringParameters params, HerbieConfigGroup herbieConfigGroup,
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		super();
 		this.params  = params;

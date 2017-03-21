@@ -63,7 +63,7 @@ public class WelfareStatsContainer {
 					
 					score += pplan.getScore();
 					Id<PPlan> pplanId = Id.create(pplan.getLine().getId().toString() + "-" + pplan.getId().toString(), PPlan.class);
-					welfareCorrection += this.welfareAnalyzer.getLineId2welfareCorrection(pplanId);
+					welfareCorrection += this.welfareAnalyzer.getWelfareCorrection(pplanId);
 					
 				}
 				

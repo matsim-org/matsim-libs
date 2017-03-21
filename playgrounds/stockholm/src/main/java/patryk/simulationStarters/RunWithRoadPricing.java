@@ -19,8 +19,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
@@ -150,12 +150,12 @@ public final class RunWithRoadPricing {
 		// include cadyts into the plan scoring (this will add the cadyts
 		// corrections to the scores):
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			@Inject private CharyparNagelScoringParametersForPerson parameters;
+			@Inject private ScoringParametersForPerson parameters;
 			@Inject private CadytsContext cadytsContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+				final ScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction

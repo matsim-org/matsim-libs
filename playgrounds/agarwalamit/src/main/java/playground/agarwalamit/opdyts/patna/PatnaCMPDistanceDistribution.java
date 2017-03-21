@@ -81,8 +81,6 @@ public final class PatnaCMPDistanceDistribution implements DistanceDistribution 
             mode2legs.put("walk", getModeDistanceLegs(walkLegs, walkVals));
         }
 
-        System.out.println("Total legs "+totalLegs+" ans sum of all legs "+legsSumAllModes);
-
         // check if difference is not greaater than 1%, due to rounding.
         if( legsSumAllModes >= 0.99*totalLegs && legsSumAllModes <= 1.01 * totalLegs) {
             // everything is fine

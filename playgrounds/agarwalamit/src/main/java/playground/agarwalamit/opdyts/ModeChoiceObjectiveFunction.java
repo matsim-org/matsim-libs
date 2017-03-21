@@ -52,12 +52,9 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private final MainModeIdentifier mainModeIdentifier ;
     private final DistanceDistribution distriInfo ;
 
-    @Inject
-    private ExperiencedPlansService service ;
-    @Inject
-    private TripRouter tripRouter ;
-    @Inject
-    private Network network ;
+    @Inject private ExperiencedPlansService service ;
+    @Inject private TripRouter tripRouter ;
+    @Inject private Network network ;
     // Documentation: "Guice injects ... fields of all values that are bound using toInstance(). These are injected at injector-creation time."
     // https://github.com/google/guice/wiki/InjectionPoints
     // I read that as "the fields are injected (every time again) when the instance is injected".
@@ -84,7 +81,6 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
                     }
                     {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
-
                         fillDatabins(databins);
                         this.refStatsContainer.put( statType, databins) ;
                     }

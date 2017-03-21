@@ -28,7 +28,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  */
 
 public class DecongestionConfigGroup extends ReflectiveConfigGroup {
-	private static final String GROUP_NAME ="decongestion" ;
+	public static final String GROUP_NAME = "decongestion" ;
 	
 	public DecongestionConfigGroup() {
 		super(GROUP_NAME);
@@ -39,8 +39,6 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	private double TOLL_ADJUSTMENT = 1.0; // default: 0.1
 
 	// PID approach
-	private double TOLL_BLEND_FACTOR = 1.0; // default: 1.0
-	private boolean msa = false;
 	private double Kp = 1.0;
 	private double Kd = 1.0;
 	private double Ki = 1.0;
@@ -49,6 +47,7 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	private double integralApproachUnusedHeadwayFactor = 10.;
 	
 	// General parameters
+	private DecongestionApproach decongestionApproach = DecongestionApproach.PID;
 	private boolean RUN_FINAL_ANALYSIS = true;
 	private int UPDATE_PRICE_INTERVAL = 1;
 	private int WRITE_OUTPUT_ITERATION = 1;
@@ -56,11 +55,17 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	private double TOLERATED_AVERAGE_DELAY_SEC = 1.0; // set to 1.0 to account for rounding errors
 	private double FRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT = 0.1; // set above 0.0 to disable pricing in the previous iterations
 	private double FRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT = 1.0; // set below 1.0 to disable price adjustment for final iterations
+	private double TOLL_BLEND_FACTOR = 1.0; // default: 1.0
+	private boolean msa = false;
 	
 	// ######################################################################################
 	
 	public enum IntegralApproach {
 		Average, UnusedHeadway, Zero
+	}
+	
+	public enum DecongestionApproach {
+		BangBang, PID
 	}
 	
 	@StringGetter( "Kp" )
@@ -243,6 +248,16 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "integralApproachUnusedHeadwayFactor" )
 	public void setIntegralApproachUnusedHeadwayFactor(double integralApproachUnusedHeadwayFactor) {
 		this.integralApproachUnusedHeadwayFactor = integralApproachUnusedHeadwayFactor;
+	}
+
+	@StringGetter( "decongestionApproach" )
+	public DecongestionApproach getDecongestionApproach() {
+		return decongestionApproach;
+	}
+
+	@StringSetter( "decongestionApproach" )
+	public void setDecongestionApproach(DecongestionApproach decongestionApproach) {
+		this.decongestionApproach = decongestionApproach;
 	}
 			
 }

@@ -30,7 +30,7 @@ import org.matsim.core.utils.misc.Time;
  * This class follows the rules assumed in {@link TravelTimeCalculator}: The constructor arguments
  * timeSlice and maxTime have the same meaning as there, and the last time bin is open ended.
  */
- class FixedIntervalTimeVariantAttribute
+ final class FixedIntervalTimeVariantAttribute
     implements TimeVariantAttribute
 {
     private final int timeSlice;

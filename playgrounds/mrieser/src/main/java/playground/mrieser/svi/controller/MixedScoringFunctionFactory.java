@@ -22,16 +22,16 @@ package playground.mrieser.svi.controller;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import playground.mrieser.svi.data.ActivityToZoneMapping;
 import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
 
 public class MixedScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 
-	public MixedScoringFunctionFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final ActivityToZoneMapping act2zones, final CharyparNagelScoringParameters params) {
+	public MixedScoringFunctionFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final ActivityToZoneMapping act2zones, final ScoringParameters params) {
 		this.params = params;
 	}
 

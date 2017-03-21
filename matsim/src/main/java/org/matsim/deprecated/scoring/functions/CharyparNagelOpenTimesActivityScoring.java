@@ -21,7 +21,7 @@
 package org.matsim.deprecated.scoring.functions;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -41,7 +41,7 @@ public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivity
 
 	private final ActivityFacilities facilities;
 
-	public CharyparNagelOpenTimesActivityScoring(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+	public CharyparNagelOpenTimesActivityScoring(final ScoringParameters params, final ActivityFacilities facilities) {
 		super(params);
 		this.facilities = facilities;
 	}

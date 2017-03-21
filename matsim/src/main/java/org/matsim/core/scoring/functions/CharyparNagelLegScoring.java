@@ -45,14 +45,14 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 	protected double score;
 
 	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
+	protected final ScoringParameters params;
 	protected Network network;
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
 	
-	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network) {
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
 		this.params = params;
 		this.network = network;
 		this.nextEnterVehicleIsFirstOfTrip = true ;

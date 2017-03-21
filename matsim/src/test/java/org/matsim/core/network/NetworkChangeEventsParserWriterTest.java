@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.io.NetworkChangeEventsParser;
+import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 

@@ -29,8 +29,8 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingChoice.ParkingChoiceLib;
@@ -69,11 +69,11 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			@Override
 			public void install() {
 				final Provider<Network> networkProvider = binder().getProvider(Network.class);
-				final Provider<CharyparNagelScoringParametersForPerson> paramsProvider = binder().getProvider(CharyparNagelScoringParametersForPerson.class);
+				final Provider<ScoringParametersForPerson> paramsProvider = binder().getProvider(ScoringParametersForPerson.class);
 				ScoringFunctionFactory scoringFunctionFactory = new ScoringFunctionFactory() {
 					@Override
 					public ScoringFunction createNewScoringFunction(Person person) {
-						CharyparNagelScoringParameters params = paramsProvider.get().getScoringParameters(person);
+						ScoringParameters params = paramsProvider.get().getScoringParameters(person);
 						SumScoringFunction sumScoringFunction = new SumScoringFunction();
 						sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 						sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, networkProvider.get()));
@@ -95,7 +95,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		private CharyparNagelMoneyScoring moneyScoring;
 		private Id<Person> personId;
 
-		ParkingScoring(Config config, CharyparNagelScoringParameters params, Id<Person> personId) {
+		ParkingScoring(Config config, ScoringParameters params, Id<Person> personId) {
 			this.config = config;
 			this.activityScoring = new CharyparNagelActivityScoring(params);
 			this.moneyScoring = new CharyparNagelMoneyScoring(params);

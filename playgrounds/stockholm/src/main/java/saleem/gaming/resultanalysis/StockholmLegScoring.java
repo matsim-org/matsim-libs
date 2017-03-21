@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -31,7 +31,7 @@ public class StockholmLegScoring implements org.matsim.core.scoring.SumScoringFu
 	protected double score;
 
 	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
+	protected final ScoringParameters params;
 	protected Network network;
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
@@ -39,7 +39,7 @@ public class StockholmLegScoring implements org.matsim.core.scoring.SumScoringFu
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
 	private Person person;
 	
-	public StockholmLegScoring(Person person, final CharyparNagelScoringParameters params, Network network) {
+	public StockholmLegScoring(Person person, final ScoringParameters params, Network network) {
 		this.params = params;
 		this.network = network;
 		this.nextEnterVehicleIsFirstOfTrip = true ;

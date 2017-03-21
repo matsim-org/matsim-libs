@@ -4,6 +4,7 @@
 package playground.tschlenther.parkingSearch.Benenson;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.parking.parkingsearch.RunParkingSearchExample;
 import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
@@ -22,7 +23,7 @@ import playground.tschlenther.parkingSearch.install.TSSetupParking;
  */
 public class RunBenensonParking {
 
-	private static final String inputDir = "C:/Users/Work/Bachelor Arbeit/input/";
+	private static final String inputDir = "C:/Users/Work/Bachelor Arbeit/input/GridNet/";
 	
 	public static void main(String[] args) {
 		// set to false, if you don't require visualisation, the the example will run for 10 iterations
@@ -36,11 +37,11 @@ public class RunBenensonParking {
 	 *            turns otfvis visualisation on or off
 	 */
 	public void run(boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(inputDir + "config.xml");
-		config.plans().setInputFile(inputDir + "population10_verteilteActivities_workNames_1bis4.xml");
+		Config config = ConfigUtils.loadConfig(inputDir + "config.xml", new DvrpConfigGroup());
+		config.plans().setInputFile(inputDir + "population10_neuesVideo.xml");
 		config.facilities().setInputFile(inputDir + "parkingFacilities_full_workNames.xml");
-		config.controler().setOutputDirectory("C:/Users/Work/Bachelor Arbeit/RUNS/BenensonParking/ZwischenPräsi/KontrolleVonVideo1/");
-		config.network().setInputFile("C:/Users/Work/Bachelor Arbeit/input/grid_network_length200.xml");
+		config.controler().setOutputDirectory("C:/Users/Work/Bachelor Arbeit/RUNS/BenensonParking/Phasenuebergang_alleInMovedOverNode/");
+		config.network().setInputFile(inputDir + "grid_network_length200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		if (otfvis) {
 			config.controler().setLastIteration(0);

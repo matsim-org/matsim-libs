@@ -49,7 +49,7 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import playground.jbischoff.wobscenario.analysis.TaxiBusTravelTimesAnalyzer;
 
@@ -82,8 +82,8 @@ public class RunTaxibusPolicyCase {
 
 				// Score activities, legs, payments and being stuck
 				// with the default MATSim scoring based on utility parameters in the config file.
-				final CharyparNagelScoringParameters params =
-						new CharyparNagelScoringParameters.Builder(scenario, person.getId()).build();
+				final ScoringParameters params =
+						new ScoringParameters.Builder(scenario, person.getId()).build();
 				sum.addScoringFunction(new CharyparNagelActivityScoring(params));
 				sum.addScoringFunction(new MyLegScoring(params, scenario.getNetwork()));
 				sum.addScoringFunction(new CharyparNagelMoneyScoring(params));
@@ -111,7 +111,7 @@ public class RunTaxibusPolicyCase {
 		private final Set<Id<Link>> parkingLinks;
 		private Random rand = MatsimRandom.getRandom();
 		
-		public MyLegScoring(final CharyparNagelScoringParameters params, Network network) {
+		public MyLegScoring(final ScoringParameters params, Network network) {
 			super(params,network);
 			this.parkingLinks = new HashSet<>();
 			//Links where car legs receive an extra punishment for parking search, walking and other car-related annoyances

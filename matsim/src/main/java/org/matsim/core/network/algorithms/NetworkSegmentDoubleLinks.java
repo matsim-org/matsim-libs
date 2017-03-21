@@ -36,7 +36,7 @@ import java.util.*;
  *
  * @author laemmel
  */
-public class NetworkSegmentDoubleLinks implements NetworkRunnable {
+public final class NetworkSegmentDoubleLinks implements NetworkRunnable {
 	private static final Logger log = Logger.getLogger(NetworkSegmentDoubleLinks.class);
 
 	private Network network = null;

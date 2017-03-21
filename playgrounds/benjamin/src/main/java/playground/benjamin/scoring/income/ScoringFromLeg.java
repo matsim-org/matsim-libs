@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 
 import playground.benjamin.scoring.income.ScoringFromLeg;
@@ -54,7 +54,7 @@ public class ScoringFromLeg extends CharyparNagelLegScoring {
 
 	private Plan plan;
 
-	public ScoringFromLeg(final Plan plan, final CharyparNagelScoringParameters params, Network network, double householdIncomePerDay) {
+	public ScoringFromLeg(final Plan plan, final ScoringParameters params, Network network, double householdIncomePerDay) {
 		super(params, network);
 		this.plan = plan;
 		this.incomePerDay = householdIncomePerDay;

@@ -25,10 +25,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import static org.matsim.core.network.algorithms.NetworkCalcTopoType.*;
 
-public class NetworkCalcTopoType extends org.matsim.core.network.algorithms.NetworkCalcTopoType{
+public class NetworkCalcTopoTypeAN {
 
-	public int run(final Node node){
+	public static int run(final Node node){
 		if (NetworkUtils.getIncidentLinks(node).size() == 0) { return EMPTY.intValue(); }
 		else if (node.getInLinks().size() == 0) { return SOURCE.intValue(); }
 		else if (node.getOutLinks().size() == 0) { return SINK.intValue(); }
@@ -47,7 +48,7 @@ public class NetworkCalcTopoType extends org.matsim.core.network.algorithms.Netw
 		}
 	}
 	
-	private HashMap<Id, Node> getIncidentNodes(final Node node) {
+	private static HashMap<Id, Node> getIncidentNodes(final Node node) {
 		HashMap<Id, Node> nodes = new HashMap<Id, Node>();
 		for (Link link : node.getInLinks().values()) {
 			nodes.put(link.getFromNode().getId(), link.getFromNode());

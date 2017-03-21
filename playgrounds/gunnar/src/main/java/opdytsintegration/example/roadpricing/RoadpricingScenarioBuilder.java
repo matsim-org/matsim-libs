@@ -27,7 +27,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.RandomizedCharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.functions.RandomizedScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
@@ -271,7 +271,7 @@ class RoadpricingScenarioBuilder {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
 		controler
-				.setScoringFunctionFactory(new RandomizedCharyparNagelScoringFunctionFactory(
+				.setScoringFunctionFactory(new RandomizedScoringFunctionFactory(
 						scenario));
 
 		controler.setModules(new ControlerDefaultsWithRoadPricingModule());

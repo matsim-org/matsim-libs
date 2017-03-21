@@ -21,9 +21,9 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
@@ -46,7 +46,7 @@ public class RunSingapore {
 		final SingaporeConfigGroup singaporeConfigGroup = ConfigUtils.addOrGetModule(
 				scenario.getConfig(), SingaporeConfigGroup.GROUP_NAME, SingaporeConfigGroup.class);
 		
-		CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+		ScoringParametersForPerson parameters = new SubpopulationScoringParameters( controler.getScenario() );
 										
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
@@ -54,7 +54,7 @@ public class RunSingapore {
 			@Inject Network network;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final ScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));			

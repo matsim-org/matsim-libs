@@ -18,12 +18,14 @@
  * *********************************************************************** */
 package playground.wrashid.parkingChoice.priceoptimization;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -61,7 +63,7 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.HighStreetTariffZones
 public class SetupParkingForOptimizationScenario {
 
 
-	public static void prepare(OptimizationParkingModuleZH parkingModule, Controler controler){
+	public static void prepare(OptimizationParkingModuleZH parkingModule, Controler controler) throws IOException{
 		
 
 		Config config = controler.getConfig();
@@ -72,21 +74,13 @@ public class SetupParkingForOptimizationScenario {
 	
 		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule, parkings, controler);
 		
-//		EventsManager events = EventsUtils.createEventsManager();
-//		EventWriterXML eventsWriter = new EventWriterXML("c:\\tmp\\events.xml.gz");
-//		events.addHandler(eventsWriter);
-//		
-//		events.resetHandlers(0);
-//		eventsWriter.init("c:\\tmp\\events.xml.gz");
 		
+		//TODO: input permits from a file
 		
-		/*
-		 * We need a new ParkingInfrastructure Manager
-		 * 
-		 */
-		
-		
-		ParkingInfrastructureManager pim = new ParkingInfrastructureManager(parkingScoreManager,null);
+		String permitsFilePath = "C:\\permits.xml"; 		
+		Map<Id<Person>, Set<String>> permitsPerPerson = readPermits(permitsFilePath);
+		ParkingInfrastructureManager pim = new ParkingInfrastructureManager(parkingScoreManager, null,
+				permitsPerPerson);
 		
 		String cityZonesFilePath = config.getParam("parkingChoice.ZH", "cityZonesFile");
 		CityZones cityZones = new CityZones(cityZonesFilePath);
@@ -156,6 +150,27 @@ public class SetupParkingForOptimizationScenario {
 		parkingModule.setParkingInfrastructurManager(pim);
 		parkingModule.setParkingScoreManager(parkingScoreManager);
 		appendScoringFactory(parkingModule, controler);
+	}
+
+	private static Map<Id<Person>, Set<String>> readPermits(String permitsFilePath) throws IOException {
+
+		Map<Id<Person>, Set<String>> permits = new HashMap<>();
+		
+		final BufferedReader readerPermits = IOUtils.getBufferedReader(permitsFilePath);
+		
+		String s = readerPermits.readLine();
+		
+		while (s != null) {
+			Set<String> allPermits = new HashSet<String>();	
+			String[] arr = s.split(";");
+			for (String p : arr[1].split(","))
+				allPermits.add(p);			
+			
+			permits.put(Id.createPersonId(arr[0]), allPermits);
+			
+			
+		}
+		return permits;
 	}
 
 	private static LinkedList<PParking> getParking(Config config, String baseDir) {

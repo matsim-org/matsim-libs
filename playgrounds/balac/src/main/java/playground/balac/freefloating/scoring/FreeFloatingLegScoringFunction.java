@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 public class FreeFloatingLegScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring {
 
@@ -18,7 +18,7 @@ public class FreeFloatingLegScoringFunction extends org.matsim.deprecated.scorin
 	private Config config;
 	private ArrayList<Stats> freefloatingRentals = new ArrayList<Stats>();
 
-	public FreeFloatingLegScoringFunction(Plan plan, CharyparNagelScoringParameters params, Config config,  Network network)
+	public FreeFloatingLegScoringFunction(Plan plan, ScoringParameters params, Config config,  Network network)
 	{
 		super(params, network);
 		this.plan = plan;		

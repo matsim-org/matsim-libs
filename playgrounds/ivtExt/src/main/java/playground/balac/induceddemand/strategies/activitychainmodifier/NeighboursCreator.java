@@ -27,8 +27,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -50,7 +50,7 @@ public class NeighboursCreator {
 	private LeastCostPathCalculator pathCalculator;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private final static  Logger logger = Logger.getLogger(NeighboursCreator.class);
-	private CharyparNagelScoringParametersForPerson parametersForPerson;
+	private ScoringParametersForPerson parametersForPerson;
 	
 	private boolean allowSplittingWorkActivity = false;
 	private HashMap scoreChange;
@@ -61,7 +61,7 @@ public class NeighboursCreator {
 			QuadTree<ActivityFacility> shopFacilityQuadTree, QuadTree<ActivityFacility> leisureFacilityQuadTree,
 			Scenario scenario, LeastCostPathCalculator pathCalculator, 
 			ScoringFunctionFactory scoringFunctionFactory, HashMap scoreChange, 
-			CharyparNagelScoringParametersForPerson parametersForPerson){
+			ScoringParametersForPerson parametersForPerson){
 		this.shopFacilityQuadTree = shopFacilityQuadTree;
 		this.leisureFacilityQuadTree = leisureFacilityQuadTree;
 		this.scenario = scenario;
@@ -445,7 +445,7 @@ public class NeighboursCreator {
 	private Activity createNewActivity(String actType, Coord coord, Id<ActivityFacility> facilityId,
 			Id<Link> startLinkId, Person person, double arrivalTime) {
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
-		CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
+		ScoringParameters params = parametersForPerson.getScoringParameters( person );
 
 		Activity newActivity = pf.createActivityFromCoord(actType,
 				coord);	

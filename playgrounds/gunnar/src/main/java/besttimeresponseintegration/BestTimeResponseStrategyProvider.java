@@ -15,7 +15,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.facilities.ActivityFacilities;
 
 import matsimintegration.TimeDiscretizationInjection;
@@ -36,7 +36,7 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 
 	private final Scenario scenario;
 
-	private final CharyparNagelScoringParametersForPerson scoringParams;
+	private final ScoringParametersForPerson scoringParams;
 
 	private final Provider<TripRouter> tripRouterProvider;
 
@@ -54,7 +54,7 @@ public class BestTimeResponseStrategyProvider implements Provider<PlanStrategy> 
 
 	@Inject
 	BestTimeResponseStrategyProvider(final Scenario scenario,
-			final CharyparNagelScoringParametersForPerson scoringParams, final TimeDiscretizationInjection timeDiscrInj,
+			final ScoringParametersForPerson scoringParams, final TimeDiscretizationInjection timeDiscrInj,
 			final Provider<TripRouter> tripRouterProvider, final Map<String, TravelTime> mode2travelTime,
 			final GlobalConfigGroup globalConfigGroup, final ActivityFacilities facilities) {
 

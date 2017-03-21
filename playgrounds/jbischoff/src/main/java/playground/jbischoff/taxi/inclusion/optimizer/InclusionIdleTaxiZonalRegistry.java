@@ -53,6 +53,7 @@ public class InclusionIdleTaxiZonalRegistry
 
         isIdle = ScheduleInquiries.createIsIdle(scheduleInquiry);
         isIdleAndBarrierFree = createIsIdleAndBarrierFreePredicate(scheduleInquiry);
+        
         vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
         for (Id<Zone> id : zonalSystem.getZones().keySet()) {
             vehiclesInZones.put(id, new HashMap<Id<Vehicle>, Vehicle>());
@@ -90,23 +91,24 @@ public class InclusionIdleTaxiZonalRegistry
     }
 
 
-    public Iterable<Vehicle> findNearestVehicles(Node node, int minCount, boolean needsSpecialVehicle)
+    public Iterable<Vehicle> findNearestVehicles(Node node, boolean needsSpecialVehicle)
     {
-        if (minCount >= vehicles.size()) {
-            return getVehicles();
-        }
+        
 
         Zone zone = zonalSystem.getZone(node);
         Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
         List<Vehicle> nearestVehs = new ArrayList<>();
-
         for (Zone z : zonesByDistance) {
-            Iterables.addAll(nearestVehs,
-                    Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdle));
+        	if (needsSpecialVehicle){
+        		
+        		Iterables.addAll(nearestVehs,Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdleAndBarrierFree));
+        		
+        	}
+        	else{
+        		Iterables.addAll(nearestVehs,Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdle));
+        	}
 
-            if (nearestVehs.size() >= minCount) {
-                return nearestVehs;
-            }
+           
         }
 
         return nearestVehs;
@@ -135,7 +137,11 @@ public class InclusionIdleTaxiZonalRegistry
         return new Predicate<Vehicle>() {
             public boolean apply(Vehicle vehicle)
             {
-                return (scheduleInquiry.isIdle(vehicle)&&vehicle.getId().toString().startsWith(barrierFreeTaxiDesignator));
+            	if (vehicle.getId().toString().startsWith(barrierFreeTaxiDesignator)){
+            		
+            		return (scheduleInquiry.isIdle(vehicle));
+                   	} 
+            	else return false;
             }
         };
     }

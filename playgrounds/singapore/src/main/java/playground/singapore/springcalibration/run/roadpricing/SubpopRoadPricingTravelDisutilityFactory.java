@@ -25,18 +25,18 @@ package playground.singapore.springcalibration.run.roadpricing;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 public class SubpopRoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
 	private final RoadPricingScheme scheme;
-	private CharyparNagelScoringParametersForPerson parameters;
+	private ScoringParametersForPerson parameters;
 	private TravelDisutilityFactory previousTravelDisutilityFactory;
 	private double sigma ;
 
 
 	public SubpopRoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, 
-			RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters) {
+			RoadPricingScheme scheme, ScoringParametersForPerson parameters) {
 		this.scheme = scheme ;
 		this.parameters = parameters ;
 		this.previousTravelDisutilityFactory = previousTravelDisutilityFactory ;

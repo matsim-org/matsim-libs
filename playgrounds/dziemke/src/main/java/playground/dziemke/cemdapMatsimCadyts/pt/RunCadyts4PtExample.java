@@ -54,12 +54,12 @@ public class RunCadyts4PtExample {
 		controler.addOverridingModule(new CadytsPtModule());
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			@Inject CharyparNagelScoringParametersForPerson parameters;
+			@Inject ScoringParametersForPerson parameters;
 			@Inject Network network;
 			@Inject CadytsPtContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+				final ScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
