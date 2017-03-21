@@ -37,11 +37,25 @@ public class VirtualNetwork {
         return Collections.unmodifiableList(virtualLinks);
     }
 
+
+    /**
+     * @return number of virtual Nodes
+     */
+    public int getvNodesCount() {
+        return virtualNodes.size();
+    }
+
+    /**
+     * @return number of virtual Links
+     */
+    public int getvLinksCount() {
+        return virtualLinks.size();
+    }
+
     /**
      * Gets the virtual node belonging to a link of the network
      *
-     * @param link
-     *            of the network
+     * @param link of the network
      * @return virtual node belonging to link
      */
     public final VirtualNode getVirtualNode(Link link) {
@@ -49,14 +63,17 @@ public class VirtualNetwork {
     }
 
     /**
-     *
      * @param index
      * @return the virtualLink belonging to a certain index.
      */
-    public final VirtualLink getVirtualLink(int index){
-        return  this.getVirtualLinks().stream().filter(v->v.getIndex() == index).findAny().get();
+    public final VirtualLink getVirtualLink(int index) {
+        return this.getVirtualLinks().stream().filter(v -> v.getIndex() == index).findAny().get();
     }
 
+
+    public final VirtualNode getVirtualNode(int index){
+        return this.getVirtualNodes().stream().filter(v->v.getIndex() == index).findAny().get();
+    }
 
 
     /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn) {

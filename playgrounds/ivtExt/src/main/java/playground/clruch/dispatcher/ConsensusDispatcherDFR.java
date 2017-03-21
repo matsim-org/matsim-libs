@@ -10,7 +10,6 @@
 package playground.clruch.dispatcher;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,16 +18,22 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.red.Variance;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.ArrivalInformation;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
@@ -44,17 +49,21 @@ import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
+import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class ConsensusDispatcherDFR extends PartitionedDispatcher {
-    public static final String KEY_VIRTUALNETWORKFILE = "virtualNetworkFile";
-    public static final String KEY_LINKWEIGHTSFILE = "linkWeightsFile";
+    public static final String KEY_REBALANCINGPERIOD = "rebalancingPeriod";
+    public static final String KEY_VIRTUALNETWORKDIRECTORY = "virtualNetworkDirectory";
+    public static final String KEY_DTEXTENSION = "dtExtension";
+    public static final String KEY_WEIGHTSEXTENSION = "weightsExtension";
 
     private final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
+    final ArrivalInformation arrivalInformation;
     private final Map<VirtualLink, Double> rebalanceFloating;
     private final Map<VirtualLink, Double> vLinkWeights;
     private int rebCount = 0;
@@ -69,7 +78,8 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRequestSelector abstractRequestSelector, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            Map<VirtualLink, Double> linkWeightsIn) {
+            Map<VirtualLink, Double> linkWeightsIn, //
+            ArrivalInformation arrivalInformation) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
 
         this.virtualNodeDest = abstractVirtualNodeDest;
@@ -79,7 +89,8 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
         for (VirtualLink virtualLink : virtualNetwork.getVirtualLinks())
             rebalanceFloating.put(virtualLink, 0.0);
         vLinkWeights = linkWeightsIn;
-        rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        this.arrivalInformation = arrivalInformation;
+        rebalancingPeriod = Integer.parseInt(config.getParams().get(KEY_REBALANCINGPERIOD));
     }
 
     @Override
@@ -97,7 +108,13 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
                 // TODO: ensure that a rebalanced vehicle is then under the control of the to-virtualNode and can be dispatched there.
-                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+
+                Tensor vector = Array.zeros(availableVehicles.size());
+
+                availableVehicles.entrySet().stream().forEach(e -> vector.set(RealScalar.of(e.getValue().size()), e.getKey().index));
+                System.out.println(vector.toString());
+                System.out.println("variance="+Variance.ofVector(vector));
 
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
@@ -121,13 +138,19 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                         int imbalanceTo = -vi_excess.get(vLink.getTo());
 
                         // compute the rebalancing vehicles
-                        // TODO replace lambda_dummy with data from XML file
-                        double lambda_dummy_to = 1.0;
-                        double lambda_dummy_from = 1.0;
+                        // TODO confirm that correct
+
+                        double lambdaTo = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
+                        double lambdaFrom = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
+                        
+                        lambdaTo = Math.max(lambdaTo, 1);
+                        lambdaFrom = Math.max(lambdaFrom, 1);
+                        // System.out.println();
+                        // lambda_dummy_to = lambda_dummy_from = 1;
                         double vehicles_From_to_To = //
                                 rebalancingPeriod * vLinkWeights.get(vLink) * ( //
-                                (double) imbalanceTo / lambda_dummy_to - //
-                                        (double) imbalanceFrom / lambda_dummy_from) + //
+                                (double) imbalanceTo / lambdaTo - //
+                                        (double) imbalanceFrom / lambdaFrom) + //
                                         rebalanceFloating.get(vLink);
 
                         int rebalanceFromTo = (int) Math.round(vehicles_From_to_To);
@@ -150,9 +173,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 // DEBUGGING ENd
 
                 // generate routing instructions for rebalancing vehicles
-                Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
-                for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-                    destinationLinks.put(virtualNode, new ArrayList<>());
+                Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
 
                 // fill rebalancing destinations
                 for (Map.Entry<VirtualLink, Integer> entry : feasibleRebalanceCount.entrySet()) {
@@ -180,15 +201,15 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             // II.ii if vehilces remain in vNode, send to customers
             {
                 // collect destinations per vNode
-                Map<VirtualNode, List<Link>> destinationLinks = new HashMap<>();
-                virtualNetwork.getVirtualNodes().stream().forEach(v -> destinationLinks.put(v, new ArrayList<>()));
+                Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
+
                 for (VirtualNode vNode : virtualNetwork.getVirtualNodes()) {
                     destinationLinks.get(vNode).addAll( // stores from links
                             requests.get(vNode).stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
                 }
 
                 // collect available vehicles per vNode
-                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableNotRebalancingVehicles();
+                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
 
                 // assign destinations to the available vehicles
                 {
@@ -260,6 +281,11 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
         );
     }
 
+    /**
+     * FIXME in {@link PopulationDensityGenerator}
+     *
+     */
+
     public static class Factory implements AVDispatcherFactory {
         @Inject
         @Named(AVModule.AV_MODE)
@@ -275,6 +301,9 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
         @Inject
         private Network network;
 
+        @Inject
+        private Population population;
+
         public static VirtualNetwork virtualNetwork;
         public static Map<VirtualLink, Double> linkWeights;
 
@@ -284,21 +313,53 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
+            // ---
+            GlobalAssert.that(config.getParams().containsKey(KEY_VIRTUALNETWORKDIRECTORY));
+            GlobalAssert.that(config.getParams().containsKey(KEY_DTEXTENSION));
+            // ---
+            final File virtualnetworkDir = new File(config.getParams().get(KEY_VIRTUALNETWORKDIRECTORY));
+            GlobalAssert.that(virtualnetworkDir.isDirectory());
+            // ---
+            {
+                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork_nghbr.xml");
+                GlobalAssert.that(virtualnetworkFile.isFile());
+                virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkFile);
+            }
+            // ---
+            {
+                final String string = "consensusWeights_" + config.getParams().get(KEY_WEIGHTSEXTENSION) + ".xml";
+                final File linkWeightsXML = new File(virtualnetworkDir, string);
+                GlobalAssert.that(linkWeightsXML.isFile());
+                linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
+            }
 
-            GlobalAssert.that(config.getParams().containsKey(KEY_VIRTUALNETWORKFILE));
-            GlobalAssert.that(config.getParams().containsKey(KEY_LINKWEIGHTSFILE));
-            File virtualnetworkXML = new File(config.getParams().get(KEY_VIRTUALNETWORKFILE));
-            GlobalAssert.that(virtualnetworkXML.exists());
-            File linkWeightsXML = new File(config.getParams().get(KEY_LINKWEIGHTSFILE));
-            GlobalAssert.that(linkWeightsXML.exists());
-            virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkXML);
-            linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
+            ArrivalInformation arrivalInformation = null;
+            {
+                final String ext = config.getParams().get(KEY_DTEXTENSION);
+                final File lambdaXML = new File(virtualnetworkDir, "poissonParameters_" + ext + ".xml");
+                GlobalAssert.that(lambdaXML.isFile());
+                final File pijFile = new File(virtualnetworkDir, "transitionProbabilities_" + ext + ".xml");
+                GlobalAssert.that(pijFile.isFile());
+
+                try {
+                    long populationSize = population.getPersons().size();
+                    int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+                    arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaXML, pijFile, //
+                            populationSize, //
+                            rebalancingPeriod //
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    GlobalAssert.that(false);
+                }
+            }
 
             return new ConsensusDispatcherDFR(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, //
                     abstractVirtualNodeDest, //
                     abstractRequestSelector, //
                     abstractVehicleDestMatcher, //
-                    linkWeights);
+                    linkWeights, //
+                    arrivalInformation);
         }
     }
 }

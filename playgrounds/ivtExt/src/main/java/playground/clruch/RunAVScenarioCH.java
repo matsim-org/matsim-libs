@@ -15,6 +15,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.prep.TheApocalypse;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -22,7 +23,7 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 /**
  * main entry point
  */
-public class RunAVScenario {
+public class RunAVScenarioCH {
     public static void main(String[] args) throws MalformedURLException {
         File configFile = new File(args[0]);
         final File dir = configFile.getParentFile();
@@ -33,13 +34,14 @@ public class RunAVScenario {
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
-        
-        TheApocalypse.decimatesThe(population).toNoMoreThan(5200).people();
-        
+
+        TheApocalypse.decimatesThe(population).toNoMoreThan(5000).people();
+
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
         controler.addOverridingModule(new AVModule());
+        controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
 
         controler.run();
 

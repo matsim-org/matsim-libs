@@ -34,4 +34,6 @@ public class VirtualNode {
     public String getId() {
         return id;
     }
+
+    public int getIndex() {return  index; }
 }
