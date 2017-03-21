@@ -231,7 +231,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 	private void installEmissionDisutilityCalculatorFactory() {
 		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(
-				emissionCostModule, config.planCalcScore());
+				emissionCostModule);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

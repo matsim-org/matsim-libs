@@ -70,7 +70,7 @@ public class RunEmissionInternalizationMunich {
 		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
-				emissionCostModule, config.planCalcScore());
+				emissionCostModule);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

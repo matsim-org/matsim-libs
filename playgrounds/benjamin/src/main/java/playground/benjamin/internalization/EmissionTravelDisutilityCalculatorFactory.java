@@ -39,14 +39,13 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
 	@Inject private EmissionModule emissionModule;
+	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
+
 	private final EmissionCostModule emissionCostModule;
 	private Set<Id<Link>> hotspotLinks;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public EmissionTravelDisutilityCalculatorFactory(EmissionCostModule emissionCostModule,
-													 PlanCalcScoreConfigGroup cnScoringGroup) {
+	public EmissionTravelDisutilityCalculatorFactory(EmissionCostModule emissionCostModule) {
 		this.emissionCostModule = emissionCostModule;
-		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override

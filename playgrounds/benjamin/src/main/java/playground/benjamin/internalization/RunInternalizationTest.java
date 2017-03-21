@@ -105,7 +105,7 @@ public class RunInternalizationTest {
 
 	private void installTravelCostCalculatorFactory() {
 		final EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(
-                emissionCostModule, config.planCalcScore());
+                emissionCostModule);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

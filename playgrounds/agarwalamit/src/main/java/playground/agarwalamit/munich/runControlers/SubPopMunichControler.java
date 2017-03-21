@@ -153,7 +153,7 @@ public class SubPopMunichControler {
 
 			// this affects the router by overwriting its generalized cost function (TravelDisutility):
 			final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
-                    emissionCostModule, config.planCalcScore());
+                    emissionCostModule);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
