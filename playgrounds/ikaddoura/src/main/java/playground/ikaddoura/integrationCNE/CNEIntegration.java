@@ -254,7 +254,6 @@ public class CNEIntegration {
 
 		// ########################## Air pollution ##########################
 
-		EmissionModule emissionModule = null;
 		EmissionResponsibilityCostModule emissionCostModule = null;
 
 		if (analyzeAirPollution) {
@@ -263,13 +262,11 @@ public class CNEIntegration {
 			final boolean considerCO2Costs = true;
 			final double emissionCostFactor = 1.0;
 
-			emissionModule = new EmissionModule(controler.getScenario());
 //			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor); // moved to emissionConfigGroup. Amit Mar'17
 
 			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools);
 
 			// final is required if binding. Amit Jan 17
-			final EmissionModule finalEmissionModule = emissionModule;
 			final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
 
 			if (airPollutionPricing) {
@@ -278,7 +275,7 @@ public class CNEIntegration {
 					public void install() {
 						bind(GridTools.class).toInstance(gridTools);
 						bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
-						bind(EmissionModule.class).toInstance(finalEmissionModule);
+						bind(EmissionModule.class).asEagerSingleton();
 						bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
 						addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 					}
