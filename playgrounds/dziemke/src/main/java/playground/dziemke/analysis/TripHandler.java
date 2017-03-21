@@ -23,6 +23,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 public class TripHandler implements ActivityEndEventHandler, ActivityStartEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
     public static final Logger log = Logger.getLogger(TripHandler.class);
+    private static boolean tripmodeWarn = true;
 
     private Map<Id<Trip>, Trip> trips = new HashMap<>();
 	
@@ -183,8 +184,11 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
         // add information concerning leg mode to the object "Trip"
         Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
         trips.get(tripId).setMode(legMode);
-        log.warn("Trip mode = Arrival leg mode; assumed that every leg has the same legMode");
-		
+        if (tripmodeWarn) {
+            log.warn("Trip mode = Arrival leg mode; assumed that every leg has the same legMode");
+            tripmodeWarn = false;
+        }
+
 	}
 // --------------------------------------------------------------------------------------------------
 	
