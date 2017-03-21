@@ -46,16 +46,17 @@ public class RunInclusionTaxiScenario
     }
     public static void runMany(String configFile)
     {
-    	for (int i = 6; i<=10; i=i+1){
+    	for (int i = 30+0; i<=500; i=i+50){
     	
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());
-        config.controler().setOutputDirectory("D:/runs-svn/barrierFreeTaxi/250v_run_"+i+"/");
-        config.controler().setRunId("pop_"+i);
-        config.plans().setInputFile("itaxi_"+i+".xml.gz");
+        config.controler().setOutputDirectory("D:/runs-svn/barrierFreeTaxi/v2/veh_"+i+"/");
+        config.controler().setRunId("veh_"+i);
+//        config.plans().setInputFile("itaxi_"+i+".xml.gz");
+        config.plans().setInputFile("itaxi_"+0+".xml.gz");
         DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
         TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
-        taxi.setTaxisFile("hc_vehicles250.xml.gz");
+        taxi.setTaxisFile("hc_vehicles"+i+".xml.gz");
         createControler(config, false).run();
     	}
     }

@@ -21,6 +21,7 @@ package playground.jbischoff.taxi.inclusion.optimizer;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -84,7 +85,7 @@ public class InclusionRuleBasedTaxiOptimizer
         while (reqIter.hasNext() && idleCount > 0) {
             TaxiRequest req = reqIter.next();
             boolean barrierFreeRequest = req.getPassenger().getId().toString().startsWith(params.INCLUSION_CUSTOMER_PREFIX)? true : false;
-            Iterable<Vehicle> selectedVehs = idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(),params.nearestVehiclesLimit,barrierFreeRequest);
+            Iterable<Vehicle> selectedVehs = idleTaxiRegistry.findNearestVehicles(req.getFromLink().getFromNode(),barrierFreeRequest);
 
             if (barrierFreeRequest){
 //            	Logger.getLogger(getClass()).info("barrier free request for : "+req.getPassenger().getId()+". Assigned Vehicles: "+selectedVehs.toString());
@@ -92,12 +93,14 @@ public class InclusionRuleBasedTaxiOptimizer
 
             BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
                     .findBestVehicleForRequest(req, selectedVehs);
-
+            
+            if (best!=null){
             getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 
             reqIter.remove();
             unplannedRequestRegistry.removeRequest(req);
             idleCount--;
+            }
         }
     }
 
