@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,13 +56,12 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 
 	private MoneyEventHandler moneyHandler;
 	private ExperiencedDelayHandler congestionCostHandler;
-	private final EmissionModule emissionModule;
+	@Inject private EmissionModule emissionModule;
 	private CausedEmissionCostHandler emissCostHandler;
 	private double vttsCar;
 	
-	public MyEmissionCongestionMoneyEventControlerListener(final EmissionCostModule emissionCostModule, final EmissionModule emissionModule) {
+	public MyEmissionCongestionMoneyEventControlerListener(final EmissionCostModule emissionCostModule) {
 		this.emissionCostModule = emissionCostModule;
-		this.emissionModule = emissionModule;
 	}
 
 	@Override

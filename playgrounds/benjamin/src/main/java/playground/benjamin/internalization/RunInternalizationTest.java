@@ -88,8 +88,6 @@ public class RunInternalizationTest {
 		this.controler = new Controler(this.scenario);
 		specifyControler();
 
-		emissionModule = new EmissionModule(scenario);
-
 		emissionCostModule = new EmissionCostModule(1.0, Boolean.parseBoolean("true"));
 		
 //		installScoringFunctionFactory();
@@ -97,7 +95,7 @@ public class RunInternalizationTest {
 		this.controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 			}
@@ -106,8 +104,8 @@ public class RunInternalizationTest {
 	}
 
 	private void installTravelCostCalculatorFactory() {
-		final EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
-				emissionCostModule, config.planCalcScore());
+		final EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(
+                emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

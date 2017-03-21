@@ -67,16 +67,14 @@ public class RunEmissionInternalizationMunich {
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 
-		EmissionModule emissionModule = new EmissionModule(scenario);
-
 		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
-		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
+		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
 				emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 

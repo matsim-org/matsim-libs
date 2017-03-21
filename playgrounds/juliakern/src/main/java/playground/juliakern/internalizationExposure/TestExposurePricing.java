@@ -253,8 +253,8 @@ public class TestExposurePricing {
 		
 		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0,	false, rgt);
-		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
-				emissionCostModule, config.planCalcScore());
+		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
+                emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

@@ -21,6 +21,7 @@
 
 package playground.benjamin.scenarios.munich.exposure;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -38,13 +39,11 @@ import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 	 */
 	public class EmissionResponsibilityTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
-		private final EmissionModule emissionModule;
+		@Inject private EmissionModule emissionModule;
 		private final EmissionResponsibilityCostModule emissionResponsibilityCostModule;
 		private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-		public EmissionResponsibilityTravelDisutilityCalculatorFactory(EmissionModule emissionModule, 
-				EmissionResponsibilityCostModule emissionResponsibilityCostModule, PlanCalcScoreConfigGroup cnScoringGroup) {
-			this.emissionModule = emissionModule;
+		public EmissionResponsibilityTravelDisutilityCalculatorFactory(EmissionResponsibilityCostModule emissionResponsibilityCostModule, PlanCalcScoreConfigGroup cnScoringGroup) {
 			this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;
 			this.cnScoringGroup = cnScoringGroup;
 		}

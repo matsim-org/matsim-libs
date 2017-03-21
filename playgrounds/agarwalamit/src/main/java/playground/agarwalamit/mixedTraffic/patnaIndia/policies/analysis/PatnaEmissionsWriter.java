@@ -147,7 +147,7 @@ public class PatnaEmissionsWriter {
         PatnaEmissionVehicleCreator emissionVehicleCreatorHandler = new PatnaEmissionVehicleCreator(scenario);
 
         String emissionEventOutputFile = outputDir + "/output_emissions_events.xml.gz";
-        EmissionModule emissionModule = new EmissionModule(scenario);
+        EmissionModule emissionModule = new EmissionModule(scenario, EventsUtils.createEventsManager());
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         eventsManager.addHandler(emissionModule.getWarmEmissionHandler());

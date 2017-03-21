@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -48,7 +49,7 @@ public class EmissionModule {
 	private WarmEmissionHandler warmEmissionHandler;
 	private ColdEmissionHandler coldEmissionHandler;
 
-	private EventsManager emissionEventsManager;
+	private final EventsManager eventsManager;
 	private final EmissionsConfigGroup ecg;
 
 	//===
@@ -70,10 +71,19 @@ public class EmissionModule {
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
-
-	public EmissionModule(Scenario scenario) {
+	@Inject
+	public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
 		this.scenario = scenario;
-		ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+
+		this.ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+
+		if ( ecg.isIgnoringEmissionsFromEventsFile() ) {
+			logger.warn("Emission events are excluded from events file. A new events manager is created.");
+			this.eventsManager = EventsUtils.createEventsManager();
+		} else {
+			this.eventsManager = eventsManager;
+		}
+
 		createLookupTables();
 		createEmissionHandler();
 	}
@@ -118,14 +128,13 @@ public class EmissionModule {
 	private void createEmissionHandler() {
 		logger.info("entering createEmissionHandler");
 		
-		emissionEventsManager = EventsUtils.createEventsManager();
 		Network network = scenario.getNetwork() ;
 
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
 		
-		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager, ecg.getEmissionEfficiencyFactor());
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, ecg.getEmissionEfficiencyFactor());
+		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
+		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -382,7 +391,7 @@ public class EmissionModule {
 	}
 
 	public EventsManager getEmissionEventsManager() {
-		return emissionEventsManager;
+		return eventsManager;
 	}
 
 	@Deprecated // use scenario.getVehicles() instead.

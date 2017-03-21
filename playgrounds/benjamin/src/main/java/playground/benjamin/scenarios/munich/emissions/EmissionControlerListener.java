@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.emissions;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -43,7 +44,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	MatsimServices controler;
 	String emissionEventOutputFile;
 	Integer lastIteration;
-	EmissionModule emissionModule;
+	@Inject private EmissionModule emissionModule;
 	EventWriterXML emissionEventWriter;
 
 	public EmissionControlerListener() {
@@ -57,7 +58,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
 		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
 
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());

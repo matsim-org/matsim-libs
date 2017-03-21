@@ -152,7 +152,6 @@ public class EquilMixedTrafficEmissionTest {
 		String outputDirectory = classOutputDir + helper.getMethodName() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
-		EmissionModule emissionModule = new EmissionModule(sc);
 		( (EmissionsConfigGroup) sc.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME) ).setEmissionEfficiencyFactor(1.0);
 
 		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
@@ -160,7 +159,7 @@ public class EquilMixedTrafficEmissionTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 

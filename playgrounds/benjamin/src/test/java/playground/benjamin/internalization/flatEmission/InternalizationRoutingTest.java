@@ -68,7 +68,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private Config config;
 	private Scenario scenario;
 	private Controler controler;
-	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 
 	public void testDistanceRouting() {
@@ -189,7 +188,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.controler = new Controler(this.scenario);
 		specifyControler();
 
-		emissionModule = new EmissionModule(scenario);
 		emissionCostModule = new EmissionCostModule(100.0);
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
@@ -224,7 +222,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 			}
@@ -232,7 +230,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void installEmissionDisutilityCalculatorFactory() {
-		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
+		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(
 				emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
@@ -43,7 +43,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	private MatsimServices controler;
 	private String emissionEventOutputFile;
 	private Integer lastIteration;
-	private EmissionModule emissionModule;
+	@Inject private EmissionModule emissionModule;
 	private EventWriterXML emissionEventWriter;
 
 	public EmissionControlerListener() {
@@ -56,9 +56,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
-		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
-
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());

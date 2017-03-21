@@ -99,17 +99,15 @@ public class EquilEmissionTest {
 		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
-		EmissionModule emissionModule = new EmissionModule(sc);
-
 		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()),emissionModule, emissionCostModule, controler.getConfig().planCalcScore());
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()),null, emissionCostModule, controler.getConfig().planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				// emissions settings
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 

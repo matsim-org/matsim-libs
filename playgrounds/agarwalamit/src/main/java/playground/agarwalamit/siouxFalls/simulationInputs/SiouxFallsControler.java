@@ -30,7 +30,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
@@ -81,19 +80,18 @@ public class SiouxFallsControler {
 		controler.getConfig().vehicles().setVehiclesFile("../../siouxFalls/input/SiouxFalls_emissionVehicles.xml");
 		ecg.setUsingDetailedEmissionCalculation(false);
 		//===only emission events genertaion; used with all runs for comparisons
-		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
 		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
 
 		if(internalizeEmission)
 		{
 			//===internalization of emissions
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-			final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
+			final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
 					emissionCostModule, config.planCalcScore());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bind(EmissionModule.class).toInstance(emissionModule);
+					bind(EmissionModule.class).asEagerSingleton();
 					bind(EmissionCostModule.class).toInstance(emissionCostModule);
 					addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 					bindCarTravelDisutilityFactory().toInstance(emissionTducf);
@@ -121,14 +119,14 @@ public class SiouxFallsControler {
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 			final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
 					new EmissionCongestionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,
-					controler.getConfig().planCalcScore()), emissionCostModule, emissionModule, config.planCalcScore(), tollHandler);
+					controler.getConfig().planCalcScore()), emissionCostModule, config.planCalcScore(), tollHandler);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bindCarTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
 				}
 			});
-			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionModule, emissionCostModule, (MutableScenario) controler.getScenario(), tollHandler));
+			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionCostModule, (MutableScenario) controler.getScenario(), tollHandler));
 		}
 
 		controler.getConfig().controler().setOverwriteFileSetting(

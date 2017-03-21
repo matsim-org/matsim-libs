@@ -59,12 +59,12 @@ public class RunEmissionToolOfflineExample {
 
 		// following is only for backward compatibility in which vehicle description is null;
 		// for the new scenarios, setting vehicle description should be preferred.; Amit, sep 2016.
-		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
+		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
-		EmissionModule emissionModule = new EmissionModule(scenario);
-
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
+
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		

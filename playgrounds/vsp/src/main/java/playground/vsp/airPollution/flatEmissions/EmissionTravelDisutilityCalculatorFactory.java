@@ -20,6 +20,7 @@
 package playground.vsp.airPollution.flatEmissions;
 
 import java.util.Set;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -37,7 +38,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 
     private double sigma = 0. ;
     private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
-    private final EmissionModule emissionModule;
+    @Inject  private EmissionModule emissionModule;
     private final EmissionCostModule emissionCostModule;
     private final PlanCalcScoreConfigGroup cnScoringGroup;
     private Set<Id<Link>> hotspotLinks = null;
@@ -47,7 +48,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
                                                      EmissionCostModule emissionCostModule,
                                                      PlanCalcScoreConfigGroup cnScoringGroup) {
         this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-        this.emissionModule = emissionModule;
+//        this.emissionModule = emissionModule;
         this.emissionCostModule = emissionCostModule;
         this.cnScoringGroup = cnScoringGroup;
     }

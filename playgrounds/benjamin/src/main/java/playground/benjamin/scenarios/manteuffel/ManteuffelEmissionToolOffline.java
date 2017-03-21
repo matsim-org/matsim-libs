@@ -78,10 +78,10 @@ public class ManteuffelEmissionToolOffline{
 		ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-        
-		EmissionModule emissionModule = new EmissionModule(scenario);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
+
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		

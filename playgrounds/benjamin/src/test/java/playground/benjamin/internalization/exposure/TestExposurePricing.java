@@ -158,14 +158,13 @@ public class TestExposurePricing {
 		 ********************************************************************************************
 		 */
 
-		EmissionModule emissionModule = new EmissionModule(sc);
-
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt);
-		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule,sc.getConfig().planCalcScore());
+		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
+                emissionCostModule,sc.getConfig().planCalcScore());
 
 		controler.addOverridingModule(new AbstractModule() {
 
@@ -173,7 +172,7 @@ public class TestExposurePricing {
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
@@ -220,8 +219,6 @@ public class TestExposurePricing {
 		 ********************************************************************************************
 		 */
 
-		EmissionModule emissionModule = new EmissionModule(sc);
-
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
@@ -237,7 +234,7 @@ public class TestExposurePricing {
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);

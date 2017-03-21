@@ -85,8 +85,6 @@ public class RunExposureInternalizationMunich {
 		Scenario scenario = controler.getScenario();
 		scenario = ScenarioUtils.loadScenario(config); // TODO remove?
 
-		EmissionModule emissionModule = new EmissionModule(scenario);
-
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 //		links2xCells = gt.mapLinks2Xcells(noOfXCells);
 //		links2yCells = gt.mapLinks2Ycells(noOfYCells);
@@ -94,14 +92,14 @@ public class RunExposureInternalizationMunich {
 		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor),	
 				Boolean.parseBoolean(considerCO2Costs), rgt);
-		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
-				emissionCostModule, config.planCalcScore());
+		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
+                emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
-				bind(EmissionModule.class).toInstance(emissionModule);
+				bind(EmissionModule.class).asEagerSingleton();
 				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
 				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);

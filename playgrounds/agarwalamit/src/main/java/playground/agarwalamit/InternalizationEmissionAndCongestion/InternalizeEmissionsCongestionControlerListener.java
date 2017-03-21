@@ -20,6 +20,7 @@ package playground.agarwalamit.InternalizationEmissionAndCongestion;
 
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,7 +51,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	private final Logger logger = Logger.getLogger(InternalizeEmissionsCongestionControlerListener.class);
 
 	private MatsimServices controler;
-	private final EmissionModule emissionModule;
+	@Inject private EmissionModule emissionModule;
 	private final EmissionCostModule emissionCostModule;
 	private String emissionEventOutputFile;
 	private EventWriterXML emissionEventWriter;
@@ -65,9 +66,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	private final TollHandler tollHandler;
 	private CongestionHandlerImplV3 congestionHandler;
 
-
-	public InternalizeEmissionsCongestionControlerListener(EmissionModule emissionModule, EmissionCostModule emissionCostModule,MutableScenario scenario, TollHandler tollHandler) {
-		this.emissionModule = emissionModule;
+	public InternalizeEmissionsCongestionControlerListener(EmissionCostModule emissionCostModule, MutableScenario scenario, TollHandler tollHandler) {
 		this.emissionCostModule = emissionCostModule;
 		this.scenario = scenario;
 		this.tollHandler = tollHandler;
