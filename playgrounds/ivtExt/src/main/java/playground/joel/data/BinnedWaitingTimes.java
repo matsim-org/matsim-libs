@@ -41,13 +41,14 @@ class BinnedWaitingTimes extends AbstractData {
     static double totalMean = 0;
     double binSize = 600;
 
+    double maxWait = 50000; // maximally expected waiting time to have plots of the same range
+
     KeyMap keyMap = new KeyMap(binSize);
 
     // cut the total quantiles and mean
     DecimalFormat valueForm = new DecimalFormat("#.####");
 
-
-
+    
     String getDeltaKey(String key, double deltaT) {
         // necessary in case multiple waiting times of the same length exist
         int i = 1;
@@ -59,7 +60,6 @@ class BinnedWaitingTimes extends AbstractData {
         return deltaKey;
     }
 
-    // gives the i_th entry of waitingTimes.get(key) for the quantile
     double getEntry(String key, int i) {
         Double value = 0.0;
         int j = 0;
@@ -71,7 +71,7 @@ class BinnedWaitingTimes extends AbstractData {
             }
         }
         return value;
-    }
+    } // gives the i_th entry of waitingTimes.get(key) for the quantile
 
     void writeQuantiles() {
         for (String bin : waitingTimes.keySet()) {
@@ -103,7 +103,6 @@ class BinnedWaitingTimes extends AbstractData {
         {
             keyMap.initialize();
 
-
             // read the events when person calls AVs
             events.addHandler(new PersonDepartureEventHandler() {
 
@@ -116,28 +115,10 @@ class BinnedWaitingTimes extends AbstractData {
                 public void handleEvent(PersonDepartureEvent event) {
                     final Id<Person> idRaw = event.getPersonId();
                     final String id = idRaw.toString();
-                    if (HelperPredicates.isHuman(idRaw)) {
+                    if (HelperPredicates.isHuman(idRaw))
                         waitStart.put(id, event.getTime());
-                        //System.out.println("added person " + id + " to waitStart");
-                    }
                 }
             });
-
-            /*
-            // read the events when agent arrives at destination
-            events.addHandler(new PersonArrivalEventHandler() {
-
-                @Override
-                public void reset(int iteration) {
-                    // empty content
-                }
-
-                @Override
-                public void handleEvent(PersonArrivalEvent event) {
-                    relevantEvents.add(event);
-                }
-            });
-            */
 
             // read the events when AV arrives at agent's location
             events.addHandler(new PersonEntersVehicleEventHandler() {
@@ -154,7 +135,6 @@ class BinnedWaitingTimes extends AbstractData {
                     final String id = idRaw.toString();
 
                     if (HelperPredicates.isHuman(idRaw)) {
-                        //System.out.println("person " + id + " enters vehicle");
                         String key = keyMap.getKey(waitStart.get(id));
                         if (!waitingTimes.containsKey("all")) waitingTimes.put("all", new TreeMap<>());
                         if (!waitingTimes.containsKey( key ))  waitingTimes.put(key, new TreeMap<>());
@@ -164,7 +144,6 @@ class BinnedWaitingTimes extends AbstractData {
                         waitingTimes.get(key).put(getDeltaKey(key, deltaT), deltaT);
 
                         waitStart.remove(id);
-                        //System.out.println("removed person " + id + " from waitStart");
                     }
                 }
             });
@@ -197,7 +176,7 @@ class BinnedWaitingTimes extends AbstractData {
         // export to time series diagram PNG
         TimeDiagramCreator diagram = new TimeDiagramCreator();
         try{
-            diagram.createDiagram(directory, "binnedWaitingTimes", "waiting time", quantile50, quantile95, mean);
+            diagram.createDiagram(directory, "binnedWaitingTimes", "waiting time", quantile50, quantile95, mean, maxWait);
         }catch (Exception e){
             System.out.println("Error creating the diagram");
         }
@@ -209,10 +188,6 @@ class BinnedWaitingTimes extends AbstractData {
         }catch (Exception e){
             System.out.println("Error creating the csv file");
         }
-
-        //System.out.println("50% quantile: " + totalQuantile50);
-        //System.out.println("95% quantile: " + totalQuantile95);
-        //System.out.println("mean: " + totalMean);
 
         if (waitStart.size() != 0) System.out.println("there remain " + waitStart.size() + " waiting customers after the simulation has ended");
         else System.out.println("no remaining customers waiting at the end of the simulation");

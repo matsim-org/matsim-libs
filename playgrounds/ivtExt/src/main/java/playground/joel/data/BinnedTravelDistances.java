@@ -31,7 +31,6 @@ class BinnedTravelDistances extends AbstractData {
     NavigableMap<String, Double> binnedData = new TreeMap<>();
     NavigableMap<String, Integer> vehicleStatus = new TreeMap<>(); // 0 -> empty, 1 -> occupied
     NavigableMap<String, Double> linkLengths = new TreeMap<>();
-    HashMap<String, Set<Id<Person>>> vehicleCustomers = new HashMap<>();
     HashMap<String, Double> avLinkStart = new HashMap<>();
     double totalDistance = 0;
     double totalDistanceWithCust = 0;
@@ -42,7 +41,6 @@ class BinnedTravelDistances extends AbstractData {
 
     // cut the total distance ratio
     DecimalFormat valueForm = new DecimalFormat("#.####");
-
 
 
     double getLinkLength(Id<Link> linkId) {
@@ -78,8 +76,6 @@ class BinnedTravelDistances extends AbstractData {
         // interpolates the remaining link length before or after the next bin start
             return getLinkLength(linkId)*deltaT/(end - start);
     }
-
-
 
     void calculateDistanceRatio() {
         if (!(totalDistance == 0)) {
@@ -125,30 +121,30 @@ class BinnedTravelDistances extends AbstractData {
 
     private void put(Id linkId, String vehicle, double startTime, double endTime) {
         totalDistance += getLinkLength(linkId);
+        if (!vehicleStatus.containsKey(vehicle)) vehicleStatus.put(vehicle, 0); // replaces activitystart
         if (vehicleStatus.get(vehicle) == 1) totalDistanceWithCust += getLinkLength(linkId);
 
         if (!travelDistances.containsKey(vehicle))
             travelDistances.put(vehicle, new TreeMap<>());
 
         if(endTime <= keyMap.getBinStart(startTime) + binSize) {
-            travelDistances.get(vehicle).put(keyMap.getKey(startTime), getLinkLength(linkId));
+            binnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(startTime), getLinkLength(linkId));
             binnedHelper.putAdd(traveledDistance, keyMap.getKey(startTime), getLinkLength(linkId));
-            if (!vehicleStatus.containsKey(vehicle)) System.out.println("vehicleStatus does not contain the key " + vehicle);
             if (vehicleStatus.get(vehicle) == 1) binnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), getLinkLength(linkId));
         } else {
             double nextBin = keyMap.getBinStart(startTime) + binSize;
-            travelDistances.get(vehicle).put(keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
+            binnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
             binnedHelper.putAdd(traveledDistance, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
             if (vehicleStatus.get(vehicle) == 1) binnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
 
             while (endTime > nextBin + binSize) {
-                travelDistances.get(vehicle).put(keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
+                binnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
                 binnedHelper.putAdd(traveledDistance, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
                 if (vehicleStatus.get(vehicle) == 1) binnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
                 nextBin += binSize;
             }
 
-            travelDistances.get(vehicle).put(keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
+            binnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
             binnedHelper.putAdd(traveledDistance, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
             if (vehicleStatus.get(vehicle) == 1) binnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
         }
@@ -158,21 +154,12 @@ class BinnedTravelDistances extends AbstractData {
     private void putDriveWithCustomer(PersonEntersVehicleEvent event) {
         if (HelperPredicates.isHuman(event.getPersonId()))
             vehicleStatus.put(event.getVehicleId().toString(), 1);
-    }
+    } // switch vehicle status to 1
 
     private void putDriveToCustomer(PersonLeavesVehicleEvent event) {
         vehicleStatus.put(event.getVehicleId().toString(), 0);
-    }
+    } // switch vehicle status to 0
 
-    private Set<Id<Person>> getCustomerSet(String vehicle) {
-        if (!vehicleCustomers.containsKey(vehicle))
-            vehicleCustomers.put(vehicle, new HashSet<>());
-
-        return vehicleCustomers.get(vehicle);
-    }
-
-    private Map<String, PersonEntersVehicleEvent> firstCustomerEntersVehicleEvent = new HashMap<>();
-    private Map<String, PersonDepartureEvent> potentialEmptyDriveEvent = new HashMap<>();
 
     @Override
     void initialize(EventsManager events) {
@@ -182,45 +169,15 @@ class BinnedTravelDistances extends AbstractData {
 
             readLinkLengths();
 
-            // activitystart
-            events.addHandler(new ActivityStartEventHandler() {
-                // <event time="0.0" type="actstart" person="av_av_op1_174" link="237756569_3" actType="AVStay" />
-                @Override
-                public void handleEvent(ActivityStartEvent event) {
-                    if (event.getTime() == 0 && HelperPredicates.isPersonAV(event.getPersonId())) vehicleStatus.put(event.getPersonId().toString(), 0);
-
-                    if (event.getActType().equals("AVStay")) {
-                        final String vehicle = event.getPersonId().toString(); // = vehicle id!
-                        final double time = event.getTime();
-                        //we only consider AVStatus.DRIVEWITHCUSTOMER
-                        //put(vehicle, time, AVStatus.STAY);
-                    }
-                }
-
-                @Override
-                public void reset(int iteration) {
-                    // intentionally empty
-                }
-            });
-
-            // ===========================================
-
             // personentersvehicle
             events.addHandler(new PersonEntersVehicleEventHandler() {
                 // <event time="21574.0" type="PersonEntersVehicle" person="27114_1" vehicle="av_av_op1_174" />
                 // <event time="21589.0" type="PersonEntersVehicle" person="av_av_op1_174" vehicle="av_av_op1_174" />
                 @Override
                 public void handleEvent(PersonEntersVehicleEvent event) {
-                    final String vehicle = event.getVehicleId().toString();
                     final Id<Person> person = event.getPersonId();
-                    if (HelperPredicates.isHuman(person)) {
-                        Set<Id<Person>> set = getCustomerSet(vehicle);
-                        if (set.isEmpty()) { // if car is empty
-                            firstCustomerEntersVehicleEvent.put(vehicle, event); // mark as beginning of DRIVE WITH CUSTOMER STATUS
-                        }
-                        set.add(person);
-                        putDriveWithCustomer(event); // change vehicle status
-                    }
+                    if (HelperPredicates.isHuman(person))
+                        putDriveWithCustomer(event); // switch vehicle status to 1
                 }
 
                 @Override
@@ -229,26 +186,14 @@ class BinnedTravelDistances extends AbstractData {
                 }
             });
 
-            // TODO: what is the second if for? Is putDriveWithCustomer right there?
             // personleavesvehicle
             events.addHandler(new PersonLeavesVehicleEventHandler() {
                 // <event time="21796.0" type="PersonLeavesVehicle" person="27114_1" vehicle="av_av_op1_174" />
                 @Override
                 public void handleEvent(PersonLeavesVehicleEvent event) {
-                    final String vehicle = event.getVehicleId().toString();
                     final Id<Person> person = event.getPersonId();
-                    if (HelperPredicates.isHuman(person)) {
-                        Set<Id<Person>> set = getCustomerSet(vehicle);
-                        set.remove(person);
-                        putDriveToCustomer(event); // change vehicle status
-                        if (set.isEmpty()) { // last customer has left the car
-                            if (firstCustomerEntersVehicleEvent.containsKey(vehicle)) { // change vehicle status
-                                putDriveWithCustomer(firstCustomerEntersVehicleEvent.get(vehicle));
-                            } else {
-                                new RuntimeException("this should have a value").printStackTrace();
-                            }
-                        }
-                    }
+                    if (HelperPredicates.isHuman(person))
+                        putDriveToCustomer(event); // switch vehicle status to 0
                 }
 
                 @Override
@@ -311,53 +256,6 @@ class BinnedTravelDistances extends AbstractData {
                 }
             });
 
-
-
-            /* TODO: are these necessary?
-            // departure
-            events.addHandler(new PersonDepartureEventHandler() {
-                // <event time="21484.0" type="departure" person="av_av_op1_174" link="237756569_3" legMode="car" />
-
-                @Override
-                public void handleEvent(PersonDepartureEvent event) {
-                    // only departure events of avs are considered.
-                    if(HelperPredicates.isPersonAV(event.getPersonId())){
-                        potentialEmptyDriveEvent.put(event.getPersonId().toString(), event);
-                    }
-                }
-
-                @Override
-                public void reset(int iteration) {
-                    // intentionally empty
-
-                }
-            });
-
-            // arrival
-            events.addHandler(new PersonArrivalEventHandler() {
-                // <event time="21574.0" type="arrival" person="av_av_op1_174" link="236382034_0" legMode="car" />
-                @Override
-                public void handleEvent(PersonArrivalEvent event) {
-                    final String vehicle = event.getPersonId().toString(); // this is not always an ID to a vehicle
-                    if (!vehicleCustomers.containsKey(vehicle) || vehicleCustomers.get(vehicle).isEmpty()) {
-                        // this was an empty drive
-                        if (potentialEmptyDriveEvent.containsKey(vehicle)) // only previously registered true vehicles are considered
-                            putDriveToCustomer(potentialEmptyDriveEvent.get(vehicle));
-
-                        //else
-                        //    new RuntimeException("should have value").printStackTrace();
-                    }
-                }
-
-                @Override
-                public void reset(int iteration) {
-                    // intentionally empty
-
-                }
-            });
-            */
-
-
         }
 
     }
@@ -368,17 +266,9 @@ class BinnedTravelDistances extends AbstractData {
         File fileExport = new File(directory, "binnedDistanceRatios.xml");
 
         calculateDistanceRatio();
-        //System.out.println("total distance: " + totalDistance);
-        //System.out.println("total distance with customer: " + totalDistanceWithCust);
-        //System.out.println("total distance ratio: " + totalDistanceRatio);
 
-        // work around since getNumAVs does not work
         for(String key: traveledDistanceWithCust.keySet()) {
-
             GlobalAssert.that(traveledDistance.get(key) != 0);
-
-            //System.out.println("traveled distance in bin " + key +": " + traveledDistance.get(key));
-            //System.out.println("traveled distance with customer in bin " + key +": " + traveledDistanceWithCust.get(key));
             binnedData.put(key, calculateDistanceRatio(key));
         }
 

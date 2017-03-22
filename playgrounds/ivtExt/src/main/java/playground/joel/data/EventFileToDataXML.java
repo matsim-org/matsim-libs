@@ -41,7 +41,7 @@ public class EventFileToDataXML {
      *            of the project folder
      */
 
-    static String path = "C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_02_28_Sioux_Hungarian"; //used for test purpose in main()
+    static String path = "C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_03_22_Sioux_Hungarian_check1av"; //used for test purpose in main()
 
 
 
@@ -58,6 +58,7 @@ public class EventFileToDataXML {
 
                 EventsManager events = EventsUtils.createEventsManager();
 
+                // TODO: can be omitted, just to create travelTimes.xml for test purpose
                 // add event handlers to create TravelTimes file
                 TravelTimes travelTimes = new TravelTimes();
                 travelTimes.initialize(events);
@@ -83,13 +84,15 @@ public class EventFileToDataXML {
 
 
                 // write XML files
+                // TODO: can be omitted, just to create travelTimes.xml for test purpose
                 travelTimes.writeXML(data);
+
                 binnedTravelTimes.writeXML(data);
                 binnedTravelDistances.writeXML(data);
                 binnedWaitingTimes.writeXML(data);
 
                 File totalDataDir = new File(data, "totalData.xml");
-                totalData.generate(String.valueOf(travelTimes.totalTimeRatio),
+                totalData.generate(String.valueOf(binnedTravelTimes.totalTimeRatio),
                         String.valueOf(binnedTravelDistances.totalDistanceRatio), String.valueOf(BinnedWaitingTimes.totalMean),
                         String.valueOf(BinnedWaitingTimes.totalQuantile50), String.valueOf(BinnedWaitingTimes.totalQuantile95),
                         totalDataDir);
