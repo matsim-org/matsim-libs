@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.minibus.operator.BasicOperator;
-import org.matsim.contrib.minibus.operator.WelfareCarefulMultiPlanOperator;
 import org.matsim.contrib.minibus.replanning.ReduceStopsToBeServedRFare;
 import org.matsim.contrib.minibus.replanning.ReduceTimeServedRFare;
 import org.matsim.core.config.Config;
@@ -745,17 +744,6 @@ public final class PConfigGroup extends ConfigGroup{
 				log.warn("Transit lines will be merged. Activate the operator logger to retrieve more detailed information on particular routes.");
 			}
 		}
-		
-		if(this.welfareMaximization ){
-			
-			if(!this.operatorType.equals(WelfareCarefulMultiPlanOperator.OPERATOR_NAME)){
-				
-				log.error("Welfare maximization is enabled, " + WelfareCarefulMultiPlanOperator.OPERATOR_NAME + " should be used as operator type. Aborting...");
-				throw new RuntimeException();
-			}
-			
-		}
-		
 	}
 
 }

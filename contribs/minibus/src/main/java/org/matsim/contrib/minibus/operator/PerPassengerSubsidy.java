@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
+import com.google.inject.Inject;
+
 /**
  * 
  * 
@@ -48,8 +50,8 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
  * @author ikaddoura
  *
  */
-public class WelfareAnalyzer {
-	private static final Logger log = Logger.getLogger(WelfareAnalyzer.class);
+public class PerPassengerSubsidy implements SubsidyI {
+	private static final Logger log = Logger.getLogger(PerPassengerSubsidy.class);
 
 //	private Map<Id<Person>, Double> personId2initialBenefits;
 //	private Map<Id<Person>, Double> personId2benefits;
@@ -61,7 +63,10 @@ public class WelfareAnalyzer {
 
 	private final double subsidyPerPassenger = 100000.;
 	
-	public WelfareAnalyzer(String initialScoresFile){
+	@Inject
+	Scenario scenario;
+	
+	public PerPassengerSubsidy(){
 		// yyyy I am not happy with passing a string here and having the reader inside this method.  kai, mar'17
 		
 		//get initial scores from the given file and store the values
@@ -81,7 +86,8 @@ public class WelfareAnalyzer {
 		
 	}
 	
-	public void computeWelfare(Scenario scenario) {
+	@Override
+	public void computeSubsidy() {
 		// yyyy welfare should be computed based on executed plans, not planned plans.  --> use ExecutedPlansService
 		// When this is injected, we do not need scenario as an argument here so every implementor can do what she wants.
 		
@@ -186,16 +192,6 @@ public class WelfareAnalyzer {
 		}
 	}
 	
-	public double getWelfareCorrection(Id<PPlan> id) {
-		
-		if (this.pId2welfareCorrection.get(id) != null){
-			return this.pId2welfareCorrection.get(id);
-			
-		} else {
-			return 0.;
-		}
-	}
-
 	public void writeToFile(ScoringEvent event) {
 		// yyyy find other solution.  This would force every implementer to implement something here. 
 		
@@ -291,6 +287,16 @@ public class WelfareAnalyzer {
 //			
 //		}
 			
+	}
+
+	@Override
+	public double getSubsidy(Id<PPlan> id) {
+		if (this.pId2welfareCorrection.get(id) != null){
+			return this.pId2welfareCorrection.get(id);
+			
+		} else {
+			return 0.;
+		}
 	}
 
 }

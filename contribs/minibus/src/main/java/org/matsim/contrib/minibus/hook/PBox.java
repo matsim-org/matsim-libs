@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+//import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,9 +35,8 @@ import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.OperatorInitializer;
 import org.matsim.contrib.minibus.operator.PFranchise;
 import org.matsim.contrib.minibus.operator.POperators;
+import org.matsim.contrib.minibus.operator.SubsidyI;
 import org.matsim.contrib.minibus.operator.TimeProvider;
-import org.matsim.contrib.minibus.operator.WelfareAnalyzer;
-import org.matsim.contrib.minibus.operator.WelfareStatsContainer;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.schedule.PStopsFactory;
 import org.matsim.contrib.minibus.scoring.OperatorCostCollectorHandler;
@@ -52,6 +51,8 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 /**
  * Black box for paratransit
@@ -78,10 +79,10 @@ public final class PBox implements POperators {
 	private final OperatorCostCollectorHandler operatorCostCollectorHandler;
 	private final PStrategyManager strategyManager = new PStrategyManager();
 
-	private final WelfareAnalyzer welfareAnalyzer;
-	private final WelfareStatsContainer welfareStats;
-
 	private final TicketMachineI ticketMachine;
+	
+	@Inject(optional=true)
+	private SubsidyI subsidy;
 
 	/**
 	 * Constructor that allows to set the ticketMachine.  Deliberately in constructor and not as setter to keep the variable final.  Might be
@@ -94,17 +95,6 @@ public final class PBox implements POperators {
 		this.stageCollectorHandler = new StageContainerCreator(this.pConfig.getPIdentifier());
 		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0, this.pConfig.getCostPerHour() / 3600.0);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());
-
-		if (pConfig.getWelfareMaximization()) {
-			log.info("Objective Function: Welfare");
-			this.welfareAnalyzer = new WelfareAnalyzer(pConfig.getInitialScoresFile());
-		} else {
-			log.info("Objective Function: Operator Profit");
-			this.welfareAnalyzer = null;
-		}
-
-		this.welfareStats = new WelfareStatsContainer(pConfig, this.welfareAnalyzer);
-
 	}
 
 	void notifyStartup(StartupEvent event) {
@@ -136,7 +126,7 @@ public final class PBox implements POperators {
 		this.pStopsOnly = PStopsFactory.createPStops(event.getServices().getScenario().getNetwork(), this.pConfig, event.getServices().getScenario().getTransitSchedule());
 
 		this.operators = new LinkedList<>();
-		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getServices(), timeProvider, this.welfareAnalyzer);
+		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getServices(), timeProvider);
 
 		// init additional operators from a given transit schedule file
 		LinkedList<Operator> operatorsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getServices().getScenario().getTransitSchedule());
@@ -187,17 +177,14 @@ public final class PBox implements POperators {
 
 	void notifyScoring(ScoringEvent event) {
 
-		if (this.pConfig.getWelfareMaximization()) {
-			welfareAnalyzer.computeWelfare(event.getServices().getScenario());
-			welfareAnalyzer.writeToFile(event);
+		if (this.subsidy != null) {
+			subsidy.computeSubsidy();
 		}
 
 		Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
 		for (Operator operator : this.operators) {
-			operator.score(driverId2ScoreMap);
+			operator.score(driverId2ScoreMap, subsidy);
 		}
-
-		this.welfareStats.run(event, this.operators);
 
 		// why is the following done twice (see notifyIterationstarts)?
 		this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();

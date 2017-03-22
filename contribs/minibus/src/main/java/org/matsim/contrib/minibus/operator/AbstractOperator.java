@@ -73,7 +73,6 @@ abstract class AbstractOperator implements Operator{
 	PRouteProvider routeProvider;
 	int currentIteration;
 
-
 	AbstractOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
 		this.numberOfIterationsForProspecting = pConfig.getNumberOfIterationsForProspecting();
@@ -107,14 +106,23 @@ abstract class AbstractOperator implements Operator{
 	}
 
 	@Override
-	public void score(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap) {
+	public void score(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, SubsidyI subsidy) {
 		this.setScoreLastIteration(this.getScore());
 		this.setScore(0);
 		
 		// score all plans
 		for (PPlan plan : this.getAllPlans()) {
 			scorePlan(driverId2ScoreMap, plan);
+			
+			if (subsidy != null) {
+				Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);
+				double subsidyAmount = subsidy.getSubsidy(pplanId);
+				double newPlanScore = subsidyAmount + plan.getScore();
+				plan.setScore(newPlanScore);
+			}
+			
 			this.setScore(this.getScore() + plan.getScore());
+
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
 				route.setDescription(plan.toString(this.budget + this.getScore()));
 			}
@@ -264,7 +272,7 @@ abstract class AbstractOperator implements Operator{
 		}
 	}
 
-	public final static void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan) {
+	private final static void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan) {
 		double totalLineScore = 0.0;
 		int totalTripsServed = 0;
 		
