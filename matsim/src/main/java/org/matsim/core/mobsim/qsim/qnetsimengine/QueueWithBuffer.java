@@ -191,6 +191,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		
         if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue ) {
 			remainingHolesStorageCapacity = this.storageCapacity;
+			// yyyy how is this.storageCapacity supposed to have a value here?  (It might just be zero, and
+			// maybe this is the correct value, but the code is not very expressive.)  kai, mar'17
 		}
 
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
