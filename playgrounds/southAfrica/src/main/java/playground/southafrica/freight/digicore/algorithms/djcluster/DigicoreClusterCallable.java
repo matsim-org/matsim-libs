@@ -29,31 +29,26 @@ import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.DigicoreCluster;
 
-/**
- * A class to run a {@link DJCluster} instance on a single thread. The class
- * returns a list of {@link DigicoreCluster}s once called. 
- *
- * @author jwjoubert
- */
 
-public class DJClusterCallable implements Callable<List<DigicoreCluster>> {
+public class DigicoreClusterCallable implements Callable<List<DigicoreCluster>> {
 	private List<Coord> pointList;
 	private final double radius;
 	private final int minimumPoints;
 	private List<DigicoreCluster> clusterList = new ArrayList<DigicoreCluster>();
 	private Counter counter;
 	
-	public DJClusterCallable(List<Coord> pointList, double radius, int minPoints, Counter counter) {
+	public DigicoreClusterCallable(List<Coord> pointList, double radius, int minPoints, Counter counter) {
 		this.pointList = pointList;
 		this.radius = radius;
 		this.minimumPoints = minPoints;
 		this.counter = counter;
 	}
 
-//	public List<DigicoreCluster> getListOfClusters(){
-//		return this.clusterList;
-//	}
-//
+	
+	public List<DigicoreCluster> getListOfClusters(){
+		return this.clusterList;
+	}
+
 
 	@Override
 	public List<DigicoreCluster> call() throws Exception {

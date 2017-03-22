@@ -77,7 +77,6 @@ import playground.southafrica.utilities.RandomPermutation;
  */
 public class SurveyPlanPicker {
 	private final static Logger LOG = Logger.getLogger(SurveyPlanPicker.class);
-	private final static int NUMBER_OF_NEIGHBOURS = 20;
 	
 	private ComprehensivePopulationReader surveyPopulation;
 	private ComprehensivePopulationReader censusPopulation;
@@ -90,60 +89,33 @@ public class SurveyPlanPicker {
 	private Map<String, Integer> hammingDistanceChanges = new TreeMap<String, Integer>();
 	private List<Double> distanceList = new ArrayList<Double>();
 
-	
-	/**
-	 * 
-	 * @param args The following arguments are required, and in the following 
-	 * order:
-	 * <ol>
-	 * 		<li> absolute path to where the survey population is that completed
-	 * 			 the diary component. It is assumed the survey remained in the 
-	 * 			 WGS84 coordinate reference system.
-	 * 		<li> Absolute path to the folder where the population file(s) are
-	 * 			 for which plans are being picked.
-	 * 		<li> The area shapefile that coincides with the travel survey (this
-	 * 			 will typically be the Transport Analysis Zones (TAZs)). Also
-	 * 			 note that the coordinate reference system for this shapefile
-	 * 			 should be the same as the final desired population.
-	 * 		<li> The coordinate reference system of the original Treasury	
-	 * 			 population. If it wasn't tampered with, this should still be
-	 * 			 {@link TransformationFactory#WGS84_SA_Albers}.   
-	 * 		<li> The desired coordinate reference system of the final population
-	 * 			 with plans.
-	 * </ol>
-	 */
 	public static void main(String[] args){
 		Header.printHeader(SurveyPlanPicker.class.toString(), args);
-		runSurveyPlanPicker(args);
-		Header.printFooter();
-	}
-	
-	
-	
-	public static void runSurveyPlanPicker(String[] args){
+		MatsimRandom.reset();
+		
 		String surveyPopulationFolder = args[0];
 		String populationFolder = args[1];
 		String areaShapefile = args[2]; 
 		String populationCRS = args[3];
-		String finalCRS = args[4];
+		String surveyCRS = args[4];
 		
 		populationFolder += populationFolder.endsWith("/") ? "" : "/";
-
-		MatsimRandom.reset();
 		
 		SurveyPlanPicker spp = new SurveyPlanPicker(areaShapefile);
 		spp.buildQuadTreeFromSurvey(surveyPopulationFolder);
-		spp.pickActivityChainsForPopulation(populationFolder, populationCRS, finalCRS);
+		spp.pickActivityChainsForPopulation(populationFolder, populationCRS, surveyCRS);
 		
 		/* Write the adapted population. The people's activity chains and the
 		 * household attributes (home coordinate) were adapted, so we need not 
 		 * write all of the files. */
 		PopulationWriter pw = new PopulationWriter(spp.censusPopulation.getScenario().getPopulation());
-		pw.writeV5(populationFolder + "persons_withPlans.xml.gz");
+		pw.writeV5(populationFolder + "population_withPlans.xml.gz");
 		//
 		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(spp.censusPopulation.getScenario().getHouseholds().getHouseholdAttributes());
 		oaw.putAttributeConverter(Coord.class, new CoordConverter());
 		oaw.writeFile(populationFolder + "householdAttributes_withPlanHome.xml.gz");
+
+		Header.printFooter();
 	}
 	
 	
@@ -193,13 +165,6 @@ public class SurveyPlanPicker {
 		this.surveyPopulation = new ComprehensivePopulationReader();
 		this.surveyPopulation.parse(surveyPopulationFolder);
 		
-		/* Setup the coordinate transformation. The survey was parsed in the
-		 * original WGS84, while the accepted CRS for Cape Town is Hartebeesthoek
-		 * Lo19 (with NorthEast correction). */
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
-				TransformationFactory.WGS84, TransformationFactory.HARTEBEESTHOEK94_LO19);
-//				TransformationFactory.HARTEBEESTHOEK94_LO19, TransformationFactory.HARTEBEESTHOEK94_LO19);
-		
 		/* Put each person's surveyed plan in an appropriate QuadTree. */
 		LOG.info("Building QuadTree from survey population...");
 		Counter counter = new Counter("  persons placed # ");
@@ -208,7 +173,7 @@ public class SurveyPlanPicker {
 			Person person = this.surveyPopulation.getScenario().getPopulation().getPersons().get(personId);
 			Plan plan = person.createCopyOfSelectedPlanAndMakeSelected();
 			
-			Coord home = ct.transform(getQtPlanHomeCoordinate(plan));
+			Coord home = getQtPlanHomeCoordinate(plan);
 			
 			/* Get the person's demographic 'signature' */
 			ObjectAttributes personAttributes = this.surveyPopulation.getScenario().getPopulation().getPersonAttributes();
@@ -279,16 +244,11 @@ public class SurveyPlanPicker {
 		censusPopulation = new ComprehensivePopulationReader();
 		censusPopulation.parse(populationFolder);
 		
-		/* First adapt the home location (of the household) to the new CRS. 
-		 * 
-		 * BIG PROBLEM!! I now (Feb 2017) realised that the activity coordinate
-		 * for the person's "home" activity is NOT THE SAME as the "homeCoord"
-		 * in the household attributes file. It seems that the plan's 
-		 * coordinate is the 'correct' one, yet this class used the other one. */
+		/* First adapt the home location (of the household) to the new CRS. */
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(originalCRS, targetCRS);
 		for(Id<Household> hhid : censusPopulation.getScenario().getHouseholds().getHouseholds().keySet()){
-//			Coord old = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord");
-//			censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().putAttribute(hhid.toString(), "homeCoord", ct.transform(old));
+			Coord old = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord");
+			censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().putAttribute(hhid.toString(), "homeCoord", ct.transform(old));
 		}
 		
 		/*TODO Variables for debugging. Can be removed once validated. */
@@ -299,28 +259,15 @@ public class SurveyPlanPicker {
 		LOG.info("Picking plans for persons...");
 		for(Id<Person> personId : censusPopulation.getScenario().getPopulation().getPersons().keySet()){
 			Person person = censusPopulation.getScenario().getPopulation().getPersons().get(personId);
-
+			/* Remove all the existing plans the person may have. */
+			person.getPlans().clear();
+			
 			/* Get the household's home coordinate. Since the household 
 			 * coordinate is in the original CRS, it has to be converted to 
 			 * the survey CRS so that we can find a survey household in close
-			 * proximity. We do not convert it again HERE since it was 
-			 * transformed a few lines above. 
-			 * 
-			 * See comment above. We should not use the household coordinate,
-			 * but rather the individual's plan coordinate for "home". This
-			 * should be fine since (I checked) all members seem to have the 
-			 * exact same coordinate. */
+			 * proximity. */
 			Id<Household> hhid = Id.create( (String) censusPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId") , Household.class);
-			Coord censusHome = ((Activity)censusPopulation.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(0)).getCoord();
-//			Coord home = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord") ;
-			Coord home = ct.transform(censusHome);
-			
-			/* Update the household attributes with the 'correct' and 
-			 * transformed coordinate. */
-			censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().putAttribute(hhid.toString(), "homeCoord", home);
-			
-			/* Remove all the existing plans the person may have. */
-			person.getPlans().clear();
+			Coord home = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord") ;
 			
 			/* Get person's demographic 'signature' */
 			String a = SaDemographicsEmployment.convertCensus2011Employment( PersonUtils.isEmployed(person) ).toString();
@@ -335,7 +282,7 @@ public class SurveyPlanPicker {
 			String closestSignature = findClosestSignature(signature);
 			if(closestSignature != null){
 				qt = qtMap.get(closestSignature);
-				List<Tuple<Plan, Double>> closestPlans = this.getClosestPlans(home, qt, NUMBER_OF_NEIGHBOURS);
+				List<Tuple<Plan, Double>> closestPlans = this.getClosestPlans(home, qt, 20);
 
 				/* Randomly pick any of the closest plans, and make a COPY of it. */
 				Tuple<Plan, Double> randomTuple = closestPlans.get( RandomPermutation.getRandomPermutation(closestPlans.size())[0]-1 );
@@ -344,18 +291,13 @@ public class SurveyPlanPicker {
 			
 				distanceList.add(randomTuple.getSecond());
 
-				/* Should have a plan now. Change its home locations. Also 
-				 * convert the other activities' locations. */
+				/* Should have a plan now. Change its home locations. */
 				for(PlanElement pe : plan.getPlanElements()){
 					if(pe instanceof Activity){
 						Activity activity = (Activity) pe;
-						/* Set the home location. It has already been transformed. */
+						/* Set the home location */
 						if(activity.getType().equalsIgnoreCase("h")){
 							activity.setCoord(home);
-						} else{
-							/* Transform the other activities' locations. */
-							Coord oldActivityCoord = activity.getCoord();
-							activity.setCoord(ct.transform(oldActivityCoord));
 						}
 					}
 				}
@@ -458,7 +400,7 @@ public class SurveyPlanPicker {
 
 	
 	/**
-	 * The person plans from the Survey data is not put in the QuadTree at the 
+	 * The person plans from the Survey data were not put in QuadTree at the 
 	 * location of the plan's first activity. Rather, it was placed at the 
 	 * location of the first home ('h') activity. This class searches for the
 	 * first home activity in the plan.

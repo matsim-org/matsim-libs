@@ -93,29 +93,11 @@ public class SurveyParser {
 	Map<String,GeneralGrid> gridMap;
 
 	/**
-	 * 
-	 * @param args The following arguments are required, and in the following 
-	 * order:
-	 * <ol>
-	 * 		<li> the absolute path to the transport zone shapefile in WGS84
-	 * 			 format;
-	 * 		<li> the field containing the transport zone ID in the shapefile;
-	 * 		<li> the path to the <code>persons.csv</code> file;
-	 * 		<li> the path to the <code>households.csv</code> file;
-	 * 		<li> the path to the <code>householdsDerived.csv</code> file;
-	 * 		<li> the path to the <code>diary.csv</code> file;
-	 * 		<li> the path where the complete survey population will be written to;
-	 * 		<li> the path where only the individuals who completed the travel 
-	 * 			 diary component will be written to.
-	 * </ol>
+	 * @param args
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(SurveyParser.class.toString(), args);
-		runSurveyParser(args);
-		Header.printFooter();
-	}
-	
-	public static void runSurveyParser(String[] args){
+		
 		SurveyParser sp = new SurveyParser(args[0], Integer.parseInt(args[1]));
 		sp.parsePersons(args[2]);
 		sp.parseHouseholds(args[3]);
@@ -128,17 +110,21 @@ public class SurveyParser {
 		sp.cleanUpScenario(surveySc);
 		sp.writePopulation(args[7], surveySc);
 		
+		
+		
 		/* Finish off with some basic population statistics. */
 		LOG.info("---------------------------------------");
 		LOG.info(" Number of households: " + surveySc.getHouseholds().getHouseholds().size());
 		LOG.info("    Number of persons: " + surveySc.getPopulation().getPersons().size());
 		LOG.info("---------------------------------------");
-		PopulationUtils.printActivityStatistics(args[7] + (args[7].endsWith("/") ? "" : "/") + "persons.xml.gz");
+		PopulationUtils.printActivityStatistics(args[7] + (args[7].endsWith("/") ? "" : "/") + "population.xml.gz");
 		
 		/* Some arbitrary checks. Remove once done. */
 		LOG.info("              Number of observed zones: " + sp.zoneMap.size());
 		LOG.info("  Number of unknown activity locations: " + numberOfUnknownActivityLocations);
 		LOG.info("Number of (fixable) activity locations: " + numberOfFixableActivityLocations);
+		
+		Header.printFooter();
 	}
 
 	public SurveyParser(String shapefile, int idField) {
@@ -681,9 +667,8 @@ public class SurveyParser {
 		double y = 0.0;
 		if(mz != null){
 			Point p = mz.sampleRandomInteriorPoint();
-			/* Round to four decimal places. */
-			x = Double.parseDouble(String.format("%.6f", p.getX()));
-			y = Double.parseDouble(String.format("%.6f", p.getY()));
+			x = p.getX();
+			y = p.getY();
 		} else{
 			numberOfUnknownActivityLocations++;
 		}
@@ -709,19 +694,12 @@ public class SurveyParser {
     }	
 	
 	
-	/**
-	 * Currently this method explicitly writes out v5 plans. This is because
-	 * right now (February 2017) Via cannot read v6 plans.
-	 * 
-	 * @param folder
-	 * @param scenario
-	 */
 	public void writePopulation(String folder, Scenario scenario){
 		folder = folder + (folder.endsWith("/") ? "" : "/");
 		LOG.info("Writing population to " + folder);
 		
-		new PopulationWriter(scenario.getPopulation()).writeV5(folder + "persons.xml.gz");
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(folder + "personAttributes.xml.gz");
+		new PopulationWriter(scenario.getPopulation()).write(folder + "population.xml.gz");
+		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(folder + "populationAttributes.xml.gz");
 		
 		new HouseholdsWriterV10(scenario.getHouseholds()).writeFile(folder + "households.xml.gz");
 		new ObjectAttributesXmlWriter(scenario.getHouseholds().getHouseholdAttributes()).writeFile(folder + "householdAttributes.xml.gz");
@@ -776,11 +754,7 @@ public class SurveyParser {
 		}
 		
 		Point p = this.zoneMap.get(sampledZone).sampleRandomInteriorPoint();
-		/* Round to four decimal places. */
-		double x = Double.parseDouble(String.format("%.6f", p.getX()));
-		double y = Double.parseDouble(String.format("%.6f", p.getY()));
-
-		c = CoordUtils.createCoord(x, y);
+		c = CoordUtils.createCoord(p.getX(), p.getY());
 		
 		return c;
 	}
@@ -854,10 +828,7 @@ public class SurveyParser {
 				if(zoneId != null && !zoneId.equalsIgnoreCase("")){
 					/* There is known home zone. */
 					Point p = this.zoneMap.get(zoneId).sampleRandomInteriorPoint();
-					/* Round to four decimal places. */
-					double x = Double.parseDouble(String.format("%.6f", p.getX()));
-					double y = Double.parseDouble(String.format("%.6f", p.getY()));
-					homeCoord = CoordUtils.createCoord(x, y);
+					homeCoord = CoordUtils.createCoord(p.getX(), p.getY());
 				} else{
 					/* There is no transport zone. */
 					homeCoord = sampleActivityLocation("h");
@@ -958,29 +929,21 @@ public class SurveyParser {
 		/* TODO Consider what to do with repeating activities, especially
 		 * consecutive home activities. */
 		
-		/* Convert all activity locations to a projected coordinate system. For
-		 * the City of Cape Town the accepted standard is Hartebeesthoek 94,
-		 * Lo 19 (NorthEast correction. */
-//		LOG.info("Converting all activity locations to " + TransformationFactory.HARTEBEESTHOEK94_LO19 + "...");
-		/* JWJ, Feb2017, This has now been taken out. At this point we need not
-		 * have a projected coordinate system... so keep it in its original
-		 * WGS84 format. */
-//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
-//				TransformationFactory.WGS84, 
-////				TransformationFactory.HARTEBEESTHOEK94_LO19);
-//				TransformationFactory.WGS84);
-//		for(Person person : sc.getPopulation().getPersons().values()){
-//			Plan plan = person.getSelectedPlan();
-//			if(plan != null){
-//				for(PlanElement pe : plan.getPlanElements()){
-//					if(pe instanceof Activity){
-//						Activity act = (Activity)pe;
-//						((Activity)act).setCoord(ct.transform(act.getCoord()));
-//					}
-//				}
-//			}
-//		}
-//		LOG.info("Done converting activity locations.");
+		/* Convert all activity locations to a projected coordinate system. */
+		LOG.info("Converting all activity locations to EPSG:3857...");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "EPSG:3857");
+		for(Person person : sc.getPopulation().getPersons().values()){
+			Plan plan = person.getSelectedPlan();
+			if(plan != null){
+				for(PlanElement pe : plan.getPlanElements()){
+					if(pe instanceof Activity){
+						Activity act = (Activity)pe;
+						((Activity)act).setCoord(ct.transform(act.getCoord()));
+					}
+				}
+			}
+		}
+		LOG.info("Done converting activity locations.");
 		
 		LOG.info("Done cleaning up scenario.");
 	}

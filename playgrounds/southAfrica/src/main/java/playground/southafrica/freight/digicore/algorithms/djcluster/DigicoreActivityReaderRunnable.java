@@ -21,7 +21,6 @@
 package playground.southafrica.freight.digicore.algorithms.djcluster;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
@@ -45,11 +43,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
-public class DigicoreActivityReaderRunnable implements Runnable, Serializable {
+public class DigicoreActivityReaderRunnable implements Runnable {
 	
-	private static final long serialVersionUID = 1L;
-	
-	final private static Logger LOG = Logger.getLogger(DigicoreActivityReaderRunnable.class);
 	private int inCount = 0;
 	private int outCount = 0;
 	private GeometryFactory gf = new GeometryFactory();
@@ -91,7 +86,6 @@ public class DigicoreActivityReaderRunnable implements Runnable, Serializable {
 	
 	
 	private static DigicoreVehicle parseVehicleForConstructor(String file){
-		LOG.warn("This constructor is deprecated! Rather use DigicoreActivityReaderRunnable(DigicoreVehicle, ...)");
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 		dvr.readFile(file);
 		return dvr.getVehicle();
@@ -142,7 +136,7 @@ public class DigicoreActivityReaderRunnable implements Runnable, Serializable {
 						 * there are many zone, like GAP. */
 						radius *= 2.;
 						neighbourhood =  zoneQT.getDisk(p.getX(), p.getY(), radius);
-					} 
+					}
 					
 					boolean found = false;
 					Iterator<MyZone> iterator = neighbourhood.iterator();

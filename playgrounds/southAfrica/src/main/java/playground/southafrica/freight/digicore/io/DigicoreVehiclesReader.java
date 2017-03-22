@@ -20,9 +20,6 @@
 
 package playground.southafrica.freight.digicore.io;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -30,8 +27,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
-import playground.southafrica.freight.digicore.io.algorithms.AddVehicleToContainerAlgorithm;
-import playground.southafrica.freight.digicore.io.algorithms.DigicoreVehiclesAlgorithm;
 
 public class DigicoreVehiclesReader extends MatsimXmlParser {
 	private final static String DIGICORE_VEHICLES_V1 = "digicoreVehicles_v1.dtd";
@@ -39,7 +34,6 @@ public class DigicoreVehiclesReader extends MatsimXmlParser {
 	private final static Logger LOG = Logger.getLogger(DigicoreVehiclesReader.class);
 	private MatsimXmlParser delegate = null;
 	private DigicoreVehicles vehicles;
-	private List<DigicoreVehiclesAlgorithm> algorithms;
 
 	
 	/**
@@ -47,54 +41,6 @@ public class DigicoreVehiclesReader extends MatsimXmlParser {
 	 */
 	public DigicoreVehiclesReader(DigicoreVehicles vehicles) {
 		this.vehicles = vehicles;
-		
-		/* Add the default algorithm. */
-		algorithms = new ArrayList<DigicoreVehiclesAlgorithm>();
-		algorithms.add(new AddVehicleToContainerAlgorithm(vehicles));
-	}
-	
-	
-	/**
-	 * Removes all the current {@link DigicoreVehiclesAlgorithm}s.
-	 */
-	public void clearAlgorithms(){
-		this.algorithms = new ArrayList<>();
-	}
-	
-	
-	/**
-	 * Adds an algorithm. This method checks that there is not a duplicate
-	 * instance of the default {@link AddVehicleToContainerAlgorithm}.
-	 */
-	public void addAlgorithm(DigicoreVehiclesAlgorithm algorithm){
-		if(algorithm instanceof AddVehicleToContainerAlgorithm){
-			/* Check if an existing default algorithm isn't loaded already. */
-			boolean duplicate = false;
-			Iterator<DigicoreVehiclesAlgorithm> iterator = this.algorithms.iterator();
-			while(iterator.hasNext() & !duplicate){
-				DigicoreVehiclesAlgorithm instance = iterator.next();
-				if(instance instanceof AddVehicleToContainerAlgorithm){
-					LOG.error("Duplicate default algorithm");
-					throw new IllegalArgumentException("This should not happen. " + 
-							"Vehicles will be added multiple times to the same " + 
-							"container, which will result in later errors.");
-				}
-			}
-			if(!duplicate){
-				this.algorithms.add(algorithm);
-			}
-		} else{
-			this.algorithms.add(algorithm);
-		}
-	}
-	
-	/**
-	 * Returns the current number of algorithms.
-	 * 
-	 * @return
-	 */
-	public int getNumberOfAlgorithms(){
-		return this.algorithms.size();
 	}
 	
 	
@@ -116,20 +62,12 @@ public class DigicoreVehiclesReader extends MatsimXmlParser {
 		// Currently the only digicoreVehicles-type is v1
 		if (DIGICORE_VEHICLES_V1.equals(doctype)) {
 			this.delegate = new DigicoreVehiclesReader_v1(this.vehicles);
-			LOG.info("Using digicoreVehicles_v1 reader.");
-			LOG.warn("Currently V1 vehicles do not support algorithms.");
-			LOG.warn("Only the default (adding vehicle to container) is applied.");
+			LOG.info("Using digicoreVehicle_v1 reader.");
 		} else if(DIGICORE_VEHICLES_V2.equals(doctype)) {
-			this.delegate = new DigicoreVehiclesReader_v2(this.vehicles, this.algorithms);
-			LOG.info("Using digicoreVehicles_v2 reader.");
+			this.delegate = new DigicoreVehiclesReader_v2(this.vehicles);
+			LOG.info("Using digicoreVehicle_v2 reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
-		}
-		
-		/* Report the available/loaded algorithms. */
-		LOG.info("The following algorithms will be applied to each vehicle:");
-		for(DigicoreVehiclesAlgorithm algorithm : this.algorithms){
-			LOG.info("   " + algorithm.getClass().toString());
 		}
 	}
 

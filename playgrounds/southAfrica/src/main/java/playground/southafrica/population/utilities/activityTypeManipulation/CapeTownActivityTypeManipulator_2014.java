@@ -24,13 +24,11 @@ import playground.southafrica.utilities.Header;
  * Class to adapt the activity types based on the R-analysis of the activity 
  * durations.
  * 
- * FIXME Which R script?
- * 
  * @author jwjoubert
  */
-public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulator {
+public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 
-	public CapeTownActivityTypeManipulator_2014() {
+	public CapeTownActivityTypeManipulator() {
 	}
 
 	/**
@@ -38,13 +36,13 @@ public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulato
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(CapeTownActivityTypeManipulator_2014.class.toString(), args);
+		Header.printHeader(CapeTownActivityTypeManipulator.class.toString(), args);
 
 		/* ===================  For persons. ===================== */
 		String population = args[0];
 		String decileFile = args[1];
 		String outputPopulation = args[2];
-		CapeTownActivityTypeManipulator_2014 atm = new CapeTownActivityTypeManipulator_2014();
+		CapeTownActivityTypeManipulator atm = new CapeTownActivityTypeManipulator();
 		List<ActivityParams> listPersons = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();
@@ -55,7 +53,7 @@ public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulato
 		population = args[3];
 		decileFile = args[4];
 		outputPopulation = args[5];
-		atm = new CapeTownActivityTypeManipulator_2014();
+		atm = new CapeTownActivityTypeManipulator();
 		List<ActivityParams> listCommercial = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();

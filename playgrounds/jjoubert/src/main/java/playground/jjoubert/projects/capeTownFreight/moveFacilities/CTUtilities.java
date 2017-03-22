@@ -27,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,7 +49,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,6 +60,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -104,13 +103,10 @@ public class CTUtilities {
 			checkEndTimeDuration();
 			break;
 		case 5:
-			generateFacilitiesFile(args);
+			generateFacilitiesFile();
 			break;
 		case 6:
 			calculateAffectedVehicleVkt(args);
-			break;
-		case 7:
-			compareTravelTimes(args);
 			break;
 		default:
 			break;
@@ -305,59 +301,41 @@ public class CTUtilities {
 	 * Method to read a population file and generate the facilities based on
 	 * the (possible) presence of a facility Id. 
 	 */
-	public static void generateFacilitiesFile(String[] args){
+	public static void generateFacilitiesFile(){
 		LOG.info("Generating facilities file...");
-		
-		String populationFile = args[1];
-		String networkFile = args[2];
-		String facilitiesFile = args[3];
-		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new PopulationReader(sc).readFile("/Volumes/Nifty/workspace/coct-data/matsim/businessCases/facilityMove/relocatedPlans_Belcon.xml.gz");
-		new PopulationReader(sc).readFile(populationFile);
-//		new MatsimNetworkReader(sc.getNetwork()).readFile("/Volumes/Nifty/workspace/coct-data/matsim/20150930/network.xml.gz");
-		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
+		new PopulationReader(sc).readFile("/Volumes/Nifty/workspace/coct-data/matsim/businessCases/facilityMove/relocatedPlans_Belcon.xml.gz");
+		new MatsimNetworkReader(sc.getNetwork()).readFile("/Volumes/Nifty/workspace/coct-data/matsim/20150930/network.xml.gz");
 		
 		ActivityFacilities facilities = sc.getActivityFacilities();
 		ActivityFacilitiesFactory aff = facilities.getFactory();
+
 		
-		LOG.info("Processing each person's memory of plans...");
-		Counter counter = new Counter("  person # ");
 		for(Person person : sc.getPopulation().getPersons().values()){
-			for(Plan plan : person.getPlans()){
-				for(int i = 0; i < plan.getPlanElements().size()-1; i++){
-					PlanElement pe = plan.getPlanElements().get(i);
-					if(pe instanceof Activity){
-						Activity act = (Activity)pe;
-						Id<ActivityFacility> fId = act.getFacilityId();
-						if(fId != null){
-							/* Create the facility if not already there. */ 
-							ActivityFacility facility = null;
-							if(!facilities.getFacilities().containsKey(fId)){
-								facility = aff.createActivityFacility(fId, act.getCoord(),
-										NetworkUtils.getNearestLink(sc.getNetwork(), act.getCoord()).getId() );
-								facilities.addActivityFacility(facility);
-							} 
-							facility = facilities.getFacilities().get(fId);
-							
-							/* Check that the activity option is included, add if not. */
-							if(!facility.getActivityOptions().containsKey(act.getType())){
-								facility.addActivityOption(aff.createActivityOption(act.getType()));
-							}
-						} else{
-							LOG.warn("Facility with null Id: Person " + person.getId().toString() + "; location " + act.getCoord().toString());
-						}
+			Plan plan = person.getSelectedPlan();
+			for(int i = 0; i < plan.getPlanElements().size()-1; i++){
+				PlanElement pe = plan.getPlanElements().get(i);
+				if(pe instanceof Activity){
+					Activity act = (Activity)pe;
+					Id<ActivityFacility> fId = act.getFacilityId();
+					if(!facilities.getFacilities().containsKey(fId)){
+						ActivityFacility facility = aff.createActivityFacility(fId, act.getCoord());
+						
+						/* Create the facility options. */
+						ActivityOption majorOption = aff.createActivityOption("major");
+						ActivityOption minorOption = aff.createActivityOption("minor");
+						facility.addActivityOption(minorOption);
+						facility.addActivityOption(majorOption);
+
+						facilities.addActivityFacility(facility);
 					}
 				}
 			}
-			counter.incCounter();
 		}
-		counter.printCounter();
 		LOG.info("Done generating facilities file.");
 		LOG.info("Total number of facilities found: " + facilities.getFacilities().size());
 		
-//		new FacilitiesWriter(facilities).write("/Volumes/Nifty/workspace/coct-data/matsim/businessCases/facilityMove/belconFacilities.xml.gz");
-		new FacilitiesWriter(facilities).write(facilitiesFile);
+		new FacilitiesWriter(facilities).write("/Volumes/Nifty/workspace/coct-data/matsim/businessCases/facilityMove/belconFacilities.xml.gz");
 	}
 	
 	
@@ -548,116 +526,6 @@ public class CTUtilities {
 			}
 		}
 		LOG.info("Done comparing VKT.");
-	}
-	
-	public static void compareTravelTimes(String[] args){
-		LOG.info("Comparing travel times...");
-		String base = args[1];
-		String belcon = args[2];
-		String kraaicon = args[3];
-		String output = args[4];
-		
-		Scenario scBase = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scBase).readFile(base);
-		Map<Id<Person>, Double[]> map = new TreeMap<>();
-		
-		/* structure of results:
-		 * [0] base: selected plans;
-		 * [1] base: avg of all plans;
-		 * [2] belcon: selected plans;
-		 * [3] belcon: avg of all plans;
-		 * [4] kraaicon: selected plans;
-		 * [5] kraaicon: avg of all plans */
-		for(Id<Person> id : scBase.getPopulation().getPersons().keySet()){
-			Person person = scBase.getPopulation().getPersons().get(id);
-			Double[] da = {
-				calculatePlanTravelTime(person.getSelectedPlan()),
-				calculateAverageTravelTime(person),
-				0.0, 0.0, 0.0, 0.0
-			};
-			map.put(id, da);
-		}
-		
-		/* Belcon */
-		scBase = null;
-		Scenario scBelcon = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scBelcon).readFile(belcon);
-		for(Id<Person> id : scBelcon.getPopulation().getPersons().keySet()){
-			Person person = scBelcon.getPopulation().getPersons().get(id);
-			Double[] da = map.get(person.getId());
-			da[2] = calculatePlanTravelTime(person.getSelectedPlan());
-			da[3] = calculateAverageTravelTime(person);
-			map.put(id, da);
-		}
-		
-		/* Kraaicon */
-		scBelcon = null;
-		Scenario scKraaicon = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scKraaicon).readFile(kraaicon);
-		for(Id<Person> id : scKraaicon.getPopulation().getPersons().keySet()){
-			Person person = scKraaicon.getPopulation().getPersons().get(id);
-			Double[] da = map.get(person.getId());
-			da[4] = calculatePlanTravelTime(person.getSelectedPlan());
-			da[5] = calculateAverageTravelTime(person);
-			map.put(id, da);
-		}
-		
-		/* Write comparison. */
-		BufferedWriter bw = IOUtils.getBufferedWriter(output);
-		try{
-			bw.write("id,baseSelect,baseAvg,belconSelect,belconAvg,kraaiconSelect,kraaiconAvg");;
-			bw.newLine();
-			
-			for(Id<Person> id : map.keySet()){
-				Double[] da = map.get(id);
-				bw.write(String.format("%s,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\n", 
-						id.toString(),
-						da[0], da[1], da[2], da[3], da[4], da[5]));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot write to " + output);
-		} finally{
-			try {
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + output);
-			}
-		}
-		
-	}
-	
-	private static double calculatePlanTravelTime(Plan plan){
-		double planTotal = 0.0;
-		int trips = 0;
-		for(PlanElement pe : plan.getPlanElements()){
-			if(pe instanceof Leg){
-				double tt = ((Leg)pe).getTravelTime();
-				if(tt > 0){
-					planTotal += tt;
-					trips++;
-				}
-			}
-		}
-		if(trips > 0){
-			return planTotal / ((double)trips);
-		} else{
-			return Time.UNDEFINED_TIME;
-		}
-	}
-	
-	private static double calculateAverageTravelTime(Person person){
-		double total = 0.0;
-		int count = 0;
-		for(Plan plan : person.getPlans()){
-			double planTime = calculatePlanTravelTime(plan);
-			if(planTime != Time.UNDEFINED_TIME){
-				total += planTime;
-				count++;
-			}
-		}
-		return total / (double)count;
 	}
 	
 	

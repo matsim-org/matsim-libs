@@ -31,7 +31,6 @@ import java.util.TreeMap;
 
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 
@@ -50,16 +49,13 @@ public class AmenityParser {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(AmenityParser.class.toString(), args);
-		runAmenityParser(args);
-		Header.printFooter();
-	}
-	
-	public static void runAmenityParser(String[] args){
+		
 		String osmFile = args[0];
 		String facilitiesFile = args[1];
 		
 		CombinedOsmReader cor = new CombinedOsmReader(
-				TransformationFactory.HARTEBEESTHOEK94_LO19,
+//				"EPSG:3857",
+				"SA_Lo19",
 				getLanduseToMatsimMap(), 
 				getBuildingToMatsimMap(), 
 				getAmenityToMatsimMap(),
@@ -75,6 +71,8 @@ public class AmenityParser {
 			throw new RuntimeException("Cannot parse OSM file " + osmFile);
 		}
 		new FacilitiesWriter(cor.getActivityFacilities()).write(facilitiesFile);
+		
+		Header.printFooter();
 	}
 	
 	/**

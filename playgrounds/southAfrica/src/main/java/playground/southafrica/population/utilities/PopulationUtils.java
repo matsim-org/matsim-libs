@@ -73,7 +73,7 @@ public class PopulationUtils {
 		for(Person person : sc.getPopulation().getPersons().values()){
 			Plan selectedPlan = person.getSelectedPlan();
 			
-			/* Ignore plans that have a single home-based activity. */
+			/* Ignore plans that have a s ingle home-based activity. */
 			if(selectedPlan.getPlanElements().size() == 1){
 				/* Ignore it, the person stays home. */
 				/* TODO Toe determine the activity duration, i.e. scoring, we
@@ -89,10 +89,8 @@ public class PopulationUtils {
 							/* It is the first (home) activity. */
 							duration = act.getEndTime();
 							if(!act.getType().equalsIgnoreCase("h")){
-								if(!act.getType().equalsIgnoreCase("major")){
-									LOG.warn("Chain starting with activity other than `home' or `major': " 
-											+ act.getType() + " (" + person.getId() + ")");
-								}
+								LOG.warn("Chain starting with activity other than `home': " 
+										+ act.getType() + " (" + person.getId() + ")");
 								durations.add(new Tuple<String, Double>(act.getType(), duration));
 							} else{
 								durations.add(new Tuple<String, Double>("h1", duration));

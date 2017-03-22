@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -64,13 +63,10 @@ import org.matsim.vehicles.Vehicle;
  * @author jwjoubert
  */
 public class FacilityRelocator {
-	final private Logger LOG = Logger.getLogger(FacilityRelocator.class);
 	private final LeastCostPathCalculator router;
 	private final Network network;
 	Map<Id<Node>, Map<Id<Node>, Double>> routeMap;
-//	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3857", "WGS84_SA_Albers");
-	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
-			TransformationFactory.HARTEBEESTHOEK94_LO19, TransformationFactory.HARTEBEESTHOEK94_LO19);
+	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3857", "WGS84_SA_Albers");
 	private final CONTAINER_RELOCATIONS relocation;
 
 	public FacilityRelocator(Network network, String relocation) {
@@ -121,7 +117,7 @@ public class FacilityRelocator {
 						partialPlan.add(act);
 					} else{
 						relocatedActivities.add(act);
-						if(act.getType().startsWith("major")){
+						if(act.getType().equalsIgnoreCase("major")){
 							allowAsMajor = true;
 						}
 					}
@@ -132,40 +128,32 @@ public class FacilityRelocator {
 		}
 		
 		List<Activity> bestInsertionList = findBestInsertion(partialPlan, allowAsMajor);
-		if(bestInsertionList != null){
-			/* Clean up the plan. That is, ensure only the first activity has an
-			 * end time set, all others except the last only has max duration. */
-			bestInsertionList.get(0).setMaximumDuration(Time.UNDEFINED_TIME);
-			double currentEnd = bestInsertionList.get(0).getEndTime();
-			if(currentEnd == Time.UNDEFINED_TIME){
-				bestInsertionList.get(0).setEndTime(Time.parseTime("06:00:00"));
-			}
-			
-			/* The last activity has no times set. */
-			bestInsertionList.get(bestInsertionList.size()-1).setEndTime(Time.UNDEFINED_TIME);
-			bestInsertionList.get(bestInsertionList.size()-1).setMaximumDuration(Time.UNDEFINED_TIME);
-			
-			for(int i = 1; i < bestInsertionList.size()-1; i++){
-				bestInsertionList.get(i).setEndTime(Time.UNDEFINED_TIME);
-				double d = bestInsertionList.get(i).getMaximumDuration();
-				if(d == Time.UNDEFINED_TIME){
-					bestInsertionList.get(i).setMaximumDuration(Time.parseTime("00:20:00"));
-				}
-			}
-			
-			/* Build a complete plan from the list of activities. */
-			Leg commercialLeg = PopulationUtils.createLeg("commercial");
-			for(int i = 0; i < bestInsertionList.size()-1; i++){
-				newPlan.addActivity(bestInsertionList.get(i));
-				newPlan.addLeg(commercialLeg);
-			}
-			newPlan.addActivity(bestInsertionList.get(bestInsertionList.size()-1));
-		} else{
-			/* The plan is returned as is. */
-			LOG.warn("Could not find an insertion list for agent " + plan.getPerson().getId().toString() + 
-					". Returning original plan.");
-			newPlan = plan;
+		/* Clean up the plan. That is, ensure only the first activity has an
+		 * end time set, all others except the last only has max duration. The
+		 * last activity has no times set. */
+		bestInsertionList.get(0).setMaximumDuration(Time.UNDEFINED_TIME);
+		double currentEnd = bestInsertionList.get(0).getEndTime();
+		if(currentEnd == Time.UNDEFINED_TIME){
+			bestInsertionList.get(0).setEndTime(Time.parseTime("00:06:00"));
 		}
+		
+		bestInsertionList.get(bestInsertionList.size()-1).setEndTime(Time.UNDEFINED_TIME);
+		bestInsertionList.get(bestInsertionList.size()-1).setMaximumDuration(Time.UNDEFINED_TIME);
+		for(int i = 1; i < bestInsertionList.size()-1; i++){
+			bestInsertionList.get(i).setEndTime(Time.UNDEFINED_TIME);
+			double d = bestInsertionList.get(i).getMaximumDuration();
+			if(d == Time.UNDEFINED_TIME){
+				bestInsertionList.get(i).setMaximumDuration(Time.parseTime("00:20:00"));
+			}
+		}
+		
+		/* Build a complete plan from the list of activities. */
+		Leg commercialLeg = PopulationUtils.createLeg("commercial");
+		for(int i = 0; i < bestInsertionList.size()-1; i++){
+			newPlan.addActivity(bestInsertionList.get(i));
+			newPlan.addLeg(commercialLeg);
+		}
+		newPlan.addActivity(bestInsertionList.get(bestInsertionList.size()-1));
 		
 		return newPlan;
 	}
@@ -197,18 +185,16 @@ public class FacilityRelocator {
 			Activity tmpActivity = getRelocationActivity();
 			tmpList.add(i, tmpActivity);
 			
-			/* The activity type is assumed to last the median time observed in
-			 * the (latest, Feb 2017) analysis of activity durations. */
 			double tmp = evaluateList(tmpList);
 			if(tmp < best){
 				if(i == 0){
-					tmpActivity.setType("major3");
-					tmpActivity.setEndTime(Time.parseTime("08:02:58"));
+					tmpActivity.setType("major");
+					tmpActivity.setEndTime(Time.parseTime("08:00:00"));
 				} else if(i == partialRoute.size()){
-					tmpActivity.setType("major3");
+					tmpActivity.setType("major");
 				} else{
-					tmpActivity.setType("minor3");
-					tmpActivity.setMaximumDuration(Time.parseTime("00:21:59"));
+					tmpActivity.setType("minor");
+					tmpActivity.setMaximumDuration(Time.parseTime("00:20:00"));
 				}
 				best = tmp;
 				bestList = tmpList;
@@ -260,12 +246,9 @@ public class FacilityRelocator {
 	}
 	
 	/**
-	 * Returns the relocation activity. 
-	 * 
-	 * The coordinate is transformed into the (hard-code) coordinate system. For
-	 * Cape Town this is no longer <code>WGS_SA_Albers</code>, but rather the
-	 * {@link TransformationFactory#HARTEBEESTHOEK94_LO19} coordinate reference 
-	 * system.
+	 * Returns the relocation activity. The coordinate is transformed into the
+	 * <code>WGS_SA_Albers</code> coordinate reference system, which is 
+	 * typically what we use in MATSim models in South Africa.
 	 * 
 	 * @return
 	 */
@@ -286,11 +269,9 @@ public class FacilityRelocator {
 		public Coord getCoord(){
 			switch (this) {
 			case BELCON:
-//				return CoordUtils.createCoord(2073560.0, -4016772.0); /* EPSG:3857 */
-				return CoordUtils.createCoord(-34480.0, -3753783.0); /* Hartebeesthoek Lo19 */
+				return CoordUtils.createCoord(2073560.0, -4016772.0);
 			case KRAAICON:
-//				return CoordUtils.createCoord(2085660.0, -4007210.0); /* EPSG:3857 */
-				return CoordUtils.createCoord(-24890.0, -3746095.0); /* Hartebeesthoek Lo19 */
+				return CoordUtils.createCoord(2085660.0, -4007210.0);
 			default:
 				throw new RuntimeException("Dont know what to do with " + this.toString());
 			}

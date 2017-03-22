@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,17 +47,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.households.Household;
@@ -106,17 +102,23 @@ public class CapeTownScenarioCleaner {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(CapeTownScenarioCleaner.class.toString(), args);
-		run(args);
-		Header.printFooter();
-	}
-	
-	public static void run(String[] args){
+		
 		String folder = args[0];
 		folder = folder + (folder.endsWith("/") ? "" : "/");
-		
+
 		/* Copy the person and commercial vehicle attribute files from the 
 		 * work-in-progress folder. */
-//		copyFilesPre2017(folder);
+		try {
+			FileUtils.copyFile(
+					new File(folder + "wip/freightAttributes.xml.gz"), 
+					new File(folder + "commercialAttributes.xml.gz"));
+			FileUtils.copyFile(
+					new File(folder + "wip/populationAttributes.xml.gz"), 
+					new File(folder + "personAttributes.xml.gz"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not copy attribute files.");
+		}
 		
 		/* Check the necessary population input files. */
 		checkFiles(folder);
@@ -130,31 +132,19 @@ public class CapeTownScenarioCleaner {
 		updateNetworkModes(sc, folder, network);
 		
 		sc = cleanupHouseholds(sc, folder, personsCRS, wantedCRS);
-		sc = checkFacilities(sc);
 		
 		/* Write the final population to file. */
-		new PopulationWriter(sc.getPopulation()).writeV5(folder + "population.xml.gz");
+		new PopulationWriter(sc.getPopulation()).write(folder + "population.xml.gz");
 		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(folder + "populationAttributes.xml.gz");
 		new FacilitiesWriter(sc.getActivityFacilities()).write(folder + "facilities.xml.gz");
 		new HouseholdsWriterV10(sc.getHouseholds()).writeFile(folder + "households.xml.gz");
 		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
 		oaw.putAttributeConverter(Coord.class, new CoordConverter());
 		oaw.writeFile(folder + "householdAttributes.xml.gz");
+		
+		Header.printFooter();
 	}
 	
-	private static void copyFilesPre2017(String folder){
-		try {
-			FileUtils.copyFile(
-					new File(folder + "wip/freightAttributes.xml.gz"), 
-					new File(folder + "commercialAttributes.xml.gz"));
-			FileUtils.copyFile(
-					new File(folder + "wip/populationAttributes.xml.gz"), 
-					new File(folder + "personAttributes.xml.gz"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Could not copy attribute files.");
-		}
-	}
 		
 	/**
 	 * The households contain the member IDs. But in this class we've adapted
@@ -169,10 +159,10 @@ public class CapeTownScenarioCleaner {
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(personCRS, wantedCRS);
 		
-		new HouseholdsReaderV10(sc.getHouseholds()).readFile(folder + "households.xml.gz");
+		new HouseholdsReaderV10(sc.getHouseholds()).readFile(folder + "wip/households.xml.gz");
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
 		oar.putAttributeConverter(Coord.class, new CoordConverter());
-		oar.readFile(folder + "householdAttributes.xml.gz");
+		oar.readFile(folder + "wip/householdAttributes.xml.gz");
 		
 		for(Household hh : sc.getHouseholds().getHouseholds().values()){
 			int householdSize = hh.getMemberIds().size();
@@ -205,7 +195,7 @@ public class CapeTownScenarioCleaner {
 		
 		/* Update the config file accordingly. */
 		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, folder + "config.xml.gz");
+		ConfigUtils.loadConfig(config, folder + "config.xml");
 		config.qsim().setMainModes(modes);
 		config.plansCalcRoute().setNetworkModes(modes);
 		/* Add the teleported modes. */
@@ -236,7 +226,7 @@ public class CapeTownScenarioCleaner {
 		other.setBeelineDistanceFactor(1.3);
 		other.setTeleportedModeSpeed(30.0 / 3.6);
 		
-		new ConfigWriter(config).write(folder + "config.xml.gz");
+		new ConfigWriter(config).write(folder + "config.xml");
 		new NetworkWriter(sc.getNetwork()).write(network);
 		LOG.info("Done updating network modes.");
 	}
@@ -272,21 +262,6 @@ public class CapeTownScenarioCleaner {
 					Activity act = (Activity)pe;
 					Coord oldCoord = act.getCoord();
 					act.setCoord(ctPersons.transform(oldCoord));
-					
-					Id<ActivityFacility> fid = act.getFacilityId();
-					if(fid != null){
-						ActivityFacility facility;
-						if(!sc.getActivityFacilities().getFacilities().containsKey(fid)){
-							facility = aff.createActivityFacility(fid, act.getCoord());
-							sc.getActivityFacilities().addActivityFacility(facility);
-						} else{
-							facility = sc.getActivityFacilities().getFacilities().get(fid);
-						}
-						if(!facility.getActivityOptions().containsKey(act.getType())){
-							ActivityOption option = aff.createActivityOption(act.getType());
-							facility.addActivityOption(option);
-						}
-					}
 				}
 			}
 			person.addPlan(plan);
@@ -362,42 +337,6 @@ public class CapeTownScenarioCleaner {
 		return sc;
 	}
 	
-	private static Scenario checkFacilities(Scenario sc){
-		LOG.info("Checking that each activity facility is in the container, " + 
-				"and that the facilities have LinkIDs...");
-		
-		ActivityFacilities facilities = sc.getActivityFacilities();
-		Network network = sc.getNetwork();
-		
-		for(Person person : sc.getPopulation().getPersons().values()){
-			Plan plan = person.getSelectedPlan();
-			for(PlanElement pe : plan.getPlanElements()){
-				if(pe instanceof Activity){
-					Activity activity = (Activity)pe;
-					Id<ActivityFacility> fid = activity.getFacilityId();
-					if(fid != null){
-						if(!facilities.getFacilities().containsKey(fid)){
-							LOG.error("Could not find facility " + fid.toString() + 
-									" for person " + person.getId().toString());
-						}
-						
-						/* Get the facility, and check its link Id. */
-						ActivityFacility facility = facilities.getFacilities().get(fid);
-						Id<Link> lid = facility.getLinkId();
-//						LOG.debug("Link Id before: " + lid);
-						if(lid == null){
-							((ActivityFacilityImpl)facility).setLinkId( 
-									NetworkUtils.getNearestLink(network, facility.getCoord()).getId());
-						}
-//						LOG.debug("Link Id after: " + facilities.getFacilities().get(fid).getLinkId().toString() );
-					}
-				}
-			}
-		}
-		
-		LOG.info("Done checking facilties.");
-		return sc;
-	}
 	
 	private static void addAttribute(
 			Scenario oldSc, Id<Person> oldId, 
@@ -412,7 +351,7 @@ public class CapeTownScenarioCleaner {
 		boolean ePersonAttributes = checkFile(new File(folder + "personAttributes.xml.gz"));
 		boolean eCommercial = checkFile(new File(folder + "commercial.xml.gz"));
 		boolean eCommercialAttributes = checkFile(new File(folder + "commercialAttributes.xml.gz"));
-		boolean eConfig = checkFile(new File(folder + "config.xml.gz"));
+		boolean eConfig = checkFile(new File(folder + "config.xml"));
 		if(ePerson || ePersonAttributes || eCommercial || eCommercialAttributes
 				|| eConfig){
 			try {

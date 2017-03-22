@@ -35,14 +35,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
 import playground.southafrica.utilities.Header;
 
@@ -64,7 +61,6 @@ public class RunFacilityRelocator {
 		String relocation = args[1];
 		String populationRelocated = args[2];
 		String network = args[3];
-		String facilities = args[4];
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
@@ -82,22 +78,20 @@ public class RunFacilityRelocator {
 		for(Person person : sc.getPopulation().getPersons().values()){
 			Person newPerson = pf.createPerson(person.getId());
 			
-			for(Plan plan : person.getPlans()){
-//				Plan plan = person.getSelectedPlan();
-				int relocationCount = CTUtilities.countNumberOfAffectedFacilities(plan);
-				if(relocationCount > 0){
-					Plan newPlan = fr.processPlan(plan);
-					newPerson.addPlan(newPlan);
-					if(count++ < 5){
-						LOG.warn("Relocated agent: " + person.getId().toString());
-						if(count == 5){
-							LOG.warn("Future occurences of this warning will be surpressed.");
-						}
+			Plan plan = person.getSelectedPlan();
+			int relocationCount = CTUtilities.countNumberOfAffectedFacilities(plan);
+			if(relocationCount > 0){
+				Plan newPlan = fr.processPlan(plan);
+				newPerson.addPlan(newPlan);
+				if(count++ < 5){
+					LOG.warn("Relocated agent: " + person.getId().toString());
+					if(count == 5){
+						LOG.warn("Future occurences of this warning will be surpressed.");
 					}
-					affectedPersons.add(person.getId());
-				} else{
-					newPerson.addPlan(plan);
 				}
+				affectedPersons.add(person.getId());
+			} else{
+				newPerson.addPlan(plan);
 			}
 			newSc.getPopulation().addPerson(newPerson);
 		}
@@ -105,18 +99,8 @@ public class RunFacilityRelocator {
 		/* Write the resulting population to file. */
 		new PopulationWriter(newSc.getPopulation()).write(populationRelocated);
 		
-		/* Add the new facilities, with all the necessary activity options, to 
-		 * the current facilities file. */
-		String[] facilityArgs = {
-				"", /* Not needed for this call. */
-				populationRelocated,
-				network,
-				facilities
-		};
-		CTUtilities.generateFacilitiesFile(facilityArgs);
-		
 		/* Write the list of IDs that are affected. */
-		BufferedWriter bw = IOUtils.getBufferedWriter(args[5]);
+		BufferedWriter bw = IOUtils.getBufferedWriter(args[4]);
 		try{
 			bw.write("Id");
 			bw.newLine();
@@ -126,13 +110,13 @@ public class RunFacilityRelocator {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new RuntimeException("Cannot write to " + args[5]);
+			throw new RuntimeException("Cannot write to " + args[4]);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
 				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + args[5]);
+				throw new RuntimeException("Cannot close " + args[4]);
 			}
 		}
 		

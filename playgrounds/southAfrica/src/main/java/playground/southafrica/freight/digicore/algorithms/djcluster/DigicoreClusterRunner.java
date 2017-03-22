@@ -20,6 +20,7 @@
 
 package playground.southafrica.freight.digicore.algorithms.djcluster;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -35,11 +37,18 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.southafrica.freight.digicore.algorithms.concaveHull.ConcaveHull;
+import playground.southafrica.freight.digicore.algorithms.djcluster.containers.ClusterActivity;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.DigicoreCluster;
 import playground.southafrica.freight.digicore.algorithms.postclustering.ClusteredChainGenerator;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
@@ -50,6 +59,14 @@ import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
 import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+
 /**
  * Class to cluster the activities of Digicore vehicles' activity chains using
  * the {@link DJCluster} approach. Once clustered, the activity chains are <i>not</i>
@@ -58,7 +75,6 @@ import playground.southafrica.utilities.gis.MyMultiFeatureReader;
  *
  * @author jwjoubert
  */
-@SuppressWarnings("deprecation")
 public class DigicoreClusterRunner {
 	private final static Logger LOG = Logger.getLogger(DigicoreClusterRunner.class);
 	private final static int BLOCK_SIZE = 100; 
@@ -66,6 +82,7 @@ public class DigicoreClusterRunner {
 	private final int numberOfThreads;
 	private Map<Id<MyZone>, List<Coord>> zoneMap = null;
 	private ActivityFacilities facilities;
+	private ObjectAttributes facilityAttributes;
 
 	/** 
 	 * Clustering the minor activities from Digicore vehicle chains. The following
@@ -139,6 +156,8 @@ public class DigicoreClusterRunner {
 				folder.mkdirs();
 				
 				/* Cluster. */
+				dcr.facilities = FacilitiesUtils.createActivityFacilities(String.format("Digicore clustered facilities: %.0f (radius); %d (pmin)",thisRadius, thisPmin));
+				dcr.facilityAttributes = new ObjectAttributes();
 				try{
 					dcr.clusterPointLists(thisRadius, thisPmin, facilityPointFolder);
 				} catch (Exception e){
@@ -147,8 +166,8 @@ public class DigicoreClusterRunner {
 				}
 				
 				/* Write output. */
-				DJClusterUtils.writeOutput(dcr.facilities, theFacilityFile, theFacilityAttributeFile);
-				DJClusterUtils.writePrettyCsv(dcr.facilities, theFacilityCsvFile);
+				dcr.writeOutput(theFacilityFile, theFacilityAttributeFile);
+				dcr.writePrettyCsv(theFacilityCsvFile);
 			}
 		}
 		long clusterTime = System.currentTimeMillis() - jobStart - readTime;
@@ -163,9 +182,59 @@ public class DigicoreClusterRunner {
 		LOG.info("=============================================================");
 
 	}
+
+
+
+	public void writeOutput(String theFacilityFile, String theFacilityAttributeFile) {
+		/* Write (for the current configuration) facilities, and the attributes, to file. */
+		LOG.info("-------------------------------------------------------------");
+		LOG.info(" Writing the facilities to file: " + theFacilityFile);
+		FacilitiesWriter fw = new FacilitiesWriter(facilities);
+		fw.write(theFacilityFile);				
+		LOG.info(" Writing the facility attributes to file: " + theFacilityAttributeFile);
+		ObjectAttributesXmlWriter ow = new ObjectAttributesXmlWriter(facilityAttributes);
+		ow.putAttributeConverter(Point.class, new HullConverter());
+		ow.putAttributeConverter(LineString.class, new HullConverter());
+		ow.putAttributeConverter(Polygon.class, new HullConverter());
+		ow.writeFile(theFacilityAttributeFile);
+	}
+
+
+
+	public void writePrettyCsv(String theFacilityCsvFile) {
+		/* Write out pretty CSV file. */
+		LOG.info(" Writing the facilities to csv: " + theFacilityCsvFile);
+		BufferedWriter bw = IOUtils.getBufferedWriter(theFacilityCsvFile);
+		try{
+			bw.write("Id,Long,Lat,Count");
+			bw.newLine();
+			for(Id<ActivityFacility> id : this.facilities.getFacilities().keySet()){
+				ActivityFacility af = this.facilities.getFacilities().get(id);
+				bw.write(id.toString());
+				bw.write(",");
+				bw.write(String.format("%.1f,%.1f,", af.getCoord().getX(), af.getCoord().getY()));
+				bw.write(String.valueOf(this.facilityAttributes.getAttribute(id.toString(), "DigicoreActivityCount")));
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 
+
 	private void clusterPointLists(double radius, int minimumPoints, String outputFolder) throws Exception {
+		/* FIXME This counter checks how many facilities are ignored. 
+		 * This is because the concave hull algorithm still returns
+		 * empty geometries. */
+		int numberOfFacilitiesOmitted = 0;
+
 		File folder = new File(outputFolder);
 		if(folder.exists()){
 			LOG.warn("Facility points folder exists, and will be deleted. ");
@@ -189,7 +258,7 @@ public class DigicoreClusterRunner {
 		Counter counter = new Counter("   Zones completed: ");
 		/* Submit the clustering jobs to the different threads. */
 		for(Id<MyZone> id : zoneMap.keySet()){			
-			Callable<List<DigicoreCluster>> job = new DJClusterCallable(zoneMap.get(id), radius, minimumPoints, counter);
+			Callable<List<DigicoreCluster>> job = new DigicoreClusterCallable(zoneMap.get(id), radius, minimumPoints, counter);
 			Future<List<DigicoreCluster>> submit = threadExecutor.submit(job);
 			listOfJobs.add(submit);
 		}
@@ -199,9 +268,88 @@ public class DigicoreClusterRunner {
 		}
 		counter.printCounter();
 
-		this.facilities = DJClusterUtils.consolidateMultihtreadedOutput(radius, minimumPoints, outputFolder, listOfJobs);
+		int i = 0;
+		for(Future<List<DigicoreCluster>> future : listOfJobs){
+			try {
+				List<DigicoreCluster> list = future.get();
+				for(DigicoreCluster dc : list){
+					Id<ActivityFacility> facilityId = Id.create(i++, ActivityFacility.class);
+
+					/* Construct the concave hull for the clustered points. */
+					List<ClusterActivity> dcPoints = dc.getPoints();
+					if(dcPoints.size() > 0){
+						GeometryFactory gf = new GeometryFactory();
+						Geometry[] ga = new Geometry[dcPoints.size()];
+						for(int j = 0; j < dcPoints.size(); j++){
+							ga[j] = gf.createPoint(new Coordinate(dcPoints.get(j).getCoord().getX(), dcPoints.get(j).getCoord().getY()));
+						}
+						
+						GeometryCollection points = new GeometryCollection(ga, gf);
+						
+						ConcaveHull ch = new ConcaveHull(points, 10);
+						Geometry hull = ch.getConcaveHull(facilityId.toString());
+						
+						/*FIXME For some reason there are empty hulls. For now 
+						 * we are only creating facilities for those with a valid
+						 * Geometry for a hull: point, line or polygon.*/
+						if(!hull.isEmpty()){
+							dc.setConcaveHull(hull);
+							dc.setCenterOfGravity();
+							
+							ActivityFacility af = facilities.getFactory().createActivityFacility(facilityId, dc.getCenterOfGravity());
+							facilities.addActivityFacility(af);
+							facilityAttributes.putAttribute(facilityId.toString(), "DigicoreActivityCount", String.valueOf(dc.getPoints().size()));
+							facilityAttributes.putAttribute(facilityId.toString(), "concaveHull", hull);
+						} else{
+							LOG.debug("Facility " + facilityId.toString() + " is not added. Hull is an empty geometry!");
+							numberOfFacilitiesOmitted++;
+						}
+					}
+								
+					/* First, remove duplicate points. 
+					 * TODO Consider the UniqueCoordinateArrayFilter class from vividsolutions.*/
+					List<Coord> coordList = new ArrayList<Coord>();
+					for(ClusterActivity ca : dc.getPoints()){
+						if(!coordList.contains(ca.getCoord())){
+							coordList.add(ca.getCoord());
+						}
+					}
+
+					/*TODO If we want to, we need to write all the cluster members out to file HERE. 
+					 * Update (20130627): Or, rather write out the concave hull. */
+					/* FIXME Consider 'not' writing the facilities to file, as 
+					 * this takes up a HUGE amount of disk space (JWJ Nov '13) */
+					String clusterFile = String.format("%s%.0f_%d_points_%s.csv.gz", outputFolder, radius, minimumPoints, facilityId.toString());
+					BufferedWriter bw = IOUtils.getBufferedWriter(clusterFile);
+					try{
+						bw.write("Long,Lat");
+						bw.newLine();
+						for(Coord c : coordList){
+							bw.write(String.format("%f, %f\n", c.getX(), c.getY()));
+						}
+					} catch (IOException e) {
+						throw new RuntimeException("Could not write to " + clusterFile);
+					} finally{
+						try {
+							bw.close();
+						} catch (IOException e) {
+							throw new RuntimeException("Could not close " + clusterFile);
+						}
+					}
+				}
+			} catch (InterruptedException e) {
+				throw new RuntimeException("InterruptedException caught in retieving thread results.");
+			} catch (ExecutionException e) {
+				throw new RuntimeException("ExecutionException caught in retieving thread results.");
+			}				
+		}
 		ActivityFacilitiesImpl r = ((ActivityFacilitiesImpl)facilities);
+		
 		LOG.info("    facility # " + r.getFacilities().size() );
+		
+		/*TODO Can remove after debugging. Report the number of
+		 * facilities that were ignored because of empty geometries. */
+		LOG.debug("Facilities omitted: " + radius + "_" + minimumPoints + "(" + numberOfFacilitiesOmitted + ")");
 	}
 
 
@@ -331,6 +479,7 @@ public class DigicoreClusterRunner {
 	public DigicoreClusterRunner(int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 		facilities = FacilitiesUtils.createActivityFacilities("Digicore facilities");
+		facilityAttributes = new ObjectAttributes();
 	}
 	
 	

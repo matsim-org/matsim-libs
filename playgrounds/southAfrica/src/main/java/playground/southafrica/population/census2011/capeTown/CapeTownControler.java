@@ -29,7 +29,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 
 import playground.southafrica.utilities.Header;
@@ -85,14 +84,10 @@ public class CapeTownControler {
 	
 	private static Config setupConfig(String folder, Machine machine, double fraction){
 		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, folder + "config.xml.gz");
-		
-		/* Coordinate reference system. */
-		config.global().setCoordinateSystem(TransformationFactory.HARTEBEESTHOEK94_LO19);
+		ConfigUtils.loadConfig(config, folder + "config.xml");
 		
 		/* Fix the seed. */
 		config.global().setRandomSeed(201602151600l);
-		config.global().setRandomSeed(201702150940l);
 
 		/* Set the number of threads. */
 		config.global().setNumberOfThreads(machine.getThreads());
@@ -178,7 +173,7 @@ public class CapeTownControler {
 	 * @author jwjoubert
 	 */
 	private enum Machine{
-		HOBBES(15),
+		HOBBES(40),
 		MAC_MINI(4),
 		MACBOOK_PRO(4);
 

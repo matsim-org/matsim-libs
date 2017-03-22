@@ -21,7 +21,6 @@
 package playground.southafrica.freight.digicore.io;
 
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 import java.util.TimeZone;
@@ -39,7 +38,6 @@ import playground.southafrica.freight.digicore.containers.DigicorePosition;
 import playground.southafrica.freight.digicore.containers.DigicoreTrace;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
-import playground.southafrica.freight.digicore.io.algorithms.DigicoreVehiclesAlgorithm;
 
 public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
 	private final static String VEHICLES = "digicoreVehicles";
@@ -63,7 +61,7 @@ public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
 	private final static String ATTR_ACTIVITYTYPE = "type";
 	private final static String ATTR_FACILITY = "facility";
 	private final static String ATTR_LINK = "link";
-//	private final static String ATTR_TRACE_CRS = "crs";
+	private final static String ATTR_TRACE_CRS = "crs";
 	private final static String ATTR_POS_TIME = "time";
 	private final static String ATTR_POS_X = "x";
 	private final static String ATTR_POS_Y = "y";
@@ -76,12 +74,9 @@ public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
 	private TimeZone timeZone;
 	private Locale locale;
 	
-	private final List<DigicoreVehiclesAlgorithm> algorithms;
 	
-	
-	public DigicoreVehiclesReader_v2(DigicoreVehicles vehicles, List<DigicoreVehiclesAlgorithm> algorithms) {
+	public DigicoreVehiclesReader_v2(DigicoreVehicles vehicles) {
 		this.vehicles = vehicles;
-		this.algorithms = algorithms;
 	}
 	
 	
@@ -107,11 +102,7 @@ public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(VEHICLE.equals(name)){
-			/* Run all the loaded algorithms, one after another, on the current
-			 * vehicle. */
-			for(DigicoreVehiclesAlgorithm algorithm : this.algorithms){
-				algorithm.apply(currentVehicle);
-			}
+			vehicles.getVehicles().put(currentVehicle.getId(), currentVehicle);
 			currentVehicle = null;
 		} else if(CHAIN.equals(name)){
 			currentVehicle.getChains().add(currentChain);

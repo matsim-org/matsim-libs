@@ -37,8 +37,6 @@ import playground.southafrica.freight.digicore.containers.DigicorePosition;
 import playground.southafrica.freight.digicore.containers.DigicoreTrace;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
-import playground.southafrica.freight.digicore.io.algorithms.AddVehicleToContainerAlgorithm;
-import playground.southafrica.freight.digicore.io.algorithms.DigicoreVehiclesAlgorithm;
 
 public class DigicoreVehiclesReaderTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
@@ -87,7 +85,7 @@ public class DigicoreVehiclesReaderTest {
 		DigicoreVehicles dvsOut = createVehicles();
 		new DigicoreVehiclesWriter(dvsOut).writeV2(utils.getOutputDirectory() + "vehiclesV2.xml");
 		
-		DigicoreVehicles dvsIn = new DigicoreVehicles();
+		DigicoreVehicles dvsIn = createVehicles();
 		new DigicoreVehiclesReader(dvsIn).readFile(utils.getOutputDirectory() + "vehiclesV2.xml");
 		/* Check container. */
 		assertTrue("Wrong CRS.", dvsIn.getCoordinateReferenceSystem().equalsIgnoreCase(dvsOut.getCoordinateReferenceSystem()));
@@ -117,47 +115,6 @@ public class DigicoreVehiclesReaderTest {
 		assertEquals("Position x not correct.", position.getCoord().getX(), 1.0, MatsimTestUtils.EPSILON);
 		assertEquals("Position y not correct.", position.getCoord().getY(), 1.0, MatsimTestUtils.EPSILON);
 	}
-	
-	@Test
-	public void testGetNumberOfAlgorithms(){
-		DigicoreVehiclesReader dvr = new DigicoreVehiclesReader(new DigicoreVehicles());
-		assertEquals("Should only have one default algorithm.", 1, dvr.getNumberOfAlgorithms());
-	}
-	
-	@Test 
-	public void testClearAlgorithms(){
-		DigicoreVehiclesReader dvr = new DigicoreVehiclesReader(new DigicoreVehicles());
-		assertEquals("Should only have one default algorithm.", 1, dvr.getNumberOfAlgorithms());
-		dvr.clearAlgorithms();
-		assertEquals("Should have no more default algorithm.", 0, dvr.getNumberOfAlgorithms());
-	}
-	
-	@Test
-	public void testAddAlgorithm(){
-		DigicoreVehicles vehicles = new DigicoreVehicles();
-		DigicoreVehiclesReader dvr = new DigicoreVehiclesReader(vehicles);
-		
-		try{
-			dvr.addAlgorithm(new AddVehicleToContainerAlgorithm(vehicles));
-			fail("Should not allow duplicate default algorithm.");
-		} catch (IllegalArgumentException e){
-			/* Correctly caught exception. */
-		}
-
-		DigicoreVehiclesAlgorithm someAlgorithm = new DigicoreVehiclesAlgorithm() {
-			
-			@Override
-			public void apply(DigicoreVehicle vehicle) {
-				/* Do nothing */
-			}
-		};
-		try{
-			dvr.addAlgorithm(someAlgorithm);
-		} catch (IllegalArgumentException e){
-			fail("Should allow non-default algorithm.");
-		}
-	}
-	
 	
 	private DigicoreVehicles createVehicles(){
 		DigicoreVehicles dvs = new DigicoreVehicles();
