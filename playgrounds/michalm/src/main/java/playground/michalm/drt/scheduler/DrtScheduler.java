@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.tasks.DrtStayTask;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -191,52 +190,67 @@ public class DrtScheduler implements ScheduleInquiry {
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Stop> stops = vehicleEntry.stops;
 
-		Task driveToPickupTask;
+		NDrtTask currentTask = (NDrtTask)schedule.getCurrentTask();
+		Task beforePickupTask;
 
-		if (insertion.pickupIdx == 0) { // divert current drive task
-			NDrtTask currentTask = (NDrtTask)schedule.getCurrentTask();
-			switch (currentTask.getDrtTaskType()) {
-				case DRIVE:
-					driveToPickupTask = schedule.getCurrentTask();
-					VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
-							vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
-					((OnlineDriveTaskTracker)driveToPickupTask.getTaskTracker()).divertPath(vrpPath);
-					break;
-
-				case STOP:
-				case STAY:
-				default:
-					throw new UnsupportedOperationException("Still need to handle it");
+		if (insertion.pickupIdx == 0 && currentTask.getDrtTaskType() == NDrtTaskType.DRIVE) { // divert vehicle
+			beforePickupTask = currentTask;
+			VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
+					vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
+			((OnlineDriveTaskTracker)beforePickupTask.getTaskTracker()).divertPath(vrpPath);
+		} else { // insert pickup after an existing stop/stay task
+			NDrtStayTask stayTask = null;
+			NDrtStopTask stopTask = null;
+			if (insertion.pickupIdx == 0) {
+				if (currentTask.getDrtTaskType() == NDrtTaskType.STAY) {
+					stayTask = (NDrtStayTask)currentTask; // ongoing stay task
+					double oldEndTime = stayTask.getEndTime();
+					double now = timer.getTimeOfDay();
+					if (oldEndTime> now) { //split stay task into two, so that a new stop/drive task can be inserted now 
+						stayTask.setEndTime(now);
+						schedule.addTask(new NDrtStayTask(now, oldEndTime, stayTask.getLink()));
+					}
+				} else {
+					stopTask = (NDrtStopTask)currentTask; // ongoing stop task
+				}
+			} else {
+				stopTask = stops.get(insertion.pickupIdx - 1).task; // future stop task
 			}
 
-		} else { // insert pickup after an existing stop tasks
-			NDrtStopTask stopTask = stops.get(insertion.pickupIdx - 1).task;
-			if (request.getFromLink() == stopTask.getLink()) { // no detour; no new stop task
+			if (stopTask != null && request.getFromLink() == stopTask.getLink()) { // no detour; no new stop task
 				// add pickup request to stop task
 				stopTask.addPickupRequest(request);
 				request.setPickupTask(stopTask);
 				return;
+			} else if (stayTask != null && request.getFromLink() == stayTask.getLink()) {
+				// the bus stays where it is
+				beforePickupTask = stayTask;
 			} else { // add drive task to pickup location
-				NDrtStopTask nextStopTask = stops.get(insertion.pickupIdx).task;
-				if (stopTask.getTaskIdx() + 2 != nextStopTask.getTaskIdx()) {
-					throw new IllegalStateException();
+
+				// remove drive i->i+1 (if there is one)
+				if (insertion.pickupIdx < stops.size()) {// there is at least one following stop
+					NDrtStopTask nextStopTask = stops.get(insertion.pickupIdx).task;
+					if (stopTask.getTaskIdx() + 2 != nextStopTask.getTaskIdx()) {// there must a drive task in between
+						throw new RuntimeException();
+					}
+					if (stopTask.getTaskIdx() + 2 == nextStopTask.getTaskIdx()) {// there must a drive task in between
+						int driveTaskIdx = stopTask.getTaskIdx() + 1;
+						schedule.removeTask(schedule.getTasks().get(driveTaskIdx));
+					}
 				}
 
-				// remove drive i->i+1
-				int driveTaskIdx = stopTask.getTaskIdx() + 1;
-				schedule.removeTask(schedule.getTasks().get(driveTaskIdx));
-
 				// insert drive i->pickup
-				VrpPathWithTravelData vrpPath = VrpPaths.createPath(stopTask.getLink(), request.getFromLink(),
-						stopTask.getEndTime(), insertion.pathToPickup.path, travelTime);
-				driveToPickupTask = new NDrtDriveTask(vrpPath);
-				schedule.addTask(stopTask.getTaskIdx() + 1, driveToPickupTask);
+				StayTask stayOrStopTask = stayTask != null ? stayTask : stopTask;
+				VrpPathWithTravelData vrpPath = VrpPaths.createPath(stayOrStopTask.getLink(), request.getFromLink(),
+						stayOrStopTask.getEndTime(), insertion.pathToPickup.path, travelTime);
+				beforePickupTask = new NDrtDriveTask(vrpPath);
+				schedule.addTask(stayOrStopTask.getTaskIdx() + 1, beforePickupTask);
 			}
 		}
 
 		// insert pickup stop task
-		double startTime = driveToPickupTask.getEndTime();
-		int taskIdx = driveToPickupTask.getTaskIdx() + 1;
+		double startTime = beforePickupTask.getEndTime();
+		int taskIdx = beforePickupTask.getTaskIdx() + 1;
 		NDrtStopTask stopTask = new NDrtStopTask(startTime, startTime + params.stopDuration, request.getFromLink());
 		schedule.addTask(taskIdx, stopTask);
 		request.setPickupTask(stopTask);
@@ -293,7 +307,7 @@ public class DrtScheduler implements ScheduleInquiry {
 		// insert dropoff stop task
 		double startTime = driveToDropoffTask.getEndTime();
 		int taskIdx = driveToDropoffTask.getTaskIdx() + 1;
-		NDrtStopTask stopTask = new NDrtStopTask(startTime, startTime + params.stopDuration, request.getFromLink());
+		NDrtStopTask stopTask = new NDrtStopTask(startTime, startTime + params.stopDuration, request.getToLink());
 		schedule.addTask(taskIdx, stopTask);
 		request.setDropoffTask(stopTask);
 
@@ -303,13 +317,13 @@ public class DrtScheduler implements ScheduleInquiry {
 		} else {
 			Link toLink = stops.get(insertion.dropoffIdx).task.getLink(); // dropoff->j+1
 
-			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getFromLink(), toLink,
-					startTime + params.stopDuration, insertion.pathFromPickup.path, travelTime);
-			Task driveFromPickupTask = new NDrtDriveTask(vrpPath);
-			schedule.addTask(taskIdx + 1, driveFromPickupTask);
+			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getToLink(), toLink,
+					startTime + params.stopDuration, insertion.pathFromDropoff.path, travelTime);
+			Task driveFromDropoffTask = new NDrtDriveTask(vrpPath);
+			schedule.addTask(taskIdx + 1, driveFromDropoffTask);
 
 			// update timings
-			updateTimelineStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2, driveFromPickupTask.getEndTime());
+			updateTimelineStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2, driveFromDropoffTask.getEndTime());
 		}
 	}
 }

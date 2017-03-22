@@ -19,19 +19,13 @@
 
 package playground.michalm.drt.schedule;
 
-import java.util.*;
-
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-
-import playground.michalm.drt.data.NDrtRequest;
 
 /**
  * @author michalm
  */
 public class NDrtDriveTask extends DriveTaskImpl implements NDrtTask {
-	private final Set<NDrtRequest> onBoardRequests = new HashSet<>();
-
 	public NDrtDriveTask(VrpPathWithTravelData path) {
 		super(path);
 	}
@@ -39,17 +33,5 @@ public class NDrtDriveTask extends DriveTaskImpl implements NDrtTask {
 	@Override
 	public NDrtTaskType getDrtTaskType() {
 		return NDrtTaskType.DRIVE;
-	}
-
-	public Set<NDrtRequest> getOnBoardRequests() {
-		return Collections.unmodifiableSet(onBoardRequests);
-	}
-
-	public void addOnBoardRequest(NDrtRequest request) {
-		onBoardRequests.add(request);
-	}
-
-	public boolean isEmpty() {
-		return onBoardRequests.isEmpty();
 	}
 }
