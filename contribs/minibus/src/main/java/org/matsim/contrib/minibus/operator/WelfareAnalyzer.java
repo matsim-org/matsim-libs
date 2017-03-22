@@ -59,7 +59,7 @@ public class WelfareAnalyzer {
 	private Map<Id<PPlan>, Double> pId2welfareCorrection;
 	private Map<Id<PPlan>, Set<Id<Person>>> pId2persons;
 
-	private final double subsidyPerPassenger = 5.;
+	private final double subsidyPerPassenger = 100000.;
 	
 	public WelfareAnalyzer(String initialScoresFile){
 		// yyyy I am not happy with passing a string here and having the reader inside this method.  kai, mar'17
