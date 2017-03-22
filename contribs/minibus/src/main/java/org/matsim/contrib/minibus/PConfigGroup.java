@@ -737,7 +737,6 @@ public final class PConfigGroup extends ConfigGroup{
 	}
 	@Override
 	protected void checkConsistency( Config config ) {
-		double marginalUtilityOfMoney = config.planCalcScore().getMarginalUtilityOfMoney() ;
 		
 		if (this.mergeTransitLine) {
 			log.info("All routes of a minibus transit line with the same stop sequence will be merged into one single transit route. Note that the transit schedules written to the output directory do not contain all minibus routes anymore.");
@@ -753,52 +752,6 @@ public final class PConfigGroup extends ConfigGroup{
 				
 				log.error("Welfare maximization is enabled, " + WelfareCarefulMultiPlanOperator.OPERATOR_NAME + " should be used as operator type. Aborting...");
 				throw new RuntimeException();
-				
-			}
-			
-			if(marginalUtilityOfMoney == 0.){
-				
-				log.error("Welfare maximization is enabled but marginal utility of money equals 0! This would produce benefits of-Infinity! Aborting...");
-				throw new RuntimeException();
-				
-			}
-			
-			if(this.earningsPerBoardingPassenger != 0 || this.earningsPerKilometerAndPassenger != 0){
-				
-				log.error("Welfare maximization is enabled, no fares should be collected here. Aborting...");
-				throw new RuntimeException();
-				
-			}
-			
-			if(this.initialScoresFile == null){
-				
-				log.error("Welfare maximization is enabled, but no initial scores file given. Aborting...");
-				throw new RuntimeException();
-				
-			}
-			
-			for(Entry<Id<PStrategySettings>, PStrategySettings> strategyEntry : this.strategies.entrySet()){
-				
-				if(strategyEntry.getValue().getModuleName().equals(ReduceTimeServedRFare.STRATEGY_NAME)){
-					
-					if(Boolean.parseBoolean(strategyEntry.getValue().getParametersAsArrayList().get(2))){
-						
-						log.error("Welfare maximization is enabled, parameter of strategy " + ReduceTimeServedRFare.STRATEGY_NAME + " to use the collected fare as weight will not work since no fares are collected! Aborting...");
-						throw new RuntimeException();
-						
-					}
-					
-				} else if(strategyEntry.getValue().getModuleName().equals(ReduceStopsToBeServedRFare.STRATEGY_NAME)){
-					
-					if(Boolean.parseBoolean(strategyEntry.getValue().getParametersAsArrayList().get(1))){
-						
-						log.error("Welfare maximization is enabled, parameter of strategy " + ReduceStopsToBeServedRFare.STRATEGY_NAME + " to use the collected fare as weight will not work since no fares are collected! Aborting...");
-						throw new RuntimeException();
-						
-					}
-					
-				}
-				
 			}
 			
 		}
