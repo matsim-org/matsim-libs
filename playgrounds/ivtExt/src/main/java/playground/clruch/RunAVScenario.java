@@ -34,7 +34,7 @@ public class RunAVScenario {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
         
-        TheApocalypse.decimatesThe(population).toNoMoreThan(5000).people();
+        //TheApocalypse.decimatesThe(population).toNoMoreThan(5000).people();
         
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
