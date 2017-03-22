@@ -7,7 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -98,7 +97,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest
      *            provided by getAVRequests()
      */
-    protected synchronized final Void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+    protected synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
         boolean status = matchedRequests.add(avRequest);
@@ -115,7 +114,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
 
         ++total_matchedRequests;
-        return null;
     }
 
     /**
@@ -129,7 +127,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      *            is provided from super.getDivertableVehicles()
      * @param destination
      */
-    protected final Void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+    protected final void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
         final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
         Task task = schedule.getCurrentTask(); // <- implies that task is started
         new AVTaskAdapter(task) {
@@ -157,7 +155,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     assignDirective(vehicleLinkPair.avVehicle, new EmptyDirective());
             }
         };
-        return null;
     }
 
     public final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {
@@ -186,19 +183,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 super.getInfoLine(), //
                 getAVRequests().size(), //
                 total_matchedRequests);
-    }
-
-    /**
-     * @return debug information about status of this instance of {@link UniversalDispatcher}
-     */
-    public final String getUniversalDispatcherStatusString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("#requests " + getAVRequests().size());
-        stringBuilder.append(", #stay " + //
-                getStayVehicles().values().stream().flatMap(Queue::stream).count());
-        stringBuilder.append(", #divert " + //
-                getDivertableVehicles().size());
-        return stringBuilder.toString();
     }
 
 }
