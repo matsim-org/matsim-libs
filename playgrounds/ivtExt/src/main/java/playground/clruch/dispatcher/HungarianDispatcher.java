@@ -133,9 +133,11 @@ public class HungarianDispatcher extends UniversalDispatcher {
             KdTree<RequestWithID> reqKDTree = new KdTree<>(2);
             int iter = 0;
             for (Link link : requestlocs) {
-                if(link == null ||reqKDTree== null ){
-                    System.out.println("problem here?");
-                }
+                System.out.println(link);
+                System.out.println(link.getId().toString());
+                System.out.println(link.getCoord().getX());
+                System.out.println(link.getCoord().getY());
+                System.out.println(Integer.toString(iter));
                 reqKDTree.addPoint(new double[]{link.getCoord().getX(), link.getCoord().getY()}, new RequestWithID(link, Integer.toString(iter)));
                 iter++;
             }
