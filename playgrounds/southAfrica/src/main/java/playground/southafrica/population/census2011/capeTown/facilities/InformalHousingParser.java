@@ -62,7 +62,16 @@ public class InformalHousingParser {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(InformalHousingParser.class.toString(), args);
-		
+		runInformalHousingParser(args);
+		Header.printFooter();
+	}
+
+	/**
+	 * This class (correctly) assumes that the shapefile is already in the
+	 * {@link TransformationFactory#HARTEBEESTHOEK94_LO19} coordinate reference
+	 * system.
+	 */
+	public static void runInformalHousingParser(String[] args){
 		String shapefile = args[0];
 		String facilitiesFile = args[1];
 		
@@ -70,8 +79,12 @@ public class InformalHousingParser {
 		sr.readFileAndInitialize(shapefile);
 		Collection<SimpleFeature> features = sr.getFeatureSet();
 		
-		/* Hard code the coordinate conversion. */
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("SA_Lo19", "SA_Lo19");
+		/* Hard code the coordinate conversion. Since the original shapefile is
+		 * already in the correct coordinate reference system, we pass an
+		 * identity transformation. */
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
+				TransformationFactory.HARTEBEESTHOEK94_LO19,
+				TransformationFactory.HARTEBEESTHOEK94_LO19);
 		
 		LOG.info("Converting each settlement into informal housing units... (" + features.size() + " in total)");
 		Counter counter = new Counter("  settlement # ");
@@ -127,8 +140,6 @@ public class InformalHousingParser {
 		counter.printCounter();
 		
 		new FacilitiesWriter(facilities).write(facilitiesFile);
-		
-		Header.printFooter();
 	}
 	
 	private static Point getRandomInteriorPoint(MultiPolygon mp){

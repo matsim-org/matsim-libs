@@ -46,6 +46,7 @@ public class ComprehensivePopulationReader {
 	 * </ol>
 	 * These files are usually the result from census or travel survey data, 
 	 * for example using {@link Census2001SampleParser} or {@link NmbmSurveyParser}.
+	 * 
 	 * @param args
 	 */
 	public ComprehensivePopulationReader() {
@@ -59,13 +60,13 @@ public class ComprehensivePopulationReader {
 		/* Read population. */
 		LOG.info("Reading population...");
 		PopulationReader pr = new PopulationReader(this.sc);
-		pr.readFile(inputfolder + "population.xml.gz");
+		pr.readFile(inputfolder + "persons.xml.gz");
 		
 		/* Read population attributes. */
 		LOG.info("Reading person attributes...");
 		ObjectAttributesXmlReader oar1 = new ObjectAttributesXmlReader(this.sc.getPopulation().getPersonAttributes());
 		oar1.putAttributeConverter(IncomeImpl.class, new SAIncomeConverter());
-		oar1.readFile(inputfolder + "populationAttributes.xml.gz");
+		oar1.readFile(inputfolder + "personAttributes.xml.gz");
 		
 		/* Read households */
 		LOG.info("Reading households...");

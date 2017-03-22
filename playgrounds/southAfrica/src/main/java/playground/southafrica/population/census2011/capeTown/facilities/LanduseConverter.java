@@ -54,7 +54,8 @@ public class LanduseConverter {
 	private ActivityFacilities facilities;
 	private Map<Id<Parcel>, Parcel> parcels = new TreeMap<Id<Parcel>, Parcel>();
 //	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:2048", "EPSG:3857");
-	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("SA_Lo19", "SA_Lo19");
+	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
+			TransformationFactory.HARTEBEESTHOEK94_LO19, TransformationFactory.HARTEBEESTHOEK94_LO19);
 	
 	public LanduseConverter() {
 		this.facilities = null;

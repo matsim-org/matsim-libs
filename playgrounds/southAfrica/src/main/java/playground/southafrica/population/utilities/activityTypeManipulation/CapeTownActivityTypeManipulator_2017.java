@@ -28,9 +28,9 @@ import playground.southafrica.utilities.Header;
  * 
  * @author jwjoubert
  */
-public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulator {
+public class CapeTownActivityTypeManipulator_2017 extends ActivityTypeManipulator {
 
-	public CapeTownActivityTypeManipulator_2014() {
+	public CapeTownActivityTypeManipulator_2017() {
 	}
 
 	/**
@@ -38,31 +38,35 @@ public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulato
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(CapeTownActivityTypeManipulator_2014.class.toString(), args);
-
+		Header.printHeader(CapeTownActivityTypeManipulator_2017.class.toString(), args);
+		run(args);
+		Header.printFooter();
+	}
+	
+	public static void run(String[] args){
 		/* ===================  For persons. ===================== */
 		String population = args[0];
 		String decileFile = args[1];
 		String outputPopulation = args[2];
-		CapeTownActivityTypeManipulator_2014 atm = new CapeTownActivityTypeManipulator_2014();
+		CapeTownActivityTypeManipulator_2017 atm = new CapeTownActivityTypeManipulator_2017();
 		List<ActivityParams> listPersons = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();
-		/* Write the population to file. */
-		new PopulationWriter(atm.sc.getPopulation()).write(outputPopulation);
-
+		/* Write the population to file. FIXME Currently V5 until Via can handle V6 */
+		new PopulationWriter(atm.sc.getPopulation()).writeV5(outputPopulation);
+		
 		/* ===================  For freight. ===================== */
 		population = args[3];
 		decileFile = args[4];
 		outputPopulation = args[5];
-		atm = new CapeTownActivityTypeManipulator_2014();
+		atm = new CapeTownActivityTypeManipulator_2017();
 		List<ActivityParams> listCommercial = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();
-		/* Write the population to file. */
-		new PopulationWriter(atm.sc.getPopulation()).write(outputPopulation);
+		/* Write the population to file. FIXME Currently V5 until Via can handle V6 */
+		new PopulationWriter(atm.sc.getPopulation()).writeV5(outputPopulation);
 		/* ======================================================= */
-
+		
 		/* Write the config to file. */
 		Config config = getBasicConfig();
 		for(ActivityParams ap : listPersons){
@@ -73,8 +77,6 @@ public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulato
 		}
 		String outputConfig = args[6];
 		new ConfigWriter(config).write(outputConfig);
-
-		Header.printFooter();
 	}
 	
 	private static Config getBasicConfig(){
@@ -86,14 +88,18 @@ public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulato
 		h.setTypicalDuration(Time.parseTime("24:00:00"));
 		h.setScoringThisActivityAtAll(false);
 		config.planCalcScore().addActivityParams(h);
-		/* School-going kids. */
-		ActivityParams e1 = new ActivityParams("e1");
-		e1.setTypicalDuration(Time.parseTime("07:00:00"));
-		config.planCalcScore().addActivityParams(e1);
 		/* Dropping/collecting kids from school. */
 		ActivityParams e3 = new ActivityParams("e3");
 		e3.setTypicalDuration(Time.parseTime("00:05:00"));
 		config.planCalcScore().addActivityParams(e3);
+		/* Medical. */
+		ActivityParams m = new ActivityParams("m");
+		m.setTypicalDuration(Time.parseTime("00:15:00"));
+		config.planCalcScore().addActivityParams(m);
+		/* Other. */
+		ActivityParams o = new ActivityParams("o");
+		o.setTypicalDuration(Time.parseTime("00:10:00"));
+		config.planCalcScore().addActivityParams(o);
 		
 		/* Chopped chain starts. */
 		ActivityParams cs = new ActivityParams("chopStart");
@@ -137,9 +143,9 @@ public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulato
 						/* Using the median of activity durations analysed. */
 						String type = act.getType();
 						if(type.equalsIgnoreCase("minor")){
-							estimatedDuration = Time.parseTime("00:14:45");
+							estimatedDuration = Time.parseTime("00:14:47");
 						} else if(type.equalsIgnoreCase("major")){
-							estimatedDuration = Time.parseTime("07:31:17");
+							estimatedDuration = Time.parseTime("07:30:58");
 						} else if(type.equalsIgnoreCase("chopEnd")){
 							estimatedDuration = Time.parseTime("00:00:01");
 						} else{

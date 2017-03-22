@@ -24,6 +24,7 @@ package playground.southafrica.population.census2011.capeTown.facilities;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
@@ -45,7 +46,16 @@ public class LanduseParser {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(LanduseParser.class.toString(), args);
-		
+		runLanduseParser(args);
+		Header.printFooter();
+	}
+	
+	/**
+	 * This class (correctly) assumes that the shapefile is already in the
+	 * {@link TransformationFactory#HARTEBEESTHOEK94_LO19} coordinate reference
+	 * system.
+	 */
+	public static void runLanduseParser(String[] args){
 		String shapefile = args[0];
 		String facilitiesFile = args[1];
 		
@@ -64,8 +74,6 @@ public class LanduseParser {
 		
 		ActivityFacilities facilities = luc.convertParcelsToFacilities();
 		new FacilitiesWriter(facilities).write(facilitiesFile);
-		
-		Header.printFooter();
 	}
 	
 	private LanduseParser() {

@@ -53,7 +53,11 @@ public class FreightPopulationSampler {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(FreightPopulationSampler.class.toString(), args);
-		
+		run(args);
+		Header.printFooter();
+	}
+	
+	public static void run(String[] args){
 		String inputPopulation = args[0];
 		String inputAttributes = args[1];
 		double fraction = Double.parseDouble(args[2]);
@@ -67,7 +71,7 @@ public class FreightPopulationSampler {
 		
 		Scenario outSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimRandom.reset(seed);
-
+		
 		ObjectAttributes inAttr = inSc.getPopulation().getPersonAttributes();
 		ObjectAttributes outAttr = outSc.getPopulation().getPersonAttributes();
 		Iterator<? extends Person> iterator = inSc.getPopulation().getPersons().values().iterator();
@@ -87,8 +91,6 @@ public class FreightPopulationSampler {
 		/* Write the output to file. */
 		new PopulationWriter(outSc.getPopulation()).write(outputPopulation);
 		new ObjectAttributesXmlWriter(outAttr).writeFile(outputAttributes);
-		
-		Header.printFooter();
 	}
 
 }

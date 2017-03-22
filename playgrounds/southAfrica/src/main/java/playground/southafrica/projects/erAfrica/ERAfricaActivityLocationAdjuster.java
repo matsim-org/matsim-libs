@@ -64,7 +64,7 @@ import playground.southafrica.utilities.Header;
  * This class reads in the population with its allocated activity chains, and 
  * adjusts each activity's location by considering the leg's distance, and the
  * location of actual parsed activity facilities (OpenStreetMap, Cape Town 
- * landuse, or Cape Town's informal settlements).
+ * land use, or Cape Town's informal settlements).
  *  
  * @author jwjoubert
  */
@@ -112,15 +112,16 @@ public class ERAfricaActivityLocationAdjuster {
 		ala.buildQuadTreeFromFacilities(osmFacilitiesFile, ctFacilitiesFile, ctInformalHousing);
 		ala.processHouseholds();
 		
-		writeTuples(finalPopulationFolder);
-		writeTries(finalPopulationFolder);
-		writeUpdatedScenario(sc, finalPopulationFolder);
+		ala.writeTuples(finalPopulationFolder);
+		ala.writeTries(finalPopulationFolder);
+		ala.writeUpdatedScenario(sc, finalPopulationFolder);
 
 		Header.printFooter();
 	}
+
 	
-	private static void writeTuples(String folder){
-		BufferedWriter bw = IOUtils.getBufferedWriter(folder + "tuples.csv");
+	public void writeTuples(String folder){
+		BufferedWriter bw = IOUtils.getBufferedWriter(folder + "tuples.csv.gz");
 		try{
 			bw.write("type,old,new");
 			bw.newLine();
@@ -148,8 +149,8 @@ public class ERAfricaActivityLocationAdjuster {
 	}
 	
 	
-	private static void writeTries(String folder){
-		BufferedWriter bw = IOUtils.getBufferedWriter(folder + "tries.csv");
+	public void writeTries(String folder){
+		BufferedWriter bw = IOUtils.getBufferedWriter(folder + "tries.csv.gz");
 		try{
 			bw.write("type,tries");
 			bw.newLine();
@@ -177,7 +178,7 @@ public class ERAfricaActivityLocationAdjuster {
 	}
 	
 	
-	private static void writeUpdatedScenario(Scenario sc, String folder){
+	public void writeUpdatedScenario(Scenario sc, String folder){
 		folder += folder.endsWith("/") ? "" : "/";
 		
 		/* Updated household coordinates. */
@@ -213,11 +214,11 @@ public class ERAfricaActivityLocationAdjuster {
 	}
 	
 	
-	public static void setup(String treasurePopulation, String populationFolderName, String sample){
+	public static void setup(String treasuryPopulation, String populationFolderName, String sample){
 		LOG.info("Setting up the population files...");
 
 		/* Delete and create the temporary folder for population files. */
-		treasurePopulation += treasurePopulation.endsWith("/") ? "" : "/";
+		treasuryPopulation += treasuryPopulation.endsWith("/") ? "" : "/";
 		File populationFolder = new File(populationFolderName);
 		if(populationFolder.exists()){
 			LOG.warn("Population folder will be deleted and overwritten.");
@@ -229,13 +230,13 @@ public class ERAfricaActivityLocationAdjuster {
 		String folder = null;
 		switch (sample) {
 		case "001":
-			folder = treasurePopulation + "sample/001/CapeTown/";
+			folder = treasuryPopulation + "sample/001/CapeTown/";
 			break;
 		case "010":
-			folder = treasurePopulation + "sample/010/CapeTown/";
+			folder = treasuryPopulation + "sample/010/CapeTown/";
 			break;
 		case "100":
-			folder = treasurePopulation + "full/CapeTown/";
+			folder = treasuryPopulation + "full/CapeTown/";
 			break;
 		default:
 			LOG.error("Don't know how to interpret sample " + sample);
