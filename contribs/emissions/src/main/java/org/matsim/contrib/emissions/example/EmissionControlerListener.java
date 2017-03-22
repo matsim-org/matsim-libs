@@ -34,6 +34,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 
 
 /**
+ *
  * @author benjamin
  *
  */
@@ -47,6 +48,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	@Inject private EmissionModule emissionModule;
 
 	private EventWriterXML emissionEventWriter;
+
+	// I dont see, a purpose of this now. Amit Mar'17
 
 	public EmissionControlerListener() {
 		
