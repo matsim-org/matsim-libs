@@ -39,7 +39,9 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 /**
  * 
- * Computes the contribution of each transit line on the overall welfare changes.
+ * 
+ * 
+ * TODO: Compute the contribution of each transit line on the overall welfare changes.
  * Allocates the changes in user benefits to the transit lines which are used by the user.
  * 
  * 
@@ -57,7 +59,7 @@ public class WelfareAnalyzer {
 	private Map<Id<PPlan>, Double> pId2welfareCorrection;
 	private Map<Id<PPlan>, Set<Id<Person>>> pId2persons;
 
-	private final double subsidyPerPassenger = 100.;
+	private final double subsidyPerPassenger = 5.;
 	
 	public WelfareAnalyzer(String initialScoresFile){
 		// yyyy I am not happy with passing a string here and having the reader inside this method.  kai, mar'17
