@@ -94,7 +94,7 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() == 0) {
+		if (event.getIteration() == scenario.getConfig().controler().getFirstIteration()) {
 			/*
 			 * do all the stuff that is needed only once a simulation: - calculating coordinations for the via file - getting the signals data out of the scenario
 			 */
