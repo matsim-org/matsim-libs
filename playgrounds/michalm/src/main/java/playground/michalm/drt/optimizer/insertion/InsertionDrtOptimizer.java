@@ -74,8 +74,12 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 		while (reqIter.hasNext()) {
 			NDrtRequest req = reqIter.next();
 			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
+			if (best == null) {
+				throw new RuntimeException("No feasible solution");
+			}
 			getOptimContext().scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
 			vData.updateEntry(best.vehicleEntry);
+			reqIter.remove();
 		}
 	}
 }
