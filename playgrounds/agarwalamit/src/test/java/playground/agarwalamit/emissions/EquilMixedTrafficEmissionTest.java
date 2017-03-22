@@ -91,7 +91,6 @@ public class EquilMixedTrafficEmissionTest {
 
 	@Test
 	public void emissionTollTest() {
-		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		List<String> mainModes = Arrays.asList("car","bicycle");
 
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
