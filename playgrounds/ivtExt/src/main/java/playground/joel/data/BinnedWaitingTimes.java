@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.clruch.utils.HelperPredicates;
+import playground.joel.helpers.*;
 
 
 /**
@@ -29,7 +30,6 @@ class BinnedWaitingTimes extends AbstractData {
     List<Event> relevantEvents = new ArrayList<>();
     Map<String, NavigableMap<Double, Integer>> waitDelta = new TreeMap<>();
 
-    NavigableMap<Double, String> keyMap = new TreeMap<>();
     NavigableMap<String, NavigableMap<String, Double>> waitingTimes = new TreeMap<>(); // <bin, <deltaKey, waitingTime>>
     HashMap<String, Double> waitStart = new HashMap<>(); // <customerId, waitingStart>
     NavigableMap<String, Double> quantile50 = new TreeMap<>();
@@ -41,34 +41,25 @@ class BinnedWaitingTimes extends AbstractData {
     static double totalMean = 0;
     double binSize = 600;
 
-    //equalize length of all key elements
-    DecimalFormat keyForm = new DecimalFormat("#000000");
+    double maxWait = 5000; // maximally expected waiting time to have plots of the same range
+
+    KeyMap keyMap = new KeyMap(binSize);
+
     // cut the total quantiles and mean
     DecimalFormat valueForm = new DecimalFormat("#.####");
 
-
-
-    String writeKey(double binStart) {
-        String key = String.valueOf(keyForm.format(binStart)) + " - " + String.valueOf(keyForm.format(binStart + binSize));
-        return key;
-    }
-
-    String getKey(double time) {
-        return keyMap.get(keyMap.floorKey(time));
-    }
-
+    
     String getDeltaKey(String key, double deltaT) {
         // necessary in case multiple waiting times of the same length exist
         int i = 1;
-        String deltaKey = String.valueOf(keyForm.format(deltaT)) + "_" + String.valueOf(i);
+        String deltaKey = String.valueOf(keyMap.keyForm.format(deltaT)) + "_" + String.valueOf(i);
         while (waitingTimes.get(key).containsKey(deltaKey)) {
             i++;
-            deltaKey = String.valueOf(keyForm.format(deltaT)) + "_" + String.valueOf(i);
+            deltaKey = String.valueOf(keyMap.keyForm.format(deltaT)) + "_" + String.valueOf(i);
         }
         return deltaKey;
     }
 
-    // gives the i_th entry of waitingTimes.get(key) for the quantile
     double getEntry(String key, int i) {
         Double value = 0.0;
         int j = 0;
@@ -80,7 +71,7 @@ class BinnedWaitingTimes extends AbstractData {
             }
         }
         return value;
-    }
+    } // gives the i_th entry of waitingTimes.get(key) for the quantile
 
     void writeQuantiles() {
         for (String bin : waitingTimes.keySet()) {
@@ -104,31 +95,13 @@ class BinnedWaitingTimes extends AbstractData {
         }
     }
 
-    void checkFull(NavigableMap<String, Double> map) {
-        double binStart = 0;
-        boolean full = true;
-        while (binStart < 108000) {
-            if (!map.containsKey(getKey(binStart))) full = false;
-            binStart += binSize;
-        }
-        if (!full) System.out.println("not all time bins contain values\n" +
-                "\t- created bins are not continuous\n" +
-                "\t- increasing binSize could resolve this");
-    }
-
 
 
     @Override
     void initialize(EventsManager events) {
         // add handlers to read waiting customer queues
         {
-            // initialize keyMap
-            double binStart = 0;
-            while (binStart < 108000) {
-                keyMap.put(binStart, writeKey(binStart));
-                binStart += binSize;
-            }
-
+            keyMap.initialize();
 
             // read the events when person calls AVs
             events.addHandler(new PersonDepartureEventHandler() {
@@ -142,28 +115,10 @@ class BinnedWaitingTimes extends AbstractData {
                 public void handleEvent(PersonDepartureEvent event) {
                     final Id<Person> idRaw = event.getPersonId();
                     final String id = idRaw.toString();
-                    if (HelperPredicates.isHuman(idRaw)) {
+                    if (HelperPredicates.isHuman(idRaw))
                         waitStart.put(id, event.getTime());
-                        //System.out.println("added person " + id + " to waitStart");
-                    }
                 }
             });
-
-            /*
-            // read the events when agent arrives at destination
-            events.addHandler(new PersonArrivalEventHandler() {
-
-                @Override
-                public void reset(int iteration) {
-                    // empty content
-                }
-
-                @Override
-                public void handleEvent(PersonArrivalEvent event) {
-                    relevantEvents.add(event);
-                }
-            });
-            */
 
             // read the events when AV arrives at agent's location
             events.addHandler(new PersonEntersVehicleEventHandler() {
@@ -180,8 +135,7 @@ class BinnedWaitingTimes extends AbstractData {
                     final String id = idRaw.toString();
 
                     if (HelperPredicates.isHuman(idRaw)) {
-                        //System.out.println("person " + id + " enters vehicle");
-                        String key = getKey(waitStart.get(id));
+                        String key = keyMap.getKey(waitStart.get(id));
                         if (!waitingTimes.containsKey("all")) waitingTimes.put("all", new TreeMap<>());
                         if (!waitingTimes.containsKey( key ))  waitingTimes.put(key, new TreeMap<>());
 
@@ -190,7 +144,6 @@ class BinnedWaitingTimes extends AbstractData {
                         waitingTimes.get(key).put(getDeltaKey(key, deltaT), deltaT);
 
                         waitStart.remove(id);
-                        //System.out.println("removed person " + id + " from waitStart");
                     }
                 }
             });
@@ -210,9 +163,9 @@ class BinnedWaitingTimes extends AbstractData {
         NavigableMap<String, NavigableMap<String, Double>> quantiles50 = new TreeMap<>();
         NavigableMap<String, NavigableMap<String, Double>> quantiles95 = new TreeMap<>();
         NavigableMap<String, NavigableMap<String, Double>> means = new TreeMap<>();
-        checkFull(quantile50);
-        checkFull(quantile95);
-        checkFull(mean);
+        binnedHelper.checkFull(quantile50, binSize, keyMap);
+        binnedHelper.checkFull(quantile95, binSize, keyMap);
+        binnedHelper.checkFull(mean, binSize, keyMap);
         quantiles50.put("bins", quantile50);
         quantiles95.put("bins", quantile95);
         means.put("bins", mean);
@@ -223,14 +176,18 @@ class BinnedWaitingTimes extends AbstractData {
         // export to time series diagram PNG
         TimeDiagramCreator diagram = new TimeDiagramCreator();
         try{
-            diagram.createDiagram(directory, "binnedWaitingTimes", "current quantiles and mean", quantile50, quantile95, mean);
+            diagram.createDiagram(directory, "binnedWaitingTimes", "waiting time", quantile50, quantile95, mean, maxWait);
         }catch (Exception e){
             System.out.println("Error creating the diagram");
         }
 
-        //System.out.println("50% quantile: " + totalQuantile50);
-        //System.out.println("95% quantile: " + totalQuantile95);
-        //System.out.println("mean: " + totalMean);
+        // export to CSV
+        CSVcreator csv = new CSVcreator();
+        try{
+            csv.createCSV(quantile50, quantile95, mean, directory, "binnedWaitingTimes");
+        }catch (Exception e){
+            System.out.println("Error creating the csv file");
+        }
 
         if (waitStart.size() != 0) System.out.println("there remain " + waitStart.size() + " waiting customers after the simulation has ended");
         else System.out.println("no remaining customers waiting at the end of the simulation");
