@@ -27,7 +27,7 @@ import playground.joel.data.EventFileToDataXML;
  */
 public class RunAVScenario {
     public static void main(String[] args) throws MalformedURLException {
-        File configFile = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_03_13_Sioux_LP_improved/av_config.xml");
+        File configFile = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_03_15_Sioux_LP_improved/av_config.xml");
         final File dir = configFile.getParentFile();
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();

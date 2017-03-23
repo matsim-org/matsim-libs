@@ -14,6 +14,7 @@ import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Floor;
+import ch.ethz.idsc.tensor.sca.Round;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Link;
@@ -82,7 +83,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
         // PART I: rebalance all vehicles periodically
         final long round_now = Math.round(now);
-        if (round_now % rebalancingPeriod == 0) {
+
+        if (round_now % rebalancingPeriod == 0 && !getAVRequests().isEmpty()) {
 
             // setup linear program
             LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork,travelTimes);
@@ -116,11 +118,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 // solve the linear program with updated right-hand side
                 // fill right-hand-side
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
-                Tensor rebalanceCount = lpVehicleRebalancing.solveUpdatedLP(rhs);
-
+                Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);
+                Tensor rebalanceCount = Round.of(rebalanceCount2);
                 // TODO this should never become active, can be possibly removed later
                 // assert that solution is integer and does not contain negative values
-                GlobalAssert.that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(Scalar::number).map(Integer.class::cast).filter(e->e<0).findAny().isPresent());
+                GlobalAssert.that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s->s.number().doubleValue()).filter(e->e<0).findAny().isPresent());
 
 
                 // ensure that not more vehicles are sent away than available
