@@ -229,33 +229,6 @@ class BinnedTravelDistances extends AbstractData {
                 }
             });
 
-            // trafficenter
-            events.addHandler(new VehicleEntersTrafficEventHandler() {
-
-                public void handleEvent(VehicleEntersTrafficEvent event) {
-                    setStartTime(event);
-                }
-
-                @Override
-                public void reset(int iteration) {
-                    // intentionally empty
-                }
-            });
-
-            // trafficleave
-            events.addHandler(new VehicleLeavesTrafficEventHandler() {
-
-                public void handleEvent(VehicleLeavesTrafficEvent event) {
-                    final String vehicle = event.getVehicleId().toString();
-                    put(event.getLinkId(), vehicle, getStartTime(event), event.getTime());
-                }
-
-                @Override
-                public void reset(int iteration) {
-                    // intentionally empty
-                }
-            });
-
         }
 
     }
