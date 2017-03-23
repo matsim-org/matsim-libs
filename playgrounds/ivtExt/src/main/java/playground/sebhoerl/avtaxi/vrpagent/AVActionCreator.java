@@ -16,6 +16,7 @@ import playground.sebhoerl.avtaxi.passenger.AVPassengerDropoffActivity;
 import playground.sebhoerl.avtaxi.passenger.AVPassengerPickupActivity;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
+import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
 
 import javax.inject.Named;
@@ -51,7 +52,7 @@ public class AVActionCreator implements VrpAgentLogic.DynActionCreator {
                 case DRIVE:
     				return legCreator.createLeg(vehicle);
                 case STAY:
-                    return new VrpActivity(STAY_ACTIVITY_TYPE, (StayTask) task);
+                    return new VrpActivity(((AVStayTask)task).getName(), (StayTask) task);
     	    	default:
     	    		throw new IllegalStateException();
     		}

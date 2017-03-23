@@ -5,22 +5,22 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class StaticChargeCalculatorConfig extends ReflectiveConfigGroup {
     static final String STATIC_CHARGE_CALCULATOR = "static_charge_calculator";
 
-    static final String DISCHARGE_RATE_BY_DISTANCE = "dischargeRateByDistance";
-    static final String DISCHARGE_RATE_BY_TIME = "dischargeRateByTime";
-    static final String MAXIMUM_CHARGE = "maximumCharge";
-    static final String MINIMUM_CHARGE = "minimumCharge";
-    static final String RECHARGE_RATE_PER_TIME = "rechargeRatePerTime";
+    static final String DISCHARGE_RATE_BY_DISTANCE = "dischargeRateByDistance_kWh_per_km";
+    static final String DISCHARGE_RATE_BY_TIME = "dischargeRateByTime_kW";
+    static final String MAXIMUM_CHARGE = "maximumCharge_kWh";
+    static final String MINIMUM_CHARGE = "minimumCharge_kWh";
+    static final String RECHARGE_RATE_PER_TIME = "rechargeRatePerTime_kW";
 
-    private double dischargeRateByDistance = Double.NaN;
-    private double dischargeRateByTime = Double.NaN;
+    private double dischargeRateByDistance = 0.0;
+    private double dischargeRateByTime = 0.0;
 
-    private double maximumCharge = Double.NaN;
-    private double minimumCharge = Double.NaN;
+    private double maximumCharge = 100.0;
+    private double minimumCharge = 0.0;
 
-    private double rechargeRatePerTime = Double.NaN;
+    private double rechargeRatePerTime = 0.0;
 
     public StaticChargeCalculatorConfig() {
-        super("static_charge_calculator");
+        super(STATIC_CHARGE_CALCULATOR);
     }
 
     @ReflectiveConfigGroup.StringGetter(DISCHARGE_RATE_BY_DISTANCE)

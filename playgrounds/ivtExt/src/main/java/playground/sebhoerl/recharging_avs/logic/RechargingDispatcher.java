@@ -1,4 +1,4 @@
-package playground.sebhoerl.recharging_avs;
+package playground.sebhoerl.recharging_avs.logic;
 
 import com.google.inject.Inject;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -11,6 +11,7 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.sebhoerl.recharging_avs.calculators.ChargeCalculator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,8 @@ public class RechargingDispatcher implements AVDispatcher {
 
     final private AVDispatcher delegate;
     final private ChargeCalculator chargeCalculator;
+
+    private double now = Double.NEGATIVE_INFINITY;
 
     public RechargingDispatcher(ChargeCalculator chargeCalculator, AVDispatcher dispatcher) {
         this.delegate = dispatcher;
@@ -52,21 +55,21 @@ public class RechargingDispatcher implements AVDispatcher {
             chargeState.put(vehicle, currentChargeState);
         }
 
-        if (currentChargeState != null && current instanceof AVStayTask && chargeCalculator.isCritical(currentChargeState)) {
+        if (currentChargeState != null && current instanceof AVStayTask && chargeCalculator.isCritical(currentChargeState, now)) {
             if (!(current == Schedules.getLastTask(schedule))) {
                 throw new RuntimeException();
             }
 
             double now = current.getBeginTime();
             double scheduleEndTime = schedule.getEndTime();
-            double rechargingEndTime = now + chargeCalculator.getRechargeTime(now);
+            double rechargingEndTime = Math.min(now + chargeCalculator.getRechargeTime(now), scheduleEndTime);
 
             current.setEndTime(now);
 
             schedule.addTask(new RechargingTask(now, rechargingEndTime, ((AVStayTask) current).getLink()));
             schedule.addTask(new AVStayTask(rechargingEndTime, scheduleEndTime, ((AVStayTask) current).getLink()));
 
-            chargeState.put(vehicle, chargeCalculator.getMaximumCharge(vehicle));
+            chargeState.put(vehicle, chargeCalculator.getMaximumCharge(now));
         } else if (!(current instanceof RechargingTask)) {
             delegate.onNextTaskStarted(vehicle);
         }
@@ -74,12 +77,13 @@ public class RechargingDispatcher implements AVDispatcher {
 
     @Override
     public void onNextTimestep(double now) {
+        this.now = now;
         delegate.onNextTimestep(now);
     }
 
     @Override
     public void addVehicle(AVVehicle vehicle) {
-        chargeState.put(vehicle, chargeCalculator.getInitialCharge(vehicle));
+        chargeState.put(vehicle, chargeCalculator.getInitialCharge(now));
         delegate.addVehicle(vehicle);
     }
 
@@ -88,12 +92,16 @@ public class RechargingDispatcher implements AVDispatcher {
         Map<String, AVDispatcher.AVDispatcherFactory> factories;
 
         @Inject
-        ChargeCalculator chargeCalculator;
+        Map<String, ChargeCalculator> chargeCalculators;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config) {
             if (!config.getParams().containsKey("delegate")) {
                 throw new IllegalArgumentException();
+            }
+
+            if (!config.getParams().containsKey("charge_calculator")) {
+                throw new IllegalArgumentException("No charge_calculator specified for dispatcher of " + config.getParent().getId());
             }
 
             String delegateDisaptcherName = config.getParams().get("delegate");
@@ -103,7 +111,17 @@ public class RechargingDispatcher implements AVDispatcher {
                 delegateConfig.getParams().put(entry.getKey(), entry.getValue());
             }
 
-            return new RechargingDispatcher(chargeCalculator, factories.get(delegateDisaptcherName).createDispatcher(delegateConfig));
+            String chargeCalculatorName = config.getParams().get("charge_calculator");
+
+            if (!factories.containsKey(delegateDisaptcherName)) {
+                throw new IllegalArgumentException("Delegate dispatcher '" + delegateDisaptcherName + "' does not exist!");
+            }
+
+            if (!chargeCalculators.containsKey(chargeCalculatorName)) {
+                throw new IllegalArgumentException("Charge calculator '" + chargeCalculatorName + "' does not exist!");
+            }
+
+            return new RechargingDispatcher(chargeCalculators.get(chargeCalculatorName), factories.get(delegateDisaptcherName).createDispatcher(delegateConfig));
         }
     }
 }

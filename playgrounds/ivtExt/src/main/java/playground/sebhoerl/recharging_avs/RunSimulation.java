@@ -11,6 +11,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
+import playground.sebhoerl.recharging_avs.calculators.BinnedChargeCalculatorConfig;
+import playground.sebhoerl.recharging_avs.calculators.BinnedChargeCalculatorModule;
+import playground.sebhoerl.recharging_avs.calculators.StaticChargeCalculatorConfig;
+import playground.sebhoerl.recharging_avs.calculators.StaticChargeCalculatorModule;
 
 import java.net.MalformedURLException;
 
@@ -21,7 +25,7 @@ public class RunSimulation {
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
-        Config config = ConfigUtils.loadConfig(configFile, new AVConfigGroup(), dvrpConfigGroup);
+        Config config = ConfigUtils.loadConfig(configFile, new AVConfigGroup(), dvrpConfigGroup, new StaticChargeCalculatorConfig(), new BinnedChargeCalculatorConfig());
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         Controler controler = new Controler(scenario);
@@ -29,6 +33,8 @@ public class RunSimulation {
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new RechargingModule());
+        controler.addOverridingModule(new StaticChargeCalculatorModule());
+        controler.addOverridingModule(new BinnedChargeCalculatorModule());
 
         controler.run();
     }
