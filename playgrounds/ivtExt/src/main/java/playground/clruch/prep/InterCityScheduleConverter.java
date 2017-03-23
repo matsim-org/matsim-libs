@@ -39,12 +39,13 @@ public class InterCityScheduleConverter {
         // perform conversion, remove non-rail lines and lines shorter than minimal duration
         ConvertRailOnly(document);
         ConvertLongerThanOnly(document, 60);
+        RemoveEmptyTransitLines(document);
 
 
         // save file
         FileWriter writer = new FileWriter("2015_ch_schedule_Corrected_IntercityOnly.xml");
         XMLOutputter outputter = new XMLOutputter();
-        outputter.setFormat(Format.getPrettyFormat());
+        //outputter.setFormat(Format.getPrettyFormat());
         outputter.output(document, writer);
         writer.close(); // close writer
     }
@@ -156,5 +157,20 @@ public class InterCityScheduleConverter {
             }
         }
         System.out.println("removed " + removedelements + " which are of duration shorter than " + minMinutes + " minutes.");
+    }
+
+    private static void RemoveEmptyTransitLines(Document document){
+        Element rootNode = document.getRootElement();
+        List<Element> childrenNodes = rootNode.getChildren();
+        int removedelements = 0;
+        Iterator<Element> eelementIterator = childrenNodes.iterator();
+        while(eelementIterator.hasNext()){
+            Element eelement = eelementIterator.next();
+            if(eelement.getName().equals("transitLine")){
+                if(eelement.getChildren().size() == 0){
+                    eelementIterator.remove();
+                }
+            }
+        }
     }
 }

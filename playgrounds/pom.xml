@@ -144,6 +144,7 @@
 		<module>vspshk</module>
 		<module>wbean</module>
 		<module>vbmh</module>
+		<module>euler_project</module>
 	</modules>
 	<repositories>
 		<repository>
