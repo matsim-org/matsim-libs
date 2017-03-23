@@ -259,21 +259,22 @@ public class DrtScheduler implements ScheduleInquiry {
 				// the bus stays where it is
 				beforePickupTask = stayTask;
 			} else { // add drive task to pickup location
-
+				StayTask stayOrStopTask = stayTask != null ? stayTask : stopTask;
+				
 				// remove drive i->i+1 (if there is one)
 				if (insertion.pickupIdx < stops.size()) {// there is at least one following stop
 					NDrtStopTask nextStopTask = stops.get(insertion.pickupIdx).task;
-					if (stopTask.getTaskIdx() + 2 != nextStopTask.getTaskIdx()) {// there must a drive task in between
+					if (stayOrStopTask.getTaskIdx() + 2 != nextStopTask.getTaskIdx()
+							&& stayTask.getTaskIdx() + 1 != nextStopTask.getTaskIdx()) {// there must a drive task in between
 						throw new RuntimeException();
 					}
-					if (stopTask.getTaskIdx() + 2 == nextStopTask.getTaskIdx()) {// there must a drive task in between
-						int driveTaskIdx = stopTask.getTaskIdx() + 1;
+					if (stayOrStopTask.getTaskIdx() + 2 == nextStopTask.getTaskIdx()) {// there must a drive task in between
+						int driveTaskIdx = stayOrStopTask.getTaskIdx() + 1;
 						schedule.removeTask(schedule.getTasks().get(driveTaskIdx));
 					}
 				}
 
 				// insert drive i->pickup
-				StayTask stayOrStopTask = stayTask != null ? stayTask : stopTask;
 				VrpPathWithTravelData vrpPath = VrpPaths.createPath(stayOrStopTask.getLink(), request.getFromLink(),
 						stayOrStopTask.getEndTime(), insertion.pathToPickup.path, travelTime);
 				beforePickupTask = new NDrtDriveTask(vrpPath);
@@ -286,6 +287,7 @@ public class DrtScheduler implements ScheduleInquiry {
 		int taskIdx = beforePickupTask.getTaskIdx() + 1;
 		NDrtStopTask pickupStopTask = new NDrtStopTask(startTime, startTime + params.stopDuration, request.getFromLink());
 		schedule.addTask(taskIdx, pickupStopTask);
+		pickupStopTask.addPickupRequest(request);
 		request.setPickupTask(pickupStopTask);
 
 		// add drive from pickup
@@ -342,16 +344,25 @@ public class DrtScheduler implements ScheduleInquiry {
 		int taskIdx = driveToDropoffTask.getTaskIdx() + 1;
 		NDrtStopTask dropoffStopTask = new NDrtStopTask(startTime, startTime + params.stopDuration, request.getToLink());
 		schedule.addTask(taskIdx, dropoffStopTask);
+		dropoffStopTask.addDropoffRequest(request);
 		request.setDropoffTask(dropoffStopTask);
 
 		// add drive from dropoff
 		if (insertion.dropoffIdx == stops.size()) {// bus stays at dropoff
-			if (dropoffStopTask.getTaskIdx() + 1 == schedule.getTaskCount()) {
+			if (taskIdx + 2 == schedule.getTaskCount()){//remove stay task from the end of schedule,
+				NDrtStayTask oldStayTask =  (NDrtStayTask)schedule.getTasks().get(taskIdx + 1);
+				schedule.removeTask(oldStayTask);
+				
+				//TODO this should be enough
+				//schedule.removeLastTask();
+				
+			}
+			if (taskIdx + 1 == schedule.getTaskCount()) {
 				schedule.addTask(new NDrtStayTask(dropoffStopTask.getEndTime(), vehicleEntry.vehicle.getServiceEndTime(),
 						dropoffStopTask.getLink()));
 			}
 			else {
-				updateTimelineStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 1, dropoffStopTask.getEndTime());
+				throw new RuntimeException();
 			}
 		} else {
 			Link toLink = stops.get(insertion.dropoffIdx).task.getLink(); // dropoff->j+1
