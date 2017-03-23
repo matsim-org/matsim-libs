@@ -31,6 +31,7 @@ import com.google.inject.*;
 import com.google.inject.name.Named;
 
 import playground.michalm.drt.optimizer.insertion.*;
+import playground.michalm.drt.run.DrtConfigGroup;
 import playground.michalm.drt.scheduler.*;
 
 /**
@@ -40,6 +41,7 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 	public static final String DRT_OPTIMIZER = "drt_optimizer";
 
 	private final Scenario scenario;
+	private final DrtConfigGroup drtCfg;
 	private final Fleet fleet;
 	private final TravelTime travelTime;
 	private final QSim qSim;
@@ -48,9 +50,10 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 	private @Named(DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
 
 	@Inject
-	public DefaultDrtOptimizerProvider(Scenario scenario, Fleet fleet,
+	public DefaultDrtOptimizerProvider(Scenario scenario, DrtConfigGroup drtCfg, Fleet fleet,
 			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
 		this.scenario = scenario;
+		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.travelTime = travelTime;
 		this.qSim = qSim;
@@ -68,6 +71,6 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, scenario.getNetwork(), qSim.getSimTimer(),
 				travelTime, travelDisutility, scheduler);
 
-		return new InsertionDrtOptimizer(optimContext, new InsertionDrtOptimizerParams(null));
+		return new InsertionDrtOptimizer(optimContext, drtCfg, new InsertionDrtOptimizerParams(null));
 	}
 }

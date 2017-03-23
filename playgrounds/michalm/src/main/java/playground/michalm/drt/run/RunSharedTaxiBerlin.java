@@ -28,7 +28,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,19 +46,19 @@ public class RunSharedTaxiBerlin {
 	}
 
 	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
 				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
 		createControler(config, otfvis).run();
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+		DrtConfigGroup taxiCfg = DrtConfigGroup.get(config);
+		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
 		config.checkConsistency();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getVehiclesFileUrl(config.getContext()));
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule(fleet,
@@ -84,5 +83,4 @@ public class RunSharedTaxiBerlin {
 			}
 		};
 	}
-
 }

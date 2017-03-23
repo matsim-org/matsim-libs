@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.run.DrtConfigGroup;
 import playground.michalm.drt.schedule.*;
 import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
 
@@ -35,7 +36,6 @@ import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
  * @author michalm
  */
 public class VehicleData {
-
 	public static class Entry {
 		public final Vehicle vehicle;
 		public final LinkTimePair start;// TODO what if start is just at the beginning of the first stopTask???
@@ -55,17 +55,17 @@ public class VehicleData {
 		public final int occupancyChange;// diff in pickups and dropoffs
 		public int outputOccupancy;
 
-		public Stop(NDrtStopTask task) {
+		public Stop(NDrtStopTask task, DrtConfigGroup drtCfg) {
 			this.task = task;
-			maxArrivalTime = calcMaxArrivalTime();
+			maxArrivalTime = calcMaxArrivalTime(drtCfg.getMaxWaitTime());
 			maxDepartureTime = calcMaxDepartureTime();
 			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
 		}
 
-		private double calcMaxArrivalTime() {
+		private double calcMaxArrivalTime(double maxWaitTime) {
 			double maxTime = Double.MAX_VALUE;
 			for (NDrtRequest r : task.getDropoffRequests()) {
-				double reqMaxArrivalTime = r.getEarliestStartTime() + 3600;// TODO temp
+				double reqMaxArrivalTime = r.getEarliestStartTime() + maxWaitTime;
 				if (reqMaxArrivalTime < maxTime) {
 					maxTime = reqMaxArrivalTime;
 				}
@@ -86,10 +86,12 @@ public class VehicleData {
 
 	}
 
+	private final DrtConfigGroup drtCfg;
 	private final List<Entry> entries = new ArrayList<>();
 	private final double currTime;
 
-	public VehicleData(DrtOptimizerContext optimContext, Iterable<? extends Vehicle> vehicles) {
+	public VehicleData(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg, Iterable<? extends Vehicle> vehicles) {
+		this.drtCfg = drtCfg;
 		currTime = optimContext.timer.getTimeOfDay();
 
 		for (Vehicle v : vehicles) {
@@ -149,7 +151,7 @@ public class VehicleData {
 		for (int i = nextTaskIdx; i < tasks.size(); i++) {
 			NDrtTask task = tasks.get(i);
 			if (task.getDrtTaskType() == NDrtTaskType.STOP) {
-				Stop stop = new Stop((NDrtStopTask)task);
+				Stop stop = new Stop((NDrtStopTask)task, drtCfg);
 				data.stops.add(stop);
 			}
 		}

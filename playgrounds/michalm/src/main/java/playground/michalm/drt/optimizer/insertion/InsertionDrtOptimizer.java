@@ -29,19 +29,24 @@ import org.matsim.core.router.util.*;
 import playground.michalm.drt.data.NDrtRequest;
 import playground.michalm.drt.optimizer.*;
 import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import playground.michalm.drt.run.DrtConfigGroup;
 
 /**
  * @author michalm
  */
 public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
-
+	private final DrtConfigGroup drtCfg;
+	
 	private final FastMultiNodeDijkstra router;
 	private final BackwardFastMultiNodeDijkstra backwardRouter;
 
 	private final MultiVehicleInsertionProblem insertionProblem;
 
-	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, InsertionDrtOptimizerParams params) {
+	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg,
+			InsertionDrtOptimizerParams params) {
 		super(optimContext, params, new TreeSet<NDrtRequest>(Requests.ABSOLUTE_COMPARATOR));
+		this.drtCfg = drtCfg;
+		
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
 		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		// preProcessDijkstra.run(optimContext.network);
@@ -68,7 +73,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 			return;
 		}
 
-		VehicleData vData = new VehicleData(getOptimContext(), getOptimContext().fleet.getVehicles().values());
+		VehicleData vData = new VehicleData(getOptimContext(), drtCfg, getOptimContext().fleet.getVehicles().values());
 
 		Iterator<NDrtRequest> reqIter = getUnplannedRequests().iterator();
 		while (reqIter.hasNext()) {

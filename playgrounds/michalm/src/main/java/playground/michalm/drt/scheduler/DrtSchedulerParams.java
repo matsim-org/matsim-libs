@@ -19,16 +19,17 @@
 
 package playground.michalm.drt.scheduler;
 
+import playground.michalm.drt.run.DrtConfigGroup;
+
 /**
  * @author michalm
  */
 public class DrtSchedulerParams {
 	public final double stopDuration;
-    
-	//TODO create DrtConfigGroup 
-	// public DrtSchedulerParams(DrtConfigGroup drtCfg) {
-	// this.stopDuration = drtCfg.getStopDuration();
-	// }
+
+	public DrtSchedulerParams(DrtConfigGroup drtCfg) {
+		this.stopDuration = drtCfg.getStopDuration();
+	}
 
 	public DrtSchedulerParams(double stopDuration) {
 		this.stopDuration = stopDuration;
