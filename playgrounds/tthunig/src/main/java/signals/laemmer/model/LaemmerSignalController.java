@@ -24,16 +24,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.model.AbstractSignalController;
-import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalController;
-import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
+import org.matsim.contrib.signals.model.*;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.data.Lane;
 
 import com.google.inject.Provider;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
+
+import java.util.Map;
 
 
 /**
@@ -146,9 +147,7 @@ public class LaemmerSignalController  extends AbstractSignalController implement
 			double intergreen = 0;
 			double amberTime = signalsData.getAmberTimesData().getDefaultAmber();
 			if(currentGreenTimeGroupId != null) {
-				intergreen = signalsData.getIntergreenTimesData().getIntergreensForSignalSystemDataMap()
-						.get(this.system.getId())
-						.getIntergreenTime(currentGreenTimeGroupId, group.getId());
+			    intergreen = signalsData.getIntergreenTimesData().getIntergreensForSignalSystemDataMap().get(this.system.getId()).getIntergreenTime(currentGreenTimeGroupId, group.getId());
 			}
 			double inBetweenTime = intergreen + amberTime;
 			double n = this.getNumberOfExpectedVehicles(timeSeconds + inBetweenTime, linkId);

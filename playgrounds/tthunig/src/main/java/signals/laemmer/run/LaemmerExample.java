@@ -8,10 +8,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -36,13 +34,27 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.DepartureImpl;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import signals.laemmer.model.LaemmerSignalController;
 import signals.laemmer.model.LaemmerSignalModelFactory;
 import signals.laemmer.model.LaemmerSignalsModule;
 import tutorial.simpleResponsiveSignalEngine.SimpleResponsiveSignal;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by nkuehnel on 13.03.2017.
@@ -100,6 +112,8 @@ public class LaemmerExample {
         signalConfigGroup.setActionOnIntergreenViolation(SignalSystemsConfigGroup.ActionOnIntergreenViolation.EXCEPTION);
         signalConfigGroup.setUseAmbertimes(true);
 
+        config.transit().setUseTransit(true);
+
         PlanCalcScoreConfigGroup.ActivityParams dummyAct = new PlanCalcScoreConfigGroup.ActivityParams("dummy");
         dummyAct.setTypicalDuration(12 * 3600);
         config.planCalcScore().addActivityParams(dummyAct);
@@ -128,7 +142,8 @@ public class LaemmerExample {
         scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
         createNetwork(scenario);
-        createPopulation(scenario);
+//        createPopulation(scenario);
+        createTransit(scenario);
         createSignals(scenario);
         return scenario;
     }
@@ -141,7 +156,7 @@ public class LaemmerExample {
      * 					 v                                     v
      * 					 7                                    15
      * 					 ^                                     ^
-     * 					 |                                     |
+     * 		   (H1)	     |                (H2)                 |        (H3)
      * 					 v                                     v
      * 1 <----> 2 <----> 3 <----> 4 <----> 5 <----> 10 <----> 11 <----> 12 <----> 13
      * 					 ^                                     ^
@@ -195,6 +210,11 @@ public class LaemmerExample {
             link.setCapacity(1800);
             link.setLength(1000);
             link.setFreespeed(10);
+            Set<String> modes = new HashSet<>();
+            modes.add("car");
+            modes.add("bus");
+
+            link.setAllowedModes(modes);
             net.addLink(link);
         }
     }
@@ -305,7 +325,7 @@ public class LaemmerExample {
 
         ig1.setIntergreenTime(0, Id.create("SignalGroup3", SignalGroup.class), Id.create("SignalGroup1", SignalGroup.class));
         ig1.setIntergreenTime(6, Id.create("SignalGroup3", SignalGroup.class), Id.create("SignalGroup2", SignalGroup.class));
-        ig1.setIntergreenTime(6, Id.create("SignalGroup3", SignalGroup.class), Id.create("SignalGroup3", SignalGroup.class));
+        ig1.setIntergreenTime(6, Id.create("SignalGroup3", SignalGroup.class), Id.create("SignalGroup4", SignalGroup.class));
 
         ig1.setIntergreenTime(6, Id.create("SignalGroup4", SignalGroup.class), Id.create("SignalGroup1", SignalGroup.class));
         ig1.setIntergreenTime(0, Id.create("SignalGroup4", SignalGroup.class), Id.create("SignalGroup2", SignalGroup.class));
@@ -318,70 +338,121 @@ public class LaemmerExample {
         //------------------------------------------------------------------------------------------------------------
 
 
-//        // create signal system
-//        Id<SignalSystem> signalSystemId2 = Id.create("SignalSystem2", SignalSystem.class);
-//        SignalSystemData signalSystem2 = sysFac.createSignalSystemData(signalSystemId2);
-//        signalSystems.addSignalSystemData(signalSystem2);
-//
-//        // create a signal for every inLink
-//        for (Id<Link> inLinkId : scenario.getNetwork().getNodes().get(Id.createNodeId(11)).getInLinks().keySet()) {
-//            SignalData signal = sysFac.createSignalData(Id.create("Signal" + inLinkId, Signal.class));
-//            signalSystem2.addSignalData(signal);
-//            signal.setLinkId(inLinkId);
-//        }
-//
-//        // group signals with non conflicting streams
-//        Id<SignalGroup> signalGroupId5 = Id.create("SignalGroup5", SignalGroup.class);
-//        SignalGroupData signalGroup5 = signalGroups.getFactory()
-//                .createSignalGroupData(signalSystemId2, signalGroupId5);
-//        signalGroup5.addSignalId(Id.create("Signal10_11", Signal.class));
-//        signalGroups.addSignalGroupData(signalGroup5);
-//
-//        Id<SignalGroup> signalGroupId6 = Id.create("SignalGroup6", SignalGroup.class);
-//        SignalGroupData signalGroup6 = signalGroups.getFactory()
-//                .createSignalGroupData(signalSystemId2, signalGroupId6);
-//        signalGroup6.addSignalId(Id.create("Signal15_11", Signal.class));
-//        signalGroups.addSignalGroupData(signalGroup6);
-//
-//        Id<SignalGroup> signalGroupId7 = Id.create("SignalGroup7", SignalGroup.class);
-//        SignalGroupData signalGroup7 = signalGroups.getFactory()
-//                .createSignalGroupData(signalSystemId2, signalGroupId7);
-//        signalGroup7.addSignalId(Id.create("Signal12_11", Signal.class));
-//        signalGroups.addSignalGroupData(signalGroup7);
-//
-//        Id<SignalGroup> signalGroupId8 = Id.create("SignalGroup8", SignalGroup.class);
-//        SignalGroupData signalGroup8 = signalGroups.getFactory()
-//                .createSignalGroupData(signalSystemId2, signalGroupId8);
-//        signalGroup8.addSignalId(Id.create("Signal16_11", Signal.class));
-//        signalGroups.addSignalGroupData(signalGroup8);
-//
-////      create the signal control
-//        SignalSystemControllerData signalSystemControl2 = conFac.createSignalSystemControllerData(signalSystemId2);
-//        signalSystemControl2.setControllerIdentifier(LaemmerSignalController.IDENTIFIER);
-//        signalControl.addSignalSystemControllerData(signalSystemControl2);
-//
-//        //Intergreens
-//        // Create a data object for signal system with id 2
-//        IntergreensForSignalSystemData ig2 = igdf.createIntergreensForSignalSystem(Id.create("SignalSystem2", SignalSystem.class));
-//        // Request at least x seconds red between the end of green of signal group y
-//        // and the beginning of green of signal group z
-//        ig2.setIntergreenTime(6, Id.create("SignalGroup5", SignalGroup.class), Id.create("SignalGroup6", SignalGroup.class));
-//        ig2.setIntergreenTime(0, Id.create("SignalGroup5", SignalGroup.class), Id.create("SignalGroup7", SignalGroup.class));
-//        ig2.setIntergreenTime(6, Id.create("SignalGroup5", SignalGroup.class), Id.create("SignalGroup8", SignalGroup.class));
-//
-//        ig2.setIntergreenTime(6, Id.create("SignalGroup6", SignalGroup.class), Id.create("SignalGroup5", SignalGroup.class));
-//        ig2.setIntergreenTime(6, Id.create("SignalGroup6", SignalGroup.class), Id.create("SignalGroup7", SignalGroup.class));
-//        ig2.setIntergreenTime(0, Id.create("SignalGroup6", SignalGroup.class), Id.create("SignalGroup8", SignalGroup.class));
-//
-//        ig2.setIntergreenTime(0, Id.create("SignalGroup7", SignalGroup.class), Id.create("SignalGroup5", SignalGroup.class));
-//        ig2.setIntergreenTime(6, Id.create("SignalGroup7", SignalGroup.class), Id.create("SignalGroup6", SignalGroup.class));
-//        ig2.setIntergreenTime(6, Id.create("SignalGroup7", SignalGroup.class), Id.create("SignalGroup8", SignalGroup.class));
-//
-//        ig2.setIntergreenTime(6, Id.create("SignalGroup8", SignalGroup.class), Id.create("SignalGroup5", SignalGroup.class));
-//        ig2.setIntergreenTime(0, Id.create("SignalGroup8", SignalGroup.class), Id.create("SignalGroup6", SignalGroup.class));
-//        ig2.setIntergreenTime(6, Id.create("SignalGroup8", SignalGroup.class), Id.create("SignalGroup7", SignalGroup.class));
-//
-//        // add the data object to the container
-//        ig.addIntergreensForSignalSystem(ig2);
+        // create signal system
+        Id<SignalSystem> signalSystemId2 = Id.create("SignalSystem2", SignalSystem.class);
+        SignalSystemData signalSystem2 = sysFac.createSignalSystemData(signalSystemId2);
+        signalSystems.addSignalSystemData(signalSystem2);
+
+        // create a signal for every inLink
+        for (Id<Link> inLinkId : scenario.getNetwork().getNodes().get(Id.createNodeId(11)).getInLinks().keySet()) {
+            SignalData signal = sysFac.createSignalData(Id.create("Signal" + inLinkId, Signal.class));
+            signalSystem2.addSignalData(signal);
+            signal.setLinkId(inLinkId);
+        }
+
+        // group signals with non conflicting streams
+        Id<SignalGroup> signalGroupId5 = Id.create("SignalGroup5", SignalGroup.class);
+        SignalGroupData signalGroup5 = signalGroups.getFactory()
+                .createSignalGroupData(signalSystemId2, signalGroupId5);
+        signalGroup5.addSignalId(Id.create("Signal10_11", Signal.class));
+        signalGroups.addSignalGroupData(signalGroup5);
+
+        Id<SignalGroup> signalGroupId6 = Id.create("SignalGroup6", SignalGroup.class);
+        SignalGroupData signalGroup6 = signalGroups.getFactory()
+                .createSignalGroupData(signalSystemId2, signalGroupId6);
+        signalGroup6.addSignalId(Id.create("Signal15_11", Signal.class));
+        signalGroups.addSignalGroupData(signalGroup6);
+
+        Id<SignalGroup> signalGroupId7 = Id.create("SignalGroup7", SignalGroup.class);
+        SignalGroupData signalGroup7 = signalGroups.getFactory()
+                .createSignalGroupData(signalSystemId2, signalGroupId7);
+        signalGroup7.addSignalId(Id.create("Signal12_11", Signal.class));
+        signalGroups.addSignalGroupData(signalGroup7);
+
+        Id<SignalGroup> signalGroupId8 = Id.create("SignalGroup8", SignalGroup.class);
+        SignalGroupData signalGroup8 = signalGroups.getFactory()
+                .createSignalGroupData(signalSystemId2, signalGroupId8);
+        signalGroup8.addSignalId(Id.create("Signal16_11", Signal.class));
+        signalGroups.addSignalGroupData(signalGroup8);
+
+//      create the signal control
+        SignalSystemControllerData signalSystemControl2 = conFac.createSignalSystemControllerData(signalSystemId2);
+        signalSystemControl2.setControllerIdentifier(LaemmerSignalController.IDENTIFIER);
+        signalControl.addSignalSystemControllerData(signalSystemControl2);
+
+        //Intergreens
+        // Create a data object for signal system with id 2
+        IntergreensForSignalSystemData ig2 = igdf.createIntergreensForSignalSystem(Id.create("SignalSystem2", SignalSystem.class));
+        // Request at least x seconds red between the end of green of signal group y
+        // and the beginning of green of signal group z
+        ig2.setIntergreenTime(6, Id.create("SignalGroup5", SignalGroup.class), Id.create("SignalGroup6", SignalGroup.class));
+        ig2.setIntergreenTime(0, Id.create("SignalGroup5", SignalGroup.class), Id.create("SignalGroup7", SignalGroup.class));
+        ig2.setIntergreenTime(6, Id.create("SignalGroup5", SignalGroup.class), Id.create("SignalGroup8", SignalGroup.class));
+
+        ig2.setIntergreenTime(6, Id.create("SignalGroup6", SignalGroup.class), Id.create("SignalGroup5", SignalGroup.class));
+        ig2.setIntergreenTime(6, Id.create("SignalGroup6", SignalGroup.class), Id.create("SignalGroup7", SignalGroup.class));
+        ig2.setIntergreenTime(0, Id.create("SignalGroup6", SignalGroup.class), Id.create("SignalGroup8", SignalGroup.class));
+
+        ig2.setIntergreenTime(0, Id.create("SignalGroup7", SignalGroup.class), Id.create("SignalGroup5", SignalGroup.class));
+        ig2.setIntergreenTime(6, Id.create("SignalGroup7", SignalGroup.class), Id.create("SignalGroup6", SignalGroup.class));
+        ig2.setIntergreenTime(6, Id.create("SignalGroup7", SignalGroup.class), Id.create("SignalGroup8", SignalGroup.class));
+
+        ig2.setIntergreenTime(6, Id.create("SignalGroup8", SignalGroup.class), Id.create("SignalGroup5", SignalGroup.class));
+        ig2.setIntergreenTime(0, Id.create("SignalGroup8", SignalGroup.class), Id.create("SignalGroup6", SignalGroup.class));
+        ig2.setIntergreenTime(6, Id.create("SignalGroup8", SignalGroup.class), Id.create("SignalGroup7", SignalGroup.class));
+
+        // add the data object to the container
+        ig.addIntergreensForSignalSystem(ig2);
+    }
+
+    private static void createTransit(Scenario scenario) {
+        TransitSchedule ts = scenario.getTransitSchedule();
+        TransitScheduleFactory tsFac = ts.getFactory();
+
+        VehiclesFactory vehFac = scenario.getTransitVehicles().getFactory();
+
+        VehicleType busType = vehFac.createVehicleType(Id.create("bus", VehicleType.class));
+        VehicleCapacity vehCap = vehFac.createVehicleCapacity();
+        vehCap.setSeats(40);
+        vehCap.setStandingRoom(80);
+        busType.setCapacity(vehCap);
+        scenario.getTransitVehicles().addVehicleType(busType);
+        scenario.getTransitVehicles().addVehicle(vehFac.createVehicle(Id.createVehicleId(1), busType));
+
+        TransitStopFacility stop1 =tsFac.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(-1000, 500), true);
+        TransitStopFacility stop2 =tsFac.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(2000, 500), true);
+        TransitStopFacility stop3 = tsFac.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord(5000, 500), true);
+        stop1.setLinkId(Id.createLinkId("3_2"));
+        stop2.setLinkId(Id.createLinkId("10_5"));
+        stop3.setLinkId(Id.createLinkId("13_12"));
+        ts.addStopFacility(stop1);
+        ts.addStopFacility(stop2);
+        ts.addStopFacility(stop3);
+
+        TransitLine line1 = tsFac.createTransitLine(Id.create("Line1", TransitLine.class));
+        List<Id<Link>> links = new ArrayList<>();
+        links.add(Id.createLinkId("12_11"));
+        links.add(Id.createLinkId("11_10"));
+        links.add(Id.createLinkId("10_5"));
+        links.add(Id.createLinkId("5_4"));
+        links.add(Id.createLinkId("4_3"));
+        links.add(Id.createLinkId("3_2"));
+
+
+        NetworkRoute networkRoute = new LinkNetworkRouteImpl(Id.createLinkId("13_12"), links, Id.createLinkId("2_1"));
+        List<TransitRouteStop> stops = new ArrayList<>();
+
+        stops.add(tsFac.createTransitRouteStop(stop3, 60, 60));
+        stops.add(tsFac.createTransitRouteStop(stop2, 60, 60));
+        stops.add(tsFac.createTransitRouteStop(stop1, 60, 60));
+
+        TransitRoute route1 = tsFac.createTransitRoute(Id.create("route1", TransitRoute.class), networkRoute, stops, "bus");
+        line1.addRoute(route1);
+        for(int i = 0; i< 1200; i += 300) {
+            Departure dep = tsFac.createDeparture(Id.create(i+1, Departure.class), i);
+            dep.setVehicleId(Id.createVehicleId(1));
+            route1.addDeparture(dep);
+        }
+        ts.addTransitLine(line1);
     }
 }
