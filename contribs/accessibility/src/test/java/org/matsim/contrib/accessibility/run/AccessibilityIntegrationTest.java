@@ -327,7 +327,8 @@ public class AccessibilityIntegrationTest {
 		mbConfig.setUsingTravelTimesAndDistances(true);
 		config.addModule(mbConfig);
 
-		config.controler().setLastIteration(10);
+//		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 

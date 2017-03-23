@@ -29,7 +29,7 @@ public class TripAnalyzerV2Extended {
 	public static final Logger log = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
 	/* Parameters */
-	private static String runId = "be_118a";	// <----------
+	private static String runId = "be_122";	// <----------
 	private static String usedIteration = "300"; // most frequently used value: 150 // <----------
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
@@ -39,9 +39,9 @@ public class TripAnalyzerV2Extended {
 	private static final String specificMode = TransportMode.car;
 	
 	private static final boolean onlyInterior = false; // "int"
-	private static boolean onlyBerlinBased = false; // "ber"; usually varied for analysis // <----------
+	private static boolean onlyBerlinBased = true; // "ber"; usually varied for analysis // <----------
 	
-	private static boolean useDistanceFilter = false; // "dist"; usually varied for analysis // <----------
+	private static boolean useDistanceFilter = true; // "dist"; usually varied for analysis // <----------
 	// private static final double double minDistance = 0;
 	private static final double maxDistance_km = 100;
 
