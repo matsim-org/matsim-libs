@@ -41,7 +41,7 @@ class BinnedWaitingTimes extends AbstractData {
     static double totalMean = 0;
     double binSize = 600;
 
-    double maxWait = 50000; // maximally expected waiting time to have plots of the same range
+    double maxWait = 5000; // maximally expected waiting time to have plots of the same range
 
     KeyMap keyMap = new KeyMap(binSize);
 

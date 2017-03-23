@@ -1,5 +1,6 @@
 package playground.joel.data;
 
+import java.awt.*;
 import java.io.*;
 import java.util.NavigableMap;
 
@@ -19,17 +20,22 @@ import playground.joel.helpers.KeyMap;
  */
 public class TimeDiagramCreator {
 
+    static Second toTime(double time) {
+        int days = (int) (time/86400) + 1;
+        int hours = (int) (time/3600) - (days - 1)*24;
+        int minutes = (int) (time/60) - hours*60 - (days - 1)*1440;
+        int seconds = (int) time - minutes*60 - hours*3600 - (days - 1)*86400;
+        Second second = new Second(seconds, minutes, hours, days, 1, 2017); // month and year can not be zero
+        return second;
+    }
+
     public static void createDiagram(File directory, String fileTitle, String diagramTitle, NavigableMap<String, Double> map) throws Exception
     {
         final TimeSeries series = new TimeSeries( "time series");
         for(String key: map.keySet()) {
             try
             {
-                int days = (int) (KeyMap.keyToTime(key)/86400) + 1;
-                int hours = (int) (KeyMap.keyToTime(key)/3600) - (days - 1)*24;
-                int minutes = (int) (KeyMap.keyToTime(key)/60) - hours*60 - (days - 1)*1440;
-                int seconds = (int) KeyMap.keyToTime(key) - minutes*60 - hours*3600 - (days - 1)*86400;
-                Second time = new Second(seconds, minutes, hours, days, 1, 2017); // month and year can not be zero
+                Second time = toTime(KeyMap.keyToTime(key));
                 series.add(time, map.get(key));
                 GlobalAssert.that(!series.isEmpty());
             }
@@ -42,6 +48,10 @@ public class TimeDiagramCreator {
 
         final XYDataset dataset=( XYDataset )new TimeSeriesCollection(series);
         JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Time", "Value", dataset,false,false,false);
+        timechart.getXYPlot().getRangeAxis().setRange(0, 1.1);
+        timechart.getPlot().setBackgroundPaint(Color.white);
+        timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
+        timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
 
         int width = 800; /* Width of the image */
         int height = 600; /* Height of the image */
@@ -52,7 +62,7 @@ public class TimeDiagramCreator {
     }
 
     public static void createDiagram(File directory, String fileTitle, String diagramTitle,
-                                     NavigableMap<String, Double> map1, NavigableMap<String, Double> map2, NavigableMap<String, Double> map3) throws Exception
+                                     NavigableMap<String, Double> map1, NavigableMap<String, Double> map2, NavigableMap<String, Double> map3, Double maxWait) throws Exception
     {
         final TimeSeriesCollection dataset = new TimeSeriesCollection();
         final TimeSeries series1 = new TimeSeries( "time series 1");
@@ -63,11 +73,7 @@ public class TimeDiagramCreator {
         for(String key: map1.keySet()) {
             try
             {
-                int days = (int) (KeyMap.keyToTime(key)/86400) + 1;
-                int hours = (int) (KeyMap.keyToTime(key)/3600) - (days - 1)*24;
-                int minutes = (int) (KeyMap.keyToTime(key)/60) - hours*60 - (days - 1)*1440;
-                int seconds = (int) KeyMap.keyToTime(key) - minutes*60 - hours*3600 - (days - 1)*86400;
-                Second time = new Second(seconds, minutes, hours, days, 1, 2017); // month and year can not be zero
+                Second time = toTime(KeyMap.keyToTime(key));
 
                 series1.add(time, map1.get(key));
                 GlobalAssert.that(!series1.isEmpty());
@@ -87,6 +93,10 @@ public class TimeDiagramCreator {
         }
 
         JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Time", "Value", dataset,false,false,false);
+        timechart.getXYPlot().getRangeAxis().setRange(0, maxWait);
+        timechart.getPlot().setBackgroundPaint(Color.white);
+        timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
+        timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
 
         int width = 800; /* Width of the image */
         int height = 600; /* Height of the image */
