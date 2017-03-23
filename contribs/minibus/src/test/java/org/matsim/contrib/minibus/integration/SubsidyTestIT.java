@@ -47,7 +47,7 @@ import org.matsim.testcases.MatsimTestUtils;
 * @author ikaddoura
 */
 
-public class SubsidyPControlerTest2IT implements TabularFileHandler {
+public class SubsidyTestIT implements TabularFileHandler {
 	
 	private static final String gridScenarioDirectory = "http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/input/";
 
