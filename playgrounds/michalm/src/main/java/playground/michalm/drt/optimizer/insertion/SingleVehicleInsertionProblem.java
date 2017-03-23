@@ -138,7 +138,7 @@ public class SingleVehicleInsertionProblem {
 
 		// calc forward dijkstra from dropoff to beginnings of all stops
 		// TODO exclude inserting dropoff before fully occupied stops
-		pathsFromDropoff = forwardPathSearch.calcPaths(drtRequest.getFromLink(), links, minDropoffTime);
+		pathsFromDropoff = forwardPathSearch.calcPaths(drtRequest.getToLink(), links, minDropoffTime);
 	}
 
 	private void findPickupDropoffInsertions(NDrtRequest drtRequest, VehicleData.Entry vEntry) {

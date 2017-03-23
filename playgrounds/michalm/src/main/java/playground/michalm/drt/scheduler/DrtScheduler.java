@@ -204,7 +204,10 @@ public class DrtScheduler implements ScheduleInquiry {
 			if (insertion.pickupIdx == 0) {
 				if (currentTask.getDrtTaskType() == NDrtTaskType.STAY) {
 					stayTask = (NDrtStayTask)currentTask; // ongoing stay task
-					stayTask.setEndTime(timer.getTimeOfDay());
+					double now = timer.getTimeOfDay();
+					if (stayTask.getEndTime() > now) { //split stay task into two, so that a new stop/drive task can be inserted now 
+						stayTask.setEndTime(now);
+					}
 				} else {
 					stopTask = (NDrtStopTask)currentTask; // ongoing stop task
 				}
