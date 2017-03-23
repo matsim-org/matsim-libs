@@ -94,7 +94,7 @@ public final class PBox implements POperators {
 		this.scorePlansHandler = new PScorePlansHandler(this.ticketMachine);
 		this.stageCollectorHandler = new StageContainerCreator(this.pConfig.getPIdentifier());
 		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0, this.pConfig.getCostPerHour() / 3600.0);
-		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());
+		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());	
 	}
 
 	void notifyStartup(StartupEvent event) {

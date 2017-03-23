@@ -30,11 +30,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.hook.PModule;
-import org.matsim.contrib.minibus.operator.PerPassengerSubsidy;
-import org.matsim.contrib.minibus.operator.SubsidyI;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -64,7 +61,7 @@ public class SubsidyPControlerTest2IT implements TabularFileHandler {
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
 		
 		PConfigGroup pConfig = (PConfigGroup) config.getModules().get(PConfigGroup.GROUP_NAME);
-		pConfig.setWelfareMaximization(true);
+		pConfig.setSubsidyApproach("perPassenger");
 		
 		config.network().setInputFile(gridScenarioDirectory  + "network.xml");
 		config.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
@@ -79,15 +76,6 @@ public class SubsidyPControlerTest2IT implements TabularFileHandler {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		controler.addOverridingModule(new PModule()) ;
-		
-		controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
-				this.bind(SubsidyI.class).to(PerPassengerSubsidy.class);
-			}
-		});
-		
 		controler.run();
 		
 		// Check standard output files	

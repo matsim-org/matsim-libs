@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,8 +39,8 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import com.google.inject.Inject;
 
 /**
- * 
- * 
+ * To have an example/prototype and for testing purposes.
+ * This subsidy approach simply adds a certain amount for each passenger to the operator's score.
  * 
  * TODO: Compute the contribution of each transit line on the overall welfare changes.
  * Allocates the changes in user benefits to the transit lines which are used by the user.
@@ -51,7 +50,6 @@ import com.google.inject.Inject;
  *
  */
 public class PerPassengerSubsidy implements SubsidyI {
-	private static final Logger log = Logger.getLogger(PerPassengerSubsidy.class);
 
 //	private Map<Id<Person>, Double> personId2initialBenefits;
 //	private Map<Id<Person>, Double> personId2benefits;

@@ -61,11 +61,7 @@ public class SubsidyPControlerTestIT implements TabularFileHandler {
 	public final void testDefaultPControler() {
 			
 		Config config1 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
-		
-		PConfigGroup pConfig1 = (PConfigGroup) config1.getModules().get(PConfigGroup.GROUP_NAME);
-		pConfig1.setWelfareMaximization(false);
-		pConfig1.addParam("operatorType", "CarefulMultiPlanOperator");
-		
+				
 		config1.network().setInputFile(gridScenarioDirectory  + "network.xml");
 		config1.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
 		config1.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");
@@ -126,8 +122,7 @@ public class SubsidyPControlerTestIT implements TabularFileHandler {
 		Config config2 = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
 		
 		PConfigGroup pConfig2 = (PConfigGroup) config2.getModules().get(PConfigGroup.GROUP_NAME);
-		pConfig2.setWelfareMaximization(true);
-		pConfig2.addParam("operatorType", "WelfareCarefulMultiPlanOperator");
+		pConfig2.setSubsidyApproach("perPassenger");
 		
 		config2.network().setInputFile(gridScenarioDirectory  + "network.xml");
 		config2.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");

@@ -8,9 +8,7 @@
 
 <module name="p" >
 		<param name="pIdentifier" value="para_" />
-		<param name="operatorType" value="CarefulMultiPlanOperator" />
-		<param name="welfareMaximization" value="false" />
-		
+		<param name="operatorType" value="CarefulMultiPlanOperator" />		
 		<param name="numberOfOperators" value="10" />
 		<param name="numberOfIterationsForProspecting" value="10" />
 		<param name="initialBudget" value="200000.0" />
