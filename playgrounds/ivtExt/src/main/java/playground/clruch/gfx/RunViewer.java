@@ -12,6 +12,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
+import playground.clruch.net.ObjectClient;
+import playground.clruch.net.SimulationObject;
+import playground.clruch.net.SimulationSubscriber;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 public class RunViewer {
@@ -35,22 +38,38 @@ public class RunViewer {
         System.out.println(population.getPersons().size());
 
         CoordinateTransformation ct;
-        //ct = new CH1903LV03PlustoWGS84(); // <- switzerland
+        // ct = new CH1903LV03PlustoWGS84(); // <- switzerland
         ct = new SiouxFallstoWGS84(); // <- sioux falls
 
         MatsimStaticDatabase db = MatsimStaticDatabase.of(network, ct);
 
-        MatsimJMapViewer matsimComponent = new MatsimJMapViewer(db);
-        MatsimViewer matsimViewer = new MatsimViewer(matsimComponent);
+        MatsimJMapViewer matsimJMapViewer = new MatsimJMapViewer(db);
+        matsimJMapViewer.setTileGridVisible(false);
+
+        MatsimViewer matsimViewer = new MatsimViewer(matsimJMapViewer);
+
+        try {
+            ObjectClient client = new ObjectClient("localhost", new SimulationSubscriber() {
+                @Override
+                public void handle(SimulationObject simulationObject) {
+
+                    matsimJMapViewer.setSimulationObject(simulationObject);
+                }
+            });
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         // basel
         // getJMapViewer().setDisplayPosition(new Point(), new Coordinate(47.55814, 7.58769), 11);
 
         // sioux falls
-        matsimViewer.setDisplayPosition(43.54469101104898, -96.72376155853271, 11);
+        // TODO obtain center from db
+        matsimViewer.setDisplayPosition(43.54469101104898, -96.72376155853271, 13);
 
         //
-
+        matsimViewer.jFrame.setSize(800, 900);
         matsimViewer.jFrame.setVisible(true);
 
     }

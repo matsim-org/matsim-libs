@@ -44,9 +44,9 @@ public class MatsimViewer {
 
     /** Constructs the {@code Demo}. */
     public MatsimViewer(JMapViewer jMapViewer) {
-        jFrame.setSize(800, 600);
+        
         treeMap = new JMapViewerTree(jMapViewer, "Zones", false);
-        getJMapViewer().setTileGridVisible(true);
+        
         getJMapViewer().addJMVListener(new JMapViewerEventListener() {
             @Override
             public void processCommand(JMVCommandEvent command) {

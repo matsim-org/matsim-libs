@@ -190,6 +190,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     private String previousInfoMarker = "";
 
+    protected abstract void notifySimulationSubscribers(long round_now);
+
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
@@ -202,6 +204,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
                 System.out.println(infoLine);
             }
         }
+
+        notifySimulationSubscribers(Math.round(now));
 
         redispatch(now);
         private_now = null; // <- time unavailable

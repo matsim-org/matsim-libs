@@ -37,4 +37,8 @@ public class MatsimStaticDatabase {
 
     }
 
+    public OsmLink getOsmLink(String key) {
+        return linkMap.get(key);
+    }
+
 }

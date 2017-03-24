@@ -39,18 +39,19 @@ public class PulseDispatcher extends UniversalDispatcher {
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = safeConfig.getInteger("", 120);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 120);
     }
 
     @Override
     public void redispatch(double now) {
+
+        final long round_now = Math.round(now);
 
         new InOrderOfArrivalMatcher(this::setAcceptRequest).match(getStayVehicles(), getAVRequestsAtLinks());
 
         total_abortTrip += new DrivebyRequestStopper(this::setVehicleDiversion) //
                 .realize(getAVRequestsAtLinks(), getDivertableVehicles());
 
-        final long round_now = Math.round(now);
         if (round_now % dispatchPeriod == 0 && 0 < getAVRequests().size()) {
 
             for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles())
