@@ -2,10 +2,12 @@ package playground.clruch.dispatcher.core;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +21,12 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.export.AVStatus;
+import playground.clruch.gfx.util.VehicleContainer;
+import playground.clruch.net.SimulationObject;
+import playground.clruch.net.SimulationServer;
+import playground.clruch.net.SimulationSubscriber;
+import playground.clruch.net.SimulationSubscriberSet;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.GlobalAssert;
@@ -45,9 +53,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     private final double pickupDurationPerStop;
     private final double dropoffDurationPerStop;
+    private final int publishPeriod;
 
     private int total_matchedRequests = 0;
-
 
     protected UniversalDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -63,6 +71,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         setInfoLinePeriod(safeConfig.getInteger("infoLinePeriod", 10));
+        publishPeriod = safeConfig.getInteger("publishPeriod", 10);
     }
 
     /**
@@ -175,6 +184,62 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     @Override
     public final void onNextTaskStarted(AVTask task) {
         // intentionally empty
+    }
+
+    @Override
+    protected void notifySimulationSubscribers(long round_now) {
+        if (SimulationServer.INSTANCE.isRunning() && //
+                round_now % publishPeriod == 0 && 0 < getAVRequests().size()) { // TODO not final criteria
+            // block for connections
+            while (SimulationSubscriberSet.INSTANCE.isEmpty())
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            { // TODO obey to publish period
+                SimulationObject simulationObject = new SimulationObject();
+                simulationObject.infoLine = getInfoLine();
+                simulationObject.now = round_now;
+                {
+                    Map<Link, List<AVRequest>> map = getAVRequestsAtLinks();
+                    for (Entry<Link, List<AVRequest>> entry : map.entrySet())
+                        simulationObject.requestsPerLinkMap.put(entry.getKey().getId().toString(), entry.getValue().size());
+                }
+                {
+                    final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
+
+                    // Map<String, VehicleContainer> map = new HashMap<>();
+                    for (Entry<Link, Queue<AVVehicle>> entry : getStayVehicles().entrySet()) {
+                        final String linkId = entry.getKey().getId().toString();
+                        for (AVVehicle avVehicle : entry.getValue()) {
+                            final String key = avVehicle.getId().toString();
+                            VehicleContainer vehicleContainer = new VehicleContainer();
+                            vehicleContainer.linkId = linkId;
+                            vehicleContainer.avStatus = AVStatus.STAY;
+                            vehicleMap.put(key, vehicleContainer);
+                        }
+                    }
+
+                    for (VehicleLinkPair vlp : getDivertableVehicles()) {
+                        final String key = vlp.avVehicle.getId().toString();
+                        if (!vehicleMap.containsKey(key)) {
+                            VehicleContainer vehicleContainer = new VehicleContainer();
+                            vehicleContainer.linkId = vlp.linkTimePair.link.getId().toString();
+                            vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
+                            vehicleMap.put(key, vehicleContainer);
+                        }
+                    }
+
+                    simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
+                }
+
+                for (SimulationSubscriber simulationSubscriber : SimulationSubscriberSet.INSTANCE)
+                    simulationSubscriber.handle(simulationObject);
+                // System.out.println("sent to " + SimulationSubscriberSet.INSTANCE.size());
+            }
+        }
+
     }
 
     @Override

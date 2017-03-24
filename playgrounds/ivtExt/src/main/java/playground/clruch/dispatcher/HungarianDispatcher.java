@@ -34,17 +34,16 @@ public class HungarianDispatcher extends UniversalDispatcher {
     private Tensor printVals = Tensors.empty();
 
     private HungarianDispatcher( //
-                                 AVDispatcherConfig avDispatcherConfig, //
-                                 TravelTime travelTime, //
-                                 ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-                                 EventsManager eventsManager, //
-                                 Network network, AbstractRequestSelector abstractRequestSelector) {
+            AVDispatcherConfig avDispatcherConfig, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+            EventsManager eventsManager, //
+            Network network, AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
     }
-
 
     @Override
     public void redispatch(double now) {
@@ -62,14 +61,12 @@ public class HungarianDispatcher extends UniversalDispatcher {
         }
     }
 
-
     public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier) {
         // assign new destination to vehicles with bipartite matching
 
         Tensor returnTensor = Tensors.empty();
 
         Map<Link, List<AVRequest>> requests = dispatcher.getAVRequestsAtLinks();
-
 
         // reduce the number of requests for a smaller running time
         // take out and match request-vehicle pairs with distance zero
@@ -89,11 +86,11 @@ public class HungarianDispatcher extends UniversalDispatcher {
                     .entrySet().forEach(dispatcher::setVehicleDiversion);
         }
 
-                /*
-                 * // only select MAXMATCHNUMBER of oldest requests
-                 * Collection<AVRequest> avRequests = requests.values().stream().flatMap(v -> v.stream()).collect(Collectors.toList());
-                 * Collection<AVRequest> avRequestsReduced = requestSelector.selectRequests(divertableVehicles, avRequests, MAXMATCHNUMBER);
-                 */
+        /*
+         * // only select MAXMATCHNUMBER of oldest requests
+         * Collection<AVRequest> avRequests = requests.values().stream().flatMap(v -> v.stream()).collect(Collectors.toList());
+         * Collection<AVRequest> avRequestsReduced = requestSelector.selectRequests(divertableVehicles, avRequests, MAXMATCHNUMBER);
+         */
 
         // call getDivertableVehicles again to get remaining vehicles
         Collection<VehicleLinkPair> divertableVehicles = supplier.get();
@@ -101,27 +98,23 @@ public class HungarianDispatcher extends UniversalDispatcher {
         // in case requests >> divertablevehicles or divertablevehicles >> requests reduce the search space using kd-trees
         returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestlocs.size()));
         List<Link> requestlocsCut = reduceRequestsKDTree(requestlocs, divertableVehicles);
-        Collection<VehicleLinkPair> divertableVehiclesCut = reduceVehiclesKDTree(requestlocs,divertableVehicles);
+        Collection<VehicleLinkPair> divertableVehiclesCut = reduceVehiclesKDTree(requestlocs, divertableVehicles);
         returnTensor.append(Tensors.vectorInt(divertableVehiclesCut.size(), requestlocsCut.size()));
 
-        System.out.println("number of available vehicles before cutting: " + divertableVehicles.size());
-        System.out.println("number of available vehicles after cutting: " + divertableVehiclesCut.size());
-        System.out.println("number of requests before cutting: " + requestlocs.size());
-        System.out.println("number of requetss after cutting:" + requestlocsCut.size());
+        // System.out.println("number of available vehicles before cutting: " + divertableVehicles.size());
+        // System.out.println("number of available vehicles after cutting: " + divertableVehiclesCut.size());
+        // System.out.println("number of requests before cutting: " + requestlocs.size());
+        // System.out.println("number of requetss after cutting:" + requestlocsCut.size());
 
         {
-
-
 
             // find the Euclidean bipartite matching for all vehicles using the Hungarian method
             new HungarBiPartVehicleDestMatcher().match(divertableVehicles, requestlocsCut) //
                     .entrySet().forEach(dispatcher::setVehicleDiversion);
         }
 
-
         return returnTensor;
     }
-
 
     // class to uniquely distinguish requests
     static class RequestWithID {
@@ -134,10 +127,10 @@ public class HungarianDispatcher extends UniversalDispatcher {
         }
     }
 
-
     private static List<Link> reduceRequestsKDTree(List<Link> requestlocs, Collection<VehicleLinkPair> divertableVehicles) {
         // for less requests than cars, don't do anything
-        if (requestlocs.size() < divertableVehicles.size()) return requestlocs;
+        if (requestlocs.size() < divertableVehicles.size())
+            return requestlocs;
 
         // otherwise create KD tree and return reduced amount of requestlocs
         // create KD tree
@@ -154,7 +147,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
             double d2 = link.getFromNode().getCoord().getY();
             GlobalAssert.that(Double.isFinite(d1));
             GlobalAssert.that(Double.isFinite(d2));
-            KDTree.add(new double[]{d1, d2}, new RequestWithID(link, reqIter));
+            KDTree.add(new double[] { d1, d2 }, new RequestWithID(link, reqIter));
             reqIter++;
         }
 
@@ -165,20 +158,18 @@ public class HungarianDispatcher extends UniversalDispatcher {
         do {
             requestsChosen.clear();
             for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-                double[] vehLoc = new double[]{
-                        vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getX(),
-                        vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY()};
+                double[] vehLoc = new double[] { vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getX(),
+                        vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY() };
                 Cluster<RequestWithID> nearestCluster = KDTree.buildCluster(vehLoc, iter, new EuclideanDistancer());
                 nearestCluster.getValues().stream().forEach(v -> requestsChosen.put(v, v.link));
             }
             ++iter;
         } while (requestsChosen.size() < divertableVehicles.size() && iter <= divertableVehicles.size());
 
-
         List<Link> toSearchrequestlocs = new LinkedList<>();
         requestsChosen.values().stream().forEach(v -> toSearchrequestlocs.add(v));
 
-        if(toSearchrequestlocs.size()<divertableVehicles.size()){
+        if (toSearchrequestlocs.size() < divertableVehicles.size()) {
             System.out.println("Hoppla");
         }
 
@@ -187,7 +178,8 @@ public class HungarianDispatcher extends UniversalDispatcher {
 
     private static Collection<VehicleLinkPair> reduceVehiclesKDTree(List<Link> requestlocs, Collection<VehicleLinkPair> divertableVehicles) {
         // for less requests than cars, don't do anything
-        if (divertableVehicles.size() < requestlocs.size()) return divertableVehicles;
+        if (divertableVehicles.size() < requestlocs.size())
+            return divertableVehicles;
 
         // otherwise create KD tree and return reduced amount of requestlocs
         // create KD tree
@@ -204,7 +196,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
             double d2 = vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY();
             GlobalAssert.that(Double.isFinite(d1));
             GlobalAssert.that(Double.isFinite(d2));
-            KDTree.add(new double[]{d1, d2}, vehicleLinkPair);
+            KDTree.add(new double[] { d1, d2 }, vehicleLinkPair);
             vehIter++;
         }
 
@@ -215,9 +207,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         do {
             vehiclesChosen.clear();
             for (Link link : requestlocs) {
-                double[] reqloc = new double[]{
-                        link.getFromNode().getCoord().getX(),
-                        link.getFromNode().getCoord().getY()};
+                double[] reqloc = new double[] { link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY() };
                 Cluster<VehicleLinkPair> nearestCluster = KDTree.buildCluster(reqloc, iter, new EuclideanDistancer());
                 nearestCluster.getValues().stream().forEach(v -> vehiclesChosen.add(v));
             }
@@ -227,7 +217,6 @@ public class HungarianDispatcher extends UniversalDispatcher {
         return vehiclesChosen;
     }
 
-
     @Override
     public String getInfoLine() {
         return String.format("%s H=%s", //
@@ -235,7 +224,6 @@ public class HungarianDispatcher extends UniversalDispatcher {
                 printVals.toString() //
         );
     }
-
 
     public static class Factory implements AVDispatcherFactory {
         @Inject
@@ -260,7 +248,3 @@ public class HungarianDispatcher extends UniversalDispatcher {
         }
     }
 }
-
-
-
-
