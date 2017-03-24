@@ -11,6 +11,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
+import playground.sebhoerl.avtaxi.routing.AVRoute;
+import playground.sebhoerl.avtaxi.routing.AVRouteFactory;
 import playground.sebhoerl.recharging_avs.calculators.BinnedChargeCalculatorConfig;
 import playground.sebhoerl.recharging_avs.calculators.BinnedChargeCalculatorModule;
 import playground.sebhoerl.recharging_avs.calculators.StaticChargeCalculatorConfig;
@@ -26,7 +28,10 @@ public class RunSimulation {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         Config config = ConfigUtils.loadConfig(configFile, new AVConfigGroup(), dvrpConfigGroup, new StaticChargeCalculatorConfig(), new BinnedChargeCalculatorConfig());
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+
+        Scenario scenario = ScenarioUtils.createScenario(config);
+        scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(AVRoute.class, new AVRouteFactory());
+        ScenarioUtils.loadScenario(scenario);
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
