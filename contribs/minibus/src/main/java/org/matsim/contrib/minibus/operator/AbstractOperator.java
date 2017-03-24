@@ -106,13 +106,13 @@ abstract class AbstractOperator implements Operator{
 	}
 
 	@Override
-	public void score(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, SubsidyI subsidy) {
+	public void score(Map<Id<Vehicle>, PScoreContainer> pScores, SubsidyI subsidy) {
 		this.setScoreLastIteration(this.getScore());
 		this.setScore(0);
 		
 		// score all plans
 		for (PPlan plan : this.getAllPlans()) {
-			scorePlan(driverId2ScoreMap, plan);
+			scorePlan(pScores, plan);
 			
 			if (subsidy != null) {
 				Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);

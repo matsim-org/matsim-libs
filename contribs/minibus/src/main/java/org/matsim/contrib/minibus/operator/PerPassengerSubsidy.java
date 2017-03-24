@@ -56,7 +56,7 @@ public class PerPassengerSubsidy implements SubsidyI {
 //	private Map<Id<Person>, Set<Id<PPlan>>> personId2usedPPlanIds;
 //	private Set<Id<PPlan>> currentPPlanTransitRouteIds;
 	
-	private Map<Id<PPlan>, Double> pId2welfareCorrection;
+	private Map<Id<PPlan>, Double> welfareCorrection;
 	private Map<Id<PPlan>, Set<Id<Person>>> pId2persons;
 
 	private final double subsidyPerPassenger = 100000.;
@@ -94,7 +94,7 @@ public class PerPassengerSubsidy implements SubsidyI {
 //		this.personId2benefits = new HashMap<>();
 
 //		this.currentPPlanTransitRouteIds = new HashSet<Id<PPlan>>();
-		this.pId2welfareCorrection = new HashMap<>();
+		this.welfareCorrection = new HashMap<>();
 		this.pId2persons = new HashMap<>();
 
 //		for (TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()){
@@ -186,7 +186,7 @@ public class PerPassengerSubsidy implements SubsidyI {
 		}
 		
 		for (Id<PPlan> id : this.pId2persons.keySet()) {
-			this.pId2welfareCorrection.put(id, pId2persons.get(id).size() * subsidyPerPassenger);
+			this.welfareCorrection.put(id, pId2persons.get(id).size() * subsidyPerPassenger);
 		}
 	}
 	
@@ -288,9 +288,9 @@ public class PerPassengerSubsidy implements SubsidyI {
 	}
 
 	@Override
-	public double getSubsidy(Id<PPlan> id) {
-		if (this.pId2welfareCorrection.get(id) != null){
-			return this.pId2welfareCorrection.get(id);
+	public double getSubsidy(Id<PPlan> pPlanId) {
+		if (this.welfareCorrection.get(pPlanId) != null){
+			return this.welfareCorrection.get(pPlanId);
 			
 		} else {
 			return 0.;

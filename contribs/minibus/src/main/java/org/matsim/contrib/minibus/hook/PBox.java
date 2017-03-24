@@ -81,8 +81,8 @@ public final class PBox implements POperators {
 
 	private final TicketMachineI ticketMachine;
 	
-	@Inject(optional=true)
-	private SubsidyI subsidy;
+	@Inject(optional=true) private SubsidyI subsidy;
+	// yy my intuition would be to pass an empty subsidy rather than making it optional. 
 
 	/**
 	 * Constructor that allows to set the ticketMachine.  Deliberately in constructor and not as setter to keep the variable final.  Might be
