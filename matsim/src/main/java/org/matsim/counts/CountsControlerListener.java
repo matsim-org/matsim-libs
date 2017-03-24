@@ -150,6 +150,21 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
                     CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
                     ctw.writeFile(filename);
                 }
+                if (this.config.getOutputFormat().contains("xml") ||
+                        this.config.getOutputFormat().contains("all")) {
+                    String filename = controlerIO.getIterationFilename(event.getIteration(), "simulatedCounts.xml.gz");
+                    Counts<Link> simCounts = new Counts<>();
+                    simCounts.setDescription("sim values from iteration " + event.getIteration()); simCounts.setName("sim values from iteration " + event.getIteration()); simCounts.setYear(event.getIteration());
+                    for (CountSimComparison countSimComparison : cca.getComparison()) {
+						if (simCounts.getCount(countSimComparison.getId()) == null) {
+							simCounts.createAndAddCount(countSimComparison.getId(), counts.getCount(countSimComparison.getId()).getCsLabel());
+							simCounts.getCount(countSimComparison.getId()).setCoord(counts.getCount(countSimComparison.getId()).getCoord());
+						}
+						simCounts.getCount(countSimComparison.getId()).createVolume(countSimComparison.getHour(), countSimComparison.getSimulationValue());
+					}
+                    CountsWriter countsWriter = new CountsWriter(TransformationFactory.getCoordinateTransformation(globalConfigGroup.getCoordinateSystem(), TransformationFactory.WGS84), simCounts);
+                    countsWriter.write(filename);
+                }
                 reset();
                 iterationStopwatch.endOperation(OPERATION_COMPARECOUNTS);
             }
