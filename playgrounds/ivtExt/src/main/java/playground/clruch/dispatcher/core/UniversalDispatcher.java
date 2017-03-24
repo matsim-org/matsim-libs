@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,8 +29,11 @@ import playground.clruch.net.SimulationSubscriber;
 import playground.clruch.net.SimulationSubscriberSet;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
+import playground.clruch.utils.AVLocation;
+import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
+import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -190,6 +193,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     protected void notifySimulationSubscribers(long round_now) {
         if (SimulationServer.INSTANCE.isRunning() && //
                 round_now % publishPeriod == 0 && 0 < getAVRequests().size()) { // TODO not final criteria
+            if (SimulationSubscriberSet.INSTANCE.isEmpty())
+                System.out.println("waiting for connections...");
             // block for connections
             while (SimulationSubscriberSet.INSTANCE.isEmpty())
                 try {
@@ -197,49 +202,76 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            { // TODO obey to publish period
-                SimulationObject simulationObject = new SimulationObject();
-                simulationObject.infoLine = getInfoLine();
-                simulationObject.now = round_now;
-                {
-                    Map<Link, List<AVRequest>> map = getAVRequestsAtLinks();
-                    for (Entry<Link, List<AVRequest>> entry : map.entrySet())
-                        simulationObject.requestsPerLinkMap.put(entry.getKey().getId().toString(), entry.getValue().size());
-                }
-                {
-                    final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
 
-                    // Map<String, VehicleContainer> map = new HashMap<>();
-                    for (Entry<Link, Queue<AVVehicle>> entry : getStayVehicles().entrySet()) {
-                        final String linkId = entry.getKey().getId().toString();
-                        for (AVVehicle avVehicle : entry.getValue()) {
-                            final String key = avVehicle.getId().toString();
-                            VehicleContainer vehicleContainer = new VehicleContainer();
-                            vehicleContainer.linkId = linkId;
-                            vehicleContainer.avStatus = AVStatus.STAY;
-                            vehicleMap.put(key, vehicleContainer);
-                        }
-                    }
-
-                    for (VehicleLinkPair vlp : getDivertableVehicles()) {
-                        final String key = vlp.avVehicle.getId().toString();
-                        if (!vehicleMap.containsKey(key)) {
-                            VehicleContainer vehicleContainer = new VehicleContainer();
-                            vehicleContainer.linkId = vlp.linkTimePair.link.getId().toString();
-                            vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
-                            vehicleMap.put(key, vehicleContainer);
-                        }
-                    }
-
-                    simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
-                }
-
-                for (SimulationSubscriber simulationSubscriber : SimulationSubscriberSet.INSTANCE)
-                    simulationSubscriber.handle(simulationObject);
-                // System.out.println("sent to " + SimulationSubscriberSet.INSTANCE.size());
+            SimulationObject simulationObject = new SimulationObject();
+            simulationObject.infoLine = getInfoLine();
+            simulationObject.now = round_now;
+            {
+                Map<Link, List<AVRequest>> map = getAVRequestsAtLinks();
+                for (Entry<Link, List<AVRequest>> entry : map.entrySet())
+                    simulationObject.requestsPerLinkMap.put( //
+                            entry.getKey().getId().toString(), //
+                            entry.getValue().size());
             }
-        }
+            {
+                final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
 
+                // insert all stay vehicles
+                for (Entry<Link, Queue<AVVehicle>> entry : getStayVehicles().entrySet()) {
+                    final String linkId = entry.getKey().getId().toString();
+                    for (AVVehicle avVehicle : entry.getValue()) {
+                        final String key = avVehicle.getId().toString();
+                        VehicleContainer vehicleContainer = new VehicleContainer();
+                        vehicleContainer.linkId = linkId;
+                        vehicleContainer.avStatus = AVStatus.STAY;
+                        vehicleMap.put(key, vehicleContainer);
+                    }
+                }
+
+                // divertible vehicles are either on pickup or rebalancing...
+                for (VehicleLinkPair vlp : getDivertableVehicles()) {
+                    final String key = vlp.avVehicle.getId().toString();
+                    if (!vehicleMap.containsKey(key)) {
+                        VehicleContainer vehicleContainer = new VehicleContainer();
+                        vehicleContainer.linkId = vlp.linkTimePair.link.getId().toString();
+                        vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
+                        vehicleMap.put(key, vehicleContainer);
+                    }
+                }
+
+                int failcount = 0;
+                int okcount = 0;
+                for (AVVehicle avVehicle : getFunctioningVehicles()) {
+                    final String key = avVehicle.getId().toString();
+                    if (!vehicleMap.containsKey(key)) {
+                        Link link = AVLocation.of(avVehicle);
+                        if (link == null) {
+                            if (failcount == 0) {
+//                                System.out.println("------- link unknown:");
+//                                System.out.println(ScheduleUtils.toString(avVehicle.getSchedule()));
+                            }
+                            ++failcount;
+                        } else {
+                            VehicleContainer vehicleContainer = new VehicleContainer();
+                            vehicleContainer.linkId = link.getId().toString();
+                            vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
+                            vehicleMap.put(key, vehicleContainer);
+                            ++okcount;
+                        }
+                    }
+                }
+                if (0 < failcount) {
+                    System.out.println("count fail=" + failcount + " ok=" + okcount);
+                }
+
+                simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
+            }
+
+            for (SimulationSubscriber simulationSubscriber : SimulationSubscriberSet.INSTANCE)
+                simulationSubscriber.handle(simulationObject);
+            // System.out.println("sent to " + SimulationSubscriberSet.INSTANCE.size());
+
+        }
     }
 
     @Override

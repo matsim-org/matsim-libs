@@ -58,8 +58,8 @@ public class ObjectSocket implements AutoCloseable, SimulationSubscriber {
     public void handle(SimulationObject simulationObject) {
         try {
             objectOutputStream.writeObject(simulationObject);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+            System.err.println(exception.getMessage());
             System.out.println("unsubscribe");
             launched = false;
         }
