@@ -189,12 +189,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
 
-		if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue ) {
-			remainingHolesStorageCapacity = this.storageCapacity;
-			// yyyy how is this.storageCapacity supposed to have a value here?  (It might just be zero, and
-			// maybe this is the correct value, but the code is not very expressive.)  kai, mar'17
-		}
-
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 
 		if ( context.qsimConfig.getTimeStepSize() < 1. ) {
@@ -280,8 +274,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-
-
 	@Override
 	final void initBeforeSimStep() {
 		if(!context.qsimConfig.isUsingFastCapacityUpdate() ){
@@ -295,14 +287,20 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.kinematicWaves) {
-			// uncongested branch: q = vmax * rho
-			// congested branch: q = vhole * (rhojam - rho)
-			// equal: rho * (vmax + vhole) = vhole * rhojam
-			// rho(qmax) = vhole * rhojam / (vmax + vhole) 
-			// qmax = vmax * rho(qmax) = rhojam / (1/vhole + 1/vmax) ;
-			this.maxFlowFromFdiag = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
-			//			log.warn("linkID=" + this.qLink.getLink().getId() + "; setting maxFlowFromFdiag to: " + this.maxFlowFromFdiag ) ;
+		switch (context.qsimConfig.getTrafficDynamics()) {
+			case queue:
+			case withHoles:
+				break;
+			case kinematicWaves:
+				// uncongested branch: q = vmax * rho
+				// congested branch: q = vhole * (rhojam - rho)
+				// equal: rho * (vmax + vhole) = vhole * rhojam
+				// rho(qmax) = vhole * rhojam / (vmax + vhole)
+				// qmax = vmax * rho(qmax) = rhojam / (1/vhole + 1/vmax) ;
+				this.maxFlowFromFdiag = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
+				//			log.warn("linkID=" + this.qLink.getLink().getId() + "; setting maxFlowFromFdiag to: " + this.maxFlowFromFdiag ) ;
+				break;
+			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
 	}
 
@@ -348,22 +346,33 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		 * 
 		 */
 
-		if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue ) {
-			//			final double minStorCapForHoles = 2. * flowCapacityPerTimeStep * context.getSimTimer().getSimTimestepSize();
-			final double freeSpeed = qLink.getLink().getFreespeed() ;
-			final double holeSpeed = HOLE_SPEED_KM_H/3.6;
-			final double minStorCapForHoles = length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
-			//			final double minStorCapForHoles = 2.* length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
-			// I have no idea why the factor 2 needs to be there?!?! kai, apr'16
-			// I just removed the factor of 2 ... seems to work now without.  kai, may'16
-			// yyyyyy (not thought through for TS != 1sec!  (should use flow cap per second) kai, apr'16)
-			if ( storageCapacity < minStorCapForHoles ) {
-				if ( spaceCapWarningCount <= 10 ) { 
-					log.warn("storage capacity not sufficient for holes; increasing from " + storageCapacity + " to " + minStorCapForHoles ) ;
-					QueueWithBuffer.spaceCapWarningCount++;
+		switch (context.qsimConfig.getTrafficDynamics()) {
+			case queue:
+				break;
+			case withHoles:
+			case kinematicWaves:
+				//			final double minStorCapForHoles = 2. * flowCapacityPerTimeStep * context.getSimTimer().getSimTimestepSize();
+				final double freeSpeed = qLink.getLink().getFreespeed() ;
+				final double holeSpeed = HOLE_SPEED_KM_H/3.6;
+				final double minStorCapForHoles = length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
+				//			final double minStorCapForHoles = 2.* length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
+				// I have no idea why the factor 2 needs to be there?!?! kai, apr'16
+				// I just removed the factor of 2 ... seems to work now without.  kai, may'16
+				// yyyyyy (not thought through for TS != 1sec!  (should use flow cap per second) kai, apr'16)
+				if ( storageCapacity < minStorCapForHoles ) {
+					if ( spaceCapWarningCount <= 10 ) {
+						log.warn("storage capacity not sufficient for holes; increasing from " + storageCapacity + " to " + minStorCapForHoles ) ;
+						QueueWithBuffer.spaceCapWarningCount++;
+					}
+					storageCapacity = minStorCapForHoles ;
 				}
-				storageCapacity = minStorCapForHoles ;
-			}
+
+				remainingHolesStorageCapacity = this.storageCapacity;
+				// yyyy how is this.storageCapacity supposed to have a value here?  (It might just be zero, and
+				// maybe this is the correct value, but the code is not very expressive.)  kai, mar'17
+				// i think, at this location, this explains everything. amit mar'17
+				break;
+			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
 	}
 
@@ -375,11 +384,18 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	final boolean doSimStep( ) {
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.kinematicWaves) {
-			this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowFromFdiag, maxFlowFromFdiag);
+		switch (context.qsimConfig.getTrafficDynamics()) {
+			case queue:
+				break;
+			case withHoles:
+				this.processArrivalOfHoles( ) ;
+				break;
+			case kinematicWaves:
+				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowFromFdiag, maxFlowFromFdiag);
+				this.processArrivalOfHoles( ) ;
+				break;
+			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
-
-		if(context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue) this.processArrivalOfHoles( ) ;
 		this.moveQueueToBuffer();
 		return true ;
 	}
@@ -391,7 +407,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			this.remainingHolesStorageCapacity += hole.getSizeInEquivalents() ;
 		}
 	}
-
 
 	/**
 	 * Move vehicles from link to buffer, according to buffer capacity and
@@ -464,14 +479,18 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
 		}
 
-		if ( context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue ) {
-			QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
-			double ttimeOfHoles = length*3600./HOLE_SPEED_KM_H/1000. ;
+		switch (context.qsimConfig.getTrafficDynamics()) {
+			case queue:
+				break;
+			case withHoles:
+			case kinematicWaves:
+				QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
+				double ttimeOfHoles = length*3600./HOLE_SPEED_KM_H/1000. ;
 
-			//			double offset = this.storageCapacity/this.flowCapacityPerTimeStep ;
+				//			double offset = this.storageCapacity/this.flowCapacityPerTimeStep ;
 			/* NOTE: Start with completely full link, i.e. N_storageCap cells filled.  Now make light at end of link green, discharge with
 			 * flowCapPerTS.  After N_storageCap/flowCapPerTS, the link is empty.  Which also means that the holes must have reached
-			 * the upstream end of the link.  I.e. speed_holes = length / (N_storageCap/flowCap) and 
+			 * the upstream end of the link.  I.e. speed_holes = length / (N_storageCap/flowCap) and
 			 * ttime_holes = lenth/speed = N_storCap/flowCap.
 			 * Say length=75m, storCap=10, flowCap=1/2sec.  offset = 20sec.  75m/20sec = 225m/1min = 13.5km/h so this is normal.
 			 * Say length=75m, storCap=20, flowCap=1/2sec.  offset = 40sec.  ... = 6.75km/h ... to low.  Reason: unphysical parameters.
@@ -479,12 +498,14 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			 * length.  Thus we incur the reaction time twice as often --> half speed of holes.
 			 */
 
-			//			double nLanes = 2. * flowCapacityPerTimeStep ; // pseudo-lanes
-			//			double ttimeOfHoles = 0.1 * this.storageCapacity/this.flowCapacityPerTimeStep/nLanes ;
+				//			double nLanes = 2. * flowCapacityPerTimeStep ; // pseudo-lanes
+				//			double ttimeOfHoles = 0.1 * this.storageCapacity/this.flowCapacityPerTimeStep/nLanes ;
 
-			hole.setEarliestLinkExitTime( now + 1.0*ttimeOfHoles + 0.0*MatsimRandom.getRandom().nextDouble()*ttimeOfHoles ) ;
-			hole.setSizeInEquivalents(veh2Remove.getSizeInEquivalents());
-			holes.add( hole ) ;
+				hole.setEarliestLinkExitTime( now + 1.0*ttimeOfHoles + 0.0*MatsimRandom.getRandom().nextDouble()*ttimeOfHoles ) ;
+				hole.setSizeInEquivalents(veh2Remove.getSizeInEquivalents());
+				holes.add( hole ) ;
+				break;
+			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
 		return veh ;
 	}
@@ -707,11 +728,17 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		veh.setCurrentLink(qLink.getLink());
 		vehQueue.add(veh);
 
-		if ( context.qsimConfig.getTrafficDynamics()!=TrafficDynamics.queue ) {
-			remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
-		}
-		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.kinematicWaves) {
-			this.accumulatedInflowCap -= veh.getFlowCapacityConsumptionInEquivalents() ;
+		switch (context.qsimConfig.getTrafficDynamics()) {
+			case queue:
+				break;
+			case withHoles:
+				this.remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
+				break;
+			case kinematicWaves:
+				this.remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
+				this.accumulatedInflowCap -= veh.getFlowCapacityConsumptionInEquivalents() ;
+				break;
+			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
 	}
 
