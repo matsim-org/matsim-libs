@@ -10,8 +10,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03PlustoWGS84;
 
+import playground.clruch.gfx.helper.SiouxFallstoWGS84;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 public class RunViewer {
@@ -34,14 +34,25 @@ public class RunViewer {
         final Population population = scenario.getPopulation();
         System.out.println(population.getPersons().size());
 
-        CoordinateTransformation coordinateTransformation = new CH1903LV03PlustoWGS84();
+        CoordinateTransformation ct;
+        //ct = new CH1903LV03PlustoWGS84(); // <- switzerland
+        ct = new SiouxFallstoWGS84(); // <- sioux falls
 
-        MatsimComponent matsimComponent = new MatsimComponent( //
-                network, //
-                coordinateTransformation //
-        );
+        MatsimStaticDatabase db = MatsimStaticDatabase.of(network, ct);
+
+        MatsimJMapViewer matsimComponent = new MatsimJMapViewer(db);
         MatsimViewer matsimViewer = new MatsimViewer(matsimComponent);
+
+        // basel
+        // getJMapViewer().setDisplayPosition(new Point(), new Coordinate(47.55814, 7.58769), 11);
+
+        // sioux falls
+        matsimViewer.setDisplayPosition(43.54469101104898, -96.72376155853271, 11);
+
+        //
+
         matsimViewer.jFrame.setVisible(true);
+
     }
 
 }
