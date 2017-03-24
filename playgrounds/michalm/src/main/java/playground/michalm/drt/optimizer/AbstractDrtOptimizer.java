@@ -60,7 +60,11 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.add((NDrtRequest)request);
+		NDrtRequest drtRequest = (NDrtRequest)request;
+		if (drtRequest.getFromLink() == drtRequest.getToLink()) {
+			throw new IllegalArgumentException("fromLink and toLink must be different");
+		}
+		unplannedRequests.add(drtRequest);
 		requiresReoptimization = true;
 	}
 

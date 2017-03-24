@@ -25,7 +25,8 @@ import playground.michalm.drt.data.NDrtRequest;
 import playground.michalm.drt.optimizer.VehicleData;
 import playground.michalm.drt.optimizer.VehicleData.Stop;
 import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.Insertion;
-import playground.michalm.drt.schedule.NDrtStayTask;
+import playground.michalm.drt.schedule.*;
+import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
 
 /**
  * @author michalm
@@ -53,8 +54,8 @@ public class InsertionCostCalculator {
 		double dropoffDetourDuration = calculateDropoffDetourDuration(drtRequest, vEntry, insertion);
 
 		double pickupDetourTimeLoss = pickupDetourDuration - calculateReplacedDriveDuration(vEntry, i);
-		double dropoffDetourTimeLoss = i == j ? 0 //
-				: dropoffDetourDuration - calculateReplacedDriveDuration(vEntry, j);
+		double dropoffDetourTimeLoss = dropoffDetourDuration //
+				- (i == j ? 0 : calculateReplacedDriveDuration(vEntry, j));
 
 		// this is what we want to minimise
 		double totalTimeLoss = pickupDetourTimeLoss + dropoffDetourTimeLoss;
@@ -65,7 +66,11 @@ public class InsertionCostCalculator {
 
 	private double calculatePickupDetourDuration(NDrtRequest drtRequest, VehicleData.Entry vEntry,
 			Insertion insertion) {
-		if (insertion.pickupIdx > 0
+		// 'no detour' is also possible now for pickupIdx==0 if the currentTask is STOP
+		boolean ongoingStopTask = insertion.pickupIdx == 0
+				&& ((NDrtTask)vEntry.vehicle.getSchedule().getCurrentTask()).getDrtTaskType() == NDrtTaskType.STOP;
+
+		if ((ongoingStopTask || insertion.pickupIdx > 0) //
 				&& drtRequest.getFromLink() == vEntry.stops.get(insertion.pickupIdx - 1).task.getLink()) {
 			return 0;// no detour
 		}
@@ -85,7 +90,7 @@ public class InsertionCostCalculator {
 		boolean dropoffImmediatelyAfterPickup = insertion.dropoffIdx == insertion.pickupIdx;
 		boolean dropoffAppendedAtTheEnd = insertion.dropoffIdx == vEntry.stops.size();
 
-		double toDropoffTT = dropoffImmediatelyAfterPickup ? 0 // PICKUP->DROPOFF already in fromPickupTT
+		double toDropoffTT = dropoffImmediatelyAfterPickup ? 0 // PICKUP->DROPOFF taken into account as fromPickupTT
 				: insertion.pathToDropoff.path.travelTime + insertion.pathToDropoff.firstAndLastLinkTT;
 		double fromDropoffTT = dropoffAppendedAtTheEnd ? 0 // bus waits there
 				: insertion.pathFromDropoff.path.travelTime + insertion.pathFromDropoff.firstAndLastLinkTT;
