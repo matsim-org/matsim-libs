@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 /**
  * Class to convert monetary values using the Consumer Price Index (CPI)
  * using the average year-on-year rates as provided by Statistics South 
- * Africa. Source: <a href=http://beta2.statssa.gov.za/?page_id=1854&PPN=P0141>CPI History - 1960 Onwards</a>
+ * Africa. Source: <a href=http://www.statssa.gov.za/?page_id=1854&PPN=P0141>CPI History - 1960 Onwards</a>
  * @author jwjoubert
  */
 public class SouthAfricaInflationCorrector {
@@ -70,6 +70,9 @@ public class SouthAfricaInflationCorrector {
 		inflationMap.put(2011, 0.050);
 		inflationMap.put(2012, 0.056);
 		inflationMap.put(2013, 0.057);
+		inflationMap.put(2014, 0.061);
+		inflationMap.put(2015, 0.046);
+		inflationMap.put(2016, 0.064);
 	}
 	
 	/**

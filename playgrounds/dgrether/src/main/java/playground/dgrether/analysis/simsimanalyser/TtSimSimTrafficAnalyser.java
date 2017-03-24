@@ -102,7 +102,7 @@ public class TtSimSimTrafficAnalyser {
 		log.info("Filtering network...");
 		log.info("Nr links in original network: " + network.getLinks().size());
 		NetworkFilterManager netFilter = new NetworkFilterManager(network);
-		Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature("C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
+		Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature("../../../shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
 		FeatureNetworkLinkCenterCoordFilter filter = new FeatureNetworkLinkCenterCoordFilter(networkSrs, cottbusFeatureTuple.getSecond(), cottbusFeatureTuple.getFirst());
 		netFilter.addLinkFilter(filter);
 		Network fn = netFilter.applyFilters();

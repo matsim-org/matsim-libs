@@ -31,7 +31,6 @@ import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSampler;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerModule;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SimpleSnowballModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.snowball.SnowballSamplingConfigGroup;
 
@@ -53,8 +52,7 @@ public class RunScalabilityAnalysis {
 					ConfigUtils.loadConfig(
 							args[ 0 ],
 							configGroup,
-							scalabilityConfigGroup,
-							new SocialNetworkSamplingConfigGroup() );
+							scalabilityConfigGroup );
 			MoreIOUtils.initOut( config.controler().getOutputDirectory() );
 
 			new ConfigWriter( config ).write( config.controler().getOutputDirectory() + "/output_config.xml" );

@@ -37,7 +37,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.AbstractModule;
 
 /**
  * @author  jbischoff
@@ -57,9 +56,6 @@ public class RunTaxiPTIntermodalExample {
 				new TaxiConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
-		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		// yyyy in the long run, traffic dynamics should be "kinematicWaves" (or whatever it will be eventually called), and snapshotStyle should be set accordingly. kai, jan'17
 
 		// yyyy Could you please javadoc the following?  EmissionsConfigGroup has an example how the explanatory strings
 		// can be kept consistent between config file dump and javadoc.  Thx.  kai, jan'17
@@ -100,21 +96,13 @@ public class RunTaxiPTIntermodalExample {
 
 		controler.addOverridingModule(new TaxiOutputModule());
 
-//				// to replace by own dispatch module:
-//				controler.addOverridingModule( new AbstractModule(){
-//					@Override public void install() {
-////						bind(TaxiOptimizerFactory.class).to(MyTaxiOptimizerFactory.class);
-//						bind(TaxiOptimizerFactory.class).to(MyOtherTaxiOptimizerFactory.class) ;
-//					}
-//				} ) ;
-
         controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
 		
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
-		// ---
+
 		controler.run();
 	}
 }

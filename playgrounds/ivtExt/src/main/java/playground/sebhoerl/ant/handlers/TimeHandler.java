@@ -32,7 +32,7 @@ public class TimeHandler extends AbstractHandler implements PersonDepartureEvent
 
     @Override
     public void handleEvent(PersonEntersVehicleEvent event) {
-        if (event.getVehicleId().toString().startsWith("av_")) {
+        if (event.getVehicleId().toString().startsWith("av_") && data.isRelevantOperator(event.getVehicleId().toString())) {
             Double departure = departures.get(event.getPersonId());
 
             if (departure != null) {

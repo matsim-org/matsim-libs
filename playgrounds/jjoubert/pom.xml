@@ -86,6 +86,11 @@
 		<artifactId>osm-tools-process</artifactId>
 		<version>1.1.1</version>
 	</dependency>
+	<dependency>
+		<groupId>mil.nga</groupId>
+		<artifactId>tiff</artifactId>
+		<version>1.0.0</version>
+	</dependency>
   </dependencies>
   <build>
 	<plugins>
