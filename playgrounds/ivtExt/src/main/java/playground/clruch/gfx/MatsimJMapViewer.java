@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.swing.JLabel;
+
 import org.matsim.api.core.v01.Coord;
 
 import playground.clruch.gfx.util.OsmLink;
@@ -21,10 +23,12 @@ public class MatsimJMapViewer extends JMapViewer {
 
     final MatsimStaticDatabase db;
 
-    public volatile boolean drawLinks = true;
+    private volatile boolean drawLinks = true;
     public volatile int alpha = 196;
 
     SimulationObject simulationObject = null;
+
+    public JLabel jLabel = new JLabel(" ");
 
     public MatsimJMapViewer(MatsimStaticDatabase db) {
         this.db = db;
@@ -106,14 +110,25 @@ public class MatsimJMapViewer extends JMapViewer {
                 }
             }
 
+            jLabel.setText(ref.infoLine);
+
             graphics.setColor(Color.BLACK);
-            graphics.drawString(stringBuilder.toString() + " " + ref.infoLine, 0, dimension.height - 5);
+            graphics.drawString(stringBuilder.toString(), 0, dimension.height - 5);
         }
     }
 
     public void setSimulationObject(SimulationObject simulationObject) {
         this.simulationObject = simulationObject;
         repaint();
+    }
+
+    public void setDrawLinks(boolean selected) {
+        drawLinks = selected;
+        repaint();
+    }
+
+    public boolean getDrawLinks() {
+        return drawLinks;
     }
 
 }
