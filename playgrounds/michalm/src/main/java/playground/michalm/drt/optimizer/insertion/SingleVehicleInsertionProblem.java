@@ -86,16 +86,20 @@ public class SingleVehicleInsertionProblem {
 	// filter out pickups at stops with outgoingOccupancy equal to the vehicle capacity
 	// filter out dropoffs at stops with incomingOccupancy equal to the vehicle capacity
 	// (but still we need to check the capacity constraints on all drives between the pickup and dropoff)
+	//
+	// TODO maxWaitTime
+	// filter out stops which are visited too late
+	// 
 	private boolean[] considerPickupInsertion;
 	private boolean[] considerDropoffInsertion;
 
 	public SingleVehicleInsertionProblem(MultiNodePathCalculator router, BackwardMultiNodePathCalculator backwardRouter,
-			double stopDuration) {
+			double stopDuration, double maxWaitTime) {
 		forwardPathSearch = OneToManyPathSearch.createForwardSearch(router);
 		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
 
 		this.stopDuration = stopDuration;
-		costCalculator = new InsertionCostCalculator(stopDuration);
+		costCalculator = new InsertionCostCalculator(stopDuration, maxWaitTime);
 	}
 
 	public BestInsertion findBestInsertion(NDrtRequest drtRequest, VehicleData.Entry vEntry) {

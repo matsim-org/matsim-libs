@@ -64,7 +64,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 				optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
 
 		insertionProblem = new MultiVehicleInsertionProblem(new SingleVehicleInsertionProblem(router, backwardRouter,
-				optimContext.scheduler.getParams().stopDuration));
+				optimContext.scheduler.getParams().stopDuration, drtCfg.getMaxWaitTime()));
 	}
 
 	@Override

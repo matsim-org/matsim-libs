@@ -35,9 +35,11 @@ public class InsertionCostCalculator {
 	private static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE;
 
 	private final double stopDuration;
+	private final double maxWaitTime;
 
-	public InsertionCostCalculator(double stopDuration) {
+	public InsertionCostCalculator(double stopDuration, double maxWaitTime) {
 		this.stopDuration = stopDuration;
+		this.maxWaitTime = maxWaitTime;
 	}
 
 	// the main goal - minimise bus operation time
@@ -60,8 +62,9 @@ public class InsertionCostCalculator {
 		// this is what we want to minimise
 		double totalTimeLoss = pickupDetourTimeLoss + dropoffDetourTimeLoss;
 
-		return areConstraintsSatisfied(vEntry, insertion, pickupDetourTimeLoss, totalTimeLoss) ? totalTimeLoss
-				: INFEASIBLE_SOLUTION_COST;
+		boolean constraintsSatisfied = areConstraintsSatisfied(drtRequest, vEntry, insertion, pickupDetourTimeLoss,
+				totalTimeLoss);
+		return constraintsSatisfied ? totalTimeLoss : INFEASIBLE_SOLUTION_COST;
 	}
 
 	private double calculatePickupDetourDuration(NDrtRequest drtRequest, VehicleData.Entry vEntry,
@@ -70,8 +73,9 @@ public class InsertionCostCalculator {
 		boolean ongoingStopTask = insertion.pickupIdx == 0
 				&& ((NDrtTask)vEntry.vehicle.getSchedule().getCurrentTask()).getDrtTaskType() == NDrtTaskType.STOP;
 
-		if ((ongoingStopTask || insertion.pickupIdx > 0) //
-				&& drtRequest.getFromLink() == vEntry.stops.get(insertion.pickupIdx - 1).task.getLink()) {
+		if ((ongoingStopTask && drtRequest.getFromLink() == vEntry.start.link) //
+				|| (insertion.pickupIdx > 0 //
+						&& drtRequest.getFromLink() == vEntry.stops.get(insertion.pickupIdx - 1).task.getLink())) {
 			return 0;// no detour
 		}
 
@@ -108,8 +112,8 @@ public class InsertionCostCalculator {
 		return replacedDriveEndTime - replacedDriveStartTime;
 	}
 
-	private boolean areConstraintsSatisfied(VehicleData.Entry vEntry, Insertion insertion, double pickupDetourTimeLoss,
-			double totalTimeLoss) {
+	private boolean areConstraintsSatisfied(NDrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion,
+			double pickupDetourTimeLoss, double totalTimeLoss) {
 		// this is what we cannot violate
 		for (int s = insertion.pickupIdx; s < insertion.dropoffIdx; s++) {
 			Stop stop = vEntry.stops.get(s);
@@ -130,9 +134,25 @@ public class InsertionCostCalculator {
 			}
 		}
 
+		// reject solutions when maxWaitTime for the new request is violated
+		double driveToPickupStartTime = (insertion.pickupIdx == 0) ? vEntry.start.time //
+				: vEntry.stops.get(insertion.pickupIdx - 1).task.getEndTime();
+
+		double pickupTime = driveToPickupStartTime + insertion.pathToPickup.path.travelTime
+				+ insertion.pathToPickup.firstAndLastLinkTT;
+
+		//TODO uncomment this:
+//		if (pickupTime > drtRequest.getEarliestStartTime() + maxWaitTime) {
+//			return false;
+//		}
+
 		// vehicle's time window cannot be violated
 		NDrtStayTask lastTask = (NDrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
-		double lastTaskDuration = lastTask.getEndTime() - lastTask.getBeginTime();
-		return lastTaskDuration >= totalTimeLoss;
+		double timeSlack = vEntry.vehicle.getServiceEndTime() - lastTask.getBeginTime();
+		if (timeSlack < totalTimeLoss) {
+			return false;
+		}
+
+		return true;// all constraints satisfied
 	}
 }
