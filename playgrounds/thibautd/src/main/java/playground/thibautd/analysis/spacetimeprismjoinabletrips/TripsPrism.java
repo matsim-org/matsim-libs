@@ -86,24 +86,14 @@ public class TripsPrism {
 		log.debug( "constructing origin quad tree" );
 		recordsByOrigin = constructQuadTree(
 				trips,
-				new IdGetter() {
-					@Override
-					public Id getId( final Record r ) {
-						return r.getOriginLink();
-					}
-				},
+				Record::getOriginLink,
 				departureIsOnStartOfLink,
 				network);
 		log.debug( "the origin quad tree has "+recordsByOrigin.size()+" records" );
 		log.debug( "constructing destination quad tree" );
 		recordsByDestination = constructQuadTree(
 				trips,
-				new IdGetter() {
-					@Override
-					public Id getId( final Record r ) {
-						return r.getDestinationLink();
-					}
-				},
+				Record::getDestinationLink,
 				arrivalIsOnStartOfLink,
 				network);
 		log.debug( "the destination quad tree has "+recordsByDestination.size()+" records" );
@@ -131,7 +121,7 @@ public class TripsPrism {
 			Coord c = useStartNode ?
 				links.get( getter.getId( r ) ).getFromNode().getCoord() :
 				links.get( getter.getId( r ) ).getToNode().getCoord();
-			records.add( new Tuple<Coord, Record>( c , r ) );
+			records.add( new Tuple<>( c, r ) );
 
 			minX = Math.min( minX , c.getX() );
 			maxX = Math.max( maxX , c.getX() );
@@ -141,7 +131,7 @@ public class TripsPrism {
 
 		log.debug( "minX="+minX+", minY="+minY+", maxX="+maxX+", maxY="+maxY );
 
-		QuadTree<Record> qt = new QuadTree<Record>( minX-0.1, minY-0.1, maxX+0.1, maxY+0.1 );
+		QuadTree<Record> qt = new QuadTree<>( minX - 0.1, minY - 0.1, maxX + 0.1, maxY + 0.1 );
 
 		for (Tuple<Coord, Record> t : records) {
 			qt.put( t.getFirst().getX(), t.getFirst().getY(), t.getSecond() );
@@ -275,7 +265,7 @@ public class TripsPrism {
 		final double driverDepartureTime = driverTrip.getDepartureTime();
 		final double driverDirectTravelTime = getEstimatedTravelTime( driverTrip );
 		final double driverArrivalTime = driverDepartureTime + driverDirectTravelTime;
-		List<PassengerRecord> prism = new ArrayList<PassengerRecord>();
+		List<PassengerRecord> prism = new ArrayList<>();
 		Iterator<Record> iterator = records.iterator();
 
 		if (log.isTraceEnabled()) {
@@ -353,7 +343,7 @@ public class TripsPrism {
 
 			// if we arrive here, the current record is valid: retain it.
 			DistanceAndDuration direct;
-			
+
 			if (driverTrip.getEstimatedNetworkDistance() < 0) {
 				direct = ttEstimator.getTravelTime(
 						driverTrip.getDepartureTime(),
@@ -438,12 +428,8 @@ public class TripsPrism {
 		// use a tree set to allow efficient computing of the intersection
 		// this is valid only of no two records have the same id
 		Set<Record> timeAndSpaceRestricted =
-			new TreeSet<Record>(
-					new Comparator<Record>() {
-							@Override
-							public int compare(final Record arg0, final Record arg1) {
-								return arg0.getTripId().compareTo( arg1.getTripId() );
-							}} );
+				new TreeSet<>(
+						( arg0, arg1 ) -> arg0.getTripId().compareTo( arg1.getTripId() ) );
 
 		for (Record r : spaceRestricted) {
 			final double dep = r.getDepartureTime();
@@ -497,7 +483,7 @@ public class TripsPrism {
 	// /////////////////////////////////////////////////////////////////////////
 	// interfaces/classes
 	// /////////////////////////////////////////////////////////////////////////
-	private static interface IdGetter {
+	private interface IdGetter {
 		public Id getId( Record record );
 	}
 

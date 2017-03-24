@@ -66,12 +66,14 @@ public class ExtractRecordsFromEvents {
 
 		final Network network = getNetwork( networkFile );
 
+		// collect and do first classification of events
 		final TripsRecordsEventsHandler parser = new TripsRecordsEventsHandler();
 		final TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(
 				network,
 				new TravelTimeCalculatorConfigGroup());
 		processEvents( parser , travelTimeCalculator , eventFile );
 
+		// Extract "records", that is, basic information per trip (origin, destination, tod, mode)
 		final List<Record> records = extractRecords( parser );
 
 		final TripsPrism prism = new TripsPrism( records , travelTimeCalculator.getLinkTravelTimes() , network );
