@@ -9,9 +9,11 @@ public class SimulationObject implements Serializable {
     public String infoLine = "";
 
     public long now;
-    
+
     public List<RequestContainer> requests = new ArrayList<>();
-    
+
     public List<VehicleContainer> vehicles;
+
+    public Serializable serializable;
 
 }

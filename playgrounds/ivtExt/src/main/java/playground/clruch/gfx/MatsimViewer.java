@@ -16,7 +16,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 
 import playground.clruch.jmapviewer.Coordinate;
 import playground.clruch.jmapviewer.JMapViewer;
@@ -28,9 +27,6 @@ import playground.clruch.jmapviewer.interfaces.TileLoader;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
 import playground.clruch.jmapviewer.tilesources.OsmTileSource;
-import playground.clruch.net.ObjectClient;
-import playground.clruch.net.SimulationObject;
-import playground.clruch.net.SimulationSubscriber;
 
 /**
  * Demonstrates the usage of {@link JMapViewer}
@@ -93,15 +89,30 @@ public class MatsimViewer {
         getJMapViewer().setTileLoader((TileLoader) tileLoaderSelector.getSelectedItem());
         panelTop.add(tileSourceSelector);
         panelTop.add(tileLoaderSelector);
-        final JCheckBox showDrawLinks = new JCheckBox("links");
-        showDrawLinks.setSelected(matsimJMapViewer.getDrawLinks());
-        showDrawLinks.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                matsimJMapViewer.setDrawLinks(showDrawLinks.isSelected());
-            }
-        });
-        panelBottom.add(showDrawLinks);
+        // ---
+        {
+            final JCheckBox jCheckBox = new JCheckBox("links");
+            jCheckBox.setSelected(matsimJMapViewer.getDrawLinks());
+            jCheckBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    matsimJMapViewer.setDrawLinks(jCheckBox.isSelected());
+                }
+            });
+            panelBottom.add(jCheckBox);
+        }
+        // ---
+        {
+            final JCheckBox jCheckBox = new JCheckBox("veh.dest");
+            jCheckBox.setSelected(matsimJMapViewer.getDrawVehicleDestinations());
+            jCheckBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    matsimJMapViewer.setDrawVehicleDestinations(jCheckBox.isSelected());
+                }
+            });
+            panelBottom.add(jCheckBox);
+        }
         //
         final JCheckBox showTreeLayers = new JCheckBox("Tree");
         showTreeLayers.addActionListener(new ActionListener() {

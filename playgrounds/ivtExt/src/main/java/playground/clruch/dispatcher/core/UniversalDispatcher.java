@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,6 +30,7 @@ import playground.clruch.net.SimulationSubscriberSet;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
+import playground.clruch.utils.AVDestination;
 import playground.clruch.utils.AVLocation;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
@@ -214,60 +214,47 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 for (AVRequest avRequest : getAVRequests()) {
                     RequestContainer requestContainer = new RequestContainer();
                     requestContainer.requestId = avRequest.getId().toString();
-                    requestContainer.linkId = db.getLinkIndex(avRequest.getFromLink());
+                    requestContainer.fromLinkId = db.getLinkIndex(avRequest.getFromLink());
                     requestContainer.submissionTime = avRequest.getSubmissionTime();
+                    requestContainer.toLinkId = db.getLinkIndex(avRequest.getToLink());
                     simulationObject.requests.add(requestContainer);
                 }
             }
             {
                 final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
 
-                // insert all stay vehicles
-                for (Entry<Link, Queue<AVVehicle>> entry : getStayVehicles().entrySet()) {
-                    int linkId = db.getLinkIndex(entry.getKey());
-                    for (AVVehicle avVehicle : entry.getValue()) {
-                        final String key = avVehicle.getId().toString();
-                        VehicleContainer vehicleContainer = new VehicleContainer();
-                        vehicleContainer.linkId = linkId;
-                        vehicleContainer.avStatus = AVStatus.STAY;
-                        vehicleMap.put(key, vehicleContainer);
-                    }
-                }
-
-                // divertible vehicles are either on pickup or rebalancing...
+                // divertible vehicles are either stay, pickup, or rebalancing...
                 for (VehicleLinkPair vlp : getDivertableVehicles()) {
                     final String key = vlp.avVehicle.getId().toString();
-                    if (!vehicleMap.containsKey(key)) {
-                        VehicleContainer vehicleContainer = new VehicleContainer();
-                        vehicleContainer.linkId = db.getLinkIndex(vlp.linkTimePair.link);
+                    VehicleContainer vehicleContainer = new VehicleContainer();
+                    vehicleContainer.linkId = db.getLinkIndex(vlp.linkTimePair.link);
+                    if (vlp.isVehicleInStayTask()) {
+                        vehicleContainer.avStatus = AVStatus.STAY;
+                    } else {
                         vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
-                        vehicleMap.put(key, vehicleContainer);
+                        vehicleContainer.destinationLinkId = db.getLinkIndex(vlp.getCurrentDriveDestination());
                     }
+                    vehicleMap.put(key, vehicleContainer);
                 }
 
-                int failcount = 0;
-                int okcount = 0;
                 for (AVVehicle avVehicle : getFunctioningVehicles()) {
                     final String key = avVehicle.getId().toString();
                     if (!vehicleMap.containsKey(key)) {
-                        Link link = AVLocation.of(avVehicle);
-                        if (link == null) {
-                            if (failcount == 0) {
-                                System.out.println("------- link unknown:");
-                                System.out.println(ScheduleUtils.toString(avVehicle.getSchedule()));
-                            }
-                            ++failcount;
+                        final Link fromLink = AVLocation.of(avVehicle);
+                        final Link toLink = AVDestination.of(avVehicle);
+                        if (fromLink == null || toLink == null) {
+                            System.out.println("------- destination link unknown:");
+                            System.out.println(ScheduleUtils.toString(avVehicle.getSchedule()));
+                            GlobalAssert.that(fromLink != null);
+                            GlobalAssert.that(toLink != null);
                         } else {
                             VehicleContainer vehicleContainer = new VehicleContainer();
-                            vehicleContainer.linkId = db.getLinkIndex(link);
+                            vehicleContainer.linkId = db.getLinkIndex(fromLink);
                             vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
+                            vehicleContainer.destinationLinkId = db.getLinkIndex(toLink);
                             vehicleMap.put(key, vehicleContainer);
-                            ++okcount;
                         }
                     }
-                }
-                if (0 < failcount) {
-                    System.out.println("count fail=" + failcount + " ok=" + okcount);
                 }
 
                 simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
