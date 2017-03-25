@@ -2,6 +2,7 @@ package playground.clruch.gfx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -14,11 +15,11 @@ import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
-import playground.clruch.gfx.util.OsmLink;
-import playground.clruch.gfx.util.RequestContainer;
-import playground.clruch.gfx.util.VehicleContainer;
 import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.net.OsmLink;
+import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.net.VehicleContainer;
 
 public class MatsimJMapViewer extends JMapViewer {
 
@@ -38,6 +39,8 @@ public class MatsimJMapViewer extends JMapViewer {
     private final Point getMapPosition(Coord coord) {
         return getMapPosition(coord.getY(), coord.getX());
     }
+
+    private Font clockFont = new Font(Font.MONOSPACED, Font.BOLD, 16);
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -118,6 +121,11 @@ public class MatsimJMapViewer extends JMapViewer {
 
             graphics.setColor(Color.BLACK);
             graphics.drawString(stringBuilder.toString(), 0, dimension.height - 5);
+
+            {
+                graphics.setFont(clockFont);
+                graphics.drawString(new SecondsToHMS(ref.now).toDigitalWatch(), 3, 16);
+            }
         }
     }
 

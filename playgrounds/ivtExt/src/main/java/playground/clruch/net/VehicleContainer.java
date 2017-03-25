@@ -1,4 +1,4 @@
-package playground.clruch.gfx.util;
+package playground.clruch.net;
 
 import java.io.Serializable;
 

@@ -23,12 +23,12 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.export.AVStatus;
 import playground.clruch.gfx.MatsimStaticDatabase;
-import playground.clruch.gfx.util.RequestContainer;
-import playground.clruch.gfx.util.VehicleContainer;
+import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.net.SimulationSubscriber;
 import playground.clruch.net.SimulationSubscriberSet;
+import playground.clruch.net.VehicleContainer;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.AVLocation;

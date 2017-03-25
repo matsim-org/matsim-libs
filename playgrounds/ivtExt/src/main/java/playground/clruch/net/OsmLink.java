@@ -1,4 +1,4 @@
-package playground.clruch.gfx.util;
+package playground.clruch.net;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;

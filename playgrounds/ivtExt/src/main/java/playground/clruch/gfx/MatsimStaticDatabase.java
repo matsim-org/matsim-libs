@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
-import playground.clruch.gfx.util.OsmLink;
+import playground.clruch.net.OsmLink;
 
 public class MatsimStaticDatabase {
 

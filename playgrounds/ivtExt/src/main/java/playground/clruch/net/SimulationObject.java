@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import playground.clruch.gfx.util.RequestContainer;
-import playground.clruch.gfx.util.VehicleContainer;
-
 public class SimulationObject implements Serializable {
 
     public String infoLine = "";
