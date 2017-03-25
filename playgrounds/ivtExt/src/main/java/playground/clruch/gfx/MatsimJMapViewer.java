@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import org.matsim.api.core.v01.Coord;
 
 import playground.clruch.gfx.util.OsmLink;
+import playground.clruch.gfx.util.RequestContainer;
 import playground.clruch.gfx.util.VehicleContainer;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.net.SimulationObject;
@@ -53,7 +54,7 @@ public class MatsimJMapViewer extends JMapViewer {
         if (drawLinks) {
             int linkCount = 0;
             graphics.setColor(new Color(153, 153, 102, 64));
-            for (OsmLink osmLink : db.linkMap.values()) {
+            for (OsmLink osmLink : db.getOsmLinks()) {
 
                 Point p1 = getMapPosition(osmLink.coords[0]);
                 if (p1 != null) {
@@ -74,11 +75,14 @@ public class MatsimJMapViewer extends JMapViewer {
             {
                 // draw links
                 graphics.setColor(Color.DARK_GRAY);
-                for (Entry<String, Integer> entry : ref.requestsPerLinkMap.entrySet()) {
-                    OsmLink osmLink = db.getOsmLink(entry.getKey());
+                Map<Integer, List<RequestContainer>> map = //
+                        ref.requests.stream().collect(Collectors.groupingBy(rc -> rc.linkId));
+                for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
+                    int linkId = entry.getKey();
+                    OsmLink osmLink = db.getOsmLink(linkId);
                     Point p1 = getMapPosition(osmLink.getAt(0.5));
                     if (p1 != null)
-                        graphics.drawString("" + entry.getValue(), p1.x, p1.y);
+                        graphics.drawString("" + entry.getValue().size(), p1.x, p1.y);
                 }
             }
 
@@ -86,10 +90,10 @@ public class MatsimJMapViewer extends JMapViewer {
                 // draw vehicles
                 int carwidth = (int) Math.max(3, Math.round(5 / getMeterPerPixel()));
 
-                Map<String, List<VehicleContainer>> map = //
+                Map<Integer, List<VehicleContainer>> map = //
                         ref.vehicles.stream().collect(Collectors.groupingBy(VehicleContainer::getLinkId));
 
-                for (Entry<String, List<VehicleContainer>> entry : map.entrySet()) {
+                for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
                     int size = entry.getValue().size();
                     OsmLink osmLink = db.getOsmLink(entry.getKey());
                     Point p1test = getMapPosition(osmLink.getAt(0.5));

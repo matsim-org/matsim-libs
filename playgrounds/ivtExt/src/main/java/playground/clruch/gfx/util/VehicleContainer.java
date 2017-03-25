@@ -6,10 +6,10 @@ import playground.clruch.export.AVStatus;
 
 public class VehicleContainer implements Serializable {
 //    public String vehicleId; // <- probably obsolete
-    public String linkId;
+    public int linkId;
     public AVStatus avStatus;
 
-    public String getLinkId() {
+    public int getLinkId() {
         return linkId;
     }
 }

@@ -38,7 +38,7 @@ import playground.clruch.net.SimulationSubscriber;
  * @author Jan Peter Stotz
  */
 public class MatsimViewer {
-    final JFrame jFrame = new JFrame();
+    public final JFrame jFrame = new JFrame();
     private final JMapViewerTree treeMap;
     private final JLabel zoomLabel;
     private final JLabel zoomValue;

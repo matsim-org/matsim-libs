@@ -22,6 +22,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.export.AVStatus;
+import playground.clruch.gfx.MatsimStaticDatabase;
+import playground.clruch.gfx.util.RequestContainer;
 import playground.clruch.gfx.util.VehicleContainer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationServer;
@@ -203,22 +205,26 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     e.printStackTrace();
                 }
 
+            MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
+
             SimulationObject simulationObject = new SimulationObject();
             simulationObject.infoLine = getInfoLine();
             simulationObject.now = round_now;
             {
-                Map<Link, List<AVRequest>> map = getAVRequestsAtLinks();
-                for (Entry<Link, List<AVRequest>> entry : map.entrySet())
-                    simulationObject.requestsPerLinkMap.put( //
-                            entry.getKey().getId().toString(), //
-                            entry.getValue().size());
+                for (AVRequest avRequest : getAVRequests()) {
+                    RequestContainer requestContainer = new RequestContainer();
+                    requestContainer.requestId = avRequest.getId().toString();
+                    requestContainer.linkId = db.getLinkIndex(avRequest.getFromLink());
+                    requestContainer.submissionTime = avRequest.getSubmissionTime();
+                    simulationObject.requests.add(requestContainer);
+                }
             }
             {
                 final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
 
                 // insert all stay vehicles
                 for (Entry<Link, Queue<AVVehicle>> entry : getStayVehicles().entrySet()) {
-                    final String linkId = entry.getKey().getId().toString();
+                    int linkId = db.getLinkIndex(entry.getKey());
                     for (AVVehicle avVehicle : entry.getValue()) {
                         final String key = avVehicle.getId().toString();
                         VehicleContainer vehicleContainer = new VehicleContainer();
@@ -233,7 +239,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     final String key = vlp.avVehicle.getId().toString();
                     if (!vehicleMap.containsKey(key)) {
                         VehicleContainer vehicleContainer = new VehicleContainer();
-                        vehicleContainer.linkId = vlp.linkTimePair.link.getId().toString();
+                        vehicleContainer.linkId = db.getLinkIndex(vlp.linkTimePair.link);
                         vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
                         vehicleMap.put(key, vehicleContainer);
                     }
@@ -247,13 +253,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                         Link link = AVLocation.of(avVehicle);
                         if (link == null) {
                             if (failcount == 0) {
-//                                System.out.println("------- link unknown:");
-//                                System.out.println(ScheduleUtils.toString(avVehicle.getSchedule()));
+                                System.out.println("------- link unknown:");
+                                System.out.println(ScheduleUtils.toString(avVehicle.getSchedule()));
                             }
                             ++failcount;
                         } else {
                             VehicleContainer vehicleContainer = new VehicleContainer();
-                            vehicleContainer.linkId = link.getId().toString();
+                            vehicleContainer.linkId = db.getLinkIndex(link);
                             vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
                             vehicleMap.put(key, vehicleContainer);
                             ++okcount;
