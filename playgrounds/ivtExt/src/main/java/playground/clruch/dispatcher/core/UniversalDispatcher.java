@@ -31,7 +31,6 @@ import playground.clruch.net.SimulationSubscriberSet;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
-import playground.clruch.utils.AVDestination;
 import playground.clruch.utils.AVLocation;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
@@ -44,7 +43,6 @@ import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
-import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
@@ -56,7 +54,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     private final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
-    private final Map<AVVehicle, Link> vehiclesWithCustomers = new HashMap<>();
+    private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
 
     private final double pickupDurationPerStop;
     private final double dropoffDurationPerStop;
@@ -83,7 +81,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     @Override
     protected void updateDatastructures() {
-        getStayVehicles().values().stream().flatMap(Queue::stream).forEach(vehiclesWithCustomers::remove);
+        getStayVehicles().values().stream().flatMap(Queue::stream).forEach(vehiclesWithCustomer::remove);
     }
 
     /**
@@ -134,7 +132,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         assignDirective(avVehicle, new AcceptRequestDirective( //
                 avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
 
-        vehiclesWithCustomers.put(avVehicle, avRequest.getToLink());
+        Link returnVal = vehiclesWithCustomer.put(avVehicle, avRequest.getToLink());
+        GlobalAssert.that(returnVal == null);
 
         ++total_matchedRequests;
     }
@@ -194,16 +193,18 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         pendingRequests.add(request); // <- store request
     }
 
-    // TODO this will not be necessary!!!
-    @Override
-    public final void onNextTaskStarted(AVTask task) {
-        // intentionally empty
+    /**
+     * @return map of vehicles that carry a customer and their destination links
+     */
+    protected final Map<AVVehicle, Link> getVehiclesWithCustomer() {
+        return Collections.unmodifiableMap(vehiclesWithCustomer);
     }
 
-    protected Map<AVVehicle, Link> getVehiclesWithCustomerNew() {
-        return Collections.unmodifiableMap(vehiclesWithCustomers);
-    }
-
+    /**
+     * {@link PartitionedDispatcher} overrides the function
+     * 
+     * @return map of rebalancing vehicles and their destination links
+     */
     protected Map<AVVehicle, Link> getRebalancingVehicles() {
         return Collections.emptyMap();
     }
@@ -242,15 +243,20 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 // VEHICLES
                 final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
 
-                for (Entry<AVVehicle, Link> entry : getVehiclesWithCustomerNew().entrySet()) {
+                for (Entry<AVVehicle, Link> entry : getVehiclesWithCustomer().entrySet()) {
                     VehicleContainer vehicleContainer = new VehicleContainer();
                     AVVehicle avVehicle = entry.getKey();
                     final String key = avVehicle.getId().toString();
                     final Link fromLink = AVLocation.of(avVehicle);
-                    vehicleContainer.linkId = db.getLinkIndex(fromLink);
-                    vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
-                    vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
-                    vehicleMap.put(key, vehicleContainer);
+                    if (fromLink != null) {
+                        vehicleContainer.linkId = db.getLinkIndex(fromLink);
+                        vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
+                        vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
+                        vehicleMap.put(key, vehicleContainer);
+                    } else {
+                        System.out.println("location extraction fail (1):");
+                        System.out.println(ScheduleUtils.toString(avVehicle.getSchedule()));
+                    }
                 }
 
                 for (Entry<AVVehicle, Link> entry : getRebalancingVehicles().entrySet()) {
@@ -258,10 +264,15 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     AVVehicle avVehicle = entry.getKey();
                     final String key = avVehicle.getId().toString();
                     final Link fromLink = AVLocation.of(avVehicle);
-                    vehicleContainer.linkId = db.getLinkIndex(fromLink);
-                    vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
-                    vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
-                    vehicleMap.put(key, vehicleContainer);
+                    if (fromLink != null) {
+                        vehicleContainer.linkId = db.getLinkIndex(fromLink);
+                        vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
+                        vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
+                        vehicleMap.put(key, vehicleContainer);
+                    } else {
+                        System.out.println("location extraction fail (2):");
+                        System.out.println(ScheduleUtils.toString(avVehicle.getSchedule()));
+                    }
                 }
 
                 // divertible vehicles are either stay, pickup, or rebalancing...

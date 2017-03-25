@@ -47,6 +47,7 @@ public class MatsimJMapViewer extends JMapViewer {
     }
 
     private Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
+    private Font infoFont = new Font(Font.SANS_SERIF, Font.PLAIN, 13);
     private Font clockFont = new Font(Font.MONOSPACED, Font.BOLD, 16);
 
     @Override
@@ -132,8 +133,9 @@ public class MatsimJMapViewer extends JMapViewer {
                         }
                     }
                 }
+                graphics.setFont(infoFont);
                 graphics.setColor(Color.DARK_GRAY);
-                graphics.drawString("maxWaitTime= " + Math.round(maxWaitTime / 60) + " min", 0, 30);
+                graphics.drawString("maxWaitTime= " + Math.round(maxWaitTime / 60) + " min", 0, 40);
             }
 
             {

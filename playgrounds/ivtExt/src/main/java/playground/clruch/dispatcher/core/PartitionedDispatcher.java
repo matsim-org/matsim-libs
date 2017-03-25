@@ -1,7 +1,6 @@
 package playground.clruch.dispatcher.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,11 +42,11 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     @Override
     protected final void updateDatastructures() {
         super.updateDatastructures(); // mandatory call
-        // TODO currently the vehicles are removed when arriving at final link, 
+        // TODO currently the vehicles are removed when arriving at final link,
         // ... could be removed as soon as they reach rebalancing destination virtualNode instead
         getStayVehicles().values().stream().flatMap(Queue::stream).forEach(rebalancingVehicles::remove);
     }
-    
+
     @Override
     protected Map<AVVehicle, Link> getRebalancingVehicles() {
         return Collections.unmodifiableMap(rebalancingVehicles);
@@ -55,7 +54,6 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
 
     // This function has to be called only after getVirtualNodeRebalancingVehicles
     protected synchronized final void setVehicleRebalance(final VehicleLinkPair vehicleLinkPair, final Link destination) {
-        updateRebVehicles();
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(vehicleLinkPair, destination);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), vehicleLinkPair.avVehicle, destination));
@@ -79,19 +77,10 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         return returnMap;
     }
 
-    @Deprecated // function superseded by updateDatastructures()
-    private synchronized void updateRebVehicles() {
-        getStayVehicles().values().stream() //
-                .flatMap(Queue::stream).forEach(rebalancingVehicles::remove);
-    }
-
     /**
      * @return <VirtualNode, Set<AVVehicle>> with the rebalancing vehicles AVVehicle rebalancing to every node VirtualNode
      */
     protected synchronized Map<VirtualNode, Set<AVVehicle>> getVirtualNodeRebalancingToVehicles() {
-        // update the list of rebalancing vehicles
-        updateRebVehicles();
-
         // create set
         Map<VirtualNode, Set<AVVehicle>> returnMap = new HashMap<>();
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
@@ -104,21 +93,18 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
 
         // return set
         return Collections.unmodifiableMap(returnMap);
-
     }
 
     /**
      * @return
      */
     protected synchronized Map<VirtualNode, Set<AVVehicle>> getVirtualNodeArrivingWCustomerVehicles() {
-        Collection<VehicleLinkPair> customVehicles = getVehiclesWithCustomer();
-        HashMap<VirtualNode, Set<AVVehicle>> customVehiclesMap = new HashMap<>();
-
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+        final Map<AVVehicle, Link> customMap = getVehiclesWithCustomer();
+        final HashMap<VirtualNode, Set<AVVehicle>> customVehiclesMap = new HashMap<>();
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
             customVehiclesMap.put(virtualNode, new HashSet<>());
-        }
-
-        customVehicles.stream().forEach(v -> customVehiclesMap.get(virtualNetwork.getVirtualNode(v.getCurrentDriveDestination())).add(v.avVehicle));
+        customMap.entrySet().stream() //
+                .forEach(e -> customVehiclesMap.get(virtualNetwork.getVirtualNode(e.getValue())).add(e.getKey()));
         return customVehiclesMap;
     }
 
@@ -128,9 +114,6 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
      * @return
      */
     protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeDivertableNotRebalancingVehicles() {
-        // update the list of rebalancing vehicles
-        updateRebVehicles();
-
         // return list of vehicles
         Map<VirtualNode, List<VehicleLinkPair>> returnMap = getVirtualNodeAvailableVehicles();
         Map<VirtualNode, List<VehicleLinkPair>> rebalanceMap = new HashMap<>();
