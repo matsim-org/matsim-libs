@@ -35,6 +35,13 @@ public class MyGumbelDistribution implements EpsilonDistribution {
 		final double implLoc = -GAMMA * implScale;
 		this.apacheCommonsGumbel = new GumbelDistribution(implLoc, implScale);
 	}
+	
+	public MyGumbelDistribution(final double benAkivaLerman1985Scale, final int warmup) {
+		this(benAkivaLerman1985Scale);
+		for (int i = 0; i < warmup; i++) {
+			this.nextEpsilon();
+		}
+	}
 
 	// -------------------- GETTERS --------------------
 
