@@ -93,24 +93,19 @@ public class MatsimViewer {
         {
             final JCheckBox jCheckBox = new JCheckBox("links");
             jCheckBox.setSelected(matsimJMapViewer.getDrawLinks());
-            jCheckBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    matsimJMapViewer.setDrawLinks(jCheckBox.isSelected());
-                }
-            });
+            jCheckBox.addActionListener(e -> matsimJMapViewer.setDrawLinks(jCheckBox.isSelected()));
             panelBottom.add(jCheckBox);
         }
-        // ---
         {
             final JCheckBox jCheckBox = new JCheckBox("veh.dest");
             jCheckBox.setSelected(matsimJMapViewer.getDrawVehicleDestinations());
-            jCheckBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    matsimJMapViewer.setDrawVehicleDestinations(jCheckBox.isSelected());
-                }
-            });
+            jCheckBox.addActionListener(e -> matsimJMapViewer.setDrawVehicleDestinations(jCheckBox.isSelected()));
+            panelBottom.add(jCheckBox);
+        }
+        {
+            final JCheckBox jCheckBox = new JCheckBox("req.dest");
+            jCheckBox.setSelected(matsimJMapViewer.getDrawRequestDestinations());
+            jCheckBox.addActionListener(e -> matsimJMapViewer.setDrawRequestDestinations(jCheckBox.isSelected()));
             panelBottom.add(jCheckBox);
         }
         //

@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -27,7 +28,7 @@ public class ScenarioViewer {
     public static void main(String[] args) {
 
         File configFile = new File(args[0]);
-        //final File dir = configFile.getParentFile();
+        // final File dir = configFile.getParentFile();
 
         final Network network;
         // TODO potentially use MatsimNetworkReader to only read network?!
@@ -38,6 +39,9 @@ public class ScenarioViewer {
             Scenario scenario = ScenarioUtils.loadScenario(config);
             network = scenario.getNetwork();
         }
+
+        double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
+        System.out.println(bb[0] + " " + bb[1] + " " + bb[2] + " " + bb[3]);
 
         CoordinateTransformation ct;
         // ct = new CH1903LV03PlustoWGS84(); // <- switzerland

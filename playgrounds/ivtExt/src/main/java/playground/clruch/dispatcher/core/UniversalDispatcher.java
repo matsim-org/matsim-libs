@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     private final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
+    private final Map<AVVehicle, Link> vehiclesWithCustomers = new HashMap<>();
 
     private final double pickupDurationPerStop;
     private final double dropoffDurationPerStop;
@@ -77,6 +79,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         setInfoLinePeriod(safeConfig.getInteger("infoLinePeriod", 10));
         publishPeriod = safeConfig.getInteger("publishPeriod", 10);
+    }
+
+    @Override
+    protected void updateDatastructures() {
+        getStayVehicles().values().stream().flatMap(Queue::stream).forEach(vehiclesWithCustomers::remove);
     }
 
     /**
@@ -126,6 +133,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         assignDirective(avVehicle, new AcceptRequestDirective( //
                 avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
+
+        vehiclesWithCustomers.put(avVehicle, avRequest.getToLink());
 
         ++total_matchedRequests;
     }
@@ -191,8 +200,16 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // intentionally empty
     }
 
+    protected Map<AVVehicle, Link> getVehiclesWithCustomerNew() {
+        return Collections.unmodifiableMap(vehiclesWithCustomers);
+    }
+
+    protected Map<AVVehicle, Link> getRebalancingVehicles() {
+        return Collections.emptyMap();
+    }
+
     @Override
-    protected void notifySimulationSubscribers(long round_now) {
+    protected final void notifySimulationSubscribers(long round_now) {
         if (SimulationServer.INSTANCE.isRunning() && //
                 round_now % publishPeriod == 0 && 0 < getAVRequests().size()) { // TODO not final criteria
             if (SimulationSubscriberSet.INSTANCE.isEmpty())
@@ -200,17 +217,18 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             // block for connections
             while (SimulationSubscriberSet.INSTANCE.isEmpty())
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-            MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
+            final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
 
-            SimulationObject simulationObject = new SimulationObject();
+            final SimulationObject simulationObject = new SimulationObject();
             simulationObject.infoLine = getInfoLine();
             simulationObject.now = round_now;
             {
+                // REQUESTS
                 for (AVRequest avRequest : getAVRequests()) {
                     RequestContainer requestContainer = new RequestContainer();
                     requestContainer.requestId = avRequest.getId().toString();
@@ -221,39 +239,44 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 }
             }
             {
+                // VEHICLES
                 final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
+
+                for (Entry<AVVehicle, Link> entry : getVehiclesWithCustomerNew().entrySet()) {
+                    VehicleContainer vehicleContainer = new VehicleContainer();
+                    AVVehicle avVehicle = entry.getKey();
+                    final String key = avVehicle.getId().toString();
+                    final Link fromLink = AVLocation.of(avVehicle);
+                    vehicleContainer.linkId = db.getLinkIndex(fromLink);
+                    vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
+                    vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
+                    vehicleMap.put(key, vehicleContainer);
+                }
+
+                for (Entry<AVVehicle, Link> entry : getRebalancingVehicles().entrySet()) {
+                    VehicleContainer vehicleContainer = new VehicleContainer();
+                    AVVehicle avVehicle = entry.getKey();
+                    final String key = avVehicle.getId().toString();
+                    final Link fromLink = AVLocation.of(avVehicle);
+                    vehicleContainer.linkId = db.getLinkIndex(fromLink);
+                    vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
+                    vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
+                    vehicleMap.put(key, vehicleContainer);
+                }
 
                 // divertible vehicles are either stay, pickup, or rebalancing...
                 for (VehicleLinkPair vlp : getDivertableVehicles()) {
                     final String key = vlp.avVehicle.getId().toString();
-                    VehicleContainer vehicleContainer = new VehicleContainer();
-                    vehicleContainer.linkId = db.getLinkIndex(vlp.linkTimePair.link);
-                    if (vlp.isVehicleInStayTask()) {
-                        vehicleContainer.avStatus = AVStatus.STAY;
-                    } else {
-                        vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
-                        vehicleContainer.destinationLinkId = db.getLinkIndex(vlp.getCurrentDriveDestination());
-                    }
-                    vehicleMap.put(key, vehicleContainer);
-                }
-
-                for (AVVehicle avVehicle : getFunctioningVehicles()) {
-                    final String key = avVehicle.getId().toString();
                     if (!vehicleMap.containsKey(key)) {
-                        final Link fromLink = AVLocation.of(avVehicle);
-                        final Link toLink = AVDestination.of(avVehicle);
-                        if (fromLink == null || toLink == null) {
-                            System.out.println("------- destination link unknown:");
-                            System.out.println(ScheduleUtils.toString(avVehicle.getSchedule()));
-                            GlobalAssert.that(fromLink != null);
-                            GlobalAssert.that(toLink != null);
+                        VehicleContainer vehicleContainer = new VehicleContainer();
+                        vehicleContainer.linkId = db.getLinkIndex(vlp.linkTimePair.link);
+                        if (vlp.isVehicleInStayTask()) {
+                            vehicleContainer.avStatus = AVStatus.STAY;
                         } else {
-                            VehicleContainer vehicleContainer = new VehicleContainer();
-                            vehicleContainer.linkId = db.getLinkIndex(fromLink);
-                            vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
-                            vehicleContainer.destinationLinkId = db.getLinkIndex(toLink);
-                            vehicleMap.put(key, vehicleContainer);
+                            vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
+                            vehicleContainer.destinationLinkId = db.getLinkIndex(vlp.getCurrentDriveDestination());
                         }
+                        vehicleMap.put(key, vehicleContainer);
                     }
                 }
 
@@ -262,8 +285,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
             for (SimulationSubscriber simulationSubscriber : SimulationSubscriberSet.INSTANCE)
                 simulationSubscriber.handle(simulationObject);
-            // System.out.println("sent to " + SimulationSubscriberSet.INSTANCE.size());
-
         }
     }
 

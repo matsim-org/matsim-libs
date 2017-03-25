@@ -115,7 +115,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * @return collection of cars that are in the driving state with a customer, i.e. their
      *         second last task is an AVDropoff Task (followed by AVStay task)
      */
-    @Deprecated
+    @Deprecated // this is meant to be provided by universalDisp
     protected final Collection<VehicleLinkPair> getVehiclesWithCustomer() {
         Collection<VehicleLinkPair> collection = new LinkedList<>();
         for (AVVehicle avVehicle : getFunctioningVehicles())
@@ -192,10 +192,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private String previousInfoMarker = "";
 
     protected abstract void notifySimulationSubscribers(long round_now);
+    protected abstract void updateDatastructures();
 
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
+        
+        updateDatastructures();
 
         if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
             String infoLine = getInfoLine();

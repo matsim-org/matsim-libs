@@ -27,6 +27,7 @@ public class MatsimJMapViewer extends JMapViewer {
 
     private volatile boolean drawLinks = true;
     private volatile boolean drawVehicleDestinations = true;
+    private volatile boolean drawRequestDestinations = true;
     public volatile int alpha = 196;
 
     SimulationObject simulationObject = null;
@@ -83,6 +84,8 @@ public class MatsimJMapViewer extends JMapViewer {
         if (ref != null) {
 
             {
+
+                double maxWaitTime = 0;
                 // draw requests
                 graphics.setFont(requestsFont);
                 Map<Integer, List<RequestContainer>> map = //
@@ -99,29 +102,27 @@ public class MatsimJMapViewer extends JMapViewer {
 
                         final int x = p1.x;
                         final int y = p1.y;
+
                         {
                             graphics.setColor(new Color(32, 128, 32, 128));
                             int index = numRequests;
                             for (RequestContainer rc : entry.getValue()) {
                                 double waitTime = ref.now - rc.submissionTime;
+                                maxWaitTime = Math.max(waitTime, maxWaitTime);
                                 int piy = y - index;
-                                graphics.drawLine(x, piy, x + ((int) waitTime / 10), piy);
+                                int wid = (int) waitTime / 10;
+                                int left = x - wid / 2;
+                                graphics.drawLine(left, piy, left + wid, piy);
                                 --index;
                             }
                         }
-                        {
+                        if (drawRequestDestinations) {
                             graphics.setColor(new Color(128, 128, 128, 64));
                             for (RequestContainer rc : entry.getValue()) {
-
-                                Point p2;
-                                {
-                                    int linkId = rc.toLinkId;
-                                    OsmLink osmLink = db.getOsmLink(linkId);
-                                    p2 = getMapPositionAlways(osmLink.getAt(0.5));
-                                }
-                                // if (p2 != null)
+                                int linkId = rc.toLinkId;
+                                OsmLink osmLink = db.getOsmLink(linkId);
+                                Point p2 = getMapPositionAlways(osmLink.getAt(0.5));
                                 graphics.drawLine(x, y, p2.x, p2.y);
-
                             }
                         }
                         // if (numRequests<3)
@@ -131,6 +132,8 @@ public class MatsimJMapViewer extends JMapViewer {
                         }
                     }
                 }
+                graphics.setColor(Color.DARK_GRAY);
+                graphics.drawString("maxWaitTime= " + Math.round(maxWaitTime / 60) + " min", 0, 30);
             }
 
             {
@@ -208,6 +211,15 @@ public class MatsimJMapViewer extends JMapViewer {
 
     public boolean getDrawVehicleDestinations() {
         return drawVehicleDestinations;
+    }
+
+    public void setDrawRequestDestinations(boolean selected) {
+        drawRequestDestinations = selected;
+        repaint();
+    }
+
+    public boolean getDrawRequestDestinations() {
+        return drawRequestDestinations;
     }
 
 }

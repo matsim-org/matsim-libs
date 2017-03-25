@@ -8,8 +8,8 @@ import java.net.Socket;
 public class ObjectClient {
     public final String IP;
     private Socket socket;
-    ObjectOutputStream myObjectOutputStream = null;
-    ObjectInputStream myObjectInputStream;
+    ObjectOutputStream objectOutputStream = null;
+    ObjectInputStream objectInputStream;
     volatile boolean isLaunched = true;
 
     public ObjectClient(final String IP, SimulationSubscriber simulationSubscriber) throws Exception {
@@ -19,13 +19,13 @@ public class ObjectClient {
             public void run() {
                 try {
                     socket = new Socket(InetAddress.getByName(IP), SimulationServer.OBJECT_SERVER_PORT); // blocking if IP cannot be reached
-                    myObjectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                    myObjectOutputStream.flush();
-                    if (myObjectInputStream == null)
+                    objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                    objectOutputStream.flush();
+                    if (objectInputStream == null)
                         // constructor blocks until the corresponding ObjectOutputStream has written and flushed the header
-                        myObjectInputStream = new ObjectInputStream(socket.getInputStream());
+                        objectInputStream = new ObjectInputStream(socket.getInputStream());
                     while (isLaunched) {
-                        Object object = myObjectInputStream.readObject(); // blocks until object is available
+                        Object object = objectInputStream.readObject(); // blocks until object is available
                         if (object instanceof SimulationObject) {
                             SimulationObject simulationObject = (SimulationObject) object;
                             simulationSubscriber.handle(simulationObject);
@@ -53,6 +53,6 @@ public class ObjectClient {
     }
 
     public boolean isOpen() {
-        return socket != null && myObjectOutputStream != null;
+        return socket != null && objectOutputStream != null;
     }
 }

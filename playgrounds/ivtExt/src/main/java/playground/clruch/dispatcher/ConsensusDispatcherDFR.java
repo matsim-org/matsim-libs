@@ -29,6 +29,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.red.Variance;
+import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;

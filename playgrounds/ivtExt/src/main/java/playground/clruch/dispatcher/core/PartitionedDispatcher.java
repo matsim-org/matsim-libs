@@ -1,17 +1,20 @@
-package playground.clruch.dispatcher;
+package playground.clruch.dispatcher.core;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.clruch.dispatcher.core.RebalanceVehicleEvent;
-import playground.clruch.dispatcher.core.UniversalDispatcher;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
@@ -20,18 +23,34 @@ import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+/**
+ * a {@link PartitionedDispatcher} has a {@link VirtualNetwork}
+ */
 public abstract class PartitionedDispatcher extends UniversalDispatcher {
     protected final VirtualNetwork virtualNetwork; //
     private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>();
 
     public PartitionedDispatcher( //
-                                  AVDispatcherConfig config, //
-                                  TravelTime travelTime, //
-                                  ParallelLeastCostPathCalculator router, //
-                                  EventsManager eventsManager, //
-                                  VirtualNetwork virtualNetwork) {
+            AVDispatcherConfig config, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator router, //
+            EventsManager eventsManager, //
+            VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
+    }
+
+    @Override
+    protected final void updateDatastructures() {
+        super.updateDatastructures(); // mandatory call
+        // TODO currently the vehicles are removed when arriving at final link, 
+        // ... could be removed as soon as they reach rebalancing destination virtualNode instead
+        getStayVehicles().values().stream().flatMap(Queue::stream).forEach(rebalancingVehicles::remove);
+    }
+    
+    @Override
+    protected Map<AVVehicle, Link> getRebalancingVehicles() {
+        return Collections.unmodifiableMap(rebalancingVehicles);
     }
 
     // This function has to be called only after getVirtualNodeRebalancingVehicles
@@ -43,7 +62,6 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         Link returnVal = rebalancingVehicles.put(vehicleLinkPair.avVehicle, destination);
         GlobalAssert.that(returnVal == null);
     }
-
 
     /**
      * @return returns the divertable vehicles per virtualNode
@@ -61,10 +79,10 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         return returnMap;
     }
 
-    // TODO currently the vehicles are removed when arriving at final link, could be removed as soon as they reach rebalancing destination virtualNode instead
+    @Deprecated // function superseded by updateDatastructures()
     private synchronized void updateRebVehicles() {
         getStayVehicles().values().stream() //
-                .flatMap(q -> q.stream()).forEach(rebalancingVehicles::remove);
+                .flatMap(Queue::stream).forEach(rebalancingVehicles::remove);
     }
 
     /**
@@ -105,7 +123,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     }
 
     /**
-     * // same as getVirtualNodeAvailableVehicles() but returns only vehicles which are currently not in a rebalancing task
+     * same as getVirtualNodeAvailableVehicles() but returns only vehicles which are currently not in a rebalancing task
      *
      * @return
      */
@@ -125,8 +143,6 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         return rebalanceMap;
     }
 
-    //
-
     protected Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {
         Map<VirtualNode, List<AVRequest>> returnMap = getAVRequests().stream() //
                 .parallel() //
@@ -140,9 +156,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         return returnMap;
     }
 
-
     /**
-     *
      * @return return virtualNode related HashMaps
      */
     protected <Type> Map<VirtualNode, List<Type>> createvNodeLinksMap() {
@@ -151,6 +165,5 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
             returnMap.put(virtualNode, new ArrayList<>());
         return returnMap;
     }
-
 
 }
