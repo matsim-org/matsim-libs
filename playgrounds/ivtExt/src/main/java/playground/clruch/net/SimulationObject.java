@@ -1,11 +1,8 @@
 package playground.clruch.net;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import playground.clruch.gfx.util.VehicleContainer;
 
 public class SimulationObject implements Serializable {
 
@@ -13,8 +10,10 @@ public class SimulationObject implements Serializable {
 
     public long now;
 
-    public Map<String, Integer> requestsPerLinkMap = new HashMap<>();
-    
+    public List<RequestContainer> requests = new ArrayList<>();
+
     public List<VehicleContainer> vehicles;
+
+    public Serializable serializable;
 
 }

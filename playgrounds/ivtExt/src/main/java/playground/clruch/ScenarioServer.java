@@ -12,8 +12,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
 import playground.clruch.export.EventFileToProcessingXML;
+import playground.clruch.gfx.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.prep.TheApocalypse;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
@@ -23,13 +25,13 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 /**
  * main entry point
  */
-public class ScenarioAsServer {
+public class ScenarioServer {
     public static void main(String[] args) throws MalformedURLException {
         File configFile = new File(args[0]);
         final File dir = configFile.getParentFile();
 
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
-        
+
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
@@ -37,10 +39,10 @@ public class ScenarioAsServer {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
 
+        MatsimStaticDatabase.initializeSingletonInstance( //
+                scenario.getNetwork(), new IdentityTransformation());
 
-        TheApocalypse.decimatesThe(population).toNoMoreThan(500000).people();
-
-        TheApocalypse.decimatesThe(population).toNoMoreThan(5200).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(10000).people();
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
