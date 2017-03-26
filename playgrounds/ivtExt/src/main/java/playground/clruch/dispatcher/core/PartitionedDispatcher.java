@@ -1,12 +1,12 @@
 package playground.clruch.dispatcher.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,11 +40,11 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     }
 
     @Override
-    protected final void updateDatastructures() {
-        super.updateDatastructures(); // mandatory call
+    final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
+        super.updateDatastructures(stayVehicles); // mandatory call
         // TODO currently the vehicles are removed when arriving at final link,
         // ... could be removed as soon as they reach rebalancing destination virtualNode instead
-        getStayVehicles().values().stream().flatMap(Queue::stream).forEach(rebalancingVehicles::remove);
+        stayVehicles.forEach(rebalancingVehicles::remove);
     }
 
     @Override

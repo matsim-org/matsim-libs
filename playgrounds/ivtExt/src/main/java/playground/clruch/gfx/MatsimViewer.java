@@ -104,8 +104,8 @@ public class MatsimViewer {
         }
         {
             final JCheckBox jCheckBox = new JCheckBox("req.dest");
-            jCheckBox.setSelected(matsimJMapViewer.getDrawRequestDestinations());
-            jCheckBox.addActionListener(e -> matsimJMapViewer.setDrawRequestDestinations(jCheckBox.isSelected()));
+            jCheckBox.setSelected(matsimJMapViewer.requestLayer.getDrawDestinations());
+            jCheckBox.addActionListener(e -> matsimJMapViewer.requestLayer.setDrawDestinations(jCheckBox.isSelected()));
             panelBottom.add(jCheckBox);
         }
         //

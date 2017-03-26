@@ -27,27 +27,27 @@ public class MatsimJMapViewer extends JMapViewer {
 
     private volatile boolean drawLinks = true;
     private volatile boolean drawVehicleDestinations = true;
-    private volatile boolean drawRequestDestinations = true;
     public volatile int alpha = 196;
 
     SimulationObject simulationObject = null;
+
+    public final RequestLayer requestLayer;
 
     public JLabel jLabel = new JLabel(" ");
 
     public MatsimJMapViewer(MatsimStaticDatabase db) {
         this.db = db;
+        requestLayer = new RequestLayer(this);
     }
 
-    private final Point getMapPosition(Coord coord) {
+    final Point getMapPosition(Coord coord) {
         return getMapPosition(coord.getY(), coord.getX());
     }
 
-    private final Point getMapPositionAlways(Coord coord) {
+    final Point getMapPositionAlways(Coord coord) {
         return getMapPosition(coord.getY(), coord.getX(), false);
     }
 
-    private Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
-    private Font infoFont = new Font(Font.SANS_SERIF, Font.PLAIN, 13);
     private Font clockFont = new Font(Font.MONOSPACED, Font.BOLD, 16);
 
     @Override
@@ -84,59 +84,7 @@ public class MatsimJMapViewer extends JMapViewer {
 
         if (ref != null) {
 
-            {
-
-                double maxWaitTime = 0;
-                // draw requests
-                graphics.setFont(requestsFont);
-                Map<Integer, List<RequestContainer>> map = //
-                        ref.requests.stream().collect(Collectors.groupingBy(rc -> rc.fromLinkId));
-                for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-                    Point p1;
-                    {
-                        int linkId = entry.getKey();
-                        OsmLink osmLink = db.getOsmLink(linkId);
-                        p1 = getMapPosition(osmLink.getAt(0.5));
-                    }
-                    if (p1 != null) {
-                        final int numRequests = entry.getValue().size();
-
-                        final int x = p1.x;
-                        final int y = p1.y;
-
-                        {
-                            graphics.setColor(new Color(32, 128, 32, 128));
-                            int index = numRequests;
-                            for (RequestContainer rc : entry.getValue()) {
-                                double waitTime = ref.now - rc.submissionTime;
-                                maxWaitTime = Math.max(waitTime, maxWaitTime);
-                                int piy = y - index;
-                                int wid = (int) waitTime / 10;
-                                int left = x - wid / 2;
-                                graphics.drawLine(left, piy, left + wid, piy);
-                                --index;
-                            }
-                        }
-                        if (drawRequestDestinations) {
-                            graphics.setColor(new Color(128, 128, 128, 64));
-                            for (RequestContainer rc : entry.getValue()) {
-                                int linkId = rc.toLinkId;
-                                OsmLink osmLink = db.getOsmLink(linkId);
-                                Point p2 = getMapPositionAlways(osmLink.getAt(0.5));
-                                graphics.drawLine(x, y, p2.x, p2.y);
-                            }
-                        }
-                        // if (numRequests<3)
-                        {
-                            graphics.setColor(Color.DARK_GRAY);
-                            graphics.drawString("" + numRequests, x, y - numRequests);
-                        }
-                    }
-                }
-                graphics.setFont(infoFont);
-                graphics.setColor(Color.DARK_GRAY);
-                graphics.drawString("maxWaitTime= " + Math.round(maxWaitTime / 60) + " min", 0, 40);
-            }
+            requestLayer.paint(graphics, ref);
 
             {
                 // draw vehicles
@@ -213,15 +161,6 @@ public class MatsimJMapViewer extends JMapViewer {
 
     public boolean getDrawVehicleDestinations() {
         return drawVehicleDestinations;
-    }
-
-    public void setDrawRequestDestinations(boolean selected) {
-        drawRequestDestinations = selected;
-        repaint();
-    }
-
-    public boolean getDrawRequestDestinations() {
-        return drawRequestDestinations;
     }
 
 }
