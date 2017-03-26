@@ -3,13 +3,13 @@ package playground.clruch.gfx;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
 
@@ -17,27 +17,33 @@ import org.matsim.api.core.v01.Coord;
 
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.net.OsmLink;
-import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.net.VehicleContainer;
 
 public class MatsimJMapViewer extends JMapViewer {
 
     final MatsimStaticDatabase db;
 
     private volatile boolean drawLinks = true;
-    private volatile boolean drawVehicleDestinations = true;
     public volatile int alpha = 196;
 
     SimulationObject simulationObject = null;
 
     public final RequestLayer requestLayer;
+    public final VehicleLayer vehicleLayer;
+    private final List<ViewerLayer> viewerLayers = new ArrayList<>();
+
+    private final List<InfoString> infoStrings = new LinkedList<>();
+    private static Font countFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
 
     public JLabel jLabel = new JLabel(" ");
 
     public MatsimJMapViewer(MatsimStaticDatabase db) {
         this.db = db;
         requestLayer = new RequestLayer(this);
+        vehicleLayer = new VehicleLayer(this);
+
+        viewerLayers.add(requestLayer);
+        viewerLayers.add(vehicleLayer);
     }
 
     final Point getMapPosition(Coord coord) {
@@ -53,7 +59,6 @@ public class MatsimJMapViewer extends JMapViewer {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        final SimulationObject ref = simulationObject; // <- use ref (instead of sim...Obj... ) for thread safety
         Dimension dimension = getSize();
         Graphics2D graphics = (Graphics2D) g;
         graphics.setColor(new Color(255, 255, 255, alpha));
@@ -82,51 +87,13 @@ public class MatsimJMapViewer extends JMapViewer {
         }
         /*****************************************************/
 
+        final SimulationObject ref = simulationObject; // <- use ref (instead of sim...Obj... ) for thread safety
         if (ref != null) {
 
-            requestLayer.paint(graphics, ref);
+            viewerLayers.forEach(v -> v.paint(graphics, ref));
 
-            {
-                // draw vehicles
-                int carwidth = (int) Math.max(3, Math.round(5 / getMeterPerPixel()));
-
-                Map<Integer, List<VehicleContainer>> map = //
-                        ref.vehicles.stream().collect(Collectors.groupingBy(VehicleContainer::getLinkId));
-
-                for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
-                    int size = entry.getValue().size();
-                    OsmLink osmLink = db.getOsmLink(entry.getKey());
-                    Point p1test = getMapPosition(osmLink.getAt(0.5));
-                    if (p1test != null) {
-                        double delta = 1.0 / size;
-                        double sum = 0;
-                        for (VehicleContainer vc : entry.getValue()) {
-
-                            Point p1 = getMapPosition(osmLink.getAt(sum));
-                            if (p1 != null) {
-                                graphics.setColor(vc.avStatus.color);
-                                graphics.fillRect(p1.x, p1.y, carwidth, carwidth);
-
-                                if (vc.destinationLinkId != VehicleContainer.LINK_UNSPECIFIED && //
-                                        drawVehicleDestinations) {
-                                    OsmLink toOsmLink = db.getOsmLink(vc.destinationLinkId);
-                                    // toOsmLink.
-                                    Point p2 = getMapPositionAlways(toOsmLink.getAt(0.5));
-                                    // if (p2 != null)
-                                    {
-                                        Color col = new Color(vc.avStatus.color.getRGB() & (0x40ffffff), true);
-                                        graphics.setColor(col);
-                                        graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
-                                    }
-                                }
-
-                            }
-                            sum += delta;
-
-                        }
-                    }
-                }
-            }
+            infoStrings.clear();
+            viewerLayers.forEach(v -> v.hud(graphics, ref));
 
             jLabel.setText(ref.infoLine);
 
@@ -137,7 +104,32 @@ public class MatsimJMapViewer extends JMapViewer {
                 graphics.setFont(clockFont);
                 graphics.drawString(new SecondsToHMS(ref.now).toDigitalWatch(), 3, 16);
             }
+
+            drawInfoStrings(graphics);
         }
+    }
+
+    private void drawInfoStrings(Graphics2D graphics) {
+        int piy = 40;
+        final int height = 15;
+        graphics.setFont(countFont);
+        FontMetrics fontMetrics = graphics.getFontMetrics();
+        for (InfoString infoString : infoStrings) {
+            graphics.setColor(new Color(255, 255, 255, 192));
+            int width = fontMetrics.stringWidth(infoString.message);
+            graphics.fillRect(0, piy, width, height);
+            graphics.setColor(infoString.color);
+            graphics.drawString(infoString.message, 0, piy + height - 2);
+            piy += height;
+        }
+    }
+    
+    void appendSeparator() {
+        append(new InfoString(""));
+    }
+
+    void append(InfoString infoString) {
+        infoStrings.add(infoString);
     }
 
     public void setSimulationObject(SimulationObject simulationObject) {
@@ -152,15 +144,6 @@ public class MatsimJMapViewer extends JMapViewer {
 
     public boolean getDrawLinks() {
         return drawLinks;
-    }
-
-    public void setDrawVehicleDestinations(boolean selected) {
-        drawVehicleDestinations = selected;
-        repaint();
-    }
-
-    public boolean getDrawVehicleDestinations() {
-        return drawVehicleDestinations;
     }
 
 }

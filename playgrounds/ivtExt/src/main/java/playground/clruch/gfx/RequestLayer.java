@@ -13,20 +13,21 @@ import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 
-public class RequestLayer {
+public class RequestLayer extends ViewerLayer {
 
-    private Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
-    private Font infoFont = new Font(Font.SANS_SERIF, Font.PLAIN, 13);
+    private static Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
+    // ---
     private volatile boolean drawRequestDestinations = true;
 
-    final MatsimJMapViewer matsimJMapViewer;
-
     public RequestLayer(MatsimJMapViewer matsimJMapViewer) {
-        this.matsimJMapViewer = matsimJMapViewer;
+        super(matsimJMapViewer);
     }
 
+    double maxWaitTime;
+
+    @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        double maxWaitTime = 0;
+        maxWaitTime = 0;
         // draw requests
         graphics.setFont(requestsFont);
         Map<Integer, List<RequestContainer>> map = //
@@ -66,18 +67,30 @@ public class RequestLayer {
                         graphics.drawLine(x, y, p2.x, p2.y);
                     }
                 }
-                // if (numRequests<3)
-                {
-                    graphics.setColor(Color.DARK_GRAY);
-                    graphics.drawString("" + numRequests, x, y - numRequests);
-                }
+                graphics.setColor(Color.DARK_GRAY);
+                graphics.drawString("" + numRequests, x, y - numRequests);
             }
         }
-        graphics.setFont(infoFont);
-        graphics.setColor(Color.DARK_GRAY);
-        graphics.drawString("maxWaitTime= " + Math.round(maxWaitTime / 60) + " min", 0, 40);
 
     }
+
+    @Override
+    void hud(Graphics2D graphics, SimulationObject ref) {
+        {
+            InfoString infoString = new InfoString(String.format("%5d %s", //
+                    ref.requests.size(), "open requests"));
+            infoString.color = Color.BLACK;
+            matsimJMapViewer.append(infoString);
+        }
+        {
+            InfoString infoString = new InfoString(String.format("%5d %s", //
+                    Math.round(maxWaitTime / 60), "maxWaitTime [min]"));
+            infoString.color = Color.BLACK;
+            matsimJMapViewer.append(infoString);
+        }
+        matsimJMapViewer.appendSeparator();
+    }
+
     public void setDrawDestinations(boolean selected) {
         drawRequestDestinations = selected;
         matsimJMapViewer.repaint();
