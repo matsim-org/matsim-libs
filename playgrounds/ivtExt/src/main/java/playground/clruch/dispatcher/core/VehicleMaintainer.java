@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -111,6 +112,16 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
+     * @return collection of AVVehicles that are in stay mode
+     */
+    private final Collection<AVVehicle> getStayVehiclesCollection() {
+        return getFunctioningVehicles().stream() //
+                .filter(this::isWithoutDirective) //
+                .filter(v -> Schedules.getLastTask(v.getSchedule()).getStatus().equals(Task.TaskStatus.STARTED)) //
+                .collect(Collectors.toList());
+    }
+
+    /**
      * @return collection of cars that are in the driving state without customer, or stay task.
      *         if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
      *         that invoke assignDirective(...), the vehicle is not included in the successive call to
@@ -163,13 +174,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * dispatchers can update their data structures based on the stay vehicle set
      * function is not meant for issuing directives
      */
-    protected abstract void updateDatastructures();
+    abstract void updateDatastructures(Collection<AVVehicle> stayVehicles);
 
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
 
-        updateDatastructures();
+        updateDatastructures(Collections.unmodifiableCollection(getStayVehiclesCollection()));
 
         if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
             String infoLine = getInfoLine();

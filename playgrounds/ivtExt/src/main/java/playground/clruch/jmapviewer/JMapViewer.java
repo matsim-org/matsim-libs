@@ -53,7 +53,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Vectors for clock-wise tile painting
      */
-    private static final Point[] move = {new Point(1, 0), new Point(0, 1), new Point(-1, 0), new Point(0, -1)};
+    private static final Point[] move = { new Point(1, 0), new Point(0, 1), new Point(-1, 0), new Point(0, -1) };
 
     /** Maximum zoom level */
     public static final int MAX_ZOOM = 22;
@@ -120,8 +120,11 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Creates a new {@link JMapViewer} instance.
-     * @param tileCache The cache where to store tiles
-     * @param downloadThreadCount not used anymore
+     * 
+     * @param tileCache
+     *            The cache where to store tiles
+     * @param downloadThreadCount
+     *            not used anymore
      * @deprecated use {@link #JMapViewer(TileCache)}
      */
     @Deprecated
@@ -131,7 +134,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Creates a new {@link JMapViewer} instance.
-     * @param tileCache The cache where to store tiles
+     * 
+     * @param tileCache
+     *            The cache where to store tiles
      *
      */
     public JMapViewer(TileCache tileCache) {
@@ -244,9 +249,13 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the display position.
-     * @param x X coordinate
-     * @param y Y coordinate
-     * @param zoom zoom level, between {@link #MIN_ZOOM} and {@link #MAX_ZOOM}
+     * 
+     * @param x
+     *            X coordinate
+     * @param y
+     *            Y coordinate
+     * @param zoom
+     *            zoom level, between {@link #MIN_ZOOM} and {@link #MAX_ZOOM}
      */
     public void setDisplayPosition(int x, int y, int zoom) {
         setDisplayPosition(new Point(getWidth() / 2, getHeight() / 2), x, y, zoom);
@@ -254,10 +263,15 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the display position.
-     * @param mapPoint map point
-     * @param x X coordinate
-     * @param y Y coordinate
-     * @param zoom zoom level, between {@link #MIN_ZOOM} and {@link #MAX_ZOOM}
+     * 
+     * @param mapPoint
+     *            map point
+     * @param x
+     *            X coordinate
+     * @param y
+     *            Y coordinate
+     * @param zoom
+     *            zoom level, between {@link #MIN_ZOOM} and {@link #MAX_ZOOM}
      */
     public void setDisplayPosition(Point mapPoint, int x, int y, int zoom) {
         if (zoom > tileController.getTileSource().getMaxZoom() || zoom < MIN_ZOOM)
@@ -286,9 +300,13 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the displayed map pane and zoom level so that all chosen map elements are visible.
-     * @param markers whether to consider markers
-     * @param rectangles whether to consider rectangles
-     * @param polygons whether to consider polygons
+     * 
+     * @param markers
+     *            whether to consider markers
+     * @param rectangles
+     *            whether to consider rectangles
+     * @param polygons
+     *            whether to consider polygons
      */
     public void setDisplayToFitMapElements(boolean markers, boolean rectangles, boolean polygons) {
         int nbElemToCheck = 0;
@@ -399,7 +417,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     }
 
     /**
-     * @param center the center to set
+     * @param center
+     *            the center to set
      */
     public void setCenter(Point center) {
         this.center = center;
@@ -432,8 +451,10 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
      * Converts the relative pixel coordinate (regarding the top left corner of
      * the displayed map) into a latitude / longitude coordinate
      *
-     * @param mapPointX X coordinate
-     * @param mapPointY Y coordinate
+     * @param mapPointX
+     *            X coordinate
+     * @param mapPointY
+     *            Y coordinate
      * @return latitude / longitude
      */
     public ICoordinate getPosition(int mapPointX, int mapPointY) {
@@ -445,15 +466,18 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Calculates the position on the map of a given coordinate
      *
-     * @param lat latitude
-     * @param lon longitude
-     * @param checkOutside check if the point is outside the displayed area
+     * @param lat
+     *            latitude
+     * @param lon
+     *            longitude
+     * @param checkOutside
+     *            check if the point is outside the displayed area
      * @return point on the map or <code>null</code> if the point is not visible
      *         and checkOutside set to <code>true</code>
      */
     public Point getMapPosition(double lat, double lon, boolean checkOutside) {
         Point p = tileSource.latLonToXY(lat, lon, zoom);
-        p.translate(-(center.x - getWidth() / 2), -(center.y - getHeight() /2));
+        p.translate(-(center.x - getWidth() / 2), -(center.y - getHeight() / 2));
 
         if (checkOutside && (p.x < 0 || p.y < 0 || p.x > getWidth() || p.y > getHeight())) {
             return null;
@@ -464,8 +488,10 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Calculates the position on the map of a given coordinate
      *
-     * @param lat latitude
-     * @param lon longitude
+     * @param lat
+     *            latitude
+     * @param lon
+     *            longitude
      * @return point on the map or <code>null</code> if the point is not visible
      */
     public Point getMapPosition(double lat, double lon) {
@@ -475,10 +501,14 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Calculates the position on the map of a given coordinate
      *
-     * @param lat Latitude
-     * @param lon longitude
-     * @param offset Offset respect Latitude
-     * @param checkOutside check if the point is outside the displayed area
+     * @param lat
+     *            Latitude
+     * @param lon
+     *            longitude
+     * @param offset
+     *            Offset respect Latitude
+     * @param checkOutside
+     *            check if the point is outside the displayed area
      * @return Integer the radius in pixels
      */
     public Integer getLatOffset(double lat, double lon, double offset, boolean checkOutside) {
@@ -493,8 +523,10 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Calculates the position on the map of a given coordinate
      *
-     * @param marker MapMarker object that define the x,y coordinate
-     * @param p coordinate
+     * @param marker
+     *            MapMarker object that define the x,y coordinate
+     * @param p
+     *            coordinate
      * @return Integer the radius in pixels
      */
     public Integer getRadius(MapMarker marker, Point p) {
@@ -511,7 +543,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Calculates the position on the map of a given coordinate
      *
-     * @param coord coordinate
+     * @param coord
+     *            coordinate
      * @return point on the map or <code>null</code> if the point is not visible
      */
     public Point getMapPosition(Coordinate coord) {
@@ -524,8 +557,10 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Calculates the position on the map of a given coordinate
      *
-     * @param coord coordinate
-     * @param checkOutside check if the point is outside the displayed area
+     * @param coord
+     *            coordinate
+     * @param checkOutside
+     *            check if the point is outside the displayed area
      * @return point on the map or <code>null</code> if the point is not visible
      *         and checkOutside set to <code>true</code>
      */
@@ -550,8 +585,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
         ICoordinate originCoord = getPosition(origin);
         ICoordinate centerCoord = getPosition(center);
 
-        double mDistance = tileSource.getDistance(originCoord.getLat(), originCoord.getLon(),
-                centerCoord.getLat(), centerCoord.getLon());
+        double mDistance = tileSource.getDistance(originCoord.getLat(), originCoord.getLon(), centerCoord.getLat(), centerCoord.getLon());
 
         return mDistance / pDistance;
     }
@@ -605,6 +639,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
         // paint the tiles in a spiral, starting from center of the map
         boolean painted = true;
         int x = 0;
+        g.setFont(new Font(Font.DIALOG, Font.PLAIN, 10)); // jan added this
         while (painted) {
             painted = false;
             for (int i = 0; i < 4; i++) {
@@ -626,6 +661,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                             tile.paint(g, posx, posy, tilesize, tilesize);
                             if (tileGridVisible) {
                                 g.drawRect(posx, posy, tilesize, tilesize);
+                                g.drawString(String.format("x=%d y=%d", tile.getXtile(), tile.getYtile()), posx, posy + 10);
                             }
                         }
                         painted = true;
@@ -683,13 +719,16 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
         }
 
         attribution.paintAttribution(g, getWidth(), getHeight(), getPosition(0, 0), getPosition(getWidth(), getHeight()), zoom, this);
-        
+
     }
 
     /**
      * Paint a single marker.
-     * @param g Graphics used for painting
-     * @param marker marker to paint
+     * 
+     * @param g
+     *            Graphics used for painting
+     * @param marker
+     *            marker to paint
      */
     protected void paintMarker(Graphics g, MapMarker marker) {
         Point p = getMapPosition(marker.getLat(), marker.getLon(), marker.getMarkerStyle() == MapMarker.STYLE.FIXED);
@@ -723,8 +762,11 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Paint a single rectangle.
-     * @param g Graphics used for painting
-     * @param rectangle rectangle to paint
+     * 
+     * @param g
+     *            Graphics used for painting
+     * @param rectangle
+     *            rectangle to paint
      */
     protected void paintRectangle(Graphics g, MapRectangle rectangle) {
         Coordinate topLeft = rectangle.getTopLeft();
@@ -762,8 +804,11 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Paint a single polygon.
-     * @param g Graphics used for painting
-     * @param polygon polygon to paint
+     * 
+     * @param g
+     *            Graphics used for painting
+     * @param polygon
+     *            polygon to paint
      */
     protected void paintPolygon(Graphics g, MapPolygon polygon) {
         List<? extends ICoordinate> coords = polygon.getPoints();
@@ -838,7 +883,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Increases the current zoom level by one
-     * @param mapPoint point to choose as center for new zoom level
+     * 
+     * @param mapPoint
+     *            point to choose as center for new zoom level
      */
     public void zoomIn(Point mapPoint) {
         setZoom(zoom + 1, mapPoint);
@@ -854,7 +901,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Decreases the current zoom level by one
      *
-     * @param mapPoint point to choose as center for new zoom level
+     * @param mapPoint
+     *            point to choose as center for new zoom level
      */
     public void zoomOut(Point mapPoint) {
         setZoom(zoom - 1, mapPoint);
@@ -863,12 +911,13 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Set the zoom level and center point for display
      *
-     * @param zoom new zoom level
-     * @param mapPoint point to choose as center for new zoom level
+     * @param zoom
+     *            new zoom level
+     * @param mapPoint
+     *            point to choose as center for new zoom level
      */
     public void setZoom(int zoom, Point mapPoint) {
-        if (zoom > tileController.getTileSource().getMaxZoom() || zoom < tileController.getTileSource().getMinZoom()
-                || zoom == this.zoom)
+        if (zoom > tileController.getTileSource().getMaxZoom() || zoom < tileController.getTileSource().getMinZoom() || zoom == this.zoom)
             return;
         ICoordinate zoomPos = getPosition(mapPoint);
         tileController.cancelOutstandingJobs(); // Clearing outstanding load
@@ -881,7 +930,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Set the zoom level
      *
-     * @param zoom new zoom level
+     * @param zoom
+     *            new zoom level
      */
     public void setZoom(int zoom) {
         setZoom(zoom, new Point(getWidth() / 2, getHeight() / 2));
@@ -892,7 +942,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
      * derived implementations for adapting zoom dependent values. The new zoom
      * level can be obtained via {@link #getZoom()}.
      *
-     * @param oldZoom the previous zoom level
+     * @param oldZoom
+     *            the previous zoom level
      */
     protected void zoomChanged(int oldZoom) {
         zoomSlider.setToolTipText("Zoom level " + zoom);
@@ -904,6 +955,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Determines whether the tile grid is visible or not.
+     * 
      * @return {@code true} if the tile grid is visible, {@code false} otherwise
      */
     public boolean isTileGridVisible() {
@@ -912,7 +964,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets whether the tile grid is visible or not.
-     * @param tileGridVisible {@code true} if the tile grid is visible, {@code false} otherwise
+     * 
+     * @param tileGridVisible
+     *            {@code true} if the tile grid is visible, {@code false} otherwise
      */
     public void setTileGridVisible(boolean tileGridVisible) {
         this.tileGridVisible = tileGridVisible;
@@ -921,6 +975,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Determines whether {@link MapMarker}s are painted or not.
+     * 
      * @return {@code true} if {@link MapMarker}s are painted, {@code false} otherwise
      */
     public boolean getMapMarkersVisible() {
@@ -930,7 +985,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Enables or disables painting of the {@link MapMarker}
      *
-     * @param mapMarkersVisible {@code true} to enable painting of markers
+     * @param mapMarkersVisible
+     *            {@code true} to enable painting of markers
      * @see #addMapMarker(MapMarker)
      * @see #getMapMarkerList()
      */
@@ -941,7 +997,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the list of {@link MapMarker}s.
-     * @param mapMarkerList list of {@link MapMarker}s
+     * 
+     * @param mapMarkerList
+     *            list of {@link MapMarker}s
      */
     public void setMapMarkerList(List<MapMarker> mapMarkerList) {
         this.mapMarkerList = mapMarkerList;
@@ -950,6 +1008,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Returns the list of {@link MapMarker}s.
+     * 
      * @return list of {@link MapMarker}s
      */
     public List<MapMarker> getMapMarkerList() {
@@ -958,7 +1017,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the list of {@link MapRectangle}s.
-     * @param mapRectangleList list of {@link MapRectangle}s
+     * 
+     * @param mapRectangleList
+     *            list of {@link MapRectangle}s
      */
     public void setMapRectangleList(List<MapRectangle> mapRectangleList) {
         this.mapRectangleList = mapRectangleList;
@@ -967,6 +1028,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Returns the list of {@link MapRectangle}s.
+     * 
      * @return list of {@link MapRectangle}s
      */
     public List<MapRectangle> getMapRectangleList() {
@@ -975,7 +1037,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the list of {@link MapPolygon}s.
-     * @param mapPolygonList list of {@link MapPolygon}s
+     * 
+     * @param mapPolygonList
+     *            list of {@link MapPolygon}s
      */
     public void setMapPolygonList(List<MapPolygon> mapPolygonList) {
         this.mapPolygonList = mapPolygonList;
@@ -984,6 +1048,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Returns the list of {@link MapPolygon}s.
+     * 
      * @return list of {@link MapPolygon}s
      */
     public List<MapPolygon> getMapPolygonList() {
@@ -992,7 +1057,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Add a {@link MapMarker}.
-     * @param marker map marker to add
+     * 
+     * @param marker
+     *            map marker to add
      */
     public void addMapMarker(MapMarker marker) {
         mapMarkerList.add(marker);
@@ -1001,7 +1068,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Remove a {@link MapMarker}.
-     * @param marker map marker to remove
+     * 
+     * @param marker
+     *            map marker to remove
      */
     public void removeMapMarker(MapMarker marker) {
         mapMarkerList.remove(marker);
@@ -1018,7 +1087,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Add a {@link MapRectangle}.
-     * @param rectangle map rectangle to add
+     * 
+     * @param rectangle
+     *            map rectangle to add
      */
     public void addMapRectangle(MapRectangle rectangle) {
         mapRectangleList.add(rectangle);
@@ -1027,7 +1098,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Remove a {@link MapRectangle}.
-     * @param rectangle map rectangle to remove
+     * 
+     * @param rectangle
+     *            map rectangle to remove
      */
     public void removeMapRectangle(MapRectangle rectangle) {
         mapRectangleList.remove(rectangle);
@@ -1044,7 +1117,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Add a {@link MapPolygon}.
-     * @param polygon map polygon to add
+     * 
+     * @param polygon
+     *            map polygon to add
      */
     public void addMapPolygon(MapPolygon polygon) {
         mapPolygonList.add(polygon);
@@ -1053,7 +1128,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Remove a {@link MapPolygon}.
-     * @param polygon map polygon to remove
+     * 
+     * @param polygon
+     *            map polygon to remove
      */
     public void removeMapPolygon(MapPolygon polygon) {
         mapPolygonList.remove(polygon);
@@ -1070,7 +1147,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets whether zoom controls are displayed or not.
-     * @param visible {@code true} if zoom controls are displayed, {@code false} otherwise
+     * 
+     * @param visible
+     *            {@code true} if zoom controls are displayed, {@code false} otherwise
      */
     public void setZoomContolsVisible(boolean visible) {
         zoomSlider.setVisible(visible);
@@ -1080,6 +1159,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Determines whether zoom controls are displayed or not.
+     * 
      * @return {@code true} if zoom controls are displayed, {@code false} otherwise
      */
     public boolean getZoomControlsVisible() {
@@ -1088,7 +1168,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the tile source.
-     * @param tileSource tile source
+     * 
+     * @param tileSource
+     *            tile source
      */
     public void setTileSource(TileSource tileSource) {
         if (tileSource.getMaxZoom() > MAX_ZOOM)
@@ -1117,6 +1199,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Determines whether the {@link MapRectangle}s are painted or not.
+     * 
      * @return {@code true} if the {@link MapRectangle}s are painted, {@code false} otherwise
      */
     public boolean isMapRectanglesVisible() {
@@ -1126,7 +1209,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Enables or disables painting of the {@link MapRectangle}s.
      *
-     * @param mapRectanglesVisible {@code true} to enable painting of rectangles
+     * @param mapRectanglesVisible
+     *            {@code true} to enable painting of rectangles
      * @see #addMapRectangle(MapRectangle)
      * @see #getMapRectangleList()
      */
@@ -1137,6 +1221,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Determines whether the {@link MapPolygon}s are painted or not.
+     * 
      * @return {@code true} if the {@link MapPolygon}s are painted, {@code false} otherwise
      */
     public boolean isMapPolygonsVisible() {
@@ -1146,7 +1231,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Enables or disables painting of the {@link MapPolygon}s.
      *
-     * @param mapPolygonsVisible {@code true} to enable painting of polygons
+     * @param mapPolygonsVisible
+     *            {@code true} to enable painting of polygons
      * @see #addMapPolygon(MapPolygon)
      * @see #getMapPolygonList()
      */
@@ -1157,6 +1243,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Determines whether scroll wrap is enabled or not.
+     * 
      * @return {@code true} if scroll wrap is enabled, {@code false} otherwise
      */
     public boolean isScrollWrapEnabled() {
@@ -1165,7 +1252,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets whether scroll wrap is enabled or not.
-     * @param scrollWrapEnabled {@code true} if scroll wrap is enabled, {@code false} otherwise
+     * 
+     * @param scrollWrapEnabled
+     *            {@code true} if scroll wrap is enabled, {@code false} otherwise
      */
     public void setScrollWrapEnabled(boolean scrollWrapEnabled) {
         this.scrollWrapEnabled = scrollWrapEnabled;
@@ -1174,6 +1263,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Returns the zoom controls apparence style (horizontal/vertical).
+     * 
      * @return {@link ZOOM_BUTTON_STYLE#VERTICAL} or {@link ZOOM_BUTTON_STYLE#HORIZONTAL}
      */
     public ZOOM_BUTTON_STYLE getZoomButtonStyle() {
@@ -1182,7 +1272,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the zoom controls apparence style (horizontal/vertical).
-     * @param style {@link ZOOM_BUTTON_STYLE#VERTICAL} or {@link ZOOM_BUTTON_STYLE#HORIZONTAL}
+     * 
+     * @param style
+     *            {@link ZOOM_BUTTON_STYLE#VERTICAL} or {@link ZOOM_BUTTON_STYLE#HORIZONTAL}
      */
     public void setZoomButtonStyle(ZOOM_BUTTON_STYLE style) {
         zoomButtonStyle = style;
@@ -1207,6 +1299,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Returns the tile controller.
+     * 
      * @return the tile controller
      */
     public TileController getTileController() {
@@ -1215,6 +1308,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Return tile information caching class
+     * 
      * @return tile cache
      * @see TileController#getTileCache()
      */
@@ -1224,7 +1318,9 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Sets the tile loader.
-     * @param loader tile loader
+     * 
+     * @param loader
+     *            tile loader
      */
     public void setTileLoader(TileLoader loader) {
         tileController.setTileLoader(loader);
@@ -1232,6 +1328,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     /**
      * Returns attribution.
+     * 
      * @return attribution
      */
     public AttributionSupport getAttribution() {
@@ -1239,14 +1336,16 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     }
 
     /**
-     * @param listener listener to set
+     * @param listener
+     *            listener to set
      */
     public void addJMVListener(JMapViewerEventListener listener) {
         evtListenerList.add(JMapViewerEventListener.class, listener);
     }
 
     /**
-     * @param listener listener to remove
+     * @param listener
+     *            listener to remove
      */
     public void removeJMVListener(JMapViewerEventListener listener) {
         evtListenerList.remove(JMapViewerEventListener.class, listener);
@@ -1255,7 +1354,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     /**
      * Send an update to all objects registered with viewer
      *
-     * @param evt event to dispatch
+     * @param evt
+     *            event to dispatch
      */
     private void fireJMVEvent(JMVCommandEvent evt) {
         Object[] listeners = evtListenerList.getListenerList();

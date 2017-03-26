@@ -55,7 +55,7 @@ public class MatsimStaticDatabase {
             ++index;
         }
     }
-    
+
     public int getLinkIndex(Link link) {
         return linkInteger.get(link);
     }
@@ -66,6 +66,10 @@ public class MatsimStaticDatabase {
 
     public Collection<OsmLink> getOsmLinks() {
         return Collections.unmodifiableCollection(list);
+    }
+
+    public int getOsmLinksSize() {
+        return list.size();
     }
 
 }

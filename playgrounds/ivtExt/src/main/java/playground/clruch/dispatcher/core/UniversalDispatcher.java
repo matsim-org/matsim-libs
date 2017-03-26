@@ -8,7 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -80,8 +79,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     @Override
-    protected void updateDatastructures() {
-        getStayVehicles().values().stream().flatMap(Queue::stream).forEach(vehiclesWithCustomer::remove);
+    void updateDatastructures(Collection<AVVehicle> stayVehicles) {
+        stayVehicles.forEach(vehiclesWithCustomer::remove);
     }
 
     /**
@@ -228,6 +227,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             final SimulationObject simulationObject = new SimulationObject();
             simulationObject.infoLine = getInfoLine();
             simulationObject.now = round_now;
+            simulationObject.total_matchedRequests = total_matchedRequests;
             {
                 // REQUESTS
                 for (AVRequest avRequest : getAVRequests()) {

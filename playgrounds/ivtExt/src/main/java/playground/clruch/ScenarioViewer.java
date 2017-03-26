@@ -13,7 +13,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import playground.clruch.gfx.MatsimJMapViewer;
 import playground.clruch.gfx.MatsimStaticDatabase;
-import playground.clruch.gfx.MatsimViewer;
+import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
@@ -28,7 +28,6 @@ public class ScenarioViewer {
     public static void main(String[] args) {
 
         File configFile = new File(args[0]);
-        // final File dir = configFile.getParentFile();
 
         final Network network;
         // TODO potentially use MatsimNetworkReader to only read network?!
@@ -52,7 +51,7 @@ public class ScenarioViewer {
         MatsimJMapViewer matsimJMapViewer = new MatsimJMapViewer(MatsimStaticDatabase.INSTANCE);
         matsimJMapViewer.setTileGridVisible(false);
 
-        MatsimViewer matsimViewer = new MatsimViewer(matsimJMapViewer);
+        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);
 
         // basel
         // getJMapViewer().setDisplayPosition(new Point(), new Coordinate(47.55814, 7.58769), 11);

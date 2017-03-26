@@ -9,6 +9,8 @@ public class SimulationObject implements Serializable {
     public String infoLine = "";
 
     public long now;
+    
+    public int total_matchedRequests;
 
     public List<RequestContainer> requests = new ArrayList<>();
 
