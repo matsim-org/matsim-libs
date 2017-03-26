@@ -11,9 +11,9 @@ public abstract class ViewerLayer {
     public ViewerLayer(MatsimJMapViewer matsimJMapViewer) {
         this.matsimJMapViewer = matsimJMapViewer;
     }
-    
+
     abstract void paint(Graphics2D graphics, SimulationObject ref);
-    
+
     abstract void hud(Graphics2D graphics, SimulationObject ref);
 
 }

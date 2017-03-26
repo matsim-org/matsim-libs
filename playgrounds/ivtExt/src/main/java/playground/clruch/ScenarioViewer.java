@@ -28,7 +28,6 @@ public class ScenarioViewer {
     public static void main(String[] args) {
 
         File configFile = new File(args[0]);
-        // final File dir = configFile.getParentFile();
 
         final Network network;
         // TODO potentially use MatsimNetworkReader to only read network?!
