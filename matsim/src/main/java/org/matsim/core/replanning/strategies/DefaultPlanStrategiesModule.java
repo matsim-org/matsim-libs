@@ -133,7 +133,8 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 	    final String SelectExpBeta="SelectExpBeta";
 	    final String SelectRandom="SelectRandom";
 	    final String SelectPathSizeLogit="SelectPathSizeLogit" ; 
-	    }
+    }
+    
 
     public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, @Deprecated ChangeLegMode, TimeAllocationMutator_ReRoute, 
     	@Deprecated ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, @Deprecated TripSubtourModeChoice }
