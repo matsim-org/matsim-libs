@@ -27,13 +27,12 @@ import playground.tschlenther.parkingSearch.Benenson.BenensonDynLeg;
  * @author Work
  *
  */
-public class MemoryBasedParkingSearchLogic implements ParkingSearchLogic {
+public class SlotMemoryBasedParkingSearchLogic implements ParkingSearchLogic {
 
 	private FacilityBasedParkingManager parkingManager;
 
-	private static final Logger logger = Logger.getLogger(MemoryBasedParkingSearchLogic.class);
+	private static final Logger logger = Logger.getLogger(SlotMemoryBasedParkingSearchLogic.class);
 
-	
 	private Network network;
 	private HashSet<Id<Link>> knownLinks;   
 	
@@ -41,7 +40,7 @@ public class MemoryBasedParkingSearchLogic implements ParkingSearchLogic {
 	 * @param network 
 	 * 
 	 */
-	public MemoryBasedParkingSearchLogic(Network network, FacilityBasedParkingManager fBasedParkingManager) {
+	public SlotMemoryBasedParkingSearchLogic(Network network, FacilityBasedParkingManager fBasedParkingManager) {
 		this.network = network;
 		this.knownLinks = new HashSet<Id<Link>>();
 		this.parkingManager = fBasedParkingManager;
