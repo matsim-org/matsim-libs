@@ -142,8 +142,8 @@ public class LaemmerExample {
         scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
         createNetwork(scenario);
-//        createPopulation(scenario);
-        createTransit(scenario);
+        createPopulation(scenario);
+//        createTransit(scenario);
         createSignals(scenario);
         return scenario;
     }
@@ -156,7 +156,7 @@ public class LaemmerExample {
      * 					 v                                     v
      * 					 7                                    15
      * 					 ^                                     ^
-     * 		   (H1)	     |                (H2)                 |        (H3)
+     * 		   (H1)	     |                (H2)                 |       (H3)
      * 					 v                                     v
      * 1 <----> 2 <----> 3 <----> 4 <----> 5 <----> 10 <----> 11 <----> 12 <----> 13
      * 					 ^                                     ^
