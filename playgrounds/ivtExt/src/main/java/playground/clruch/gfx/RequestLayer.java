@@ -77,17 +77,16 @@ public class RequestLayer extends ViewerLayer {
     @Override
     void hud(Graphics2D graphics, SimulationObject ref) {
         {
-            InfoString infoString = new InfoString(String.format("%5d %s", //
-                    ref.requests.size(), "open requests"));
-            infoString.color = Color.BLACK;
+            InfoString infoString = new InfoString(String.format("%5d %s", ref.requests.size(), "open requests"));
+            infoString.color = Color.BLACK; // new Color(204, 122, 0);
             matsimJMapViewer.append(infoString);
         }
         {
-            InfoString infoString = new InfoString(String.format("%5d %s", //
-                    Math.round(maxWaitTime / 60), "maxWaitTime [min]"));
-            infoString.color = Color.BLACK;
+            InfoString infoString = new InfoString(String.format("%5d %s", Math.round(maxWaitTime / 60), "maxWaitTime [min]"));
+            infoString.color = Color.BLACK; // new Color(255, 102, 0);
             matsimJMapViewer.append(infoString);
         }
+        matsimJMapViewer.append("%5d %s", ref.total_matchedRequests, "matched req.");
         matsimJMapViewer.appendSeparator();
     }
 

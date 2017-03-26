@@ -4,8 +4,6 @@ package playground.clruch.gfx;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -14,14 +12,12 @@ import java.awt.event.MouseEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import playground.clruch.jmapviewer.Coordinate;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.JMapViewerTree;
 import playground.clruch.jmapviewer.OsmTileLoader;
-import playground.clruch.jmapviewer.events.JMVCommandEvent;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.jmapviewer.interfaces.TileLoader;
 import playground.clruch.jmapviewer.interfaces.TileSource;
@@ -31,25 +27,16 @@ import playground.clruch.jmapviewer.tilesources.OsmTileSource;
 /**
  * Demonstrates the usage of {@link JMapViewer}
  *
- * @author Jan Peter Stotz
+ * adapted from code by Jan Peter Stotz
  */
-public class MatsimViewer {
+public class MatsimViewerFrame {
     public final JFrame jFrame = new JFrame();
     private final JMapViewerTree treeMap;
-    private final JLabel zoomLabel;
-    private final JLabel zoomValue;
-    private final JLabel mperpLabelName;
-    private final JLabel mperpLabelValue;
 
     /** Constructs the {@code Demo}. */
-    public MatsimViewer(MatsimJMapViewer matsimJMapViewer) {
+    public MatsimViewerFrame(MatsimJMapViewer matsimJMapViewer) {
 
         treeMap = new JMapViewerTree(matsimJMapViewer, "Zones", false);
-
-        getJMapViewer().addJMVListener(command -> {
-            if (command.getCommand().equals(JMVCommandEvent.COMMAND.ZOOM) || command.getCommand().equals(JMVCommandEvent.COMMAND.MOVE))
-                updateZoomParameters();
-        });
 
         jFrame.setLayout(new BorderLayout());
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,10 +44,7 @@ public class MatsimViewer {
         JPanel panel = new JPanel(new BorderLayout());
         JPanel panelTop = new JPanel();
         JPanel panelBottom = new JPanel();
-        mperpLabelName = new JLabel("Meters/Pixels: ");
-        mperpLabelValue = new JLabel(String.format("%s", getJMapViewer().getMeterPerPixel()));
-        zoomLabel = new JLabel("Zoom: ");
-        zoomValue = new JLabel(String.format("%s", getJMapViewer().getZoom()));
+
         jFrame.add(panel, BorderLayout.NORTH);
         jFrame.add(matsimJMapViewer.jLabel, BorderLayout.SOUTH);
         panel.add(panelTop, BorderLayout.NORTH);
@@ -78,22 +62,28 @@ public class MatsimViewer {
                 getJMapViewer().setTileSource((TileSource) e.getItem());
             }
         });
-        JComboBox<TileLoader> tileLoaderSelector;
-        tileLoaderSelector = new JComboBox<>(new TileLoader[] { new OsmTileLoader(getJMapViewer()) });
-        tileLoaderSelector.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                getJMapViewer().setTileLoader((TileLoader) e.getItem());
-            }
-        });
-        getJMapViewer().setTileLoader((TileLoader) tileLoaderSelector.getSelectedItem());
+//        JComboBox<TileLoader> tileLoaderSelector;
+//        tileLoaderSelector = new JComboBox<>(new TileLoader[] { new OsmTileLoader(getJMapViewer()) });
+//        tileLoaderSelector.addItemListener(new ItemListener() {
+//            @Override
+//            public void itemStateChanged(ItemEvent e) {
+//                getJMapViewer().setTileLoader((TileLoader) e.getItem());
+//            }
+//        });
+//        getJMapViewer().setTileLoader((TileLoader) tileLoaderSelector.getSelectedItem());
         panelTop.add(tileSourceSelector);
-        panelTop.add(tileLoaderSelector);
+//        panelTop.add(tileLoaderSelector);
         // ---
         {
             final JCheckBox jCheckBox = new JCheckBox("links");
             jCheckBox.setSelected(matsimJMapViewer.linkLayer.getDraw());
             jCheckBox.addActionListener(e -> matsimJMapViewer.linkLayer.setDraw(jCheckBox.isSelected()));
+            panelBottom.add(jCheckBox);
+        }
+        {
+            final JCheckBox jCheckBox = new JCheckBox("req.dest");
+            jCheckBox.setSelected(matsimJMapViewer.requestLayer.getDrawDestinations());
+            jCheckBox.addActionListener(e -> matsimJMapViewer.requestLayer.setDrawDestinations(jCheckBox.isSelected()));
             panelBottom.add(jCheckBox);
         }
         {
@@ -103,35 +93,17 @@ public class MatsimViewer {
             panelBottom.add(jCheckBox);
         }
         {
-            final JCheckBox jCheckBox = new JCheckBox("req.dest");
-            jCheckBox.setSelected(matsimJMapViewer.requestLayer.getDrawDestinations());
-            jCheckBox.addActionListener(e -> matsimJMapViewer.requestLayer.setDrawDestinations(jCheckBox.isSelected()));
+            final JCheckBox jCheckBox = new JCheckBox("tree");
+            jCheckBox.addActionListener(e -> treeMap.setTreeVisible(jCheckBox.isSelected()));
             panelBottom.add(jCheckBox);
         }
-        //
-        final JCheckBox showTreeLayers = new JCheckBox("Tree");
-        showTreeLayers.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                treeMap.setTreeVisible(showTreeLayers.isSelected());
-            }
-        });
-        panelBottom.add(showTreeLayers);
+        {
+            final JCheckBox jCheckBox = new JCheckBox("grid");
+            jCheckBox.setSelected(getJMapViewer().isTileGridVisible());
+            jCheckBox.addActionListener(e -> getJMapViewer().setTileGridVisible(jCheckBox.isSelected()));
+            panelBottom.add(jCheckBox);
+        }
 
-        final JCheckBox showTileGrid = new JCheckBox("grid");
-        showTileGrid.setSelected(getJMapViewer().isTileGridVisible());
-        showTileGrid.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getJMapViewer().setTileGridVisible(showTileGrid.isSelected());
-            }
-        });
-        panelBottom.add(showTileGrid);
-
-        panelTop.add(zoomLabel);
-        panelTop.add(zoomValue);
-        panelTop.add(mperpLabelName);
-        panelTop.add(mperpLabelValue);
         jFrame.add(treeMap, BorderLayout.CENTER);
 
         getJMapViewer().addMouseListener(new MouseAdapter() {
@@ -164,13 +136,6 @@ public class MatsimViewer {
 
     private JMapViewer getJMapViewer() {
         return treeMap.getViewer();
-    }
-
-    private void updateZoomParameters() {
-        if (mperpLabelValue != null)
-            mperpLabelValue.setText(String.format("%10.2e", getJMapViewer().getMeterPerPixel()));
-        if (zoomValue != null)
-            zoomValue.setText(String.format("%s", getJMapViewer().getZoom()));
     }
 
     public void setDisplayPosition(double lat, double lon, int zoom) {

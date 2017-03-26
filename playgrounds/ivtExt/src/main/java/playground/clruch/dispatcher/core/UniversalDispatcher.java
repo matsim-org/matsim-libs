@@ -227,6 +227,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             final SimulationObject simulationObject = new SimulationObject();
             simulationObject.infoLine = getInfoLine();
             simulationObject.now = round_now;
+            simulationObject.total_matchedRequests = total_matchedRequests;
             {
                 // REQUESTS
                 for (AVRequest avRequest : getAVRequests()) {

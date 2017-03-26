@@ -33,8 +33,7 @@ public class LinkLayer extends ViewerLayer {
 
     @Override
     void hud(Graphics2D graphics, SimulationObject ref) {
-        matsimJMapViewer.append(new InfoString(String.format("%5d streets", //
-                matsimJMapViewer.db.getOsmLinksSize())));
+        matsimJMapViewer.append("%5d streets", matsimJMapViewer.db.getOsmLinksSize());
         matsimJMapViewer.appendSeparator();
     }
 

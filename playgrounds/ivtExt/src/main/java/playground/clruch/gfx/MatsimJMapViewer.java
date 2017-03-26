@@ -22,7 +22,7 @@ public class MatsimJMapViewer extends JMapViewer {
 
     final MatsimStaticDatabase db;
 
-    public volatile int alpha = 196;
+    public volatile int alpha = 196 - 32;
 
     SimulationObject simulationObject = null;
 
@@ -65,15 +65,19 @@ public class MatsimJMapViewer extends JMapViewer {
         graphics.setColor(new Color(255, 255, 255, alpha));
         graphics.fillRect(0, 0, dimension.width, dimension.height);
 
-        final SimulationObject ref = simulationObject; // <- use ref (instead of sim...Obj... ) for thread safety
+        final SimulationObject ref = simulationObject; // <- use ref for thread safety
         if (ref != null) {
 
             infoStrings.clear();
-            append(new InfoString(new SecondsToHMS(ref.now).toDigitalWatch()));
+            append(new SecondsToHMS(ref.now).toDigitalWatch());
             appendSeparator();
 
             viewerLayers.forEach(v -> v.paint(graphics, ref));
             viewerLayers.forEach(v -> v.hud(graphics, ref));
+
+            append("%5d zoom", getZoom());
+            append("%5d m/pixel", (int) Math.ceil(getMeterPerPixel()));
+            appendSeparator();
 
             jLabel.setText(ref.infoLine);
 
@@ -104,6 +108,10 @@ public class MatsimJMapViewer extends JMapViewer {
 
     void appendSeparator() {
         append(new InfoString(""));
+    }
+
+    void append(String format, Object... args) {
+        append(new InfoString(String.format(format, args)));
     }
 
     void append(InfoString infoString) {
