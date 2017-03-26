@@ -54,7 +54,7 @@ public class RequestLayer extends ViewerLayer {
                         int piy = y - index;
                         int wid = (int) waitTime / 10;
                         int left = x - wid / 2;
-                        graphics.drawLine(left, piy, left + wid, piy);
+//                        graphics.drawLine(left, piy, left + wid, piy);
                         --index;
                     }
                 }

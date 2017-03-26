@@ -9,6 +9,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -22,6 +23,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
+import playground.clruch.gheat.HeatMap;
+import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.jmapviewer.events.JMVCommandEvent;
 import playground.clruch.jmapviewer.events.JMVCommandEvent.COMMAND;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
@@ -72,6 +75,10 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     protected boolean scrollWrapEnabled;
 
     protected transient TileController tileController;
+    
+//    protected HeatMapDataSource dataSource; // jan added this
+    protected DataManager dataManager; // jan added this
+ 
 
     /**
      * x- and y-position of the center of this map-panel on the world map
@@ -659,6 +666,14 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                         }
                         if (tile != null) {
                             tile.paint(g, posx, posy, tilesize, tilesize);
+                            try {
+                                BufferedImage img = HeatMap.GetTile(dataManager, "classic", // 
+                                        zoom, tile.getXtile(), tile.getYtile(), false, 64);
+                                g.drawImage(img, posx, posy, this);
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
                             if (tileGridVisible) {
                                 g.drawRect(posx, posy, tilesize, tilesize);
                                 g.drawString(String.format("x=%d y=%d", tile.getXtile(), tile.getYtile()), posx, posy + 10);
