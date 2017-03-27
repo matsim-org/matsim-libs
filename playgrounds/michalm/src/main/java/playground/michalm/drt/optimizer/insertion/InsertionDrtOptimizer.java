@@ -36,7 +36,7 @@ import playground.michalm.drt.run.DrtConfigGroup;
  */
 public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 	private final DrtConfigGroup drtCfg;
-	
+
 	private final FastMultiNodeDijkstra router;
 	private final BackwardFastMultiNodeDijkstra backwardRouter;
 
@@ -46,7 +46,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 			InsertionDrtOptimizerParams params) {
 		super(optimContext, params, new TreeSet<NDrtRequest>(Requests.ABSOLUTE_COMPARATOR));
 		this.drtCfg = drtCfg;
-		
+
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
 		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		// preProcessDijkstra.run(optimContext.network);
@@ -80,10 +80,11 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 			NDrtRequest req = reqIter.next();
 			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
 			if (best == null) {
-				//throw new RuntimeException("No feasible solution");
+				// throw new RuntimeException("No feasible solution");
+			} else {
+				getOptimContext().scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
+				vData.updateEntry(best.vehicleEntry);
 			}
-			getOptimContext().scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
-			vData.updateEntry(best.vehicleEntry);
 			reqIter.remove();
 		}
 	}
