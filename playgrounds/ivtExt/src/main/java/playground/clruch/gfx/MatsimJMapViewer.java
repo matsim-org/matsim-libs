@@ -10,12 +10,22 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.clruch.gheat.PointLatLng;
+import playground.clruch.gheat.datasources.DataManager;
+import playground.clruch.gheat.datasources.FileDataSource;
+import playground.clruch.gheat.datasources.HeatMapDataSource;
+import playground.clruch.gheat.graphics.ThemeManager;
 import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.net.OsmLink;
+import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 
 public class MatsimJMapViewer extends JMapViewer {
@@ -36,6 +46,7 @@ public class MatsimJMapViewer extends JMapViewer {
     private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
 
     public JLabel jLabel = new JLabel(" ");
+    final MatsimDataSource matsimDataSource = new MatsimDataSource();
 
     public MatsimJMapViewer(MatsimStaticDatabase db) {
         this.db = db;
@@ -47,6 +58,17 @@ public class MatsimJMapViewer extends JMapViewer {
         viewerLayers.add(linkLayer);
         viewerLayers.add(requestLayer);
         viewerLayers.add(vehicleLayer);
+
+        try {
+            ThemeManager.init("/home/datahaki/3rdparty/GHEAT-JAVA/JavaHeatMaps/heatmaps/src/main/resources/res/etc");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        HeatMapDataSource dataSource = new FileDataSource( //
+                "/home/datahaki/3rdparty/GHEAT-JAVA/JavaHeatMaps/heatmaps/src/main/resources/points.txt", 2, 1, 0);
+
+        dataManager = new DataManager(matsimDataSource);
+
     }
 
     final Point getMapPosition(Coord coord) {
@@ -59,13 +81,28 @@ public class MatsimJMapViewer extends JMapViewer {
 
     @Override
     protected void paintComponent(Graphics g) {
+        final SimulationObject ref = simulationObject; // <- use ref for thread safety
+
+        if (ref != null) {
+            matsimDataSource.clear();
+            Map<Integer, List<RequestContainer>> map = ref.requests.stream().collect(Collectors.groupingBy(r -> r.fromLinkId));
+            // map.entrySet();
+            for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
+                OsmLink osmLink = db.getOsmLink(entry.getKey());
+                final int size = entry.getValue().size();
+                for (int count = 0; count < size; ++count) {
+                    Coord coord = osmLink.getAt(count / (double) size);
+                    matsimDataSource.addPoint(new PointLatLng(coord.getX(), coord.getY(), 0));
+                }
+            }
+        }
+
         super.paintComponent(g);
         Dimension dimension = getSize();
         Graphics2D graphics = (Graphics2D) g;
         graphics.setColor(new Color(255, 255, 255, alpha));
         graphics.fillRect(0, 0, dimension.width, dimension.height);
 
-        final SimulationObject ref = simulationObject; // <- use ref for thread safety
         if (ref != null) {
 
             infoStrings.clear();
