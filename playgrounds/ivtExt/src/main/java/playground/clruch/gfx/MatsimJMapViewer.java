@@ -18,10 +18,9 @@ import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.clruch.ResourceLocator;
 import playground.clruch.gheat.PointLatLng;
 import playground.clruch.gheat.datasources.DataManager;
-import playground.clruch.gheat.datasources.FileDataSource;
-import playground.clruch.gheat.datasources.HeatMapDataSource;
 import playground.clruch.gheat.graphics.ThemeManager;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.net.OsmLink;
@@ -60,12 +59,12 @@ public class MatsimJMapViewer extends JMapViewer {
         viewerLayers.add(vehicleLayer);
 
         try {
-            ThemeManager.init("/home/datahaki/3rdparty/GHEAT-JAVA/JavaHeatMaps/heatmaps/src/main/resources/res/etc");
+            ThemeManager.init(ResourceLocator.INSTANCE.gheatDirectory.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        HeatMapDataSource dataSource = new FileDataSource( //
-                "/home/datahaki/3rdparty/GHEAT-JAVA/JavaHeatMaps/heatmaps/src/main/resources/points.txt", 2, 1, 0);
+        // HeatMapDataSource dataSource = new FileDataSource( //
+        // "/home/datahaki/3rdparty/GHEAT-JAVA/JavaHeatMaps/heatmaps/src/main/resources/points.txt", 2, 1, 0);
 
         dataManager = new DataManager(matsimDataSource);
 
