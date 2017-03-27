@@ -32,7 +32,7 @@ import org.matsim.pt.router.TransitActsRemover;
  * @author jbischoff
  *
  */
-public class RemoveBSWBPTRoutes {
+public class RemovePTRoutes {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
