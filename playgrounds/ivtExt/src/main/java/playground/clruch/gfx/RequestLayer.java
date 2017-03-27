@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.matsim.api.core.v01.Coord;
+
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
@@ -17,7 +19,9 @@ public class RequestLayer extends ViewerLayer {
 
     private static Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
     // ---
-    private volatile boolean drawRequestDestinations = true;
+    private volatile boolean drawRequestDestinations = false;
+
+    MatsimHeatMap requestHeatMap = new MatsimHeatMap("red", 128);
 
     public RequestLayer(MatsimJMapViewer matsimJMapViewer) {
         super(matsimJMapViewer);
@@ -26,12 +30,28 @@ public class RequestLayer extends ViewerLayer {
     double maxWaitTime;
 
     @Override
+    public void perpareHeatmaps(SimulationObject ref) {
+        requestHeatMap.clear();
+        Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
+                .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
+        for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
+            OsmLink osmLink = matsimJMapViewer.db.getOsmLink(entry.getKey());
+            final int size = entry.getValue().size();
+            for (int count = 0; count < size; ++count) {
+                Coord coord = osmLink.getAt(count / (double) size);
+                requestHeatMap.addPoint(coord.getX(), coord.getY());
+            }
+        }
+
+    }
+
+    @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
         maxWaitTime = 0;
         // draw requests
         graphics.setFont(requestsFont);
-        Map<Integer, List<RequestContainer>> map = //
-                ref.requests.stream().collect(Collectors.groupingBy(rc -> rc.fromLinkId));
+        Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
+                .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
         for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
             Point p1;
             {
@@ -54,14 +74,14 @@ public class RequestLayer extends ViewerLayer {
                         int piy = y - index;
                         int wid = (int) waitTime / 10;
                         int left = x - wid / 2;
-//                        graphics.drawLine(left, piy, left + wid, piy);
+                        // graphics.drawLine(left, piy, left + wid, piy);
                         --index;
                     }
                 }
                 if (drawRequestDestinations) {
                     graphics.setColor(new Color(128, 128, 128, 64));
                     for (RequestContainer rc : entry.getValue()) {
-                        int linkId = rc.toLinkId;
+                        int linkId = rc.toLinkIndex;
                         OsmLink osmLink = matsimJMapViewer.db.getOsmLink(linkId);
                         Point p2 = matsimJMapViewer.getMapPositionAlways(osmLink.getAt(0.5));
                         graphics.drawLine(x, y, p2.x, p2.y);

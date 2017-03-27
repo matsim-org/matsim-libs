@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import playground.clruch.export.AVStatus;
+import playground.clruch.net.AbstractContainer;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.VehicleContainer;
@@ -38,9 +39,9 @@ public class VehicleLayer extends ViewerLayer {
                     if (p1 != null) {
                         graphics.setColor(vc.avStatus.color);
                         graphics.fillRect(p1.x, p1.y, carwidth, carwidth);
-                        if (vc.destinationLinkId != VehicleContainer.LINK_UNSPECIFIED && //
+                        if (vc.destinationLinkIndex != AbstractContainer.LINK_UNSPECIFIED && //
                                 drawVehicleDestinations) {
-                            OsmLink toOsmLink = matsimJMapViewer.db.getOsmLink(vc.destinationLinkId);
+                            OsmLink toOsmLink = matsimJMapViewer.db.getOsmLink(vc.destinationLinkIndex);
                             Point p2 = matsimJMapViewer.getMapPositionAlways(toOsmLink.getAt(0.5));
                             Color col = new Color(vc.avStatus.color.getRGB() & (0x60ffffff), true);
                             graphics.setColor(col);

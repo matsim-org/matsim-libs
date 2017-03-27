@@ -3,26 +3,35 @@ package playground.clruch.gfx;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import playground.clruch.jmapviewer.Coordinate;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.JMapViewerTree;
-import playground.clruch.jmapviewer.OsmTileLoader;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
-import playground.clruch.jmapviewer.interfaces.TileLoader;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
 import playground.clruch.jmapviewer.tilesources.OsmTileSource;
+import playground.clruch.net.StorageSupplier;
 
 /**
  * Demonstrates the usage of {@link JMapViewer}
@@ -30,17 +39,21 @@ import playground.clruch.jmapviewer.tilesources.OsmTileSource;
  * adapted from code by Jan Peter Stotz
  */
 public class MatsimViewerFrame {
+    Timer timer = new Timer();
     public final JFrame jFrame = new JFrame();
     private final JMapViewerTree treeMap;
 
     /** Constructs the {@code Demo}. */
     public MatsimViewerFrame(MatsimJMapViewer matsimJMapViewer) {
-
         treeMap = new JMapViewerTree(matsimJMapViewer, "Zones", false);
-
         jFrame.setLayout(new BorderLayout());
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        jFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                timer.cancel();
+            }
+        });
         JPanel panel = new JPanel(new BorderLayout());
         JPanel panelTop = new JPanel();
         JPanel panelBottom = new JPanel();
@@ -62,17 +75,43 @@ public class MatsimViewerFrame {
                 getJMapViewer().setTileSource((TileSource) e.getItem());
             }
         });
-//        JComboBox<TileLoader> tileLoaderSelector;
-//        tileLoaderSelector = new JComboBox<>(new TileLoader[] { new OsmTileLoader(getJMapViewer()) });
-//        tileLoaderSelector.addItemListener(new ItemListener() {
-//            @Override
-//            public void itemStateChanged(ItemEvent e) {
-//                getJMapViewer().setTileLoader((TileLoader) e.getItem());
-//            }
-//        });
-//        getJMapViewer().setTileLoader((TileLoader) tileLoaderSelector.getSelectedItem());
         panelTop.add(tileSourceSelector);
-//        panelTop.add(tileLoaderSelector);
+        {
+            StorageSupplier storageSupplier = StorageSupplier.getDefault();
+            final int size = storageSupplier.size();
+            if (size == 0) {
+                panelTop.add(new JLabel("no playback"));
+            } else {
+                System.out.println("points to playback = " + size);
+                JSlider jSlider = new JSlider(0, size - 1, 0);
+                jSlider.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        int index = jSlider.getValue();
+                        try {
+                            matsimJMapViewer.simulationObject = storageSupplier.getSimulationObject(index);
+                            matsimJMapViewer.repaint();
+                        } catch (Exception exception) {
+                            System.out.println("cannot load: " + index);
+                        }
+                    }
+                });
+                jSlider.setPreferredSize(new Dimension(400, 30));
+                panelTop.add(jSlider);
+
+                JToggleButton jToggleButton = new JToggleButton("auto");
+                panelTop.add(jToggleButton);
+
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (jToggleButton.isSelected())
+                            jSlider.setValue(jSlider.getValue() + 1);
+                    }
+                }, 10, 333);
+
+            }
+        }
         // ---
         {
             final JCheckBox jCheckBox = new JCheckBox("links");

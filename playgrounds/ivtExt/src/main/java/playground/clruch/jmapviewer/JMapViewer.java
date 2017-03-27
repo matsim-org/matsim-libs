@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +24,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
+import playground.clruch.gfx.MatsimHeatMap;
 import playground.clruch.gheat.HeatMap;
 import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.jmapviewer.events.JMVCommandEvent;
@@ -75,10 +77,10 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     protected boolean scrollWrapEnabled;
 
     protected transient TileController tileController;
-    
-//    protected HeatMapDataSource dataSource; // jan added this
-    protected DataManager dataManager; // jan added this
- 
+
+    // protected DataManager dataManager; // jan added this
+
+    protected List<MatsimHeatMap> matsimHeatmaps = new ArrayList<>();
 
     /**
      * x- and y-position of the center of this map-panel on the world map
@@ -665,15 +667,11 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                             tile = tileController.getTile(tilex, tiley, zoom);
                         }
                         if (tile != null) {
-                            tile.paint(g, posx, posy, tilesize, tilesize);
-                            try {
-                                BufferedImage img = HeatMap.GetTile(dataManager, "classic", // 
-                                        zoom, tile.getXtile(), tile.getYtile(), false, 64);
-                                g.drawImage(img, posx, posy, this);
-                            } catch (Exception e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+                            tile.paint(g, posx, posy); // , tilesize, tilesize
+
+                            for (MatsimHeatMap matsimHeatmap : matsimHeatmaps)
+                                matsimHeatmap.render(g, tile, zoom, posx, posy);
+
                             if (tileGridVisible) {
                                 g.drawRect(posx, posy, tilesize, tilesize);
                                 g.drawString(String.format("x=%d y=%d", tile.getXtile(), tile.getYtile()), posx, posy + 10);

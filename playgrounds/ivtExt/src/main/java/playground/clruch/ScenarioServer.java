@@ -32,6 +32,9 @@ public class ScenarioServer {
 
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
 
+        // set to true in order to make server wait for viewer client:
+        SimulationServer.INSTANCE.setWaitForClients(false);
+
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 

@@ -12,6 +12,9 @@ public abstract class ViewerLayer {
         this.matsimJMapViewer = matsimJMapViewer;
     }
 
+    public void perpareHeatmaps(SimulationObject ref) {        
+    }
+
     abstract void paint(Graphics2D graphics, SimulationObject ref);
 
     abstract void hud(Graphics2D graphics, SimulationObject ref);

@@ -26,7 +26,8 @@ import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.net.SimulationSubscriber;
-import playground.clruch.net.SimulationSubscriberSet;
+import playground.clruch.net.SimulationClientSet;
+import playground.clruch.net.StorageSubscriber;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
@@ -210,17 +211,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     @Override
     protected final void notifySimulationSubscribers(long round_now) {
-        if (SimulationServer.INSTANCE.isRunning() && //
-                round_now % publishPeriod == 0 && 0 < getAVRequests().size()) { // TODO not final criteria
-            if (SimulationSubscriberSet.INSTANCE.isEmpty())
-                System.out.println("waiting for connections...");
-            // block for connections
-            while (SimulationSubscriberSet.INSTANCE.isEmpty())
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
+        if (round_now % publishPeriod == 0) {
 
             final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
 
@@ -232,10 +224,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 // REQUESTS
                 for (AVRequest avRequest : getAVRequests()) {
                     RequestContainer requestContainer = new RequestContainer();
-                    requestContainer.requestId = avRequest.getId().toString();
-                    requestContainer.fromLinkId = db.getLinkIndex(avRequest.getFromLink());
+                    requestContainer.requestIndex = db.getRequestIndex(avRequest);
+                    requestContainer.fromLinkIndex = db.getLinkIndex(avRequest.getFromLink());
                     requestContainer.submissionTime = avRequest.getSubmissionTime();
-                    requestContainer.toLinkId = db.getLinkIndex(avRequest.getToLink());
+                    requestContainer.toLinkIndex = db.getLinkIndex(avRequest.getToLink());
                     simulationObject.requests.add(requestContainer);
                 }
             }
@@ -249,9 +241,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     final String key = avVehicle.getId().toString();
                     final Link fromLink = AVLocation.of(avVehicle);
                     if (fromLink != null) {
-                        vehicleContainer.linkId = db.getLinkIndex(fromLink);
+                        vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
+                        vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
                         vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
-                        vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
+                        vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
                         vehicleMap.put(key, vehicleContainer);
                     } else {
                         System.out.println("location extraction fail (1):");
@@ -265,9 +258,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     final String key = avVehicle.getId().toString();
                     final Link fromLink = AVLocation.of(avVehicle);
                     if (fromLink != null) {
-                        vehicleContainer.linkId = db.getLinkIndex(fromLink);
+                        vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
+                        vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
                         vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
-                        vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
+                        vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
                         vehicleMap.put(key, vehicleContainer);
                     } else {
                         System.out.println("location extraction fail (2):");
@@ -280,12 +274,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     final String key = vlp.avVehicle.getId().toString();
                     if (!vehicleMap.containsKey(key)) {
                         VehicleContainer vehicleContainer = new VehicleContainer();
-                        vehicleContainer.linkId = db.getLinkIndex(vlp.linkTimePair.link);
+                        vehicleContainer.vehicleIndex = db.getVehicleIndex(vlp.avVehicle);
+                        vehicleContainer.linkIndex = db.getLinkIndex(vlp.linkTimePair.link);
                         if (vlp.isVehicleInStayTask()) {
                             vehicleContainer.avStatus = AVStatus.STAY;
                         } else {
                             vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
-                            vehicleContainer.destinationLinkId = db.getLinkIndex(vlp.getCurrentDriveDestination());
+                            vehicleContainer.destinationLinkIndex = db.getLinkIndex(vlp.getCurrentDriveDestination());
                         }
                         vehicleMap.put(key, vehicleContainer);
                     }
@@ -294,8 +289,21 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
             }
 
-            // TODO store simulationObject alle 1000 Sekunden ein anderes Verzeichnis
-            for (SimulationSubscriber simulationSubscriber : SimulationSubscriberSet.INSTANCE)
+            new StorageSubscriber().handle(simulationObject);
+
+            if (SimulationServer.INSTANCE.getWaitForClients()) { // <- server is running && wait for clients is set
+                if (SimulationClientSet.INSTANCE.isEmpty())
+                    System.out.println("waiting for connections...");
+                // block for connections
+                while (SimulationClientSet.INSTANCE.isEmpty())
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+            }
+            
+            for (SimulationSubscriber simulationSubscriber : SimulationClientSet.INSTANCE)
                 simulationSubscriber.handle(simulationObject);
         }
     }
