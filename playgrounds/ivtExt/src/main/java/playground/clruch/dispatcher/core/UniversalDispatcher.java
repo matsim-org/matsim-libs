@@ -26,7 +26,8 @@ import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.net.SimulationSubscriber;
-import playground.clruch.net.SimulationSubscriberSet;
+import playground.clruch.net.SimulationClientSet;
+import playground.clruch.net.StorageSubscriber;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
@@ -210,17 +211,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     @Override
     protected final void notifySimulationSubscribers(long round_now) {
-        if (SimulationServer.INSTANCE.isRunning() && //
-                round_now % publishPeriod == 0 && 0 < getAVRequests().size()) { // TODO not final criteria
-            if (SimulationSubscriberSet.INSTANCE.isEmpty())
-                System.out.println("waiting for connections...");
-            // block for connections
-            while (SimulationSubscriberSet.INSTANCE.isEmpty())
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        // TODO not final criteria
+        if (round_now % publishPeriod == 0) { // TODO not final criteria
 
             final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
 
@@ -231,7 +223,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             {
                 // REQUESTS
                 for (AVRequest avRequest : getAVRequests()) {
-                    RequestContainer requestContainer = new RequestContainer();                     
+                    RequestContainer requestContainer = new RequestContainer();
                     requestContainer.requestIndex = db.getRequestIndex(avRequest);
                     requestContainer.fromLinkIndex = db.getLinkIndex(avRequest.getFromLink());
                     requestContainer.submissionTime = avRequest.getSubmissionTime();
@@ -297,7 +289,20 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
             }
 
-            for (SimulationSubscriber simulationSubscriber : SimulationSubscriberSet.INSTANCE)
+            new StorageSubscriber().handle(simulationObject);
+
+            if (SimulationServer.INSTANCE.getWaitForClients()) { // <- server is running && wait for clients is set
+                if (SimulationClientSet.INSTANCE.isEmpty())
+                    System.out.println("waiting for connections...");
+                // block for connections
+                while (SimulationClientSet.INSTANCE.isEmpty())
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+            }            
+            for (SimulationSubscriber simulationSubscriber : SimulationClientSet.INSTANCE)
                 simulationSubscriber.handle(simulationObject);
         }
     }

@@ -24,7 +24,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
-import playground.clruch.gfx.MatsimHeatmap;
+import playground.clruch.gfx.MatsimHeatMap;
 import playground.clruch.gheat.HeatMap;
 import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.jmapviewer.events.JMVCommandEvent;
@@ -80,7 +80,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     // protected DataManager dataManager; // jan added this
 
-    protected List<MatsimHeatmap> matsimHeatmaps = new ArrayList<>();
+    protected List<MatsimHeatMap> matsimHeatmaps = new ArrayList<>();
 
     /**
      * x- and y-position of the center of this map-panel on the world map
@@ -669,7 +669,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                         if (tile != null) {
                             tile.paint(g, posx, posy); // , tilesize, tilesize
 
-                            for (MatsimHeatmap matsimHeatmap : matsimHeatmaps)
+                            for (MatsimHeatMap matsimHeatmap : matsimHeatmaps)
                                 matsimHeatmap.render(g, tile, zoom, posx, posy);
 
                             if (tileGridVisible) {

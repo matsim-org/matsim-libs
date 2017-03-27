@@ -1,5 +1,6 @@
 package playground.clruch.net;
 
+import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -16,7 +17,7 @@ public class ObjectSocket implements AutoCloseable, SimulationSubscriber {
             // flush the stream immediately to ensure that constructors for receiving ObjectInputStreams will not block when reading the header
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             objectOutputStream.flush();
-            SimulationSubscriberSet.INSTANCE.add(this); // TODO not the right location
+            SimulationClientSet.INSTANCE.add(this); // TODO not the right location
         } catch (Exception myException) {
             myException.printStackTrace();
         }
@@ -27,11 +28,13 @@ public class ObjectSocket implements AutoCloseable, SimulationSubscriber {
                     if (objectInputStream == null)
                         // constructor blocks until the corresponding ObjectOutputStream has written and flushed the header
                         objectInputStream = new ObjectInputStream(socket.getInputStream());
-                    
+
                     while (launched) {
                         Object myObject = objectInputStream.readObject(); // blocking, might give EOFException
                         System.out.println("object received");
                     }
+                } catch (EOFException eofException) {
+                    System.out.println("client has disconnected");
                 } catch (Exception exception) {
                     if (launched)
                         exception.printStackTrace();
@@ -44,13 +47,13 @@ public class ObjectSocket implements AutoCloseable, SimulationSubscriber {
                 }
             }
         });
-        
+
         myThread.start();
     }
 
     @Override
     public void close() throws Exception {
-        SimulationSubscriberSet.INSTANCE.remove(this);
+        SimulationClientSet.INSTANCE.remove(this);
         socket.close();
     }
 

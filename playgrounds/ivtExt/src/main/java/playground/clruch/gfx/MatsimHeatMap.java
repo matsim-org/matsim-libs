@@ -11,7 +11,7 @@ import playground.clruch.gheat.PointLatLng;
 import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.jmapviewer.Tile;
 
-public class MatsimHeatmap {
+public class MatsimHeatMap {
     final MatsimDataSource matsimDataSource = new MatsimDataSource();
     final DataManager dataManager = new DataManager(matsimDataSource);
     final ImageObserver imageObserver = new JLabel();
@@ -20,7 +20,7 @@ public class MatsimHeatmap {
     boolean show = true;
     int defaultOpacity;
 
-    public MatsimHeatmap(String colorScheme, int defaultOpacity) {
+    public MatsimHeatMap(String colorScheme, int defaultOpacity) {
         this.colorScheme = colorScheme;
         this.defaultOpacity = defaultOpacity;
     }
