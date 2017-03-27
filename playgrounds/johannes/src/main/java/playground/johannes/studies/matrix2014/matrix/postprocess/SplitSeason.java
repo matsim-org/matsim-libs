@@ -48,9 +48,9 @@ public class SplitSeason {
 
     public static void main(String args[]) throws IOException {
         String sourceFile = args[0];//"/Users/johannes/gsv/matrix2014/sim/output/1E7/gsv-matrix.txt";
-        String targetFile = args[3];//"/Users/johannes/gsv/matrix2014/sim/output/1E7/gsv-matrix-season.txt";
         String shareFile = args[1];//"/Users/johannes/gsv/matrix2014/sim/output/season-share.txt";
         String zoneFile = args[2];//"/Users/johannes/gsv/gis/zones/geojson/tomtom.de.gk3.geojson";
+        String targetFile = args[3];//"/Users/johannes/gsv/matrix2014/sim/output/1E7/gsv-matrix-season.txt";
         /*
         Load share table.
          */
