@@ -22,6 +22,7 @@ public class LPVehicleRebalancing {
     // TODO generalize this to "objective weights"
     Map<VirtualLink, Double> travelTimes;
     glp_prob lp;
+    glp_smcp parm = new glp_smcp();
     final int n;
 
 
@@ -173,6 +174,7 @@ public class LPVehicleRebalancing {
      */
     public void closeLP() {
         // release storage allocated for LP
+        parm.delete();
         GLPK.glp_delete_prob(lp);
         System.out.println("Book instance is getting destroyed");
     }
@@ -192,9 +194,8 @@ public class LPVehicleRebalancing {
 
         // Solve model
         GLPK.glp_write_lp(lp, null, "networklinearprogram_updated.lp");
-        glp_smcp parm = new glp_smcp();
         GLPK.glp_init_smcp(parm);
-        int ret = GLPK.glp_simplex(lp, parm);
+        int ret = GLPK.glp_simplex(lp,parm);
 
         // Retrieve solution
         // TODO check if ret == 0 functions properly or not
@@ -217,7 +218,6 @@ public class LPVehicleRebalancing {
         } else {
             return Array.zeros(virtualNetwork.getvLinksCount());
         }
-
 
     }
 

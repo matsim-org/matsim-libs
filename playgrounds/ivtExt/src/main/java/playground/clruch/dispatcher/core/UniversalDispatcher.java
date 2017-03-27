@@ -211,8 +211,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     @Override
     protected final void notifySimulationSubscribers(long round_now) {
-        // TODO not final criteria
-        if (round_now % publishPeriod == 0) { // TODO not final criteria
+
+        if (round_now % publishPeriod == 0) {
 
             final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
 
@@ -301,7 +301,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-            }            
+            }
+            
             for (SimulationSubscriber simulationSubscriber : SimulationClientSet.INSTANCE)
                 simulationSubscriber.handle(simulationObject);
         }

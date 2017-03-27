@@ -1,25 +1,84 @@
 package playground.clruch;
 
-import org.gnu.glpk.GLPK;
-import org.gnu.glpk.GLPKConstants;
-import org.gnu.glpk.GlpkException;
-import org.gnu.glpk.SWIGTYPE_p_double;
-import org.gnu.glpk.SWIGTYPE_p_int;
-import org.gnu.glpk.glp_prob;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.alg.Array;
 import org.gnu.glpk.glp_smcp;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
+import playground.clruch.netdata.VirtualLink;
+import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkLoader;
+import playground.clruch.netdata.vLinkDataReader;
+import playground.sebhoerl.avtaxi.config.*;
+import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
+
+import java.io.File;
+import java.util.Map;
 
 public class Lp {
-    //	Minimize z = -.5 * x1 + .5 * x2 - x3 + 1
-    //
-    //	subject to
-    //	0.0 <= x1 - .5 * x2 <= 0.2
-    //  -x2 + x3 <= 0.4
-    //	where,
-    //	0.0 <= x1 <= 0.5
-    //	0.0 <= x2 <= 0.5
-    //  0.0 <= x3 <= 0.5
 
-    public static void main(String[] arg) {
+    public static void main(String[] args) {
+        File configFile = new File(args[0]);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup());
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+
+        AVConfig avConfig = new AVConfig();
+        AVConfigReader reader = new AVConfigReader(avConfig);
+
+        System.out.println(configFile.getParent());
+        reader.readFile(configFile.getParent()+"/av.xml");
+
+        File virtualnetworkXML = null;
+        for (AVOperatorConfig oc : avConfig.getOperatorConfigs()) {
+            AVDispatcherConfig dc = oc.getDispatcherConfig();
+            AVGeneratorConfig gc = oc.getGeneratorConfig();
+            virtualnetworkXML= new File(dc.getParams().get("virtualNetworkFile"));
+        }
+
+
+        System.out.println("" + virtualnetworkXML.getAbsoluteFile());
+        VirtualNetwork virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
+        Map<VirtualLink, Double> travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkXML, virtualNetwork, "Ttime");
+
+
+        int iter = 10;
+
+
+
+        // Solving the LP with deleting
+        long startTime = System.currentTimeMillis();
+        for(int i = 0; i<iter;++i){
+            LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork, travelTimes);
+            Tensor rhs = Array.zeros(virtualNetwork.getvNodesCount());
+            Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);
+            lpVehicleRebalancing.closeLP();
+        }
+        long estimatedTimeNewSetup = System.currentTimeMillis() - startTime;
+
+
+        // Solving the LP without deleting
+        startTime = System.currentTimeMillis();
+        LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork, travelTimes);
+        for(int i = 0; i<iter*10000;++i){
+            Tensor rhs = Array.zeros(virtualNetwork.getvNodesCount());
+            Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);
+        }
+        lpVehicleRebalancing.closeLP();
+        long estimatedTimeRHS = System.currentTimeMillis() - startTime;
+
+        // Results
+        System.out.println("Time with repeated setup: " + estimatedTimeNewSetup);
+        System.out.println("Time with single setup: " + estimatedTimeRHS);
+        System.out.println("Saved time: " + (1.0-(double) estimatedTimeRHS/ (double) estimatedTimeNewSetup)*100 + "%");
+
+    }
+}
+
+
+/*
         glp_prob lp;
         glp_smcp parm;
         SWIGTYPE_p_int ind;
@@ -146,6 +205,7 @@ public class Lp {
      *
      * @param lp problem
      */
+/*
     static void write_lp_solution(glp_prob lp) {
         int i;
         int n;
@@ -167,3 +227,4 @@ public class Lp {
         }
     }
 }
+*/

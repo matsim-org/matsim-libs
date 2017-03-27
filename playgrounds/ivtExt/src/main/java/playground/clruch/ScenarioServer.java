@@ -31,7 +31,8 @@ public class ScenarioServer {
         final File dir = configFile.getParentFile();
 
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
-        
+
+        // set to true in order to make server wait for viewer client:
         SimulationServer.INSTANCE.setWaitForClients(false);
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
