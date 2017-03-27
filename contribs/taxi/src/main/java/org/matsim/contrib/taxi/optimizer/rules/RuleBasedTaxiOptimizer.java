@@ -48,8 +48,17 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 
 	public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext, RuleBasedTaxiOptimizerParams params,
 			ZonalSystem zonalSystem) {
-		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
+		this(optimContext, params, zonalSystem, new BestDispatchFinder(optimContext));
+	}
 
+	public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext, RuleBasedTaxiOptimizerParams params,
+			BestDispatchFinder dispatchFinder) {
+		this(optimContext, params, new SquareGridSystem(optimContext.network, params.cellSize), dispatchFinder);
+	}
+
+	public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext, RuleBasedTaxiOptimizerParams params,
+			ZonalSystem zonalSystem, BestDispatchFinder dispatchFinder) {
+		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
 		this.params = params;
 
 		if (optimContext.scheduler.getParams().vehicleDiversion) {
@@ -57,7 +66,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 			throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
 		}
 
-		dispatchFinder = new BestDispatchFinder(optimContext);
+		this.dispatchFinder = dispatchFinder;
 		idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, optimContext.scheduler);
 		unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 	}
@@ -167,7 +176,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 		} else if (getOptimContext().scheduler.isIdle(vehicle)) {
 			idleTaxiRegistry.addVehicle(vehicle);
 		} else {
-			if (schedule.getCurrentTask().getTaskIdx() != 0) {//not first task
+			if (schedule.getCurrentTask().getTaskIdx() != 0) {// not first task
 				TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
 				if (isWaitStay(previousTask)) {
 					idleTaxiRegistry.removeVehicle(vehicle);
