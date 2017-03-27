@@ -2,9 +2,14 @@ package playground.clruch.net;
 
 import java.io.Serializable;
 
+/**
+ * the suffix "index" is chosen since the value is not identical to the "ID" of matsim
+ * 
+ * values are initialized to -1 to detect is assignment has been overlooked
+ */
 public class RequestContainer implements Serializable {
-    public String requestId; // potentially unnecessary!?
-    public int fromLinkId; // where the person is now
-    public double submissionTime;
-    public int toLinkId; // where the person wants to go
+    public int requestIndex = -1; // <- valid values are positive
+    public int fromLinkIndex = -1; // where the person is now
+    public double submissionTime = -1;
+    public int toLinkIndex = -1; // where the person wants to go
 }

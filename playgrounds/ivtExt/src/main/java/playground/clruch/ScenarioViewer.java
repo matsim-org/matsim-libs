@@ -54,7 +54,7 @@ public class ScenarioViewer {
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);
 
         // basel
-        // getJMapViewer().setDisplayPosition(new Point(), new Coordinate(47.55814, 7.58769), 11);
+        // matsimViewer.setDisplayPosition(47.55814, 7.58769, 11);
 
         // sioux falls
         // TODO obtain center from db

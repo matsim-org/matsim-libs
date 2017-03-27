@@ -231,11 +231,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             {
                 // REQUESTS
                 for (AVRequest avRequest : getAVRequests()) {
-                    RequestContainer requestContainer = new RequestContainer();
-                    requestContainer.requestId = avRequest.getId().toString();
-                    requestContainer.fromLinkId = db.getLinkIndex(avRequest.getFromLink());
+                    RequestContainer requestContainer = new RequestContainer();                     
+                    requestContainer.requestIndex = db.getRequestIndex(avRequest);
+                    requestContainer.fromLinkIndex = db.getLinkIndex(avRequest.getFromLink());
                     requestContainer.submissionTime = avRequest.getSubmissionTime();
-                    requestContainer.toLinkId = db.getLinkIndex(avRequest.getToLink());
+                    requestContainer.toLinkIndex = db.getLinkIndex(avRequest.getToLink());
                     simulationObject.requests.add(requestContainer);
                 }
             }
@@ -249,9 +249,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     final String key = avVehicle.getId().toString();
                     final Link fromLink = AVLocation.of(avVehicle);
                     if (fromLink != null) {
-                        vehicleContainer.linkId = db.getLinkIndex(fromLink);
+                        vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
+                        vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
                         vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
-                        vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
+                        vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
                         vehicleMap.put(key, vehicleContainer);
                     } else {
                         System.out.println("location extraction fail (1):");
@@ -265,9 +266,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     final String key = avVehicle.getId().toString();
                     final Link fromLink = AVLocation.of(avVehicle);
                     if (fromLink != null) {
-                        vehicleContainer.linkId = db.getLinkIndex(fromLink);
+                        vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
+                        vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
                         vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
-                        vehicleContainer.destinationLinkId = db.getLinkIndex(entry.getValue());
+                        vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
                         vehicleMap.put(key, vehicleContainer);
                     } else {
                         System.out.println("location extraction fail (2):");
@@ -280,12 +282,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     final String key = vlp.avVehicle.getId().toString();
                     if (!vehicleMap.containsKey(key)) {
                         VehicleContainer vehicleContainer = new VehicleContainer();
-                        vehicleContainer.linkId = db.getLinkIndex(vlp.linkTimePair.link);
+                        vehicleContainer.vehicleIndex = db.getVehicleIndex(vlp.avVehicle);
+                        vehicleContainer.linkIndex = db.getLinkIndex(vlp.linkTimePair.link);
                         if (vlp.isVehicleInStayTask()) {
                             vehicleContainer.avStatus = AVStatus.STAY;
                         } else {
                             vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
-                            vehicleContainer.destinationLinkId = db.getLinkIndex(vlp.getCurrentDriveDestination());
+                            vehicleContainer.destinationLinkIndex = db.getLinkIndex(vlp.getCurrentDriveDestination());
                         }
                         vehicleMap.put(key, vehicleContainer);
                     }

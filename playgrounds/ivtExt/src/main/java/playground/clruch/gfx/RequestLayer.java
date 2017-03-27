@@ -31,7 +31,7 @@ public class RequestLayer extends ViewerLayer {
         // draw requests
         graphics.setFont(requestsFont);
         Map<Integer, List<RequestContainer>> map = //
-                ref.requests.stream().collect(Collectors.groupingBy(rc -> rc.fromLinkId));
+                ref.requests.stream().collect(Collectors.groupingBy(rc -> rc.fromLinkIndex));
         for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
             Point p1;
             {
@@ -61,7 +61,7 @@ public class RequestLayer extends ViewerLayer {
                 if (drawRequestDestinations) {
                     graphics.setColor(new Color(128, 128, 128, 64));
                     for (RequestContainer rc : entry.getValue()) {
-                        int linkId = rc.toLinkId;
+                        int linkId = rc.toLinkIndex;
                         OsmLink osmLink = matsimJMapViewer.db.getOsmLink(linkId);
                         Point p2 = matsimJMapViewer.getMapPositionAlways(osmLink.getAt(0.5));
                         graphics.drawLine(x, y, p2.x, p2.y);
