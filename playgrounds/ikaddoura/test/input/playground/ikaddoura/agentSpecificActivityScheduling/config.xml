@@ -23,7 +23,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="2" />
+		<param name="lastIteration" value="0" />
 		<param name="mobsim" value="qsim" />
 	</module>
 

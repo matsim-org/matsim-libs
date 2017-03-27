@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
 * @author ikaddoura
 */
 
-public class RunExampleTestIT {
+public class RunExampleTest {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -51,17 +51,17 @@ public class RunExampleTestIT {
 		Controler controler = new Controler(scenario);
 		
 		AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-		aa.setTolerance(1234.);
+		aa.setTolerance(0.);
 		controler = aa.prepareControler(true);
 		
 //		controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getPopulation()));
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
-		
+
 		final int index = scenario.getConfig().controler().getLastIteration() - scenario.getConfig().controler().getFirstIteration();
-		double avgScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.average ).get(index);
-		Assert.assertEquals("Wrong average executed score.", 118.35436213048318, avgScore, MatsimTestUtils.EPSILON);
+		double executedScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
+		Assert.assertEquals("Wrong average executed score.", 132.59084365011148, executedScore, MatsimTestUtils.EPSILON);
 		
 		
 	}
