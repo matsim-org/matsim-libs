@@ -37,7 +37,7 @@ public abstract class AbstractTask implements Task {
 
 	public AbstractTask(double beginTime, double endTime) {
 		if (beginTime > endTime) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("beginTime=" + beginTime + "; endTime=" + endTime);
 		}
 
 		this.beginTime = beginTime;

@@ -80,7 +80,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 			NDrtRequest req = reqIter.next();
 			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
 			if (best == null) {
-				throw new RuntimeException("No feasible solution");
+				//throw new RuntimeException("No feasible solution");
 			}
 			getOptimContext().scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
 			vData.updateEntry(best.vehicleEntry);
