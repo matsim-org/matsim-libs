@@ -55,7 +55,7 @@ public class RunSharedTaxiBerlin {
 		DrtConfigGroup taxiCfg = DrtConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
 		config.checkConsistency();
-
+		config.qsim().setEndTime(40*3600);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FleetImpl fleet = new FleetImpl();
 		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getVehiclesFileUrl(config.getContext()));
