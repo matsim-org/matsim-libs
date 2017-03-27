@@ -294,6 +294,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
             }
 
+            // TODO store simulationObject alle 1000 Sekunden ein anderes Verzeichnis
             for (SimulationSubscriber simulationSubscriber : SimulationSubscriberSet.INSTANCE)
                 simulationSubscriber.handle(simulationObject);
         }

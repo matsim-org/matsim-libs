@@ -15,6 +15,7 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Floor;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.gnu.glpk.glp_smcp;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
