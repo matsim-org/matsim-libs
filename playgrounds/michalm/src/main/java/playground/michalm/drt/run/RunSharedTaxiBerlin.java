@@ -35,6 +35,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.inject.Provider;
 
+import playground.michalm.drt.analysis.DRTAnalysisModule;
 import playground.michalm.drt.optimizer.*;
 import playground.michalm.drt.passenger.NDrtRequestCreator;
 import playground.michalm.drt.vrpagent.NDrtActionCreator;
@@ -63,7 +64,7 @@ public class RunSharedTaxiBerlin {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule(fleet,
 				createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class));
-
+		controler.addOverridingModule(new DRTAnalysisModule());
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
