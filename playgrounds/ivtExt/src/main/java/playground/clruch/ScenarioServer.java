@@ -31,6 +31,8 @@ public class ScenarioServer {
         final File dir = configFile.getParentFile();
 
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
+        
+        SimulationServer.INSTANCE.setWaitForClients(false);
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);

@@ -13,7 +13,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
+import playground.clruch.net.IdIntegerDatabase;
 import playground.clruch.net.OsmLink;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class MatsimStaticDatabase {
 
@@ -47,6 +50,9 @@ public class MatsimStaticDatabase {
      */
     private final List<OsmLink> list;
 
+    private final IdIntegerDatabase requestIdIntegerDatabase = new IdIntegerDatabase();
+    private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
+
     private MatsimStaticDatabase(NavigableMap<String, OsmLink> linkMap) {
         list = new ArrayList<>(linkMap.values());
         int index = 0;
@@ -72,4 +78,11 @@ public class MatsimStaticDatabase {
         return list.size();
     }
 
+    public int getRequestIndex(AVRequest avRequest) {
+        return requestIdIntegerDatabase.getId(avRequest.getId().toString());
+    }
+
+    public int getVehicleIndex(AVVehicle avVehicle) {
+        return vehicleIdIntegerDatabase.getId(avVehicle.getId().toString());
+    }
 }

@@ -1,7 +1,6 @@
 package playground.clruch.gfx;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -10,21 +9,14 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
 import playground.clruch.ResourceLocator;
-import playground.clruch.gheat.PointLatLng;
-import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.gheat.graphics.ThemeManager;
 import playground.clruch.jmapviewer.JMapViewer;
-import playground.clruch.net.OsmLink;
-import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 
 public class MatsimJMapViewer extends JMapViewer {
@@ -45,7 +37,7 @@ public class MatsimJMapViewer extends JMapViewer {
     private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
 
     public JLabel jLabel = new JLabel(" ");
-    final MatsimDataSource matsimDataSource = new MatsimDataSource();
+    // MatsimHeatmap rebalanceHeatmap = new MatsimHeatmap("classic", 128);
 
     public MatsimJMapViewer(MatsimStaticDatabase db) {
         this.db = db;
@@ -56,6 +48,7 @@ public class MatsimJMapViewer extends JMapViewer {
 
         viewerLayers.add(linkLayer);
         viewerLayers.add(requestLayer);
+        matsimHeatmaps.add(requestLayer.requestHeatMap);
         viewerLayers.add(vehicleLayer);
 
         try {
@@ -63,11 +56,6 @@ public class MatsimJMapViewer extends JMapViewer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // HeatMapDataSource dataSource = new FileDataSource( //
-        // "/home/datahaki/3rdparty/GHEAT-JAVA/JavaHeatMaps/heatmaps/src/main/resources/points.txt", 2, 1, 0);
-
-        dataManager = new DataManager(matsimDataSource);
-
     }
 
     final Point getMapPosition(Coord coord) {
@@ -82,25 +70,29 @@ public class MatsimJMapViewer extends JMapViewer {
     protected void paintComponent(Graphics g) {
         final SimulationObject ref = simulationObject; // <- use ref for thread safety
 
-        if (ref != null) {
-            matsimDataSource.clear();
-            Map<Integer, List<RequestContainer>> map = ref.requests.stream().collect(Collectors.groupingBy(r -> r.fromLinkId));
-            // map.entrySet();
-            for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-                OsmLink osmLink = db.getOsmLink(entry.getKey());
-                final int size = entry.getValue().size();
-                for (int count = 0; count < size; ++count) {
-                    Coord coord = osmLink.getAt(count / (double) size);
-                    matsimDataSource.addPoint(new PointLatLng(coord.getX(), coord.getY(), 0));
-                }
-            }
-        }
+        if (ref != null)
+            viewerLayers.forEach(viewerLayer -> viewerLayer.perpareHeatmaps(ref));
+        // {
+        // rebalanceHeatmap.clear();
+        // Map<Integer, List<VehicleContainer>> map = ref.vehicles.stream()
+        // .filter(v->v.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
+        // .collect(Collectors.groupingBy(r -> r.destinationLinkIndex));
+        //
+        // for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
+        // OsmLink osmLink = db.getOsmLink(entry.getKey());
+        // final int size = entry.getValue().size();
+        // for (int count = 0; count < size; ++count) {
+        // Coord coord = osmLink.getAt(count / (double) size);
+        // rebalanceHeatmap.addPoint(coord.getX(), coord.getY());
+        // }
+        // }
+        // }
 
         super.paintComponent(g);
-        Dimension dimension = getSize();
         Graphics2D graphics = (Graphics2D) g;
-        graphics.setColor(new Color(255, 255, 255, alpha));
-        graphics.fillRect(0, 0, dimension.width, dimension.height);
+        // Dimension dimension = getSize();
+        // graphics.setColor(new Color(255, 255, 255, alpha));
+        // graphics.fillRect(0, 0, dimension.width, dimension.height);
 
         if (ref != null) {
 
@@ -108,8 +100,8 @@ public class MatsimJMapViewer extends JMapViewer {
             append(new SecondsToHMS(ref.now).toDigitalWatch());
             appendSeparator();
 
-            viewerLayers.forEach(v -> v.paint(graphics, ref));
-            viewerLayers.forEach(v -> v.hud(graphics, ref));
+            viewerLayers.forEach(viewerLayer -> viewerLayer.paint(graphics, ref));
+            viewerLayers.forEach(viewerLayer -> viewerLayer.hud(graphics, ref));
 
             append("%5d zoom", getZoom());
             append("%5d m/pixel", (int) Math.ceil(getMeterPerPixel()));

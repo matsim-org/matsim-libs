@@ -8,6 +8,7 @@ public abstract class AbstractServer {
 
     private volatile boolean isRunning = false;
     private ServerSocket serverSocket = null;
+    private boolean waitForClients = true;
 
     protected abstract int getPort();
 
@@ -36,8 +37,12 @@ public abstract class AbstractServer {
         }).start();
     }
 
-    public final boolean isRunning() {
-        return isRunning;
+    public final void setWaitForClients(boolean waitForClients) {
+        this.waitForClients = waitForClients;
+    }
+
+    public final boolean getWaitForClients() {
+        return isRunning && waitForClients;
     }
 
     /** closes server socket */

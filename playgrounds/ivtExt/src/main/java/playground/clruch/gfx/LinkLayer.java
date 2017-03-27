@@ -9,7 +9,7 @@ import playground.clruch.net.SimulationObject;
 
 public class LinkLayer extends ViewerLayer {
 
-    private volatile boolean drawLinks = true;
+    private volatile boolean drawLinks = false;
     private static final Color LINKCOLOR = new Color(153, 153, 102, 64);
 
     public LinkLayer(MatsimJMapViewer matsimJMapViewer) {
