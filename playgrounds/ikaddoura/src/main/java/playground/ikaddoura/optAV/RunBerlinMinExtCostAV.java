@@ -48,7 +48,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
@@ -140,8 +140,7 @@ public class RunBerlinMinExtCostAV {
 		Controler controler = new Controler(scenario);
 		
 		if (agentBasedActivityScheduling) {
-			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-			controler = aa.prepareControler(false);
+			controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig()));
 		}
 				
 		// #############################

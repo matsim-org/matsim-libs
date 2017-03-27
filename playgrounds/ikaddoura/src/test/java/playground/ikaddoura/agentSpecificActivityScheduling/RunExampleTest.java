@@ -43,18 +43,17 @@ public class RunExampleTest {
 	public void test1() {
 		
 		final String configFile = testUtils.getPackageInputDirectory() + "/config.xml";
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new AgentSpecificActivitySchedulingConfigGroup()));
 	
+		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+		asasConfigGroup.setTolerance(0.);
+		
 		String outputDirectory = testUtils.getOutputDirectory() + "/";
 		scenario.getConfig().controler().setOutputDirectory(outputDirectory);
 		
 		Controler controler = new Controler(scenario);
 		
-		AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-		aa.setTolerance(0.);
-		controler = aa.prepareControler(true);
-		
-//		controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getPopulation()));
+		controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig(), scenario.getPopulation()));
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
@@ -62,7 +61,6 @@ public class RunExampleTest {
 		final int index = scenario.getConfig().controler().getLastIteration() - scenario.getConfig().controler().getFirstIteration();
 		double executedScore = controler.getScoreStats().getScoreHistory().get( ScoreItem.executed ).get(index);
 		Assert.assertEquals("Wrong average executed score.", 132.59084365011148, executedScore, MatsimTestUtils.EPSILON);
-		
 		
 	}
 	

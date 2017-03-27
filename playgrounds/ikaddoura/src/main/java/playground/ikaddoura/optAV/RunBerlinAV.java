@@ -49,7 +49,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
@@ -119,8 +119,7 @@ public class RunBerlinAV {
 		Controler controler = new Controler(scenario);
 				
 		if (agentBasedActivityScheduling) {
-			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-			controler = aa.prepareControler(false);
+			controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig()));
 		}
 		
 		// #############################

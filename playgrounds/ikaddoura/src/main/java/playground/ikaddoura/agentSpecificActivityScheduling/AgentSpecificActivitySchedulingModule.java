@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,22 +23,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.utils.prepare.PopulationTools;
 
 /**
+ * 
  * Idea: Interpret the activity times in the initial population as agent-specific activity opening, closing and latest start times.
  * This allows to switch on time allocation and to adjust the elasticity via beta_performing, beta_late and the tolerance value.
  * 
- * (1) Adjusts the population in the scenario:
+ * (1) Optional: Adjusts the population in the scenario:
  * 		(a) converts normal activities (e.g. home, work) to duration-specific activities (e.g. home_7200, work_3600, ...)
  * 		(b) merges overnight activities in case they have the same base type (e.g. home_7200 and home_3600 --> home_10800) 
  * 		(c) writes initial activity times to person attributes. The initial activity schedule will be used to compute agent-specific opening, closing and latest arrival times.
@@ -47,63 +45,54 @@ import playground.ikaddoura.utils.prepare.PopulationTools;
  * 
  * (Other activity parameters will be ignored. The activity-related score only results from performing an activity plus an additional late arrival penalty which comes on top of the opportunity cost of time.)
  * 
- * @author ikaddoura
- */
+ * 
+* @author ikaddoura
+*/
 
-public class AgentSpecificActivityScheduling {
-
-	private static final Logger log = Logger.getLogger(AgentSpecificActivityScheduling.class);
+public class AgentSpecificActivitySchedulingModule extends AbstractModule {
+	private static final Logger log = Logger.getLogger(AgentSpecificActivitySchedulingModule.class);	
+	private final List<ActivityParams> initialActivityParams = new ArrayList<>();
+		
+	public AgentSpecificActivitySchedulingModule(Config config) {
+		log.info("Not adjusting the population."
+				+ " Opening and closing times are expected to be provided as person attributes in the plans file.");
 	
-	private double activityDurationBin = 3600.;
-	private double tolerance = 900.;
-	
-	private boolean removeNetworkSpecificInformation = false;
-	
-	private String configFile = null;
-	private Controler controler = null;
-	
-	public AgentSpecificActivityScheduling(String configFile) {
-		this.configFile = configFile;
+		adjustConfig(config);
 	}
 	
-	public AgentSpecificActivityScheduling(Controler controler) {
-		this.controler = controler;
+	public AgentSpecificActivitySchedulingModule(Config config, Population population) {
+		
+		adjustConfig(config);
+				
+		log.info("Adjusting the population...");
+
+		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) config.getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+		
+		PopulationTools.setScoresToZero(population);
+		PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(population, asasConfigGroup.getActivityDurationBin());			
+		PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(population);
+		PopulationTools.analyze(population);
+			
+		if (asasConfigGroup.isRemoveNetworkSpecificInformation()) PopulationTools.removeNetworkSpecificInformation(population);
+
+		log.info("Adjusting the population... Done.");
 	}
 
-	public Controler prepareControler(boolean adjustPopulation) {
+	private void adjustConfig(Config config) {
 		
-		Controler controler = null;
+		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) config.getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
 		
-		if (configFile != null) {
-			Config config = ConfigUtils.loadConfig(configFile);
-			Scenario scenario = ScenarioUtils.loadScenario(config);
-			controler = new Controler(scenario);
-		} else {
-			if (this.controler == null) {
-				throw new RuntimeException("Controler is null. Aborting...");
-			}
-			controler = this.controler;
+		log.info("Initial activities: ");
+		for (ActivityParams actParams : config.planCalcScore().getActivityParams()) {
+			initialActivityParams.add(actParams);
+			log.info(" -> " + actParams.getActivityType());
 		}
 		
-		if (adjustPopulation) {
-			log.info("Adjusting the population...");
-
-			PopulationTools.setScoresToZero(controler.getScenario().getPopulation());
-			PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(controler.getScenario().getPopulation(), activityDurationBin);			
-			PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(controler.getScenario().getPopulation());
-			PopulationTools.analyze(controler.getScenario().getPopulation());
-				
-			if (removeNetworkSpecificInformation) PopulationTools.removeNetworkSpecificInformation(controler.getScenario().getPopulation());
-
-			log.info("Adjusting the population... Done.");
-		}					
-		
-		// adjust config
 		log.info("Adding duration-specific activity types to config...");
 		
 		List<ActivityParams> newActivityParams = new ArrayList<>();
-
-		for (ActivityParams actParams : controler.getConfig().planCalcScore().getActivityParams()) {
+		
+		for (ActivityParams actParams : initialActivityParams) {
 			String activityType = actParams.getActivityType();
 			
 			if (activityType.contains("interaction")) {
@@ -113,9 +102,9 @@ public class AgentSpecificActivityScheduling {
 				
 				log.info("Splitting activity " + activityType + " in duration-specific activities.");
 
-				double maximumDuration = (activityDurationBin * 24.) + activityDurationBin;
+				double maximumDuration = (asasConfigGroup.getActivityDurationBin() * 24.) + asasConfigGroup.getActivityDurationBin();
 				
-				for (double n = activityDurationBin; n <= maximumDuration ; n = n + activityDurationBin) {
+				for (double n = asasConfigGroup.getActivityDurationBin(); n <= maximumDuration ; n = n + asasConfigGroup.getActivityDurationBin()) {
 					ActivityParams params = new ActivityParams(activityType + "_" + n);
 					params.setTypicalDuration(n);
 					params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
@@ -125,42 +114,25 @@ public class AgentSpecificActivityScheduling {
 		}
 		
 		for (ActivityParams actParams : newActivityParams) {
-			controler.getConfig().planCalcScore().addActivityParams(actParams);
+			config.planCalcScore().addActivityParams(actParams);
 		}	
 		
 		log.info("Adding duration-specific activity types to config... Done.");
+	}
+
+	@Override
+	public void install() {
 		
 		// adjust scoring
 		log.info("Replacing the default activity scoring by an agent-specific opening / closing time consideration...");
+				
+		this.bind(CountActEventHandler.class).asEagerSingleton();
+		this.addEventHandlerBinding().to(CountActEventHandler.class);
 		
-		final CountActEventHandler activityCounter = new CountActEventHandler();
-		final AgentSpecificScoringFunctionFactory scoringFunctionFactory = new AgentSpecificScoringFunctionFactory(controler.getScenario(), activityCounter, tolerance);
-		
-		controler.addOverridingModule( new AbstractModule() {
-			
-			@Override
-			public void install() {
-						
-				this.addEventHandlerBinding().toInstance(activityCounter);
-				this.bindScoringFunctionFactory().toInstance(scoringFunctionFactory);				
-			}
-		});
+		this.bindScoringFunctionFactory().to(AgentSpecificScoringFunctionFactory.class);	
 		
 		log.info("Replacing the default activity scoring by an agent-specific opening / closing time consideration... Done.");
 		
-		return controler;
-	}
-
-	public void setActivityDurationBin(double activityDurationBin) {
-		this.activityDurationBin = activityDurationBin;
-	}
-
-	public void setRemoveNetworkSpecificInformation(boolean removeNetworkSpecificInformation) {
-		this.removeNetworkSpecificInformation = removeNetworkSpecificInformation;
-	}
-
-	public void setTolerance(double tolerance) {
-		this.tolerance = tolerance;
 	}
 
 }

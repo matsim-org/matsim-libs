@@ -36,7 +36,8 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingConfigGroup;
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
@@ -67,6 +68,7 @@ public class BerlinControler {
 	private static String configFile;
 	private static String outputBaseDirectory;
 
+	// departure time choice settings
 	private static boolean agentSpecificActivityScheduling;
 	private static boolean adjustPopulation;
 	private static double activityDurationBin;
@@ -182,11 +184,17 @@ public class BerlinControler {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 				
-		if (agentSpecificActivityScheduling) {		
-			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-			aa.setActivityDurationBin(activityDurationBin);
-			aa.setTolerance(tolerance);
-			controler = aa.prepareControler(adjustPopulation);			
+		if (agentSpecificActivityScheduling) {	
+			
+			AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+			asasConfigGroup.setActivityDurationBin(activityDurationBin);
+			asasConfigGroup.setTolerance(tolerance);
+			
+			if (adjustPopulation) {
+				controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig(), scenario.getPopulation()));
+			} else {
+				controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig()));
+			}	
 		}
 				
 		if (pricingApproach.toString().equals(PricingApproach.NoPricing.toString())) {
@@ -299,7 +307,6 @@ public class BerlinControler {
 		
 		MATSimVideoUtils.createLegHistogramVideo(controler.getConfig().controler().getOutputDirectory());
 		
-		// delete unnecessary iterations folder here.
 		int firstIt = controler.getConfig().controler().getFirstIteration();
 		int lastIt = controler.getConfig().controler().getLastIteration();
 		String OUTPUT_DIR = controler.getConfig().controler().getOutputDirectory();
