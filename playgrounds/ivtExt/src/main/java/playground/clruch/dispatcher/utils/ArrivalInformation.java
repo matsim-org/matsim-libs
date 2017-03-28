@@ -28,12 +28,13 @@ public class ArrivalInformation {
     Tensor pij;
     private int numberTimeSteps;
     private final double dtSeconds; // used as lookup
+    public final long populationSize;
     // private final Scalar factor;
     VirtualNetwork virtualNetwork;
 
     public ArrivalInformation(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, long populationSize, int rebalancingPeriod) throws JDOMException, IOException {
         virtualNetwork = virtualNetworkIn;
-
+        this.populationSize = populationSize;
         System.out.println("reading historic travel data");
         {// arrival rates lambda
             SAXBuilder builder = new SAXBuilder();
@@ -49,7 +50,7 @@ public class ArrivalInformation {
             // construct matrices based on xml
             // the lambdas are normalized of their population size and time bin width
             Scalar factor = RealScalar.of(populationSize * rebalancingPeriod);
-            lambda = Tensors.matrix((i, j) -> getLambdafromFile(i, j, rootNode).multiply(factor), numberTimeSteps, virtualNetwork.getvNodesCount());
+            lambda = Tensors.matrix((i, j) -> getLambdafromFile(i, j, rootNode).multiply(factor), numberTimeSteps, virtualNetwork.getvNodesCount()-1);
         }
         {// transition probabilities pij
             SAXBuilder builder = new SAXBuilder();
@@ -60,7 +61,7 @@ public class ArrivalInformation {
             pij = Tensors.empty();
             for (int k = 0; k < numberTimeSteps; ++k) {
                 final int timestep = k;
-                pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
+                pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount()-1, virtualNetwork.getvNodesCount()-1));
             }
             System.out.println("Do we get here?");
         }

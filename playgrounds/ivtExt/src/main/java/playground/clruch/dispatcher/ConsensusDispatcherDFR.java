@@ -44,6 +44,7 @@ import playground.clruch.netdata.VirtualNetworkLoader;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.netdata.vLinkDataReader;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -53,11 +54,15 @@ import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+/**
+ * {@link PopulationDensityGenerator}
+ */
 public class ConsensusDispatcherDFR extends PartitionedDispatcher {
     public static final String KEY_REBALANCINGPERIOD = "rebalancingPeriod";
     public static final String KEY_VIRTUALNETWORKDIRECTORY = "virtualNetworkDirectory";
     public static final String KEY_DTEXTENSION = "dtExtension";
     public static final String KEY_WEIGHTSEXTENSION = "weightsExtension";
+    public static final String KEY_FEEDBACKTERM = "feedbackTerm";
 
     private final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
@@ -68,18 +73,20 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
     private final Map<VirtualLink, Double> vLinkWeights;
     private int rebCount = 0;
 
+    private final FeedbackTerm feebackTerm;
+
     public ConsensusDispatcherDFR( //
-            AVDispatcherConfig config, //
-            AVGeneratorConfig generatorConfig, //
-            TravelTime travelTime, //
-            ParallelLeastCostPathCalculator router, //
-            EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork, //
-            AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractRequestSelector abstractRequestSelector, //
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            Map<VirtualLink, Double> linkWeightsIn, //
-            ArrivalInformation arrivalInformation) {
+                                   AVDispatcherConfig config, //
+                                   AVGeneratorConfig generatorConfig, //
+                                   TravelTime travelTime, //
+                                   ParallelLeastCostPathCalculator router, //
+                                   EventsManager eventsManager, //
+                                   VirtualNetwork virtualNetwork, //
+                                   AbstractVirtualNodeDest abstractVirtualNodeDest, //
+                                   AbstractRequestSelector abstractRequestSelector, //
+                                   AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
+                                   Map<VirtualLink, Double> linkWeightsIn, //
+                                   ArrivalInformation arrivalInformation) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
 
         this.virtualNodeDest = abstractVirtualNodeDest;
@@ -91,6 +98,9 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
         vLinkWeights = linkWeightsIn;
         this.arrivalInformation = arrivalInformation;
         rebalancingPeriod = Integer.parseInt(config.getParams().get(KEY_REBALANCINGPERIOD));
+
+        feebackTerm = FeedbackTerm.valueOf(
+                config.getParams().get(KEY_FEEDBACKTERM));
     }
 
     @Override
@@ -114,7 +124,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
                 availableVehicles.entrySet().stream().forEach(e -> vector.set(RealScalar.of(e.getValue().size()), e.getKey().index));
                 System.out.println(vector.toString());
-                System.out.println("variance="+Variance.ofVector(vector));
+                System.out.println("variance=" + Variance.ofVector(vector));
 
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
@@ -136,24 +146,40 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                         // if(availableVehicles.containsKey(vlink))
                         int imbalanceFrom = -vi_excess.get(vLink.getFrom());
                         int imbalanceTo = -vi_excess.get(vLink.getTo());
-
+                        double vehicles_From_to_To = 0.0;
                         // compute the rebalancing vehicles
                         // TODO confirm that correct
 
-                        double lambdaTo = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
-                        double lambdaFrom = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
-                        
-                        lambdaTo = Math.max(lambdaTo, 1);
-                        lambdaFrom = Math.max(lambdaFrom, 1);
-                        // System.out.println();
-                        // lambda_dummy_to = lambda_dummy_from = 1;
-                        double vehicles_From_to_To = //
-                                rebalancingPeriod * vLinkWeights.get(vLink) * ( //
-                                (double) imbalanceTo / lambdaTo - //
-                                        (double) imbalanceFrom / lambdaFrom) + //
-                                        rebalanceFloating.get(vLink);
+                        switch (feebackTerm) {
+                            case LDX: {
+                                double lambdaTo = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
+                                double lambdaFrom = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
+                                //long popSize = arrivalInformation.populationSize;
+                                long popSize = 1;
+                                lambdaTo = Math.max(lambdaTo, 1);
+                                lambdaFrom = Math.max(lambdaFrom, 1);
+                                // System.out.println();
+                                // lambda_dummy_to = lambda_dummy_from = 1;
+                                vehicles_From_to_To = //
+                                        rebalancingPeriod * (double) popSize * vLinkWeights.get(vLink) * ( //
+                                                (double) imbalanceTo / lambdaTo - //
+                                                        (double) imbalanceFrom / lambdaFrom) + //
+                                                rebalanceFloating.get(vLink);
+                                break;
+                            }
+                            case LX: {
+
+                                vehicles_From_to_To = //
+                                        rebalancingPeriod * vLinkWeights.get(vLink) * ( //
+                                                (double) imbalanceTo - //
+                                                        (double) imbalanceFrom) + //
+                                                rebalanceFloating.get(vLink);
+                                break;
+                            }
+                        }
 
                         int rebalanceFromTo = (int) Math.round(vehicles_From_to_To);
+                        // GlobalAssert.that(rebalanceFromTo);
                         double rebalanceRest = vehicles_From_to_To - (double) rebalanceFromTo;
                         rebalanceCount.put(vLink, rebalanceFromTo);
                         rebalanceFloating.put(vLink, rebalanceRest);
@@ -283,7 +309,6 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
     /**
      * FIXME in {@link PopulationDensityGenerator}
-     *
      */
 
     public static class Factory implements AVDispatcherFactory {
