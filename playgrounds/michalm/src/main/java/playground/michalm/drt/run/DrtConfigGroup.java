@@ -24,8 +24,10 @@ import java.util.Map;
 
 import org.matsim.core.config.*;
 
+
 public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "drt";
+	public static final String DRTMODE = "drt";
 
 	@SuppressWarnings("deprecation")
 	public static DrtConfigGroup get(Config config) {
@@ -36,6 +38,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String MAX_WAIT_TIME = "maxWaitTime";
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 
+	private static final String SCHEME = "operationalScheme";
+	private static final String TRANSITSCHEDULEFILE = "transitStopFile";
+	private static final String WALKDISTANCE = "maximumWalkDistance";
+	private static final String SPEEDESTIMATE = "estimatedDRTSpeed";
+	private static final String BEELINEDISTANCEESTIMATE = "estimatedBeelineDistanceFactor";
+	
+	
 	// input
 	public static final String VEHICLES_FILE = "vehiclesFile";
 
@@ -44,6 +53,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
 	private String vehiclesFile = null;
+	
+	private DRTOperationalScheme operationalScheme;			
+	private String transitStopFile = null;
+	private double maximumWalkDistance;
+	private double estimatedSpeed = 25/3.6;
+	private double estimatedBeelineDistanceFactor = 1.3;
+
+	
+	public enum DRTOperationalScheme {
+				stationbased,
+				door2door
+				};
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -104,5 +125,88 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	public URL getVehiclesFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
+	}
+	
+
+	/**
+	 * @return the operationalScheme
+	 */
+	@StringGetter(SCHEME)
+	public DRTOperationalScheme getOperationalScheme() {
+		return operationalScheme;
+	}
+	
+	
+	/**
+	 * @param operationalScheme the operationalScheme to set
+	 */
+	@StringSetter(SCHEME)
+	public void setOperationalScheme(String operationalScheme) {
+		
+		this.operationalScheme = DRTOperationalScheme.valueOf(operationalScheme);
+	}
+	
+	/**
+	 * @return the transitStopFile
+	 */
+	@StringGetter(TRANSITSCHEDULEFILE)
+	public String getTransitStopFile() {
+		return transitStopFile;
+	}
+	
+	/**
+	 * @param transitStopFile the transitStopFile to set
+	 */
+	@StringSetter(TRANSITSCHEDULEFILE)
+	public void setTransitStopFile(String transitStopFile) {
+		this.transitStopFile = transitStopFile;
+	}
+	
+	/**
+	 * @return the maximumWalkDistance
+	 */
+	@StringGetter(WALKDISTANCE)
+	public double getMaximumWalkDistance() {
+		return maximumWalkDistance;
+	}
+	
+	/**
+	 * @param maximumWalkDistance the maximumWalkDistance to set
+	 */
+	@StringSetter(WALKDISTANCE)
+	public void setMaximumWalkDistance(double maximumWalkDistance) {
+		this.maximumWalkDistance = maximumWalkDistance;
+	}
+
+	/**
+	 * @return the estimatedSpeed
+	 */
+	@StringGetter(SPEEDESTIMATE)
+	public double getEstimatedSpeed() {
+		return estimatedSpeed;
+	}
+	
+	/**
+	 * @param estimatedSpeed the estimatedSpeed to set
+	 */
+	@StringSetter(SPEEDESTIMATE)
+	public void setEstimatedSpeed(double estimatedSpeed) {
+		this.estimatedSpeed = estimatedSpeed;
+	}
+	
+	/**
+	 * @return the estimatedBeelineDistanceFactor
+	 */
+	@StringGetter(BEELINEDISTANCEESTIMATE)
+	public double getEstimatedBeelineDistanceFactor() {
+		return estimatedBeelineDistanceFactor;
+	}
+	
+	/**
+	 * @param estimatedBeelineDistanceFactor the estimatedBeelineDistanceFactor to set
+	 */
+	@StringSetter(BEELINEDISTANCEESTIMATE)
+	public void setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
+		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
 	}
 }

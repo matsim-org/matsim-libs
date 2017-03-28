@@ -39,8 +39,9 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.inject.name.Names;
 
-import playground.jbischoff.drt.config.DRTConfigGroup;
+
 import playground.jbischoff.drt.routingModule.StopBasedDRTRoutingModule;
+import playground.michalm.drt.run.DrtConfigGroup;
 
 
 public class RunTaxiWithStopsExample {
@@ -54,7 +55,7 @@ public class RunTaxiWithStopsExample {
 		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
 				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
 		
-		DRTConfigGroup drt = new DRTConfigGroup();
+		DrtConfigGroup drt = new DrtConfigGroup();
 		drt.setEstimatedBeelineDistanceFactor(1.3);
 		drt.setEstimatedSpeed(30/3.6);
 		drt.setMaximumWalkDistance(500);
@@ -83,8 +84,8 @@ public class RunTaxiWithStopsExample {
 					
 			@Override
 			public void install() {
-				bind(TransitSchedule.class).annotatedWith(Names.named(DRTConfigGroup.DRTMODE)).toInstance(scenario2.getTransitSchedule());;
-				addRoutingModuleBinding(DRTConfigGroup.DRTMODE).to(StopBasedDRTRoutingModule.class).asEagerSingleton();
+				bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRTMODE)).toInstance(scenario2.getTransitSchedule());;
+				addRoutingModuleBinding(DrtConfigGroup.DRTMODE).to(StopBasedDRTRoutingModule.class).asEagerSingleton();
 				
 			}
 		});
