@@ -163,7 +163,7 @@ public class Tile {
         BufferedImage tile;
         Graphics2D graphic;
         // If we have already created the empty tile then return it
-        if (Cache.hasEmptyTile(colorScheme.hashCode(), zoomOpacity))
+        if (Cache.hasEmptyTile(colorScheme.hashCode(), zoomOpacity)) // FIXME this assumes hashcode is "equals"!
             return Cache.getEmptyTile(colorScheme.hashCode(), zoomOpacity);
         // Create a blank tile that is 32 bit and has an alpha
         tile = new BufferedImage(HeatMap.SIZE, HeatMap.SIZE, BufferedImage.TYPE_INT_ARGB);
