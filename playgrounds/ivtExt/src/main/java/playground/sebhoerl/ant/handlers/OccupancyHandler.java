@@ -38,6 +38,7 @@ public class OccupancyHandler extends AbstractHandler implements PersonEntersVeh
     public void handleEvent(PersonEntersVehicleEvent event) {
         if (!data.isOrdinaryPerson(event.getPersonId())) return;
         if (!event.getVehicleId().toString().startsWith("av_")) return;
+        if (!data.isRelevantOperator(event.getVehicleId().toString())) return;
 
         ensureVehicle(event.getVehicleId());
         process(event.getVehicleId(), event.getTime(), +1);
@@ -47,6 +48,7 @@ public class OccupancyHandler extends AbstractHandler implements PersonEntersVeh
     public void handleEvent(PersonLeavesVehicleEvent event) {
         if (!data.isOrdinaryPerson(event.getPersonId())) return;
         if (!event.getVehicleId().toString().startsWith("av_")) return;
+        if (!data.isRelevantOperator(event.getVehicleId().toString())) return;
 
         ensureVehicle(event.getVehicleId());
         process(event.getVehicleId(), event.getTime(), -1);

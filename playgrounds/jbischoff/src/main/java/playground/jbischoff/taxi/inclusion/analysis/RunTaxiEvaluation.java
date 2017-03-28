@@ -41,7 +41,7 @@ public class RunTaxiEvaluation {
 
 	public static void main(String[] args) {
 
-		String networkFile = "D:/runs-svn/barrierFreeTaxi/1500_run_50/taxis_50.output_network.xml.gz";
+		String networkFile = "D:/runs-svn/barrierFreeTaxi/v2/veh_300/veh_300.output_network.xml.gz";
 
 		// Berlin
 		String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
@@ -67,9 +67,9 @@ public class RunTaxiEvaluation {
 		List<String> normalWaitTimes = new ArrayList<>();
 		List<String> barrierfreeWaitTimes = new ArrayList<>();
 		
-		for (int i = 50; i <= 500; i = i + 50) {
-			String runId = "taxis_" + i;
-			String dir = "D:/runs-svn/barrierFreeTaxi/1500_run_" + i + "/";
+		for (int i = 300; i <= 500; i = i + 50) {
+			String runId = "veh_" + i;
+			String dir = "D:/runs-svn/barrierFreeTaxi/v2/veh_"+ i + "/";
 			System.out.println("pop " + runId);
 			ZoneBasedBarrierFreeTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandlerBF = new ZoneBasedBarrierFreeTaxiCustomerWaitHandler(
 					network, geo, true);

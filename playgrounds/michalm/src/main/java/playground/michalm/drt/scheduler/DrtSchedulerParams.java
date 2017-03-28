@@ -19,29 +19,19 @@
 
 package playground.michalm.drt.scheduler;
 
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import playground.michalm.drt.run.DrtConfigGroup;
 
 /**
  * @author michalm
  */
 public class DrtSchedulerParams {
-	public final boolean vehicleDiversion;
-	public final double pickupDuration;// TODO per passenger??
-	public final double dropoffDuration;// TODO per passenger??
-	public final double AStarEuclideanOverdoFactor;
+	public final double stopDuration;
 
-	public DrtSchedulerParams(TaxiConfigGroup taxiCfg) {
-		this.vehicleDiversion = taxiCfg.isVehicleDiversion();
-		this.pickupDuration = taxiCfg.getPickupDuration();
-		this.dropoffDuration = taxiCfg.getDropoffDuration();
-		this.AStarEuclideanOverdoFactor = taxiCfg.getAStarEuclideanOverdoFactor();
+	public DrtSchedulerParams(DrtConfigGroup drtCfg) {
+		this.stopDuration = drtCfg.getStopDuration();
 	}
 
-	public DrtSchedulerParams(boolean destinationKnown, boolean vehicleDiversion, double pickupDuration,
-			double dropoffDuration, double AStarEuclideanOverdoFactor) {
-		this.vehicleDiversion = vehicleDiversion;
-		this.pickupDuration = pickupDuration;
-		this.dropoffDuration = dropoffDuration;
-		this.AStarEuclideanOverdoFactor = AStarEuclideanOverdoFactor;
+	public DrtSchedulerParams(double stopDuration) {
+		this.stopDuration = stopDuration;
 	}
 }

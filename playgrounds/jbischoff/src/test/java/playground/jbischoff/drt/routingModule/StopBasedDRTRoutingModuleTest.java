@@ -44,7 +44,8 @@ import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import playground.jbischoff.drt.config.DRTConfigGroup;
+import playground.michalm.drt.run.DrtConfigGroup;
+
 
 /**
  * @author  jbischoff
@@ -95,7 +96,7 @@ public class StopBasedDRTRoutingModuleTest {
 	 */
 	private Scenario createTestScenario() {
 		Config config = ConfigUtils.createConfig();
-		DRTConfigGroup drtConfigGroup = new DRTConfigGroup();
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.setMaximumWalkDistance(200);
 		drtConfigGroup.setTransitStopFile("./src/test/resources/cottbus/stops-schedule.xml.gz");
 		config.addModule(drtConfigGroup);

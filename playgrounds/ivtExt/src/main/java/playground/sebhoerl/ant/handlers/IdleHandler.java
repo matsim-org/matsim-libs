@@ -25,14 +25,14 @@ public class IdleHandler extends AbstractHandler implements ActivityStartEventHa
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
-        if (event.getActType().equals("AVStay")) {
+        if (event.getActType().equals("AVStay") && data.isRelevantOperator(event.getPersonId().toString())) {
             startTimes.put(event.getPersonId(), event.getTime());
         }
     }
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        if (event.getActType().equals("AVStay")) {
+        if (event.getActType().equals("AVStay") && data.isRelevantOperator(event.getPersonId().toString())) {
             Double startTime = startTimes.remove(event.getPersonId());
 
             //if (startTime != null) {

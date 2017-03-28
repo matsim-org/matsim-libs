@@ -45,19 +45,19 @@ public final class StageContainer {
 	private VehicleArrivesAtFacilityEvent vehArrivesAtFacilityELeft;
 	private double meterTravelled = 0.0;
 
-	public void handlePersonEnters(PersonEntersVehicleEvent personEnterVehE, VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE, TransitDriverStartsEvent transitDriverStartsE){
-		this.personEnterVehE = personEnterVehE;
+	public void handlePersonEnters(PersonEntersVehicleEvent personEnterVehE1, VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE, TransitDriverStartsEvent transitDriverStartsE1){
+		this.personEnterVehE = personEnterVehE1;
 		this.vehArrivesAtFacilityEEntered = vehArrivesAtFacilityE;
-		this.transitDriverStartsE = transitDriverStartsE;
+		this.transitDriverStartsE = transitDriverStartsE1;
 	}
 	
-	public void handlePersonLeaves(PersonLeavesVehicleEvent personLeavesVehE, VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE){
-		this.personLeavesVehE = personLeavesVehE;
+	public void handlePersonLeaves(PersonLeavesVehicleEvent personLeavesVehE1, VehicleArrivesAtFacilityEvent vehArrivesAtFacilityE){
+		this.personLeavesVehE = personLeavesVehE1;
 		this.vehArrivesAtFacilityELeft = vehArrivesAtFacilityE;
 	}
 	
-	public void addDistanceTravelled(double meterTravelled){
-		this.meterTravelled  += meterTravelled;
+	public void addDistanceTravelled(double meterTravelled1){
+		this.meterTravelled  += meterTravelled1;
 	}
 
 	public Id<TransitStopFacility> getStopEntered() {

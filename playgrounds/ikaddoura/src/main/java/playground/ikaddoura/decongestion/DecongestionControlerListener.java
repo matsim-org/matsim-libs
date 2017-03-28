@@ -233,74 +233,75 @@ public class DecongestionControlerListener implements StartupListener, AfterMobs
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-				
-		if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controler().getFirstIteration()) {
 			
-			this.nextDisableInnovativeStrategiesIteration = (int) (congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL());
-			log.info("next disable innovative strategies iteration: " + this.nextDisableInnovativeStrategiesIteration);
-
-			if (this.nextDisableInnovativeStrategiesIteration != 0) {
-				this.nextEnableInnovativeStrategiesIteration = (int) (congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() + 1);
-			}
-			log.info("next enable innovative strategies iteration: " + this.nextEnableInnovativeStrategiesIteration);
-
-		} else {
-			
-			if (event.getIteration() == this.nextDisableInnovativeStrategiesIteration) {
-				// set weight to zero
-				log.warn("Strategy weight adjustment (set to zero) in iteration " + event.getIteration());
-								
-				for (GenericPlanStrategy<Plan, Person> strategy : event.getServices().getStrategyManager().getStrategies(null)) {
-					
-					String strategyName = strategy.toString();
-					if (isInnovativeStrategy(strategyName)) {
-						log.info("Setting weight for " + strategyName + " to zero.");
-						event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, 0.0);
-					}
-				}
+		if (congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() > 1) {
+			if (event.getIteration() == this.congestionInfo.getScenario().getConfig().controler().getFirstIteration()) {
 				
-				this.nextDisableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL();
+				this.nextDisableInnovativeStrategiesIteration = (int) (congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL());
 				log.info("next disable innovative strategies iteration: " + this.nextDisableInnovativeStrategiesIteration);
-				
-			} else if (event.getIteration() == this.nextEnableInnovativeStrategiesIteration) {
-				// set weight back to original value
 
-				if (event.getIteration() >= congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * (congestionInfo.getScenario().getConfig().controler().getLastIteration() - congestionInfo.getScenario().getConfig().controler().getFirstIteration())) {
-					
-					log.info("Strategies are switched off by global settings. Do not set back the strategy parameters to original values...");
+				if (this.nextDisableInnovativeStrategiesIteration != 0) {
+					this.nextEnableInnovativeStrategiesIteration = (int) (congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL() + 1);
+				}
+				log.info("next enable innovative strategies iteration: " + this.nextEnableInnovativeStrategiesIteration);
+
+			} else {
 				
-				} else {
-					
-					log.info("Strategy weight adjustment (set back to original value) in iteration " + event.getIteration());
-					
+				if (event.getIteration() == this.nextDisableInnovativeStrategiesIteration) {
+					// set weight to zero
+					log.warn("Strategy weight adjustment (set to zero) in iteration " + event.getIteration());
+									
 					for (GenericPlanStrategy<Plan, Person> strategy : event.getServices().getStrategyManager().getStrategies(null)) {
 						
 						String strategyName = strategy.toString();
 						if (isInnovativeStrategy(strategyName)) {
-							
-							double originalValue = -1.0;
-							for (StrategySettings setting : event.getServices().getConfig().strategy().getStrategySettings()) {
-								log.info("setting: " + setting.getStrategyName());
-								log.info("strategyName: " + strategyName);
-
-								if (strategyName.contains(setting.getStrategyName())) {
-									originalValue = setting.getWeight();
-								}
-							}		
-							
-							if (originalValue == -1.0) {
-								throw new RuntimeException("Aborting...");
-							}
-							
-							log.warn("Setting weight for " + strategyName + " back to original value: " + originalValue);
-							event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, originalValue);
+							log.info("Setting weight for " + strategyName + " to zero.");
+							event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, 0.0);
 						}
-					}			
-					this.nextEnableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL();
-				}
-			}
-		}
+					}
+					
+					this.nextDisableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL();
+					log.info("next disable innovative strategies iteration: " + this.nextDisableInnovativeStrategiesIteration);
+					
+				} else if (event.getIteration() == this.nextEnableInnovativeStrategiesIteration) {
+					// set weight back to original value
 
+					if (event.getIteration() >= congestionInfo.getScenario().getConfig().strategy().getFractionOfIterationsToDisableInnovation() * (congestionInfo.getScenario().getConfig().controler().getLastIteration() - congestionInfo.getScenario().getConfig().controler().getFirstIteration())) {
+						
+						log.info("Strategies are switched off by global settings. Do not set back the strategy parameters to original values...");
+					
+					} else {
+						
+						log.info("Strategy weight adjustment (set back to original value) in iteration " + event.getIteration());
+						
+						for (GenericPlanStrategy<Plan, Person> strategy : event.getServices().getStrategyManager().getStrategies(null)) {
+							
+							String strategyName = strategy.toString();
+							if (isInnovativeStrategy(strategyName)) {
+								
+								double originalValue = -1.0;
+								for (StrategySettings setting : event.getServices().getConfig().strategy().getStrategySettings()) {
+									log.info("setting: " + setting.getStrategyName());
+									log.info("strategyName: " + strategyName);
+
+									if (strategyName.contains(setting.getStrategyName())) {
+										originalValue = setting.getWeight();
+									}
+								}		
+								
+								if (originalValue == -1.0) {
+									throw new RuntimeException("Aborting...");
+								}
+								
+								log.warn("Setting weight for " + strategyName + " back to original value: " + originalValue);
+								event.getServices().getStrategyManager().changeWeightOfStrategy(strategy, null, originalValue);
+							}
+						}			
+						this.nextEnableInnovativeStrategiesIteration += congestionInfo.getDecongestionConfigGroup().getUPDATE_PRICE_INTERVAL();
+					}
+				}
+			}	
+		}
 	}
 
 	private boolean isInnovativeStrategy(String strategyName) {

@@ -27,12 +27,14 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacility;
 
 
 /**
@@ -55,6 +57,8 @@ public class ChainChopperTest {
 		Assert.assertTrue("Wrong activity type at end.",s1End.getType().equalsIgnoreCase("chopEnd"));
 		Assert.assertEquals("Wrong coordinate.", 1.0, s1End.getCoord().getY(), 0.1);
 		Assert.assertEquals("Wrong number of plan elements.", 3, s1.getPlanElements().size());
+		Assert.assertNotNull("Must have facility Id.", ((Activity)s1.getPlanElements().get(0)).getFacilityId());
+		Assert.assertNotNull("Must have facility Id.", ((Activity)s1.getPlanElements().get(2)).getFacilityId());
 		
 		/* Segment 2. */
 		Plan s2 = list.get(1);
@@ -63,6 +67,8 @@ public class ChainChopperTest {
 		Assert.assertEquals("Wrong chain start time.", 60.0, s2Start.getEndTime(), 0.1);
 		Assert.assertEquals("Wrong coordinate.", 1.0, s2Start.getCoord().getY(), 0.1);
 		Assert.assertEquals("Wrong number of plan elements.", 3, s2.getPlanElements().size());
+		Assert.assertNotNull("Must have facility Id.", ((Activity)s2.getPlanElements().get(0)).getFacilityId());
+		Assert.assertNotNull("Must have facility Id.", ((Activity)s2.getPlanElements().get(2)).getFacilityId());
 	}
 	
 	@Test
@@ -78,6 +84,8 @@ public class ChainChopperTest {
 		Assert.assertEquals("Wrong duration.", Time.UNDEFINED_TIME, s1End.getMaximumDuration(), 0.1);
 		Assert.assertEquals("Wrong coordinate.", 1.0, s1End.getCoord().getY(), 0.1);
 		Assert.assertEquals("Wrong number of plan elements.", 3, s1.getPlanElements().size());
+		Assert.assertNotNull("Must have facility Id.", ((Activity)s1.getPlanElements().get(0)).getFacilityId());
+		Assert.assertNotNull("Must have facility Id.", ((Activity)s1.getPlanElements().get(2)).getFacilityId());
 		
 		/* Segment 2. */
 		Plan s2 = list.get(1);
@@ -86,6 +94,8 @@ public class ChainChopperTest {
 		Assert.assertEquals("Wrong chain start time.", Time.parseTime("01:00:00"), s2Start.getEndTime(), 0.1);
 		Assert.assertEquals("Wrong coordinate.", 1.0, s2Start.getCoord().getY(), 0.1);
 		Assert.assertEquals("Wrong number of plan elements.", 3, s2.getPlanElements().size());
+		Assert.assertNotNull("Must have facility Id.", ((Activity)s2.getPlanElements().get(0)).getFacilityId());
+		Assert.assertNotNull("Must have facility Id.", ((Activity)s2.getPlanElements().get(2)).getFacilityId());
 	}
 	
 	@Test
@@ -122,6 +132,7 @@ public class ChainChopperTest {
 		Plan plan = PopulationUtils.createPlan();
 		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
+		a.setFacilityId(Id.create("a", ActivityFacility.class));
 		plan.addActivity(a);
 		
 		plan.addLeg(PopulationUtils.createLeg("truck"));
@@ -132,6 +143,7 @@ public class ChainChopperTest {
 		double distance = Math.round((travelTime * ChainChopper.AVERAGE_SPEED) / ChainChopper.CROWFLY_FACTOR);
 		
 		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 2.0));
+		b.setFacilityId(Id.create("b", ActivityFacility.class));
 		plan.addActivity(b);
 		return plan;
 	}
@@ -151,6 +163,7 @@ public class ChainChopperTest {
 		Plan plan = PopulationUtils.createPlan();
 		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
+		a.setFacilityId(Id.create("a", ActivityFacility.class));
 		plan.addActivity(a);
 		
 		plan.addLeg(PopulationUtils.createLeg("truck"));
@@ -162,11 +175,13 @@ public class ChainChopperTest {
 		
 		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 1.0));
 		b.setMaximumDuration(Time.parseTime("02:00:00"));
+		b.setFacilityId(Id.create("b", ActivityFacility.class));
 		plan.addActivity(b);
 		
 		plan.addLeg(PopulationUtils.createLeg("truck"));
 		
 		Activity c = PopulationUtils.createActivityFromCoord("c", CoordUtils.createCoord(2*distance, 2.0));
+		c.setFacilityId(Id.create("c", ActivityFacility.class));
 		plan.addActivity(c);
 		return plan;
 	}
@@ -185,6 +200,7 @@ public class ChainChopperTest {
 		Plan plan = PopulationUtils.createPlan();
 		Activity a = PopulationUtils.createActivityFromCoord("a", CoordUtils.createCoord(0.0, 0.0));
 		a.setEndTime(Time.parseTime("16:00:00"));
+		a.setFacilityId(Id.create("a", ActivityFacility.class));
 		plan.addActivity(a);
 		
 		plan.addLeg(PopulationUtils.createLeg("truck"));
@@ -195,6 +211,7 @@ public class ChainChopperTest {
 		double distance = Math.round((travelTime * ChainChopper.AVERAGE_SPEED) / ChainChopper.CROWFLY_FACTOR);
 		
 		Activity b = PopulationUtils.createActivityFromCoord("b", CoordUtils.createCoord(distance, 2.0));
+		b.setFacilityId(Id.create("b", ActivityFacility.class));
 		plan.addActivity(b);
 		return plan;
 	}

@@ -24,6 +24,8 @@ import org.matsim.vehicles.Vehicle;
 public class BenensonDynLeg extends ParkingDynLeg{
 	
 	private static final Logger logger = Logger.getLogger(BenensonDynLeg.class);
+	private static final boolean logForDebug = false;
+	
 	private double totalObservedParkingSpaces = 0.0;
 	private double observedFreeParkingSpaces = 0.0;
 	private double firstDestLinkEnterTime = 0;
@@ -53,7 +55,7 @@ public class BenensonDynLeg extends ParkingDynLeg{
 			if(((BenensonParkingSearchLogic)this.logic).goIntoObserving(currentLinkId, this.route.getEndLinkId())){
 				this.legStage = ParkingMode.OBSERVING;
 				this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
-				logger.error("vehicle " + this.vehicleId + " goes into observing on link " + this.currentLinkId);
+				if(logForDebug)logger.error("vehicle " + this.vehicleId + " goes into observing on link " + this.currentLinkId);
 			}
 		}
 		if(this.legStage == ParkingMode.OBSERVING ){
@@ -67,7 +69,7 @@ public class BenensonDynLeg extends ParkingDynLeg{
 			if(((BenensonParkingSearchLogic)this.logic).goIntoParking(currentLinkId, this.route.getEndLinkId())){
 				this.legStage = ParkingMode.SEARCH_WHILE_APPROACH;
 				this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
-				logger.error("vehicle " + this.vehicleId + " goes into parking on link " + this.currentLinkId);
+				if(logForDebug)logger.error("vehicle " + this.vehicleId + " goes into parking on link " + this.currentLinkId);
 			}
 		}
 		if(this.legStage == ParkingMode.SEARCH_WHILE_APPROACH){
@@ -82,23 +84,23 @@ public class BenensonDynLeg extends ParkingDynLeg{
 						pUnoccupied = this.observedFreeParkingSpaces / this.totalObservedParkingSpaces;
 					}
 					if ( ((BenensonParkingSearchLogic)this.logic).wantToParkHere(pUnoccupied, currentLinkId, route.getEndLinkId())){
-						logger.error("vehicle " + this.vehicleId + " würde gerne auf Link " + currentLinkId + " parken.\n "
+						if(logForDebug)logger.error("vehicle " + this.vehicleId + " würde gerne auf Link " + currentLinkId + " parken.\n "
 								+ "\t pUnoccupied = " + pUnoccupied + "\n\t totalObservedParkingSpaces = " + totalObservedParkingSpaces + "\n\t observedFreeSpaces = " + this.observedFreeParkingSpaces );
 						hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);	
 					}
 				}
 				else{
-					logger.error("nothing free for vehicle " + vehicleId + " on link " + currentLinkId);
+					if(logForDebug)logger.error("nothing free for vehicle " + vehicleId + " on link " + currentLinkId);
 				}
 			}
 		}
 		if (this.legStage == ParkingMode.SEARCH_FOR_NEXT){
-			logger.error("vehicle " + this.vehicleId + " in PHASE3 auf link " + this.currentLinkId);
+			if(logForDebug)logger.error("vehicle " + this.vehicleId + " in PHASE3 auf link " + this.currentLinkId);
 			//if( ((BenensonParkingSearchLogic)this.logic).isDriverInAcceptableDistance(currentLinkId, route.getEndLinkId(), this.firstDestLinkEnterTimer, timer.getTimeOfDay()) ){
 			
 				hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
 				
-				logger.error("vehicle " + this.vehicleId + " probiert in Phase 3 auf Link " + this.currentLinkId + ", " +
+				if(logForDebug)logger.error("vehicle " + this.vehicleId + " probiert in Phase 3 auf Link " + this.currentLinkId + ", " +
 						(int)(timer.getTimeOfDay() - this.firstDestLinkEnterTime)/60 + ":" + (int)(timer.getTimeOfDay() - this.firstDestLinkEnterTime)%60
 						+ " min nach Erreichen des Ziels zu parken. Resultat: " + hasFoundParking);
 			//}
@@ -127,7 +129,7 @@ public class BenensonDynLeg extends ParkingDynLeg{
 		}
 		else {
 			if (hasFoundParking) {
-				logger.error("vehicle " + this.vehicleId + " has found a parking on link " + this.currentLinkId + " after passing " + Math.abs((this.route.getLinkIds().size() - this.currentLinkIdx - 3)) + " links");
+				if(logForDebug)logger.error("vehicle " + this.vehicleId + " has found a parking on link " + this.currentLinkId + " after passing " + Math.abs((this.route.getLinkIds().size() - this.currentLinkIdx - 3)) + " links");
 				return null;
 			}
 			else {

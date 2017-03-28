@@ -18,9 +18,9 @@ public class TaxiAnalysisTest {
 
 	private static final Logger logger = Logger.getLogger(TaxiAnalysisTest.class);
 
-	static final String outputDir = "C:/Users/Tille/WORK/TaxiAnalysisNEU";
-	static final String eventsFile ="C:/Users/Tille/WORK/shared-svn/projects/audi_av/scenario/events.out.xml.gz";
-	static final String networkFile ="C:/Users/Tille/WORK/shared-svn/projects/audi_av/scenario/networkc.xml.gz";
+	static final String outputDir = ".../Users/WORK/TaxiAnalysisNEU";
+	static final String eventsFile =".../shared-svn/projects/audi_av/scenario/events.out.xml.gz";
+	static final String networkFile =".../shared-svn/projects/audi_av/scenario/networkc.xml.gz";
 
 	public static void main(String[] args){
 		Config config = ConfigUtils.createConfig();

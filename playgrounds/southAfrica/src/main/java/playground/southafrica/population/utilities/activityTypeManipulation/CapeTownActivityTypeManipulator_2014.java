@@ -26,9 +26,9 @@ import playground.southafrica.utilities.Header;
  * 
  * @author jwjoubert
  */
-public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
+public class CapeTownActivityTypeManipulator_2014 extends ActivityTypeManipulator {
 
-	public CapeTownActivityTypeManipulator() {
+	public CapeTownActivityTypeManipulator_2014() {
 	}
 
 	/**
@@ -36,13 +36,13 @@ public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(CapeTownActivityTypeManipulator.class.toString(), args);
+		Header.printHeader(CapeTownActivityTypeManipulator_2014.class.toString(), args);
 
 		/* ===================  For persons. ===================== */
 		String population = args[0];
 		String decileFile = args[1];
 		String outputPopulation = args[2];
-		CapeTownActivityTypeManipulator atm = new CapeTownActivityTypeManipulator();
+		CapeTownActivityTypeManipulator_2014 atm = new CapeTownActivityTypeManipulator_2014();
 		List<ActivityParams> listPersons = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();
@@ -53,7 +53,7 @@ public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 		population = args[3];
 		decileFile = args[4];
 		outputPopulation = args[5];
-		atm = new CapeTownActivityTypeManipulator();
+		atm = new CapeTownActivityTypeManipulator_2014();
 		List<ActivityParams> listCommercial = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();

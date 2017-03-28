@@ -21,7 +21,7 @@ package playground.thibautd.socnetsimusages.run;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-class KtiInputFilesConfigGroup extends ReflectiveConfigGroup {
+public class KtiInputFilesConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "ktiInputFiles";
 
 	private String worldFile = null;

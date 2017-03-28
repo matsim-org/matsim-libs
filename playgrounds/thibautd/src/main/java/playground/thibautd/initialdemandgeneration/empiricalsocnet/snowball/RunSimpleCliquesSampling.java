@@ -23,25 +23,27 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.gbl.MatsimRandom;
 import playground.ivt.utils.MonitoringUtils;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.CliquesCsvWriter;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.StopwatchCsvWriter;
 
 /**
  * @author thibautd
  */
 public class RunSimpleCliquesSampling {
-	public static void main( String[] args ) {
+	public static void main( final String[] args ) {
 		final SnowballSamplingConfigGroup configGroup = new SnowballSamplingConfigGroup();
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup , new SocialNetworkSamplingConfigGroup() );
+		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup  );
 
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() , config );
 
 		new ConfigWriter( config ).write( config.controler().getOutputDirectory()+"/output_config.xml" );
+
+		MatsimRandom.reset( config.global().getRandomSeed() );
 
 		try ( final AutocloserModule closer = new AutocloserModule();
 				final AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose() ){

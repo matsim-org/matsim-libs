@@ -78,6 +78,6 @@ public class RequestImpl implements Request {
 
 	@Override
 	public String toString() {
-		return "Request_" + id + " [S=(" + earliestStartTime + ", ???, " + latestStartTime + "), F=???]";
+		return "Request_" + id + " [TW=(" + earliestStartTime + ", " + latestStartTime + ")]";
 	}
 }

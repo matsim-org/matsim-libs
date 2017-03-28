@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,29 +36,35 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
+import com.google.inject.Inject;
+
 /**
+ * To have an example/prototype and for testing purposes.
+ * This subsidy approach simply adds a certain amount for each passenger to the operator's score.
  * 
- * Computes the contribution of each transit line on the overall welfare changes.
+ * TODO: Compute the contribution of each transit line on the overall welfare changes.
  * Allocates the changes in user benefits to the transit lines which are used by the user.
  * 
  * 
  * @author ikaddoura
  *
  */
-public class WelfareAnalyzer {
-	private static final Logger log = Logger.getLogger(WelfareAnalyzer.class);
+public class PerPassengerSubsidy implements SubsidyI {
 
 //	private Map<Id<Person>, Double> personId2initialBenefits;
 //	private Map<Id<Person>, Double> personId2benefits;
 //	private Map<Id<Person>, Set<Id<PPlan>>> personId2usedPPlanIds;
 //	private Set<Id<PPlan>> currentPPlanTransitRouteIds;
 	
-	private Map<Id<PPlan>, Double> pId2welfareCorrection;
+	private Map<Id<PPlan>, Double> welfareCorrection;
 	private Map<Id<PPlan>, Set<Id<Person>>> pId2persons;
 
-	private final double subsidyPerPassenger = 100.;
+	private final double subsidyPerPassenger = 100000.;
 	
-	public WelfareAnalyzer(String initialScoresFile){
+	@Inject
+	Scenario scenario;
+	
+	public PerPassengerSubsidy(){
 		// yyyy I am not happy with passing a string here and having the reader inside this method.  kai, mar'17
 		
 		//get initial scores from the given file and store the values
@@ -79,7 +84,8 @@ public class WelfareAnalyzer {
 		
 	}
 	
-	public void computeWelfare(Scenario scenario) {
+	@Override
+	public void computeSubsidy() {
 		// yyyy welfare should be computed based on executed plans, not planned plans.  --> use ExecutedPlansService
 		// When this is injected, we do not need scenario as an argument here so every implementor can do what she wants.
 		
@@ -88,7 +94,7 @@ public class WelfareAnalyzer {
 //		this.personId2benefits = new HashMap<>();
 
 //		this.currentPPlanTransitRouteIds = new HashSet<Id<PPlan>>();
-		this.pId2welfareCorrection = new HashMap<>();
+		this.welfareCorrection = new HashMap<>();
 		this.pId2persons = new HashMap<>();
 
 //		for (TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()){
@@ -180,20 +186,10 @@ public class WelfareAnalyzer {
 		}
 		
 		for (Id<PPlan> id : this.pId2persons.keySet()) {
-			this.pId2welfareCorrection.put(id, pId2persons.get(id).size() * subsidyPerPassenger);
+			this.welfareCorrection.put(id, pId2persons.get(id).size() * subsidyPerPassenger);
 		}
 	}
 	
-	public double getWelfareCorrection(Id<PPlan> id) {
-		
-		if (this.pId2welfareCorrection.get(id) != null){
-			return this.pId2welfareCorrection.get(id);
-			
-		} else {
-			return 0.;
-		}
-	}
-
 	public void writeToFile(ScoringEvent event) {
 		// yyyy find other solution.  This would force every implementer to implement something here. 
 		
@@ -289,6 +285,16 @@ public class WelfareAnalyzer {
 //			
 //		}
 			
+	}
+
+	@Override
+	public double getSubsidy(Id<PPlan> pPlanId) {
+		if (this.welfareCorrection.get(pPlanId) != null){
+			return this.welfareCorrection.get(pPlanId);
+			
+		} else {
+			return 0.;
+		}
 	}
 
 }

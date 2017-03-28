@@ -19,10 +19,7 @@
 
 package playground.agarwalamit.analysis.tripTime;
 
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import javax.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -43,6 +40,9 @@ public class ModalTravelTimeControlerListener implements StartupListener, Iterat
 	private int firstIteration = 0;
 	private final SortedMap<String, double []> mode2AvgTripTimes = new TreeMap<>();
 
+	// following is required to fix if at some intermediate iteration, one of the mode type vanishes, the arrayCopy wont work
+	private final Set<String> modeHistory = new HashSet<>();
+
 	@Inject
 	private ModalTripTravelTimeHandler travelTimeHandler;
 
@@ -61,6 +61,10 @@ public class ModalTravelTimeControlerListener implements StartupListener, Iterat
 		String outputDir = event.getServices().getConfig().controler().getOutputDirectory();
 
 		SortedMap<String, Double > mode2AvgTripTime = modalAvgTime();
+		modeHistory.addAll(mode2AvgTripTime.keySet());
+		modeHistory.stream().filter(e -> ! mode2AvgTripTime.containsKey(e)).forEach(e -> mode2AvgTripTime.put(e, 0.));
+
+
 		int itNrIndex = event.getIteration() - this.firstIteration;
 
 		for(String mode : mode2AvgTripTime.keySet()) {
@@ -105,11 +109,11 @@ public class ModalTravelTimeControlerListener implements StartupListener, Iterat
 		SortedMap<String, Map<Id<Person>, List<Double>>> times = travelTimeHandler.getLegMode2PesonId2TripTimes();
 		for(String mode :times.keySet()){
 			double tripTimes =0;
-			int count = 0;
-			for(Id<Person> id : times.get(mode).keySet()){
-				tripTimes += ListUtils.doubleSum(times.get(mode).get(id));
-				count += times.get(mode).get(id).size();
-			}
+				int count = 0;
+				for(Id<Person> id : times.get(mode).keySet()){
+					tripTimes += ListUtils.doubleSum(times.get(mode).get(id));
+					count += times.get(mode).get(id).size();
+				}
 			mode2AvgTripTime.put(mode, tripTimes/count);
 		}
 		return mode2AvgTripTime;

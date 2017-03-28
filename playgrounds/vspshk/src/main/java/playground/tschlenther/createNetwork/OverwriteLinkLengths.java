@@ -3,6 +3,9 @@
  */
 package playground.tschlenther.createNetwork;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
@@ -14,6 +17,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 //import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.tschlenther.analysis.modules.taxiTrips.TaxiAnalysisTest;
 
@@ -38,14 +44,49 @@ public class OverwriteLinkLengths {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String input = "C:/Users/Work/Bachelor Arbeit/input/grid_network.xml";
-		String output = "C:/Users/Work/Bachelor Arbeit/input/grid_network_length200.xml";
-		overwriteGridNetworkLengthsAllToGivenLength(input, output, 200);
+		String input = "C:/Users/Work/Bachelor Arbeit/input/Berlin/network-car.xml.gz";
+		String output = "C:/Users/Work/Bachelor Arbeit/input/Berlin/network-ZONES-MARKED-EDIT.xml.gz";
+//		overwriteGridNetworkLengthsAllToGivenLength(input, output, 200);
+		markZones(input, output);
 	}
 
+	static void markZones(String inputFile, String outputFile){
+		Scenario oldNetScen = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		oldNet = oldNetScen.getNetwork();
+		
+		log.info("reading old net file");
+		MatsimNetworkReader oldReader = new MatsimNetworkReader(oldNet);
+		oldReader.readFile(inputFile);
+
+		Set<Id<Link>> mierrendorfLinks = readLinks("C:/Users/Work/Bachelor Arbeit/input/Berlin/mierendorfflinks_edit.txt");
+		Set<Id<Link>> klausenerLinks = readLinks("C:/Users/Work/Bachelor Arbeit/input/Berlin/klausnerlinks_edit.txt");
+		
+		for(Id<Link> ll : mierrendorfLinks){
+			Link link = oldNet.getLinks().get(ll);
+			if(link == null){
+				log.error("couldn't find link " + ll);
+			}
+			else{
+				oldNet.getLinks().get(ll).setFreespeed(7777);	
+			}
+			
+		}
+		for(Id<Link> ll : klausenerLinks){
+			Link link = oldNet.getLinks().get(ll);
+			if(link == null){
+				log.error("couldn't find link " + ll);
+			}
+			else{
+				oldNet.getLinks().get(ll).setFreespeed(5555);	
+			}
+		}
+		log.info("WRITING NETWORK TO " + outputFile);
+		NetworkWriter writer = new NetworkWriter(oldNet);
+		writer.write(outputFile);
+		log.info("DONE");
+	}
 	
-	
-	
+
 	
 	static void overWriteOneNetWithOther(){
 		
@@ -114,5 +155,26 @@ public class OverwriteLinkLengths {
 		
 		log.info("DONE");
 	}
+	private static Set<Id<Link>> readLinks(String fileName) {
+		final Set<Id<Link>> links = new HashSet<>();
+		TabularFileParserConfig config = new TabularFileParserConfig();
+	    config.setDelimiterTags(new String[] {"\t"});
+	    config.setFileName(fileName);
+	    new TabularFileParser().parse(config, new TabularFileHandler() {
+			@Override
+			public void startRow(String[] row) {
+				links.add(Id.createLinkId(row[0]));
+			}
+		});
 
+		
+		return links;
+	}
+	
+	static void overwriteGivenLinksToGivenLength(Network net, Set<Id<Link>> linkIDs, int wantedLinkLength){
+		for(Id<Link> ll : linkIDs){
+			oldNet.getLinks().get(ll).setLength(wantedLinkLength);
+		}
+	}
+	
 }

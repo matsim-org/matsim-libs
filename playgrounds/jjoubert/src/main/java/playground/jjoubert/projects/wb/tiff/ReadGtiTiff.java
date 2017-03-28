@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ReadGtiTiff.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,20 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration.empiricalsocnet.framework;
-
-import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * @author thibautd
+ * 
  */
-public class SocialNetworkSamplingConfigGroup extends ReflectiveConfigGroup {
-	private static final String GROUP_NAME = "socialNetworkSampler";
+package playground.jjoubert.projects.wb.tiff;
 
+import playground.southafrica.utilities.Header;
 
+/**
+ * Class to read the land cover TIFF file provided by GeoTerraImage.
+ * 
+ * @author jwjoubert
+ */
+public class ReadGtiTiff {
 
-	public SocialNetworkSamplingConfigGroup( ) {
-		super( GROUP_NAME );
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Header.printHeader(ReadGtiTiff.class.toString(), args);
+		run(args);
+		Header.printFooter();
+	}
+	
+	public static void run(String[] args){
+		String tiff = args[0];
+
 	}
 
 }
