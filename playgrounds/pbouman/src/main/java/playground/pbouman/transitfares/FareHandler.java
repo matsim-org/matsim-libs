@@ -12,16 +12,21 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.MutableScenario;
 
@@ -34,7 +39,9 @@ public class FareHandler implements
 										LinkLeaveEventHandler,
 										TransitDriverStartsEventHandler,
 										AfterMobsimListener,
-										StartupListener
+										StartupListener,
+										VehicleLeavesTrafficEventHandler,
+										VehicleEntersTrafficEventHandler
 
 {
 
@@ -63,6 +70,18 @@ public class FareHandler implements
 	
 	private String output;
 	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
+	
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
 	public FareHandler(Scenario s)
 	{
 		this(s,null);
@@ -164,10 +183,16 @@ public class FareHandler implements
 	{
 		// Add the length of the link to the distances of all passengers in the vehicle
 		// the driver is 
-		if (driverToVehicle.get(event.getDriverId()) != null)
+		
+		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId()) ;
+		
+		// yyyyyy this might now be going from one data structure to another and back ... I am just brute-force fixing.  kai, mar'17
+		
+		if (driverToVehicle.get( driverId ) != null)
+//		if (driverToVehicle.get(event.getDriverId()) != null)
 		{
 			Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
-			Id vehicle = driverToVehicle.get(event.getDriverId());
+			Id vehicle = driverToVehicle.get(driverId);
 			for (Id p : vehicleToPassengers.get(vehicle))
 			{
 				if (agentCurrentDistance.containsKey(p))
@@ -251,6 +276,7 @@ public class FareHandler implements
 	}
 
 	
+	@Override
 	public void reset(int iteration)
 	{
 		agentDiscount = new HashMap<>();

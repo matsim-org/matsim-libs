@@ -13,6 +13,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.pbouman.transitfares.TransitFares;
+
 /**
  * @author nagel
  *
@@ -42,6 +44,9 @@ public class PeakPricingTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
+		
+		TransitFares.activateTransitPricing(controler, false, false);
+		
 		controler.run();
 
 	}
