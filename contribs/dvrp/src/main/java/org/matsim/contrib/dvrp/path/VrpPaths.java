@@ -53,6 +53,16 @@ public class VrpPaths {
 		}
 
 		int count = path.links.size();
+		if (count > 0) {
+			if (fromLink.getToNode() != path.links.get(0).getFromNode()) {
+				throw new IllegalArgumentException("fromLink and path are not connected");
+			}
+			if (path.links.get(count - 1).getToNode() != toLink.getFromNode()) {
+				throw new IllegalArgumentException("path and toLink are not connected");
+			}
+		}
+		
+		
 		Link[] links = new Link[count + 2];
 		double[] linkTTs = new double[count + 2];
 

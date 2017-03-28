@@ -52,7 +52,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import playground.jbischoff.drt.config.DRTConfigGroup;
+import playground.michalm.drt.run.DrtConfigGroup;
+
+
 
 /**
  * @author  jbischoff
@@ -66,7 +68,7 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 	private final StageActivityTypes drtStageActivityType = new DRTStageActivityType();
 	private final RoutingModule walkRouter;
 	private final Map<Id<TransitStopFacility>,TransitStopFacility> stops;
-	private final DRTConfigGroup drtconfig;
+	private final DrtConfigGroup drtconfig;
 	private final double walkBeelineFactor;
 	private final Network network;
 	private final Scenario scenario;
@@ -74,11 +76,11 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 	 * 
 	 */
 	@Inject
-	public StopBasedDRTRoutingModule(@Named(TransportMode.walk) RoutingModule walkRouter, @Named(DRTConfigGroup.DRTMODE) TransitSchedule transitSchedule, Scenario scenario) {
+	public StopBasedDRTRoutingModule(@Named(TransportMode.walk) RoutingModule walkRouter, @Named(DrtConfigGroup.DRTMODE) TransitSchedule transitSchedule, Scenario scenario) {
 			transitSchedule.getFacilities();
 			this.walkRouter = walkRouter;
 			this.stops = transitSchedule.getFacilities();
-			this.drtconfig = (DRTConfigGroup) scenario.getConfig().getModules().get(DRTConfigGroup.GROUPNAME);
+			this.drtconfig = (DrtConfigGroup) scenario.getConfig().getModules().get(DrtConfigGroup.GROUP_NAME);
 			this.walkBeelineFactor = scenario.getConfig().plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
 			this.network = scenario.getNetwork();
 			this.scenario = scenario;
@@ -108,7 +110,7 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 	    drtRoute.setDistance(drtconfig.getEstimatedBeelineDistanceFactor()*CoordUtils.calcEuclideanDistance(accessFacility.getCoord(), egressFacility.getCoord()));
 	    drtRoute.setTravelTime(drtRoute.getDistance()/drtconfig.getEstimatedSpeed());
 
-	    Leg drtLeg = PopulationUtils.createLeg(DRTConfigGroup.DRTMODE);
+	    Leg drtLeg = PopulationUtils.createLeg(DrtConfigGroup.DRTMODE);
         drtLeg.setDepartureTime(departureTime+walkLeg.getTravelTime()+1);
         drtLeg.setTravelTime(drtRoute.getTravelTime());
         drtLeg.setRoute(drtRoute);

@@ -17,79 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.drt.run;
+package playground.michalm.drt.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
-import org.matsim.contrib.taxi.run.TaxiOutputModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.name.Names;
+import com.google.inject.Provider;
 
+import playground.michalm.drt.analysis.DRTAnalysisModule;
+import playground.michalm.drt.optimizer.*;
+import playground.michalm.drt.passenger.NDrtRequestCreator;
+import playground.michalm.drt.vrpagent.NDrtActionCreator;
 
-import playground.jbischoff.drt.routingModule.StopBasedDRTRoutingModule;
-import playground.michalm.drt.run.DrtConfigGroup;
-
-
-public class RunTaxiWithStopsExample {
-
+public class RunSharedTaxiBerlin {
 	public static void main(String[] args) {
-		String configFile = "../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/testconfig.xml";
-		RunTaxiWithStopsExample.run(configFile, false);
+		String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
+		RunSharedTaxiBerlin.run(configFile, false);
 	}
 
 	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
 				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
-		
-		DrtConfigGroup drt = new DrtConfigGroup();
-		drt.setEstimatedBeelineDistanceFactor(1.3);
-		drt.setEstimatedSpeed(30/3.6);
-		drt.setMaximumWalkDistance(500);
-		drt.setOperationalScheme("stationbased");
-		config.addModule(drt);
-		
 		createControler(config, otfvis).run();
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-
-
-		
+		DrtConfigGroup taxiCfg = DrtConfigGroup.get(config);
+		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
+		config.checkConsistency();
+		config.qsim().setEndTime(40*3600);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).parse(TaxiConfigGroup.get(config).getTaxisFileUrl(config.getContext()));
+		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getVehiclesFileUrl(config.getContext()));
 
 		Controler controler = new Controler(scenario);
-			controler.addOverridingModule(new TaxiOutputModule());
-
-		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(scenario2).readFile("../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/stopsWRS_300m.xml");
-		
-		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
-        controler.addOverridingModule(new AbstractModule() {
-					
-			@Override
-			public void install() {
-				bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRTMODE)).toInstance(scenario2.getTransitSchedule());;
-				addRoutingModuleBinding(DrtConfigGroup.DRTMODE).to(StopBasedDRTRoutingModule.class).asEagerSingleton();
-				
-			}
-		});
-
+		controler.addOverridingModule(new DvrpModule(fleet,
+				createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class));
+		controler.addOverridingModule(new DRTAnalysisModule());
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
@@ -97,4 +72,16 @@ public class RunTaxiWithStopsExample {
 		return controler;
 	}
 
+	private static com.google.inject.AbstractModule createModuleForQSimPlugin(
+			final Class<? extends Provider<? extends DrtOptimizer>> providerClass) {
+		return new com.google.inject.AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(DrtOptimizer.class).toProvider(providerClass).asEagerSingleton();
+				bind(VrpOptimizer.class).to(DrtOptimizer.class);
+				bind(DynActionCreator.class).to(NDrtActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(NDrtRequestCreator.class).asEagerSingleton();
+			}
+		};
+	}
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,67 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package playground.michalm.drt.passenger;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+
+import playground.michalm.drt.data.NDrtRequest;
 
 /**
  * @author michalm
  */
-public class RequestImpl implements Request {
-	private final Id<Request> id;
-	private final double quantity;
-	private final double earliestStartTime;
-	private final double latestStartTime;
-	private final double submissionTime;
-
-	private boolean rejected = false;
-
-	public RequestImpl(Id<Request> id, double quantity, double earliestStartTime, double latestStartTime,
-			double submissionTime) {
-		this.id = id;
-		this.quantity = quantity;
-		this.earliestStartTime = earliestStartTime;
-		this.latestStartTime = latestStartTime;
-		this.submissionTime = submissionTime;
-	}
-
+public class NDrtRequestCreator implements PassengerRequestCreator {
 	@Override
-	public Id<Request> getId() {
-		return id;
-	}
-
-	@Override
-	public double getQuantity() {
-		return quantity;
-	}
-
-	@Override
-	public double getEarliestStartTime() {
-		return earliestStartTime;
-	}
-
-	@Override
-	public double getLatestStartTime() {
-		return latestStartTime;
-	}
-
-	@Override
-	public double getSubmissionTime() {
-		return submissionTime;
-	}
-
-	@Override
-	public boolean isRejected() {
-		return rejected;
-	}
-
-	public void setRejected(boolean rejected) {
-		this.rejected = rejected;
-	}
-
-	@Override
-	public String toString() {
-		return "Request_" + id + " [TW=(" + earliestStartTime + ", " + latestStartTime + ")]";
+	public NDrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+			double earliestStartTime, double latestStartTime, double submissionTime) {
+		return new NDrtRequest(id, passenger, fromLink, toLink, earliestStartTime, submissionTime);
 	}
 }

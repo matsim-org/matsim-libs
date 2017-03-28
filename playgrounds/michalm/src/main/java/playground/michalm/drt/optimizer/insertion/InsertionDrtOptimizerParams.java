@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.scheduler;
+package playground.michalm.drt.optimizer.insertion;
 
-import playground.michalm.drt.run.DrtConfigGroup;
+import org.apache.commons.configuration.Configuration;
+
+import playground.michalm.drt.optimizer.AbstractDrtOptimizerParams;
 
 /**
  * @author michalm
  */
-public class DrtSchedulerParams {
-	public final double stopDuration;
-
-	public DrtSchedulerParams(DrtConfigGroup drtCfg) {
-		this.stopDuration = drtCfg.getStopDuration();
-	}
-
-	public DrtSchedulerParams(double stopDuration) {
-		this.stopDuration = stopDuration;
+public class InsertionDrtOptimizerParams extends AbstractDrtOptimizerParams {
+	public InsertionDrtOptimizerParams(Configuration optimizerConfig) {
+		super(optimizerConfig);
 	}
 }

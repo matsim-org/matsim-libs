@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.scheduler;
+/**
+ * 
+ */
+package playground.michalm.drt.analysis;
 
-import playground.michalm.drt.run.DrtConfigGroup;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+
+import com.google.inject.Inject;
 
 /**
- * @author michalm
+ * @author  jbischoff
+ *
  */
-public class DrtSchedulerParams {
-	public final double stopDuration;
+/**
+ *
+ */
+public class DRTAnalysisControlerListener implements IterationEndsListener{
 
-	public DrtSchedulerParams(DrtConfigGroup drtCfg) {
-		this.stopDuration = drtCfg.getStopDuration();
+	@Inject 
+	VehicleOccupancyEvaluator vehicleOccupancyEvaluator;
+	@Inject
+	MatsimServices matsimServices;
+
+	
+	/* (non-Javadoc)
+	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+	 */
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		vehicleOccupancyEvaluator.calcAndWriteFleetStats(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleOccupancy"));
 	}
 
-	public DrtSchedulerParams(double stopDuration) {
-		this.stopDuration = stopDuration;
-	}
 }

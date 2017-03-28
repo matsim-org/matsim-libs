@@ -19,11 +19,14 @@
 
 package playground.michalm.drt.vrpagent;
 
-import org.matsim.contrib.drt.tasks.DrtStayTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.optimizer.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.*;
+import org.matsim.core.mobsim.qsim.QSim;
+
+import com.google.inject.Inject;
 
 import playground.michalm.drt.schedule.*;
 
@@ -36,9 +39,11 @@ public class NDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final PassengerEngine passengerEngine;
 	private final VrpLegs.LegCreator legCreator;
 
-	public NDrtActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator) {
+	@Inject
+	public NDrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, QSim qSim) {
 		this.passengerEngine = passengerEngine;
-		this.legCreator = legCreator;
+		legCreator = VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer,
+				qSim.getSimTimer());
 	}
 
 	@Override
@@ -54,7 +59,7 @@ public class NDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 						DRT_STOP_NAME);
 
 			case STAY:
-				return new VrpActivity(DRT_STAY_NAME, (DrtStayTask)task);
+				return new VrpActivity(DRT_STAY_NAME, (NDrtStayTask)task);
 
 			default:
 				throw new IllegalStateException();

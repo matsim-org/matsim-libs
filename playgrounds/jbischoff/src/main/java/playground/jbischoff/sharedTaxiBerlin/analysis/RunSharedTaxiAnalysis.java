@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.scheduler;
+/**
+ * 
+ */
+package playground.jbischoff.sharedTaxiBerlin.analysis;
 
-import playground.michalm.drt.run.DrtConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+
+import playground.michalm.drt.analysis.VehicleOccupancyEvaluator;
 
 /**
- * @author michalm
+ * @author  jbischoff
+ *
  */
-public class DrtSchedulerParams {
-	public final double stopDuration;
-
-	public DrtSchedulerParams(DrtConfigGroup drtCfg) {
-		this.stopDuration = drtCfg.getStopDuration();
-	}
-
-	public DrtSchedulerParams(double stopDuration) {
-		this.stopDuration = stopDuration;
-	}
+/**
+ *
+ */
+public class RunSharedTaxiAnalysis {
+public static void main(String[] args) {
+	String eventsFile = "C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/output_events.xml.gz";
+	
+	EventsManager events = EventsUtils.createEventsManager();
+	VehicleOccupancyEvaluator vehicleOccupancyEvaluator = new VehicleOccupancyEvaluator(16*3600, 32*3600, 4);
+	events.addHandler(vehicleOccupancyEvaluator);
+	new MatsimEventsReader(events).readFile(eventsFile);
+//	vehicleOccupancyEvaluator.writeDetailedOccupancyFiles("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/vehicles/");
+	vehicleOccupancyEvaluator.calcAndWriteFleetStats("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/vehicleStats.csv");
+}
 }

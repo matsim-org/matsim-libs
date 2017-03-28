@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.scheduler;
+/**
+ * 
+ */
+package playground.michalm.drt.analysis;
 
-import playground.michalm.drt.run.DrtConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 
 /**
- * @author michalm
+ * @author  jbischoff
+ *
  */
-public class DrtSchedulerParams {
-	public final double stopDuration;
+/**
+ *
+ */
+public class DRTAnalysisModule extends AbstractModule {
 
-	public DrtSchedulerParams(DrtConfigGroup drtCfg) {
-		this.stopDuration = drtCfg.getStopDuration();
+	/* (non-Javadoc)
+	 * @see org.matsim.core.controler.AbstractModule#install()
+	 */
+	@Override
+	public void install() {
+		bind(VehicleOccupancyEvaluator.class).asEagerSingleton();
+		addControlerListenerBinding().to(DRTAnalysisControlerListener.class).asEagerSingleton();
 	}
 
-	public DrtSchedulerParams(double stopDuration) {
-		this.stopDuration = stopDuration;
-	}
 }
