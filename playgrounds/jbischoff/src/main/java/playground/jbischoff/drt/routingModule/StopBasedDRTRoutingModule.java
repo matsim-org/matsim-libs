@@ -76,7 +76,7 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 	 * 
 	 */
 	@Inject
-	public StopBasedDRTRoutingModule(@Named(TransportMode.walk) RoutingModule walkRouter, @Named(DrtConfigGroup.DRTMODE) TransitSchedule transitSchedule, Scenario scenario) {
+	public StopBasedDRTRoutingModule(@Named(TransportMode.walk) RoutingModule walkRouter, @Named(DrtConfigGroup.DRT_MODE) TransitSchedule transitSchedule, Scenario scenario) {
 			transitSchedule.getFacilities();
 			this.walkRouter = walkRouter;
 			this.stops = transitSchedule.getFacilities();
@@ -110,7 +110,7 @@ public class StopBasedDRTRoutingModule implements RoutingModule {
 	    drtRoute.setDistance(drtconfig.getEstimatedBeelineDistanceFactor()*CoordUtils.calcEuclideanDistance(accessFacility.getCoord(), egressFacility.getCoord()));
 	    drtRoute.setTravelTime(drtRoute.getDistance()/drtconfig.getEstimatedSpeed());
 
-	    Leg drtLeg = PopulationUtils.createLeg(DrtConfigGroup.DRTMODE);
+	    Leg drtLeg = PopulationUtils.createLeg(DrtConfigGroup.DRT_MODE);
         drtLeg.setDepartureTime(departureTime+walkLeg.getTravelTime()+1);
         drtLeg.setTravelTime(drtRoute.getTravelTime());
         drtLeg.setRoute(drtRoute);

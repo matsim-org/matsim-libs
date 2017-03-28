@@ -84,8 +84,8 @@ public class RunTaxiWithStopsExample {
 					
 			@Override
 			public void install() {
-				bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRTMODE)).toInstance(scenario2.getTransitSchedule());;
-				addRoutingModuleBinding(DrtConfigGroup.DRTMODE).to(StopBasedDRTRoutingModule.class).asEagerSingleton();
+				bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRT_MODE)).toInstance(scenario2.getTransitSchedule());;
+				addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(StopBasedDRTRoutingModule.class).asEagerSingleton();
 				
 			}
 		});

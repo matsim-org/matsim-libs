@@ -128,7 +128,7 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(DrtConfigGroup.DRTMODE)){
+		if (event.getLegMode().equals(DrtConfigGroup.DRT_MODE)){
 			this.departureTimes.put(event.getPersonId(), event.getTime());
 		}
 	}

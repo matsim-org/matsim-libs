@@ -24,10 +24,9 @@ import java.util.Map;
 
 import org.matsim.core.config.*;
 
-
 public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "drt";
-	public static final String DRTMODE = "drt";
+	public static final String DRT_MODE = "drt";
 
 	@SuppressWarnings("deprecation")
 	public static DrtConfigGroup get(Config config) {
@@ -38,33 +37,29 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String MAX_WAIT_TIME = "maxWaitTime";
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 
-	private static final String SCHEME = "operationalScheme";
-	private static final String TRANSITSCHEDULEFILE = "transitStopFile";
-	private static final String WALKDISTANCE = "maximumWalkDistance";
-	private static final String SPEEDESTIMATE = "estimatedDRTSpeed";
-	private static final String BEELINEDISTANCEESTIMATE = "estimatedBeelineDistanceFactor";
-	
-	
-	// input
+	private static final String OPERATIONAL_SCHEME = "operationalScheme";
+	private static final String MAXIMUM_WALK_DISTANCE = "maximumWalkDistance";
+	private static final String ESTIMATED_DRT_SPEED = "estimatedDRTSpeed";
+	private static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
+
 	public static final String VEHICLES_FILE = "vehiclesFile";
+	private static final String TRANSIT_STOP_FILE = "transitStopFile";
 
 	private double stopDuration = Double.NaN;// seconds
 	private double maxWaitTime = Double.NaN;// seconds
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
-	private String vehiclesFile = null;
-	
-	private DRTOperationalScheme operationalScheme;			
-	private String transitStopFile = null;
+	private DRTOperationalScheme operationalScheme;
 	private double maximumWalkDistance;
-	private double estimatedSpeed = 25/3.6;
+	private double estimatedDrtSpeed = 25 / 3.6;
 	private double estimatedBeelineDistanceFactor = 1.3;
 
+	private String vehiclesFile = null;
+	private String transitStopFile = null;
 	
 	public enum DRTOperationalScheme {
-				stationbased,
-				door2door
-				};
+		stationbased, door2door
+	}
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -126,54 +121,55 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public URL getVehiclesFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
 	}
-	
 
 	/**
 	 * @return the operationalScheme
 	 */
-	@StringGetter(SCHEME)
+	@StringGetter(OPERATIONAL_SCHEME)
 	public DRTOperationalScheme getOperationalScheme() {
 		return operationalScheme;
 	}
-	
-	
+
 	/**
-	 * @param operationalScheme the operationalScheme to set
+	 * @param operationalScheme
+	 *            the operationalScheme to set
 	 */
-	@StringSetter(SCHEME)
+	@StringSetter(OPERATIONAL_SCHEME)
 	public void setOperationalScheme(String operationalScheme) {
-		
+
 		this.operationalScheme = DRTOperationalScheme.valueOf(operationalScheme);
 	}
-	
+
 	/**
 	 * @return the transitStopFile
 	 */
-	@StringGetter(TRANSITSCHEDULEFILE)
+	@StringGetter(TRANSIT_STOP_FILE)
 	public String getTransitStopFile() {
 		return transitStopFile;
 	}
-	
+
 	/**
-	 * @param transitStopFile the transitStopFile to set
+	 * @param transitStopFile
+	 *            the transitStopFile to set
 	 */
-	@StringSetter(TRANSITSCHEDULEFILE)
+	@StringSetter(TRANSIT_STOP_FILE)
 	public void setTransitStopFile(String transitStopFile) {
 		this.transitStopFile = transitStopFile;
 	}
-	
+
 	/**
 	 * @return the maximumWalkDistance
 	 */
-	@StringGetter(WALKDISTANCE)
+	@StringGetter(MAXIMUM_WALK_DISTANCE)
 	public double getMaximumWalkDistance() {
 		return maximumWalkDistance;
 	}
-	
+
 	/**
-	 * @param maximumWalkDistance the maximumWalkDistance to set
+	 * @param maximumWalkDistance
+	 *            the maximumWalkDistance to set
 	 */
-	@StringSetter(WALKDISTANCE)
+	@StringSetter(MAXIMUM_WALK_DISTANCE)
 	public void setMaximumWalkDistance(double maximumWalkDistance) {
 		this.maximumWalkDistance = maximumWalkDistance;
 	}
@@ -181,31 +177,33 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * @return the estimatedSpeed
 	 */
-	@StringGetter(SPEEDESTIMATE)
+	@StringGetter(ESTIMATED_DRT_SPEED)
 	public double getEstimatedSpeed() {
-		return estimatedSpeed;
+		return estimatedDrtSpeed;
 	}
-	
+
 	/**
-	 * @param estimatedSpeed the estimatedSpeed to set
+	 * @param estimatedSpeed
+	 *            the estimatedSpeed to set
 	 */
-	@StringSetter(SPEEDESTIMATE)
+	@StringSetter(ESTIMATED_DRT_SPEED)
 	public void setEstimatedSpeed(double estimatedSpeed) {
-		this.estimatedSpeed = estimatedSpeed;
+		this.estimatedDrtSpeed = estimatedSpeed;
 	}
-	
+
 	/**
 	 * @return the estimatedBeelineDistanceFactor
 	 */
-	@StringGetter(BEELINEDISTANCEESTIMATE)
+	@StringGetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
 	public double getEstimatedBeelineDistanceFactor() {
 		return estimatedBeelineDistanceFactor;
 	}
-	
+
 	/**
-	 * @param estimatedBeelineDistanceFactor the estimatedBeelineDistanceFactor to set
+	 * @param estimatedBeelineDistanceFactor
+	 *            the estimatedBeelineDistanceFactor to set
 	 */
-	@StringSetter(BEELINEDISTANCEESTIMATE)
+	@StringSetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
 	public void setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
 		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
 	}
