@@ -23,6 +23,13 @@ public class StorageSupplier {
         ordered = new ArrayList<>(map.values());
     }
 
+    /**
+     * 
+     * @param index
+     * @return
+     * @throws Exception
+     *             if anything goes wrong, for instance file not found, or object cannot be cast to SimulationObject
+     */
     public SimulationObject getSimulationObject(int index) throws Exception {
         File file = ordered.get(index);
         byte[] bytes = CompressionUtils.decompress(Files.readAllBytes(file.toPath()));

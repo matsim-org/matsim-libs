@@ -33,14 +33,14 @@ public enum StorageUtils {
         File[] files = DIRECTORY.listFiles(); // TODO probably not sorted
         if (files.length == 0)
             return Collections.emptyNavigableMap();
-        NavigableMap<Integer, File> map = new TreeMap<>();
+        NavigableMap<Integer, File> navigableMap = new TreeMap<>();
         File lastIter = files[files.length - 1];
         for (File dir : lastIter.listFiles())
             if (dir.isDirectory())
                 for (File file : dir.listFiles())
                     if (file.isFile())
-                        map.put(Integer.parseInt(file.getName().substring(0, 7)), file);
-        return map;
+                        navigableMap.put(Integer.parseInt(file.getName().substring(0, 7)), file);
+        return navigableMap;
     }
 
 }

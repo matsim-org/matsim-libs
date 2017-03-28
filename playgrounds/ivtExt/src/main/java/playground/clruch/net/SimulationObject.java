@@ -4,6 +4,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * this class deliberately does not have any helper/member functions.
+ * 
+ * {@link SimulationObject} is only used for communication and storage of the
+ * status of the AV simulation 
+ */
 public class SimulationObject implements Serializable {
 
     public int iteration = 0;
