@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -43,10 +42,8 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.tasks.DrtDriveWithPassengersTask;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.core.config.Config;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -64,16 +61,13 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 
 	
 	
-	final private DescriptiveStatistics waitTimes = new DescriptiveStatistics();
-	final private DescriptiveStatistics rideDistances = new DescriptiveStatistics();
-	final private List<Tuple<Double,Double>> beelineVsRideDistances = new ArrayList();
 	final private Map<Id<Person>,Double> departureTimes = new HashMap<>();
 	final private Map<Id<Person>,Id<Link>> departureLinks = new HashMap<>();
-	final private List<DrtDepature> drtDepatures = new ArrayList<>();
+	final private List<DrtTrip> drtTrips = new ArrayList<>();
 	final private Map<Id<Vehicle>,Map<Id<Person>,MutableDouble>> inVehicleDistance = new HashMap<>();
+	final private Map<Id<Person>,DrtTrip> currentTrips = new HashMap<>();
 	
 	final private Network network;
-	final private DrtConfigGroup drtConfigGroup;
 	/* (non-Javadoc)
 	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
 	 */
@@ -82,19 +76,22 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	 * 
 	 */
 	@Inject
-	public DrtPassengerStats(Network network, Config config) {
+	public DrtPassengerStats(Network network, EventsManager events) {
 		this.network = network;
-		this.drtConfigGroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		events.addHandler(this);
+	}
+	
+	public DrtPassengerStats(Network network) {
+		this.network = network;
 	}
 	
 	@Override
 	public void reset(int iteration) {
-		waitTimes.clear();
-		rideDistances.clear();
-		beelineVsRideDistances.clear();
-		waitTimes.clear();
-		this.drtDepatures.clear();
-		this.rideDistances.clear();
+		this.drtTrips.clear();
+		departureTimes.clear();
+		departureLinks.clear();
+		inVehicleDistance.clear();
+		currentTrips.clear();
 	}
 	/* (non-Javadoc)
 	 * @see org.matsim.api.core.v01.events.handler.ActivityEndEventHandler#handleEvent(org.matsim.api.core.v01.events.ActivityEndEvent)
@@ -111,6 +108,12 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	 */
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		if (inVehicleDistance.containsKey(event.getVehicleId())){
+			double distance = network.getLinks().get(event.getLinkId()).getLength();
+			for (MutableDouble d : inVehicleDistance.get(event.getVehicleId()).values()){
+				d.add(distance);
+			}
+		}
 		
 	}
 
@@ -119,7 +122,19 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	 */
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-
+		if (event.getLegMode().equals(DrtConfigGroup.DRT_MODE)){
+			DrtTrip trip = currentTrips.remove(event.getPersonId());
+			if (trip!=null){
+			double distance = inVehicleDistance.get(trip.getVehicle()).remove(event.getPersonId()).doubleValue();	
+				trip.setTravelDistance(distance);
+				trip.setArrivalTime(event.getTime());
+				trip.setToLink(event.getLinkId());
+				trip.setTravelTime(event.getTime()-trip.getDepartureTime()+trip.getWaitTime());
+			}
+			else {
+				throw new NullPointerException("Arrival without departure?");
+				}
+		}
 		
 	}
 
@@ -130,6 +145,7 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(DrtConfigGroup.DRT_MODE)){
 			this.departureTimes.put(event.getPersonId(), event.getTime());
+			this.departureLinks.put(event.getPersonId(), event.getLinkId());
 		}
 	}
 
@@ -141,63 +157,26 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 		if (this.departureTimes.containsKey(event.getPersonId())){
 			double departureTime = this.departureTimes.remove(event.getPersonId());
 			double waitTime = event.getTime() - departureTime;
-			this.waitTimes.addValue(waitTime);
 			Id<Link> departureLink = this.departureLinks.remove(event.getPersonId());
-			DrtDepature departure = new DrtDepature(departureTime, event.getPersonId(), event.getVehicleId(), departureLink, waitTime);
-			this.drtDepatures.add(departure);
+			DrtTrip trip = new DrtTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink, waitTime);
+			this.drtTrips.add(trip);
+			this.currentTrips.put(event.getPersonId(), trip);
 			this.inVehicleDistance.get(event.getVehicleId()).put(event.getPersonId(), new MutableDouble());
 		}
 	}
+	
+	/**
+	 * @return the drtTrips
+	 */
+	public List<DrtTrip> getDrtTrips() {
+		return drtTrips;
+	}
+	
 
 	
-	public class DrtDepature implements Comparable<DrtDepature>{
-		private final double departureTime; 
-		private final Id<Person> person; 
-		private final Id<Vehicle> vehicle; 
-		private final Id<Link> fromLinkId; 
-		private final double waitTime;
-
-		DrtDepature(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId,
-				double waitTime) {
-			this.departureTime = departureTime;
-			this.person = person;
-			this.vehicle = vehicle;
-			this.fromLinkId = fromLinkId;
-			this.waitTime = waitTime;
-		}
-
-		public Double getDepartureTime() {
-			return departureTime;
-		}
-
-		public Id<Person> getPerson() {
-			return person;
-		}
-
-		public Id<Vehicle> getVehicle() {
-			return vehicle;
-		}
-
-		public Id<Link> getFromLinkId() {
-			return fromLinkId;
-		}
-
-		public double getWaitTime() {
-			return waitTime;
-		}
-
-		/* (non-Javadoc)
-		 * @see java.lang.Comparable#compareTo(java.lang.Object)
-		 */
-		@Override
-		public int compareTo(DrtDepature o) {
-			return getDepartureTime().compareTo(o.getDepartureTime());
-		}
-		
-		
-		
-	}
+	
 
 
 	
 }
+
