@@ -22,6 +22,9 @@
  */
 package playground.michalm.drt.analysis;
 
+import java.util.List;
+
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -40,7 +43,16 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 	@Inject 
 	VehicleOccupancyEvaluator vehicleOccupancyEvaluator;
 	@Inject
+	DrtPassengerStats drtPassengerStats;
+	@Inject
 	MatsimServices matsimServices;
+	/**
+	 * 
+	 */
+	@Inject
+	public DRTAnalysisControlerListener(Config config) {
+		
+	}
 
 	
 	/* (non-Javadoc)
@@ -49,6 +61,8 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		vehicleOccupancyEvaluator.calcAndWriteFleetStats(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleOccupancy"));
+		List<DrtTrip> trips = drtPassengerStats.getDrtTrips();
+		DrtTripsAnalyser.analyseWaitTimes(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitStats"), trips, 1800);
 	}
 
 }

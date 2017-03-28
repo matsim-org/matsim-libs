@@ -39,6 +39,7 @@ public class DRTAnalysisModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(VehicleOccupancyEvaluator.class).asEagerSingleton();
+		bind(DrtPassengerStats.class).asEagerSingleton();
 		addControlerListenerBinding().to(DRTAnalysisControlerListener.class).asEagerSingleton();
 	}
 

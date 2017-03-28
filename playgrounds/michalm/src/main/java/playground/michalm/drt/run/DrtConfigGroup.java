@@ -44,6 +44,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String VEHICLES_FILE = "vehiclesFile";
 	private static final String TRANSIT_STOP_FILE = "transitStopFile";
+	private static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
+	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
 
 	private double stopDuration = Double.NaN;// seconds
 	private double maxWaitTime = Double.NaN;// seconds
@@ -56,6 +58,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	private String vehiclesFile = null;
 	private String transitStopFile = null;
+	
+	private boolean plotDetailedCustomerStats = true;
+	private boolean plotDetailedVehicleStats = false;
 	
 	public enum DRTOperationalScheme {
 		stationbased, door2door
@@ -75,6 +80,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 						+ " day at the link where it stopped operating the day before");
 		map.put(VEHICLES_FILE,
 				"An XML file specifying the taxi fleet. The file format according to dvrp_vehicles_v1.dtd");
+		map.put(PLOT_CUST_STATS, "Writes out detailed DRT customer stats in each iteration.");
+		map.put(PLOT_VEH_STATS, "Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration.");
 		return map;
 	}
 
@@ -173,7 +180,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public void setMaximumWalkDistance(double maximumWalkDistance) {
 		this.maximumWalkDistance = maximumWalkDistance;
 	}
-
+	
 	/**
 	 * @return the estimatedSpeed
 	 */
@@ -206,5 +213,33 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
 	public void setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
 		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
+	}
+	/**
+	 * @return the plotDetailedCustomerStats
+	 */
+	@StringGetter(PLOT_CUST_STATS)
+	public boolean isPlotDetailedCustomerStats() {
+		return plotDetailedCustomerStats;
+	}
+	/**
+	 * @param plotDetailedCustomerStats the plotDetailedCustomerStats to set
+	 */
+	@StringSetter(PLOT_CUST_STATS)
+	public void setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
+		this.plotDetailedCustomerStats = plotDetailedCustomerStats;
+	}
+	/**
+	 * @return the plotDetailedVehicleStats
+	 */
+	@StringGetter(PLOT_VEH_STATS)
+	public boolean isPlotDetailedVehicleStats() {
+		return plotDetailedVehicleStats;
+	}
+	/**
+	 * @param plotDetailedVehicleStats the plotDetailedVehicleStats to set
+	 */
+	@StringSetter(PLOT_VEH_STATS)
+	public void setPlotDetailedVehicleStats(boolean plotDetailedVehicleStats) {
+		this.plotDetailedVehicleStats = plotDetailedVehicleStats;
 	}
 }
