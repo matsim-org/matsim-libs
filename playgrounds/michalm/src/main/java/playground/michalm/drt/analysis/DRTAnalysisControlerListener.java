@@ -31,6 +31,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 
 import com.google.inject.Inject;
 
+import playground.michalm.drt.run.DrtConfigGroup;
+
 /**
  * @author  jbischoff
  *
@@ -46,11 +48,13 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 	DrtPassengerStats drtPassengerStats;
 	@Inject
 	MatsimServices matsimServices;
+	private final DrtConfigGroup drtgroup ;
 	/**
 	 * 
 	 */
 	@Inject
 	public DRTAnalysisControlerListener(Config config) {
+		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		
 	}
 
@@ -61,7 +65,14 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		vehicleOccupancyEvaluator.calcAndWriteFleetStats(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleOccupancy"));
+		if (drtgroup.isPlotDetailedVehicleStats()){
+			vehicleOccupancyEvaluator.writeDetailedOccupancyFiles(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleStats_"));
+		}
 		List<DrtTrip> trips = drtPassengerStats.getDrtTrips();
+		
+		if (drtgroup.isPlotDetailedCustomerStats()){
+			//TODO: Add this
+		}
 		DrtTripsAnalyser.analyseWaitTimes(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitStats"), trips, 1800);
 	}
 
