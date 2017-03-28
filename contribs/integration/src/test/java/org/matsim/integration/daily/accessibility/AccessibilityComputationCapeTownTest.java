@@ -51,23 +51,15 @@ public class AccessibilityComputationCapeTownTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-//	@Test
-//	public void testQuick() {
-//		run(1000., false, false);
-//	}
-//	@Test
-//	public void testLocal() {
-//		run(1000., false, true);
-//	}
 	@Test
-	public void testOnServer() {
-		run(1000., true, false);
-	}
-	
-	public void run(Double cellSize, boolean push2Geoserver, boolean createQGisOutput) {
-
+	public void runAccessibilityComputation() {
+		Double cellSize = 1000.;
+		boolean push2Geoserver = true; // set true for run on server
+		boolean createQGisOutput = false; // set false for run on server
+		
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 
+		// Input (if pre-downloaded)
 		// Network file
 		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/za/capetown/2015-10-15_network.xml.gz";
@@ -79,9 +71,12 @@ public class AccessibilityComputationCapeTownTest {
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		
+		// Input (directly from OSM)
+		// TODO
+		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
-		config.controler().setRunId("za_capetown_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0]);
+		config.controler().setRunId("za_capetown_" + cellSize.toString().split("\\.")[0]);
 		
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setCellSizeCellBasedAccessibility(cellSize.intValue());
