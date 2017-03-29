@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-public class DrtTrip implements Comparable<DrtTrip>{
+public class DynModeTrip implements Comparable<DynModeTrip>{
 	private final double departureTime; 
 	private final Id<Person> person; 
 	private final Id<Vehicle> vehicle; 
@@ -40,7 +40,7 @@ public class DrtTrip implements Comparable<DrtTrip>{
 	static final String demitter = ";";
 	public static final String HEADER = "departureTime"+demitter+"personId"+demitter+"vehicleId"+demitter+"fromLinkId"+demitter+"toLinkId"+demitter+"waitTime"+demitter+"arrivalTime"+demitter+"travelTime"+"travelDistance_m";
 	
-	DrtTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId,
+	DynModeTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId,
 			double waitTime) {
 		this.departureTime = departureTime;
 		this.person = person;
@@ -70,7 +70,7 @@ public class DrtTrip implements Comparable<DrtTrip>{
 	}
 	
 
-	public double getTravelTime() {
+	public double getInVehicleTravelTime() {
 		return travelTime;
 	}
 
@@ -86,7 +86,7 @@ public class DrtTrip implements Comparable<DrtTrip>{
 		this.travelDistance_m = travelDistance_m;
 	}
 
-	public Id<Link> getToLink() {
+	public Id<Link> getToLinkId() {
 		return toLink;
 	}
 
@@ -106,7 +106,7 @@ public class DrtTrip implements Comparable<DrtTrip>{
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(DrtTrip o) {
+	public int compareTo(DynModeTrip o) {
 		return getDepartureTime().compareTo(o.getDepartureTime());
 	}
 	
@@ -119,10 +119,10 @@ public class DrtTrip implements Comparable<DrtTrip>{
 				getPerson()+demitter+
 				getVehicle()+demitter+
 				getFromLinkId()+demitter+
-				getToLink()+demitter+
+				getToLinkId()+demitter+
 				getWaitTime()+demitter+
 				getArrivalTime()+demitter+
-				getTravelTime()+demitter+
+				getInVehicleTravelTime()+demitter+
 				getTravelDistance();
 	}
 	

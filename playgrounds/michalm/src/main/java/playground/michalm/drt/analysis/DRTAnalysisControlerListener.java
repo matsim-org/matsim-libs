@@ -22,12 +22,16 @@
  */
 package playground.michalm.drt.analysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.utils.io.IOUtils;
 
 import com.google.inject.Inject;
 
@@ -43,12 +47,15 @@ import playground.michalm.drt.run.DrtConfigGroup;
 public class DRTAnalysisControlerListener implements IterationEndsListener{
 
 	@Inject 
-	VehicleOccupancyEvaluator vehicleOccupancyEvaluator;
+	DrtVehicleOccupancyEvaluator vehicleOccupancyEvaluator;
 	@Inject
-	DrtPassengerStats drtPassengerStats;
+	DynModePassengerStats drtPassengerStats;
 	@Inject
 	MatsimServices matsimServices;
+	@Inject
+	Network network;
 	private final DrtConfigGroup drtgroup ;
+	private boolean headerWritten = false;
 	/**
 	 * 
 	 */
@@ -64,16 +71,44 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		
+		
 		vehicleOccupancyEvaluator.calcAndWriteFleetStats(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleOccupancy"));
 		if (drtgroup.isPlotDetailedVehicleStats()){
 			vehicleOccupancyEvaluator.writeDetailedOccupancyFiles(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleStats_"));
 		}
-		List<DrtTrip> trips = drtPassengerStats.getDrtTrips();
+		List<DynModeTrip> trips = drtPassengerStats.getDrtTrips();
+		
+		writeIterationStats(DynModeTripsAnalyser.summarizeTrips(trips, ";"),event.getIteration());
 		
 		if (drtgroup.isPlotDetailedCustomerStats()){
-			//TODO: Add this
+			DynModeTripsAnalyser.collection2Text(trips,matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_trips") , DynModeTrip.HEADER);
 		}
-		DrtTripsAnalyser.analyseWaitTimes(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitStats"), trips, 1800);
+		DynModeTripsAnalyser.analyseDetours(network, trips, drtgroup.getEstimatedBeelineDistanceFactor(), drtgroup.getEstimatedSpeed(), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_detours"));
+		DynModeTripsAnalyser.analyseWaitTimes(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitStats"), trips, 1800);
 	}
+
+
+	/**
+	 * @param summarizeTrips
+	 * @param iteration
+	 */
+	private void writeIterationStats(String summarizeTrips, int it) {
+		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename("drt_customer_stats.csv"));
+		try {
+			if (!headerWritten){
+				headerWritten=true;
+				bw.write("iteration;rides;wait_average;wait_max;wait_p95;inVehicleTravelTime_mean;distance_m_mean;totalTravelTime_mean");
+			}
+			bw.newLine();
+			bw.write(it+";"+summarizeTrips);
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	 
 
 }
