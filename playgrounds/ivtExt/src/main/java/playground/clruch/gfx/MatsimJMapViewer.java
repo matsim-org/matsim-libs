@@ -36,7 +36,7 @@ public class MatsimJMapViewer extends JMapViewer {
     public final VehicleLayer vehicleLayer;
 
     private final List<ViewerLayer> viewerLayers = new ArrayList<>();
-    private final PointCloud pc;
+    private PointCloud pc = null;
     private final List<InfoString> infoStrings = new LinkedList<>();
     private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
     private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
@@ -62,7 +62,8 @@ public class MatsimJMapViewer extends JMapViewer {
             e.printStackTrace();
         }
 
-        pc = PointCloud.fromCsvFile(new File("vN_90vS_L1/voronoi_BoundaryPoints.csv"));
+//        pc = PointCloud.fromCsvFile(new File("vN_90vS_L1/voronoi_BoundaryPoints.csv"));
+        pc = null;
     }
 
     /**
