@@ -20,11 +20,8 @@ package playground.thibautd.phd;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
+import org.matsim.contrib.socnetsim.framework.controller.CliquesModule;
 import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
-import org.matsim.contrib.socnetsim.framework.controller.SocialNetworkModule;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 import org.matsim.contrib.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
 import org.matsim.contrib.socnetsim.jointtrips.JointTripsModule;
 import org.matsim.contrib.socnetsim.run.RunUtils;
@@ -39,7 +36,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import playground.ivt.matsim2030.Matsim2030Utils;
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import playground.ivt.lib.tools.fileCreation.F2LConfigGroup;
 import playground.thibautd.socnetsimusages.run.KtiInputFilesConfigGroup;
 import playground.thibautd.socnetsimusages.run.ZurichScenarioUtils;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityConfigGroup;
@@ -69,33 +67,24 @@ public class ReRunChap4 {
 		// One needs to add the various features one wants to use in one module to be safe:
 		// this way, if two features conflict, a crash will occur at injection.
 		controller.addOverridingModule(
-				new AbstractModule() {
-					@Override
-					public void install() {
-						install(new JointDecisionProcessModule());
-					}
-				} );
+						new JointDecisionProcessModule() );
 		controller.addOverridingModule(
 				new AbstractModule() {
 					@Override
 					public void install() {
-						install( new ConfigConfiguredPlanLinkIdentifierModule());
-						install(new SocnetsimDefaultAnalysisModule());
-						install(new JointActivitiesScoringModule());
-						install(new DefaultGroupStrategyRegistryModule());
-						install(new JointTripsModule());
-						install(new SocialNetworkModule());
-						install(new EquityStrategiesModule());
+						install( new ConfigConfiguredPlanLinkIdentifierModule() );
+						install( new SocnetsimDefaultAnalysisModule() );
+						install( new JointActivitiesScoringModule() );
+						install( new DefaultGroupStrategyRegistryModule() );
+						install( new JointTripsModule() );
+						//install( new SocialNetworkModule() );
+						install( new CliquesModule() );
+						install( new EquityStrategiesModule() );
 						install( new StartingPointRandomizerModule() );
 					}
 				});
 		controller.addOverridingModule(
-				new AbstractModule() {
-					@Override
-					public void install() {
-						install(new KtiScoringWithEquityModule());
-					}
-				} );
+						new KtiScoringWithEquityModule() );
 
 
 		controller.run();
@@ -104,19 +93,8 @@ public class ReRunChap4 {
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 		RunUtils.enrichScenario(scenario);
-		Matsim2030Utils.enrichScenario( scenario );
+		//Matsim2030Utils.enrichScenario( scenario );
 		ZurichScenarioUtils.enrichScenario( scenario );
-		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
-
-		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
-				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );
-
-		new SocialNetworkReader( scenario ).readFile( snConf.getInputFile() );
-
-		final SocialNetwork sn = (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
-		scenario.getPopulation().getPersons().keySet().stream()
-				.filter( sn.getEgos()::contains )
-				.forEach( sn::addEgo );
 
 		return scenario;
 	}
@@ -125,6 +103,8 @@ public class ReRunChap4 {
 		final Config config = ConfigUtils.createConfig();
 		JointScenarioUtils.addConfigGroups( config );
 		config.addModule( new KtiInputFilesConfigGroup() );
+		config.addModule( new KtiLikeScoringConfigGroup() );
+		config.addModule( new F2LConfigGroup() );
 		RunUtils.addConfigGroups( config );
 		// some redundancy here... just add scenarioMerging "by hand"
 		//Matsim2030Utils.addDefaultGroups( config );
