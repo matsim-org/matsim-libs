@@ -88,7 +88,7 @@ public class RequestLayer extends ViewerLayer {
                     }
                 }
                 graphics.setColor(Color.DARK_GRAY);
-                graphics.drawString("" + numRequests, x, y - numRequests);
+                graphics.drawString("" + numRequests, x, y); //  - numRequests
             }
         }
 
