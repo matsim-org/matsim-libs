@@ -28,8 +28,14 @@ public class MatsimHeatMap {
     public void render(Graphics graphics, Tile tile, int zoom, int posx, int posy) {
         if (show)
             try {
-                BufferedImage img = HeatMap.GetTile(dataManager, colorScheme, //
-                        zoom, tile.getXtile(), tile.getYtile(), false, defaultOpacity);
+                BufferedImage img = HeatMap.GetTile( //
+                        dataManager, //
+                        colorScheme, //
+                        zoom, //
+                        tile.getXtile(), //
+                        tile.getYtile(), //
+                        false, //
+                        defaultOpacity);
                 graphics.drawImage(img, posx, posy, imageObserver);
             } catch (Exception e) {
                 e.printStackTrace();
