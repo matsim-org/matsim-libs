@@ -18,6 +18,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03PlustoWGS84;
 import playground.clruch.export.AVStatus;
 import playground.clruch.gfx.MatsimStaticDatabase;
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
@@ -32,6 +33,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 class AnalysisDemo {
@@ -48,8 +50,8 @@ class AnalysisDemo {
 
         // TODO later remove hard-coded
         CoordinateTransformation ct;
-        //ct = new CH1903LV03PlustoWGS84(); // <- switzerland
-        ct = new SiouxFallstoWGS84(); // <- sioux falls
+        ct = new CH1903LV03PlustoWGS84(); // <- switzerland
+        //ct = new SiouxFallstoWGS84(); // <- sioux falls
         MatsimStaticDatabase.initializeSingletonInstance(network, ct);
 
 
@@ -90,12 +92,20 @@ class AnalysisDemo {
 
                 for (int index = 1; index < size; ++index) {
                     SimulationObject s = storageSupplier.getSimulationObject(index);
-                    VehicleContainer vehicleNow = s.vehicles.stream().filter(v -> v.vehicleIndex == vehicleID).findAny().get();
-                    //vehicle location
-                    vehicleLocAtTime.append(RealScalar.of(vehicleNow.getLinkId()));
-                    if (vehicleNow.avStatus.equals(AVStatus.DRIVEWITHCUSTOMER)) {
-                        vehicleCustatTime.append(RealScalar.of(1.0));
+                    Optional<VehicleContainer> optvehicleNow = s.vehicles.stream().filter(v -> v.vehicleIndex == vehicleID).findAny();
+                    if (optvehicleNow.isPresent()) {
+                        VehicleContainer vehicleNow = optvehicleNow.get();
+                        //vehicle location
+                        vehicleLocAtTime.append(RealScalar.of(vehicleNow.getLinkId()));
+                        if (vehicleNow.avStatus.equals(AVStatus.DRIVEWITHCUSTOMER)) {
+                            vehicleCustatTime.append(RealScalar.of(1.0));
+                        } else {
+                            vehicleCustatTime.append(RealScalar.of(0.0));
+                        }
+
                     } else {
+                        // TODO find out why this happens, should not
+                        vehicleLocAtTime.append(RealScalar.of(s.vehicles.get(0).getLinkId()));
                         vehicleCustatTime.append(RealScalar.of(0.0));
                     }
 
@@ -146,8 +156,6 @@ class AnalysisDemo {
                 custdistAtTime = custdistAtTime.add(custvehicleDistAtTime);
             }
         }
-
-
 
 
         for (int index = 0; index < size; ++index) {
@@ -211,7 +219,6 @@ class AnalysisDemo {
         }
 
 
-
         Files.write(Paths.get("basicdemo.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
         Files.write(Paths.get("basicdemo.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
 
@@ -231,10 +238,4 @@ class AnalysisDemo {
         return scenario.getNetwork();
     }
 }
-
-class TimeDistObj {
-    public Scalar time;
-    public double distance;
-}
-
 
