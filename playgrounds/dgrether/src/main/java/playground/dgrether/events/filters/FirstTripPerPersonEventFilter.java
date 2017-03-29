@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -50,15 +51,14 @@ public class FirstTripPerPersonEventFilter implements EventFilter {
 	@Override
 	public boolean doProcessEvent(Event event) {
 		if (event instanceof HasPersonId){
+			if (event instanceof PersonArrivalEvent){
+				firstTripFinishedPersons.add(((PersonArrivalEvent) event).getPersonId());
+			} else if (event instanceof VehicleEntersTrafficEvent){
+				delegate.handleEvent((VehicleEntersTrafficEvent)event);
+			} else if (event instanceof VehicleLeavesTrafficEvent){
+				delegate.handleEvent((VehicleLeavesTrafficEvent)event);
+			}
 			return checkFirstTripFinished(((HasPersonId)event).getPersonId());
-		} else if (event instanceof VehicleEntersTrafficEvent){
-			VehicleEntersTrafficEvent vete = (VehicleEntersTrafficEvent)event;
-			delegate.handleEvent(vete);
-			return checkFirstTripFinished(delegate.getDriverOfVehicle(vete.getVehicleId()));
-		} else if (event instanceof VehicleLeavesTrafficEvent){
-			VehicleLeavesTrafficEvent vlte = (VehicleLeavesTrafficEvent)event;
-			delegate.handleEvent(vlte);
-			return checkFirstTripFinished(delegate.getDriverOfVehicle(vlte.getVehicleId()));
 		} else if (event instanceof LinkEnterEvent){
 			return checkFirstTripFinished(delegate.getDriverOfVehicle(((LinkEnterEvent) event).getVehicleId()));
 		} else if (event instanceof LinkLeaveEvent){
@@ -66,7 +66,6 @@ public class FirstTripPerPersonEventFilter implements EventFilter {
 		} else if (event instanceof VehicleAbortsEvent){
 			return checkFirstTripFinished(delegate.getDriverOfVehicle(((VehicleAbortsEvent) event).getVehicleId()));
 		} else {
-			LOG.warn("An event of type " + event.getEventType() + " was skipped in the event filter.");
 			return false;
 		}
 	}
