@@ -123,8 +123,8 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		this.earliestLinkExitTimePerPerson.remove(event.getPersonId());
-		log.warn("Vehicle " + event.getPersonId() + " got stucked at link "
-				+ event.getLinkId() + ". Its delay at this link is not considered in the total delay.");
+		log.warn("Person " + event.getPersonId() + " stucked at link "
+				+ event.getLinkId() + ". Their delay at this link is not considered in the total delay.");
 	}
 
 	public double getTotalDelay() {
