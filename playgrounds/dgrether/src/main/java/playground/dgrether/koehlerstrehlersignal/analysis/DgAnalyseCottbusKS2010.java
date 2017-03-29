@@ -365,10 +365,14 @@ public class DgAnalyseCottbusKS2010 {
 					results.addResult(result);
 
 					EventsFilterManager eventsManager = new EventsFilterManagerImpl();
-					TimeEventFilter tef = new TimeEventFilter();
-					tef.setStartTime(time.startTime);
-					tef.setEndTime(time.endTime);
-					eventsManager.addFilter(tef);
+//					TimeEventFilter tef = new TimeEventFilter();
+//					tef.setStartTime(time.startTime);
+//					tef.setEndTime(time.endTime);
+//					eventsManager.addFilter(tef);
+					/* use trip filter instead of time filter to consider also trips that are delayed. theresa, mar'17 */
+					if (time.name.equals("morning")){
+						eventsManager.addFilter(new FirstTripPerPersonEventFilter());
+					}
 
 					DgAverageTravelTimeSpeed avgTtSpeed = new DgAverageTravelTimeSpeed(net);
 					eventsManager.addHandler(avgTtSpeed);
