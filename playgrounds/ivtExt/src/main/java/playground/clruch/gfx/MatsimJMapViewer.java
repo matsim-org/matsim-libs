@@ -1,6 +1,7 @@
 package playground.clruch.gfx;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -20,11 +21,12 @@ import playground.clruch.ResourceLocator;
 import playground.clruch.gheat.graphics.ThemeManager;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.utils.gui.GraphicsUtil;
 
 public class MatsimJMapViewer extends JMapViewer {
 
     final MatsimStaticDatabase db;
-
+    private int repaint_count = 0;
     public volatile int alpha = 196 - 32;
 
     SimulationObject simulationObject = null;
@@ -37,6 +39,7 @@ public class MatsimJMapViewer extends JMapViewer {
     private final PointCloud pc;
     private final List<InfoString> infoStrings = new LinkedList<>();
     private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
+    private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
 
     public JLabel jLabel = new JLabel(" ");
     // MatsimHeatmap rebalanceHeatmap = new MatsimHeatmap("classic", 128);
@@ -77,6 +80,7 @@ public class MatsimJMapViewer extends JMapViewer {
 
     @Override
     protected void paintComponent(Graphics g) {
+        ++repaint_count;
         final SimulationObject ref = simulationObject; // <- use ref for thread safety
 
         if (ref != null)
@@ -98,13 +102,13 @@ public class MatsimJMapViewer extends JMapViewer {
         // }
 
         super.paintComponent(g);
-        Graphics2D graphics = (Graphics2D) g;
-        // Dimension dimension = getSize();
+        final Graphics2D graphics = (Graphics2D) g;
+        final Dimension dimension = getSize();
         // graphics.setColor(new Color(255, 255, 255, alpha));
         // graphics.fillRect(0, 0, dimension.width, dimension.height);
 
         if (pc != null) {
-            graphics.setColor(new Color(255, 153, 0,128));
+            graphics.setColor(new Color(255, 153, 0, 128));
             for (Tensor pnt : pc.tensor) {
                 Coord coord = MatsimStaticDatabase.INSTANCE.coordinateTransformation.transform(new Coord( //
                         pnt.Get(0).number().doubleValue(), //
@@ -134,6 +138,13 @@ public class MatsimJMapViewer extends JMapViewer {
             jLabel.setText(ref.infoLine);
 
             drawInfoStrings(graphics);
+            GraphicsUtil.setQualityHigh(graphics);
+            new SbbClockDisplay().drawClock(graphics, ref.now, new Point(dimension.width - 70, 70));
+        }
+        {
+            graphics.setFont(debugStringFont);
+            graphics.setColor(Color.LIGHT_GRAY);
+            graphics.drawString("" + repaint_count, 0, dimension.height - 40);
         }
     }
 

@@ -45,7 +45,7 @@ public class AttributionSupport {
             attrTermsText = source.getTermsOfUseText();
             attrTermsUrl = source.getTermsOfUseURL();
             if (attrTermsUrl != null && attrTermsText == null) {
-                attrTermsText = tr("Background Terms of Use");
+                attrTermsText = tr(" "); // jan removed: "Background Terms of Use"
             }
         } else {
             attrImage = null;
