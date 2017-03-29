@@ -35,7 +35,9 @@ public class MatsimStaticDatabase {
             linkMap.put(link.getId().toString(), osmLink);
         }
 
-        INSTANCE = new MatsimStaticDatabase(linkMap);
+        INSTANCE = new MatsimStaticDatabase( //
+                coordinateTransformation, //
+                linkMap);
     }
 
     public static MatsimStaticDatabase INSTANCE;
@@ -45,6 +47,8 @@ public class MatsimStaticDatabase {
      */
     private final Map<Link, Integer> linkInteger = new HashMap<>();
 
+    public final CoordinateTransformation coordinateTransformation;
+
     /**
      * rapid lookup from Viewer
      */
@@ -53,7 +57,10 @@ public class MatsimStaticDatabase {
     private final IdIntegerDatabase requestIdIntegerDatabase = new IdIntegerDatabase();
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
 
-    private MatsimStaticDatabase(NavigableMap<String, OsmLink> linkMap) {
+    private MatsimStaticDatabase(//
+            CoordinateTransformation coordinateTransformation, //
+            NavigableMap<String, OsmLink> linkMap) {
+        this.coordinateTransformation = coordinateTransformation;
         list = new ArrayList<>(linkMap.values());
         int index = 0;
         for (OsmLink osmLink : list) {
