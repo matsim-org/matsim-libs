@@ -2,9 +2,9 @@ package playground.clruch.gfx;
 
 public class SecondsToHMS {
 
-    final int h;
-    final int m;
-    final int s;
+    public final int h;
+    public final int m;
+    public final int s;
 
     public SecondsToHMS(double now) {
         int round = (int) Math.floor(now);
