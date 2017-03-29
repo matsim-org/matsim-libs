@@ -31,7 +31,6 @@ import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
-import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,12 +46,12 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunTaxiPTIntermodalExample {
 	public static void main(String[] args) {
-		new RunTaxiPTIntermodalExample().run(true);
+		new RunTaxiPTIntermodalExample().run(false);
 	}
 
 	public void run(boolean OTFVis) {
 		Config config = ConfigUtils.loadConfig(
-				"./src/main/resources/intermodal/config.xml",
+				"intermodal/config.xml",
 				new TaxiConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

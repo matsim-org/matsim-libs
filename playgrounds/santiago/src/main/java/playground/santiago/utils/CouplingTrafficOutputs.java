@@ -12,7 +12,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class CouplingTrafficOutputs {
 
 	private HashMap <String,String> simSteps = new HashMap<>();
-	private String outputFolder = "../../../baseCaseAnalysis/1pct/2_testingSteps/";
+	private String outputFolder = "../../../baseCaseAnalysis/10pct/2_testingSteps/";
 	private final Logger log = Logger.getLogger(CouplingTrafficOutputs.class);
 	
 	
@@ -32,18 +32,18 @@ public class CouplingTrafficOutputs {
 //		simSteps.put("G_0", "300-500");
 //		simSteps.put("I_0", "300-500");
 //		simSteps.put("J_0", "300-500");
-//		simSteps.put("0_24", "0-300");
+		simSteps.put("0_24", "0-300");
 //		simSteps.put("0_24C0", "300-600");
-//		simSteps.put("0_24T0", "300-600");
-//		simSteps.put("0_24T2", "600-800");
-		simSteps.put("0_24T1", "600-800");
+		simSteps.put("0_24T0", "300-400");
+		simSteps.put("0_24T2", "400-600");
+		simSteps.put("0_24T1", "400-600");
 		
 		try{
 		PrintWriter pw = new PrintWriter (new FileWriter ( outputFolder + "stepsCountsCompare.txt" ));
 		pw.println("Link Id" + "\t" + "Hour" + "\t" + "MATSIM volumes" + "\t" + "Count volumes" + "\t" + "Relative Error" + "\t" + "Step" + "\t" + "It");
 		
 		for(HashMap.Entry<String, String> entry :simSteps.entrySet()){
-			String analysisFolder = "../../../runs-svn/santiago/baseCase1pct/outputOfStep" + entry.getKey() + "/analysis/";
+			String analysisFolder = "../../../runs-svn/santiago/baseCase10pct/outputOfStep" + entry.getKey() + "/analysis/";
 			String[]firstLastIt = entry.getValue().split("-");
 			
 			int firstIt = Integer.parseInt(firstLastIt[0]);

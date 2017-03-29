@@ -45,7 +45,7 @@ public class FindStandardDeviation {
 		 
 		 TreeMap<Integer,Double> tsHistogram = createHistogram (transantiagoTimes);
 		 
-		 write(tsHistogram, "histogramTS.txt");
+	//	 write(tsHistogram, "histogramTS.txt"); //Histogram with bins' size equal to 15 minutes - not necessary
 		 
 		 TreeMap<Integer,Double> summary = new TreeMap<>();
 		 
@@ -55,8 +55,9 @@ public class FindStandardDeviation {
 			 
 			 double error = 0;
 			 double expectedError = 0;
-			 TreeMap<Integer,Double> populationHistogram = new TreeMap<>(); 
 			 ArrayList<Double> randomizedTimes = new ArrayList<>();
+			 TreeMap<Integer,Double> populationHistogram = new TreeMap<>(); 
+
 			 
 			 for (int rep = 0; rep<numberOfExperiments; ++rep){
 				 

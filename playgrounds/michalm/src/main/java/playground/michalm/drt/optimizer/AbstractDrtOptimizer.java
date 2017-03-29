@@ -24,10 +24,10 @@ import java.util.Collection;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.schedule.NDrtTask;
 
 /**
  * @author michalm
@@ -60,7 +60,13 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.add((NDrtRequest)request);
+		NDrtRequest drtRequest = (NDrtRequest)request;
+		if (drtRequest.getFromLink() == drtRequest.getToLink()) {
+			//throw new IllegalArgumentException("fromLink and toLink must be different");
+			System.err.println("fromLink and toLink must be different");
+			return;
+		}
+		unplannedRequests.add(drtRequest);
 		requiresReoptimization = true;
 	}
 
@@ -71,11 +77,11 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 		Task newCurrentTask = vehicle.getSchedule().nextTask();
 
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-			requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
+			requiresReoptimization = doReoptimizeAfterNextTask((NDrtTask)newCurrentTask);
 		}
 	}
 
-	protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask) {
+	protected boolean doReoptimizeAfterNextTask(NDrtTask newCurrentTask) {
 		return false;
 	}
 
@@ -85,5 +91,13 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 
 		// TODO we may here possibly decide whether or not to reoptimize
 		// if (delays/speedups encountered) {requiresReoptimization = true;}
+	}
+
+	protected Collection<NDrtRequest> getUnplannedRequests() {
+		return unplannedRequests;
+	}
+
+	protected DrtOptimizerContext getOptimContext() {
+		return optimContext;
 	}
 }

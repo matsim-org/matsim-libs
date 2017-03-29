@@ -62,21 +62,12 @@ public class AccessibilityComputationNairobiTest {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationNairobiTest.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
-//	@Test
-//	public void testQuick() {
-//		run(1000., false, false);
-//	}
-	@Test
-	public void testLocal() throws IOException {
-		run(1000., true, true);
-	}
-//	@Test
-//	public void testOnServer() {
-//		run(1000., true, false);
-//	}
 	
-	public void run(Double cellSize, boolean push2Geoserver, boolean createQGisOutput) throws IOException {
+	@Test
+	public void runAccessibilityComputation() throws IOException {
+		Double cellSize = 1000.;
+		boolean push2Geoserver = true; // set true for run on server
+		boolean createQGisOutput = true; // set false for run on server
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 		// Notation: minX, maxX, minY, maxY
@@ -133,8 +124,8 @@ public class AccessibilityComputationNairobiTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, false);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true );
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true );
 		acg.setOutputCrs("EPSG:21037"); // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
 //		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();

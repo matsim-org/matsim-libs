@@ -168,7 +168,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	 * @param linkId
 	 * @param time
 	 */
-	private boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
+	protected boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			this.parkingLocationsOutsideFacilities.put(vehicleId, linkId);

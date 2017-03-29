@@ -31,8 +31,8 @@ import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
   **/
 public class TrafficAnalysis {
 	
-	static String netFile = "../../../runs-svn/santiago/baseCase10pct/outputOfStep0_24T0/output_network.xml.gz"; //be Aware
-	static String countsFile = "../../../runs-svn/santiago/baseCase10pct/outputOfStep0_24T0/output_counts.xml.gz"; //be Aware
+	static String netFile = "../../../runs-svn/santiago/baseCase10pct/outputOfStep0_24T0/output_network.xml.gz";
+	static String countsFile = "../../../runs-svn/santiago/baseCase10pct/outputOfStep0_24T0/output_counts.xml.gz";
 	
 	
 
@@ -42,7 +42,7 @@ public class TrafficAnalysis {
 		
 		int it=0;
 		
-		while (it<=100){
+		while (it<=300){
 			int itAux = 300 + it;
 			String eventsFile = "../../../runs-svn/santiago/baseCase10pct/outputOfStep0_24T0/ITERS/it." + it + "/" + it + ".events.xml.gz";
 			String txtOutFile = "../../../runs-svn/santiago/baseCase10pct/outputOfStep0_24T0/analysis/" + itAux + ".countscompare.txt";

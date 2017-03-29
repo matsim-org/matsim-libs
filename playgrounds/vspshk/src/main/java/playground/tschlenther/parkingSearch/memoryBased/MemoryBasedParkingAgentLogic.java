@@ -57,7 +57,7 @@ public class MemoryBasedParkingAgentLogic extends ParkingAgentLogic {
 			isinitialLocation = false;
 			Leg currentLeg = (Leg) this.currentPlanElement;
 			//this could be Car, Carsharing, Motorcylce, or whatever else mode we have, so we want our leg to reflect this.
-			return new ParkingDynLeg(currentLeg.getMode(), actualRoute, parkingLogic, parkingManager, currentlyAssignedVehicleId, timer, events);
+			return new DistanceMemoryBasedDynLeg(currentLeg.getMode(), actualRoute, parkingLogic, parkingManager, currentlyAssignedVehicleId, timer, events);
 		}
 		else throw new RuntimeException("parking location mismatch");
 		

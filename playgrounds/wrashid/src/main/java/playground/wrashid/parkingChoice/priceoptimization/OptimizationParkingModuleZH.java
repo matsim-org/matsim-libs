@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PC2Parking;
-import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -25,6 +24,7 @@ import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageW
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
 import playground.wrashid.parkingChoice.priceoptimization.analysis.ArrivalDepartureParkingHandler;
 import playground.wrashid.parkingChoice.priceoptimization.infrastracture.OptimizableParking;
+import playground.wrashid.parkingChoice.priceoptimization.scoring.ParkingScoreManager;
 import playground.wrashid.parkingChoice.priceoptimization.simulation.ParkingChoiceSimulation;
 import playground.wrashid.parkingChoice.priceoptimization.simulation.ParkingInfrastructureManager;
 
@@ -178,7 +178,7 @@ public class OptimizationParkingModuleZH implements IterationStartsListener,
 		eventsManager.addHandler(arrivalDepartureParkingHandler);
 
 		eventsManager.resetHandlers(0);
-		eventsWriter.init(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
+		//eventsWriter.init(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		
 		getParkingInfrastructure().setEventsManager(eventsManager);
 	}
