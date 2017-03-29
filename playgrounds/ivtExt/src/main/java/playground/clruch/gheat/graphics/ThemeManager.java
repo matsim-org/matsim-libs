@@ -8,10 +8,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-public class ThemeManager {
-    private ThemeManager() {
-    }
-
+public enum ThemeManager {
+    ;
     private static Map<String, BufferedImage> dotsList;
     private static Map<String, BufferedImage> colorSchemeList;
     private static final String DOTS_FOLDER = "dots";
@@ -34,9 +32,11 @@ public class ThemeManager {
         return dotsList.get("dot" + zoom + ".png");
     }
 
+    // TODO input to fnction is ignored
     public static BufferedImage GetColorScheme(String schemeName) throws Exception {
-        if (!colorSchemeList.containsKey(schemeName + ".png"))
-            throw new Exception("Color scheme '" + schemeName + " could not be found");
-        return colorSchemeList.get(schemeName + ".png");
+        return ColorSchemes.ORANGE.getBufferedImage();
+        // if (!colorSchemeList.containsKey(schemeName + ".png"))
+        // throw new Exception("Color scheme '" + schemeName + " could not be found");
+        // return colorSchemeList.get(schemeName + ".png");
     }
 }

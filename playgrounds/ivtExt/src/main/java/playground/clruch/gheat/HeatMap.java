@@ -25,11 +25,8 @@ public class HeatMap {
                 zoom, //
                 x, //
                 y, //
-                dataManager.GetPointsForTile(x, y, ThemeManager.GetDot(zoom), zoom), changeOpacityWithZoom, defaultOpacity);
-    }
-
-    public static BufferedImage GetTile(DataManager dataManager, String colorScheme, // 
-            int zoom, int x, int y) throws Exception {
-        return GetTile(dataManager, colorScheme, zoom, x, y, false, 100);
+                dataManager.GetPointsForTile(x, y, ThemeManager.GetDot(zoom), zoom), //
+                changeOpacityWithZoom, //
+                defaultOpacity);
     }
 }
