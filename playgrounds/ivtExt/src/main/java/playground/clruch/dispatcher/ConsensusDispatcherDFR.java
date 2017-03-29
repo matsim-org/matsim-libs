@@ -10,10 +10,7 @@
 package playground.clruch.dispatcher;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -70,17 +67,17 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
     private int rebCount = 0;
 
     public ConsensusDispatcherDFR( //
-            AVDispatcherConfig config, //
-            AVGeneratorConfig generatorConfig, //
-            TravelTime travelTime, //
-            ParallelLeastCostPathCalculator router, //
-            EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork, //
-            AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractRequestSelector abstractRequestSelector, //
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            Map<VirtualLink, Double> linkWeightsIn, //
-            ArrivalInformation arrivalInformation) {
+                                   AVDispatcherConfig config, //
+                                   AVGeneratorConfig generatorConfig, //
+                                   TravelTime travelTime, //
+                                   ParallelLeastCostPathCalculator router, //
+                                   EventsManager eventsManager, //
+                                   VirtualNetwork virtualNetwork, //
+                                   AbstractVirtualNodeDest abstractVirtualNodeDest, //
+                                   AbstractRequestSelector abstractRequestSelector, //
+                                   AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
+                                   Map<VirtualLink, Double> linkWeightsIn, //
+                                   ArrivalInformation arrivalInformation) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
 
         this.virtualNodeDest = abstractVirtualNodeDest;
@@ -115,7 +112,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
                 availableVehicles.entrySet().stream().forEach(e -> vector.set(RealScalar.of(e.getValue().size()), e.getKey().index));
                 System.out.println(vector.toString());
-                System.out.println("variance="+Variance.ofVector(vector));
+                System.out.println("variance=" + Variance.ofVector(vector));
 
                 // Calculate the excess vehicles per virtual Node i, where v_i excess = vi_own - c_i = v_i + sum_j (v_ji) - c_i
                 // TODO check if sum_j (v_ji) also contains the customer vehicles travelling to v_i and add if so.
@@ -143,15 +140,15 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
                         double lambdaTo = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
                         double lambdaFrom = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
-                        
+
                         lambdaTo = Math.max(lambdaTo, 1);
                         lambdaFrom = Math.max(lambdaFrom, 1);
                         // System.out.println();
                         // lambda_dummy_to = lambda_dummy_from = 1;
                         double vehicles_From_to_To = //
                                 rebalancingPeriod * vLinkWeights.get(vLink) * ( //
-                                (double) imbalanceTo / lambdaTo - //
-                                        (double) imbalanceFrom / lambdaFrom) + //
+                                        (double) imbalanceTo / lambdaTo - //
+                                                (double) imbalanceFrom / lambdaFrom) + //
                                         rebalanceFloating.get(vLink);
 
                         int rebalanceFromTo = (int) Math.round(vehicles_From_to_To);
@@ -160,6 +157,7 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                         rebalanceFloating.put(vLink, rebalanceRest);
                     }
                 }
+
 
                 // ensure that not more vehicles are sent away than available
                 Map<VirtualLink, Integer> feasibleRebalanceCount = rebalanceCount; // new HashMap<>();
@@ -284,7 +282,6 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
     /**
      * FIXME in {@link PopulationDensityGenerator}
-     *
      */
 
     public static class Factory implements AVDispatcherFactory {

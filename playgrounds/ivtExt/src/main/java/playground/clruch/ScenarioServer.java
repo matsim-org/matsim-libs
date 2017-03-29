@@ -45,7 +45,7 @@ public class ScenarioServer {
         MatsimStaticDatabase.initializeSingletonInstance( //
                 scenario.getNetwork(), new IdentityTransformation());
 
-        TheApocalypse.decimatesThe(population).toNoMoreThan(30000).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(20000).people();
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
