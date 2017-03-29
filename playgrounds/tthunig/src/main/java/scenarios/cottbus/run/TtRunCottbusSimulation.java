@@ -22,6 +22,8 @@
 package scenarios.cottbus.run;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -75,6 +77,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import analysis.TtAnalyzedGeneralResultsWriter;
 import analysis.TtGeneralAnalysis;
 import analysis.TtListenerToBindGeneralAnalysis;
+import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -84,7 +87,6 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
-import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import signals.CombinedSignalsModule;
 import signals.downstreamSensor.DownstreamSignalController;
 import utils.SignalizeScenario;
@@ -98,6 +100,8 @@ import utils.SignalizeScenario;
 public class TtRunCottbusSimulation {
 
 	private static final Logger LOG = Logger.getLogger(TtRunCottbusSimulation.class);
+	
+	private final static String RUN_ID = "3097";
 	
 	private final static NetworkType NETWORK_TYPE = NetworkType.V1;
 	public enum NetworkType {
@@ -116,14 +120,19 @@ public class TtRunCottbusSimulation {
 		WoMines // without mines as working places
 	}
 	
-	private final static SignalType SIGNAL_TYPE = SignalType.MS_SYLVIA;
+	private final static SignalType SIGNAL_TYPE = SignalType.ALL_GREEN_INSIDE_ENVELOPE;
 	public enum SignalType {
 		NONE, MS, MS_RANDOM_OFFSETS, MS_SYLVIA, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN, 
-		ALL_NODES_ALL_GREEN, ALL_NODES_DOWNSTREAM, ALL_GREEN_INSIDE_ENVELOPE, ALL_DOWNSTREAM_INSIDE_ENVELOPE
+		ALL_NODES_ALL_GREEN, ALL_NODES_DOWNSTREAM, ALL_GREEN_INSIDE_ENVELOPE, 
+		ALL_MS_INSIDE_ENVELOPE_REST_GREEN, // all MS systems fixed-time, rest all green
+		ALL_MS_AS_SYLVIA_INSIDE_ENVELOPE_REST_GREEN, // all MS systems as sylvia with MS basis, rest all green. note: green basis for sylvia does not work
+		ALL_MS_AS_DOWNSTREAM_INSIDE_ENVELOPE_REST_GREEN, // all MS systems as downstream with MS basis, rest all green
+		ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_MS, // all MS systems as downstream with MS basis, rest downstream with green basis
+		ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_GREEN // all systems inside envelope downstream with green basis
 	}
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.CORDON_RING;
 	private enum PricingType {
 		NONE, CP_V3, CP_V4, CP_V7, CP_V8, CP_V9, CP_V10, FLOWBASED, CORDON_INNERCITY, CORDON_RING
 	}
@@ -136,9 +145,9 @@ public class TtRunCottbusSimulation {
 	private static final String INPUT_BASE_DIR = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
 	private static final String BTU_BASE_DIR = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
 	
-	private static final boolean WRITE_INITIAL_FILES = false;
+	private static final boolean WRITE_INITIAL_FILES = true;
 	private static final boolean USE_COUNTS = false;
-	private static final double SCALING_FACTOR = .7;
+	private static final double SCALING_FACTOR = .9;
 	
 	public static void main(String[] args) {		
 		Config config = defineConfig();
@@ -180,7 +189,8 @@ public class TtRunCottbusSimulation {
 			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes_v3.xml");
 			break;
 		}
-		if (SIGNAL_TYPE.toString().startsWith("ALL")){
+		if (SIGNAL_TYPE.toString().startsWith("ALL") && !SIGNAL_TYPE.toString().contains("MS")){
+			// if signal type 'All...' without 'MS' is used, lanes are defined later in 'prepareScenario'
 			config.network().setLaneDefinitionsFile(null);
 		}
 		
@@ -195,19 +205,13 @@ public class TtRunCottbusSimulation {
 			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/commuter_population_wgs84_utm33n_car_only.xml.gz");
 			break;
 		case WoMines:
-			if (NETWORK_TYPE.equals(NetworkType.V1)){
-				if (SIGNAL_TYPE.toString().contains("ENVELOPE")){
-//					config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-3_100it_cap0.5_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_ALL_GREEN_INSIDE_ENVELOPE_5plans_WoMines_V1/output_plans.xml.gz");
-//					config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-6_100it_cap0.7_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_ALL_GREEN_INSIDE_ENVELOPE_5plans_WoMines_V1/output_plans.xml.gz");
-					config.plans().setInputFile(OUTPUT_BASE_DIR + "2017-02-13_100it_cap0.5_ReRoute0.1_tbs900_ChExp0.9_beta2_lanes_2link_ALL_DOWNSTREAM_INSIDE_ENVELOPE_5plans_WoMines_V1/output_plans.xml.gz");
-				} else {
-//					 config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
-					// use routes from a 100th iteration as initial plans
-					config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_100it_MS_cap0.7.xml.gz");
-				}
-			} else {
-				config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
-			}
+			// TODO choose one
+			// BaseCase output plans. the number specifies the flow and storage capacity that was used	
+			config.plans().setInputFile(OUTPUT_BASE_DIR + "run3090/3090.output_plans.xml.gz");
+			// BaseCase plans, no routes
+//			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
+			// BaseCase plans, no links for acitivties, no routes
+//			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
 			break;
 		case GRID_LOCK_BTU:
 			// take these as initial plans
@@ -226,15 +230,16 @@ public class TtRunCottbusSimulation {
 		// config.plans().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/plans_scale1.4false.xml");
 
 		// set number of iterations
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(100);
+		// TODO
+		config.controler().setFirstIteration(100);
+		config.controler().setLastIteration(200);
 
 		// able or enable signals and lanes
-		config.qsim().setUseLanes(SIGNAL_TYPE.toString().startsWith("ALL") ? false : true);
-		// set signal files
-		if (!SIGNAL_TYPE.equals(SignalType.NONE) && !SIGNAL_TYPE.toString().startsWith("ALL")) {
+		// if signal type 'All...' is used without 'MS', lanes and signals are defined later in 'prepareScenario'
+		if (!SIGNAL_TYPE.equals(SignalType.NONE) && (SIGNAL_TYPE.toString().contains("MS") || !SIGNAL_TYPE.toString().startsWith("ALL"))) {
 			SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 			signalConfigGroup.setUseSignalSystems(true);
+			config.qsim().setUseLanes(SIGNAL_TYPE.toString().startsWith("ALL") && !SIGNAL_TYPE.toString().contains("MS") ? false : true);
 			// set signal systems
 			switch (NETWORK_TYPE) {
 			case V1:
@@ -260,8 +265,11 @@ public class TtRunCottbusSimulation {
 			// set signal control
 			switch (SIGNAL_TYPE) {
 			case MS:
-			case DOWNSTREAM_MS:
-			case DOWNSTREAM_ALLGREEN: // will be changed to all day green later
+			case DOWNSTREAM_MS: // will be changed to downstream later
+			case DOWNSTREAM_ALLGREEN: // will be changed to all day green and downstream later
+			case ALL_MS_INSIDE_ENVELOPE_REST_GREEN: // additional signal systems will be added later
+			case ALL_MS_AS_DOWNSTREAM_INSIDE_ENVELOPE_REST_GREEN: // will be changed to downstream later; additional signal systems will be added later
+			case ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_MS: // additional signal systems will be added later
 				if (NETWORK_TYPE.equals(NetworkType.V1) || NETWORK_TYPE.equals(NetworkType.BTU_NET)) {
 					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13.xml");
 				} else {
@@ -276,6 +284,7 @@ public class TtRunCottbusSimulation {
 				}
 				break;
 			case MS_SYLVIA:
+			case ALL_MS_AS_SYLVIA_INSIDE_ENVELOPE_REST_GREEN:
 				if (NETWORK_TYPE.equals(NetworkType.V1)){
 					signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_sylvia_no_13.xml");
 				} else {
@@ -313,8 +322,7 @@ public class TtRunCottbusSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		// TODO
-		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+		config.travelTimeCalculator().setTraveltimeBinSize( 900 );
 
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		// hash map and array produce same results. only difference: memory and time.
@@ -371,17 +379,18 @@ public class TtRunCottbusSimulation {
 		config.qsim().setStuckTime( 3600 );
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStartTime(3600 * 5); 
+		// TODO change to a higher value for congested scenarios
 		config.qsim().setEndTime(24.*3600.);
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(false); // false is default
 //		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles); // queue is default
 		
 		if (NETWORK_TYPE.equals(NetworkType.BTU_NET)){
-			LOG.warn("Keep in mind that the btu network has already be scaled");
+			LOG.warn("Keep in mind that the btu network capacity has already been scaled");
 		}
 //		config.qsim().setStorageCapFactor( SCALING_FACTOR );
 		/* storage cap should be scaled less than flow capacity factor. 
 		 * read in NicolaiNagelHiResAccessibilityMethod (2014), p.75f. (or p.9 in preprint), they mention RieserNagel2008NetworkBreakdown as reference */
-		config.qsim().setStorageCapFactor( SCALING_FACTOR / Math.pow(SCALING_FACTOR,1/4) );
+		config.qsim().setStorageCapFactor( SCALING_FACTOR / Math.pow(SCALING_FACTOR,1/4.) );
 		config.qsim().setFlowCapFactor( SCALING_FACTOR );
 		
 		// adapt monetary distance cost rate
@@ -394,14 +403,15 @@ public class TtRunCottbusSimulation {
 		config.planCalcScore().setMarginalUtilityOfMoney(1.0); // default is 1.0
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		// note: overwriteExistingFiles necessary when 'writeInputFiles' is true
 		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
 
 		config.vspExperimental().setWritingOutputEvents(true);
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.controler().setCreateGraphs(true);
 
-		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
-		config.controler().setWritePlansInterval(config.controler().getLastIteration());
+		config.controler().setWriteEventsInterval(config.controler().getLastIteration()/2);
+		config.controler().setWritePlansInterval(config.controler().getLastIteration()/2);
 
 		// define activity types
 		{
@@ -462,8 +472,7 @@ public class TtRunCottbusSimulation {
 		case DOWNSTREAM_ALLGREEN:
 			// adapt signal controller for downstream signal control
 			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-			SignalControlData signalControl = signalsData.getSignalControlData();
-			for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()) {
+			for (SignalSystemControllerData controllerData : signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().values()) {
 				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
 				if (SIGNAL_TYPE.equals(SignalType.DOWNSTREAM_ALLGREEN)){
 					// change to all day green
@@ -476,16 +485,41 @@ public class TtRunCottbusSimulation {
 				}
 			}
 			break;
+		case ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_MS:
+			// change all signal controller to downstream
+			signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+			for (SignalSystemControllerData controllerData : signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().values()) {
+				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+			}
+			// note: no break - should continue! (signals of following types are replaced anyway)
 		case ALL_NODES_ALL_GREEN:
 		case ALL_NODES_DOWNSTREAM:
 		case ALL_GREEN_INSIDE_ENVELOPE:
-		case ALL_DOWNSTREAM_INSIDE_ENVELOPE:
-			// signalize all intersections (or all inside envelope), create lanes for all intersections
+		case ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_GREEN:
+			// signalize all intersections (or all inside envelope or all that are not signalized yet), create corresponding lanes
 			SignalizeScenario signalizer = new SignalizeScenario(scenario);
+			if (SIGNAL_TYPE.toString().contains("BASIS_MS"))
+				signalizer.setOverwriteSignals(false);
 			if (SIGNAL_TYPE.toString().contains("DOWNSTREAM"))
 				signalizer.setSignalControlIdentifier(DownstreamSignalController.IDENTIFIER);
 			if (SIGNAL_TYPE.toString().contains("ENVELOPE"))
 				signalizer.setBoundingBox(INPUT_BASE_DIR + "shape_files/signal_systems/bounding_box.shp");
+			signalizer.createSignalsAndLanesForAllTurnings();
+			break;		
+		case ALL_MS_AS_DOWNSTREAM_INSIDE_ENVELOPE_REST_GREEN:
+			// change all signal controller to downstream
+			signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+			for (SignalSystemControllerData controllerData : signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().values()) {
+				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+			} 
+			// note: no break - should continue! (following sylvia and ms already have correct signal controller)
+		case ALL_MS_AS_SYLVIA_INSIDE_ENVELOPE_REST_GREEN:
+		case ALL_MS_INSIDE_ENVELOPE_REST_GREEN:
+			// add additional all day green signals inside envelope
+			signalizer = new SignalizeScenario(scenario);
+			signalizer.setOverwriteSignals(false);
+			signalizer.setBoundingBox(INPUT_BASE_DIR + "shape_files/signal_systems/bounding_box.shp");
+			// note: no specific signal controller identifier - additional signals should show green all day
 			signalizer.createSignalsAndLanesForAllTurnings();
 			break;
 		default:
@@ -498,8 +532,9 @@ public class TtRunCottbusSimulation {
 //		}
 		
 		createRunNameAndOutputDir(scenario);
-		if (WRITE_INITIAL_FILES) 
+		if (WRITE_INITIAL_FILES){ 
 			writeInitFiles(scenario);
+		}
 		
 		return scenario;
 	}
@@ -687,10 +722,11 @@ public class TtRunCottbusSimulation {
 		double flowCap = config.qsim().getFlowCapFactor();
 		if (storeCap == flowCap && storeCap != 1.0){
 			runName += "_cap" + storeCap;
-		} else if (storeCap != 1.0) {
-			runName += "_storeCap" + storeCap;
-		} else if (flowCap != 1.0) {
-			runName += "_flowCap" + flowCap;
+		} else { 
+			if (storeCap != 1.0)
+				runName += "_storeCap" + storeCap;
+			if (flowCap != 1.0)
+				runName += "_flowCap" + flowCap;
 		}
 		
 		StrategySettings[] strategies = config.strategy().getStrategySettings()
@@ -768,12 +804,27 @@ public class TtRunCottbusSimulation {
 		runName += "_" + POP_TYPE;
 		runName += "_" + NETWORK_TYPE;
 		
-		String outputDir = OUTPUT_BASE_DIR + runName + "/"; 
+		String outputDir = OUTPUT_BASE_DIR + "run" + RUN_ID + "/"; 
+//		String outputDir = OUTPUT_BASE_DIR + runName + "/"; 
 		// create directory
 		new File(outputDir).mkdirs();
 
 		config.controler().setOutputDirectory(outputDir);
 		LOG.info("The output will be written to " + outputDir);
+		
+		config.controler().setRunId(RUN_ID);
+		
+		// write run description
+		PrintStream stream;
+		String filename = outputDir + "runDescription.txt";
+		try {
+			stream = new PrintStream(new File(filename));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		stream.println(runName);
+		stream.close();
 	}
 
 	private static void writeInitFiles(Scenario scenario) {
@@ -783,11 +834,19 @@ public class TtRunCottbusSimulation {
 		
 		// write network and lanes
 		new NetworkWriter(scenario.getNetwork()).write(outputDir + "network.xml");
-		if (scenario.getConfig().qsim().isUseLanes()) 
+		// correct paths before writing config
+		scenario.getConfig().network().setInputFile("network.xml");
+		if (scenario.getConfig().qsim().isUseLanes()) {
 			new LanesWriter(scenario.getLanes()).write(outputDir + "lanes.xml");
+			scenario.getConfig().network().setLaneDefinitionsFile("lanes.xml");
+		}
+		String outputDirTmp = scenario.getConfig().controler().getOutputDirectory();
+		// adapt output dir to be able to run it on the cluster
+		scenario.getConfig().controler().setOutputDirectory("/net/ils3/thunig/runs-svn/cottbus/createGridLock/run" + RUN_ID + "/");
 		
 		// write population
 		new PopulationWriter(scenario.getPopulation()).write(outputDir + "plans.xml");
+		scenario.getConfig().plans().setInputFile("plans.xml");
 		
 		// write signal files
 		if (!SIGNAL_TYPE.equals(SignalType.NONE)) {
@@ -795,10 +854,19 @@ public class TtRunCottbusSimulation {
 			new SignalSystemsWriter20(signalsData.getSignalSystemsData()).write(outputDir + "signalSystems.xml");
 			new SignalControlWriter20(signalsData.getSignalControlData()).write(outputDir + "signalControl.xml");
 			new SignalGroupsWriter20(signalsData.getSignalGroupsData()).write(outputDir + "signalGroups.xml");
+			
+			SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
+					SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+			signalsConfigGroup.setSignalSystemFile("signalSystems.xml");
+			signalsConfigGroup.setSignalGroupsFile("signalGroups.xml");
+			signalsConfigGroup.setSignalControlFile("signalControl.xml");
 		}
 		
 		// write config
 		new ConfigWriter(scenario.getConfig()).write(outputDir + "config.xml");
+		
+		// restore output dir
+		scenario.getConfig().controler().setOutputDirectory(outputDirTmp);
 	}
 
 }
