@@ -32,7 +32,10 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.lanes.data.Lane;
 import playground.dgrether.signalsystems.LinkSensorManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 
 /**
@@ -41,24 +44,29 @@ import java.util.*;
  */
 public class LaemmerSignalController extends AbstractSignalController implements SignalController {
 
-    private static final Logger log = Logger.getLogger(LaemmerSignalController.class);
+    public static final Logger log = Logger.getLogger(LaemmerSignalController.class);
+    public static final Logger drivewayLog = Logger.getLogger(LaemmerSignalController.LaemmerSignal.class);
 
     public static final String IDENTIFIER = "LaemmerSignalControl";
 
-    private Map<Id<Signal>, Double> avgArrivalRates;
-    private Map<Id<Signal>, Double> timeSinceService;
-
-    private Queue<Id<SignalGroup>> regulationQueue = new LinkedList<>();
-    private double remainingRegulationTime = 0;
+    private Queue<LaemmerSignal> regulationQueue = new LinkedList<>();
 
     //TODO: Parametrize periods
     private static final double DESIRED_PERIOD = 90.;
     private static final double MAX_PERIOD = 120.;
 
-    private final double DEFAULT_AMBER = 3;
+    private List<LaemmerSignal> signals;
 
-    private List<Driveway> driveways;
-    private Driveway currentSelectedDriveway;
+    private Request activeRequest = null;
+
+    private LinkSensorManager sensorManager;
+    private SignalsData signalsData;
+    private Network network;
+
+    private final double DEFAULT_INBETWEEN = 5;
+
+    private double tIdle;
+    private double flowSum;
 
 
     public final static class SignalControlProvider implements Provider<SignalController> {
@@ -78,10 +86,6 @@ public class LaemmerSignalController extends AbstractSignalController implements
         }
     }
 
-    private LinkSensorManager sensorManager;
-    private SignalsData signalsData;
-    private Network network;
-
 
     private LaemmerSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
         this.sensorManager = sensorManager;
@@ -91,102 +95,80 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
     @Override
     public void simulationInitialized(double simStartTimeSeconds) {
-        avgArrivalRates = new HashMap<>();
-        timeSinceService = new HashMap<>();
-
         this.initializeSensoring();
-        driveways = new ArrayList<>();
+        signals = new ArrayList<>();
         for (SignalGroup group : this.system.getSignalGroups().values()) {
-
-            driveways.add(new Driveway(group));
             this.system.scheduleDropping(simStartTimeSeconds, group.getId());
             //TODO: Zwischenzeiten haengen nicht nur von aktueller Phase ab
             for (Signal signal : group.getSignals().values()) {
-                timeSinceService.put(signal.getId(), Double.valueOf(signalsData.getAmberTimesData().getDefaultAmber()));
+                flowSum += network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
+                signals.add(new LaemmerSignal(group.getId(), signal));
             }
         }
-
-
     }
 
     @Override
-    public void updateState(double timeSeconds) {
+    public void updateState(double now) {
 
-        for (Driveway driveway : driveways) {
-            driveway.update(timeSeconds);
-        }
+        log.info("-------------------------------------------------------------");
+        log.info("Updating System" + this.system.getId() + ". Time: " + now);
 
-        Collections.sort(driveways);
+        log.info("Updating signals");
 
-        Driveway max = driveways.get(0);
-        if (currentSelectedDriveway == null || !max.equals(currentSelectedDriveway)) {
-            if (currentSelectedDriveway != null) {
-                currentSelectedDriveway.toggleSelection();
-                this.system.scheduleDropping(timeSeconds, currentSelectedDriveway.group.getId());
+        if (!regulationQueue.isEmpty() && regulationQueue.peek().equals(activeRequest.signal)) {
+            LaemmerSignal signal = regulationQueue.peek();
+            log.info( "Remaining regulation time for " + signal.signal.getId() + ": " + (activeRequest.time + activeRequest.regulationTime - now) );
+            int n = getNumberOfExpectedVehicles(now, signal.link.getId());
+            if (activeRequest.regulationTime + activeRequest.time - now <= 0 || n == 0) {
+                regulationQueue.poll();
+                log.info("Stopping regulation for " + signal.signal.getId() + " remaining vehicles: " + n);
             }
-            currentSelectedDriveway = max;
-            currentSelectedDriveway.toggleSelection();
-            this.system.scheduleOnset(timeSeconds + currentSelectedDriveway.remainingInBetweenTime, currentSelectedDriveway.group.getId());
         }
 
-
-//        updateRegulationQueue(timeSeconds);
-//
-//        if (remainingRegulationTime < 1) {
-//            Id<SignalGroup> grp;
-//            grp = regulationQueue.peek();
-//            if (grp == null) {
-//                grp = selectSignalGroup(timeSeconds);
-//            }
-//            processSignalGroup(timeSeconds, grp);
-//        }
-
-//        if (remainingInBetweenTime > 0) {
-//            remainingInBetweenTime--;
-//        }
-//        if (remainingRegulationTime > 0) {
-//            remainingRegulationTime--;
-//        }
-    }
+        tIdle = DESIRED_PERIOD;
+        for (LaemmerSignal signal : signals) {
+            signal.update(now);
+            tIdle -= (signal.loadFactor * DESIRED_PERIOD + DEFAULT_INBETWEEN);
+        }
+        log.info("T_Idle = " + tIdle);
 
 
-//    private void updateRegulationQueue(double timeSeconds) {
-//        for (SignalGroup group : this.system.getSignalGroups().values()) {
-//            double intergreen = 0;
-//            double amberTime = signalsData.getAmberTimesData().getDefaultAmber();
-//
-//            if (currentGreenTimeGroupId != null) {
-//                intergreen = signalsData.getIntergreenTimesData().getIntergreensForSignalSystemDataMap()
-//                        .get(this.system.getId()).getIntergreenTime(currentGreenTimeGroupId, group.getId());
-//            }
-//            double inBetweenTime = amberTime + intergreen;
-//
-//            for (Signal signal : group.getSignals().values()) {
-//                if (checkForRegulation(signal, timeSeconds, inBetweenTime) && !regulationQueue.contains(signal.getId())) {
-//                    regulationQueue.add(group.getId());
+        LaemmerSignal max = regulationQueue.peek();
+        if(max==null) {
+            log.info("no queue selected.");
+        } else {
+            log.info("regulating for " + max.signal.getId());
+        }
+//        if (max == null) {
+//            double index = 0;
+//            for (LaemmerSignal signal : signals) {
+//                if (signal.index > index) {
+//                    max = signal;
+//                    index = signal.index;
+//                    log.info("Max index of " + index + ".Signal " + max.signal.getId() + " of Group " + max.group);
 //                }
 //            }
 //        }
-//    }
 
-
-    private boolean checkForRegulation(Signal signal, double timeSeconds, double inBetweenTime) {
-        Id<Link> linkId = signal.getLinkId();
-        double n = this.getNumberOfExpectedVehicles(timeSeconds, linkId);
-        double a;
-        if (n == 0) {
-            a = inBetweenTime;
-        } else {
-            a = timeSinceService.get(signal.getId()) + 1;
+        if (activeRequest != null && activeRequest.signal != max) {
+            log.info("Dropping group " + activeRequest.signal.group + " after " + (now - activeRequest.time + "s."));
+            this.system.scheduleDropping(now, activeRequest.signal.group);
+            activeRequest = null;
         }
-        timeSinceService.put(signal.getId(), a);
 
-        double avgArrivalRate = avgArrivalRates.get(signal.getId());
-        double maxFlow = this.network.getLinks().get(linkId).getCapacity() / 3600.;
-        double nCrit = avgArrivalRate * DESIRED_PERIOD
-                * (MAX_PERIOD - a / (1 - avgArrivalRate / maxFlow)
-                / (MAX_PERIOD - DESIRED_PERIOD));
-        return n >= nCrit;
+        if (activeRequest == null && max != null || activeRequest != null && max != activeRequest.signal && max != null) {
+            log.info("Driveway changed. Creating new Request for " + (now + DEFAULT_INBETWEEN) + " granted time: " + max.regulationTime);
+            activeRequest = new Request(now + DEFAULT_INBETWEEN, max, max.regulationTime);
+        }
+
+        if (activeRequest != null) {
+            if (activeRequest.isDue(now)) {
+                log.info("Setting group " + activeRequest.signal.group);
+                this.system.scheduleOnset(now, activeRequest.signal.group);
+            } else if (activeRequest.time > now) {
+                log.info("Remaining in-between-time " + (activeRequest.time - now));
+            }
+        }
     }
 
 
@@ -209,6 +191,11 @@ public class LaemmerSignalController extends AbstractSignalController implements
         return this.sensorManager.getNumberOfCarsInDistance(linkId, 0., timeSeconds);
     }
 
+    private double getAverageArrivalRate(double timeSeconds, Id<Link> linkId) {
+        Link link = network.getLinks().get(linkId);
+        return this.sensorManager.getAverageArrivalRate(linkId, timeSeconds);
+    }
+
 
     @Override
     public void reset(Integer iterationNumber) {
@@ -220,8 +207,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
                 if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()) {
                     //					log.error("system: " + this.system.getId() + " signal: " + signal.getId() + " has no lanes...");
                     this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), 0.);
-                    //TODO: register for arrival rate
-                    avgArrivalRates.put(signal.getId(), 0.25);
+                    this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId());
                 } else {
                     for (Id<Lane> laneId : signal.getLaneIds()) {
                         //TODO check this part again concerning implementation of CarsOnLaneHandler
@@ -232,113 +218,146 @@ public class LaemmerSignalController extends AbstractSignalController implements
         }
     }
 
-    class Driveway implements Comparable<Driveway> {
+    class Request {
+        final double time;
+        final LaemmerSignal signal;
+        final double regulationTime;
 
-        SignalGroup group;
-
-        boolean selected = false;
-        double groupIndex = 0;
-        double remainingInBetweenTime;
-        double intergreen = 0;
-        private double abortionPenalty = 0;
-
-
-        Driveway(SignalGroup signalGroup) {
-            this.group = signalGroup;
+        Request(double time, LaemmerSignal laemmerSignal, double regulationTime) {
+            this.signal = laemmerSignal;
+            this.time = time;
+            this.regulationTime = regulationTime;
         }
 
-        public void update(double timeSeconds) {
+        public boolean isDue(double timeSeconds) {
+            return timeSeconds == this.time;
+        }
+    }
 
-            if (selected) {
-                calculateAbortionPenalty(timeSeconds);
+    class LaemmerSignal {
+
+        Id<SignalGroup> group;
+        Signal signal;
+        double index = 0;
+        private double abortionPenalty = 0;
+        private double loadFactor;
+        private double a = DEFAULT_INBETWEEN;
+        private Link link;
+        private double maxFlow;
+        private double regulationTime = 0;
+
+        LaemmerSignal(Id<SignalGroup> signalGroup, Signal signal) {
+            this.group = signalGroup;
+            this.signal = signal;
+            link = network.getLinks().get(signal.getLinkId());
+            maxFlow = network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
+            drivewayLog.info("LaemmeSignal for signal " + signal.getId() + " created.");
+        }
+
+        public void update(double now) {
+            drivewayLog.info("---------------------------------------------------");
+            drivewayLog.info("UPDATING " + signal.getId() + " at " + now);
+
+            if (activeRequest != null && this.equals(activeRequest.signal)) {
+                calculateAbortionPenalty(now);
+                drivewayLog.info("Calculating Abortion Penalty.");
+            } else {
+                this.abortionPenalty = 0;
             }
-            updateIntergreen();
 
-            //update avgarrival
-            //update a
+            updateArrivalRate(now);
+            if (regulate(now)) {
+                return;
+            }
 
-            groupIndex = 0;
+            if (activeRequest != null && activeRequest.signal == this) {
+                calculateActivePriorityIndex(now);
+            } else {
+                calculateInactivePriorityIndex(now);
+            }
+        }
 
-            for (Signal signal : group.getSignals().values()) {
-                double signalIndex = 0;
-                Id<Link> linkId = signal.getLinkId();
-                double flow = network.getLinks().get(linkId).getCapacity() / 3600.;
-                if (selected) {
-                    //TODO: currentInBetween time has to exclude intergreens
-                    for (double i = remainingInBetweenTime; i <= (intergreen + DEFAULT_AMBER); i++) {
-                        double nExpected = getNumberOfExpectedVehicles(timeSeconds + i, linkId);
-                        double reqGreenTime = nExpected / flow;
-                        double tempIndex = nExpected / (i + reqGreenTime);
-                        if (tempIndex > signalIndex) {
-                            signalIndex = tempIndex;
-                        }
-                    }
-                } else {
-                    double nExpected = getNumberOfExpectedVehicles(timeSeconds + (intergreen + DEFAULT_AMBER), linkId);
-                    double reqGreenTime = nExpected / flow;
-                    double penalty = 0;
-                    if (currentSelectedDriveway != null) {
-                        penalty = currentSelectedDriveway.abortionPenalty;
-                    }
-                    signalIndex = nExpected / (penalty + (intergreen + DEFAULT_AMBER) + reqGreenTime);
+        private void calculateInactivePriorityIndex(double now) {
+            drivewayLog.info("Non-Active driveway.");
+            double nExpected = getNumberOfExpectedVehicles(now + DEFAULT_INBETWEEN, link.getId());
+            double reqGreenTime = nExpected / maxFlow;
+            double penalty = 0;
+            if (activeRequest != null) {
+                penalty = activeRequest.signal.abortionPenalty;
+            }
+            index = nExpected / (penalty + DEFAULT_INBETWEEN + reqGreenTime);
+            drivewayLog.info("n=" + nExpected + " at second " + (now + DEFAULT_INBETWEEN) + "resulting in " + reqGreenTime + " required green time. Penalty: " + penalty + ".  Index: " + index);
+        }
+
+        private void calculateActivePriorityIndex(double now) {
+            drivewayLog.info("Active driveway.");
+            double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
+            drivewayLog.info("Remaining in between time " + remainingInBetweenTime);
+            for (double i = remainingInBetweenTime; i <= DEFAULT_INBETWEEN; i++) {
+                double nExpected = getNumberOfExpectedVehicles(now + i, link.getId());
+                double reqGreenTime = nExpected / maxFlow;
+                double tempIndex = nExpected / (i + reqGreenTime);
+                drivewayLog.info("n=" + nExpected + " at second " + (now + i) + "resulting in " + reqGreenTime + " required green time. Index: " + tempIndex);
+                if (tempIndex > index) {
+                    index = tempIndex;
+                    drivewayLog.info("Index: " + index);
                 }
-                groupIndex += signalIndex;
             }
+        }
 
-            if (selected && remainingInBetweenTime > 0) {
-                remainingInBetweenTime--;
-            }
+        private void updateArrivalRate(double now) {
+            double avgArrivalRate = getAverageArrivalRate(now, link.getId());
+            loadFactor = avgArrivalRate / maxFlow;
+            drivewayLog.info("Avg Arrival Rate: " + avgArrivalRate + ", load factor: " + loadFactor);
         }
 
         private void calculateAbortionPenalty(double timeSeconds) {
-
-            if (!selected) {
-                this.abortionPenalty = 0;
-                return;
+            this.abortionPenalty = 0;
+            double waitingTimeSum = 0;
+            double remainingInBetweenTime = Math.max(activeRequest.time - timeSeconds, 0);
+            for (double i = remainingInBetweenTime; i < DEFAULT_INBETWEEN; i++) {
+                waitingTimeSum += getNumberOfExpectedVehicles(timeSeconds + i, link.getId());
             }
-            double penaltySum = 0;
-
-            for (Signal signal : group.getSignals().values()) {
-                Id<Link> linkId = signal.getLinkId();
-                double waitingTimeSum = 0;
-                //TODO: reduce inbetweentime for selected driveway to amber times only after start of service
-                //TODO: check integration implementation
-                for (double i = remainingInBetweenTime; i <= (intergreen + DEFAULT_AMBER); i++) {
-                    waitingTimeSum += (waitingTimeSum + getNumberOfExpectedVehicles(timeSeconds + i, linkId));
-                }
-                double n = getNumberOfExpectedVehicles(timeSeconds + (intergreen + DEFAULT_AMBER), linkId);
-                if (n > 0) {
-                    penaltySum += waitingTimeSum / n;
-                }
+            double n = getNumberOfExpectedVehicles(timeSeconds + DEFAULT_INBETWEEN, link.getId());
+            if (n > 0) {
+                this.abortionPenalty += waitingTimeSum / n;
             }
-            this.abortionPenalty = penaltySum;
+            drivewayLog.info("Waiting time sum of " + waitingTimeSum + " in case of abortion. Resulting in " + this.abortionPenalty + "s penalty");
         }
 
-        private void updateIntergreen() {
-            intergreen = 0;
-            if (!selected && currentSelectedDriveway != null) {
-                Id<SignalGroup> currentGroupId = currentSelectedDriveway.group.getId();
-                intergreen = signalsData.getIntergreenTimesData().getIntergreensForSignalSystemDataMap()
-                        .get(system.getId()).getIntergreenTime(currentGroupId, this.group.getId());
-            } else if (selected && remainingInBetweenTime <= DEFAULT_AMBER) {
-                intergreen = 0;
-            }
-        }
+        private boolean regulate(double timeSeconds) {
 
+            drivewayLog.info("Checking for regulation");
 
-        private void toggleSelection() {
-            this.selected = !this.selected;
-            this.remainingInBetweenTime = intergreen + DEFAULT_AMBER;
-        }
+            double n = getNumberOfExpectedVehicles(timeSeconds, link.getId());
+            double avgArrivalRate = getAverageArrivalRate(timeSeconds, link.getId());
 
-        @Override
-        public int compareTo(Driveway o) {
-            if (o.groupIndex > this.groupIndex) {
-                return -1;
-            } else if (o.groupIndex < this.groupIndex) {
-                return 1;
+            if (n == 0) {
+                a = DEFAULT_INBETWEEN;
+                drivewayLog.info("Queue length zero, setting a to inbetween time");
             } else {
-                return 0;
+                a++;
+                drivewayLog.info("a set to " + a);
+            }
+            if (regulationQueue.contains(this)) {
+                drivewayLog.info("Already in regulation queue. Aborting.");
+                return false;
+            }
+            this.regulationTime = 0;
+            double nCrit = avgArrivalRate * DESIRED_PERIOD
+                    * ((MAX_PERIOD - (a / (1 - avgArrivalRate / maxFlow)))
+                    / (MAX_PERIOD - DESIRED_PERIOD));
+            drivewayLog.info("n = " + n);
+            drivewayLog.info("nCrit = " + nCrit);
+            //TODO: keep n>1?
+            if (n >= nCrit && n > 1) {
+                regulationQueue.add(this);
+                this.regulationTime = Math.ceil(this.loadFactor * DESIRED_PERIOD + (maxFlow / flowSum) * tIdle);
+                drivewayLog.info("Adding to regulation queue with granted time " + regulationTime );
+                return true;
+            } else {
+                drivewayLog.info("No need for regulation.");
+                return false;
             }
         }
     }
