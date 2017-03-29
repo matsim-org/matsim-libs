@@ -84,6 +84,14 @@ class LatexResultsWriter {
 //		header.append("delta total delay [hh:mm:ss]");
 //		header.append(separator);
 		header.append("$\\Delta$ delay [%]");
+		header.append(separator);
+		
+		header.append("\\#trips [veh]");
+		header.append(separator);
+//		header.append("$\\Delta$ \\#trips [veh]");
+//		header.append(separator);
+		header.append("$\\Delta$ \\#trips [%]");
+		
 		header.append("\t\\\\");
 		
 
@@ -132,7 +140,13 @@ class LatexResultsWriter {
 //		out.append(Time.writeTime(r.deltaTotalDelay));
 //		out.append(separator);
 		out.append(formatDouble(r.delayPercent));
+		out.append(separator);
+		
+		out.append(formatDoubleInt(r.noTrips));
+		out.append(separator);
+//		out.append(formatDoubleInt(r.deltaNoTrips));
 //		out.append(separator);
+		out.append(formatDouble(r.noTripsPercent));
 		
 		
 		out.append("\t\\\\");
