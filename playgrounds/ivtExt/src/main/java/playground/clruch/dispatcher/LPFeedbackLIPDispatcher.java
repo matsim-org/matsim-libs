@@ -17,10 +17,13 @@ import ch.ethz.idsc.tensor.sca.Floor;
 import ch.ethz.idsc.tensor.sca.Round;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.gnu.glpk.glp_smcp;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+
+import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.*;
@@ -49,6 +52,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     final int numberOfAVs;
     private int total_rebalanceCount  = 0;
     Tensor printVals = Tensors.empty();
+    LPVehicleRebalancing lpVehicleRebalancing;
 
 
     public LPFeedbackLIPDispatcher( //
@@ -71,6 +75,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
+        // setup linear program
+        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork,travelTimes);
     }
 
 
@@ -84,10 +90,9 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         // PART I: rebalance all vehicles periodically
         final long round_now = Math.round(now);
 
-        if (round_now % rebalancingPeriod == 0 && !getAVRequests().isEmpty()) {
+        if (round_now % rebalancingPeriod == 0) {
 
-            // setup linear program
-            LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork,travelTimes);
+
 
 
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
@@ -159,7 +164,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             }
             // close the LP to avoid data leaks
             // TODO can this be taken out to not delete the LP in every instance?
-            lpVehicleRebalancing.closeLP();
+            //lpVehicleRebalancing.closeLP();
         }
 
 
