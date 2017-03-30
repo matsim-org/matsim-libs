@@ -17,12 +17,15 @@ public class VirtualNode {
     /** id is only used for debugging */
     private final String id;
     private final Set<Link> links;
+    private final int neighCount;
 
-    VirtualNode(int index, String idIn, Set<Link> linksIn) {
+    VirtualNode(int index, String idIn, Set<Link> linksIn, int neighCount) {
         this.index = index;
         this.id = idIn;
         this.links = linksIn;
-        
+        this.neighCount = neighCount;
+
+        //EVTL GET RID OF THIS -> LEFTOVER NODE or deal differently with it
         if (!idIn.contains("" + (index + 1)))
             throw new RuntimeException("node index mismatch:" + idIn + " != " + (index + 1));
     }
@@ -36,4 +39,6 @@ public class VirtualNode {
     }
 
     public int getIndex() {return  index; }
+
+    public int getNeighCount() {return neighCount;}
 }

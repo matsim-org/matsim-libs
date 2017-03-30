@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import ch.ethz.idsc.tensor.alg.Array;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -115,11 +116,15 @@ public class ArrivalInformation {
         return ZeroScalar.get();
     }
 
-    public Scalar getLambdaforTime(double time, int vNodeindex) {
+    public Tensor getLambdaforTime(double time) {
         int row = (int) Math.min(time / dtSeconds, numberTimeSteps - 1);
-        int col = vNodeindex;
-        return lambda.Get(row, col);
+        return lambda.get(row).copy();
     }
+
+    public Scalar getLambdaforTime(double time, int vNodeindex) {
+        return getLambdaforTime(time).Get(vNodeindex);
+    }
+
 
     public Scalar getpijforTime(int time, int from, int to) {
         int timestep = (int) Math.min(time / dtSeconds, numberTimeSteps - 1);
