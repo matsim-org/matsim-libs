@@ -54,10 +54,10 @@ public final class AccessibilityCalculator {
 	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
 	// (test may depend on that this is a "Linked" Hash Map. kai, dec'16)
 	
-	private PlanCalcScoreConfigGroup cnScoringGroup;
-	private AccessibilityConfigGroup acg;
-	private Network network;
-	private double walkSpeedMeterPerHour;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
+	private final AccessibilityConfigGroup acg;
+	private final Network network;
+	private final double walkSpeedMeterPerHour;
 
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 	
@@ -88,10 +88,10 @@ public final class AccessibilityCalculator {
 	public final void computeAccessibilities(Double departureTime, ActivityFacilities opportunities) {
 		AggregationObject[] aggregatedOpportunities = aggregateOpportunities(opportunities, network);
 
-		Map<String,ExpSum> expSums = new HashMap<>() ;
+		Map<String,Double> expSums = new HashMap<>();
 		for (String mode : calculators.keySet()) {
 			LOG.warn("Calculate ExpSum for mode = " + mode);
-			expSums.put(mode, new ExpSum());
+			expSums.put(mode, 0.);
 		}
 
 		// Condense measuring points (origins) that have the same nearest node on the network
@@ -115,18 +115,17 @@ public final class AccessibilityCalculator {
 			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
 				assert(origin.getCoord() != null);
 
-				for (ExpSum expSum : expSums.values()) {
-					expSum.reset();
+				for (String key : expSums.keySet()) {
+					expSums.put(key, 0.);
 				}
 				
 //				Gbl.assertIf( this.aggregatedOpportunities.length>0);
 				// yyyyyy a test fails when this line is made active; cannot say why an execution path where there are now opportunities can make sense for a test.  kai, mar'17
 				
 				for (final AggregationObject aggregatedFacility : aggregatedOpportunities) {
-//					computeAndAddExpUtilContributions( expSums, origin, aggregatedFacility, departureTime );
 					for (Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet()) {
 						final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity(origin , aggregatedFacility, departureTime);
-						expSums.get(calculatorEntry.getKey()).addExpUtils(expVhk);
+						expSums.put(calculatorEntry.getKey(), expSums.get(calculatorEntry.getKey()) + expVhk);
 					}
 				}
 				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
@@ -138,12 +137,12 @@ public final class AccessibilityCalculator {
 				for (String mode : calculators.keySet()) {
 					LOG.info("---- calculate accessibility for mode=" + mode );
 					if(!acg.isUsingRawSumsWithoutLn()){
-						LOG.info("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
+						LOG.info("expSums.get(mode).getSum() = " + expSums.get(mode));
 						// logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
-						accessibilities.put(mode, (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log( expSums.get(mode).getSum()));
+						accessibilities.put(mode, (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode)));
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
-						accessibilities.put(mode, expSums.get(mode).getSum()) ;
+						accessibilities.put(mode, expSums.get(mode));
 					}
 				}
 
@@ -251,27 +250,5 @@ public final class AccessibilityCalculator {
 	
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener){
 		this.zoneDataExchangeListeners.add(listener);
-	}
-
-
-	/**
-	 * stores travel disutilities for different modes
-	 */
-	static class ExpSum {
-		// could just use Map<Modes4Accessibility,Double>, but since it is fairly far inside the loop, I leave it with primitive
-		// variables on the (unfounded) intuition that this helps with computational speed.  kai, 
-		private double sum = 0.;
-
-		void reset() {
-			this.sum = 0.;
-		}
-
-		void addExpUtils(double val){
-			this.sum += val;
-		}
-
-		double getSum(){
-			return this.sum;
-		}
 	}
 }
