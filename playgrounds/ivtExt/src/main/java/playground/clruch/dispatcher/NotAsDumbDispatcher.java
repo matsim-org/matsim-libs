@@ -1,14 +1,20 @@
 package playground.clruch.dispatcher;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.simonton.Cluster;
@@ -23,15 +29,11 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class NotAsDumbDispatcher extends UniversalDispatcher {
     private final int dispatchPeriod;
 
     final Network network; // <- for verifying link references
     final Collection<Link> linkReferences; // <- for verifying link references
-
 
     private NotAsDumbDispatcher( //
                                  AVDispatcherConfig avDispatcherConfig, //
@@ -45,7 +47,6 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
         linkReferences = new HashSet<>(network.getLinks().values());
 //        vehicleRequestMatcher = ;
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
-
     }
 
     /**
@@ -70,63 +71,126 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
 
     @Override
     public void redispatch(double now) {
-        // simulate this with a dispatchPeriod of about 4 minutes to simulate a heuristic dumb dispatcher
+        // verifyReferences(); // <- debugging only
 
-        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), getAVRequestsAtLinks());
-
+        new InOrderOfArrivalMatcher(this::setAcceptRequest).match(getStayVehicles(), getAVRequestsAtLinks());
 
         final long round_now = Math.round(now);
         if (round_now % dispatchPeriod == 0) {
+
             total_abortTrip += new DrivebyRequestStopper(this::setVehicleDiversion).realize(getAVRequestsAtLinks(), getDivertableVehicles());
-            {
+
+            { // TODO this should be replaceable by some naive matcher
+
                 Iterator<AVRequest> requestIterator = getAVRequests().iterator();
-                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-                    Link dest = vehicleLinkPair.getCurrentDriveDestination();
-                    Link vehicleLink = vehicleLinkPair.getDivertableLocation();
-                    if (dest == null) { // vehicle in stay task
-                        if (requestIterator.hasNext()) {
-                            Link closestLink = requestIterator.next().getFromLink();
-                            while(requestIterator.hasNext()){
-                                Link newLink = requestIterator.next().getFromLink();
-                                if(iscloserthan(closestLink,newLink,vehicleLink)){
-                                    closestLink = newLink;
-                                }
-                            }
-                            setVehicleDiversion(vehicleLinkPair, closestLink);
-                            ++total_driveOrder;
-                        } else
-                            break;
+                while (requestIterator.hasNext()) {
+                    Link reqLink = requestIterator.next().getFromLink();
+                    VehicleLinkPair vehicletoMatch = null;
+                    if (round_now % dispatchPeriod*3 == 0) {
+                        vehicletoMatch = someCloseVehicleReturner(getDivertableVehicles(), reqLink, 2);
+                    } else {
+                        vehicletoMatch = closeVehicleReturner(getDivertableVehicles(), reqLink, 2000.0);
+                    }
+
+                    /*
+                    if (round_now % 600 == 0) {
+                        vehicletoMatch = closeVehicleReturner(getDivertableVehicles(), reqLink, 100000000000.0);
+                    } else {
+                        vehicletoMatch = closeVehicleReturner(getDivertableVehicles(), reqLink, 2000.0);
+                    }
+                    */
+                    if (vehicletoMatch != null) {
+                        setVehicleDiversion(vehicletoMatch, reqLink);
+                        ++total_driveOrder;
                     }
                 }
-            }
 
+
+                /*
+
+
+
+                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                    Iterator<AVRequest> requestIterator = getAVRequests().iterator();
+                    Link dest = vehicleLinkPair.getCurrentDriveDestination();
+                    Link avloc = vehicleLinkPair.getDivertableLocation();
+                    if (dest == null && requestIterator.hasNext()) { // vehicle in stay task
+                        Link closestLink = requestIterator.next().getFromLink();
+                        double closestDist = LinkDistance(closestLink, avloc);
+                        while (requestIterator.hasNext()) {
+                            Link newLink = requestIterator.next().getFromLink();
+                            if (LinkDistance(newLink, avloc) < closestDist) {
+                                closestLink = newLink;
+                            }
+                        }
+                        setVehicleDiversion(vehicleLinkPair, closestLink);
+                        ++total_driveOrder;
+                    } else
+                        break;
+                }
+
+                */
+            }
         }
+
     }
+
+    // TODO ugly implementation, make nicer using kdtree or similar
+    VehicleLinkPair closeVehicleReturner(Collection<VehicleLinkPair> vehicleLinkPairs, Link reqlink, double MaxDist) {
+
+        HashMap<VehicleLinkPair, Double> distanceMap = new HashMap<>();
+        for (VehicleLinkPair vehicleLinkPair : vehicleLinkPairs) {
+            distanceMap.put(vehicleLinkPair, LinkDistance(vehicleLinkPair.getDivertableLocation(), reqlink));
+        }
+        Optional<Map.Entry<VehicleLinkPair, Double>> totake = distanceMap.entrySet().stream().filter(v -> v.getValue() < MaxDist).findAny();
+        if (totake.isPresent()) {
+            return totake.get().getKey();
+        } else return null;
+    }
+
 
     /**
      *
-     * @param A
-     * @param B
-     * @param C
-     * @return true if B is closer than A from C
+     * @param vehicleLinkPairs
+     * @param reqlink
+     * @param numbNeigh
+     * @return reurns random vehicleLinkPair among all vehicleLinkpairs among the numbNeigh closest ones to reqLink
      */
-    boolean iscloserthan(Link A,Link B,Link C){
-        Coord coordA = A.getCoord();
-        Coord coordB = B.getCoord();
-        Coord coordC = C.getCoord();
+    VehicleLinkPair someCloseVehicleReturner(Collection<VehicleLinkPair> vehicleLinkPairs, Link reqlink, int numbNeigh) {
+        // otherwise create KD tree and return reduced amount of requestlocs
+        // create KD tree
+        int dimensions = 2;
+        int maxDensity = vehicleLinkPairs.size();
+        double maxCoordinate = 1000000000000.0;
+        int maxDepth = vehicleLinkPairs.size();
+        MyTree<VehicleLinkPair> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
 
-        if(distCoord(coordB,coordC)<distCoord(coordA,coordC)){
-            return  true;
-        }else
-            return false;
+        // add uniquely identifiable requests to KD tree
+        int reqIter = 0;
+        for (VehicleLinkPair vehicleLinkPair : vehicleLinkPairs) {
+            double d1 = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord().getX();
+            double d2 = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord().getY();
+            GlobalAssert.that(Double.isFinite(d1));
+            GlobalAssert.that(Double.isFinite(d2));
+            KDTree.add(new double[]{d1, d2}, vehicleLinkPair);
+        }
 
+        double[] vehLoc = new double[] { reqlink.getToNode().getCoord().getX(),
+                reqlink.getToNode().getCoord().getY() };
+
+        Cluster<VehicleLinkPair> nearestCluster = KDTree.buildCluster(vehLoc, numbNeigh, new EuclideanDistancer());
+        Optional<VehicleLinkPair> optional = nearestCluster.getValues().stream().findAny();
+        if(optional.isPresent()) return  optional.get();
+        else return null;
     }
 
-    double distCoord(Coord c1, Coord c2){
+    // TODO replace by MATSim internal function?
+    double LinkDistance(Link l1, Link l2) {
+        Coord c1 = l1.getCoord();
+        Coord c2 = l2.getCoord();
         double dx = c1.getX() - c2.getX();
         double dy = c1.getY() - c2.getY();
-        return Math.hypot(dx,dy);
+        return Math.hypot(dx, dy);
     }
 
 
