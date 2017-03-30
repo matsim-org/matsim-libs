@@ -33,9 +33,7 @@ public final class AccessibilityCalculator {
 
 	private static final Logger LOG = Logger.getLogger(AccessibilityCalculator.class);
 
-	// measuring points (origins) for accessibility calculation
 	private final ActivityFacilitiesImpl measuringPoints;
-	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
 	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
@@ -49,13 +47,13 @@ public final class AccessibilityCalculator {
 	@Deprecated // yyyy
 	private double logitScaleParameter;
 
-	@Deprecated // yyyy
-	private double inverseOfLogitScaleParameter;
+	//@Deprecated // yyyy
+	//private double inverseOfLogitScaleParameter;
 
 	private double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	private double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
 
-	private double walkSpeedMeterPerHour = -1;
+	private double walkSpeedMeterPerHour;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0;
@@ -63,6 +61,8 @@ public final class AccessibilityCalculator {
 	private Scenario scenario;
 	private AccessibilityConfigGroup acg;
 
+	private static boolean prn = true;
+	
 
 	public AccessibilityCalculator(Scenario scenario, ActivityFacilitiesImpl measuringPoints) {
 		this.scenario = scenario;
@@ -73,7 +73,7 @@ public final class AccessibilityCalculator {
 
 		useRawSum = acg.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
-		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
+		//inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
 			LOG.error("marginal utility of distance for car different from zero but not used in accessibility computations");
@@ -93,95 +93,37 @@ public final class AccessibilityCalculator {
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 	}
-
-
-	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
-		this.zoneDataExchangeListeners.add(l);
-	}
-
-
-	/**
-	 * This aggregates the disutilities Vjk to get from node j to all k that are attached to j.
-	 * Finally the sum(Vjk) is assigned to node j, which is done in this method.
-	 * 
-	 *     j---k1 
-	 *     |\
-	 *     | \
-	 *     k2 k3
-	 *
-	 * Calculates the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j
-	 *
-	 * @param opportunities such as workplaces, either given at a parcel- or zone-level
-	 * @param network giving the road network
-	 */
-	private final void aggregateOpportunities(final ActivityFacilities opportunities, Network network){
-		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
-		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
-
-		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
-		Map<Id<Node>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
-		ProgressBar bar = new ProgressBar( opportunities.getFacilities().size() );
-
-		for ( ActivityFacility opportunity : opportunities.getFacilities().values() ) {
-			bar.update();
-
-			Node nearestNode = NetworkUtils.getNearestNode(network,opportunity.getCoord());
-
-			// get Euclidian distance to nearest node
-			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
-			double VjkWalkTravelTime	= this.betaWalkTT * (distance_meter / this.walkSpeedMeterPerHour);
-			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
-			double expVjk				= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
-
-			// add Vjk to sum
-			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
-			if ( jco == null ) {
-				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
-				opportunityClusterMap.put( nearestNode.getId(), jco ) ; 
-			}
-			if ( cnt == 0 ) {
-				cnt++;
-				LOG.warn("ignoring the capacities of the facilities");
-				LOG.warn(Gbl.ONLYONCE);
-			}
-			jco.addObject(opportunity.getId(), expVjk);
-		}
-		LOG.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + opportunityClusterMap.size() + " nodes.");
-		this.aggregatedOpportunities = opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
-	}
-
-	private static int cnt2 = 0 ;
-	private static boolean prn = true ;
-
-	public final void computeAccessibilities( Double departureTime, ActivityFacilities opportunities) {
+	
+	
+	public final void computeAccessibilities(Double departureTime, ActivityFacilities opportunities) {
 		aggregateOpportunities(opportunities, scenario.getNetwork());
 
 		Map<String,ExpSum> expSums = new HashMap<>() ;
 		for (String mode : calculators.keySet()) {
-			LOG.warn("calculate ExpSum for mode=" + mode );
+			LOG.warn("Calculate ExpSum for mode = " + mode);
 			expSums.put(mode, new ExpSum());
 		}
 
 		// Condense measuring points (origins) that have the same nearest node on the network
 		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
 
-		LOG.info("Now going through all origins:");
-		//		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
+		LOG.info("Iterating over all (aggregated) origins:");
+		// ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 
-		// go through all nodes (keys) that have a measuring point (origin) assigned
+		// Go through all nodes (keys) that have a measuring point (origin) assigned
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
-			LOG.info("calculate accessibility for node=" + nodeId );
-			//			bar.update();
+			LOG.info("Calculate accessibility for node = " + nodeId);
+			// progressBar.update();
 
 			Node fromNode = scenario.getNetwork().getNodes().get(nodeId);
 
 			for (AccessibilityContributionCalculator calculator : calculators.values()) {
-				Gbl.assertNotNull(calculator) ;
+				Gbl.assertNotNull(calculator);
 				calculator.notifyNewOriginNode(fromNode, departureTime);
 			}
 
 			// get list with origins that are assigned to "fromNode"
-			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
+			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
 				cnt++ ;
 				if ( cnt >=10 ) prn = false ;
 				if ( prn ) LOG.info("-- calculate accessibility for origin=" + origin.getId() );
@@ -212,7 +154,7 @@ public final class AccessibilityCalculator {
 					if ( prn ) LOG.info("---- calculate accessibility for mode=" + mode );
 					if(!useRawSum){
 						if ( prn ) LOG.info("expSums.get(mode).getSum() = " + expSums.get(mode).getSum());
-						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( expSums.get(mode).getSum() ) ) ;
+						accessibilities.put( mode, (1/logitScaleParameter) * Math.log( expSums.get(mode).getSum() ) ) ;
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
 						accessibilities.put( mode, expSums.get(mode).getSum() ) ;
@@ -240,11 +182,53 @@ public final class AccessibilityCalculator {
 			zoneDataExchangeInterface.finish();
 		}
 	}
-
-
+	
+	
 	/**
-	 * This method condenses measuring points (origins) that have the same nearest node on the network
+	 * Aggregates disutilities Vjk to get from node j to all k that are attached to j and assign sum(Vjk) is to node j.
+	 * 
+	 *     j---k1 
+	 *     |\
+	 *     | \
+	 *     k2 k3
+	 *
 	 */
+	private final void aggregateOpportunities(final ActivityFacilities opportunities, Network network){
+		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
+		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
+
+		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node...");
+		Map<Id<Node>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
+		ProgressBar progressBar = new ProgressBar(opportunities.getFacilities().size());
+
+		for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
+			progressBar.update();
+
+			Node nearestNode = NetworkUtils.getNearestNode(network,opportunity.getCoord());
+
+			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
+			double VjkWalkTravelTime = this.betaWalkTT * (distance_m / this.walkSpeedMeterPerHour);
+			double VjkWalkDistance = this.betaWalkTD * distance_m;
+			double expVjk = Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkDistance ) );
+
+			// add Vjk to sum
+			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
+			if ( jco == null ) {
+				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
+				opportunityClusterMap.put( nearestNode.getId(), jco ) ; 
+			}
+			if ( cnt == 0 ) {
+				cnt++;
+				LOG.warn("ignoring the capacities of the facilities");
+				LOG.warn(Gbl.ONLYONCE);
+			}
+			jco.addObject(opportunity.getId(), expVjk);
+		}
+		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " nodes.");
+		this.aggregatedOpportunities = opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
+	}
+
+
 	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode() {
 		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
 
@@ -271,27 +255,11 @@ public final class AccessibilityCalculator {
 		return aggregatedOrigins;
 	}
 
-	private static int cnt4 = 0 ;
-
-	//	private void computeAndAddExpUtilContributions(Map<Modes4Accessibility,ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
+	
 	private void computeAndAddExpUtilContributions(Map<String, ExpSum> expSums, ActivityFacility origin, final AggregationObject aggregatedFacility, Double departureTime) {
-		for ( Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-			//			final Modes4Accessibility mode = Modes4Accessibility.valueOf(calculatorEntry.getKey());
-			String mode = calculatorEntry.getKey();
-			if ( cnt4<10 ) {
-				cnt4++ ;
-				LOG.info("mode=" + mode ) ;
-		}
-
-			// new
-			//			if ( !this.acg.getIsComputingMode().contains(mode) ) {
-			//				continue; // XXX yyyyyy should be configured by adding only the relevant calculators
-			//			}
-			// end new
-
+		for (Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet()) {
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
-
-			expSums.get(mode).addExpUtils( expVhk );
+			expSums.get(calculatorEntry.getKey()).addExpUtils( expVhk );
 		}
 	}
 
@@ -302,8 +270,14 @@ public final class AccessibilityCalculator {
 		this.calculators.put(mode , calc) ;
 	}
 
+	
 	public Set<String> getModes() {
 		return this.calculators.keySet() ;
+	}
+	
+	
+	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener){
+		this.zoneDataExchangeListeners.add(listener);
 	}
 
 
@@ -328,5 +302,4 @@ public final class AccessibilityCalculator {
 			return this.sum;
 		}
 	}
-
 }
