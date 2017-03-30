@@ -36,11 +36,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 
-public class RunSharedTaxiBerlin {
+public class RunNonSharedTaxiBerlin {
 
 	public static void main(String[] args) {
 		String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
-		RunSharedTaxiBerlin.run(configFile, false);
+		RunNonSharedTaxiBerlin.run(configFile, false);
 	}
 
 	public static void run(String configFile, boolean otfvis) {

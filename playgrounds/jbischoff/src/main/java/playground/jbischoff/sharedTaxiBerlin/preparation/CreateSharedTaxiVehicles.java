@@ -54,7 +54,7 @@ public class CreateSharedTaxiVehicles {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		double operationStartTime = 17*3600; //t0
 		double operationEndTime = 31*3600.;	//t1
-		int seats = 4;
+		int seats = 3;
 		String networkfile = "../../../shared-svn/projects/bvg_sharedTaxi/input/network.xml.gz";
 		List<Vehicle> vehicles = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
@@ -63,7 +63,7 @@ public class CreateSharedTaxiVehicles {
 		allLinks.addAll(scenario.getNetwork().getLinks().keySet());
 		for (int numberofVehicles = 25; numberofVehicles<=500; numberofVehicles+=25){
 		
-		String taxisFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/vehicles/taxis_"+numberofVehicles+".xml.gz";
+		String taxisFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/vehicles/cap_"+seats+"/taxis_"+numberofVehicles+".xml.gz";
 		for (int i = 0; i< numberofVehicles;i++){
 			Link startLink;
 			do {
