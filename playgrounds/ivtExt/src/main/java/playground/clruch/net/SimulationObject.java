@@ -9,6 +9,8 @@ import java.util.List;
  * 
  * {@link SimulationObject} is only used for communication and storage of the
  * status of the AV simulation 
+ * 
+ * instead, implement utility functions in {@link SimulationObjects}
  */
 public class SimulationObject implements Serializable {
 

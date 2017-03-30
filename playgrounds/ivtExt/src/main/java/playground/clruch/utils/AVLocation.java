@@ -15,6 +15,10 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
 public class AVLocation extends AVTaskAdapter {
 
+    /**
+     * @param avVehicle
+     * @return link or null with a small chance
+     */
     public static Link of(AVVehicle avVehicle) {
         Schedule schedule = avVehicle.getSchedule();
         return new AVLocation(schedule.getCurrentTask()).link;
