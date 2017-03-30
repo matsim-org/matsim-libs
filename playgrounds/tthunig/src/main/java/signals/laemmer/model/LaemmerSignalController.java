@@ -41,18 +41,19 @@ import java.util.Queue;
 /**
  * @author dgrether
  * @author tthunig
+ * @author nkuehnel
  */
 public class LaemmerSignalController extends AbstractSignalController implements SignalController {
 
     public static final Logger log = Logger.getLogger(LaemmerSignalController.class);
-    public static final Logger drivewayLog = Logger.getLogger(LaemmerSignalController.LaemmerSignal.class);
+    public static final Logger signalLog = Logger.getLogger(LaemmerSignalController.LaemmerSignal.class);
 
     public static final String IDENTIFIER = "LaemmerSignalControl";
 
     private Queue<LaemmerSignal> regulationQueue = new LinkedList<>();
 
     //TODO: Parametrize periods
-    private static final double DESIRED_PERIOD = 90.;
+    private static final double DESIRED_PERIOD = 60.;
     private static final double MAX_PERIOD = 120.;
 
     private List<LaemmerSignal> signals;
@@ -99,7 +100,6 @@ public class LaemmerSignalController extends AbstractSignalController implements
         signals = new ArrayList<>();
         for (SignalGroup group : this.system.getSignalGroups().values()) {
             this.system.scheduleDropping(simStartTimeSeconds, group.getId());
-            //TODO: Zwischenzeiten haengen nicht nur von aktueller Phase ab
             for (Signal signal : group.getSignals().values()) {
                 flowSum += network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
                 signals.add(new LaemmerSignal(group.getId(), signal));
@@ -109,12 +109,18 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
     @Override
     public void updateState(double now) {
-
         log.info("-------------------------------------------------------------");
         log.info("Updating System" + this.system.getId() + ". Time: " + now);
+        updateActiveRegulation(now);
+        updateParameters(now);
+        log.debug("T_Idle = " + tIdle);
+        log.debug("Updating signals");
+        updateSignals(now);
+        LaemmerSignal selection = selectSignal();
+        processSelection(now, selection);
+    }
 
-        log.info("Updating signals");
-
+    private void updateActiveRegulation(double now) {
         if (!regulationQueue.isEmpty() && regulationQueue.peek().equals(activeRequest.signal)) {
             LaemmerSignal signal = regulationQueue.peek();
             log.info( "Remaining regulation time for " + signal.signal.getId() + ": " + (activeRequest.time + activeRequest.regulationTime - now) );
@@ -124,32 +130,29 @@ public class LaemmerSignalController extends AbstractSignalController implements
                 log.info("Stopping regulation for " + signal.signal.getId() + " remaining vehicles: " + n);
             }
         }
+    }
 
-        tIdle = DESIRED_PERIOD;
-        for (LaemmerSignal signal : signals) {
-            signal.update(now);
-            tIdle -= (signal.loadFactor * DESIRED_PERIOD + DEFAULT_INBETWEEN);
-        }
-        log.info("T_Idle = " + tIdle);
-
-
+    private LaemmerSignal selectSignal() {
         LaemmerSignal max = regulationQueue.peek();
         if(max==null) {
-            log.info("no queue selected.");
+            log.debug("no queue selected.");
         } else {
-            log.info("regulating for " + max.signal.getId());
+            log.debug("regulating for " + max.signal.getId());
         }
-//        if (max == null) {
-//            double index = 0;
-//            for (LaemmerSignal signal : signals) {
-//                if (signal.index > index) {
-//                    max = signal;
-//                    index = signal.index;
-//                    log.info("Max index of " + index + ".Signal " + max.signal.getId() + " of Group " + max.group);
-//                }
-//            }
-//        }
+        if (max == null) {
+            double index = 0;
+            for (LaemmerSignal signal : signals) {
+                if (signal.index > index) {
+                    max = signal;
+                    index = signal.index;
+                    log.debug("Max index of " + index + ".Signal " + max.signal.getId() + " of Group " + max.group);
+                }
+            }
+        }
+        return max;
+    }
 
+    private void processSelection(double now, LaemmerSignal max) {
         if (activeRequest != null && activeRequest.signal != max) {
             log.info("Dropping group " + activeRequest.signal.group + " after " + (now - activeRequest.time + "s."));
             this.system.scheduleDropping(now, activeRequest.signal.group);
@@ -157,7 +160,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
         }
 
         if (activeRequest == null && max != null || activeRequest != null && max != activeRequest.signal && max != null) {
-            log.info("Driveway changed. Creating new Request for " + (now + DEFAULT_INBETWEEN) + " granted time: " + max.regulationTime);
+            log.debug("Driveway changed. Creating new Request for " + (now + DEFAULT_INBETWEEN) + " granted time: " + max.regulationTime);
             activeRequest = new Request(now + DEFAULT_INBETWEEN, max, max.regulationTime);
         }
 
@@ -166,26 +169,25 @@ public class LaemmerSignalController extends AbstractSignalController implements
                 log.info("Setting group " + activeRequest.signal.group);
                 this.system.scheduleOnset(now, activeRequest.signal.group);
             } else if (activeRequest.time > now) {
-                log.info("Remaining in-between-time " + (activeRequest.time - now));
+                log.debug("Remaining in-between-time " + (activeRequest.time - now));
             }
         }
     }
 
-
-    /**
-     * @return \hat{n_i} (t)
-     */
-    private int getNumberOfVehiclesForClearance() {
-
-        return 0;
+    private void updateSignals(double now) {
+        for (LaemmerSignal signal : signals) {
+            signal.update(now);
+        }
     }
 
+    private void updateParameters(double now) {
+        tIdle = DESIRED_PERIOD;
+        for (LaemmerSignal signal : signals) {
+            tIdle -= (signal.loadFactor * DESIRED_PERIOD + DEFAULT_INBETWEEN);
+            signal.updateAbortionPenalty(now);
+        }
+    }
 
-    /**
-     * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
-     * <p>
-     * N_i^{exp}(t + \hat(g)_i))
-     */
     private int getNumberOfExpectedVehicles(double timeSeconds, Id<Link> linkId) {
         Link link = network.getLinks().get(linkId);
         return this.sensorManager.getNumberOfCarsInDistance(linkId, 0., timeSeconds);
@@ -251,112 +253,108 @@ public class LaemmerSignalController extends AbstractSignalController implements
             this.signal = signal;
             link = network.getLinks().get(signal.getLinkId());
             maxFlow = network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
-            drivewayLog.info("LaemmeSignal for signal " + signal.getId() + " created.");
+            signalLog.debug("LaemmeSignal for signal " + signal.getId() + " created.");
         }
 
         public void update(double now) {
-            drivewayLog.info("---------------------------------------------------");
-            drivewayLog.info("UPDATING " + signal.getId() + " at " + now);
+            signalLog.info("---------------------------------------------------");
+            signalLog.info("UPDATING " + signal.getId() + " at " + now);
 
-            if (activeRequest != null && this.equals(activeRequest.signal)) {
-                calculateAbortionPenalty(now);
-                drivewayLog.info("Calculating Abortion Penalty.");
-            } else {
-                this.abortionPenalty = 0;
-            }
+            updateAbortionPenalty(now);
 
             updateArrivalRate(now);
             if (regulate(now)) {
                 return;
             }
-
-            if (activeRequest != null && activeRequest.signal == this) {
-                calculateActivePriorityIndex(now);
-            } else {
-                calculateInactivePriorityIndex(now);
-            }
+            calculatePriorityIndex(now);
         }
 
-        private void calculateInactivePriorityIndex(double now) {
-            drivewayLog.info("Non-Active driveway.");
-            double nExpected = getNumberOfExpectedVehicles(now + DEFAULT_INBETWEEN, link.getId());
-            double reqGreenTime = nExpected / maxFlow;
-            double penalty = 0;
-            if (activeRequest != null) {
-                penalty = activeRequest.signal.abortionPenalty;
-            }
-            index = nExpected / (penalty + DEFAULT_INBETWEEN + reqGreenTime);
-            drivewayLog.info("n=" + nExpected + " at second " + (now + DEFAULT_INBETWEEN) + "resulting in " + reqGreenTime + " required green time. Penalty: " + penalty + ".  Index: " + index);
-        }
-
-        private void calculateActivePriorityIndex(double now) {
-            drivewayLog.info("Active driveway.");
-            double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
-            drivewayLog.info("Remaining in between time " + remainingInBetweenTime);
-            for (double i = remainingInBetweenTime; i <= DEFAULT_INBETWEEN; i++) {
-                double nExpected = getNumberOfExpectedVehicles(now + i, link.getId());
-                double reqGreenTime = nExpected / maxFlow;
-                double tempIndex = nExpected / (i + reqGreenTime);
-                drivewayLog.info("n=" + nExpected + " at second " + (now + i) + "resulting in " + reqGreenTime + " required green time. Index: " + tempIndex);
-                if (tempIndex > index) {
-                    index = tempIndex;
-                    drivewayLog.info("Index: " + index);
+        private void updateAbortionPenalty(double now) {
+            if (activeRequest != null && this.equals(activeRequest.signal)) {
+                this.abortionPenalty = 0;
+                double waitingTimeSum = 0;
+                double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
+                for (double i = remainingInBetweenTime; i < DEFAULT_INBETWEEN; i++) {
+                    waitingTimeSum += getNumberOfExpectedVehicles(now + i, link.getId());
                 }
+                double n = getNumberOfExpectedVehicles(now + DEFAULT_INBETWEEN, link.getId());
+                if (n > 0) {
+                    this.abortionPenalty += waitingTimeSum / n;
+                }
+                signalLog.debug("Waiting time sum of " + waitingTimeSum + " in case of abortion. Resulting in " + this.abortionPenalty + "s penalty");
+                signalLog.debug("Calculating Abortion Penalty.");
+            } else {
+                this.abortionPenalty = 0;
+            }
+        }
+
+        private void calculatePriorityIndex(double now) {
+            if (activeRequest != null && activeRequest.signal == this) {
+                signalLog.debug("Selected signal.");
+                double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
+                signalLog.debug("Remaining in between time " + remainingInBetweenTime);
+                for (double i = remainingInBetweenTime; i <= DEFAULT_INBETWEEN; i++) {
+                    double nExpected = getNumberOfExpectedVehicles(now + i, link.getId());
+                    double reqGreenTime = nExpected / maxFlow;
+                    double tempIndex = nExpected / (i + reqGreenTime);
+                    signalLog.debug("n=" + nExpected + " at second " + (now + i) + "resulting in " + reqGreenTime + " required green time. Index: " + tempIndex);
+                    if (tempIndex > index) {
+                        index = tempIndex;
+                        signalLog.info("Index: " + index);
+                    }
+                }
+            } else {
+                signalLog.debug("Non-Active signal.");
+                double nExpected = getNumberOfExpectedVehicles(now + DEFAULT_INBETWEEN, link.getId());
+                double reqGreenTime = nExpected / maxFlow;
+                double penalty = 0;
+                if (activeRequest != null) {
+                    penalty = activeRequest.signal.abortionPenalty;
+                }
+                index = nExpected / (penalty + DEFAULT_INBETWEEN + reqGreenTime);
+                signalLog.info("n=" + nExpected + " at second " + (now + DEFAULT_INBETWEEN) + "resulting in " + reqGreenTime + " required green time. Penalty: " + penalty + ".  Index: " + index);
             }
         }
 
         private void updateArrivalRate(double now) {
             double avgArrivalRate = getAverageArrivalRate(now, link.getId());
             loadFactor = avgArrivalRate / maxFlow;
-            drivewayLog.info("Avg Arrival Rate: " + avgArrivalRate + ", load factor: " + loadFactor);
-        }
-
-        private void calculateAbortionPenalty(double timeSeconds) {
-            this.abortionPenalty = 0;
-            double waitingTimeSum = 0;
-            double remainingInBetweenTime = Math.max(activeRequest.time - timeSeconds, 0);
-            for (double i = remainingInBetweenTime; i < DEFAULT_INBETWEEN; i++) {
-                waitingTimeSum += getNumberOfExpectedVehicles(timeSeconds + i, link.getId());
-            }
-            double n = getNumberOfExpectedVehicles(timeSeconds + DEFAULT_INBETWEEN, link.getId());
-            if (n > 0) {
-                this.abortionPenalty += waitingTimeSum / n;
-            }
-            drivewayLog.info("Waiting time sum of " + waitingTimeSum + " in case of abortion. Resulting in " + this.abortionPenalty + "s penalty");
+            signalLog.debug("Avg Arrival Rate: " + avgArrivalRate + ", load factor: " + loadFactor);
         }
 
         private boolean regulate(double timeSeconds) {
 
-            drivewayLog.info("Checking for regulation");
+            signalLog.debug("Checking for regulation");
 
             double n = getNumberOfExpectedVehicles(timeSeconds, link.getId());
             double avgArrivalRate = getAverageArrivalRate(timeSeconds, link.getId());
 
             if (n == 0) {
                 a = DEFAULT_INBETWEEN;
-                drivewayLog.info("Queue length zero, setting a to inbetween time");
+                signalLog.debug("Queue length zero, setting a to inbetween time");
             } else {
                 a++;
-                drivewayLog.info("a set to " + a);
+                signalLog.debug("a set to " + a);
             }
             if (regulationQueue.contains(this)) {
-                drivewayLog.info("Already in regulation queue. Aborting.");
+                signalLog.debug("Already in regulation queue. Aborting.");
                 return false;
             }
             this.regulationTime = 0;
             double nCrit = avgArrivalRate * DESIRED_PERIOD
                     * ((MAX_PERIOD - (a / (1 - avgArrivalRate / maxFlow)))
                     / (MAX_PERIOD - DESIRED_PERIOD));
-            drivewayLog.info("n = " + n);
-            drivewayLog.info("nCrit = " + nCrit);
-            //TODO: keep n>1?
-            if (n >= nCrit && n > 1) {
+            signalLog.debug("n = " + n);
+            signalLog.debug("nCrit = " + nCrit);
+            //TODO: keep n>=1?
+            if (n >= nCrit && n >= 1) {
                 regulationQueue.add(this);
+                signalLog.debug("Regulation time parameters: lambda: " + this.loadFactor + " | T: " + DESIRED_PERIOD + " | qmax: " + maxFlow + " | qsum: " + flowSum + " | T_idle:" + tIdle);
                 this.regulationTime = Math.ceil(this.loadFactor * DESIRED_PERIOD + (maxFlow / flowSum) * tIdle);
-                drivewayLog.info("Adding to regulation queue with granted time " + regulationTime );
+                signalLog.info("Adding to regulation queue with granted time " + regulationTime );
                 return true;
             } else {
-                drivewayLog.info("No need for regulation.");
+                signalLog.debug("No need for regulation.");
                 return false;
             }
         }

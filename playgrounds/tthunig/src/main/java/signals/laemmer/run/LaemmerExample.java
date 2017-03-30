@@ -11,47 +11,33 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesDataFactory;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
-import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.*;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactoryImpl;
 import org.matsim.contrib.signals.model.*;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
-import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.DepartureImpl;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import signals.laemmer.model.LaemmerSignalController;
-import signals.laemmer.model.LaemmerSignalModelFactory;
 import signals.laemmer.model.LaemmerSignalsModule;
-import tutorial.simpleResponsiveSignalEngine.SimpleResponsiveSignal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,7 +82,7 @@ public class LaemmerExample {
         try {
             LaemmerSignalController.log.addAppender(new FileAppender(new SimpleLayout(), "logs/main.txt"));
 
-            LaemmerSignalController.drivewayLog.addAppender(new FileAppender(new SimpleLayout(), "logs/driveways.txt"));
+            LaemmerSignalController.signalLog.addAppender(new FileAppender(new SimpleLayout(), "logs/driveways.txt"));
 
 
         } catch (IOException e) {
@@ -156,7 +142,7 @@ public class LaemmerExample {
 
         createNetwork(scenario);
         createPopulation(scenario);
-//        createTransit(scenario);
+        createTransit(scenario);
         createSignals(scenario);
         return scenario;
     }
