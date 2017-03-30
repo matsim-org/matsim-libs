@@ -25,7 +25,7 @@ public class VirtualNode {
         this.links = linksIn;
         this.neighCount = neighCount;
 
-        //EVTL GET RID OF THIS -> LEFTOVER NODE or deal differently with it
+        //EVTL GET RID OF THIS -> LEFTOVER NODE or deal differently with it or test if last idx is not leftOver-> problem & fill last one in!!sth like this... TODO
         if (!idIn.contains("" + (index + 1)))
             throw new RuntimeException("node index mismatch:" + idIn + " != " + (index + 1));
     }
