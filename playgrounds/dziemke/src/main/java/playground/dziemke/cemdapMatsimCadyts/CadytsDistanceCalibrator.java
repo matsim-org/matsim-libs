@@ -69,7 +69,10 @@ public class CadytsDistanceCalibrator {
 
 //        CadytsDistanceCalibrator calibrator = new CadytsDistanceCalibrator();
 //        calibrator.run(args);
-        PersonDistHistoAnalyzer.analyze("testGT5poissonBerlin");
+
+//        PersonDistHistoAnalyzer.analyze("testGT5poissonBerlin");
+
+//      TODO work interrupted in favor to Amit Agarwal's work on distanceBins
     }
 
     private static double poisson(int averqageValue, int k) {
