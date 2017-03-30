@@ -52,8 +52,8 @@ public class SrV2008TripParser {
 	private static final String TRIP_ID = "WNR";
 	// activity end corresponds to start of trip
 	private static final String DEPARTURE_ZONE_ID = "START_TEILBEZIRK2";
-	private static final String ACTIVITY_END_ACT_TYPE = "V_START_ZWECK";
-	private static final String ACTIVITY_START_ACT_TYPE = "V_ZWECK";
+	private static final String ACTIVITY_BEFORE_TRIP_TYPE = "V_START_ZWECK";
+	private static final String ACTIVITY_AFTER_TRIP_TYPE = "V_ZWECK";
 	private static final String USE_HOUSEHOLD_CAR = "V_HHPKW_F";
 	private static final String USE_OTHER_CAR = "V_ANDPKW_F";
 	private static final String USE_HOUSEHOLD_CAR_POOL = "V_HHPKW_MF";
@@ -113,7 +113,7 @@ public class SrV2008TripParser {
 				Id<Person> personId = Id.create(entries[columnNumbers.get(PERSON_ID)], Person.class);
 				Id<Trip> tripId = Id.create(entries[columnNumbers.get(TRIP_ID)], Trip.class);
 				//String activityEndActType = new String(entries[columnNumbers.get(ACTIVITY_END_ACT_TYPE)]);
-				String activityEndActType = transformActType(new Integer(entries[columnNumbers.get(ACTIVITY_END_ACT_TYPE)]));
+				String activityBeforeTripType = transformActType(new Integer(entries[columnNumbers.get(ACTIVITY_BEFORE_TRIP_TYPE)]));
 				Id<Zone> departureZoneId = Id.create(entries[columnNumbers.get(DEPARTURE_ZONE_ID)], Zone.class);
 				Double departureTime_min = new Double(entries[columnNumbers.get(DEPARTURE_TIME_MIN)]);
 				Integer useHouseholdCar = new Integer(entries[columnNumbers.get(USE_HOUSEHOLD_CAR)]);
@@ -130,7 +130,7 @@ public class SrV2008TripParser {
 				Id<Zone> arrivalZoneId = Id.create(entries[columnNumbers.get(ARRIVAL_ZONE_ID)], Zone.class);
 				Double arrivalTime_min = new Double(entries[columnNumbers.get(ARRIVAL_TIME_MIN)]);
 				// String activityStartActType = new String(entries[columnNumbers.get(ACTIVITY_START_ACT_TYPE)]);
-				String activityStartActType = transformActType(new Integer(entries[columnNumbers.get(ACTIVITY_START_ACT_TYPE)]));
+				String activityAfterTripType = transformActType(new Integer(entries[columnNumbers.get(ACTIVITY_AFTER_TRIP_TYPE)]));
 				
 				Double weight = new Double(entries[columnNumbers.get(WEIGHT)]);
 				
@@ -139,7 +139,7 @@ public class SrV2008TripParser {
 				trip.setPersonId(personId);
 				tripId = Id.create(personId + "_" + tripId, Trip.class);
 				trip.setTripId(tripId);
-				trip.setActivityEndActType(activityEndActType);
+				trip.setActivityTypeBeforeTrip(activityBeforeTripType);
 				trip.setDepartureZoneId(departureZoneId);
 				trip.setDepartureTime_s(departureTime_min * 60.);
 				//trip.setDepartureLegMode(departureLegMode);
@@ -156,7 +156,7 @@ public class SrV2008TripParser {
 				trip.setArrivalZoneId(arrivalZoneId);
 				trip.setArrivalTime_s(arrivalTime_min * 60.);
 				//trip.setArrivalLegMode(arrivalLegMode);
-				trip.setActivityStartActType(activityStartActType);
+				trip.setActivityTypeAfterTrip(activityAfterTripType);
 				
 				trip.setWeight(weight);
 				

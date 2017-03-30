@@ -93,7 +93,7 @@ public class SrV2PlansAndEventsConverter {
 	    		Plan plan = person.getPlans().get(0);
 	    		Trip trip = tripsMap.get(departureTime);
 
-	    		String activityTypeEndingActivity = trip.getActivityEndActType();	
+	    		String activityTypeEndingActivity = trip.getActivityTypeBeforeTrip();	
 	    		// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
 	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
 	    		Coord departureCoordinates = new Coord(x, x);
@@ -113,7 +113,7 @@ public class SrV2PlansAndEventsConverter {
 	    		plan.addLeg(populationFactory.createLeg(TransportMode.car));
 	    		
 	    		// last activity
-	    		String activityTypeStartingActivity = trip.getActivityStartActType();
+	    		String activityTypeStartingActivity = trip.getActivityTypeAfterTrip();
 	    		if (departureTime == tripsMap.lastKey()) {
 		    		double x2 = Double.parseDouble(trip.getArrivalZoneId().toString());
 		    		Coord arrivalCoordinates = new Coord(x2, x2);
