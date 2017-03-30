@@ -69,7 +69,7 @@ public class CemdapMatsimCadytsControllerConfig {
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cadytsContext);
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
 				sumScoringFunction.addScoringFunction(scoringFunction);
 
@@ -106,7 +106,7 @@ public class CemdapMatsimCadytsControllerConfig {
 	private static void runAnalyses(Config config, String planningAreaShapeFile) {
 		String outputDirectory = config.controler().getOutputDirectory();
 		String runId = config.controler().getRunId();
-		String networkFile = outputDirectory + "/" + runId + ".output_config.xml.gz"; // args[0];
+		String networkFile = outputDirectory + "/" + runId + ".output_network.xml.gz"; // args[0];
 		String eventsFile = outputDirectory + "/" + runId + ".output_events.xml.gz"; // args[1];
 		String usedIteration = Integer.toString(config.controler().getLastIteration()); // usedIteration = args[5];
 		// onlySpecificMode = args[6]; onlyBerlinBased = args[7]; useDistanceFilter = args[8]
