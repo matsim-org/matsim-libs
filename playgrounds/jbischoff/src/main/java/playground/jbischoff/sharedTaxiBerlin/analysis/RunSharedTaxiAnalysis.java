@@ -35,10 +35,10 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 
 import playground.jbischoff.utils.JbUtils;
-import playground.michalm.drt.analysis.DrtPassengerStats;
-import playground.michalm.drt.analysis.DrtTrip;
-import playground.michalm.drt.analysis.DrtTripsAnalyser;
-import playground.michalm.drt.analysis.VehicleOccupancyEvaluator;
+import playground.michalm.drt.analysis.DynModeTrip;
+import playground.michalm.drt.analysis.DynModeTripsAnalyser;
+import playground.michalm.drt.analysis.DrtVehicleOccupancyEvaluator;
+import playground.michalm.drt.analysis.DynModePassengerStats;
 
 /**
  * @author  jbischoff
@@ -54,17 +54,17 @@ public static void main(String[] args) {
 	Network network = NetworkUtils.createNetwork();
 	new MatsimNetworkReader(network).readFile(networkFile);
 	EventsManager events = EventsUtils.createEventsManager();
-	DrtPassengerStats drtStats = new DrtPassengerStats(network);
-	VehicleOccupancyEvaluator vehicleOccupancyEvaluator = new VehicleOccupancyEvaluator(16*3600, 32*3600, 4);
+	DynModePassengerStats drtStats = new DynModePassengerStats(network,"drt");
+	DrtVehicleOccupancyEvaluator vehicleOccupancyEvaluator = new DrtVehicleOccupancyEvaluator(16*3600, 32*3600, 4);
 	events.addHandler(vehicleOccupancyEvaluator);
 	events.addHandler(drtStats);
 	new MatsimEventsReader(events).readFile(eventsFile);
-//	vehicleOccupancyEvaluator.writeDetailedOccupancyFiles("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/vehicles/");
+	vehicleOccupancyEvaluator.writeDetailedOccupancyFiles("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/vehicles/");
 	vehicleOccupancyEvaluator.calcAndWriteFleetStats("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/vehicleStats.csv");
-	List<DrtTrip> trips = drtStats.getDrtTrips();
-	JbUtils.collection2Text(trips, "C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/drtrips.csv", DrtTrip.HEADER);
-	DrtTripsAnalyser.analyseWaitTimes("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/waitstats", trips, 1800);
-	
+	List<DynModeTrip> trips = drtStats.getDrtTrips();
+	JbUtils.collection2Text(trips, "C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/drtrips.csv", DynModeTrip.HEADER);
+	DynModeTripsAnalyser.analyseWaitTimes("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/waitstats", trips, 1800);
+	DynModeTripsAnalyser.analyseDetours(network, trips, 1.3, 4.16, "C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/detours");
 //	Collections.sort(trips);	
 //	for (DrtTrip trip : trips){
 //		System.out.println(trip.toString());

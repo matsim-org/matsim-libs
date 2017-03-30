@@ -28,7 +28,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.parkingsearch.evaluation.ParkedVechiclesVisualiser;
+import org.matsim.contrib.parking.parkingsearch.evaluation.ParkedVehiclesVisualiser;
 import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingSearchAndEgressTimeEvaluator;
 import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingSearchEvaluator;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -57,7 +57,7 @@ public static void main(String[] args) {
 	ParkingSearchAndEgressTimeEvaluator klausEval = new ParkingSearchAndEgressTimeEvaluator(readLinks("../../../shared-svn/projects/bmw_carsharing/data/gis/klausnerlinks.txt"),network);	
 	WalkLegPlotterVIA wlp = new WalkLegPlotterVIA(network,"car");
 	WalkLegPlotterVIA wlpFF = new WalkLegPlotterVIA(network,"freefloating");
-	ParkedVechiclesVisualiser pvv = new ParkedVechiclesVisualiser(network);
+	ParkedVehiclesVisualiser pvv = new ParkedVehiclesVisualiser(network);
 	ParkingSearchEvaluator pwde = new ParkingSearchEvaluator();
 	DisagModalSplitAnalysis das = new DisagModalSplitAnalysis(network);
 	das.addZone("klausner", JbUtils.readShapeFileAndExtractGeometry("../../../shared-svn/projects/bmw_carsharing/data/gis/klaus.shp", "id").get("0"));

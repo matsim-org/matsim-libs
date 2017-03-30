@@ -59,7 +59,7 @@ import com.google.inject.Inject;
 /**
  *
  */
-public class ParkedVechiclesVisualiser implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
+public class ParkedVehiclesVisualiser implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
 		Network network;
 	
@@ -67,7 +67,7 @@ public class ParkedVechiclesVisualiser implements PersonEntersVehicleEventHandle
 	 * 
 	 */
 	@Inject
-	public ParkedVechiclesVisualiser(Network network) {
+	public ParkedVehiclesVisualiser(Network network) {
 		this.network = network;
 	}
 	

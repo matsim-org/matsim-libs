@@ -42,8 +42,10 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -57,15 +59,16 @@ import playground.michalm.drt.run.DrtConfigGroup;
 /**
  *
  */
-public class DrtPassengerStats implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, ActivityEndEventHandler{
+public class DynModePassengerStats implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, ActivityEndEventHandler{
 
 	
 	
 	final private Map<Id<Person>,Double> departureTimes = new HashMap<>();
 	final private Map<Id<Person>,Id<Link>> departureLinks = new HashMap<>();
-	final private List<DrtTrip> drtTrips = new ArrayList<>();
+	final private List<DynModeTrip> drtTrips = new ArrayList<>();
 	final private Map<Id<Vehicle>,Map<Id<Person>,MutableDouble>> inVehicleDistance = new HashMap<>();
-	final private Map<Id<Person>,DrtTrip> currentTrips = new HashMap<>();
+	final private Map<Id<Person>,DynModeTrip> currentTrips = new HashMap<>();
+	final String mode;
 	
 	final private Network network;
 	/* (non-Javadoc)
@@ -76,12 +79,14 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	 * 
 	 */
 	@Inject
-	public DrtPassengerStats(Network network, EventsManager events) {
+	public DynModePassengerStats(Network network, EventsManager events, Config config) {
+		this.mode = ((DvrpConfigGroup) config.getModules().get(DvrpConfigGroup.GROUP_NAME)).getMode();
 		this.network = network;
 		events.addHandler(this);
 	}
 	
-	public DrtPassengerStats(Network network) {
+	public DynModePassengerStats(Network network, String mode) {
+		this.mode = mode;
 		this.network = network;
 	}
 	
@@ -122,8 +127,8 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	 */
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if (event.getLegMode().equals(DrtConfigGroup.DRT_MODE)){
-			DrtTrip trip = currentTrips.remove(event.getPersonId());
+		if (event.getLegMode().equals(mode)){
+			DynModeTrip trip = currentTrips.remove(event.getPersonId());
 			if (trip!=null){
 			double distance = inVehicleDistance.get(trip.getVehicle()).remove(event.getPersonId()).doubleValue();	
 				trip.setTravelDistance(distance);
@@ -143,7 +148,7 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(DrtConfigGroup.DRT_MODE)){
+		if (event.getLegMode().equals(mode)){
 			this.departureTimes.put(event.getPersonId(), event.getTime());
 			this.departureLinks.put(event.getPersonId(), event.getLinkId());
 		}
@@ -158,7 +163,7 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 			double departureTime = this.departureTimes.remove(event.getPersonId());
 			double waitTime = event.getTime() - departureTime;
 			Id<Link> departureLink = this.departureLinks.remove(event.getPersonId());
-			DrtTrip trip = new DrtTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink, waitTime);
+			DynModeTrip trip = new DynModeTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink, waitTime);
 			this.drtTrips.add(trip);
 			this.currentTrips.put(event.getPersonId(), trip);
 			this.inVehicleDistance.get(event.getVehicleId()).put(event.getPersonId(), new MutableDouble());
@@ -168,7 +173,7 @@ public class DrtPassengerStats implements PersonEntersVehicleEventHandler, Perso
 	/**
 	 * @return the drtTrips
 	 */
-	public List<DrtTrip> getDrtTrips() {
+	public List<DynModeTrip> getDrtTrips() {
 		return drtTrips;
 	}
 	

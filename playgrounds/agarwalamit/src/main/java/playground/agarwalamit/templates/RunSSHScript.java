@@ -17,30 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.michalm.drt.analysis;
+package playground.agarwalamit.templates;
 
-import org.matsim.core.controler.AbstractModule;
+import java.util.Properties;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 
 /**
- * @author  jbischoff
- *
+ * Created by amit on 28/03/2017.
  */
-/**
- *
- */
-public class DRTAnalysisModule extends AbstractModule {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.AbstractModule#install()
-	 */
-	@Override
-	public void install() {
-		bind(DrtVehicleOccupancyEvaluator.class).asEagerSingleton();
-		bind(DynModePassengerStats.class).asEagerSingleton();
-		addControlerListenerBinding().to(DRTAnalysisControlerListener.class).asEagerSingleton();
-	}
+
+public class RunSSHScript {
+
+    private static final String myPassword = "xxx";
+
+    public static void main(String[] args) {
+
+        try {
+            JSch jSch = new JSch();
+            jSch.setKnownHosts("~/.ssh/known_hosts"); // location of the ssh fingerprint (unique host key)
+
+            Properties config = new Properties();
+
+            config.put("StrictHostKeyChecking", "no"); // so that no question asked, and script run without any problem
+
+            Session session = jSch.getSession("agarwal", "cluster-i.math.tu-berlin.de", 22);
+            session.setConfig(config);
+            session.setPassword(myPassword);
+
+            try {
+                session.connect();
+
+                System.out.println( session.getUserInfo() );
+
+            } finally {
+                session.disconnect();
+            }
+
+
+        } catch (JSchException e) {
+            throw new RuntimeException("Aborting. Reason : " + e);
+        }
+
+    }
 
 }

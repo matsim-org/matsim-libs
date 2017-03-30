@@ -17,7 +17,7 @@ public class SantiagoAnalysis {
 	private static final String CASE_NAME = "baseCase10pct";
 	
 	private static final String RUN_DIR = "../../../runs-svn/santiago/" + CASE_NAME + "/";
-	private static final String OUTPUT_FOLDER = RUN_DIR + "outputOfStep0_24T2/";	
+	private static final String OUTPUT_FOLDER = RUN_DIR + "outputOfStep0_24T0/";	
 	private static final String ANALYSIS_DIR = OUTPUT_FOLDER + "analysis/";
 
 //	private static final String PLANS = IT_FOLDER + IT_NUMBER +".plans.xml.gz";
@@ -65,8 +65,8 @@ public class SantiagoAnalysis {
 	public static void main (String[]arg){
 		
 		int it = 0;		
-		while (it<=200){
-		int itAux = 400 + it;
+		while (it<=300){
+		int itAux = 300 + it;
 		String itFolder = OUTPUT_FOLDER + "ITERS/it." + it + "/";		
 		String events = itFolder + it +".events.xml.gz";	
 		String outputDir = ANALYSIS_DIR +"modalSplit_It"+ itAux  + ".txt";		
