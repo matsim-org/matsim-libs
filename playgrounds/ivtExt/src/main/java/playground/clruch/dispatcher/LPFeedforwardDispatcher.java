@@ -307,6 +307,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
             File virtualnetworkXML = new File(config.getParams().get("virtualNetworkFile"));
+            File alphaijFile = new File(config.getParams().get("rebalancingRates"));
             File lambdaFileXML = new File(config.getParams().get("lambdaFile"));
             File pijFileXML = new File(config.getParams().get("pijFile"));
             System.out.println("" + virtualnetworkXML.getAbsoluteFile());
@@ -316,8 +317,9 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             long populationSize = population.getPersons().size();
             int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
 
+
             try {
-                arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaFileXML, pijFileXML, //
+                arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaFileXML, pijFileXML, alphaijFile,//
                         populationSize, rebalancingPeriod);
             } catch (Exception e) {
                 System.out.println("something went wrong.");

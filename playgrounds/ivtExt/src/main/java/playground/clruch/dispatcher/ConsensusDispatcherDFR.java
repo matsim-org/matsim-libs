@@ -152,8 +152,8 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
 
                         switch (feebackTerm) {
                             case LDX: {
-                                double lambdaTo = arrivalInformation.getLambdaforTime(now, vLink.getTo().index).number().doubleValue();
-                                double lambdaFrom = arrivalInformation.getLambdaforTime(now, vLink.getFrom().index).number().doubleValue();
+                                double lambdaTo = arrivalInformation.getLambdaforTime((int)now, vLink.getTo().index).number().doubleValue();
+                                double lambdaFrom = arrivalInformation.getLambdaforTime((int)now, vLink.getFrom().index).number().doubleValue();
                                 //long popSize = arrivalInformation.populationSize;
                                 long popSize = 1;
                                 lambdaTo = Math.max(lambdaTo, 1);
@@ -365,11 +365,13 @@ public class ConsensusDispatcherDFR extends PartitionedDispatcher {
                 GlobalAssert.that(lambdaXML.isFile());
                 final File pijFile = new File(virtualnetworkDir, "transitionProbabilities_" + ext + ".xml");
                 GlobalAssert.that(pijFile.isFile());
+                final File alphaijFile = new File(virtualnetworkDir, "rebalancingRates_" + ext + ".xml");
+                GlobalAssert.that(alphaijFile.isFile());
 
                 try {
                     long populationSize = population.getPersons().size();
                     int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-                    arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaXML, pijFile, //
+                    arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaXML, pijFile, alphaijFile, //
                             populationSize, //
                             rebalancingPeriod //
                     );

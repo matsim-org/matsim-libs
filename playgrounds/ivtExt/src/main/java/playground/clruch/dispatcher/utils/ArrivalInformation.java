@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.alg.Dimensions;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -27,13 +28,14 @@ import playground.clruch.utils.GlobalAssert;
 public class ArrivalInformation {
     Tensor lambda;
     Tensor pij;
+    Tensor alpha_ij;
     private int numberTimeSteps;
     private final double dtSeconds; // used as lookup
     public final long populationSize;
     // private final Scalar factor;
     VirtualNetwork virtualNetwork;
 
-    public ArrivalInformation(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, long populationSize, int rebalancingPeriod) throws JDOMException, IOException {
+    public ArrivalInformation(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize, int rebalancingPeriod) throws JDOMException, IOException {
         virtualNetwork = virtualNetworkIn;
         this.populationSize = populationSize;
         System.out.println("reading historic travel data");
@@ -63,6 +65,19 @@ public class ArrivalInformation {
             for (int k = 0; k < numberTimeSteps; ++k) {
                 final int timestep = k;
                 pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount()-1, virtualNetwork.getvNodesCount()-1));
+            }
+            System.out.println("Do we get here?");
+        }
+        {// rebalancing rates alpha_ij
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(alphaijFile);
+            Element rootNode = document.getRootElement();
+            // List<Element> children = rootNode.getChildren();
+
+            alpha_ij = Tensors.empty();
+            for (int k = 0; k < numberTimeSteps; ++k) {
+                final int timestep = k;
+                alpha_ij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount()-1, virtualNetwork.getvNodesCount()-1));
             }
             System.out.println("Do we get here?");
         }
@@ -116,13 +131,60 @@ public class ArrivalInformation {
         return ZeroScalar.get();
     }
 
-    public Tensor getLambdaforTime(double time) {
+    private Scalar getalphaijfromFile(int from, int to, int timestep, Element rootNode) {
+        List<Element> children = rootNode.getChildren();
+
+        // get element with virtualLink col
+        VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
+        VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
+
+        Optional<Element> optional = children.stream()
+                .filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId()) && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId()))
+                .findFirst();
+
+        if (optional.isPresent()) {
+            Element vLinkElem = optional.get();
+            Element timeatvLink = vLinkElem.getChildren().get(timestep);
+            return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("alpha_ij").getValue()));
+        }
+        System.out.println("Whats happening?");
+        GlobalAssert.that(false);
+        return ZeroScalar.get();
+    }
+
+    public Tensor getLambdaforTime(int time) {
         int row = (int) Math.min(time / dtSeconds, numberTimeSteps - 1);
         return lambda.get(row).copy();
     }
 
-    public Scalar getLambdaforTime(double time, int vNodeindex) {
+    public Scalar getLambdaforTime(int time, int vNodeindex) {
         return getLambdaforTime(time).Get(vNodeindex);
+    }
+
+    public Tensor getNextNonZeroLambdaforTime(int time) {
+        List<Integer> dim_lambda = Dimensions.of(lambda);
+        int N                    = dim_lambda.get(1);
+        Tensor nZlambda = Array.zeros(N);
+
+        for (int i=0;i<N;i++){
+            nZlambda.set(getNextNonZeroLambdaforTime(time,i),i);
+        }
+        return nZlambda;
+    }
+
+    public Scalar getNextNonZeroLambdaforTime(int time, int vNodeindex) {
+        int row           = (int) Math.min(time / dtSeconds, numberTimeSteps - 1);
+        Scalar nZ_lambda  = lambda.Get(row, vNodeindex);
+        List<Integer> dim_lambda = Dimensions.of(lambda);
+
+        while (nZ_lambda.number().doubleValue() == 0){
+            row++;
+            if (row>dim_lambda.get(0)){
+                row = 0; //Cylcic Search for non-zero element
+            }
+            nZ_lambda = lambda.Get(row, vNodeindex);
+         }
+         return nZ_lambda;
     }
 
 
@@ -131,4 +193,8 @@ public class ArrivalInformation {
         return pij.Get(timestep, from, to);
     }
 
+    public Tensor getAlphaijforTime(int time) {
+        int timestep = (int) Math.min(time / dtSeconds, numberTimeSteps - 1);
+        return alpha_ij.get(timestep).copy();
+    }
 }
