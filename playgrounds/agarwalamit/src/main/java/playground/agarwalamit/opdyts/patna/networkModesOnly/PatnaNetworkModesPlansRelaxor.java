@@ -73,7 +73,7 @@ class PatnaNetworkModesPlansRelaxor {
 				this.bind(ModalTripTravelTimeHandler.class);
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
-				this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new PatnaOneBinDistanceDistribution(
+				this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new PatnaNetworkModesOneBinDistanceDistribution(
 						OpdytsScenario.PATNA_1Pct)));
 			}
 		});
