@@ -67,6 +67,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final int publishPeriod;
 
     private int total_matchedRequests = 0;
+    private Integer AVVEHILCECOUNT = null;
 
     protected UniversalDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -90,15 +91,22 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         stayVehicles.forEach(vehiclesWithCustomer::remove);
         // ---
         int failed = 0;
-        for (AVVehicle avVehicle : getFunctioningVehicles()) {
-            final Link link = AVLocation.of(avVehicle);
-            if (link != null)
-                vehicleLocations.put(avVehicle, link);
-            else
-                ++failed;
+        Collection<AVVehicle> collection = getFunctioningVehicles();
+        if (!collection.isEmpty()) {
+            for (AVVehicle avVehicle : collection) {
+                final Link link = AVLocation.of(avVehicle);
+                if (link != null)
+                    vehicleLocations.put(avVehicle, link);
+                else
+                    ++failed;
+            }
+            if (AVVEHILCECOUNT == null)
+                AVVEHILCECOUNT = vehicleLocations.size();
+            GlobalAssert.that(AVVEHILCECOUNT == collection.size());
+            GlobalAssert.that(AVVEHILCECOUNT == vehicleLocations.size());
         }
-        if (0 < failed)
-            System.out.println("failed to extract location for " + failed + " vehicles");
+        // if (0 < failed)
+        // System.out.println("failed to extract location for " + failed + " vehicles");
     }
 
     /**
@@ -308,6 +316,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             // in the first pass, the vehicles is typically empty
             // in that case, the simObj will not be stored or communicated
             if (SimulationObjects.hasVehicles(simulationObject)) {
+                GlobalAssert.that(AVVEHILCECOUNT == simulationObject.vehicles.size());
+
                 new StorageSubscriber().handle(simulationObject);
 
                 if (SimulationServer.INSTANCE.getWaitForClients()) { // <- server is running && wait for clients is set
