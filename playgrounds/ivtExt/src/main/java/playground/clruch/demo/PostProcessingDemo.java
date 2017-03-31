@@ -29,6 +29,7 @@ class PostProcessingDemo {
      * 
      * /media/datahaki/data/ethz/2017_03_13_Sioux_LP_improved
      */
+    // TODO can this be removed?
     public static void main(String[] args) throws Exception {
         StorageSupplier storageSupplier = StorageSupplier.getDefault();
 

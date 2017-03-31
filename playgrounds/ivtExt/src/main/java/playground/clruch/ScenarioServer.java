@@ -14,6 +14,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
+import playground.clruch.demo.AnalyzeAll;
 import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.gfx.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
@@ -45,7 +46,7 @@ public class ScenarioServer {
         MatsimStaticDatabase.initializeSingletonInstance( //
                 scenario.getNetwork(), new IdentityTransformation());
 
-        TheApocalypse.decimatesThe(population).toNoMoreThan(20000).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(12000).people();
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
@@ -56,6 +57,7 @@ public class ScenarioServer {
 
         SimulationServer.INSTANCE.stopAccepting();
 
-        EventFileToProcessingXML.convert(dir);
+        //EventFileToProcessingXML.convert(dir);
+        AnalyzeAll.analyze(args);
     }
 }
