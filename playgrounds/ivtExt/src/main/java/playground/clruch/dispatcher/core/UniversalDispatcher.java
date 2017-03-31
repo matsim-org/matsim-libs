@@ -317,6 +317,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             // in that case, the simObj will not be stored or communicated
             if (SimulationObjects.hasVehicles(simulationObject)) {
                 GlobalAssert.that(AVVEHILCECOUNT == simulationObject.vehicles.size());
+                
+                SimulationObjects.sortVehiclesAccordingToIndex(simulationObject);
 
                 new StorageSubscriber().handle(simulationObject);
 
