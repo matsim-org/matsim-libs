@@ -44,6 +44,7 @@ import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
+import playground.michalm.drt.routing.StopBasedDrtRoutingModule;
 import playground.michalm.drt.run.DrtConfigGroup;
 
 
@@ -62,7 +63,7 @@ public class StopBasedDRTRoutingModuleTest {
 		final Double networkTravelSpeed = 0.83333;
 		final Double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario.getPopulation().getFactory(), networkTravelSpeed, beelineFactor);
-		StopBasedDRTRoutingModule stopBasedDRTRoutingModule = new StopBasedDRTRoutingModule(walkRouter, scenario.getTransitSchedule(), scenario);
+		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(walkRouter, scenario.getTransitSchedule(), scenario);
 		
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
 		Activity h = (Activity) p1.getSelectedPlan().getPlanElements().get(0);

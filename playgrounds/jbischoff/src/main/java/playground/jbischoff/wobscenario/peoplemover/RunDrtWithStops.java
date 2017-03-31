@@ -17,50 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.drt.run;
+package playground.jbischoff.wobscenario.peoplemover;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
-import org.matsim.contrib.taxi.run.TaxiOutputModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.name.Names;
-
-
-import playground.jbischoff.drt.routingModule.StopBasedDRTRoutingModule;
 import playground.michalm.drt.run.DrtConfigGroup;
+import playground.michalm.drt.run.DrtConfigGroup.DrtOperationalScheme;
+import playground.michalm.drt.run.DrtControlerCreator;
 
 
-public class RunTaxiWithStopsExample {
+public class RunDrtWithStops {
 
 	public static void main(String[] args) {
 		String configFile = "../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/testconfig.xml";
-		RunTaxiWithStopsExample.run(configFile, false);
+		RunDrtWithStops.run(configFile, false);
 	}
 
 	public static void run(String configFile, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
-				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
-		
-		DrtConfigGroup drt = new DrtConfigGroup();
+				new OTFVisConfigGroup(), new DrtConfigGroup());
+		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		drt.setEstimatedBeelineDistanceFactor(1.3);
 		drt.setEstimatedSpeed(30/3.6);
 		drt.setMaximumWalkDistance(500);
-		drt.setOperationalScheme("stationbased");
-		config.addModule(drt);
+		drt.setTransitStopFile("stopsWRS_300m.xml");
+		drt.setOperationalScheme(DrtOperationalScheme.stationbased.toString());
+		drt.setDrtNetworkMode("av");
+		
+		config.qsim().setStartTime(0);
+		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		
 		createControler(config, otfvis).run();
 	}
@@ -69,26 +61,9 @@ public class RunTaxiWithStopsExample {
 
 
 		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).parse(TaxiConfigGroup.get(config).getTaxisFileUrl(config.getContext()));
+		Controler controler = DrtControlerCreator.createControler(config, otfvis);
 
-		Controler controler = new Controler(scenario);
-			controler.addOverridingModule(new TaxiOutputModule());
-
-		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(scenario2).readFile("../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/stopsWRS_300m.xml");
-		
-		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
-        controler.addOverridingModule(new AbstractModule() {
-					
-			@Override
-			public void install() {
-				bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRT_MODE)).toInstance(scenario2.getTransitSchedule());;
-				addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(StopBasedDRTRoutingModule.class).asEagerSingleton();
-				
-			}
-		});
+	
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

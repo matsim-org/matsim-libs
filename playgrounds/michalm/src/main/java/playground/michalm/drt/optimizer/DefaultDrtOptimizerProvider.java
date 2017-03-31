@@ -50,20 +50,20 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 	private final Fleet fleet;
 	private final TravelTime travelTime;
 	private final QSim qSim;
-	private final Network preparedNetwork;
+	private final Network drtNetwork;
 
 	@Inject(optional = true)
 	private @Named(DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
 
 	@Inject
 	public DefaultDrtOptimizerProvider(Scenario scenario, DrtConfigGroup drtCfg, Fleet fleet,
-			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
+			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim, @Named(DrtConfigGroup.GROUP_NAME) Network drtNetwork) {
 		this.scenario = scenario;
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.travelTime = travelTime;
 		this.qSim = qSim;
-		this.preparedNetwork = prepareDRTNetwork(scenario.getNetwork(),drtCfg.getDrtNetworkMode());
+		this.drtNetwork = drtNetwork;
 	}
 
 
@@ -77,7 +77,7 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 		DrtScheduler scheduler = new DrtScheduler(scenario, fleet, qSim.getSimTimer(), schedulerParams, travelTime);
 		
 		
-		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, preparedNetwork, qSim.getSimTimer(),
+		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, drtNetwork, qSim.getSimTimer(),
 				travelTime, travelDisutility, scheduler);
 
 		return new InsertionDrtOptimizer(optimContext, drtCfg, new InsertionDrtOptimizerParams(null));
@@ -85,19 +85,7 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 	
 
 
-	private Network prepareDRTNetwork(Network network, String drtNetworkMode) {
-		NetworkFilterManager nfm = new NetworkFilterManager(network);
-		nfm.addLinkFilter(new NetworkLinkFilter() {
-			
-			@Override
-			public boolean judgeLink(Link l) {
-				if (l.getAllowedModes().contains(drtNetworkMode))	return true;
-				else return false;
-			}
-		});
-		Network filteredNet = nfm.applyFilters();
-		return filteredNet;
-	}
+
 	
 	
 }
