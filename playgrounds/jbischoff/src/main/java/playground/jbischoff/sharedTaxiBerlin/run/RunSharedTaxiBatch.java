@@ -42,14 +42,15 @@ public class RunSharedTaxiBatch {
 
 	public static void main(String[] args) {
 
-		int capacity = 3;
-		for (int i = 25; i<=200; i=i+25){
+		int capacity = 4;
+		for (int i = 50; i<=150; i=i+25){
 			String runId = "v"+i+"c"+capacity;
 			String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
 			Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
 					new OTFVisConfigGroup(), new TaxiFareConfigGroup());
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
-			drt.setVehiclesFile("vehicles/cap_"+capacity+"/taxis_"+i+".xml.gz");
+			drt.setEstimatedBeelineDistanceFactor(1.5);
+			drt.setVehiclesFile("vehicles_net_bvg/cap_"+capacity+"/taxis_"+i+".xml.gz");
 			config.controler().setRunId(runId);
 			config.controler().setOutputDirectory("D:/runs-svn/bvg_sharedTaxi/demand01/"+runId);
 			RunSharedTaxiBerlin.createControler(config, false).run();
