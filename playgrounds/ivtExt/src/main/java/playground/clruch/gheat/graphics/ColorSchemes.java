@@ -4,6 +4,10 @@ import java.awt.image.BufferedImage;
 
 public enum ColorSchemes {
     ORANGE(CommonPalettes.createOrange()), //
+    ORANGE_CONTOUR(CommonPalettes.createOrangeContour()), //
+    GREEN(CommonPalettes.createGreen()), //
+    GREEN_CONTOUR(CommonPalettes.createGreenContour()), //
+    BLACK(CommonPalettes.createBlack()), //
     ;
 
     public final ColorScheme colorScheme;
