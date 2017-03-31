@@ -46,6 +46,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private static final String TRANSIT_STOP_FILE = "transitStopFile";
 	private static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
 	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
+	private static final String DRT_NET_MODE = "drtNetworkMode";
+	
 
 	private double stopDuration = Double.NaN;// seconds
 	private double maxWaitTime = Double.NaN;// seconds
@@ -58,6 +60,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	private String vehiclesFile = null;
 	private String transitStopFile = null;
+	private String drtNetworkMode = "car";
 	
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
@@ -82,9 +85,26 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 				"An XML file specifying the taxi fleet. The file format according to dvrp_vehicles_v1.dtd");
 		map.put(PLOT_CUST_STATS, "Writes out detailed DRT customer stats in each iteration.");
 		map.put(PLOT_VEH_STATS, "Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration.");
+		map.put(DRT_NET_MODE, "DRT Network Mode. Default = car");
 		return map;
 	}
 
+	/**
+	 * @return the drtNetworkMode
+	 */
+	@StringGetter(DRT_NET_MODE)
+	public String getDrtNetworkMode() {
+		return drtNetworkMode;
+	}
+	
+	/**
+	 * @param drtNetworkMode the drtNetworkMode to set
+	 */
+	@StringSetter(DRT_NET_MODE)
+	public void setDrtNetworkMode(String drtNetworkMode) {
+		this.drtNetworkMode = drtNetworkMode;
+	}
+	
 	@StringGetter(STOP_DURATION)
 	public double getStopDuration() {
 		return stopDuration;
