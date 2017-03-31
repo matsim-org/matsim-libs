@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
@@ -21,7 +22,8 @@ public class RequestLayer extends ViewerLayer {
     // ---
     private volatile boolean drawRequestDestinations = false;
 
-    MatsimHeatMap requestHeatMap = new MatsimHeatMap("red", 128);
+    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.ORANGE_CONTOUR.colorScheme);
+    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN_CONTOUR.colorScheme);
 
     public RequestLayer(MatsimJMapViewer matsimJMapViewer) {
         super(matsimJMapViewer);
@@ -31,15 +33,31 @@ public class RequestLayer extends ViewerLayer {
 
     @Override
     public void perpareHeatmaps(SimulationObject ref) {
-        requestHeatMap.clear();
-        Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
-                .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
-        for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-            OsmLink osmLink = matsimJMapViewer.db.getOsmLink(entry.getKey());
-            final int size = entry.getValue().size();
-            for (int count = 0; count < size; ++count) {
-                Coord coord = osmLink.getAt(count / (double) size);
-                requestHeatMap.addPoint(coord.getX(), coord.getY());
+        {
+            requestHeatMap.clear();
+            Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
+                    .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
+            for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
+                OsmLink osmLink = matsimJMapViewer.db.getOsmLink(entry.getKey());
+                final int size = entry.getValue().size();
+                for (int count = 0; count < size; ++count) {
+                    Coord coord = osmLink.getAt(count / (double) size);
+                    requestHeatMap.addCoord(coord);
+                }
+            }
+        }
+        // ---
+        {
+            requestDestMap.clear();
+            Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
+                    .collect(Collectors.groupingBy(requestContainer -> requestContainer.toLinkIndex));
+            for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
+                OsmLink osmLink = matsimJMapViewer.db.getOsmLink(entry.getKey());
+                final int size = entry.getValue().size();
+                for (int count = 0; count < size; ++count) {
+                    Coord coord = osmLink.getAt(count / (double) size);
+                    requestDestMap.addPoint(coord.getX(), coord.getY());
+                }
             }
         }
 
@@ -88,7 +106,7 @@ public class RequestLayer extends ViewerLayer {
                     }
                 }
                 graphics.setColor(Color.DARK_GRAY);
-                graphics.drawString("" + numRequests, x, y); //  - numRequests
+                graphics.drawString("" + numRequests, x, y); // - numRequests
             }
         }
 

@@ -7,24 +7,21 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import playground.clruch.gheat.graphics.BlendComposite;
+import playground.clruch.gheat.graphics.ColorScheme;
 import playground.clruch.gheat.graphics.GammaCorrection;
 
 public class Tile {
-    private static int[] _zoomOpacity = new Opacity().BuildZoomMapping();
-
     private Tile() {
     }
 
-    public static BufferedImage Generate(BufferedImage colorScheme, BufferedImage dot, int zoom, int tileX, int tileY, DataPoint[] points, boolean changeOpacityWithZoom,
-            int defaultOpacity) throws Exception {
+    public static BufferedImage Generate(ColorScheme colorScheme, BufferedImage dot, //
+            int zoom, int tileX, int tileY, DataPoint[] points) throws Exception {
         int expandedWidth;
         int expandedHeight;
         int x1;
         int x2;
         int y1;
         int y2;
-        if (defaultOpacity < Opacity.TRANSPARENT || defaultOpacity > Opacity.OPAQUE)
-            throw new Exception("The default opacity of '" + defaultOpacity + "' doesn't fall between '" + Opacity.TRANSPARENT + "' and '" + Opacity.OPAQUE + "'");
         // Translate tile to pixel coords.
         x1 = tileX * HeatMap.SIZE;
         x2 = x1 + 255;
@@ -40,35 +37,31 @@ public class Tile {
         expandedHeight = y2 - y1;
         BufferedImage tile;
         if (points.length == 0) {
-            if (changeOpacityWithZoom)
-                tile = GetEmptyTile(colorScheme, _zoomOpacity[zoom]);
-            else
-                tile = GetEmptyTile(colorScheme, defaultOpacity);
+            tile = GetEmptyTile(colorScheme);
         } else {
             tile = GetBlankImage(expandedHeight, expandedWidth);
             tile = AddPoints(tile, dot, points);
             tile = Trim(tile, dot);
-            if (changeOpacityWithZoom)
-                tile = Colorize(tile, colorScheme, _zoomOpacity[zoom]);
-            else
-                tile = Colorize(tile, colorScheme, defaultOpacity);
+            tile = Colorize(tile, colorScheme.bufferedImage);
         }
         return tile;
     }
 
     /// Takes the gray scale and applies the color scheme to it.
-    public static BufferedImage Colorize(BufferedImage tile, BufferedImage colorScheme, int zoomOpacity) {
+    public static BufferedImage Colorize(BufferedImage tile, BufferedImage palette) {
         Color tilePixelColor;
-        Color colorSchemePixel;
+        // Color colorSchemePixel;
         for (int x = 0; x < tile.getWidth(); x++) {
             for (int y = 0; y < tile.getHeight(); y++) {
                 // Get color for this intensity
                 tilePixelColor = new Color(tile.getRGB(x, y));
                 // Get the color of the scheme from the intensity on the tile
                 // Only need to get one color in the tile, because it is grayscale, so each color will have the same intensity
-                colorSchemePixel = new Color(colorScheme.getRGB(0, tilePixelColor.getRed()));
-                zoomOpacity = (int) ((((double) zoomOpacity / 255.0f) * ((double) colorSchemePixel.getAlpha() / 255.0f)) * 255f);
-                tile.setRGB(x, y, new Color(colorSchemePixel.getRed(), colorSchemePixel.getGreen(), colorSchemePixel.getBlue(), zoomOpacity).getRGB());
+                int rgba = palette.getRGB(0, tilePixelColor.getRed());
+                // colorSchemePixel = new Color();
+                // zoomOpacity = (int) ((((double) zoomOpacity / 255.0f) * ((double) colorSchemePixel.getAlpha() / 255.0f)) * 255f);
+                Color color = new Color(rgba, true);
+                tile.setRGB(x, y, color.getRGB());
             }
         }
         return tile;
@@ -158,29 +151,27 @@ public class Tile {
     }
 
     /* Empty tile with no points on it. */
-    public static BufferedImage GetEmptyTile(BufferedImage colorScheme, int zoomOpacity) {
-        Color colorSchemePixelColor;
-        BufferedImage tile;
-        Graphics2D graphic;
+    public static BufferedImage GetEmptyTile(ColorScheme colorScheme) {
         // If we have already created the empty tile then return it
-        if (Cache.hasEmptyTile(colorScheme.hashCode(), zoomOpacity)) // FIXME this assumes hashcode is "equals"!
-            return Cache.getEmptyTile(colorScheme.hashCode(), zoomOpacity);
+        if (Cache.hasEmptyTile(colorScheme))
+            return Cache.getEmptyTile(colorScheme);
+        System.out.println("create empty tile: " + colorScheme);
         // Create a blank tile that is 32 bit and has an alpha
-        tile = new BufferedImage(HeatMap.SIZE, HeatMap.SIZE, BufferedImage.TYPE_INT_ARGB);
-        graphic = tile.createGraphics();
+        BufferedImage tile = new BufferedImage(HeatMap.SIZE, HeatMap.SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphic = tile.createGraphics();
         // Get the first pixel of the color scheme, on the dark side
-        colorSchemePixelColor = new Color(colorScheme.getRGB(0, colorScheme.getHeight() - 1));
-        zoomOpacity = (int) (((zoomOpacity / 255.0f) // # From Configuration
-                * (colorSchemePixelColor.getAlpha() / 255.0f) // #From per-pixel alpha
-        ) * 255.0f);
-        graphic.setColor(new Color(colorSchemePixelColor.getRed(), colorSchemePixelColor.getGreen(), colorSchemePixelColor.getBlue(), zoomOpacity));
+        BufferedImage palette = colorScheme.bufferedImage;
+        int rgba = palette.getRGB(0, palette.getHeight() - 1);
+        graphic.setColor(new Color(rgba, true));
         graphic.fillRect(0, 0, HeatMap.SIZE, HeatMap.SIZE);
+        // graphic.setColor(Color.BLACK);
+        // graphic.drawString("[empty]", 10, 10);
         graphic.dispose();
         // Save the newly created empty tile
         // There is a empty tile for each scheme and zoom level
         // Double check it does not already exists
-        if (!Cache.hasEmptyTile(colorScheme.hashCode(), zoomOpacity))
-            Cache.putEmptyTile(tile, colorScheme.hashCode(), zoomOpacity);
+        if (!Cache.hasEmptyTile(colorScheme))
+            Cache.putEmptyTile(colorScheme, tile);
         return tile;
     }
 }

@@ -1,6 +1,7 @@
 // License: GPL. For details, see Readme.txt file.
 package playground.clruch.jmapviewer;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -9,7 +10,6 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,8 +25,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
 import playground.clruch.gfx.MatsimHeatMap;
-import playground.clruch.gheat.HeatMap;
-import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.jmapviewer.events.JMVCommandEvent;
 import playground.clruch.jmapviewer.events.JMVCommandEvent.COMMAND;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
@@ -668,6 +666,12 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                         }
                         if (tile != null) {
                             tile.paint(g, posx, posy); // , tilesize, tilesize
+
+                            {
+                                Color color = new Color(255, 255, 255, 128);
+                                g.setColor(color);
+                                g.fillRect(posx, posy, 256, 256);
+                            }
 
                             for (MatsimHeatMap matsimHeatmap : matsimHeatmaps)
                                 matsimHeatmap.render(g, tile, zoom, posx, posy);

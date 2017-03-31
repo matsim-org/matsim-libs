@@ -6,9 +6,12 @@ import java.awt.image.ImageObserver;
 
 import javax.swing.JLabel;
 
+import org.matsim.api.core.v01.Coord;
+
 import playground.clruch.gheat.HeatMap;
 import playground.clruch.gheat.PointLatLng;
 import playground.clruch.gheat.datasources.DataManager;
+import playground.clruch.gheat.graphics.ColorScheme;
 import playground.clruch.jmapviewer.Tile;
 
 public class MatsimHeatMap {
@@ -16,13 +19,11 @@ public class MatsimHeatMap {
     final DataManager dataManager = new DataManager(matsimDataSource);
     final ImageObserver imageObserver = new JLabel();
 
-    String colorScheme;
+    ColorScheme colorScheme;
     boolean show = true;
-    int defaultOpacity;
 
-    public MatsimHeatMap(String colorScheme, int defaultOpacity) {
+    public MatsimHeatMap(ColorScheme colorScheme) {
         this.colorScheme = colorScheme;
-        this.defaultOpacity = defaultOpacity;
     }
 
     public void render(Graphics graphics, Tile tile, int zoom, int posx, int posy) {
@@ -33,9 +34,7 @@ public class MatsimHeatMap {
                         colorScheme, //
                         zoom, //
                         tile.getXtile(), //
-                        tile.getYtile(), //
-                        false, //
-                        defaultOpacity);
+                        tile.getYtile());
                 graphics.drawImage(img, posx, posy, imageObserver);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -45,10 +44,14 @@ public class MatsimHeatMap {
 
     public void clear() {
         matsimDataSource.clear();
+    }
 
+    public void addCoord(Coord coord) {
+        addPoint(coord.getX(), coord.getY());
     }
 
     public void addPoint(double x, double y) {
         matsimDataSource.addPoint(new PointLatLng(x, y));
     }
+
 }

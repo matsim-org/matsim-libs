@@ -4,24 +4,26 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
+import playground.clruch.gheat.graphics.ColorScheme;
+
 public class Cache {
-    private static Map<String, BufferedImage> _emptyTile = new HashMap<String, BufferedImage>();
+    private static Map<ColorScheme, BufferedImage> _emptyTile = new HashMap<>();
     private static Object syncroot = new Object();
 
     private Cache() {
     }
 
-    public static boolean hasEmptyTile(int key, int zoomOpacity) {
-        return _emptyTile.containsKey(key + "_" + zoomOpacity);
+    public static boolean hasEmptyTile(ColorScheme key) {
+        return _emptyTile.containsKey(key);
     }
 
-    public static BufferedImage getEmptyTile(int key, int zoomOpacity) {
-        return _emptyTile.get(key + "_" + zoomOpacity);
+    public static BufferedImage getEmptyTile(ColorScheme key) {
+        return _emptyTile.get(key);
     }
 
-    public static void putEmptyTile(BufferedImage tile, int key, int zoomOpacity) {
+    public static void putEmptyTile(ColorScheme key, BufferedImage tile) {
         synchronized (syncroot) {
-            _emptyTile.put(Integer.toString(key) + "_" + zoomOpacity, tile);
+            _emptyTile.put(key, tile);
         }
     }
 }

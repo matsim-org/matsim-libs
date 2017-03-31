@@ -32,11 +32,4 @@ public enum ThemeManager {
         return dotsList.get("dot" + zoom + ".png");
     }
 
-    // TODO input to fnction is ignored
-    public static BufferedImage GetColorScheme(String schemeName) throws Exception {
-        return ColorSchemes.ORANGE.getBufferedImage();
-        // if (!colorSchemeList.containsKey(schemeName + ".png"))
-        // throw new Exception("Color scheme '" + schemeName + " could not be found");
-        // return colorSchemeList.get(schemeName + ".png");
-    }
 }
