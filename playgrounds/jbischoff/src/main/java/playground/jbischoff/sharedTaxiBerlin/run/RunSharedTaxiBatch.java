@@ -42,7 +42,7 @@ public class RunSharedTaxiBatch {
 
 	public static void main(String[] args) {
 
-		int capacity = 2;
+		int capacity = 6;
 		for (int i = 50; i<=150; i=i+25){
 			String runId = "v"+i+"c"+capacity;
 			String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";

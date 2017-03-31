@@ -49,9 +49,9 @@ public class CreatePeopleMoverVehicles {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		int numberofVehicles = 100;
+		int numberofVehicles = 300;
 		double operationStartTime = 0.; //t0
-		double operationEndTime = 30*3600.;	//t1
+		double operationEndTime = 36*3600.;	//t1
 		int seats = 8;
 		String networkfile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av-mar17.xml";
 		String taxisFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/pm_"+numberofVehicles+".xml";
