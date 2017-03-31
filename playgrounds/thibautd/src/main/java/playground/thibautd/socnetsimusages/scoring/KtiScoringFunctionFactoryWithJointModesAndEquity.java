@@ -181,11 +181,11 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 								groupSizeGroup.getUtilityOfMissingContact_util_s())));
 
 
-		addScoringFunction( person.getId() , function ,
-				new StandardDeviationScorer(
-						travelTimesRecords,
-						group.getJoinableActivityTypes(),
-						betaStdDev ) );
+		//addScoringFunction( person.getId() , function ,
+		//		new StandardDeviationScorer(
+		//				travelTimesRecords,
+		//				group.getJoinableActivityTypes(),
+		//				betaStdDev ) );
 		return function;
 	}
 

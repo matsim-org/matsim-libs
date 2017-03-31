@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning;
 
-import org.matsim.api.core.v01.Scenario;
-
 import org.matsim.contrib.socnetsim.usage.PlanLinkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.CompositePlanLinkIdentifier;
@@ -40,108 +38,77 @@ public class PlanLinkIdentifierUtils {
 	private PlanLinkIdentifierUtils() {}
 
 	public static class LinkIdentifierProvider implements Provider<PlanLinkIdentifier> {
-		private final Scenario sc;
+		private final PlanLinkConfigGroup configGroup;
+		private final SocialNetwork socialNetwork;
 
 		@Inject
-		public LinkIdentifierProvider(final Scenario sc) {
-			this.sc = sc;
+		public LinkIdentifierProvider(
+				final PlanLinkConfigGroup configGroup,
+				final SocialNetwork socialNetwork ) {
+			this.configGroup = configGroup;
+			this.socialNetwork = socialNetwork;
 		}
 
 		@Override
 		public PlanLinkIdentifier get() {
-			return createPlanLinkIdentifier( sc );
+			final CompositePlanLinkIdentifier id = new CompositePlanLinkIdentifier();
+
+			id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
+
+			if ( configGroup.getLinkJointTrips().isWeak() ) {
+				id.addOrComponent( new JointTripsPlanLinkIdentifier() );
+			}
+
+			if ( configGroup.getLinkVehicles().isWeak() ) {
+				id.addOrComponent( new VehicularPlanBasedIdentifier() );
+			}
+
+			if ( configGroup.getLinkJoinableActivities().isWeak() ) {
+				for ( String activityType : configGroup.getJoinableTypes() ) {
+					id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
+				}
+			}
+
+			return id;
 		}
 	}
 
 	public static class WeakLinkIdentifierProvider implements Provider<PlanLinkIdentifier> {
-		private final Scenario sc;
+		private final PlanLinkConfigGroup configGroup;
+		private final SocialNetwork socialNetwork;
 
 		@Inject
-		public WeakLinkIdentifierProvider(final Scenario sc) {
-			this.sc = sc;
+		public WeakLinkIdentifierProvider(
+				final PlanLinkConfigGroup configGroup,
+				final SocialNetwork socialNetwork ) {
+			this.configGroup = configGroup;
+			this.socialNetwork = socialNetwork;
 		}
 
 		@Override
 		public PlanLinkIdentifier get() {
-			return createWeakPlanLinkIdentifier( sc );
-		}
-	}
+			final CompositePlanLinkIdentifier id =
+				new CompositePlanLinkIdentifier();
 
-	public static PlanLinkIdentifier createPlanLinkIdentifier(
-			final Scenario scenario ) {
-		final PlanLinkConfigGroup configGroup = (PlanLinkConfigGroup)
-			scenario.getConfig().getModule( PlanLinkConfigGroup.GROUP_NAME );
-		return PlanLinkIdentifierUtils.createPlanLinkIdentifier(
-					configGroup,
-					(SocialNetwork) scenario.getScenarioElement(
-						SocialNetwork.ELEMENT_NAME ) );
-	}
+			id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
 
-	public static PlanLinkIdentifier createPlanLinkIdentifier(
-			final PlanLinkConfigGroup conf,
-			final SocialNetwork socialNetwork) {
-		final CompositePlanLinkIdentifier id =
-			new CompositePlanLinkIdentifier();
-
-		id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
-
-		if ( conf.getLinkJointTrips().isWeak() ) {
-			id.addOrComponent( new JointTripsPlanLinkIdentifier() );
-		}
-
-		if ( conf.getLinkVehicles().isWeak() ) {
-			id.addOrComponent( new VehicularPlanBasedIdentifier() );
-		}
-
-		if ( conf.getLinkJoinableActivities().isWeak() ) {
-			for ( String activityType : conf.getJoinableTypes() ) {
-				id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
+			if ( configGroup.getLinkJointTrips().isStrong() ) {
+				id.addOrComponent( new JointTripsPlanLinkIdentifier() );
 			}
-		}
 
-		return id;
-	}
-	
-	public static PlanLinkIdentifier createWeakPlanLinkIdentifier(
-			final Scenario scenario ) {
-		final PlanLinkConfigGroup configGroup = (PlanLinkConfigGroup)
-			scenario.getConfig().getModule( PlanLinkConfigGroup.GROUP_NAME );
-		return PlanLinkIdentifierUtils.createWeakPlanLinkIdentifier(
-					configGroup,
-					(SocialNetwork) scenario.getScenarioElement(
-						SocialNetwork.ELEMENT_NAME ) );
-	}
-	
-	/**
-	 * The "weak" identifier only considers strong links!
-	 * (The name should be changed)
-	 * @param conf
-	 * @param socialNetwork
-	 * @return
-	 */
-	public static PlanLinkIdentifier createWeakPlanLinkIdentifier(
-			final PlanLinkConfigGroup conf,
-			final SocialNetwork socialNetwork) {
-		final CompositePlanLinkIdentifier id =
-			new CompositePlanLinkIdentifier();
-
-		id.addAndComponent( new SocialNetworkPlanLinkIdentifier( socialNetwork ) );
-
-		if ( conf.getLinkJointTrips().isStrong() ) {
-			id.addOrComponent( new JointTripsPlanLinkIdentifier() );
-		}
-
-		if ( conf.getLinkVehicles().isStrong() ) {
-			id.addOrComponent( new VehicularPlanBasedIdentifier() );
-		}
-
-		if ( conf.getLinkJoinableActivities().isStrong() ) {
-			for ( String activityType : conf.getJoinableTypes() ) {
-				id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
+			if ( configGroup.getLinkVehicles().isStrong() ) {
+				id.addOrComponent( new VehicularPlanBasedIdentifier() );
 			}
-		}
 
-		return id;
+			if ( configGroup.getLinkJoinableActivities().isStrong() ) {
+				for ( String activityType : configGroup.getJoinableTypes() ) {
+					id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
+				}
+			}
+
+			return id;
+		}
 	}
+
 }
 

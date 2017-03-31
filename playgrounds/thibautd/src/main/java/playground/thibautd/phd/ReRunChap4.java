@@ -93,6 +93,7 @@ public class ReRunChap4 {
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 		RunUtils.enrichScenario(scenario);
+		RunUtils.connectLocations( scenario );
 		//Matsim2030Utils.enrichScenario( scenario );
 		ZurichScenarioUtils.enrichScenario( scenario );
 
