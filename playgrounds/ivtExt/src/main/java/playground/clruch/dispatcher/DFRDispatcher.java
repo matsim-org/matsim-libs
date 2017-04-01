@@ -62,8 +62,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
     private int rebCount = 0;
     private final int N_vStations;
     private final long popSize;
-    private Tensor rebalancingOrderRest;
-    private Tensor rebalancingOrder;
+    private Tensor rebalancingOrderRest_FB;
+    private Tensor rebalancingOrderRest_FF;
 
     private final FeedbackTerm feebackTerm;
 
@@ -89,8 +89,9 @@ public class DFRDispatcher extends PartitionedDispatcher {
         rebalancingPeriod = Integer.parseInt(config.getParams().get(KEY_REBALANCINGPERIOD));
         N_vStations = virtualNetwork.getvNodesCount(); //Consider here nodecount -1 as no vLink to leftover region!!
         popSize = arrivalInformation.populationSize;
-        rebalancingOrderRest     = Array.zeros(N_vStations, N_vStations);
-        rebalancingOrder         = Array.zeros(N_vStations, N_vStations);
+        rebalancingOrderRest_FB     = Array.zeros(N_vStations, N_vStations);
+        rebalancingOrderRest_FF     = Array.zeros(N_vStations, N_vStations);
+
         feebackTerm = FeedbackTerm.valueOf(
                 config.getParams().get(KEY_FEEDBACKTERM));
     }
@@ -143,10 +144,9 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 //======================================================================================================
                 // DFR Iterations: Compute Rebalancing
                 //======================================================================================================
-                 //Map<VirtualLink, Integer> rebalanceCount = new HashMap<>(); // TODO
                 {
                     //==================================================================================================
-                    // Feedforward Rebalancing Term //TODO isuue with lambda equal zero -> matlab is faking lambdas...) evtl compute reb. rates in matlab!!
+                    // Feedforward Rebalancing Term
                     //==================================================================================================
                         Tensor alpha_ij = arrivalInformation.getAlphaijforTime((int) now);
                         Tensor alphaij = alpha_ij.multiply(RealScalar.of(rebalancingPeriod)).multiply(RealScalar.of(popSize));
@@ -179,25 +179,24 @@ public class DFRDispatcher extends PartitionedDispatcher {
                             //==============================================================================================
                                 switch (feebackTerm) {
                                     case LDX: {
-                                    // Get Lambda and test if not in consensus Set
-                                    Tensor lambda = arrivalInformation.getNextNonZeroLambdaforTime((int) now);
-                                    GlobalAssert.that(Total.of(lambda).Get().number().doubleValue() != 0); // no lambda is ever zero (if zero take next non-zero)
-                                    Tensor consensusVal = consensusLDX(systemImbalance, lambda);
-                                    boolean notConsSetFrom = (Math.abs((double) imbalanceFrom - consensusVal.Get(indexFrom).number().doubleValue()) > (double) vLink.getFrom().getNeighCount());
-                                    boolean notConsSetTo = (Math.abs((double) imbalanceTo - consensusVal.Get(indexTo).number().doubleValue()) > (double) vLink.getTo().getNeighCount());
-                                    if (notConsSetFrom || notConsSetTo) {
-                                        double lambdaFrom = lambda.Get(indexFrom).number().doubleValue();
-                                        double lambdaTo = lambda.Get(indexTo).number().doubleValue();
-                                        // do  feedback rebalancing if not in consensus Set
-                                        rebalance_From_To = //
-                                                rebalancingPeriod * (double) popSize * linkWeight * ( //
-                                                        (double) imbalanceTo / lambdaTo - //
-                                                                (double) imbalanceFrom / lambdaFrom);
-                                    }else{//prevent rest to integrate if in consensus set // TODO PROPPERLY!!! this is a debug hack
-                                        rebalancingOrderRest.set(RealScalar.of(0),indexFrom,indexTo);
-                                        rebalancingOrderRest.set(RealScalar.of(0),indexTo,indexFrom);
-                                    }
-                                    break;
+                                        // Get Lambda and test if not in consensus Set
+                                        Tensor lambda = arrivalInformation.getNextNonZeroLambdaforTime((int) now);
+                                        GlobalAssert.that(Total.of(lambda).Get().number().doubleValue() != 0); // no lambda is ever zero (if zero take next non-zero)
+                                        Tensor consensusVal = consensusLDX(systemImbalance, lambda);
+                                        boolean notConsSetFrom = (Math.abs((double) imbalanceFrom - consensusVal.Get(indexFrom).number().doubleValue()) > (double) vLink.getFrom().getNeighCount());
+                                        boolean notConsSetTo = (Math.abs((double) imbalanceTo - consensusVal.Get(indexTo).number().doubleValue()) > (double) vLink.getTo().getNeighCount());
+                                        if (notConsSetFrom || notConsSetTo) {
+                                            double lambdaFrom = lambda.Get(indexFrom).number().doubleValue();
+                                            double lambdaTo = lambda.Get(indexTo).number().doubleValue();
+                                            // do  feedback rebalancing if not in consensus Set
+                                            rebalance_From_To = //
+                                                    rebalancingPeriod * (double) popSize * linkWeight * ( //
+                                                            (double) imbalanceTo / lambdaTo - //
+                                                                    (double) imbalanceFrom / lambdaFrom) +//
+                                                            rebalancingOrderRest_FB.Get(indexFrom, indexTo).number().doubleValue() - //
+                                                            rebalancingOrderRest_FB.Get(indexTo, indexFrom).number().doubleValue();
+                                        }
+                                        break;
                                     }
                                     case LX: {
                                         // Test if not in consensus Set
@@ -209,10 +208,9 @@ public class DFRDispatcher extends PartitionedDispatcher {
                                             rebalance_From_To = //
                                                     rebalancingPeriod * linkWeight * ( //
                                                             (double) imbalanceTo - //
-                                                                    (double) imbalanceFrom);
-                                        }else{//prevent rest to integrate if in consensus set //TODO PROPPERLY, this is a debug hack
-                                            rebalancingOrderRest.set(RealScalar.of(0),indexFrom,indexTo);
-                                            rebalancingOrderRest.set(RealScalar.of(0),indexTo,indexFrom);
+                                                                    (double) imbalanceFrom) +//
+                                                            rebalancingOrderRest_FB.Get(indexFrom, indexTo).number().doubleValue() - //
+                                                            rebalancingOrderRest_FB.Get(indexTo, indexFrom).number().doubleValue();
                                         }
                                         break;
                                     }
@@ -232,24 +230,27 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 //======================================================================================================
                 // Quantize Total Rebalancing
                 //======================================================================================================
-                    Tensor desiredRebalancingOrder = rebalancingOrderRest.add(feedback_Rebalancing_DFR.add(feedfwrd_Rebalancing_LPR));
-                    rebalancingOrder = Round.of(desiredRebalancingOrder);
-
-                    rebalancingOrderRest = rebalancingOrder.subtract(desiredRebalancingOrder);
-
+                    //FeedForward Rebalancing
+                    Tensor rebalancingOrder_FF = Round.of(feedfwrd_Rebalancing_LPR.add(rebalancingOrderRest_FF));
+                    rebalancingOrderRest_FF = rebalancingOrder_FF.subtract(feedfwrd_Rebalancing_LPR);
+                    //Feedback Rebalancing
+                    Tensor rebalancingOrder_FB = Round.of(feedback_Rebalancing_DFR);
+                    rebalancingOrderRest_FB    = feedback_Rebalancing_DFR.subtract(rebalancingOrder_FB);
+                    //Combine the two
+                    Tensor rebalancingOrder    = rebalancingOrder_FB.add(rebalancingOrder_FF);
 
                 //DEBUG START
                 System.out.println("Rebalancing Tensor:\n" + Pretty.of(rebalancingOrder));
-                System.out.println("Rebalancing Rest Tensor:\n" + Pretty.of(rebalancingOrderRest));
+                System.out.println("Rebalancing Rest Tensor:\n" + Pretty.of(rebalancingOrderRest_FF.add(rebalancingOrderRest_FB)));
                 //DEBUG END
 
                 //======================================================================================================
                 // Total Rebalancing and Feasibility Test //TODO feasibility (test)
                 //======================================================================================================
 
-                    Tensor feasibleRebalanceCount = rebalancingOrder; //TODO Rename feasibileRebalanceOrder
+                    Tensor feasibleRebalanceOrder = rebalancingOrder;
                     /*
-                     * feasibleRebalanceCount = returnFeasibleRebalance(rebalanceCount, available_Vehicles);
+                     * feasibleRebalanceOrder = returnFeasibleRebalance(rebalanceCount, available_Vehicles);
                      */
                 {
                     int rebCars = Total.of(Total.of(rebalancingOrder)).Get().number().intValue();
@@ -269,7 +270,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 for (int rebalanceFromidx=0;rebalanceFromidx<N_vStations-1;rebalanceFromidx++){
                     for (int rebalanceToidx=0; rebalanceToidx<N_vStations-1;rebalanceToidx++){
 
-                        int rebalanceCars = feasibleRebalanceCount.Get(rebalanceFromidx,rebalanceToidx).number().intValue();
+                        int rebalanceCars = feasibleRebalanceOrder.Get(rebalanceFromidx,rebalanceToidx).number().intValue();
                         if (rebalanceCars!=0){
                             VirtualNode rebalanceFromvNode = virtualNetwork.getVirtualNode(rebalanceFromidx);
                             VirtualNode rebalanceTovNode   = virtualNetwork.getVirtualNode(rebalanceToidx);

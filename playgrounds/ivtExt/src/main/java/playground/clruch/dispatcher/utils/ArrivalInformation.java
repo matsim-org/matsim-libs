@@ -160,7 +160,6 @@ public class ArrivalInformation {
     public Scalar getLambdaforTime(int time, int vNodeindex) {
         return getLambdaforTime(time).Get(vNodeindex);
     }
-
     public Tensor getNextNonZeroLambdaforTime(int time) {
         List<Integer> dim_lambda = Dimensions.of(lambda);
         int N                    = dim_lambda.get(1);
@@ -179,7 +178,7 @@ public class ArrivalInformation {
 
         while (nZ_lambda.number().doubleValue() == 0){
             row++;
-            if (row>dim_lambda.get(0)){
+            if (!(row<dim_lambda.get(0))){
                 row = 0; //Cylcic Search for non-zero element
             }
             nZ_lambda = lambda.Get(row, vNodeindex);
