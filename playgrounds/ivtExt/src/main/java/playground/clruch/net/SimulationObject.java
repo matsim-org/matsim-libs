@@ -9,6 +9,8 @@ import java.util.List;
  * 
  * {@link SimulationObject} is only used for communication and storage of the
  * status of the AV simulation 
+ * 
+ * instead, implement utility functions in {@link SimulationObjects}
  */
 public class SimulationObject implements Serializable {
 
@@ -17,7 +19,19 @@ public class SimulationObject implements Serializable {
     public long now;
     public int total_matchedRequests;
     public List<RequestContainer> requests = new ArrayList<>();
+    /**
+     * vehicles shall not be an empty list
+     * but always contain the complete collection of vehicles
+     */
     public List<VehicleContainer> vehicles;
+    /**
+     * use field serializable to attach information that is specific to dispatcher
+     * the value is null by default
+     */
     public Serializable serializable;
+    
+    /**
+     * DO NOT PUT MEMBER FUNCTIONS OR STATIC FUNCTION INSIDE CLASS !!!
+     */
 
 }

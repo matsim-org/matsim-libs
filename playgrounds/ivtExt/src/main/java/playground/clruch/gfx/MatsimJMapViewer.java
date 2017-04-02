@@ -54,6 +54,7 @@ public class MatsimJMapViewer extends JMapViewer {
         viewerLayers.add(linkLayer);
         viewerLayers.add(requestLayer);
         matsimHeatmaps.add(requestLayer.requestHeatMap);
+        matsimHeatmaps.add(requestLayer.requestDestMap);
         viewerLayers.add(vehicleLayer);
 
         try {

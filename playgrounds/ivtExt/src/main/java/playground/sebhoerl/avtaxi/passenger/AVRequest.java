@@ -12,6 +12,8 @@ import playground.sebhoerl.avtaxi.routing.AVRoute;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 
+import java.util.Comparator;
+
 public class AVRequest extends RequestImpl implements PassengerRequest {
     final private Link pickupLink;
     final private Link dropoffLink;
@@ -76,4 +78,5 @@ public class AVRequest extends RequestImpl implements PassengerRequest {
     public AVRoute getRoute() {
         return route;
     }
+
 }
