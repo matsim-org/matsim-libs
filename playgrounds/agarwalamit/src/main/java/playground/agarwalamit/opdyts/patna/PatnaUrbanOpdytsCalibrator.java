@@ -76,16 +76,19 @@ public class PatnaUrbanOpdytsCalibrator {
 		int iterationsToConvergence = 10; //
 		int averagingIterations = 10;
 		boolean isRunningOnCluster = false;
-		double randomVariance = 0.1;
+		double randomVariance = 1.0;
 
 		if (args.length>0) isRunningOnCluster = true;
 
 		if ( isRunningOnCluster ) {
-			OUT_DIR = args[0];
+
 			configFile = args[1];
 			averagingIterations = Integer.valueOf(args[2]);
 			iterationsToConvergence = Integer.valueOf(args[3]);
 			randomVariance = Double.valueOf(args[4]);
+
+			OUT_DIR = args[0]+"RV_"+randomVariance+"_AI_"+averagingIterations+"its/";
+
 		} else {
 			configFile = configDir+"/config_urban_1pct.xml";
 		}
@@ -125,7 +128,7 @@ public class PatnaUrbanOpdytsCalibrator {
 		modes2consider.add("pt");
 		modes2consider.add("walk");
 
-		DistanceDistribution referenceStudyDistri = new PatnaCMPDistanceDistribution(PATNA_1_PCT);
+		DistanceDistribution referenceStudyDistri = new PatnaOneBinDistanceDistribution(PATNA_1_PCT);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
 		// following is the  entry point to start a matsim controler together with opdyts

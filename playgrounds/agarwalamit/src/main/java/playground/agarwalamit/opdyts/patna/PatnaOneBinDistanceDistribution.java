@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts.patna.networkModesOnly;
+package playground.agarwalamit.opdyts.patna;
 
 import java.util.Collections;
 import java.util.Map;
@@ -27,13 +27,12 @@ import playground.agarwalamit.opdyts.OpdytsScenario;
 import playground.agarwalamit.opdyts.equil.EquilDistanceDistribution;
 
 /**
- * Created by amit on 14/03/17.
- * This is a fake distribution to simplify the opdyts set up.
- * Input plan have 525 car, 2697 motorbike and 3858 bicycle plans; total = 7080
- * So let's assume that modal split is (car:motorbike:bikee::5,29,66)
+ * Created by amit on 21/10/16.
  */
 
-final class PatnaOneBinDistanceDistribution implements DistanceDistribution {
+
+@SuppressWarnings("DefaultFileTemplate")
+public final class PatnaOneBinDistanceDistribution implements DistanceDistribution {
 
     private final Map<String, double []> mode2legs = new TreeMap<>();
     private final double [] distClasses = new double[] {0.0};
@@ -50,26 +49,36 @@ final class PatnaOneBinDistanceDistribution implements DistanceDistribution {
             default:
                 throw new RuntimeException("not implemented yet.");
             case PATNA_1Pct:
-                totalLegs = 7080.0 * 2.0 ;
+                totalLegs = 13278.0 * 2.0 ;
                 break;
             case PATNA_10Pct:
-                totalLegs = 7080.0 * 2.0 * 10.0;
+                totalLegs = 13278.0 * 2.0 * 10.0 ;
                 break;
         }
         {
             double [] carVals = {100.0};
-            double carLegs = 0.05 * totalLegs;
+            double carLegs = 0.02 * totalLegs;
             mode2legs.put("car", getModeDistanceLegs(carLegs, carVals));
         }
         {
             double [] motorbikeVals = {100.0};
-            double motorbikeLegs = 0.29 * totalLegs;
+            double motorbikeLegs = 0.14 * totalLegs;
             mode2legs.put("motorbike", getModeDistanceLegs(motorbikeLegs, motorbikeVals));
         }
         {
             double [] bikeVals = {100.0};
-            double bikeLegs = 0.66 * totalLegs;
+            double bikeLegs = 0.33 * totalLegs;
             mode2legs.put("bike", getModeDistanceLegs(bikeLegs, bikeVals));
+        }
+        {
+            double [] ptVals = {100.0};
+            double ptLegs = 0.22 * totalLegs;
+            mode2legs.put("pt", getModeDistanceLegs(ptLegs, ptVals));
+        }
+        {
+            double [] walkVals = {100.0};
+            double walkLegs = 0.29 * totalLegs;
+            mode2legs.put("walk", getModeDistanceLegs(walkLegs, walkVals));
         }
 
         // check if difference is not greaater than 1%, due to rounding.

@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -44,7 +45,6 @@ import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistri
  * Created by amit on 20/09/16.
  */
 
-@SuppressWarnings("DefaultFileTemplate")
 public class OpdytsModalStatsControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
     @Inject
@@ -58,6 +58,11 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
 
     private BufferedWriter writer;
     private final Set<String> mode2consider;
+
+    /*
+     * after every 10/20/50 iterations, distance distribution will be written out.
+     */
+    private final int distriEveryItr = 50;
 
     public OpdytsModalStatsControlerListener(final Set<String> modes2consider, final DistanceDistribution referenceStudyDistri) {
         this.mode2consider = modes2consider;
@@ -104,7 +109,10 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
 
-        if(event.getIteration() == event.getServices().getConfig().controler().getFirstIteration()) {
+       final int iteration = event.getIteration();
+       final Config config = event.getServices().getConfig();
+
+        if (iteration == config.controler().getFirstIteration()) {
             this.initialMode2DistanceClass2LegCount.putAll(this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts());
         } else {
             // nothing to do
@@ -114,30 +122,32 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
 
         // evaluate objective function value
         ObjectiveFunctionEvaluator objectiveFunctionEvaluator = new ObjectiveFunctionEvaluator();
-        Map<String, double []> realCounts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
-        Map<String, double []> simCounts = new TreeMap<>();
+        Map<String, double[]> realCounts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
+        Map<String, double[]> simCounts = new TreeMap<>();
 
         // initialize simcounts array for each mode
         realCounts.entrySet().forEach(entry -> simCounts.put(entry.getKey(), new double[entry.getValue().length]));
 
         SortedMap<String, SortedMap<Double, Integer>> simCountsHandler = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
-        for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet()  ) {
-            if (! realCounts.containsKey(e.getKey())) continue;
-            double [] counts = new double [realCounts.get(e.getKey()).length];
+        for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet()) {
+            if (!realCounts.containsKey(e.getKey())) continue;
+            double[] counts = new double[realCounts.get(e.getKey()).length];
             int index = 0;
             for (Integer count : simCountsHandler.get(e.getKey()).values()) {
-                counts [index++] = count;
+                counts[index++] = count;
             }
-            simCounts.put(e.getKey(),counts);
+            simCounts.put(e.getKey(), counts);
         }
 
         try {
-            writer.write(event.getIteration() + "\t" +
+            writer.write(iteration + "\t" +
                     mode2Legs.keySet().toString() + "\t" +
                     mode2Legs.values().toString() + "\t");
 
             // write modalParams
-            Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = event.getServices().getConfig().planCalcScore().getModes();
+            Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = config
+                                                                                .planCalcScore()
+                                                                                .getModes();
 
             SortedMap<String, Double> ascs = new TreeMap<>();
             SortedMap<String, Double> travs = new TreeMap<>();
@@ -159,18 +169,20 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
                     dists.values().toString() + "\t" +
                     moneyRates.values().toString());
 
-            writer.write( "\t" + objectiveFunctionEvaluator.getObjectiveFunctionValue(realCounts,simCounts));
+            writer.write("\t" + objectiveFunctionEvaluator.getObjectiveFunctionValue(realCounts, simCounts));
             writer.newLine();
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("File not found.");
         }
 
-        // dist-distribution file
-        String distriDir = event.getServices().getConfig().controler().getOutputDirectory()+"/distanceDistri/";
-        new File(distriDir).mkdir();
-        String outFile = distriDir + "/"+event.getIteration()+".distanceDistri.txt";
-        writeDistanceDistribution(outFile);
+        if( iteration % distriEveryItr == 0 || iteration == config.controler().getLastIteration() ) {
+            // dist-distribution file
+            String distriDir = config.controler().getOutputDirectory() + "/distanceDistri/";
+            new File(distriDir).mkdir();
+            String outFile = distriDir + "/" + iteration + ".distanceDistri.txt";
+            writeDistanceDistribution(outFile);
+        }
     }
 
     @Override

@@ -44,14 +44,13 @@ public class RunFDDataExample {
 
         Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 
-        List<String> mainModes = Arrays.asList("car","bike");
+        List<String> mainModes = Arrays.asList("car");
 
         // queue model parameters
         QSimConfigGroup qSimConfigGroup = scenario.getConfig().qsim();
         qSimConfigGroup.setMainModes(mainModes);
-        qSimConfigGroup.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
-        qSimConfigGroup.setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
-        qSimConfigGroup.setEndTime(24*3600.);
+        qSimConfigGroup.setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+        qSimConfigGroup.setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
         qSimConfigGroup.setUsingFastCapacityUpdate(true);
 
         scenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn);
@@ -71,19 +70,19 @@ public class RunFDDataExample {
             vehicles.addVehicleType(bike);
         }
 
-        String myDir = FileUtils.SHARED_SVN+"/projects/mixedTraffic/triangularNetwork/runTest/holes/1lane/";
-        String outFolder ="/carBikePassing/";
+        String myDir = FileUtils.SHARED_SVN+"/projects/mixedTraffic/triangularNetwork/run316/kwm/1lane/";
+        String outFolder ="/car_2000_2/";
         scenario.getConfig().controler().setOutputDirectory(myDir+outFolder);
 
         // a container, used to store the link properties,
         // all sides of triangle will have these properties (identical links).
 
-        RaceTrackLinkProperties raceTrackLinkProperties = new RaceTrackLinkProperties(1000.0, 1600.0,
+        RaceTrackLinkProperties raceTrackLinkProperties = new RaceTrackLinkProperties(1000.0, 2000.0,
                 60.0/3.6, 1.0, new HashSet<>(mainModes));
 
 //        FundamentalDiagramDataGenerator fundamentalDiagramDataGenerator = new FundamentalDiagramDataGenerator( scenario );
         FundamentalDiagramDataGenerator fundamentalDiagramDataGenerator = new FundamentalDiagramDataGenerator(raceTrackLinkProperties, scenario);
-        fundamentalDiagramDataGenerator.setModalShareInPCU(new Double [] {1.0,1.0}); // equal modal split
+        fundamentalDiagramDataGenerator.setModalShareInPCU(new Double [] {1.0}); // equal modal split
         fundamentalDiagramDataGenerator.setReduceDataPointsByFactor(1);
         fundamentalDiagramDataGenerator.setIsWritingEventsFileForEachIteration(false);
         fundamentalDiagramDataGenerator.setIsPlottingDistribution(false);

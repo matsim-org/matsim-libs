@@ -52,7 +52,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 		// preProcessDijkstra.run(optimContext.network);
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-
+		
 		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
 				.createRoutingNetwork(optimContext.network);
 		router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility, optimContext.travelTime,
