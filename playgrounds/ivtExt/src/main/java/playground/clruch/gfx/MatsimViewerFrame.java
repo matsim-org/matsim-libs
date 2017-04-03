@@ -153,6 +153,13 @@ public class MatsimViewerFrame implements Runnable {
             panelSettings.add(jCheckBox);
         }
         {
+            matsimJMapViewer.virtualNetworkLayer.init();
+            final JCheckBox jCheckBox = new JCheckBox("cells");
+            jCheckBox.setSelected(matsimJMapViewer.virtualNetworkLayer.getDrawCells());
+            jCheckBox.addActionListener(e -> matsimJMapViewer.virtualNetworkLayer.setDrawCells(jCheckBox.isSelected()));
+            panelSettings.add(jCheckBox);
+        }
+        {
             final JCheckBox jCheckBox = new JCheckBox("tree");
             jCheckBox.addActionListener(e -> treeMap.setTreeVisible(jCheckBox.isSelected()));
             panelSettings.add(jCheckBox);
@@ -163,6 +170,7 @@ public class MatsimViewerFrame implements Runnable {
             jCheckBox.addActionListener(e -> getJMapViewer().setTileGridVisible(jCheckBox.isSelected()));
             panelSettings.add(jCheckBox);
         }
+
 
         getJMapViewer().addMouseListener(new MouseAdapter() {
             @Override
