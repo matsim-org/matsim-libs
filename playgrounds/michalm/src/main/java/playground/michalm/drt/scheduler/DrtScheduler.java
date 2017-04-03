@@ -205,8 +205,7 @@ public class DrtScheduler implements ScheduleInquiry {
 				if (currentTask.getDrtTaskType() == NDrtTaskType.STAY) {
 					stayTask = (NDrtStayTask)currentTask; // ongoing stay task
 					double now = timer.getTimeOfDay();
-					if (stayTask.getEndTime() > now) { // split stay task into two, so that a new stop/drive task can be
-														// inserted now
+					if (stayTask.getEndTime() > now) { // stop stay task; a new stop/drive task can be inserted now
 						stayTask.setEndTime(now);
 					}
 				} else {
@@ -222,7 +221,7 @@ public class DrtScheduler implements ScheduleInquiry {
 				request.setPickupTask(stopTask);
 
 				/// ADDED
-				////TODO this is copied, but has not been updated !!!!!!!!!!!!!!!
+				//// TODO this is copied, but has not been updated !!!!!!!!!!!!!!!
 				// add drive from pickup
 				if (insertion.pickupIdx == insertion.dropoffIdx) {
 					// remove drive i->i+1 (if there is one)
@@ -358,10 +357,6 @@ public class DrtScheduler implements ScheduleInquiry {
 			if (taskIdx + 2 == schedule.getTaskCount()) {// remove stay task from the end of schedule,
 				NDrtStayTask oldStayTask = (NDrtStayTask)schedule.getTasks().get(taskIdx + 1);
 				schedule.removeTask(oldStayTask);
-
-				// TODO this should be enough
-				// schedule.removeLastTask();
-
 			}
 			if (taskIdx + 1 == schedule.getTaskCount()) {
 
