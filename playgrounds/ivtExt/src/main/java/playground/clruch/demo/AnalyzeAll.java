@@ -6,6 +6,8 @@ import playground.clruch.gfx.MatsimStaticDatabase;
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
 import playground.clruch.net.StorageSupplier;
 
+import java.io.File;
+
 import static playground.clruch.demo.utils.NetworkLoader.loadNetwork;
 
 /**
@@ -17,6 +19,10 @@ public class AnalyzeAll {
     }
 
     public static void analyze(String[] args){
+
+        File config = new File(args[0]);
+        File data = new File(config.getParent(), "output/data");
+        data.mkdir();
 
         // load system network
         Network network = loadNetwork(args);
@@ -37,7 +43,7 @@ public class AnalyzeAll {
         CoreAnalysis coreAnalysis = new CoreAnalysis(storageSupplier);
         DistanceAnalysis distanceAnalysis = new DistanceAnalysis(storageSupplier);
         try {
-            coreAnalysis.analyze();
+            coreAnalysis.analyze(data.toString());
             distanceAnalysis.analzye();
         } catch (Exception e) {
             e.printStackTrace();

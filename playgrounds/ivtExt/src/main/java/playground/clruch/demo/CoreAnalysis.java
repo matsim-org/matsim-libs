@@ -14,17 +14,26 @@ import playground.clruch.export.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
+import playground.joel.data.DiagramCreator;
 
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
+    NavigableMap<Long, Double> quantile50 = new TreeMap<>();
+    NavigableMap<Long, Double> quantile95= new TreeMap<>();
+    NavigableMap<Long, Double> mean= new TreeMap<>();
+    NavigableMap<Long, Double> occupancy= new TreeMap<>();
+    double maxWait = 5000;
 
     CoreAnalysis(StorageSupplier storageSupplierIn){
         storageSupplier = storageSupplierIn;
@@ -32,7 +41,7 @@ class CoreAnalysis {
     }
 
 
-    public void analyze() throws Exception {
+    public void analyze(String directory) throws Exception {
 
 
         Tensor table = Tensors.empty();
@@ -91,6 +100,12 @@ class CoreAnalysis {
 
             table.append(row);
 
+            // create maps for diagram creation
+            quantile50.put(s.now, 1000.0); // waitTimeQuantile.get(1));
+            quantile95.put(s.now, 1500.0); // waitTimeQuantile.get(2));
+            mean.put(s.now, 2000.0); // waitTimeMean);
+            occupancy.put(s.now, 0.5); // occupancyRatio);
+
             if (s.now % 1000 == 0)
                 System.out.println(s.now);
 
@@ -99,6 +114,15 @@ class CoreAnalysis {
 
         Files.write(Paths.get("basicdemo.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
         Files.write(Paths.get("basicdemo.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+
+        DiagramCreator diagram = new DiagramCreator();
+        try{
+            File dir = new File(directory);
+            diagram.createDiagram(dir, "binnedWaitingTimes", "waiting times", quantile50, quantile95, mean, maxWait);
+            diagram.createDiagram(dir, "binnedTimeRatios", "occupancy ratio", occupancy);
+        }catch (Exception e){
+            System.out.println("Error creating the diagrams");
+        }
 
     }
 }
