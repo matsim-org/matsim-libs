@@ -52,30 +52,35 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
     private Queue<LaemmerSignal> regulationQueue = new LinkedList<>();
 
+    LaemmerConfig config;
+
     //TODO: Parametrize periods
-    private static final double DESIRED_PERIOD = 60.;
-    private static final double MAX_PERIOD = 120.;
+    private final double DESIRED_PERIOD;
+
+    private final double MAX_PERIOD;
 
     private List<LaemmerSignal> signals;
 
     private Request activeRequest = null;
-
     private LinkSensorManager sensorManager;
     private SignalsData signalsData;
+
     private Network network;
 
     private final double DEFAULT_INBETWEEN = 5;
-
     private double tIdle;
+
     private double flowSum;
 
 
     public final static class SignalControlProvider implements Provider<SignalController> {
+        private final LaemmerConfig config;
         private final LinkSensorManager sensorManager;
         private final SignalsData signalsData;
         private final Network network;
 
-        public SignalControlProvider(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+        public SignalControlProvider(LaemmerConfig config, LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+            this.config = config;
             this.sensorManager = sensorManager;
             this.signalsData = signalsData;
             this.network = network;
@@ -83,15 +88,18 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
         @Override
         public SignalController get() {
-            return new LaemmerSignalController(sensorManager, signalsData, network);
+            return new LaemmerSignalController(config, sensorManager, signalsData, network);
         }
     }
 
 
-    private LaemmerSignalController(LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+    private LaemmerSignalController(LaemmerConfig config, LinkSensorManager sensorManager, SignalsData signalsData, Network network) {
+        this.config = config;
         this.sensorManager = sensorManager;
         this.signalsData = signalsData;
         this.network = network;
+        DESIRED_PERIOD = config.getDESIRED_PERIOD();
+        MAX_PERIOD = config.getMAX_PERIOD();
     }
 
     @Override

@@ -21,6 +21,7 @@
  */
 package signals.laemmer.model;
 
+import com.google.inject.Provides;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
@@ -31,9 +32,6 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.ReplanningContext;
-
-import com.google.inject.Provides;
-
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
 import signals.CombinedSignalsModule;
@@ -48,10 +46,13 @@ import signals.CombinedSignalsModule;
 @Deprecated
 public class LaemmerSignalsModule extends AbstractModule{
 
+	private LaemmerConfig laemmerConfig = new LaemmerConfig();
+
 	@Override
 	public void install() {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			// signal specific bindings
+			bind(LaemmerConfig.class).toInstance(laemmerConfig);
 			bind(SignalModelFactory.class).to(LaemmerSignalModelFactory.class);
 			
 			// bindings for sensor based signals
@@ -73,5 +74,9 @@ public class LaemmerSignalsModule extends AbstractModule{
 		signalManager.resetModel(replanningContext.getIteration());		
 		return signalManager;
     }
+
+	public void setSylviaConfig(LaemmerConfig laemmerConfig) {
+		this.laemmerConfig = laemmerConfig;
+	}
 	
 }

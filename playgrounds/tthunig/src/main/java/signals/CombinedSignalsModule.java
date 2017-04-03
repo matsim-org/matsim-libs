@@ -40,6 +40,7 @@ import com.google.inject.Provides;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
+import signals.laemmer.model.LaemmerConfig;
 
 /**
  * Add this module if you want to simulate fixed-time signals, sylvia, laemmer, gershenson or the downstream signals or different control schemes together at different intersections (i.e. systems) in
@@ -52,6 +53,7 @@ public class CombinedSignalsModule extends AbstractModule {
 	
 	private boolean alwaysSameMobsimSeed = false;
 	private DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+	private LaemmerConfig laemmerConfig = new LaemmerConfig();
 	
 	@Override
 	public void install() {
@@ -68,6 +70,7 @@ public class CombinedSignalsModule extends AbstractModule {
 	
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			bind(DgSylviaConfig.class).toInstance(sylviaConfig);
+			bind(LaemmerConfig.class).toInstance(laemmerConfig);
 			bind(SignalModelFactory.class).to(CombinedSignalModelFactory.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
 			bind(LinkSensorManager.class);
@@ -95,5 +98,9 @@ public class CombinedSignalsModule extends AbstractModule {
 
 	public void setSylviaConfig(DgSylviaConfig sylviaConfig) {
 		this.sylviaConfig = sylviaConfig;
+	}
+
+	public void setLaemmerConfig(LaemmerConfig laemmerConfig) {
+		this.laemmerConfig = laemmerConfig;
 	}
 }

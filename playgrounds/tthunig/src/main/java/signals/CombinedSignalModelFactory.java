@@ -48,6 +48,7 @@ import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalPlan;
 import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import signals.downstreamSensor.DownstreamSignalController;
+import signals.laemmer.model.LaemmerConfig;
 import signals.laemmer.model.LaemmerSignalController;
 
 /**
@@ -65,13 +66,13 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 	private Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
 
 	@Inject
-	public CombinedSignalModelFactory(Scenario scenario, DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, JDEQSimConfigGroup jdeQSim) {
+	public CombinedSignalModelFactory(Scenario scenario, LaemmerConfig laemmerConfig, DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, JDEQSimConfigGroup jdeQSim) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
 		// prepare signal controller provider
 		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, signalsData));
 		signalControlProvider.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network, jdeQSim));
-		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(sensorManager, signalsData, network));
+		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(laemmerConfig, sensorManager, signalsData, network));
 		signalControlProvider.put(DgRoederGershensonSignalController.IDENTIFIER, new DgRoederGershensonSignalController.SignalControlProvider(sensorManager, scenario));
 	}
 
