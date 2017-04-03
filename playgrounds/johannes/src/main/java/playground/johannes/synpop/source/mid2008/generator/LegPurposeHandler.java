@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,71 +23,54 @@ import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author johannes
- *
  */
 public class LegPurposeHandler implements LegAttributeHandler {
 
-	@Override
-	public void handle(Segment leg, Map<String, String> attributes) {
-		String val = attributes.get(VariableNames.LEG_MAIN_TYPE);
+    private Map<String, String> mapping;
 
-		if(val.equalsIgnoreCase("1")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.WORK);
-			
-		} else if(val.equalsIgnoreCase("2")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.BUSINESS);
-			
-		} else if(val.equalsIgnoreCase("3")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.EDUCATION);
-			
-		} else if(val.equalsIgnoreCase("4")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.SHOP);
-			
-		} else if(val.equalsIgnoreCase("5")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.PRIVATE);
-			
-		} else if(val.equalsIgnoreCase("6")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.PICKDROP);
-			
-		} else if(val.equalsIgnoreCase("7")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.LEISURE);
-			
-			String subtype = attributes.get(VariableNames.LEG_SUB_TYPE);
-			if(subtype != null) {
-				if(subtype.equalsIgnoreCase("701")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.VISIT);
-				} else if(subtype.equalsIgnoreCase("702")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.CULTURE);
-				} else if(subtype.equalsIgnoreCase("703")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.CULTURE);
-				} else if(subtype.equalsIgnoreCase("701")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.SPORT);
-				} else if(subtype.equalsIgnoreCase("706")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.GASTRO);
-				} else if(subtype.equalsIgnoreCase("708")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.VACATIONS_SHORT);
-				} else if(subtype.equalsIgnoreCase("709")) {
-					leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.VACATIONS_LONG);
-				}
-			}
-			
-		} else if(val.equalsIgnoreCase("8")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.HOME);
-			
-		} else if(val.equalsIgnoreCase("31")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.EDUCATION);
-			
-		} else if(val.equalsIgnoreCase("32")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.EDUCATION);
-			
-		} else {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.MISC);
-		}
-		
-	}
+    public LegPurposeHandler(Map<String, String> mapping) {
+        this.mapping = mapping;
+    }
 
+    @Override
+    public void handle(Segment leg, Map<String, String> attributes) {
+        /*
+        First, assign the main purpose label. Fallback to "misc" if no mapping is available.
+         */
+        String mainTypeCode = attributes.get(VariableNames.LEG_MAIN_TYPE);
+        String mainTypeLabel = mapping.get(mainTypeCode);
+
+        if(mainTypeLabel == null) mainTypeLabel = ActivityTypes.MISC;
+        leg.setAttribute(CommonKeys.LEG_PURPOSE, mainTypeLabel);
+        /*
+        Second, override the main purpose if a sub purpose label is available.
+         */
+        String subTypeCode = attributes.get(VariableNames.LEG_SUB_TYPE);
+        String subTypeLabel = mapping.get(subTypeCode);
+
+        if(subTypeLabel != null) leg.setAttribute(CommonKeys.LEG_PURPOSE, subTypeLabel);
+    }
+
+
+    public static Map<String, String> loadMappingFromFile(String filename) throws IOException {
+        Map<String, String> mapping = new HashMap<>();
+
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        String line = reader.readLine();
+
+        while((line = reader.readLine()) != null) {
+            String tokens[] = line.split("\\s");
+            mapping.put(tokens[0], tokens[1]);
+        }
+
+        return mapping;
+    }
 }
