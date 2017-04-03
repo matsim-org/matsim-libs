@@ -35,13 +35,13 @@ public class MultiVehicleInsertionProblem {
 	}
 
 	public BestInsertion findBestInsertion(NDrtRequest drtRequest, VehicleData vData) {
-		return selectBestInsertion(drtRequest, vData);
+		return findBestInsertion(drtRequest, vData.getEntries());
 	}
 
-	private BestInsertion selectBestInsertion(NDrtRequest drtRequest, VehicleData vData) {
+	public BestInsertion findBestInsertion(NDrtRequest drtRequest, Iterable<Entry> vEntries) {
 		double minCost = Double.MAX_VALUE;
 		BestInsertion fleetBestInsertion = null;
-		for (Entry vEntry : vData.getEntries()) {
+		for (Entry vEntry : vEntries) {
 			BestInsertion bestInsertion = insertionProblem.findBestInsertion(drtRequest, vEntry);
 			if (bestInsertion.cost < minCost) {
 				fleetBestInsertion = bestInsertion;

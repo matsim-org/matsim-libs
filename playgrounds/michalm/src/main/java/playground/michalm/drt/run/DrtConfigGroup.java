@@ -47,7 +47,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
 	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
 	private static final String DRT_NET_MODE = "drtNetworkMode";
-	
+
+	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 
 	private double stopDuration = Double.NaN;// seconds
 	private double maxWaitTime = Double.NaN;// seconds
@@ -61,10 +62,12 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private String vehiclesFile = null;
 	private String transitStopFile = null;
 	private String drtNetworkMode = "car";
-	
+
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
-	
+
+	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
+
 	public enum DrtOperationalScheme {
 		stationbased, door2door
 	}
@@ -84,13 +87,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(VEHICLES_FILE,
 				"An XML file specifying the taxi fleet. The file format according to dvrp_vehicles_v1.dtd");
 		map.put(PLOT_CUST_STATS, "Writes out detailed DRT customer stats in each iteration.");
-		map.put(PLOT_VEH_STATS, "Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration.");
+		map.put(PLOT_VEH_STATS,
+				"Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration.");
 		map.put(DRT_NET_MODE, "DRT Network Mode. Default = car");
 		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased.");
-		map.put(MAXIMUM_WALK_DISTANCE,"Maximum walk distance to next stop location in stationbased system.");
+		map.put(MAXIMUM_WALK_DISTANCE, "Maximum walk distance to next stop location in stationbased system.");
 		map.put(TRANSIT_STOP_FILE, "Stop locations file (transit schedule format, but without lines) for DRT stops.");
 		map.put(ESTIMATED_DRT_SPEED, "Beeline Speed estimate for DRT. Used in analysis and in plans file");
-		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR, "Beeline distance factor for DRT. Used in analyis and in plans file.");
+		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR,
+				"Beeline distance factor for DRT. Used in analyis and in plans file.");
+		map.put(NUMBER_OF_THREADS,
+				"Number of threads used for parallel evaluation of request insertion into existing schedules. "
+						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
 		return map;
 	}
 
@@ -101,15 +109,16 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public String getDrtNetworkMode() {
 		return drtNetworkMode;
 	}
-	
+
 	/**
-	 * @param drtNetworkMode the drtNetworkMode to set
+	 * @param drtNetworkMode
+	 *            the drtNetworkMode to set
 	 */
 	@StringSetter(DRT_NET_MODE)
 	public void setDrtNetworkMode(String drtNetworkMode) {
 		this.drtNetworkMode = drtNetworkMode;
 	}
-	
+
 	@StringGetter(STOP_DURATION)
 	public double getStopDuration() {
 		return stopDuration;
@@ -183,7 +192,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public URL getTransitStopsFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.transitStopFile);
 	}
-	
+
 	/**
 	 * @param transitStopFile
 	 *            the transitStopFile to set
@@ -209,7 +218,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public void setMaximumWalkDistance(double maximumWalkDistance) {
 		this.maximumWalkDistance = maximumWalkDistance;
 	}
-	
+
 	/**
 	 * @return the estimatedSpeed
 	 */
@@ -243,6 +252,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public void setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
 		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
 	}
+
 	/**
 	 * @return the plotDetailedCustomerStats
 	 */
@@ -250,13 +260,16 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public boolean isPlotDetailedCustomerStats() {
 		return plotDetailedCustomerStats;
 	}
+
 	/**
-	 * @param plotDetailedCustomerStats the plotDetailedCustomerStats to set
+	 * @param plotDetailedCustomerStats
+	 *            the plotDetailedCustomerStats to set
 	 */
 	@StringSetter(PLOT_CUST_STATS)
 	public void setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
 		this.plotDetailedCustomerStats = plotDetailedCustomerStats;
 	}
+
 	/**
 	 * @return the plotDetailedVehicleStats
 	 */
@@ -264,11 +277,23 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public boolean isPlotDetailedVehicleStats() {
 		return plotDetailedVehicleStats;
 	}
+
 	/**
-	 * @param plotDetailedVehicleStats the plotDetailedVehicleStats to set
+	 * @param plotDetailedVehicleStats
+	 *            the plotDetailedVehicleStats to set
 	 */
 	@StringSetter(PLOT_VEH_STATS)
 	public void setPlotDetailedVehicleStats(boolean plotDetailedVehicleStats) {
 		this.plotDetailedVehicleStats = plotDetailedVehicleStats;
+	}
+
+	@StringGetter(NUMBER_OF_THREADS)
+	public int getNumberOfThreads() {
+		return numberOfThreads;
+	}
+
+	@StringSetter(NUMBER_OF_THREADS)
+	public void setNumberOfThreads(final int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
 	}
 }
