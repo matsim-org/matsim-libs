@@ -175,6 +175,7 @@ public class DynModeTripsAnalyser {
 
 	public static void analyseWaitTimes(String fileName, List<DynModeTrip> trips, int binsize_s) {
 		Collections.sort(trips);
+		if (trips.size()==0) return;
 		int startTime = ((int) (trips.get(0).getDepartureTime() / binsize_s)) * binsize_s;
 		int endTime = ((int) (trips.get(trips.size() - 1).getDepartureTime() / binsize_s) + binsize_s) * binsize_s;
 		Map<Double, List<DynModeTrip>> splitTrips = splitTripsIntoBins(trips, startTime, endTime, binsize_s);
