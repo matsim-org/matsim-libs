@@ -26,7 +26,6 @@ import playground.michalm.drt.data.NDrtRequest;
 import playground.michalm.drt.optimizer.VehicleData;
 import playground.michalm.drt.optimizer.VehicleData.Entry;
 import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
-import playground.michalm.util.ExecutorServices;
 
 /**
  * @author michalm
@@ -57,7 +56,7 @@ public class ParallelMultiVehicleInsertionProblem {
 		for (int i = 0; i < threads; i++) {
 			taskGroups[i] = new TaskGroup(singleInsertionProblems[i]);
 		}
-		executorService = ExecutorServices.createFixedThreadPoolExecutorService(threads);
+		executorService = Executors.newFixedThreadPool(threads);
 	}
 
 	public BestInsertion findBestInsertion(final NDrtRequest drtRequest, VehicleData vData) {
