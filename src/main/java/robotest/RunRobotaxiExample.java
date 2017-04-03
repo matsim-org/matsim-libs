@@ -52,7 +52,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 public class RunRobotaxiExample {
 
 	public static void main(String[] args) {
-		String configFile = "C:/Users/VWBIDGN/Documents/MATSim/Szenarien/run114/config.xml";
+		String configFile = "D:/Axer/MatsimDataStore/WOB_BS_Taxi_only/config.xml";
 		RunRobotaxiExample.run(configFile, false);
 	}
 
