@@ -57,9 +57,9 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(preProcessDijkstra)
 				.createRoutingNetwork(optimContext.network);
 
-		int threads = Runtime.getRuntime().availableProcessors();
-		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[threads];
-		for (int i = 0; i < threads; i++) {
+		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
+				.getNumberOfThreads()];
+		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
 			FastMultiNodeDijkstra router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility,
 					optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
 			BackwardFastMultiNodeDijkstra backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork,

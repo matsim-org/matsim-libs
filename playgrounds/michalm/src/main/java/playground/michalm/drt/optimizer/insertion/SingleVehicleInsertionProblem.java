@@ -89,7 +89,7 @@ public class SingleVehicleInsertionProblem {
 	//
 	// TODO maxWaitTime
 	// filter out stops which are visited too late
-	// 
+	//
 	private boolean[] considerPickupInsertion;
 	private boolean[] considerDropoffInsertion;
 
@@ -136,8 +136,8 @@ public class SingleVehicleInsertionProblem {
 		// calc backward dijkstra from dropoff to ends of all stops
 		// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located there)
 		links.set(0, drtRequest.getFromLink());
-		//TODO change the above line into the following one (after nulls are supported by OneToManyPathSearch)
-		//links.set(0, null);
+		// TODO change the above line into the following one (after nulls are supported by OneToManyPathSearch)
+		// links.set(0, null);
 		pathsToDropoff = backwardPathSearch.calcPaths(drtRequest.getToLink(), links, minDropoffTime);
 
 		// calc forward dijkstra from dropoff to beginnings of all stops
@@ -183,6 +183,12 @@ public class SingleVehicleInsertionProblem {
 			// replacing j -> j+1 with j -> dropoff -> j+1 ==> all following stop tasks are affected
 			// (==> calc delay for tasks j to n ==> calc cost)
 
+			// no checking the capacity constraints if i == j
+			if (j > i && // i -> pickup -> i+1 && j -> dropoff -> j+1
+					vEntry.stops.get(j - 1).outputOccupancy == vEntry.vehicle.getCapacity()) {
+				return;// stop iterating -- cannot insert dropoff after node j
+			}
+
 			if (j < stopCount && // has next stop
 					drtRequest.getToLink() == vEntry.stops.get(j).task.getLink()) {// next stop is at the same link
 				// optimize for cases where the dropoff is at the same link as stop j-1 (i.e. node j)
@@ -190,15 +196,8 @@ public class SingleVehicleInsertionProblem {
 				// ==> only evaluate insertion _after_ stop j (node j+1)
 				continue;
 			}
-			if (j == i) {// i -> pickup -> dropoff -> i+1
-				// no need to check the capacity constraints
-				addInsertion(drtRequest, vEntry, i, j);
-			} else if (j > i) {// i -> pickup -> i+1 && j -> dropoff -> j+1
-				if (vEntry.stops.get(j - 1).outputOccupancy == vEntry.vehicle.getCapacity()) {
-					return;// stop iterating -- cannot insert dropoff after node j
-				}
-				addInsertion(drtRequest, vEntry, i, j);
-			}
+
+			addInsertion(drtRequest, vEntry, i, j);
 		}
 	}
 
