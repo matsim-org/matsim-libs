@@ -43,6 +43,8 @@ public class RunDrtWithStops {
 	public static void run(String configFile, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
 				new OTFVisConfigGroup(), new DrtConfigGroup());
+		//	for debugging:
+		config.plans().setInputFile("singleDrtAgent.xml");
 		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		drt.setEstimatedBeelineDistanceFactor(1.3);
 		drt.setEstimatedSpeed(30/3.6);
