@@ -59,18 +59,39 @@ public class ParallelMultiVehicleInsertionProblem {
 		executorService = Executors.newFixedThreadPool(threads);
 	}
 
-	public BestInsertion findBestInsertion(final NDrtRequest drtRequest, VehicleData vData) {
-		int idx = 0;
-		for (Entry vEntry : vData.getEntries()) {
-			taskGroups[idx++ % threads].vEntries.add(vEntry);
+	public BestInsertion findBestInsertion(NDrtRequest drtRequest, VehicleData vData) {
+		divideTasksIntoGroups(vData);
+		return findBestInsertion(submitTasks(drtRequest));
+	}
+
+	private void divideTasksIntoGroups(VehicleData vData) {
+		Iterator<Entry> vEntryIter = vData.getEntries().iterator();
+		int div = vData.getSize() / threads;
+		int mod = vData.getSize() % threads;
+
+		for (int i = 0; i < threads; i++) {
+			int count = div + (i < mod ? 1 : 0);
+			for (int j = 0; j < count; j++) {
+				taskGroups[i].vEntries.add(vEntryIter.next());
+			}
 		}
 
+		if (vEntryIter.hasNext()) {
+			throw new RuntimeException();
+		}
+	}
+
+	private List<Future<BestInsertion>> submitTasks(NDrtRequest drtRequest) {
 		List<Future<BestInsertion>> bestInsertionFutures = new ArrayList<>();
 		for (int i = 0; i < threads; i++) {
 			final TaskGroup taskGroup = taskGroups[i];
 			bestInsertionFutures.add(executorService.submit(() -> taskGroup.findBestInsertion(drtRequest)));
 		}
 
+		return bestInsertionFutures;
+	}
+
+	private BestInsertion findBestInsertion(List<Future<BestInsertion>> bestInsertionFutures) {
 		double minCost = Double.MAX_VALUE;
 		BestInsertion fleetBestInsertion = null;
 		for (Future<BestInsertion> bestInsertionFuture : bestInsertionFutures) {
@@ -84,7 +105,6 @@ public class ParallelMultiVehicleInsertionProblem {
 				throw new RuntimeException(e);
 			}
 		}
-
 		return fleetBestInsertion;
 	}
 
