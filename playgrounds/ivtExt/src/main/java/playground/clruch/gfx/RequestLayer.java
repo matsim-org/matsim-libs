@@ -32,7 +32,7 @@ public class RequestLayer extends ViewerLayer {
     double maxWaitTime;
 
     @Override
-    public void perpareHeatmaps(SimulationObject ref) {
+    public void prepareHeatmaps(SimulationObject ref) {
         {
             requestHeatMap.clear();
             Map<Integer, List<RequestContainer>> map = ref.requests.stream() //

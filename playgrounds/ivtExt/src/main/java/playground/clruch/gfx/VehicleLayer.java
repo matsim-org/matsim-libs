@@ -21,6 +21,25 @@ public class VehicleLayer extends ViewerLayer {
     public VehicleLayer(MatsimJMapViewer matsimJMapViewer) {
         super(matsimJMapViewer);
     }
+    
+    @Override
+    public void prepareHeatmaps(SimulationObject ref) {
+        // {
+        // rebalanceHeatmap.clear();
+        // Map<Integer, List<VehicleContainer>> map = ref.vehicles.stream()
+        // .filter(v->v.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
+        // .collect(Collectors.groupingBy(r -> r.destinationLinkIndex));
+        //
+        // for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
+        // OsmLink osmLink = db.getOsmLink(entry.getKey());
+        // final int size = entry.getValue().size();
+        // for (int count = 0; count < size; ++count) {
+        // Coord coord = osmLink.getAt(count / (double) size);
+        // rebalanceHeatmap.addPoint(coord.getX(), coord.getY());
+        // }
+        // }
+        // }
+    }
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
