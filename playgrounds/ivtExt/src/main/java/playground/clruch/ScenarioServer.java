@@ -12,10 +12,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
 import playground.clruch.demo.AnalyzeAll;
-import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.gfx.MatsimStaticDatabase;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.SimulationServer;
@@ -58,7 +56,7 @@ public class ScenarioServer {
 
         SimulationServer.INSTANCE.stopAccepting();
 
-        //EventFileToProcessingXML.convert(dir);
+        // EventFileToProcessingXML.convert(dir);
         AnalyzeAll.analyze(args);
     }
 }

@@ -20,8 +20,8 @@ public enum ReferenceFrame {
             new WGS84toCH1903LV03Plus()), //
     ;
     // ---
-    CoordinateTransformation coords_toWGS84;
-    CoordinateTransformation coords_fromWGS84;
+    public final CoordinateTransformation coords_toWGS84;
+    public final CoordinateTransformation coords_fromWGS84;
 
     private ReferenceFrame(CoordinateTransformation c1, CoordinateTransformation c2) {
         this.coords_toWGS84 = c1;

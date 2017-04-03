@@ -22,23 +22,23 @@ public class MatsimStaticDatabase {
 
     public static void initializeSingletonInstance( //
             Network network, //
-            ReferenceFrame coordinatePair) {
+            ReferenceFrame referenceFrame) {
 
         NavigableMap<String, OsmLink> linkMap = new TreeMap<>();
 
-        CoordinateTransformation coordinateTransformation = coordinatePair.coords_toWGS84;
+        CoordinateTransformation coords_toWGS84 = referenceFrame.coords_toWGS84;
 
         for (Link link : network.getLinks().values()) {
             OsmLink osmLink = new OsmLink(link);
 
-            osmLink.coords[0] = coordinateTransformation.transform(link.getFromNode().getCoord());
-            osmLink.coords[1] = coordinateTransformation.transform(link.getToNode().getCoord());
+            osmLink.coords[0] = coords_toWGS84.transform(link.getFromNode().getCoord());
+            osmLink.coords[1] = coords_toWGS84.transform(link.getToNode().getCoord());
 
             linkMap.put(link.getId().toString(), osmLink);
         }
 
         INSTANCE = new MatsimStaticDatabase( //
-                coordinatePair, //
+                referenceFrame, //
                 linkMap);
     }
 
@@ -50,6 +50,7 @@ public class MatsimStaticDatabase {
     private final Map<Link, Integer> linkInteger = new HashMap<>();
 
     public final CoordinateTransformation coordinateTransformation;
+    public final ReferenceFrame referenceFrame;
 
     /**
      * rapid lookup from Viewer
@@ -59,10 +60,11 @@ public class MatsimStaticDatabase {
     private final IdIntegerDatabase requestIdIntegerDatabase = new IdIntegerDatabase();
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
 
-    private MatsimStaticDatabase(//
-            ReferenceFrame coordinatePair, //
+    private MatsimStaticDatabase( //
+            ReferenceFrame referenceFrame, //
             NavigableMap<String, OsmLink> linkMap) {
-        this.coordinateTransformation = coordinatePair.coords_toWGS84;
+        this.coordinateTransformation = referenceFrame.coords_toWGS84;
+        this.referenceFrame = referenceFrame;
         list = new ArrayList<>(linkMap.values());
         int index = 0;
         for (OsmLink osmLink : list) {
