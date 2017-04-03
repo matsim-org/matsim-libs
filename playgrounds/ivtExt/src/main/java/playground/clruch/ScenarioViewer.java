@@ -10,7 +10,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03PlustoWGS84;
 
 import playground.clruch.gfx.MatsimJMapViewer;
 import playground.clruch.gfx.MatsimStaticDatabase;
@@ -52,7 +51,7 @@ public class ScenarioViewer {
         System.out.println(bb[0] + " " + bb[1] + " " + bb[2] + " " + bb[3]);
 
         CoordinateTransformation ct;
-        //ct = new CH1903LV03PlustoWGS84(); // <- switzerland
+        // ct = new CH1903LV03PlustoWGS84(); // <- switzerland
         ct = new SiouxFallstoWGS84(); // <- sioux falls
 
         MatsimStaticDatabase.initializeSingletonInstance(network, ct);
@@ -63,7 +62,7 @@ public class ScenarioViewer {
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);
 
         // basel
-        //matsimViewer.setDisplayPosition(47.55814, 7.58769, 11);
+        // matsimViewer.setDisplayPosition(47.55814, 7.58769, 11);
 
         // sioux falls
         // TODO obtain center from db

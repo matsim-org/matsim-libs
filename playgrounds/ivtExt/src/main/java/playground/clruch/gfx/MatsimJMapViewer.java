@@ -7,7 +7,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,8 +16,6 @@ import javax.swing.JLabel;
 import org.matsim.api.core.v01.Coord;
 
 import ch.ethz.idsc.tensor.Tensor;
-import playground.clruch.ResourceLocator;
-import playground.clruch.gheat.graphics.ThemeManager;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.GraphicsUtil;
@@ -57,13 +54,7 @@ public class MatsimJMapViewer extends JMapViewer {
         matsimHeatmaps.add(requestLayer.requestDestMap);
         viewerLayers.add(vehicleLayer);
 
-        try {
-            ThemeManager.init(ResourceLocator.INSTANCE.gheatDirectory.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-//        pc = PointCloud.fromCsvFile(new File("vN_90vS_L1/voronoi_BoundaryPoints.csv"));
+        // pc = PointCloud.fromCsvFile(new File("vN_90vS_L1/voronoi_BoundaryPoints.csv"));
         pc = null;
     }
 

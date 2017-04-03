@@ -7,14 +7,17 @@ public class CommonPalettes {
     public static ColorScheme createOrange() {
         ColorScheme colorScheme = new ColorScheme();
         for (int c = 0; c < 256; ++c)
-            colorScheme.set(c, new Color(255, 128 + c / 2, c));
+            colorScheme.set(c, new Hue(.11111, 1 - c / 256., 1, 1 - c / 256.).rgba);
+        // colorScheme.set(c, new Color(255, 128 + c / 2, c));
+        colorScheme.set(255, new Color(0, 0, 0, 0));
         return colorScheme;
     }
 
     public static ColorScheme createGreen() {
         ColorScheme colorScheme = new ColorScheme();
         for (int c = 0; c < 256; ++c)
-            colorScheme.set(c, new Hue(.33333, 1 - c / 256., 1, 1).rgba);
+            colorScheme.set(c, new Hue(.33333, 1 - c / 256., 1, 1 - c / 256.).rgba);
+        colorScheme.set(255, new Color(0, 0, 0, 0));
         return colorScheme;
     }
 
