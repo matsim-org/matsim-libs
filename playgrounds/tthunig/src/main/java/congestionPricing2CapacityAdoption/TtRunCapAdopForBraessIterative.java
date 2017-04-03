@@ -68,9 +68,9 @@ import utils.ModifyPopulation;
  * @author tthunig
  *
  */
-public class TtRunCapAdopForBraess {
+public class TtRunCapAdopForBraessIterative {
 	
-	private static final Logger LOG = Logger.getLogger(TtRunCapAdopForBraess.class);
+	private static final Logger LOG = Logger.getLogger(TtRunCapAdopForBraessIterative.class);
 	
 	private static final int flowValueStepSize = 2;
 	private static final int iterationNumberPerStep = 100;
