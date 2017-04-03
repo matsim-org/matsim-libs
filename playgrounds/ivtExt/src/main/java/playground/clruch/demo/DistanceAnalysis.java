@@ -45,13 +45,13 @@ class DistanceAnalysis {
 
         {
             Tensor table = list.stream().map(vs -> vs.distanceTotal).reduce(Tensor::add).get();
-            Files.write(Paths.get("distanceTotal.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-            Files.write(Paths.get("distanceTotal.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+            Files.write(Paths.get("output/data/distanceTotal.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
+            Files.write(Paths.get("output/data/distanceTotal.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
         }
         {
             Tensor table = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get();
-            Files.write(Paths.get("distanceWithCustomer.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-            Files.write(Paths.get("distanceWithCustomer.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+            Files.write(Paths.get("output/data/distanceWithCustomer.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
+            Files.write(Paths.get("output/data/distanceWithCustomer.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
         }
     }
 }

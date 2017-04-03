@@ -112,8 +112,8 @@ class CoreAnalysis {
         }
 
 
-        Files.write(Paths.get("basicdemo.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-        Files.write(Paths.get("basicdemo.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+        Files.write(Paths.get("output/data/basicdemo.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
+        Files.write(Paths.get("output/data/basicdemo.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
 
         DiagramCreator diagram = new DiagramCreator();
         try{
