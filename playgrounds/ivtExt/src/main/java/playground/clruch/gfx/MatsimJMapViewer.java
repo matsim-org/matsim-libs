@@ -54,7 +54,7 @@ public class MatsimJMapViewer extends JMapViewer {
         viewerLayers.add(vehicleLayer);
         viewerLayers.add(virtualNetworkLayer);
 
-        // 
+        //
         // pc = null;
     }
 
@@ -161,6 +161,11 @@ public class MatsimJMapViewer extends JMapViewer {
 
     public void setSimulationObject(SimulationObject simulationObject) {
         this.simulationObject = simulationObject;
+        repaint();
+    }
+
+    public void setMapAlphaCover(int alpha) {
+        mapAlphaCover = alpha;
         repaint();
     }
 

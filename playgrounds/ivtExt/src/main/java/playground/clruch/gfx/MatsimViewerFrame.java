@@ -6,8 +6,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -80,7 +78,13 @@ public class MatsimViewerFrame implements Runnable {
 
         panelControls.add(new MatsimToggleButton(matsimJMapViewer));
         JMapTileSelector.install(panelControls, matsimJMapViewer);
-
+        {
+            SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
+            spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 255);
+            spinnerLabel.setValueSafe(matsimJMapViewer.mapAlphaCover);
+            spinnerLabel.addSpinnerListener(i -> matsimJMapViewer.setMapAlphaCover(i));
+            spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "alpha cover");
+        }
         {
             StorageSupplier storageSupplier = StorageSupplier.getDefault();
             final int size = storageSupplier.size();
@@ -170,7 +174,6 @@ public class MatsimViewerFrame implements Runnable {
             jCheckBox.addActionListener(e -> getJMapViewer().setTileGridVisible(jCheckBox.isSelected()));
             panelSettings.add(jCheckBox);
         }
-
 
         getJMapViewer().addMouseListener(new MouseAdapter() {
             @Override

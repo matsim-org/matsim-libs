@@ -76,8 +76,6 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
 
     protected transient TileController tileController;
 
-    // protected DataManager dataManager; // jan added this
-
     protected List<MatsimHeatMap> matsimHeatmaps = new ArrayList<>();
 
     /**
@@ -90,11 +88,13 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
      * Current zoom level
      */
     protected int zoom;
+    
+    public int mapAlphaCover = 128;
 
     protected JSlider zoomSlider;
     protected JButton zoomInButton;
     protected JButton zoomOutButton;
-
+    
     /**
      * Apparence of zoom controls.
      */
@@ -668,8 +668,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                             tile.paint(g, posx, posy); // , tilesize, tilesize
 
                             {
-                                Color color = new Color(255, 255, 255, 128);
-                                g.setColor(color);
+                                g.setColor(new Color(255, 255, 255, mapAlphaCover));
                                 g.fillRect(posx, posy, 256, 256);
                             }
 
