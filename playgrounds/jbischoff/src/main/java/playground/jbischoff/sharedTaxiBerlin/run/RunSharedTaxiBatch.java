@@ -42,8 +42,8 @@ public class RunSharedTaxiBatch {
 
 	public static void main(String[] args) {
 
-		int capacity = 6;
-		for (int i = 50; i<=150; i=i+25){
+		int capacity = 1;
+		for (int i = 100; i<150; i=i+25){
 			String runId = "v"+i+"c"+capacity;
 			String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
 			Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),

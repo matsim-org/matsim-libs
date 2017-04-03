@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -134,7 +135,9 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 				trip.setTravelDistance(distance);
 				trip.setArrivalTime(event.getTime());
 				trip.setToLink(event.getLinkId());
-				trip.setTravelTime(event.getTime()-trip.getDepartureTime()+trip.getWaitTime());
+				Coord toCoord = this.network.getLinks().get(event.getLinkId()).getCoord();
+				trip.setToCoord(toCoord);
+				trip.setInVehicleTravelTime(event.getTime()-trip.getDepartureTime()-trip.getWaitTime());
 			}
 			else {
 				throw new NullPointerException("Arrival without departure?");
@@ -163,7 +166,8 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 			double departureTime = this.departureTimes.remove(event.getPersonId());
 			double waitTime = event.getTime() - departureTime;
 			Id<Link> departureLink = this.departureLinks.remove(event.getPersonId());
-			DynModeTrip trip = new DynModeTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink, waitTime);
+			Coord departureCoord = this.network.getLinks().get(departureLink).getCoord();
+			DynModeTrip trip = new DynModeTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink, departureCoord, waitTime);
 			this.drtTrips.add(trip);
 			this.currentTrips.put(event.getPersonId(), trip);
 			this.inVehicleDistance.get(event.getVehicleId()).put(event.getPersonId(), new MutableDouble());

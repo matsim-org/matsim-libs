@@ -104,6 +104,7 @@ public class DynModeTripsAnalyser {
 	    format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 	    format.setMinimumIntegerDigits(1);
 	    format.setMaximumFractionDigits(2);
+	    format.setGroupingUsed(false);
 		
 	    for (DynModeTrip trip : trips) {
 			waitStats.addValue(trip.getWaitTime());
