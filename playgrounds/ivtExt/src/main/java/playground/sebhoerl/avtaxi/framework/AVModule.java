@@ -107,8 +107,12 @@ public class AVModule extends AbstractModule {
         bind(HungarianDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), HungarianDispatcher.class.getSimpleName()).to(HungarianDispatcher.Factory.class);
 
-        bind(DFRDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
+
+        bind(DFRDispatcher_v0.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher_v0.class.getSimpleName()).to(DFRDispatcher_v0.Factory.class);
+
+        bind(DFRDispatcher_v1.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher_v1.class.getSimpleName()).to(DFRDispatcher_v1.Factory.class);
 
         /** dispatchers for PartitionedDispatcher */
         bind(ConsensusDispatcherDFR.Factory.class);
