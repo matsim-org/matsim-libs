@@ -15,7 +15,6 @@ import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
-import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.GraphicsUtil;
@@ -31,15 +30,14 @@ public class MatsimJMapViewer extends JMapViewer {
     public final LinkLayer linkLayer;
     public final RequestLayer requestLayer;
     public final VehicleLayer vehicleLayer;
+    public final VirtualNetworkLayer virtualNetworkLayer;
 
     private final List<ViewerLayer> viewerLayers = new ArrayList<>();
-    private PointCloud pc = null;
     private final List<InfoString> infoStrings = new LinkedList<>();
     private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
     private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
 
     public JLabel jLabel = new JLabel(" ");
-    // MatsimHeatmap rebalanceHeatmap = new MatsimHeatmap("classic", 128);
 
     public MatsimJMapViewer(MatsimStaticDatabase db) {
         this.db = db;
@@ -47,15 +45,17 @@ public class MatsimJMapViewer extends JMapViewer {
         linkLayer = new LinkLayer(this);
         requestLayer = new RequestLayer(this);
         vehicleLayer = new VehicleLayer(this);
+        virtualNetworkLayer = new VirtualNetworkLayer(this);
 
         viewerLayers.add(linkLayer);
         viewerLayers.add(requestLayer);
         matsimHeatmaps.add(requestLayer.requestHeatMap);
         matsimHeatmaps.add(requestLayer.requestDestMap);
         viewerLayers.add(vehicleLayer);
+        viewerLayers.add(virtualNetworkLayer);
 
-        // pc = PointCloud.fromCsvFile(new File("vN_90vS_L1/voronoi_BoundaryPoints.csv"));
-        pc = null;
+        // 
+        // pc = null;
     }
 
     /**
@@ -99,21 +99,6 @@ public class MatsimJMapViewer extends JMapViewer {
         final Dimension dimension = getSize();
         // graphics.setColor(new Color(255, 255, 255, alpha));
         // graphics.fillRect(0, 0, dimension.width, dimension.height);
-
-        if (pc != null) {
-            graphics.setColor(new Color(255, 153, 0, 128));
-            for (Tensor pnt : pc.tensor) {
-                Coord coord = MatsimStaticDatabase.INSTANCE.coordinateTransformation.transform(new Coord( //
-                        pnt.Get(0).number().doubleValue(), //
-                        pnt.Get(1).number().doubleValue() //
-                ));
-
-                Point point = getMapPosition(coord);
-                if (point != null)
-                    graphics.drawRect(point.x, point.y, 1, 1);
-
-            }
-        }
 
         if (ref != null) {
 

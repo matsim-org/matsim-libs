@@ -14,6 +14,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import playground.clruch.gfx.MatsimJMapViewer;
 import playground.clruch.gfx.MatsimStaticDatabase;
 import playground.clruch.gfx.MatsimViewerFrame;
+import playground.clruch.gfx.PointCloud;
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
@@ -57,6 +58,9 @@ public class ScenarioViewer {
         MatsimStaticDatabase.initializeSingletonInstance(network, ct);
 
         MatsimJMapViewer matsimJMapViewer = new MatsimJMapViewer(MatsimStaticDatabase.INSTANCE);
+        // this is optional and should not cause problems if file does not exist.
+        // temporary solution
+        matsimJMapViewer.virtualNetworkLayer.pc = PointCloud.fromCsvFile(new File("vN_90vS_L1/voronoi_BoundaryPoints.csv"));
         matsimJMapViewer.setTileGridVisible(false);
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);
