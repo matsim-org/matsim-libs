@@ -22,9 +22,11 @@ public class MatsimStaticDatabase {
 
     public static void initializeSingletonInstance( //
             Network network, //
-            CoordinateTransformation coordinateTransformation) {
+            ReferenceFrame coordinatePair) {
 
         NavigableMap<String, OsmLink> linkMap = new TreeMap<>();
+
+        CoordinateTransformation coordinateTransformation = coordinatePair.coords_toWGS84;
 
         for (Link link : network.getLinks().values()) {
             OsmLink osmLink = new OsmLink(link);
@@ -36,7 +38,7 @@ public class MatsimStaticDatabase {
         }
 
         INSTANCE = new MatsimStaticDatabase( //
-                coordinateTransformation, //
+                coordinatePair, //
                 linkMap);
     }
 
@@ -58,9 +60,9 @@ public class MatsimStaticDatabase {
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
 
     private MatsimStaticDatabase(//
-            CoordinateTransformation coordinateTransformation, //
+            ReferenceFrame coordinatePair, //
             NavigableMap<String, OsmLink> linkMap) {
-        this.coordinateTransformation = coordinateTransformation;
+        this.coordinateTransformation = coordinatePair.coords_toWGS84;
         list = new ArrayList<>(linkMap.values());
         int index = 0;
         for (OsmLink osmLink : list) {

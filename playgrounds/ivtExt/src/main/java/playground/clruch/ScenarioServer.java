@@ -17,6 +17,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import playground.clruch.demo.AnalyzeAll;
 import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.gfx.MatsimStaticDatabase;
+import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.prep.TheApocalypse;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
@@ -44,7 +45,7 @@ public class ScenarioServer {
         final Population population = scenario.getPopulation();
 
         MatsimStaticDatabase.initializeSingletonInstance( //
-                scenario.getNetwork(), new IdentityTransformation());
+                scenario.getNetwork(), ReferenceFrame.IDENTITY);
 
         TheApocalypse.decimatesThe(population).toNoMoreThan(12000).people();
 

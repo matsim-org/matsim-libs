@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import org.matsim.api.core.v01.Coord;
 
 import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.GraphicsUtil;
 
@@ -76,8 +77,15 @@ public class MatsimJMapViewer extends JMapViewer {
             viewerLayers.forEach(viewerLayer -> viewerLayer.prepareHeatmaps(ref));
 
         super.paintComponent(g);
+
         final Graphics2D graphics = (Graphics2D) g;
         final Dimension dimension = getSize();
+
+        {
+
+            ICoordinate ic = getPosition(new Point(0, 0));
+            System.out.println(ic.getLat() + " " + ic.getLon());
+        }
 
         if (ref != null) {
 
