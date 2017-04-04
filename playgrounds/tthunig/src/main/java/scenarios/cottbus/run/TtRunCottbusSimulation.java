@@ -101,7 +101,7 @@ public class TtRunCottbusSimulation {
 
 	private static final Logger LOG = Logger.getLogger(TtRunCottbusSimulation.class);
 	
-	private final static String RUN_ID = "3097";
+	private final static String RUN_ID = "3098";
 	
 	private final static NetworkType NETWORK_TYPE = NetworkType.V1;
 	public enum NetworkType {
@@ -132,7 +132,7 @@ public class TtRunCottbusSimulation {
 	}
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.CORDON_RING;
+	private static final PricingType PRICING_TYPE = PricingType.CORDON_INNERCITY;
 	private enum PricingType {
 		NONE, CP_V3, CP_V4, CP_V7, CP_V8, CP_V9, CP_V10, FLOWBASED, CORDON_INNERCITY, CORDON_RING
 	}
@@ -410,8 +410,8 @@ public class TtRunCottbusSimulation {
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.controler().setCreateGraphs(true);
 
-		config.controler().setWriteEventsInterval(config.controler().getLastIteration()/2);
-		config.controler().setWritePlansInterval(config.controler().getLastIteration()/2);
+		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
+		config.controler().setWritePlansInterval(config.controler().getLastIteration());
 
 		// define activity types
 		{
