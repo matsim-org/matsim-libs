@@ -1,5 +1,6 @@
 package playground.joel.data;
 
+import ch.ethz.idsc.tensor.Tensor;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -53,8 +54,8 @@ public class DiagramCreator {
         timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
         timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
 
-        int width = 800; /* Width of the image */
-        int height = 600; /* Height of the image */
+        int width = 1200; /* Width of the image */
+        int height = 900; /* Height of the image */
         File timeChart = new File( directory,fileTitle + ".png" );
         ChartUtilities.saveChartAsPNG( timeChart, timechart, width, height );
         GlobalAssert.that(timeChart.exists() && !timeChart.isDirectory());
@@ -62,44 +63,29 @@ public class DiagramCreator {
     }
 
     public static void createDiagram(File directory, String fileTitle, String diagramTitle,
-                                     NavigableMap<Long, Double> map1, NavigableMap<Long, Double> map2, NavigableMap<Long, Double> map3, Double maxWait) throws Exception
+                                     Tensor time, Tensor values) throws Exception
     {
         final TimeSeriesCollection dataset = new TimeSeriesCollection();
-        final TimeSeries series1 = new TimeSeries( "time series 1");
-        final TimeSeries series2 = new TimeSeries( "time series 2");
-        final TimeSeries series3 = new TimeSeries( "time series 3");
+        for (int i = 0; i < values.length(); i++) {
+            final TimeSeries series = new TimeSeries("time series " + i);
+            for (int j = 0; j < time.length(); j++) {
+                Second daytime = toTime(time.Get(j).number().doubleValue());
 
-        GlobalAssert.that((map1.keySet().size() == map2.keySet().size()) && (map1.keySet().size() == map3.keySet().size()));
-        for(Long key: map1.keySet()) {
-            try
-            {
-                Second time = toTime(key.doubleValue());
+                series.add(daytime, values.Get(i,j).number().doubleValue());
 
-                series1.add(time, map1.get(key));
-                GlobalAssert.that(!series1.isEmpty());
-                series2.add(time, map2.get(key));
-                GlobalAssert.that(!series2.isEmpty());
-                series3.add(time, map3.get(key));
-                GlobalAssert.that(!series3.isEmpty());
-
-                dataset.addSeries(series1);
-                dataset.addSeries(series2);
-                dataset.addSeries(series3);
             }
-            catch ( SeriesException e  )
-            {
-                System.err.println( "Error adding to series" );
-            }
+            dataset.addSeries(series);
         }
 
+
         JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Time", "Value", dataset,false,false,false);
-        timechart.getXYPlot().getRangeAxis().setRange(0, maxWait);
+        //timechart.getXYPlot().getRangeAxis().setRange(0, maxWait);
         timechart.getPlot().setBackgroundPaint(Color.white);
         timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
         timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
 
-        int width = 800; /* Width of the image */
-        int height = 600; /* Height of the image */
+        int width = 1200; /* Width of the image */
+        int height = 900; /* Height of the image */
         File timeChart = new File( directory,fileTitle + ".png" );
         ChartUtilities.saveChartAsPNG( timeChart, timechart, width, height );
         GlobalAssert.that(timeChart.exists() && !timeChart.isDirectory());

@@ -29,10 +29,6 @@ import java.util.stream.Collectors;
 class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
-    NavigableMap<Long, Double> quantile50 = new TreeMap<>();
-    NavigableMap<Long, Double> quantile95= new TreeMap<>();
-    NavigableMap<Long, Double> mean= new TreeMap<>();
-    NavigableMap<Long, Double> occupancy= new TreeMap<>();
     double maxWait = 5000;
 
     CoreAnalysis(StorageSupplier storageSupplierIn){
@@ -68,7 +64,7 @@ class CoreAnalysis {
                     waitTimeMean = Mean.of(submission);
                 } else {
                     waitTimeQuantile = Array.zeros(3);
-                    waitTimeMean = Array.zeros(1);
+                    waitTimeMean = Mean.of(Array.zeros(1));
                 }
             }
 
@@ -100,29 +96,23 @@ class CoreAnalysis {
 
             table.append(row);
 
-            // create maps for diagram creation
-            quantile50.put(s.now, waitTimeQuantile.Get(1).number().doubleValue()); // waitTimeQuantile.get(1));
-            quantile95.put(s.now, waitTimeQuantile.Get(2).number().doubleValue()); // waitTimeQuantile.get(2));
-            mean.put(s.now, waitTimeMean.Get().number().doubleValue()); // waitTimeMean);
-            occupancy.put(s.now, occupancyRatio.number().doubleValue()); // occupancyRatio);
-
             if (s.now % 1000 == 0)
                 System.out.println(s.now);
 
         }
 
+        AnalyzeAll.saveFile(table, "basicDemo");
 
-        Files.write(Paths.get("output/data/basicdemo.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-        Files.write(Paths.get("output/data/basicdemo.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
-
+/*
         DiagramCreator diagram = new DiagramCreator();
         try{
             File dir = new File(directory);
-            diagram.createDiagram(dir, "binnedWaitingTimes", "waiting times", quantile50, quantile95, mean, maxWait);
-            diagram.createDiagram(dir, "binnedTimeRatios", "occupancy ratio", occupancy);
+            DiagramCreator.createDiagram(dir, "binnedWaitingTimes", "waiting times", quantile50, quantile95, mean, maxWait);
+            DiagramCreator.createDiagram(dir, "binnedTimeRatios", "occupancy ratio", occupancy);
         }catch (Exception e){
             System.out.println("Error creating the diagrams");
         }
+        */
 
     }
 }

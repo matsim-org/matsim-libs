@@ -1,5 +1,9 @@
 package playground.clruch.demo;
 
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.io.CsvFormat;
+import ch.ethz.idsc.tensor.io.MathematicaFormat;
+import ch.ethz.idsc.tensor.io.MatlabExport;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -9,6 +13,8 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static playground.clruch.demo.utils.NetworkLoader.loadNetwork;
 
@@ -18,6 +24,12 @@ import static playground.clruch.demo.utils.NetworkLoader.loadNetwork;
 public class AnalyzeAll {
     public static void main(String[] args) throws Exception {
         analyze(args);
+    }
+
+    static void saveFile(Tensor table, String name) throws Exception {
+        Files.write(Paths.get("output/data/" + name + ".csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
+        Files.write(Paths.get("output/data/" + name + ".mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+        Files.write(Paths.get("output/data/" + name + ".m"), (Iterable<String>) MatlabExport.of(table)::iterator);
     }
 
     public static void analyze(String[] args){

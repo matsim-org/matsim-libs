@@ -4,6 +4,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.MathematicaFormat;
+import ch.ethz.idsc.tensor.io.MatlabExport;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
@@ -24,12 +25,6 @@ class DistanceAnalysis {
     DistanceAnalysis(StorageSupplier storageSupplierIn) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
-    }
-
-    static void saveFile(Tensor table, String name) throws Exception {
-        Files.write(Paths.get("output/data/" + name + ".csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-        Files.write(Paths.get("output/data/" + name + ".mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
-        
     }
 
     public void analzye() throws Exception {
@@ -57,9 +52,9 @@ class DistanceAnalysis {
         Tensor table2 = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get();
         Tensor table3 = table1.map(InvertUnlessZero.function).pmul(table2);
         {
-            saveFile(table1, "distanceTotal");
-            saveFile(table2, "distanceWithCustomer");
-            saveFile(table3, "distanceRatio");
+            AnalyzeAll.saveFile(table1, "distanceTotal");
+            AnalyzeAll.saveFile(table2, "distanceWithCustomer");
+            AnalyzeAll.saveFile(table3, "distanceRatio");
         }
     }
 }
