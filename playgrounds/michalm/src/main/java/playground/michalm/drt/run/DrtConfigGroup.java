@@ -22,6 +22,7 @@ package playground.michalm.drt.run;
 import java.net.URL;
 import java.util.Map;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.*;
 
 public class DrtConfigGroup extends ReflectiveConfigGroup {
@@ -61,7 +62,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	private String vehiclesFile = null;
 	private String transitStopFile = null;
-	private String drtNetworkMode = "car";
+	private String drtNetworkMode = TransportMode.car;
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
