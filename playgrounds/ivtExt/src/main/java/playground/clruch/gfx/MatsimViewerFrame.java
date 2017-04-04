@@ -211,6 +211,8 @@ public class MatsimViewerFrame implements Runnable {
     }
 
     public void setDisplayPosition(Coord coord, int zoom) {
+        // double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
+        // System.out.println(bb[0] + " " + bb[1] + " " + bb[2] + " " + bb[3]);
         setDisplayPosition(coord.getY(), coord.getX(), zoom);
     }
 

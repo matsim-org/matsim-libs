@@ -1,4 +1,4 @@
-package playground.clruch.gfx;
+package playground.clruch.net;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,9 +16,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.red.Mean;
-import playground.clruch.net.CoordUtil;
-import playground.clruch.net.IdIntegerDatabase;
-import playground.clruch.net.OsmLink;
+import playground.clruch.gfx.ReferenceFrame;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
@@ -62,6 +60,8 @@ public class MatsimStaticDatabase {
     private final IdIntegerDatabase requestIdIntegerDatabase = new IdIntegerDatabase();
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
 
+    private Integer iteration;
+
     private MatsimStaticDatabase( //
             ReferenceFrame referenceFrame, //
             NavigableMap<String, OsmLink> linkMap) {
@@ -72,6 +72,13 @@ public class MatsimStaticDatabase {
             linkInteger.put(osmLink.link, index);
             ++index;
         }
+    }
+
+    public SimulationObject createSimulationObject(long now) {
+        SimulationObject simulationObject = new SimulationObject();
+        simulationObject.iteration = iteration;
+        simulationObject.now = now;
+        return simulationObject;
     }
 
     public int getLinkIndex(Link link) {
@@ -103,5 +110,10 @@ public class MatsimStaticDatabase {
 
     public int getVehicleIndex(AVVehicle avVehicle) {
         return vehicleIdIntegerDatabase.getId(avVehicle.getId().toString());
+    }
+
+    public void setIteration(Integer iteration) {
+        this.iteration = iteration;
+        System.out.println("set iteration=" + iteration);
     }
 }

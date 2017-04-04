@@ -21,7 +21,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.export.AVStatus;
-import playground.clruch.gfx.MatsimStaticDatabase;
+import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationClientSet;
 import playground.clruch.net.SimulationObject;
@@ -247,9 +247,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
             final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
 
-            final SimulationObject simulationObject = new SimulationObject();
+            final SimulationObject simulationObject = db.createSimulationObject(round_now);
             simulationObject.infoLine = getInfoLine();
-            simulationObject.now = round_now;
             simulationObject.total_matchedRequests = total_matchedRequests;
             {
                 // REQUESTS
