@@ -72,7 +72,7 @@ public class PopulationAnalyzer {
         Load GIS data...
          */
         DataPool dataPool = new DataPool();
-        dataPool.register(new FacilityDataLoader(configGroup.getValue("facilities"), random), FacilityDataLoader.KEY);
+        dataPool.register(new FacilityDataLoader(configGroup.getValue("facilities"), null, random), FacilityDataLoader.KEY);
         dataPool.register(new ZoneDataLoader(configGroup), ZoneDataLoader.KEY);
 
 //        ValidateFacilities.validate(dataPool, "nuts3");
