@@ -95,11 +95,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 .withDescription("Config file location")
                 .hasArg(true)
                 .withArgName("CONFIG.XML")
-                .isRequired(true)
+                .isRequired(false)
                 .create("c"));
         options.addOption("h", "host", true, "Host name or IP");
         options.addOption("p", "port", true, "Port number of MasterControler");
-        options.addOption("t", "threads", true, "Number of threads for parallel events handling.");
+        options.addOption("t", "threads", true, "Number of threads for replanning.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
 
@@ -113,23 +113,35 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 printHelp(options);
                 System.exit(1);
             }
+        } else if (commandLine.getArgs().length>0) {
+            try {
+                config = ConfigUtils.loadConfig(commandLine.getArgs()[0]);
+
+            } catch (UncheckedIOException e) {
+                System.err.println("Config file not found");
+                printHelp(options);
+                System.exit(1);
+            }
         } else {
             System.err.println("Config file not specified");
             System.out.println(options.toString());
             System.exit(1);
         }
 
+
+        final DistributedSimConfigGroup distributedSimConfigGroup = ConfigUtils.addOrGetModule(this.config,DistributedSimConfigGroup.GROUP_NAME,DistributedSimConfigGroup.class);
+
         //The following line will make the controler use the events manager that doesn't check for event order
         config.parallelEventHandling().setSynchronizeOnSimSteps(false);
         //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
-        int numThreads = 1;
+        int numThreads = config.global().getNumberOfThreads();
         if (commandLine.hasOption("t"))
             try {
                 numThreads = Integer.parseInt(commandLine.getOptionValue("t"));
             } catch (NumberFormatException e) {
-                System.err.println("Number of threads should be int.");
+                System.err.println("Number of threads should be int or it wasn't specced on cmd line. Taking the default of "+distributedSimConfigGroup.getDefaultNumThreadsOnSlave());
                 System.out.println(options.toString());
-                System.exit(1);
+                numThreads = distributedSimConfigGroup.getDefaultNumThreadsOnSlave();
             }
         else {
             System.err.println("Will use the number of threads in config for simulation.");
@@ -141,20 +153,19 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (commandLine.hasOption("h")) {
             hostname = commandLine.getOptionValue("h");
         } else
-            System.err.println("No host specified, using default (localhost)");
+            System.err.println("No host or IP specified, using default (localhost)");
 
         /*
         * INITIALIZING COMMS
         * */
         Socket socket = null;
-        int socketNumber = 12345;
+        int socketNumber = distributedSimConfigGroup.getMasterPortNumber();
         if (commandLine.hasOption("p")) {
             try {
                 socketNumber = Integer.parseInt(commandLine.getOptionValue("p"));
             } catch (NumberFormatException e) {
-                System.err.println("Port number should be integer");
+                System.err.println("Port number should be integer. Defaulting to "+ distributedSimConfigGroup.getMasterPortNumber());
                 System.out.println(options.toString());
-                System.exit(1);
             }
         } else {
             System.err.println("Will accept connections on default port number 12345");

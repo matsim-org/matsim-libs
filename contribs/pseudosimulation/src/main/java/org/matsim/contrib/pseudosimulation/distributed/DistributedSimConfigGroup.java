@@ -13,6 +13,15 @@ public class DistributedSimConfigGroup extends ReflectiveConfigGroup {
     private int masterPortNumber = 12345;
     static final String SLAVE_ITERS_PER_MASTER_ITER = "slaveIterationsPerMasterIteration";
     private int slaveIterationsPerMasterIteration = 10;
+    static final String DEFAULT_NUM_THREADS_ON_SLAVE = "defaultNumThreadsOnSlave";
+    private int defaultNumThreadsOnSlave = 1;
+    /**
+     * The number of slaves the master will distribute to from the start.
+     * Defaults to 2, each with one thread for replanning.
+     * You can still add more afterwards and load balancing should take care of it.
+     *
+     * Override the default number of threads on the slave with a
+     */
     static final String INIT_NUM_SLAVES = "initialNumberOfSlaves";
     private int initialNumberOfSlaves = 2;
     /**
@@ -89,6 +98,14 @@ public class DistributedSimConfigGroup extends ReflectiveConfigGroup {
     @StringSetter(MASTER_MUTATION_RATE)
     public void setMasterMutationRate(double masterMutationRate) {
         this.masterMutationRate = masterMutationRate;
+    }
+    @StringGetter(DEFAULT_NUM_THREADS_ON_SLAVE)
+    public int getDefaultNumThreadsOnSlave() {
+        return defaultNumThreadsOnSlave;
+    }
+    @StringSetter(DEFAULT_NUM_THREADS_ON_SLAVE)
+    public void setDefaultNumThreadsOnSlave(int defaultNumThreadsOnSlave) {
+        this.defaultNumThreadsOnSlave = defaultNumThreadsOnSlave;
     }
     @StringGetter(SLAVE_MUTATION_RATE)
     public double getSlaveMutationRate() {
