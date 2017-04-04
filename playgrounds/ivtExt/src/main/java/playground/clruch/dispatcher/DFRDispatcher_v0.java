@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.*;
@@ -152,6 +153,9 @@ public class DFRDispatcher_v0 extends PartitionedDispatcher {
                         //FeedForward Rebalancing
                         for (int i = 0; i < N_vStations - 1; i++) {
                             for (int j = 0; j < N_vStations - 1; j++) {
+                                if (!(alphaij.Get(i, j).number().doubleValue()==0)){
+                                    System.out.println("Stop");
+                                }
                                 feedfwrd_Rebalancing_LPR.set(alphaij.Get(i, j), i, j);
                             }
                         }
@@ -231,16 +235,17 @@ public class DFRDispatcher_v0 extends PartitionedDispatcher {
                 //======================================================================================================
                     //FeedForward Rebalancing
                     Tensor rebalancingOrder_FF = Round.of(feedfwrd_Rebalancing_LPR);
-                    rebalancingOrderRest_FF = rebalancingOrder_FF.subtract(feedfwrd_Rebalancing_LPR);
+                    rebalancingOrderRest_FF = feedfwrd_Rebalancing_LPR.subtract(rebalancingOrder_FF);
                     //Feedback Rebalancing
                     Tensor rebalancingOrder_FB = Round.of(feedback_Rebalancing_DFR);
                     rebalancingOrderRest_FB    = feedback_Rebalancing_DFR.subtract(rebalancingOrder_FB);
                     //Combine the two
-                    Tensor rebalancingOrder    = rebalancingOrder_FB.add(rebalancingOrder_FF);
+                   // Tensor rebalancingOrder    = rebalancingOrder_FB.add(rebalancingOrder_FF);
+                    Tensor rebalancingOrder    = rebalancingOrder_FF;
 
                 //DEBUG START
                 System.out.println("Rebalancing Tensor:\n" + Pretty.of(rebalancingOrder));
-                System.out.println("Rebalancing Rest Tensor:\n" + Pretty.of(rebalancingOrderRest_FF.add(rebalancingOrderRest_FB)));
+                System.out.println("Rebalancing Rest Tensor:\n" + Pretty.of(rebalancingOrderRest_FF));//.add(rebalancingOrderRest_FB)));
                 //DEBUG END
 
                 //======================================================================================================

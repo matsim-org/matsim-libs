@@ -14,12 +14,16 @@ import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Floor;
+import ch.ethz.idsc.tensor.sca.Round;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+import org.gnu.glpk.glp_smcp;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+
+import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.*;
@@ -48,6 +52,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     final int numberOfAVs;
     private int total_rebalanceCount  = 0;
     Tensor printVals = Tensors.empty();
+    LPVehicleRebalancing lpVehicleRebalancing;
 
 
     public LPFeedbackLIPDispatcher( //
@@ -70,6 +75,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
+        // setup linear program
+        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork,travelTimes);
     }
 
 
@@ -82,10 +89,10 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
         // PART I: rebalance all vehicles periodically
         final long round_now = Math.round(now);
+
         if (round_now % rebalancingPeriod == 0) {
 
-            // setup linear program
-            LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork,travelTimes);
+
 
 
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
@@ -116,11 +123,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 // solve the linear program with updated right-hand side
                 // fill right-hand-side
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
-                Tensor rebalanceCount = lpVehicleRebalancing.solveUpdatedLP(rhs);
-
+                Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);
+                Tensor rebalanceCount = Round.of(rebalanceCount2);
                 // TODO this should never become active, can be possibly removed later
                 // assert that solution is integer and does not contain negative values
-                GlobalAssert.that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(Scalar::number).map(Integer.class::cast).filter(e->e<0).findAny().isPresent());
+                GlobalAssert.that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s->s.number().doubleValue()).filter(e->e<0).findAny().isPresent());
 
 
                 // ensure that not more vehicles are sent away than available
@@ -157,7 +164,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             }
             // close the LP to avoid data leaks
             // TODO can this be taken out to not delete the LP in every instance?
-            lpVehicleRebalancing.closeLP();
+            //lpVehicleRebalancing.closeLP();
         }
 
 

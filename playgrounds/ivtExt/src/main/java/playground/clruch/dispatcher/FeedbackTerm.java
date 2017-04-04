@@ -5,5 +5,6 @@ package playground.clruch.dispatcher;
  */
 public enum FeedbackTerm {
     LX,
-    LDX;
+    LDX,
+    FFonly;
 }

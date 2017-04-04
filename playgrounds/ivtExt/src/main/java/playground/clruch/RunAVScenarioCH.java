@@ -25,7 +25,8 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  */
 public class RunAVScenarioCH {
     public static void main(String[] args) throws MalformedURLException {
-        File configFile = new File(args[0]);
+        //File configFile = new File(args[0]);
+        File configFile = new File("defaultIVTConfig.xml");
         final File dir = configFile.getParentFile();
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();

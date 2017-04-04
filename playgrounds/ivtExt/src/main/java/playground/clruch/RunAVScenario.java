@@ -34,6 +34,9 @@ public class RunAVScenario {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
         
+
+        TheApocalypse.decimatesThe(population).toNoMoreThan(500000).people();
+
         TheApocalypse.decimatesThe(population).toNoMoreThan(5200).people();
         
         Controler controler = new Controler(scenario);

@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.*;
@@ -50,8 +51,10 @@ public class DFRDispatcher_v1 extends PartitionedDispatcher {
     public static final String KEY_DTEXTENSION = "dtExtension";
     public static final String KEY_WEIGHTSEXTENSION = "weightsExtension";
     public static final String KEY_FEEDBACKTERM = "feedbackTerm";
+    public static final String KEY_REDISPATCHPERIOD = "redispatchPeriod";
 
     private final int rebalancingPeriod;
+    private final int redispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
@@ -84,6 +87,7 @@ public class DFRDispatcher_v1 extends PartitionedDispatcher {
         vLinkWeights = linkWeightsIn;
         this.arrivalInformation = arrivalInformation;
         rebalancingPeriod = Integer.parseInt(config.getParams().get(KEY_REBALANCINGPERIOD));
+        redispatchPeriod = Integer.parseInt(config.getParams().get(KEY_REDISPATCHPERIOD));
         N_vStations = virtualNetwork.getvNodesCount(); //Consider here nodecount -1 as no vLink to leftover region!!
         popSize = arrivalInformation.populationSize;
         rebalancingOrderRest   = Array.zeros(N_vStations, N_vStations);
@@ -101,41 +105,42 @@ public class DFRDispatcher_v1 extends PartitionedDispatcher {
         // Map<VirtualNode, List<VehicleLinkPair>> available_Vehicles = getVirtualNodeAvailableNotRebalancingVehicles();
 
         // B: redispatch all vehicles
+        //==============================================================================================================
+        // Get Open Requests
+        //==============================================================================================================
+        Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
+        //==============================================================================================================
+        // DFR Algorithm
+        //==============================================================================================================
         final long round_now = Math.round(now);
         if (round_now % rebalancingPeriod == 0) {
-            //==========================================================================================================
-            // Get Open Requests
-            //==========================================================================================================
-                Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
-            //==========================================================================================================
-            // DFR Algorithm
-            //==========================================================================================================
+
             {   //======================================================================================================
                 // Initialize
                 //======================================================================================================
-                    // Get System State
-                    Map<VirtualNode, List<VehicleLinkPair>> available_Vehicles = getVirtualNodeDivertableNotRebalancingVehicles();
-                    Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
-                    //Init Matrices
-                    Tensor rebalancingTovStation    = Array.zeros(N_vStations);
-                    Tensor openRequests             = Array.zeros(N_vStations);
-                    Tensor availableVehicles        = Array.zeros(N_vStations);
-                    Tensor feedback_Rebalancing_DFR = Array.zeros(N_vStations, N_vStations);
-                    Tensor feedfwrd_Rebalancing_LPR = Array.zeros(N_vStations, N_vStations);
-                    //Update Matrices
-                    available_Vehicles.entrySet().stream().forEach(e -> availableVehicles.set(RealScalar.of(e.getValue().size()), e.getKey().index));
-                    v_ij_reb.entrySet().stream().forEach(e -> rebalancingTovStation.set(RealScalar.of(e.getValue().size()),e.getKey().index));
-                    requests.entrySet().stream().forEach(e->openRequests.set(RealScalar.of(e.getValue().size()),e.getKey().index));
+                // Get System State
+                Map<VirtualNode, List<VehicleLinkPair>> available_Vehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
+                //Init Matrices
+                Tensor rebalancingTovStation = Array.zeros(N_vStations);
+                Tensor openRequests = Array.zeros(N_vStations);
+                Tensor availableVehicles = Array.zeros(N_vStations);
+                Tensor feedback_Rebalancing_DFR = Array.zeros(N_vStations, N_vStations);
+                Tensor feedfwrd_Rebalancing_LPR = Array.zeros(N_vStations, N_vStations);
+                //Update Matrices
+                available_Vehicles.entrySet().stream().forEach(e -> availableVehicles.set(RealScalar.of(e.getValue().size()), e.getKey().index));
+                v_ij_reb.entrySet().stream().forEach(e -> rebalancingTovStation.set(RealScalar.of(e.getValue().size()), e.getKey().index));
+                requests.entrySet().stream().forEach(e -> openRequests.set(RealScalar.of(e.getValue().size()), e.getKey().index));
                 //======================================================================================================
                 // Compute Excess Vehicles -> System Imbalance
                 //======================================================================================================
-                    Tensor systemImbalance = openRequests.subtract(availableVehicles).subtract(rebalancingTovStation);
+                Tensor systemImbalance = openRequests.subtract(availableVehicles).subtract(rebalancingTovStation);
                 //DEBUG START
-                    System.out.println("--------------------------------------------------------------------");
-                    System.out.println("Available Vehicles: "+ availableVehicles.toString());
-                    System.out.println("Open Requests     : "+ openRequests.toString());
-                    System.out.println("Rebalancing to vS : "+ rebalancingTovStation.toString());
-                    System.out.println("System Imbalance : "+ systemImbalance.toString());
+                System.out.println("--------------------------------------------------------------------");
+                System.out.println("Available Vehicles: " + availableVehicles.toString());
+                System.out.println("Open Requests     : " + openRequests.toString());
+                System.out.println("Rebalancing to vS : " + rebalancingTovStation.toString());
+                System.out.println("System Imbalance : " + systemImbalance.toString());
                 //DEBUG END
                 //======================================================================================================
                 // DFR Iterations: Compute Rebalancing
@@ -144,114 +149,127 @@ public class DFRDispatcher_v1 extends PartitionedDispatcher {
                     //==================================================================================================
                     // Get Feedforward rebalancing Rates
                     //==================================================================================================
-                        Tensor alpha_ij = arrivalInformation.getAlphaijforTime((int) now);
-                        Tensor alphaij = alpha_ij.multiply(RealScalar.of(popSize));
+                    Tensor alpha_ij = arrivalInformation.getAlphaijforTime((int) now);
+                    Tensor alphaij = alpha_ij.multiply(RealScalar.of(popSize));
 
-                        //FeedForward Rebalancing
-                        for (int i = 0; i < N_vStations - 1; i++) {
-                            for (int j = 0; j < N_vStations - 1; j++) {
-                                feedfwrd_Rebalancing_LPR.set(alphaij.Get(i, j), i, j);
-                            }
+                    //FeedForward Rebalancing
+                    for (int i = 0; i < N_vStations - 1; i++) {
+                        for (int j = 0; j < N_vStations - 1; j++) {
+                            feedfwrd_Rebalancing_LPR.set(alphaij.Get(i, j), i, j);
                         }
+                    }
 
                     //==================================================================================================
                     // Compute Feedback Rebalancing
                     //==================================================================================================
-                        for (Map.Entry<VirtualLink, Double> entry : vLinkWeights.entrySet()) {
-                            //==============================================================================================
-                            // SETUP
-                            //==============================================================================================
-                                //Get vLink info: weight and nodes
-                                VirtualLink vLink = entry.getKey();
-                                double linkWeight = entry.getValue();
-                                int indexFrom = vLink.getFrom().getIndex();
-                                int indexTo = vLink.getTo().getIndex();
-                                //Get Imbalance
-                                int imbalanceFrom = systemImbalance.Get(indexFrom).number().intValue(); //potentially leave as scalar
-                                int imbalanceTo = systemImbalance.Get(indexTo).number().intValue();
-                                // compute the rebalancing vehicles
-                                double rebalance_From_To = 0.0;
-                            //==============================================================================================
-                            // Feedback Rebalancing Term
-                            //==============================================================================================
-                                switch (feebackTerm) {
-                                    case LDX: {
-                                        // Get Lambda and test if not in consensus Set
-                                        Tensor lambda = arrivalInformation.getNextNonZeroLambdaforTime((int) now);
-                                        GlobalAssert.that(Total.of(lambda).Get().number().doubleValue() != 0); // no lambda is ever zero (if zero take next non-zero)
-                                        Tensor consensusVal = consensusLDX(systemImbalance, lambda);
-                                        boolean notConsSetFrom = (Math.abs((double) imbalanceFrom - consensusVal.Get(indexFrom).number().doubleValue()) > (double) vLink.getFrom().getNeighCount());
-                                        boolean notConsSetTo = (Math.abs((double) imbalanceTo - consensusVal.Get(indexTo).number().doubleValue()) > (double) vLink.getTo().getNeighCount());
-                                        if (notConsSetFrom || notConsSetTo) {
-                                            double lambdaFrom = lambda.Get(indexFrom).number().doubleValue();
-                                            double lambdaTo = lambda.Get(indexTo).number().doubleValue();
-                                            // do  feedback rebalancing if not in consensus Set
-                                            rebalance_From_To = //
-                                                    rebalancingPeriod * (double) popSize * linkWeight * ( //
-                                                            (double) imbalanceTo / lambdaTo - //
-                                                                    (double) imbalanceFrom / lambdaFrom) +//
-                                                                        rebalancingOrderRest.Get(indexFrom,indexTo).number().doubleValue() -//
-                                                                        rebalancingOrderRest.Get(indexTo,indexFrom).number().doubleValue();
-                                        }else{
-                                            //if in consensus set only do FF rebalancing
-                                            rebalance_From_To = rebalancingPeriod * (feedfwrd_Rebalancing_LPR.Get(indexFrom,indexTo).number().doubleValue() - //
-                                                                                     feedfwrd_Rebalancing_LPR.Get(indexTo,indexFrom).number().doubleValue())+ //
-                                                                                        rebalancingOrderRest.Get(indexFrom,indexTo).number().doubleValue() -//
-                                                                                        rebalancingOrderRest.Get(indexTo,indexFrom).number().doubleValue();
-                                        }
-                                        break;
-                                    }
-                                    case LX: {
-                                        // Test if not in consensus Set
-                                        Scalar consensusVal = consensusLX(systemImbalance);
-                                        boolean notConsSetFrom = (Math.abs(imbalanceFrom - consensusVal.number().intValue()) > vLink.getFrom().getNeighCount());
-                                        boolean notConsSetTo = (Math.abs(imbalanceTo - consensusVal.number().intValue()) > vLink.getTo().getNeighCount());
-                                        if (notConsSetFrom || notConsSetTo) {
-                                            // do feedback rebalancing if not in consensus Set
-                                            rebalance_From_To = //
-                                                    rebalancingPeriod * linkWeight * ( //
-                                                            (double) imbalanceTo - //
-                                                                    (double) imbalanceFrom) +//
-                                                            rebalancingOrderRest.Get(indexFrom, indexTo).number().doubleValue() - //
-                                                            rebalancingOrderRest.Get(indexTo, indexFrom).number().doubleValue();
-                                        }else{
-                                            //if on consensus set only do FF rebalancing
-                                            rebalance_From_To = rebalancingPeriod * (feedfwrd_Rebalancing_LPR.Get(indexFrom,indexTo).number().doubleValue() - //
-                                                                                     feedfwrd_Rebalancing_LPR.Get(indexTo,indexFrom).number().doubleValue())+ //
-                                                                                        rebalancingOrderRest.Get(indexFrom,indexTo).number().doubleValue() -//
-                                                                                        rebalancingOrderRest.Get(indexTo,indexFrom).number().doubleValue();
-                                        }
-                                        break;
-                                    }
-                                }
-                                //Update feedback_Rebalance tensor
-                                if (rebalance_From_To > 0) {
-                                    feedback_Rebalancing_DFR.set(RealScalar.of(rebalance_From_To), indexFrom, indexTo);
+                    for (Map.Entry<VirtualLink, Double> entry : vLinkWeights.entrySet()) {
+                        //==============================================================================================
+                        // SETUP
+                        //==============================================================================================
+                        //Get vLink info: weight and nodes
+                        VirtualLink vLink = entry.getKey();
+                        double linkWeight = entry.getValue();
+                        int indexFrom = vLink.getFrom().getIndex();
+                        int indexTo = vLink.getTo().getIndex();
+                        //Get Imbalance
+                        int imbalanceFrom = systemImbalance.Get(indexFrom).number().intValue(); //potentially leave as scalar
+                        int imbalanceTo = systemImbalance.Get(indexTo).number().intValue();
+                        // compute the rebalancing vehicles
+                        double rebalance_From_To = 0.0;
+                        //==============================================================================================
+                        // Feedback Rebalancing Term
+                        //==============================================================================================
+                        switch (feebackTerm) {
+                            case LDX: {
+                                // Get Lambda and test if not in consensus Set
+                                Tensor lambda = arrivalInformation.getNextNonZeroLambdaforTime((int) now);
+                                GlobalAssert.that(Total.of(lambda).Get().number().doubleValue() != 0); // no lambda is ever zero (if zero take next non-zero)
+                                Tensor consensusVal = consensusLDX(systemImbalance, lambda);
+                                boolean notConsSetFrom = (Math.abs((double) imbalanceFrom - consensusVal.Get(indexFrom).number().doubleValue()) > (double) vLink.getFrom().getNeighCount());
+                                boolean notConsSetTo = (Math.abs((double) imbalanceTo - consensusVal.Get(indexTo).number().doubleValue()) > (double) vLink.getTo().getNeighCount());
+                                if (notConsSetFrom || notConsSetTo) {
+                                    double lambdaFrom = lambda.Get(indexFrom).number().doubleValue();
+                                    double lambdaTo = lambda.Get(indexTo).number().doubleValue();
+                                    // do  feedback rebalancing if not in consensus Set
+                                    rebalance_From_To = //
+                                            rebalancingPeriod * (double) popSize * linkWeight * ( //
+                                                    (double) imbalanceTo / lambdaTo - //
+                                                            (double) imbalanceFrom / lambdaFrom) +//
+                                                    rebalancingOrderRest.Get(indexFrom, indexTo).number().doubleValue() -//
+                                                    rebalancingOrderRest.Get(indexTo, indexFrom).number().doubleValue();
                                 } else {
-                                    feedback_Rebalancing_DFR.set(RealScalar.of(-rebalance_From_To), indexTo, indexFrom);
+                                    //if in consensus set only do FF rebalancing
+                                    rebalance_From_To = rebalancingPeriod * (feedfwrd_Rebalancing_LPR.Get(indexFrom, indexTo).number().doubleValue() - //
+                                            feedfwrd_Rebalancing_LPR.Get(indexTo, indexFrom).number().doubleValue()) + //
+                                            rebalancingOrderRest.Get(indexFrom, indexTo).number().doubleValue() -//
+                                            rebalancingOrderRest.Get(indexTo, indexFrom).number().doubleValue();
                                 }
+                                break;
+                            }
+                            case LX: {
+                                // Test if not in consensus Set
+                                Scalar consensusVal = consensusLX(systemImbalance);
+                                boolean notConsSetFrom = (Math.abs(imbalanceFrom - consensusVal.number().intValue()) > vLink.getFrom().getNeighCount());
+                                boolean notConsSetTo = (Math.abs(imbalanceTo - consensusVal.number().intValue()) > vLink.getTo().getNeighCount());
+                                if (notConsSetFrom || notConsSetTo) {
+                                    // do feedback rebalancing if not in consensus Set
+                                    rebalance_From_To = //
+                                            rebalancingPeriod * linkWeight * ( //
+                                                    (double) imbalanceTo - //
+                                                            (double) imbalanceFrom) +//
+                                                    rebalancingOrderRest.Get(indexFrom, indexTo).number().doubleValue() - //
+                                                    rebalancingOrderRest.Get(indexTo, indexFrom).number().doubleValue();
+                                } else {
+                                    //if on consensus set only do FF rebalancing
+                                    rebalance_From_To = rebalancingPeriod * (feedfwrd_Rebalancing_LPR.Get(indexFrom, indexTo).number().doubleValue() - //
+                                            feedfwrd_Rebalancing_LPR.Get(indexTo, indexFrom).number().doubleValue()) + //
+                                            rebalancingOrderRest.Get(indexFrom, indexTo).number().doubleValue() -//
+                                            rebalancingOrderRest.Get(indexTo, indexFrom).number().doubleValue();
+                                }
+                                break;
+                            }
+                            case FFonly: {
+                                //DEBUG START
+                                double tst = (feedfwrd_Rebalancing_LPR.Get(indexFrom, indexTo).number().doubleValue() - //
+                                        feedfwrd_Rebalancing_LPR.Get(indexTo, indexFrom).number().doubleValue());
+                                if (tst != 0) {
+                                    System.out.println("Debug BP");
+                                }
+                                //DEBUG END
+                                rebalance_From_To = rebalancingPeriod * (feedfwrd_Rebalancing_LPR.Get(indexFrom, indexTo).number().doubleValue() - //
+                                        feedfwrd_Rebalancing_LPR.Get(indexTo, indexFrom).number().doubleValue()) + //
+                                        rebalancingOrderRest.Get(indexFrom, indexTo).number().doubleValue() -//
+                                        rebalancingOrderRest.Get(indexTo, indexFrom).number().doubleValue();
+                            }
                         }
+                        //Update feedback_Rebalance tensor
+                        if (rebalance_From_To > 0) {
+                            feedback_Rebalancing_DFR.set(RealScalar.of(rebalance_From_To), indexFrom, indexTo);
+                        } else {
+                            feedback_Rebalancing_DFR.set(RealScalar.of(-rebalance_From_To), indexTo, indexFrom);
+                        }
+                    }
                     //DEBUG START
-                    System.out.println("DFRRebalancing Tensor:\n" + Pretty.of(feedback_Rebalancing_DFR));
-                    System.out.println("FF Rebalancing Tensor:\n" + Pretty.of(feedfwrd_Rebalancing_LPR.multiply(RealScalar.of(rebalancingPeriod))));
+//                    System.out.println("DFRRebalancing Tensor:\n" + Pretty.of(feedback_Rebalancing_DFR));
+//                    System.out.println("FF Rebalancing Tensor:\n" + Pretty.of(feedfwrd_Rebalancing_LPR.multiply(RealScalar.of(rebalancingPeriod))));
                     //DEBUG END
                 }
                 //======================================================================================================
                 // Quantize Total Rebalancing
                 //======================================================================================================
-                    Tensor rebalancingOrder = Round.of(feedback_Rebalancing_DFR);
-                    rebalancingOrderRest = feedback_Rebalancing_DFR.subtract(rebalancingOrder);
+                Tensor rebalancingOrder = Round.of(feedback_Rebalancing_DFR);
+                rebalancingOrderRest = feedback_Rebalancing_DFR.subtract(rebalancingOrder);
 
                 //DEBUG START
-                System.out.println("Rebalancing Tensor:\n" + Pretty.of(rebalancingOrder));
-                System.out.println("Rebalancing Rest Tensor:\n" + Pretty.of(rebalancingOrderRest));
+//                System.out.println("Rebalancing Tensor:\n" + Pretty.of(rebalancingOrder));
+//                System.out.println("Rebalancing Rest Tensor:\n" + Pretty.of(rebalancingOrderRest));
                 //DEBUG END
 
                 //======================================================================================================
                 // Total Rebalancing and Feasibility Test //TODO feasibility (test)
                 //======================================================================================================
 
-                    Tensor feasibleRebalanceOrder = rebalancingOrder;
+                Tensor feasibleRebalanceOrder = rebalancingOrder;
                     /*
                      * feasibleRebalanceOrder = returnFeasibleRebalance(rebalanceCount, available_Vehicles);
                      */
@@ -259,9 +277,9 @@ public class DFRDispatcher_v1 extends PartitionedDispatcher {
                     int rebCars = Total.of(Total.of(rebalancingOrder)).Get().number().intValue();
                     rebCount += rebCars;
                     //DEBUG START
-                        System.out.println("Total Number of Cars to Rebalance now (fake! only count those actually sent!):" + Integer.toString(rebCars));
-                        System.out.println("Total Number of Total Rebalanced Cars (fake! only count those actually sent!) :" + Integer.toString(rebCount));
-                        System.out.println("--------------------------------------------------------------------");
+                    System.out.println("Total Number of Cars to Rebalance now (fake! only count those actually sent!):" + Integer.toString(rebCars));
+                    System.out.println("Total Number of Total Rebalanced Cars (fake! only count those actually sent!) :" + Integer.toString(rebCount));
+                    System.out.println("--------------------------------------------------------------------");
                     //DEBUG STOPP
                 }
                 //======================================================================================================
@@ -270,14 +288,14 @@ public class DFRDispatcher_v1 extends PartitionedDispatcher {
                 Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
 
                 //Fill destinationLinks Map
-                for (int rebalanceFromidx=0;rebalanceFromidx<N_vStations-1;rebalanceFromidx++){
-                    for (int rebalanceToidx=0; rebalanceToidx<N_vStations-1;rebalanceToidx++){
+                for (int rebalanceFromidx = 0; rebalanceFromidx < N_vStations - 1; rebalanceFromidx++) {
+                    for (int rebalanceToidx = 0; rebalanceToidx < N_vStations - 1; rebalanceToidx++) {
 
-                        int rebalanceCars = feasibleRebalanceOrder.Get(rebalanceFromidx,rebalanceToidx).number().intValue();
-                        if (rebalanceCars!=0){
+                        int rebalanceCars = feasibleRebalanceOrder.Get(rebalanceFromidx, rebalanceToidx).number().intValue();
+                        if (rebalanceCars != 0) {
                             VirtualNode rebalanceFromvNode = virtualNetwork.getVirtualNode(rebalanceFromidx);
-                            VirtualNode rebalanceTovNode   = virtualNetwork.getVirtualNode(rebalanceToidx);
-                            List<Link> rebalanceTargets    = virtualNodeDest.selectLinkSet(rebalanceTovNode, rebalanceCars);
+                            VirtualNode rebalanceTovNode = virtualNetwork.getVirtualNode(rebalanceToidx);
+                            List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(rebalanceTovNode, rebalanceCars);
                             destinationLinks.get(rebalanceFromvNode).addAll(rebalanceTargets);
                         }
                     }
@@ -296,14 +314,13 @@ public class DFRDispatcher_v1 extends PartitionedDispatcher {
                     Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.match(available_Vehicles.get(virtualNode), destinationLinks.get(virtualNode));
                     rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v, rebalanceMatching.get(v)));
                 }
-
-
             }
-            //==========================================================================================================
-            // Match Remaining Cars to Customers
-            //==========================================================================================================
-
-            // II.ii if vehilces remain in vNode, send to customers
+        }
+        //==========================================================================================================
+        // Match Remaining Cars to Customers
+        //==========================================================================================================
+        if (round_now % redispatchPeriod == 0){
+        // II.ii if vehilces remain in vNode, send to customers
             {
                 // collect destinations per vNode
                 Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();

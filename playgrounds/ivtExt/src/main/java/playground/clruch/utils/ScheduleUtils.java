@@ -1,7 +1,6 @@
 package playground.clruch.utils;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 
@@ -49,6 +48,6 @@ public class ScheduleUtils {
         } else {
             throw new IllegalArgumentException("taskEndTime " + taskEndTime + " > scheduleEndTime " + scheduleEndTime);
         }
-
     }
+
 }

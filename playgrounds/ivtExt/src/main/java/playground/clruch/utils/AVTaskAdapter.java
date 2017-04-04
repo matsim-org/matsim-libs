@@ -1,4 +1,4 @@
-package playground.clruch.dispatcher.core;
+package playground.clruch.utils;
 
 import org.matsim.contrib.dvrp.schedule.Task;
 
@@ -14,7 +14,7 @@ import playground.sebhoerl.avtaxi.schedule.AVTask.AVTaskType;
  * to {@link AVTask} internally. The adapter then invokes the handling function
  * corresponding to one of the four possible {@link AVTaskType}s of the given task.  
  */
-/* package until needed elsewhere */ class AVTaskAdapter implements AVTaskListener {
+public class AVTaskAdapter implements AVTaskListener {
 
     public AVTaskAdapter(Task task) {
         final AVTask avTask = (AVTask) task;

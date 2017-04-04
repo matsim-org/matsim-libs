@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -19,12 +20,12 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
@@ -111,37 +112,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
-     * @return collection of cars that are in the driving state with a customer, i.e. their
-     *         second last task is an AVDropoff Task (followed by AVStay task)
+     * @return collection of AVVehicles that are in stay mode
      */
-    @Deprecated
-    protected final Collection<VehicleLinkPair> getVehiclesWithCustomer() {
-        Collection<VehicleLinkPair> collection = new LinkedList<>();
-        for (AVVehicle avVehicle : getFunctioningVehicles())
-            if (isWithoutDirective(avVehicle)) {
-                Schedule schedule = avVehicle.getSchedule();
-                int n = schedule.getTaskCount();
-                if (n > 1) { // take care that array bounds are respected, schedules with n = 1 are staying AVs and not of interest.
-                    AVTask avTask = (AVTask) schedule.getTasks().get(n - 2); // Dropoff task
-                    if (avTask instanceof AVDropoffTask) {
-                        new AVTaskAdapter(schedule.getCurrentTask()) {
-                            @Override
-                            public void handle(AVDriveTask avDriveTask) {
-                                // for empty cars the drive task is second to last task
-                                TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                                OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                                LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
-                                if (linkTimePair != null)
-                                    collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
-                            }
-
-                        };
-                    }
-
-                }
-
-            }
-        return collection;
+    private final Collection<AVVehicle> getStayVehiclesCollection() {
+        return getFunctioningVehicles().stream() //
+                .filter(this::isWithoutDirective) //
+                .filter(v -> Schedules.getLastTask(v.getSchedule()).getStatus().equals(Task.TaskStatus.STARTED)) //
+                .collect(Collectors.toList());
     }
 
     /**
@@ -190,9 +167,20 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     private String previousInfoMarker = "";
 
+    protected abstract void notifySimulationSubscribers(long round_now);
+
+    /**
+     * invoked at the beginning of every iteration
+     * dispatchers can update their data structures based on the stay vehicle set
+     * function is not meant for issuing directives
+     */
+    abstract void updateDatastructures(Collection<AVVehicle> stayVehicles);
+
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
+
+        updateDatastructures(Collections.unmodifiableCollection(getStayVehiclesCollection()));
 
         if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
             String infoLine = getInfoLine();
@@ -202,6 +190,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
                 System.out.println(infoLine);
             }
         }
+
+        notifySimulationSubscribers(Math.round(now));
 
         redispatch(now);
         private_now = null; // <- time unavailable
@@ -243,4 +233,9 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * @param now
      */
     protected abstract void redispatch(double now);
+
+    @Override
+    public final void onNextTaskStarted(AVTask task) {
+        // intentionally empty
+    }
 }
