@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -44,7 +44,6 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -63,17 +62,11 @@ public final class AccessibilityModule extends AbstractModule {
 	private static final Logger LOG = Logger.getLogger(AccessibilityModule.class);
 
 	private List<SpatialGridDataExchangeInterface> spatialGridDataListeners = new ArrayList<>() ;
-
 	private List<FacilityDataExchangeInterface> facilityDataListeners = new ArrayList<>() ; 
-
 	private List<ActivityFacilities> additionalFacs = new ArrayList<>() ;
-
 	private String activityType;
-
 	private boolean pushing2Geoserver;
-
 	private String crs;
-	
 	
 	/**
 	 * If this class does not provide you with enough flexibility, do your own new AbstractModule(){...}, copy the install part from this class
@@ -82,18 +75,6 @@ public final class AccessibilityModule extends AbstractModule {
 	public AccessibilityModule() {
 	}
 	
-	public final void setPushing2Geoserver( boolean pushing2Geoserver ) {
-		this.pushing2Geoserver = pushing2Geoserver ;
-	}
-	
-	@Deprecated
-	public final void addSpatialGridDataExchangeListener( SpatialGridDataExchangeInterface listener ) {
-		spatialGridDataListeners.add( listener ) ;
-	}
-	
-	public final void addFacilityDataExchangeListener( FacilityDataExchangeInterface listener ) {
-		this.facilityDataListeners.add( listener ) ;
-	}
 	
 	@Override
 	public void install() {
@@ -115,7 +96,6 @@ public final class AccessibilityModule extends AbstractModule {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
 				double cellSize_m = acg.getCellSizeCellBasedAccessibility();
 				if (cellSize_m <= 0) {
-//					throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 					LOG.error("Cell Size needs to be assigned a value greater than zero.");
 				}
 				crs = acg.getOutputCrs() ;
@@ -124,19 +104,20 @@ public final class AccessibilityModule extends AbstractModule {
 				
 				final BoundingBox boundingBox;
 				final ActivityFacilitiesImpl measuringPoints;
-				if(acg.getAreaOfAccessibilityComputation()==AreaOfAccesssibilityComputation.fromShapeFile) {
+				
+				if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromShapeFile) {
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
 					Envelope envelope = boundary.getEnvelopeInternal();
 					boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize_m);
 					LOG.info("Using shape file to determine the area for accessibility computation.");
 				
-				} else if(acg.getAreaOfAccessibilityComputation()==AreaOfAccesssibilityComputation.fromBoundingBox) {
+				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromBoundingBox) {
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
 				
-				} else if(acg.getAreaOfAccessibilityComputation()==AreaOfAccesssibilityComputation.fromFile){
+				} else if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromFile) {
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
@@ -156,28 +137,28 @@ public final class AccessibilityModule extends AbstractModule {
 				LOG.warn("boundingBox = " + boundingBox);
 				
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
-					AccessibilityContributionCalculator calc = null ;
-					switch( mode ) {
+				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
+					AccessibilityContributionCalculator calculator = null ;
+					switch(mode) {
 					case bike:
-						calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), config, network);
 						break;
 					case car: {
 						final TravelTime travelTime = travelTimes.get(mode.name());
 						Gbl.assertNotNull(travelTime);
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-						calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
 						break; }
 					case freespeed: {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
-						calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
 						break; }
 					case walk:
-						calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), config, network);
 						break;
 					case matrixBasedPt:
-						calc = new LeastCostPathCalculatorAccessibilityContributionCalculator(
+						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
 								config.planCalcScore(),
 								ptMatrix.asPathCalculator(config.planCalcScore()));
 						break;
@@ -185,9 +166,9 @@ public final class AccessibilityModule extends AbstractModule {
 					default:
 //						TravelTime timeCalculator = this.travelTimes.get( mode.toString() ) ;
 //						TravelDisutility travelDisutility = this.travelDisutilityFactories.get(mode.toString()).createTravelDisutility(timeCalculator) ;
-						calc = new TripRouterAccessibilityContributionCalculator(mode.toString(), tripRouter, config.planCalcScore()) ;
+						calculator = new TripRouterAccessibilityContributionCalculator(mode.toString(), tripRouter, config.planCalcScore());
 					}
-					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calculator);
 				}
 				
 				if (pushing2Geoserver == true) {
@@ -196,14 +177,16 @@ public final class AccessibilityModule extends AbstractModule {
 
 				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, 
 						opportunities, ptMatrix, scenario, boundingBox, cellSize_m);
-
-				for ( SpatialGridDataExchangeInterface listener : spatialGridDataListeners ) {
-					gbasl.addSpatialGridDataExchangeListener(listener) ;
-				}
-				for ( ActivityFacilities fac : additionalFacs ) {
+				
+				for (ActivityFacilities fac : additionalFacs) {
 					gbasl.addAdditionalFacilityData(fac);
 				}
-				for ( FacilityDataExchangeInterface listener : facilityDataListeners ) {
+
+				for (SpatialGridDataExchangeInterface listener : spatialGridDataListeners) {
+					gbasl.addSpatialGridDataExchangeListener(listener) ;
+				}
+				
+				for (FacilityDataExchangeInterface listener : facilityDataListeners) {
 					gbasl.addFacilityDataExchangeListener(listener);
 				}
 				
@@ -213,14 +196,28 @@ public final class AccessibilityModule extends AbstractModule {
 			}
 		});
 	}
+	
+	public final void setPushing2Geoserver( boolean pushing2Geoserver ) {
+		this.pushing2Geoserver = pushing2Geoserver ;
+	}
+	
+	@Deprecated
+	public final void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface listener) {
+		spatialGridDataListeners.add(listener) ;
+	}
+	
+	public final void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener) {
+		this.facilityDataListeners.add(listener) ;
+	}
 
 	/**
-	 * Add additional facility data that will generate an additional column for each (x,y,t)-Entry.  The facilities are aggreated to
+	 * Add additional facility data that will generate an additional column for each (x,y,t)-Entry. The facilities are aggregated to
 	 * the measurement points in downstream code.
 	 */
 	public void addAdditionalFacilityData(ActivityFacilities facilities) {
 		additionalFacs.add(facilities) ;
 	}
+	
 	public void setConsideredActivityType(String activityType) {
 		// yyyy could be done via config (list of activities)
 		this.activityType = activityType ;

@@ -57,7 +57,7 @@ public final class AccessibilityCalculator {
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private final AccessibilityConfigGroup acg;
 	private final Network network;
-	private final double walkSpeedMeterPerHour;
+	private final double walkSpeed_m_h;
 
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 	
@@ -81,7 +81,7 @@ public final class AccessibilityCalculator {
 			LOG.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
 
-		this.walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
+		this.walkSpeed_m_h = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 	}
 	
 	
@@ -97,7 +97,7 @@ public final class AccessibilityCalculator {
 		// Condense measuring points (origins) that have the same nearest node on the network
 		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
 
-		LOG.info("Iterating over all (aggregated) origins:");
+		LOG.info("Iterating over all aggregated measuring points...");
 		// ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 		
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) { // Go through all nodes (keys) that have a measuring point (origin) assigned
@@ -111,21 +111,21 @@ public final class AccessibilityCalculator {
 				calculator.notifyNewOriginNode(fromNode, departureTime);
 			}
 
-			// get list with origins that are assigned to "fromNode" // TODO Why fromNode?
+			// Get list with measuring points that are assigned to "fromNode"
 			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
 				assert(origin.getCoord() != null);
 
-				for (String key : expSums.keySet()) {
+				for (String key : expSums.keySet()) { // Is it really necessary to reset here?
 					expSums.put(key, 0.);
 				}
 				
-//				Gbl.assertIf( this.aggregatedOpportunities.length>0);
+				//Gbl.assertIf(aggregatedOpportunities.length > 0);
 				// yyyyyy a test fails when this line is made active; cannot say why an execution path where there are now opportunities can make sense for a test.  kai, mar'17
 				
 				for (final AggregationObject aggregatedFacility : aggregatedOpportunities) {
-					for (Map.Entry<String, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet()) {
-						final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity(origin , aggregatedFacility, departureTime);
-						expSums.put(calculatorEntry.getKey(), expSums.get(calculatorEntry.getKey()) + expVhk);
+					for (String mode : calculators.keySet()) {
+						final double expVhk = calculators.get(mode).computeContributionOfOpportunity(origin , aggregatedFacility, departureTime);
+						expSums.put(mode, expSums.get(mode) + expVhk);
 					}
 				}
 				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
@@ -183,28 +183,29 @@ public final class AccessibilityCalculator {
 		for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
 			progressBar.update();
 
-			Node nearestNode = NetworkUtils.getNearestNode(network,opportunity.getCoord());
-
+			Node nearestNode = NetworkUtils.getNearestNode(network, opportunity.getCoord());
 			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 			
 			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-			double betaWalkTT = this.cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - this.cnScoringGroup.getPerforming_utils_hr();
-			double VjkWalkTravelTime = betaWalkTT * (distance_m / this.walkSpeedMeterPerHour);
+			double walkBetaTT_utils_h = this.cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - this.cnScoringGroup.getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
+			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / this.walkSpeed_m_h);
 			
 			// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist:
-			double betaWalkTD = cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-			double VjkWalkDistance = betaWalkTD * distance_m;
+			double walkBetaTD_utils_m = cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(); // default value: 0.
+			double VjkWalkDistance = walkBetaTD_utils_m * distance_m;
 			
-			double expVjk = Math.exp(this.cnScoringGroup.getBrainExpBeta() * (VjkWalkTravelTime + VjkWalkDistance ) );
+			double expVjk = Math.exp(this.cnScoringGroup.getBrainExpBeta() * (VjkWalkTravelTime + VjkWalkDistance));
 
 			// add Vjk to sum
-			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
-			if ( jco == null ) {
-				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
-				opportunityClusterMap.put( nearestNode.getId(), jco ) ; 
-			}
+			AggregationObject jco = opportunityClusterMap.get(nearestNode.getId()); // Why "jco"?
+			if (jco == null) {
+				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0.); // initialize with zero!
+				opportunityClusterMap.put(nearestNode.getId(), jco); 
+			} // TODO This is wrong! There must be an "else" here as opportunities that are the first to be added the AggregationObject when it is created will be counted twice!
 			jco.addObject(opportunity.getId(), expVjk);
+//			LOG.info("--- numberOfObjects = " + jco.getNumberOfObjects() + " --- objectIds = " + jco.getObjectIds());
 		}
+		LOG.warn("Here is an error in the aggregation! Fix this soon with other changes that alter test reults!");
 		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " nodes.");
 		return opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
 	}
@@ -217,21 +218,19 @@ public final class AccessibilityCalculator {
 		Gbl.assertNotNull(measuringPoints.getFacilities()) ;
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 
-			// determine nearest network node (from- or toNode) based on the link
-			Node fromNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),	NetworkUtils.getNearestLinkExactly(network, measuringPoint.getCoord()));
+			// Determine nearest network node (from- or toNode) based on the link
+			Node nearestNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),	NetworkUtils.getNearestLinkExactly(network, measuringPoint.getCoord()));
+			Id<Node> nearestNodeId = nearestNode.getId();
 
-			// this is used as a key for hash map lookups
-			Id<Node> nodeId = fromNode.getId();
-
-			// create new entry if key does not exist!
-			if(!aggregatedOrigins.containsKey(nodeId)) {
-				aggregatedOrigins.put(nodeId, new ArrayList<ActivityFacility>());
+			// Create new entry if key does not exist!
+			if(!aggregatedOrigins.containsKey(nearestNodeId)) {
+				aggregatedOrigins.put(nearestNodeId, new ArrayList<ActivityFacility>());
 			}
-			// assign measure point (origin) to it's nearest node
-			aggregatedOrigins.get(nodeId).add(measuringPoint);
+			// Assign measure point (origin) to it's nearest node
+			aggregatedOrigins.get(nearestNodeId).add(measuringPoint);
 		}
-		LOG.info("Number of measurement points (origins): " + measuringPoints.getFacilities().values().size());
-		LOG.info("Number of aggregated measurement points (origins): " + aggregatedOrigins.size());
+		LOG.info("Number of measuring points: " + measuringPoints.getFacilities().values().size());
+		LOG.info("Number of aggregated measuring points: " + aggregatedOrigins.size());
 		return aggregatedOrigins;
 	}
 

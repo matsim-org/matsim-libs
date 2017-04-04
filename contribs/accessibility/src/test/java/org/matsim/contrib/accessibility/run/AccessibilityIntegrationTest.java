@@ -339,12 +339,10 @@ public class AccessibilityIntegrationTest {
 	private static Scenario createTestScenario(final Config config) {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// Creating test opportunities (facilities)
+		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
-			Coord coord = link.getCoord();
-			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
 			opportunities.addActivityFacility(facility);
 		}
 		return scenario;

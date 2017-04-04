@@ -70,14 +70,11 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 	 * @param scenario MATSim scenario
 	 */
 	public GridBasedAccessibilityShutdownListenerV3(AccessibilityCalculator accessibilityCalculator, ActivityFacilities opportunities, 
-			PtMatrix ptMatrix, Scenario scenario, double xMin, 
-			double yMin, double xMax, 
-			double yMax, double cellSize) {
+			PtMatrix ptMatrix, Scenario scenario, double xMin, double yMin, double xMax, double yMax, double cellSize) {
 		this.xMin = xMin;
 		this.yMin = yMin;
 		this.xMax = xMax;
 		this.yMax = yMax;
-		log.warn("Constructor----------------- minX = " + xMin + "; minY = " + yMin + "; maxX = " + xMax + ";maxY = " + yMax);
 		this.cellSize = cellSize;
 		this.ptMatrix = ptMatrix;
 		this.opportunities = opportunities;
@@ -114,19 +111,13 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		// yyyyyy todo: get rid of the above special case. kai, nov'16
 
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
-		// new
 		for (String mode : accessibilityCalculator.getModes() ) {
-			log.warn("put accessibility grid for mode=" + mode ); 
-			log.warn("----------------- minX = " + xMin + "; minY = " + yMin + "; maxX = " + xMax + ";maxY = " + yMax);
+			log.warn("put accessibility grid for mode=" + mode );
 			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 		}
-//		for ( Modes4Accessibility mode : accessibilityCalculator.getIsComputingMode()) {
-//			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
-//		}
-		// end new
 		
 		// always put the free speed grid (yyyy may not be necessary in the long run)
-		spatialGridAggregator.getAccessibilityGrids().put( Modes4Accessibility.freespeed.name(), 
+		spatialGridAggregator.getAccessibilityGrids().put(Modes4Accessibility.freespeed.name(),
 				new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 
 		lockedForAdditionalFacilityData  = true ;
@@ -153,8 +144,8 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		log.info("Computing and writing cell based accessibility measures ...");
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 
-		AccessibilityConfigGroup moduleAPCM = ConfigUtils.addOrGetModule( scenario.getConfig(), AccessibilityConfigGroup.class);
-		accessibilityCalculator.computeAccessibilities(moduleAPCM.getTimeOfDay(), opportunities);
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
+		accessibilityCalculator.computeAccessibilities(acg.getTimeOfDay(), opportunities);
 
 		// do calculation of aggregate index values, e.g. gini coefficient
 		if (calculateAggregateValues) {
@@ -193,18 +184,13 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 
-		// write header
+		// Write header
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
 		//		writer.writeField(Labels.TIME); // TODO
-		// new
 		for (String mode : accessibilityCalculator.getModes() ) {
 			writer.writeField(mode + "_accessibility");
 		}
-		//		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-		//			writer.writeField(mode.toString() + "_accessibility");
-		//		}
-		// end new
 		writer.writeField(Labels.POPULATION_DENSITIY); // TODO I think this has to be made adjustable
 		writer.writeField(Labels.POPULATION_DENSITIY);
 		writer.writeNewLine();
@@ -242,7 +228,6 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 				}
 				writer.writeNewLine(); 
 			}
-			// writer.writeNewLine(); // gnuplot pm3d scanline
 		}
 		writer.close() ;
 
@@ -327,10 +312,8 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 
 	/**
 	 * Using this method changes the folder structure of the output. The output of the calculation will be written into the
-	 * subfolder. This is needed if for than one ContolerListener is added since otherwise the output would be overwritten
+	 * subfolder. This is needed if more than one ContolerListener is added since otherwise the output would be overwritten
 	 * and not be available for analyses anymore.
-	 * 
-	 * @param subdirectory the name of the subdirectory
 	 */
 	public void writeToSubdirectoryWithName(String subdirectory) {
 		this.outputSubdirectory = subdirectory;
