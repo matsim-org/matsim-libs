@@ -44,14 +44,18 @@ public class RunDrtWithStops {
 		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
 				new OTFVisConfigGroup(), new DrtConfigGroup());
 		//	for debugging:
-		config.plans().setInputFile("singleDrtAgent.xml");
+//		config.plans().setInputFile("singleDrtAgent.xml");
 		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		
 		drt.setEstimatedBeelineDistanceFactor(1.3);
 		drt.setEstimatedSpeed(30/3.6);
 		drt.setMaximumWalkDistance(500);
 		drt.setTransitStopFile("stopsWRS_300m.xml");
 		drt.setOperationalScheme(DrtOperationalScheme.stationbased.toString());
 		drt.setDrtNetworkMode("av");
+		int threads = Runtime.getRuntime().availableProcessors() -2;
+		System.out.println(threads + " threads used for drt.");
+		drt.setNumberOfThreads(threads);
 		
 		config.qsim().setStartTime(0);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
