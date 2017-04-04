@@ -9,10 +9,14 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.red.Mean;
+import playground.clruch.net.CoordUtil;
 import playground.clruch.net.IdIntegerDatabase;
 import playground.clruch.net.OsmLink;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -22,21 +26,23 @@ public class MatsimStaticDatabase {
 
     public static void initializeSingletonInstance( //
             Network network, //
-            CoordinateTransformation coordinateTransformation) {
+            ReferenceFrame referenceFrame) {
 
         NavigableMap<String, OsmLink> linkMap = new TreeMap<>();
+
+        CoordinateTransformation coords_toWGS84 = referenceFrame.coords_toWGS84;
 
         for (Link link : network.getLinks().values()) {
             OsmLink osmLink = new OsmLink(link);
 
-            osmLink.coords[0] = coordinateTransformation.transform(link.getFromNode().getCoord());
-            osmLink.coords[1] = coordinateTransformation.transform(link.getToNode().getCoord());
+            osmLink.coords[0] = coords_toWGS84.transform(link.getFromNode().getCoord());
+            osmLink.coords[1] = coords_toWGS84.transform(link.getToNode().getCoord());
 
             linkMap.put(link.getId().toString(), osmLink);
         }
 
         INSTANCE = new MatsimStaticDatabase( //
-                coordinateTransformation, //
+                referenceFrame, //
                 linkMap);
     }
 
@@ -46,8 +52,7 @@ public class MatsimStaticDatabase {
      * rapid lookup from MATSIM side
      */
     private final Map<Link, Integer> linkInteger = new HashMap<>();
-
-    public final CoordinateTransformation coordinateTransformation;
+    public final ReferenceFrame referenceFrame;
 
     /**
      * rapid lookup from Viewer
@@ -57,10 +62,10 @@ public class MatsimStaticDatabase {
     private final IdIntegerDatabase requestIdIntegerDatabase = new IdIntegerDatabase();
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
 
-    private MatsimStaticDatabase(//
-            CoordinateTransformation coordinateTransformation, //
+    private MatsimStaticDatabase( //
+            ReferenceFrame referenceFrame, //
             NavigableMap<String, OsmLink> linkMap) {
-        this.coordinateTransformation = coordinateTransformation;
+        this.referenceFrame = referenceFrame;
         list = new ArrayList<>(linkMap.values());
         int index = 0;
         for (OsmLink osmLink : list) {
@@ -79,6 +84,13 @@ public class MatsimStaticDatabase {
 
     public Collection<OsmLink> getOsmLinks() {
         return Collections.unmodifiableCollection(list);
+    }
+
+    public Coord getCenter() {
+        return CoordUtil.toCoord( //
+                Mean.of(Tensor.of(getOsmLinks().stream() //
+                        .map(osmLink -> osmLink.getAt(.5)) //
+                        .map(CoordUtil::toTensor))));
     }
 
     public int getOsmLinksSize() {

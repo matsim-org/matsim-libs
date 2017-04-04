@@ -15,7 +15,14 @@ import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Sort;
+import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.GraphicsUtil;
 
@@ -23,7 +30,6 @@ public class MatsimJMapViewer extends JMapViewer {
 
     final MatsimStaticDatabase db;
     private int repaint_count = 0;
-    public volatile int alpha = 196 - 32;
 
     SimulationObject simulationObject = null;
 
@@ -53,9 +59,6 @@ public class MatsimJMapViewer extends JMapViewer {
         matsimHeatmaps.add(requestLayer.requestDestMap);
         viewerLayers.add(vehicleLayer);
         viewerLayers.add(virtualNetworkLayer);
-
-        // 
-        // pc = null;
     }
 
     /**
@@ -71,34 +74,27 @@ public class MatsimJMapViewer extends JMapViewer {
         return getMapPosition(coord.getY(), coord.getX(), false);
     }
 
+    final Coord getCoordPositionXY(Point point) {
+        ICoordinate ic = getPosition(point);
+        // System.out.println("lat=" + ic.getLat() + " lon=" + ic.getLon());
+        Coord coord = new Coord(ic.getLon(), ic.getLat());
+        Coord xy = db.referenceFrame.coords_fromWGS84.transform(coord);
+        // System.out.println(xy);
+        return xy;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         ++repaint_count;
         final SimulationObject ref = simulationObject; // <- use ref for thread safety
 
         if (ref != null)
-            viewerLayers.forEach(viewerLayer -> viewerLayer.perpareHeatmaps(ref));
-        // {
-        // rebalanceHeatmap.clear();
-        // Map<Integer, List<VehicleContainer>> map = ref.vehicles.stream()
-        // .filter(v->v.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
-        // .collect(Collectors.groupingBy(r -> r.destinationLinkIndex));
-        //
-        // for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
-        // OsmLink osmLink = db.getOsmLink(entry.getKey());
-        // final int size = entry.getValue().size();
-        // for (int count = 0; count < size; ++count) {
-        // Coord coord = osmLink.getAt(count / (double) size);
-        // rebalanceHeatmap.addPoint(coord.getX(), coord.getY());
-        // }
-        // }
-        // }
+            viewerLayers.forEach(viewerLayer -> viewerLayer.prepareHeatmaps(ref));
 
         super.paintComponent(g);
+
         final Graphics2D graphics = (Graphics2D) g;
         final Dimension dimension = getSize();
-        // graphics.setColor(new Color(255, 255, 255, alpha));
-        // graphics.fillRect(0, 0, dimension.width, dimension.height);
 
         if (ref != null) {
 
@@ -161,6 +157,11 @@ public class MatsimJMapViewer extends JMapViewer {
 
     public void setSimulationObject(SimulationObject simulationObject) {
         this.simulationObject = simulationObject;
+        repaint();
+    }
+
+    public void setMapAlphaCover(int alpha) {
+        mapAlphaCover = alpha;
         repaint();
     }
 

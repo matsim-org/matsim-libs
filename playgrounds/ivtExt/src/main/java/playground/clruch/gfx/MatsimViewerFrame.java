@@ -6,8 +6,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -22,6 +20,8 @@ import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import org.matsim.api.core.v01.Coord;
 
 import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
@@ -80,7 +80,13 @@ public class MatsimViewerFrame implements Runnable {
 
         panelControls.add(new MatsimToggleButton(matsimJMapViewer));
         JMapTileSelector.install(panelControls, matsimJMapViewer);
-
+        {
+            SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
+            spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 255);
+            spinnerLabel.setValueSafe(matsimJMapViewer.mapAlphaCover);
+            spinnerLabel.addSpinnerListener(i -> matsimJMapViewer.setMapAlphaCover(i));
+            spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "alpha cover");
+        }
         {
             StorageSupplier storageSupplier = StorageSupplier.getDefault();
             final int size = storageSupplier.size();
@@ -153,7 +159,6 @@ public class MatsimViewerFrame implements Runnable {
             panelSettings.add(jCheckBox);
         }
         {
-            matsimJMapViewer.virtualNetworkLayer.init();
             final JCheckBox jCheckBox = new JCheckBox("cells");
             jCheckBox.setSelected(matsimJMapViewer.virtualNetworkLayer.getDrawCells());
             jCheckBox.addActionListener(e -> matsimJMapViewer.virtualNetworkLayer.setDrawCells(jCheckBox.isSelected()));
@@ -170,7 +175,6 @@ public class MatsimViewerFrame implements Runnable {
             jCheckBox.addActionListener(e -> getJMapViewer().setTileGridVisible(jCheckBox.isSelected()));
             panelSettings.add(jCheckBox);
         }
-
 
         getJMapViewer().addMouseListener(new MouseAdapter() {
             @Override
@@ -204,6 +208,10 @@ public class MatsimViewerFrame implements Runnable {
 
     private JMapViewer getJMapViewer() {
         return treeMap.getViewer();
+    }
+
+    public void setDisplayPosition(Coord coord, int zoom) {
+        setDisplayPosition(coord.getY(), coord.getX(), zoom);
     }
 
     public void setDisplayPosition(double lat, double lon, int zoom) {
