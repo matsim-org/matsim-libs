@@ -56,6 +56,7 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 	Network network;
 	private final DrtConfigGroup drtgroup ;
 	private boolean headerWritten = false;
+	private boolean vheaderWritten = false;
 	/**
 	 * 
 	 */
@@ -79,11 +80,12 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 		}
 		List<DynModeTrip> trips = drtPassengerStats.getDrtTrips();
 		
-		writeIterationStats(DynModeTripsAnalyser.summarizeTrips(trips, ";"),event.getIteration());
-		
+		writeIterationPassengerStats(DynModeTripsAnalyser.summarizeTrips(trips, ";"),event.getIteration());
+		writeIterationVehicleStats(DynModeTripsAnalyser.summarizeVehicles(drtPassengerStats.getVehicleDistances(), ";"), event.getIteration());
 		if (drtgroup.isPlotDetailedCustomerStats()){
 			DynModeTripsAnalyser.collection2Text(trips,matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_trips.csv") , DynModeTrip.HEADER);
 		}
+		DynModeTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleDistances(),matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleDistanceStats.csv"));
 		DynModeTripsAnalyser.analyseDetours(network, trips, drtgroup.getEstimatedBeelineDistanceFactor(), drtgroup.getEstimatedSpeed(), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_detours"));
 		DynModeTripsAnalyser.analyseWaitTimes(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitStats"), trips, 1800);
 	}
@@ -93,7 +95,7 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 	 * @param summarizeTrips
 	 * @param iteration
 	 */
-	private void writeIterationStats(String summarizeTrips, int it) {
+	private void writeIterationPassengerStats(String summarizeTrips, int it) {
 		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename("drt_customer_stats.csv"));
 		try {
 			if (!headerWritten){
@@ -108,6 +110,28 @@ public class DRTAnalysisControlerListener implements IterationEndsListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+		
+		/**
+		 * @param summarizeTrips
+		 * @param iteration
+		 */
+		private void writeIterationVehicleStats(String summarizeVehicles, int it) {
+			BufferedWriter bw = IOUtils.getAppendingBufferedWriter(matsimServices.getControlerIO().getOutputFilename("drt_vehicle_stats.csv"));
+			try {
+				if (!vheaderWritten){
+					vheaderWritten =true;
+					bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
+					
+				}
+				bw.newLine();
+				bw.write(it+";"+summarizeVehicles);
+				bw.flush();
+				bw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 	 
 

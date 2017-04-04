@@ -68,6 +68,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	final private Map<Id<Person>,Id<Link>> departureLinks = new HashMap<>();
 	final private List<DynModeTrip> drtTrips = new ArrayList<>();
 	final private Map<Id<Vehicle>,Map<Id<Person>,MutableDouble>> inVehicleDistance = new HashMap<>();
+	final private Map<Id<Vehicle>,double[]> vehicleDistances = new HashMap<>();
 	final private Map<Id<Person>,DynModeTrip> currentTrips = new HashMap<>();
 	final String mode;
 	
@@ -98,6 +99,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 		departureLinks.clear();
 		inVehicleDistance.clear();
 		currentTrips.clear();
+		vehicleDistances.clear();
 	}
 	/* (non-Javadoc)
 	 * @see org.matsim.api.core.v01.events.handler.ActivityEndEventHandler#handleEvent(org.matsim.api.core.v01.events.ActivityEndEvent)
@@ -107,6 +109,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)){
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
 			this.inVehicleDistance.put(vid, new HashMap<>());
+			this.vehicleDistances.put(vid, new double[3]);
 		}
 	}
 	/* (non-Javadoc)
@@ -118,6 +121,11 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 			double distance = network.getLinks().get(event.getLinkId()).getLength();
 			for (MutableDouble d : inVehicleDistance.get(event.getVehicleId()).values()){
 				d.add(distance);
+			}
+			this.vehicleDistances.get(event.getVehicleId())[0]+=distance; //overall distance drive
+			this.vehicleDistances.get(event.getVehicleId())[1]+=distance*inVehicleDistance.get(event.getVehicleId()).size(); //overall revenue distance
+			if (inVehicleDistance.get(event.getVehicleId()).size()>0){
+			this.vehicleDistances.get(event.getVehicleId())[2]+=distance; //overall occupied distance
 			}
 		}
 		
@@ -179,6 +187,13 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	 */
 	public List<DynModeTrip> getDrtTrips() {
 		return drtTrips;
+	}
+	
+	/**
+	 * @return the vehicleDistances
+	 */
+	public Map<Id<Vehicle>, double[]> getVehicleDistances() {
+		return vehicleDistances;
 	}
 	
 

@@ -54,11 +54,13 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author jbischoff
@@ -300,5 +302,66 @@ public class DynModeTripsAnalyser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * @param vehicleDistances
+	 * @param iterationFilename
+	 */
+	public static void writeVehicleDistances(Map<Id<Vehicle>, double[]> vehicleDistances, String iterationFilename) {
+		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;revenueDistance_pm";
+		BufferedWriter bw = IOUtils.getBufferedWriter(iterationFilename);
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+		try {
+			bw.write(header);
+			for (Entry<Id<Vehicle>, double[]> e : vehicleDistances.entrySet()){
+				double drivenDistance = e.getValue()[0];
+				double revenueDistance = e.getValue()[1];
+				double occDistance = e.getValue()[2];
+				double emptyDistance = drivenDistance-occDistance;
+				bw.newLine();
+				bw.write(e.getKey().toString()+";"+format.format(drivenDistance)+";"+format.format(occDistance)+";"+format.format(emptyDistance)+";"+format.format(revenueDistance));
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * @param vehicleDistances
+	 * @param string
+	 * @return
+	 */
+	public static String summarizeVehicles(Map<Id<Vehicle>, double[]> vehicleDistances, String del) {
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+		
+		DescriptiveStatistics driven = new DescriptiveStatistics();
+		DescriptiveStatistics revenue = new DescriptiveStatistics();
+		DescriptiveStatistics occupied = new DescriptiveStatistics();
+		DescriptiveStatistics empty = new DescriptiveStatistics();
+		
+		for (double[] dist : vehicleDistances.values()){
+			driven.addValue(dist[0]);
+			revenue.addValue(dist[1]);
+			occupied.addValue(dist[2]);
+			double emptyD = dist[0]- dist[2];
+			empty.addValue(emptyD);
+		}
+//		bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
+		String result = vehicleDistances.size()+del+format.format(driven.getSum())+del+format.format(empty.getSum())+del+format.format(empty.getSum()/driven.getSum())+del+format.format(revenue.getSum())
+		+del+format.format(driven.getMean())+del+format.format(empty.getMean())+del+format.format(revenue.getMean());
+		return result;
 	}
 }
