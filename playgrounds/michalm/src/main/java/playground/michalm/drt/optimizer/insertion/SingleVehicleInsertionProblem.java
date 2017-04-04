@@ -51,6 +51,11 @@ public class SingleVehicleInsertionProblem {
 			this.pathToDropoff = pathToDropoff;
 			this.pathFromDropoff = pathFromDropoff;
 		}
+		
+		@Override
+		public String toString() {
+			return "Insertion: pickupIdx=" + pickupIdx + ", dropoffIdx=" + dropoffIdx;
+		}
 	}
 
 	public static class BestInsertion {

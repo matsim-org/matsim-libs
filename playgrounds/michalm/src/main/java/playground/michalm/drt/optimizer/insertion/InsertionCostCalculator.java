@@ -49,9 +49,6 @@ public class InsertionCostCalculator {
 	// ==> checks if all the constraints are satisfied for all passengers/requests ==> if not ==>
 	// INFEASIBLE_SOLUTION_COST is returned
 	public double calculate(NDrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion) {
-		int i = insertion.pickupIdx;
-		int j = insertion.dropoffIdx;
-
 		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(drtRequest, vEntry, insertion);
 		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(drtRequest, vEntry, insertion);
 
