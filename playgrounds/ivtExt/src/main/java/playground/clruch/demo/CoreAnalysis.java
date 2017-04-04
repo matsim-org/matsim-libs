@@ -25,10 +25,12 @@ import java.util.stream.Collectors;
 class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
+    String dataPath;
 
-    CoreAnalysis(StorageSupplier storageSupplierIn){
+    CoreAnalysis(StorageSupplier storageSupplierIn, String datapath){
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
+        dataPath = datapath;
     }
 
 
@@ -97,8 +99,8 @@ class CoreAnalysis {
         }
 
 
-        Files.write(Paths.get("basicdemo.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-        Files.write(Paths.get("basicdemo.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+        Files.write(Paths.get(dataPath+"/basicdemo.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
+       // Files.write(Paths.get("basicdemo.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
 
     }
 }

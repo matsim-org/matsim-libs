@@ -76,8 +76,8 @@ public class VirtualNetwork {
     }
 
 
-    /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn) {
-        VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn);
+    /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn,int neighCount) {
+        VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount);
         virtualNodes.add(virtualNode);
         for (Link link : virtualNode.getLinks())
             linkVNodeMap.put(link, virtualNode);
