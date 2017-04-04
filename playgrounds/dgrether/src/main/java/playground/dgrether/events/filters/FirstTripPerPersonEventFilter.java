@@ -45,14 +45,27 @@ public class FirstTripPerPersonEventFilter implements EventFilter {
 
 	private static final Logger LOG = Logger.getLogger(FirstTripPerPersonEventFilter.class);
 	
-	Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
-	List<Id<Person>> firstTripFinishedPersons = new LinkedList<>();
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private List<Id<Person>> firstTripFinishedPersons = new LinkedList<>();
+	private double lastTime = 0;
 	
 	@Override
 	public boolean doProcessEvent(Event event) {
 		if (event instanceof HasPersonId){
+			if (lastTime > event.getTime()){
+				// reset list when iteration starts again (first interesting event is HasPersonId, that is why this test can be made here - saves time)
+				firstTripFinishedPersons.clear();
+				delegate.reset(0);
+			}
+			lastTime = event.getTime();
+			
 			if (event instanceof PersonArrivalEvent){
-				firstTripFinishedPersons.add(((PersonArrivalEvent) event).getPersonId());
+				if (firstTripFinishedPersons.contains(((HasPersonId) event).getPersonId())){
+					return false;
+				} else {
+					firstTripFinishedPersons.add(((PersonArrivalEvent) event).getPersonId());
+					return true;
+				}
 			} else if (event instanceof VehicleEntersTrafficEvent){
 				delegate.handleEvent((VehicleEntersTrafficEvent)event);
 			} else if (event instanceof VehicleLeavesTrafficEvent){
