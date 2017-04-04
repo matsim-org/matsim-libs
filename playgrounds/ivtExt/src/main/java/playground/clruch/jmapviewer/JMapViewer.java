@@ -71,12 +71,10 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     protected boolean mapRectanglesVisible;
     protected boolean mapPolygonsVisible;
 
-    protected boolean tileGridVisible;
+    protected boolean tileGridVisible = false;
     protected boolean scrollWrapEnabled;
 
     protected transient TileController tileController;
-
-    // protected DataManager dataManager; // jan added this
 
     protected List<MatsimHeatMap> matsimHeatmaps = new ArrayList<>();
 
@@ -90,6 +88,8 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
      * Current zoom level
      */
     protected int zoom;
+
+    public int mapAlphaCover = 128;
 
     protected JSlider zoomSlider;
     protected JButton zoomInButton;
@@ -155,7 +155,6 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
         mapMarkersVisible = true;
         mapRectanglesVisible = true;
         mapPolygonsVisible = true;
-        tileGridVisible = false;
         setLayout(null);
         initializeZoomSlider();
         setMinimumSize(new Dimension(tileSource.getTileSize(), tileSource.getTileSize()));
@@ -657,7 +656,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                     if (xMin <= posx && posx <= xMax && yMin <= posy && posy <= yMax) {
                         // tile is visible
                         Tile tile;
-                        if (scrollWrapEnabled) {
+                        if (isScrollWrapEnabled()) {
                             // in case tilex is out of bounds, grab the tile to use for wrapping
                             int tilexWrap = ((tilex % gridLength) + gridLength) % gridLength;
                             tile = tileController.getTile(tilexWrap, tiley, zoom);
@@ -668,16 +667,18 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                             tile.paint(g, posx, posy); // , tilesize, tilesize
 
                             {
-                                Color color = new Color(255, 255, 255, 128);
-                                g.setColor(color);
+                                g.setColor(new Color(255, 255, 255, mapAlphaCover));
                                 g.fillRect(posx, posy, 256, 256);
                             }
 
                             for (MatsimHeatMap matsimHeatmap : matsimHeatmaps)
                                 matsimHeatmap.render(g, tile, zoom, posx, posy);
 
-                            if (tileGridVisible) {
-                                g.drawRect(posx, posy, tilesize, tilesize);
+                            if (isTileGridVisible()) {
+                                g.setColor(new Color(0, 0, 0, 32));
+                                g.drawLine(posx + 1, posy, posx + tilesize, posy);
+                                g.drawLine(posx, posy + 1, posx, posy + tilesize);
+                                g.setColor(new Color(0, 0, 0, 128));
                                 g.drawString(String.format("x=%d y=%d", tile.getXtile(), tile.getYtile()), posx, posy + 10);
                             }
                         }
@@ -750,7 +751,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     protected void paintMarker(Graphics g, MapMarker marker) {
         Point p = getMapPosition(marker.getLat(), marker.getLon(), marker.getMarkerStyle() == MapMarker.STYLE.FIXED);
         Integer radius = getRadius(marker, p);
-        if (scrollWrapEnabled) {
+        if (isScrollWrapEnabled()) {
             int tilesize = tileSource.getTileSize();
             int mapSize = tilesize << zoom;
             if (p == null) {
@@ -793,7 +794,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
             Point pBottomRight = getMapPosition(bottomRight, false);
             if (pTopLeft != null && pBottomRight != null) {
                 rectangle.paint(g, pTopLeft, pBottomRight);
-                if (scrollWrapEnabled) {
+                if (isScrollWrapEnabled()) {
                     int tilesize = tileSource.getTileSize();
                     int mapSize = tilesize << zoom;
                     int xTopLeftSave = pTopLeft.x;
@@ -839,7 +840,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                 points.add(p);
             }
             polygon.paint(g, points);
-            if (scrollWrapEnabled) {
+            if (isScrollWrapEnabled()) {
                 int tilesize = tileSource.getTileSize();
                 int mapSize = tilesize << zoom;
                 List<Point> pointsWrapped = new LinkedList<>(points);

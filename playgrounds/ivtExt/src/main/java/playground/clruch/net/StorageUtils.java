@@ -35,6 +35,7 @@ public enum StorageUtils {
             return Collections.emptyNavigableMap();
         NavigableMap<Integer, File> navigableMap = new TreeMap<>();
         File lastIter = files[files.length - 1];
+        System.out.println("loading last Iter = " + lastIter);
         for (File dir : lastIter.listFiles())
             if (dir.isDirectory())
                 for (File file : dir.listFiles())

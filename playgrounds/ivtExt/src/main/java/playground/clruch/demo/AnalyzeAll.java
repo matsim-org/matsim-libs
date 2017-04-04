@@ -2,8 +2,10 @@ package playground.clruch.demo;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import playground.clruch.gfx.MatsimStaticDatabase;
+
+import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
+import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 
 import java.io.File;
@@ -25,10 +27,7 @@ public class AnalyzeAll {
 
         // load coordinate system
         // TODO later remove hard-coded
-        CoordinateTransformation ct;
-        //ct = new CH1903LV03PlustoWGS84(); // <- switzerland
-        ct = new SiouxFallstoWGS84(); // <- sioux falls
-        MatsimStaticDatabase.initializeSingletonInstance(network, ct);
+        MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
         // load simulation data
         StorageSupplier storageSupplier = StorageSupplier.getDefault();
