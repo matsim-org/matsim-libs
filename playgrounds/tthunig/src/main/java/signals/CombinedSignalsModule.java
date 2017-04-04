@@ -37,6 +37,7 @@ import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Provides;
 
+import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
@@ -71,6 +72,8 @@ public class CombinedSignalsModule extends AbstractModule {
 		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			bind(DgSylviaConfig.class).toInstance(sylviaConfig);
 			bind(LaemmerConfig.class).toInstance(laemmerConfig);
+			bind(TtTotalDelay.class).asEagerSingleton();
+			addEventHandlerBinding().to(TtTotalDelay.class);
 			bind(SignalModelFactory.class).to(CombinedSignalModelFactory.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
 			bind(LinkSensorManager.class);

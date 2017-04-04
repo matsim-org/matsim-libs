@@ -33,6 +33,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 
 import com.google.inject.Inject;
 
+import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import signals.laemmer.model.LaemmerSignalController.SignalControlProvider;
 
@@ -51,10 +52,10 @@ public final class LaemmerSignalModelFactory implements SignalModelFactory {
 	private SignalControlProvider provider;
 	
 	@Inject
-	public LaemmerSignalModelFactory(LaemmerConfig config, LinkSensorManager sensorManager, Scenario scenario) {
+	public LaemmerSignalModelFactory(LaemmerConfig config, LinkSensorManager sensorManager, Scenario scenario, TtTotalDelay delayCalculator) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
-		this.provider = new LaemmerSignalController.SignalControlProvider(config, sensorManager, signalsData, network);
+		this.provider = new LaemmerSignalController.SignalControlProvider(config, sensorManager, signalsData, network, delayCalculator);
 	}
 
 	@Override

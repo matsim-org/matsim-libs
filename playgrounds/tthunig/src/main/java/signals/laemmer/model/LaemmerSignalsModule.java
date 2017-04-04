@@ -32,6 +32,7 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.ReplanningContext;
+import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
 import signals.CombinedSignalsModule;
@@ -54,6 +55,10 @@ public class LaemmerSignalsModule extends AbstractModule{
 			// signal specific bindings
 			bind(LaemmerConfig.class).toInstance(laemmerConfig);
 			bind(SignalModelFactory.class).to(LaemmerSignalModelFactory.class);
+
+			//binding for delay eventhandler
+			bind(TtTotalDelay.class).asEagerSingleton();
+			addEventHandlerBinding().to(TtTotalDelay.class);
 			
 			// bindings for sensor based signals
 			bind(LinkSensorManager.class);
