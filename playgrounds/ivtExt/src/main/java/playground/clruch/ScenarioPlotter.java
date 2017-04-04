@@ -13,9 +13,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import org.matsim.core.utils.geometry.transformations.CH1903LV03PlustoWGS84;
 import playground.clruch.gfx.MatsimJMapViewer;
-import playground.clruch.gfx.MatsimStaticDatabase;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
+import playground.clruch.net.MatsimStaticDatabase;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 /**

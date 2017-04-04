@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.gheat.graphics.ColorScheme;
-import playground.clruch.gheat.graphics.ThemeManager;
+import playground.clruch.gheat.graphics.DotImages;
 
 public class HeatMap {
     public static boolean isInitialised = false;
@@ -23,10 +23,10 @@ public class HeatMap {
             throw new Exception("No 'Data manager' has been specified");
         return Tile.Generate( //
                 colorScheme, //
-                ThemeManager.GetDot(zoom), //
+                DotImages.get(zoom), //
                 zoom, //
                 x, //
                 y, //
-                dataManager.GetPointsForTile(x, y, ThemeManager.GetDot(zoom), zoom));
+                dataManager.GetPointsForTile(x, y, DotImages.get(zoom), zoom));
     }
 }

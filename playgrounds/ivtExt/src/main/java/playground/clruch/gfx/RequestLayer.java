@@ -22,8 +22,8 @@ public class RequestLayer extends ViewerLayer {
     // ---
     private volatile boolean drawRequestDestinations = false;
 
-    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.ORANGE_CONTOUR.colorScheme);
-    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN_CONTOUR.colorScheme);
+    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.ORANGE.colorScheme);
+    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN.colorScheme);
 
     public RequestLayer(MatsimJMapViewer matsimJMapViewer) {
         super(matsimJMapViewer);
@@ -32,7 +32,7 @@ public class RequestLayer extends ViewerLayer {
     double maxWaitTime;
 
     @Override
-    public void perpareHeatmaps(SimulationObject ref) {
+    public void prepareHeatmaps(SimulationObject ref) {
         {
             requestHeatMap.clear();
             Map<Integer, List<RequestContainer>> map = ref.requests.stream() //

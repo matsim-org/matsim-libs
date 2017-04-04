@@ -7,7 +7,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,10 +15,15 @@ import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
-import playground.clruch.ResourceLocator;
-import playground.clruch.gheat.graphics.ThemeManager;
+import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Sort;
+import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.jmapviewer.interfaces.ICoordinate;
+import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.GraphicsUtil;
 
@@ -27,22 +31,20 @@ public class MatsimJMapViewer extends JMapViewer {
 
     final MatsimStaticDatabase db;
     private int repaint_count = 0;
-    public volatile int alpha = 196 - 32;
 
     SimulationObject simulationObject = null;
 
     public final LinkLayer linkLayer;
     public final RequestLayer requestLayer;
     public final VehicleLayer vehicleLayer;
+    public final VirtualNetworkLayer virtualNetworkLayer;
 
     private final List<ViewerLayer> viewerLayers = new ArrayList<>();
-    private PointCloud pc = null;
     private final List<InfoString> infoStrings = new LinkedList<>();
     private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
     private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
 
     public JLabel jLabel = new JLabel(" ");
-    // MatsimHeatmap rebalanceHeatmap = new MatsimHeatmap("classic", 128);
 
     public MatsimJMapViewer(MatsimStaticDatabase db) {
         this.db = db;
@@ -50,21 +52,14 @@ public class MatsimJMapViewer extends JMapViewer {
         linkLayer = new LinkLayer(this);
         requestLayer = new RequestLayer(this);
         vehicleLayer = new VehicleLayer(this);
+        virtualNetworkLayer = new VirtualNetworkLayer(this);
 
         viewerLayers.add(linkLayer);
         viewerLayers.add(requestLayer);
         matsimHeatmaps.add(requestLayer.requestHeatMap);
         matsimHeatmaps.add(requestLayer.requestDestMap);
         viewerLayers.add(vehicleLayer);
-
-        try {
-            ThemeManager.init(ResourceLocator.INSTANCE.gheatDirectory.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-//        pc = PointCloud.fromCsvFile(new File("vN_90vS_L1/voronoi_BoundaryPoints.csv"));
-        pc = null;
+        viewerLayers.add(virtualNetworkLayer);
     }
 
     /**
@@ -80,49 +75,27 @@ public class MatsimJMapViewer extends JMapViewer {
         return getMapPosition(coord.getY(), coord.getX(), false);
     }
 
+    final Coord getCoordPositionXY(Point point) {
+        ICoordinate ic = getPosition(point);
+        // System.out.println("lat=" + ic.getLat() + " lon=" + ic.getLon());
+        Coord coord = new Coord(ic.getLon(), ic.getLat());
+        Coord xy = db.referenceFrame.coords_fromWGS84.transform(coord);
+        // System.out.println(xy);
+        return xy;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         ++repaint_count;
         final SimulationObject ref = simulationObject; // <- use ref for thread safety
 
         if (ref != null)
-            viewerLayers.forEach(viewerLayer -> viewerLayer.perpareHeatmaps(ref));
-        // {
-        // rebalanceHeatmap.clear();
-        // Map<Integer, List<VehicleContainer>> map = ref.vehicles.stream()
-        // .filter(v->v.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
-        // .collect(Collectors.groupingBy(r -> r.destinationLinkIndex));
-        //
-        // for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
-        // OsmLink osmLink = db.getOsmLink(entry.getKey());
-        // final int size = entry.getValue().size();
-        // for (int count = 0; count < size; ++count) {
-        // Coord coord = osmLink.getAt(count / (double) size);
-        // rebalanceHeatmap.addPoint(coord.getX(), coord.getY());
-        // }
-        // }
-        // }
+            viewerLayers.forEach(viewerLayer -> viewerLayer.prepareHeatmaps(ref));
 
         super.paintComponent(g);
+
         final Graphics2D graphics = (Graphics2D) g;
         final Dimension dimension = getSize();
-        // graphics.setColor(new Color(255, 255, 255, alpha));
-        // graphics.fillRect(0, 0, dimension.width, dimension.height);
-
-        if (pc != null) {
-            graphics.setColor(new Color(255, 153, 0, 128));
-            for (Tensor pnt : pc.tensor) {
-                Coord coord = MatsimStaticDatabase.INSTANCE.coordinateTransformation.transform(new Coord( //
-                        pnt.Get(0).number().doubleValue(), //
-                        pnt.Get(1).number().doubleValue() //
-                ));
-
-                Point point = getMapPosition(coord);
-                if (point != null)
-                    graphics.drawRect(point.x, point.y, 1, 1);
-
-            }
-        }
 
         if (ref != null) {
 
@@ -185,6 +158,11 @@ public class MatsimJMapViewer extends JMapViewer {
 
     public void setSimulationObject(SimulationObject simulationObject) {
         this.simulationObject = simulationObject;
+        repaint();
+    }
+
+    public void setMapAlphaCover(int alpha) {
+        mapAlphaCover = alpha;
         repaint();
     }
 
