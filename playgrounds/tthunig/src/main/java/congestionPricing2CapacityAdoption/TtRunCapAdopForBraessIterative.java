@@ -78,7 +78,7 @@ public class TtRunCapAdopForBraessIterative {
 	
 	// defines which kind of pricing should be used
 	private static final PricingType PRICING_TYPE = PricingType.V9;
-	private enum PricingType {
+	enum PricingType {
 		V3, V4, V7, V8, V9, V10
 	}
 
