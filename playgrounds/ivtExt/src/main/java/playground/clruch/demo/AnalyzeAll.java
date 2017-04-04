@@ -2,9 +2,10 @@ package playground.clruch.demo;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import playground.clruch.gfx.MatsimStaticDatabase;
+
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
+import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 
 import static playground.clruch.demo.utils.NetworkLoader.loadNetwork;

@@ -154,7 +154,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
         mapRectangleList = Collections.synchronizedList(new LinkedList<MapRectangle>());
         mapMarkersVisible = true;
         mapRectanglesVisible = true;
-        mapPolygonsVisible = true;        
+        mapPolygonsVisible = true;
         setLayout(null);
         initializeZoomSlider();
         setMinimumSize(new Dimension(tileSource.getTileSize(), tileSource.getTileSize()));
@@ -675,8 +675,10 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
                                 matsimHeatmap.render(g, tile, zoom, posx, posy);
 
                             if (isTileGridVisible()) {
-                                g.setColor(new Color(0, 0, 0, 64));
-                                g.drawRect(posx, posy, tilesize, tilesize);
+                                g.setColor(new Color(0, 0, 0, 32));
+                                g.drawLine(posx + 1, posy, posx + tilesize, posy);
+                                g.drawLine(posx, posy + 1, posx, posy + tilesize);
+                                g.setColor(new Color(0, 0, 0, 128));
                                 g.drawString(String.format("x=%d y=%d", tile.getXtile(), tile.getYtile()), posx, posy + 10);
                             }
                         }

@@ -16,8 +16,8 @@ import java.io.File;
 public class NetworkLoader {
     public static Network loadNetwork(String[] args) {
         // TODO can this be made more nice?
+        // TODO potentially use MatsimNetworkReader to only read network?!
         File configFile = new File(args[0]);
-        final File dir = configFile.getParentFile();
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
