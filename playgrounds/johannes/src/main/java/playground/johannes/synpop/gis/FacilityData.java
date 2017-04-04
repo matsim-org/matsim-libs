@@ -26,6 +26,9 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -44,9 +47,12 @@ public class FacilityData {
 
     private final Random random;
 
-    public FacilityData(ActivityFacilities facilities, Random random) {
+    private final Map<String, List<String>> typeMapping;
+
+    public FacilityData(ActivityFacilities facilities, Map<String, List<String>> typeMapping, Random random) {
         this.random = random;
         this.facilities = facilities;
+        this.typeMapping = typeMapping;
     }
 
     public ActivityFacilities getAll() {
@@ -97,14 +103,20 @@ public class FacilityData {
 
             for (ActivityFacility facility : facilities.getFacilities().values()) {
                 for (ActivityOption option : facility.getActivityOptions().values()) {
-                    List<ActivityFacility> list = facilitiesMap.get(option.getType());
+                    //TODO: This needs more thinking...
+                    String buildingType = option.getType();
+                    List<String> activityTypes = typeMapping.get(buildingType);
 
-                    if (list == null) {
-                        list = new LinkedList<>();
-                        facilitiesMap.put(option.getType(), list);
+                    for(String activityType : activityTypes) {
+                        List<ActivityFacility> list = facilitiesMap.get(activityType);
+
+                        if (list == null) {
+                            list = new LinkedList<>();
+                            facilitiesMap.put(option.getType(), list);
+                        }
+
+                        list.add(facility);
                     }
-
-                    list.add(facility);
                 }
             }
 
@@ -142,5 +154,27 @@ public class FacilityData {
 
             logger.debug("Done.");
         }
+    }
+
+    public static Map<String, List<String>> loadTypeMapping(String filename) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        String line = reader.readLine();
+
+        Map<String, List<String>> mapping = new HashMap<>();
+
+        while((line = reader.readLine()) != null) {
+            String tokens[] = line.split("\\s");
+            String type = tokens[0];
+            String facility = tokens[1];
+
+            List<String> types = mapping.get(facility);
+            if(types == null) {
+                types = new ArrayList<>();
+                mapping.put(facility, types);
+            }
+            types.add(type);
+        }
+
+        return mapping;
     }
 }

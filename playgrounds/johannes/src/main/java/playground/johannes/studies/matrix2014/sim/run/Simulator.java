@@ -193,7 +193,7 @@ public class Simulator {
 //        GeoDistanceLAU2Hamiltonian.build(this, config);
 //        MeanDistanceHamiltonian.build(this, config);
 //        MeanZoneDistanceHamiltonian.build(this, config);
-        ODCalibratorHamiltonian.build(this, config);
+//        ODCalibratorHamiltonian.build(this, config);
 
         engineListeners.addComponent(new HamiltonianLogger(hamiltonian,
                 loggingInterval,
