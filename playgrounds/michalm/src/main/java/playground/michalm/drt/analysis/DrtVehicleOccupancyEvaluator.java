@@ -176,11 +176,7 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 			int endBin = getBin(event.getTime());
 			for (int i = startBin; i<endBin;i++){
 				vehicleOccupancy.get(event.getVehicleId())[i]++;
-				if (vehicleOccupancy.get(event.getVehicleId())[i]>4)
-				{
-					System.out.println(event.getTime() + " " + event.getVehicleId());
 				}
-			}
 			
 		}
 	}

@@ -43,7 +43,7 @@ public class DynModeTrip implements Comparable<DynModeTrip>{
 	
 	
 	static final String demitter = ";";
-	public static final String HEADER = "departureTime"+demitter+"personId"+demitter+"vehicleId"+demitter+"fromLinkId"+demitter+"fromCordX"+demitter+"fromCordY"+demitter+"toLinkId"+demitter+"toCoordX"+demitter+"toCoordY"+demitter+"waitTime"+demitter+"arrivalTime"+demitter+"travelTime"+"travelDistance_m";
+	public static final String HEADER = "departureTime"+demitter+"personId"+demitter+"vehicleId"+demitter+"fromLinkId"+demitter+"fromX"+demitter+"fromY"+demitter+"toLinkId"+demitter+"toX"+demitter+"toY"+demitter+"waitTime"+demitter+"arrivalTime"+demitter+"travelTime"+demitter+"travelDistance_m";
 	
 	DynModeTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
 			double waitTime) {

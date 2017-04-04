@@ -21,6 +21,7 @@ package playground.michalm.drt.optimizer;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -63,7 +64,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 		NDrtRequest drtRequest = (NDrtRequest)request;
 		if (drtRequest.getFromLink() == drtRequest.getToLink()) {
 			//throw new IllegalArgumentException("fromLink and toLink must be different");
-			System.err.println("fromLink and toLink must be different");
+			Logger.getLogger(getClass()).error("fromLink and toLink must be different. Request "+request.getId() + " will not be served. The agent will stay in limbo." );
 			return;
 		}
 		unplannedRequests.add(drtRequest);

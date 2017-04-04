@@ -55,7 +55,7 @@ public class SelectedPlansAnalyzer {
 			plansFileInterval = Integer.valueOf(args[3]);
 			useInterimPlans = Boolean.valueOf(args[4]);
 			useOutputPlans = Boolean.valueOf(args[5]);
-			if (args.length <= 7) {
+			if (args.length >= 7) {
                 alternativeOutputDir = args[6];
                 log.info("AlternativeOutputDir: " + alternativeOutputDir);
             }
