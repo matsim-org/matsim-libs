@@ -255,7 +255,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(matsimControler.getScenario(),
+                    System.out.println("init routers");
+                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(scenario,
                             waitTimes,
                             stopStopTimes);
                     bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
