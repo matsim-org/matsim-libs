@@ -21,6 +21,8 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.matsim.api.core.v01.Coord;
+
 import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -157,7 +159,6 @@ public class MatsimViewerFrame implements Runnable {
             panelSettings.add(jCheckBox);
         }
         {
-            matsimJMapViewer.virtualNetworkLayer.init();
             final JCheckBox jCheckBox = new JCheckBox("cells");
             jCheckBox.setSelected(matsimJMapViewer.virtualNetworkLayer.getDrawCells());
             jCheckBox.addActionListener(e -> matsimJMapViewer.virtualNetworkLayer.setDrawCells(jCheckBox.isSelected()));
@@ -207,6 +208,10 @@ public class MatsimViewerFrame implements Runnable {
 
     private JMapViewer getJMapViewer() {
         return treeMap.getViewer();
+    }
+
+    public void setDisplayPosition(Coord coord, int zoom) {
+        setDisplayPosition(coord.getY(), coord.getX(), zoom);
     }
 
     public void setDisplayPosition(double lat, double lon, int zoom) {

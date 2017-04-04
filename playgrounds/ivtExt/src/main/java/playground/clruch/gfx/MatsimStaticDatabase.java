@@ -9,10 +9,14 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.red.Mean;
+import playground.clruch.net.CoordUtil;
 import playground.clruch.net.IdIntegerDatabase;
 import playground.clruch.net.OsmLink;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -48,8 +52,6 @@ public class MatsimStaticDatabase {
      * rapid lookup from MATSIM side
      */
     private final Map<Link, Integer> linkInteger = new HashMap<>();
-
-    public final CoordinateTransformation coordinateTransformation;
     public final ReferenceFrame referenceFrame;
 
     /**
@@ -63,7 +65,6 @@ public class MatsimStaticDatabase {
     private MatsimStaticDatabase( //
             ReferenceFrame referenceFrame, //
             NavigableMap<String, OsmLink> linkMap) {
-        this.coordinateTransformation = referenceFrame.coords_toWGS84;
         this.referenceFrame = referenceFrame;
         list = new ArrayList<>(linkMap.values());
         int index = 0;
@@ -83,6 +84,13 @@ public class MatsimStaticDatabase {
 
     public Collection<OsmLink> getOsmLinks() {
         return Collections.unmodifiableCollection(list);
+    }
+
+    public Coord getCenter() {
+        return CoordUtil.toCoord( //
+                Mean.of(Tensor.of(getOsmLinks().stream() //
+                        .map(osmLink -> osmLink.getAt(.5)) //
+                        .map(CoordUtil::toTensor))));
     }
 
     public int getOsmLinksSize() {

@@ -10,11 +10,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.gfx.MatsimJMapViewer;
 import playground.clruch.gfx.MatsimStaticDatabase;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.gfx.PointCloud;
+import playground.clruch.gfx.ReferenceFrame;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 /**
@@ -50,24 +50,21 @@ public class ScenarioViewer {
         double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
         System.out.println(bb[0] + " " + bb[1] + " " + bb[2] + " " + bb[3]);
 
-        MatsimStaticDatabase.initializeSingletonInstance(network, //
-                ReferenceFrame.SWITZERLAND);
+        MatsimStaticDatabase.initializeSingletonInstance( //
+                network, //
+                ReferenceFrame.SIOUXFALLS);
 
         MatsimJMapViewer matsimJMapViewer = new MatsimJMapViewer(MatsimStaticDatabase.INSTANCE);
         // this is optional and should not cause problems if file does not exist.
         // temporary solution
-        matsimJMapViewer.virtualNetworkLayer.pc = PointCloud.fromCsvFile(new File("vN_90vS_L1/voronoi_BoundaryPoints.csv"));
-        matsimJMapViewer.setTileGridVisible(false);
+        matsimJMapViewer.virtualNetworkLayer.setPointCloud(PointCloud.fromCsvFile( //
+                new File("dummy_vn/voronoi_BoundaryPoints.csv"), // TODO <- extract name from xml file
+                MatsimStaticDatabase.INSTANCE.referenceFrame.coords_toWGS84));
+        
+//        matsimJMapViewer.setTileGridVisible(false);
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);
-
-        // basel
-        matsimViewer.setDisplayPosition(47.55814, 7.58769, 11);
-
-        // sioux falls
-        // TODO obtain center from db
-        // matsimViewer.setDisplayPosition(43.54469101104898, -96.72376155853271, 13);
-
+        matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(800, 900);
         matsimViewer.jFrame.setVisible(true);
 

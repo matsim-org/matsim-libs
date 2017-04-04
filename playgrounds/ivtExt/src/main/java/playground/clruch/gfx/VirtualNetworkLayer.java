@@ -6,14 +6,13 @@ import java.awt.Point;
 
 import org.matsim.api.core.v01.Coord;
 
-import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.net.SimulationObject;
 
 public class VirtualNetworkLayer extends ViewerLayer {
-    public static final Color COLOR = new Color(255, 153, 0, 128);
-    public PointCloud pc = null;
+    public static final Color COLOR = new Color(128, 153 / 2, 0, 255);
+    private PointCloud pointCloud = null;
 
-    private boolean drawCells = true;
+    private boolean drawCells = false;
 
     public VirtualNetworkLayer(MatsimJMapViewer matsimJMapViewer) {
         super(matsimJMapViewer);
@@ -25,21 +24,21 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        if (pc != null && drawCells) {
+        if (pointCloud != null && drawCells) {
             graphics.setColor(COLOR);
-            for (Tensor pnt : pc.tensor) {
-                Coord coord = MatsimStaticDatabase.INSTANCE.coordinateTransformation.transform(new Coord( //
-                        pnt.Get(0).number().doubleValue(), //
-                        pnt.Get(1).number().doubleValue() //
-                ));
-
+            for (Coord coord : pointCloud) {
                 Point point = matsimJMapViewer.getMapPosition(coord);
                 if (point != null)
-                    graphics.drawRect(point.x, point.y, 1, 1);
+                    graphics.drawRect(point.x, point.y, 0, 0);
 
             }
         }
 
+    }
+
+    public void setPointCloud(PointCloud pointCloud) {
+        this.pointCloud = pointCloud;
+        drawCells = pointCloud != null;
     }
 
     public boolean getDrawCells() {
@@ -48,10 +47,6 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     public void setDrawCells(boolean selected) {
         drawCells = selected;
-    }
-
-    public void init() {
-        drawCells = pc != null;
     }
 
 }
