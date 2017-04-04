@@ -101,10 +101,10 @@ class CoreAnalysis {
             table.append(row);
 
             // create maps for diagram creation
-            quantile50.put(s.now, 1000.0); // waitTimeQuantile.get(1));
-            quantile95.put(s.now, 1500.0); // waitTimeQuantile.get(2));
-            mean.put(s.now, 2000.0); // waitTimeMean);
-            occupancy.put(s.now, 0.5); // occupancyRatio);
+            quantile50.put(s.now, waitTimeQuantile.Get(1).number().doubleValue()); // waitTimeQuantile.get(1));
+            quantile95.put(s.now, waitTimeQuantile.Get(2).number().doubleValue()); // waitTimeQuantile.get(2));
+            mean.put(s.now, waitTimeMean.Get().number().doubleValue()); // waitTimeMean);
+            occupancy.put(s.now, occupancyRatio.number().doubleValue()); // occupancyRatio);
 
             if (s.now % 1000 == 0)
                 System.out.println(s.now);

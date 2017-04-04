@@ -1,8 +1,10 @@
 package playground.clruch.demo;
 
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.MathematicaFormat;
+import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
@@ -11,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.stream.IntStream;
 
 class DistanceAnalysis {
@@ -20,6 +24,12 @@ class DistanceAnalysis {
     DistanceAnalysis(StorageSupplier storageSupplierIn) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
+    }
+
+    static void saveFile(Tensor table, String name) throws Exception {
+        Files.write(Paths.get("output/data/" + name + ".csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
+        Files.write(Paths.get("output/data/" + name + ".mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+        
     }
 
     public void analzye() throws Exception {
@@ -43,15 +53,13 @@ class DistanceAnalysis {
 
         list.forEach(VehicleStatistic::consolidate);
 
+        Tensor table1 = list.stream().map(vs -> vs.distanceTotal).reduce(Tensor::add).get();
+        Tensor table2 = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get();
+        Tensor table3 = table1.map(InvertUnlessZero.function).pmul(table2);
         {
-            Tensor table = list.stream().map(vs -> vs.distanceTotal).reduce(Tensor::add).get();
-            Files.write(Paths.get("output/data/distanceTotal.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-            Files.write(Paths.get("output/data/distanceTotal.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
-        }
-        {
-            Tensor table = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get();
-            Files.write(Paths.get("output/data/distanceWithCustomer.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-            Files.write(Paths.get("output/data/distanceWithCustomer.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+            saveFile(table1, "distanceTotal");
+            saveFile(table2, "distanceWithCustomer");
+            saveFile(table3, "distanceRatio");
         }
     }
 }
