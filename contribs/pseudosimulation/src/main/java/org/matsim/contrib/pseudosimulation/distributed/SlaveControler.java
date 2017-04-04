@@ -201,6 +201,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         config.controler().setWriteEventsInterval(0);
         config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
+        // don't load plans; receive them from master
+        config.plans().setInputFile(null);
 //        Important, otherwise Psim breaks
         config.parallelEventHandling().setSynchronizeOnSimSteps(false);
         config.parallelEventHandling().setNumberOfThreads(1);

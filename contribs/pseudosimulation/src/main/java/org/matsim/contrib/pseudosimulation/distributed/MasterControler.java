@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
-import org.matsim.contrib.pseudosimulation.distributed.instrumentation.DistributedSimConfigGroup;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStats;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.GenomeAnalysis;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.SlaveScoreWriter;
@@ -69,8 +68,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private Scenario scenario;
     private long scenarioMemoryUse;
     private long bytesPerPlan;
-    private static boolean initialRoutingOnSlaves = false;
-    private static int slaveIterationsPerMasterIteration = 5;
+    private static boolean initialRoutingOnSlaves = true;
+    private final int slaveIterationsPerMasterIteration;
     private Config config;
     private Controler matsimControler;
     private TreeMap<Integer, SlaveHandler> slaveHandlerTreeMap;
@@ -113,6 +112,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         initialNumberOfSlaves = distributedSimConfigGroup.getInitialNumberOfSlaves();
         intelligentRouters = distributedSimConfigGroup.isIntelligentRouters();
         SelectedSimulationMode = distributedSimConfigGroup.isSlavesRunInParallelToMaster() ? SimulationMode.PARALLEL : SimulationMode.SERIAL;
+        slaveIterationsPerMasterIteration = distributedSimConfigGroup.getSlaveIterationsPerMasterIteration();
         fullTransitPerformanceTransmission = distributedSimConfigGroup.isFullTransitPerformanceTransmission();
 
         slaveHandlerTreeMap = new TreeMap<>();

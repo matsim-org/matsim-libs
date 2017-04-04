@@ -1,4 +1,4 @@
-package org.matsim.contrib.pseudosimulation.distributed.instrumentation;
+package org.matsim.contrib.pseudosimulation.distributed;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -12,20 +12,20 @@ public class DistributedSimConfigGroup extends ReflectiveConfigGroup {
     final static String MASTER_PORT_NUMBER = "masterPortNumber";
     private int masterPortNumber = 12345;
     static final String SLAVE_ITERS_PER_MASTER_ITER = "slaveIterationsPerMasterIteration";
-    private int slaveIterationsPerMasterIteration = 5;
+    private int slaveIterationsPerMasterIteration = 10;
     static final String INIT_NUM_SLAVES = "initialNumberOfSlaves";
-    private int initialNumberOfSlaves = 1;
+    private int initialNumberOfSlaves = 2;
     /**
      * Overall innovation rate on master.
      */
     static final String MASTER_MUTATION_RATE = "masterMutationRate";
-    private double masterMutationRate = 0.0001;
+    private double masterMutationRate = 0.1;
     /**
      * Overall rate of innovation on slaves per slave iteration. Total number of plans produced
      * per master iteration across all slaves is slaveMutationRate * slaveIterationsPerMasterIteration.
      */
     static final String SLAVE_MUTATION_RATE = "slaveMutationRate";
-    private double slaveMutationRate = 0.1;
+    private double slaveMutationRate = 0.3;
     /**
      * The probability that the master will accept a plan from a slave.
      */
