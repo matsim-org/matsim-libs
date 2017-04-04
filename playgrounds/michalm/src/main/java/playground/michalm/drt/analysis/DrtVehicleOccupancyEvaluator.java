@@ -176,11 +176,7 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 			int endBin = getBin(event.getTime());
 			for (int i = startBin; i<endBin;i++){
 				vehicleOccupancy.get(event.getVehicleId())[i]++;
-				if (vehicleOccupancy.get(event.getVehicleId())[i]>4)
-				{
-					System.out.println(event.getTime() + " " + event.getVehicleId());
 				}
-			}
 			
 		}
 	}
@@ -336,12 +332,12 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 			JFreeChart chart;
 			switch (type) {
 				case Line:
-					chart = ChartFactory.createXYLineChart("TimeProfile", "Time [s]", "Vehicles", dataset,
+					chart = ChartFactory.createXYLineChart("Vehicle Occupancy", "Time [s]", "Vehicles", dataset,
 							PlotOrientation.VERTICAL, true, false, false);
 					break;
 
 				case StackedArea:
-					chart = ChartFactory.createStackedXYAreaChart("TimeProfile", "Time [s]", "Vehicles", dataset,
+					chart = ChartFactory.createStackedXYAreaChart("Vehicle Occupancy", "Time [s]", "Vehicles", dataset,
 							PlotOrientation.VERTICAL, true, false, false);
 					break;
 

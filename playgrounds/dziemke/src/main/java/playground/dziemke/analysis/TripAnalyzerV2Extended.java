@@ -26,58 +26,52 @@ import playground.dziemke.utils.ShapeReader;
  * @author dziemke
  */
 public class TripAnalyzerV2Extended {
-	public static final Logger log = Logger.getLogger(TripAnalyzerV2Extended.class);
+	public static final Logger LOG = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
-	/* Parameters */
-	private static String runId = "be_121";	// <----------
-	private static String usedIteration = "300"; // most frequently used value: 150 // <----------
-	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
-	
-	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
+	// Parameters
+	private static String runId = "be_117j"; // <----------
+	private static String iterationForAnalysis = "300";
+	private static final String cemdapPersonsInputFileId = "21"; // Check if this number corresponds correctly to the runId
 
-	private static boolean onlySpecificMode = false; // "car"; should be used for runs with ChangeLegMode enabled
-	private static final String specificMode = TransportMode.car;
+	private static boolean onlyAnalyzeTripsWithMode = true; // <----------
+	private static final String mode = TransportMode.car;
 	
-	private static final boolean onlyInterior = false; // "int"
-	private static boolean onlyBerlinBased = false; // "ber"; usually varied for analysis // <----------
+	private static final boolean onlyAnalyzeTripInteriorOfArea = false; // formerly results labelled as "int"
+	private static boolean onlyAnalyzeTripsStartingOrEndingInArea = false; // formerly results labelled as "ber" (Berlin-based) <----------
+	private static final Integer areaId = 11000000; // 11000000 = Berlin; Set a shapefile that contains this area correctly!
 	
-	private static boolean useDistanceFilter = false; // "dist"; usually varied for analysis // <----------
-	// private static final double double minDistance = 0;
+	private static boolean onlyAnalyzeTripsInDistanceRange = false; // "dist"; usually varied for analysis // <----------
+	private static final double minDistance_km = 0;
 	private static final double maxDistance_km = 100;
 
-	private static final boolean onlySpecificActivityEndType = true; // used to be only "work"
-	private static final String spedificActivityEndType = "shopping";
-	
-	private static final boolean onlySpecificActivityStartType = true;
-	private static final String spedificActivityStartType = "work";
+	private static final boolean onlyAnalyzeTripsWithActivityTypeBeforeTrip = false;
+	private static final String activityTypeBeforeTrip = "shopping";
+	private static final boolean onlyAnalyzeTripsWithActivityTypeAfterTrip = false;
+	private static final String activityTypeAfterTrip = "work";
 
-	private static final boolean useAgeFilter = false; // "age"
+	private static final boolean onlyAnalyzeTripsDoneByPeopleInAgeRange = false; // "age"; this requires setting a CEMDAP file
 	private static final Integer minAge = 80; // typically "x0"
-	private static final Integer maxAge = 119; // typically "x9"; highest number ususally chosen is 119
+	private static final Integer maxAge = 119; // typically "x9"; highest number usually chosen is 119
 
 	private static final int binWidthDuration_min = 1;
 	private static final int binWidthTime_h = 1;
 	private static final int binWidthDistance_km = 1;
 	private static final int binWidthSpeed_km_h = 1;
 
-	/* Input and output */
-	private static String networkFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network_shortIds.xml.gz"; // <----------
-//	private static final String networkFile = "../../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz"; // <----------
-	private static String eventsFile = "../../../runs-svn/berlin_scenario_2016/" + runId + "/" + runId + ".output_events.xml.gz";
-//	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" + runId + "." + usedIteration + ".events.xml.gz";
-	private static String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + cemdapPersonsInputFileId + "/persons1.dat";
-//	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
-	private static String planningAreaShapeFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/Berlin_DHDN_GK4.shp";
-//	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
-	private static String outputDirectory = "../../../runs-svn/berlin_scenario_2016/" + runId + "/analysis";
-	
 	private static String gnuplotScriptName = "plot_rel_path_run.gnu";
 
-	/* Variables to store objects */
-	private static Geometry planningAreaGeometry;
+	// Input and output
+	private static String networkFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network_shortIds.xml.gz"; // <----------
+	private static String eventsFile = "../../../runs-svn/berlin_scenario_2016/" + runId + "/" + runId + ".output_events.xml.gz";
+	private static String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + cemdapPersonsInputFileId + "/persons1.dat"; // TODO
+	private static String areaShapeFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/Berlin_DHDN_GK4.shp";
+	private static String outputDirectory = "../../../runs-svn/berlin_scenario_2016/" + runId + "/analysis";
+
+	// Variables to store objects
+	private static Geometry areaGeometry;
 	private static ObjectAttributes cemdapPersonAttributes;
 
-	/* Variables to store information */
+	// Variables to store information
 	private static double aggregateWeightOfConsideredTrips = 0;
 	private static int numberOfInIncompleteTrips = 0;
     
@@ -90,13 +84,13 @@ public class TripAnalyzerV2Extended {
 		if (args.length != 0) {
 			networkFile = args[0];
 			eventsFile = args[1];
-			planningAreaShapeFile = args[2];
+			areaShapeFile = args[2];
 			outputDirectory = args[3];
 			runId = args[4];
-			usedIteration = args[5];
-			onlySpecificMode = Boolean.valueOf(args[6]);
-			onlyBerlinBased = Boolean.valueOf(args[7]);
-			useDistanceFilter = Boolean.valueOf(args[8]);
+			iterationForAnalysis = args[5];
+			onlyAnalyzeTripsWithMode = Boolean.valueOf(args[6]);
+			onlyAnalyzeTripsStartingOrEndingInArea = Boolean.valueOf(args[7]);
+			onlyAnalyzeTripsInDistanceRange = Boolean.valueOf(args[8]);
 			gnuplotScriptName = null;
 		}
 		run();
@@ -115,19 +109,19 @@ public class TripAnalyzerV2Extended {
 		eventsManager.addHandler(tripHandler);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
 		eventsReader.readFile(eventsFile);
-		log.info("Events file read!");
+		LOG.info("Events file read!");
 
 	    /* Get network, which is needed to calculate distances */
 		Network network = NetworkUtils.createNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 		networkReader.readFile(networkFile);
 
-		Map<Integer, Geometry> zoneGeometries = ShapeReader.read(planningAreaShapeFile, "NR");
-		planningAreaGeometry = zoneGeometries.get(planningAreaId);
+		Map<Integer, Geometry> zoneGeometries = ShapeReader.read(areaShapeFile, "NR");
+		areaGeometry = zoneGeometries.get(areaId);
 
 		AnalysisFileWriter writer = new AnalysisFileWriter();
 
-		if (useAgeFilter) {
+		if (onlyAnalyzeTripsDoneByPeopleInAgeRange) {
 			// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
 			CemdapPersonInputFileReader cemdapPersonInputFileReader = new CemdapPersonInputFileReader();
 			cemdapPersonInputFileReader.parse(cemdapPersonsInputFile);
@@ -183,7 +177,7 @@ public class TripAnalyzerV2Extended {
 		doBeelineCaluclations(trips, binWidthDistance_km, network);
 		writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", aggregateWeightOfConsideredTrips);
 
-		log.info(numberOfInIncompleteTrips + " trips are incomplete.");
+		LOG.info(numberOfInIncompleteTrips + " trips are incomplete.");
 
 
 		if (gnuplotScriptName != null) {
@@ -218,28 +212,27 @@ public class TripAnalyzerV2Extended {
 	
 	@SuppressWarnings("all")
 	private static void adaptOutputDirectory() {
-		outputDirectory = outputDirectory + "_" + usedIteration;
-	    if (onlySpecificMode) {
-			outputDirectory = outputDirectory + "_" + specificMode;
+		outputDirectory = outputDirectory + "_" + iterationForAnalysis;
+	    if (onlyAnalyzeTripsWithMode) {
+			outputDirectory = outputDirectory + "_" + mode;
 		}
-	    if (onlyInterior) {
-			outputDirectory = outputDirectory + "_int";
+	    if (onlyAnalyzeTripInteriorOfArea) {
+			outputDirectory = outputDirectory + "_inside-" + areaId;
 	    }
-		if (onlyBerlinBased) {
-			outputDirectory = outputDirectory + "_ber";
+		if (onlyAnalyzeTripsStartingOrEndingInArea) {
+			outputDirectory = outputDirectory + "_soe-in-" + areaId;
 		}
-		if (useDistanceFilter) {
-			outputDirectory = outputDirectory + "_dist";
+		if (onlyAnalyzeTripsInDistanceRange) {
+			outputDirectory = outputDirectory + "_dist-" + minDistance_km + "-" + maxDistance_km;
 		}
-		if (onlySpecificActivityEndType) {
-			outputDirectory = outputDirectory + "_from-" + spedificActivityEndType;
+		if (onlyAnalyzeTripsWithActivityTypeBeforeTrip) {
+			outputDirectory = outputDirectory + "_act-bef-" + activityTypeBeforeTrip;
 		}
-		if (onlySpecificActivityStartType) {
-			outputDirectory = outputDirectory + "_to-" + spedificActivityStartType;
+		if (onlyAnalyzeTripsWithActivityTypeAfterTrip) {
+			outputDirectory = outputDirectory + "_act-aft-" + activityTypeAfterTrip;
 		}
-		if (useAgeFilter) {
-			outputDirectory = outputDirectory + "_age_" + minAge.toString();
-			outputDirectory = outputDirectory + "_" + maxAge.toString();
+		if (onlyAnalyzeTripsDoneByPeopleInAgeRange) {
+			outputDirectory = outputDirectory + "_age-" + minAge.toString() + "-" + maxAge.toString();
 		}
 		new File(outputDirectory).mkdir();
 	}
@@ -268,42 +261,42 @@ public class TripAnalyzerV2Extended {
 			Point arrivalLocation = MGC.xy2Point(arrivalCoordX, arrivalCoordY);
 			Point departureLocation = MGC.xy2Point(departureCoordX, departureCoordY);
 
-			// choose if trip will be considered
-			if (onlyBerlinBased) {
-				if (!planningAreaGeometry.contains(arrivalLocation) && !planningAreaGeometry.contains(departureLocation)) {
+			// Choose if trip will be considered
+			if (onlyAnalyzeTripsStartingOrEndingInArea) {
+				if (!areaGeometry.contains(arrivalLocation) && !areaGeometry.contains(departureLocation)) {
 					continue;
 				}
 			}
-			if (onlyInterior) {
-				if (!planningAreaGeometry.contains(arrivalLocation) || !planningAreaGeometry.contains(departureLocation)) {
+			if (onlyAnalyzeTripInteriorOfArea) {
+				if (onlyAnalyzeTripsStartingOrEndingInArea) {
+					Log.warn("onlyAnalyzeTripInteriorOfArea and onlyAnalyzeTripsStartingOrEndingInArea activated at the same time!");
+				}
+				if (!areaGeometry.contains(arrivalLocation) || !areaGeometry.contains(departureLocation)) {
 					continue;
 				}
 			}
-//			if (!trip.getMode().equals("car") && !trip.getMode().equals("pt")) {
-//				throw new RuntimeException("In current implementation leg mode must either be car or pt");
-//			}
-			if (onlySpecificMode) {
-				if (!trip.getMode().equals(specificMode)) {
+			if (onlyAnalyzeTripsWithMode) {
+				if (!trip.getMode().equals(mode)) {
 					continue;
 				}
 			}
-			if (useDistanceFilter && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
+			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
 				continue;
 			}
-//			if (distanceFilter == true && (trip.getBeelineDistance(network) / 1000.) <= minDistance) {
-//    			continue;
-//    		}
-			if (onlySpecificActivityEndType && onlySpecificActivityStartType) {
-				Log.warn("onlySpecificActivityEndType and onlySpecificActivityStartType activated at the same time. This"
-						+ " may lead to results that are hard to interpret: rather not use these options simultaneously.");
+			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) <= minDistance_km) {
+    			continue;
+    		}
+			if (onlyAnalyzeTripsWithActivityTypeBeforeTrip && onlyAnalyzeTripsWithActivityTypeAfterTrip) {
+				Log.warn("onlyAnalyzeTripsWithActivityTypeBeforeTrip and onlyAnalyzeTripsWithActivityTypeAfterTrip activated at the same time."
+						+ "This may lead to results that are hard to interpret: rather not use these options simultaneously.");
 			}
-			if (onlySpecificActivityEndType) {
-				if (!trip.getActivityEndActType().equals(spedificActivityEndType)) {
+			if (onlyAnalyzeTripsWithActivityTypeBeforeTrip) {
+				if (!trip.getActivityTypeBeforeTrip().equals(activityTypeBeforeTrip)) {
 					continue;
 				}
 			}
-			if (onlySpecificActivityStartType) {
-				if (!trip.getActivityStartActType().equals(spedificActivityStartType)) {
+			if (onlyAnalyzeTripsWithActivityTypeAfterTrip) {
+				if (!trip.getActivityTypeAfterTrip().equals(activityTypeAfterTrip)) {
 					continue;
 				}
 			}
@@ -314,13 +307,11 @@ public class TripAnalyzerV2Extended {
 //   	 		personActivityAttributes.putAttribute(trip.getDriverId(), "hasWorkActivity", true);
 //    		}
 
-			/* Person-specific attributes */
-			if (useAgeFilter) {
+			// Person-specific attributes
+			if (onlyAnalyzeTripsDoneByPeopleInAgeRange) {
 				// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
-				// so far age is the only one
 				String personId = trip.getPersonId().toString();
 				int age = (int) cemdapPersonAttributes.getAttribute(personId, "age");
-
 				if (age < minAge) {
 					continue;
 				}

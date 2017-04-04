@@ -372,8 +372,8 @@ public class TripAnalyzerSrVV2 {
 	    	// reliant on variable "V_ANDPKW_MF": 0/1
 	    	int useOtherCarPool = trip.getUseOtherCarPool();
 
-	    	String activityEndActType = trip.getActivityEndActType();
-	    	String activityStartActType = trip.getActivityStartActType();
+	    	String activityEndActType = trip.getActivityTypeBeforeTrip();
+	    	String activityStartActType = trip.getActivityTypeAfterTrip();
 
 	    	if (onlyHomeAndWork == true) {
 	    		if (!(activityEndActType.equals("home") && activityStartActType.equals("work")) && !(activityEndActType.equals("work") && activityStartActType.equals("home"))) {

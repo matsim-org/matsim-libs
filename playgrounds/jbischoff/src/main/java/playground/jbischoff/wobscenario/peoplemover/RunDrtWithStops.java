@@ -17,52 +17,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.sharedTaxiBerlin.run;
+package playground.jbischoff.wobscenario.peoplemover;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
-import org.matsim.contrib.taxi.run.TaxiOutputModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import playground.michalm.drt.run.DrtConfigGroup;
+import playground.michalm.drt.run.DrtConfigGroup.DrtOperationalScheme;
+import playground.michalm.drt.run.DrtControlerCreator;
 
-public class RunSharedTaxiBerlin {
+
+public class RunDrtWithStops {
 
 	public static void main(String[] args) {
-		String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
-		RunSharedTaxiBerlin.run(configFile, false);
+		String configFile = "../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/testconfig.xml";
+		RunDrtWithStops.run(configFile, false);
 	}
 
 	public static void run(String configFile, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
-				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
+				new OTFVisConfigGroup(), new DrtConfigGroup());
+		//	for debugging:
+//		config.plans().setInputFile("singleDrtAgent.xml");
+		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		
+		drt.setEstimatedBeelineDistanceFactor(1.3);
+		drt.setEstimatedSpeed(30/3.6);
+		drt.setMaximumWalkDistance(500);
+		drt.setTransitStopFile("stopsWRS_300m.xml");
+		drt.setOperationalScheme(DrtOperationalScheme.stationbased.toString());
+		drt.setDrtNetworkMode("av");
+		int threads = Runtime.getRuntime().availableProcessors() -2;
+		System.out.println(threads + " threads used for drt.");
+		drt.setNumberOfThreads(threads);
+		
+		config.qsim().setStartTime(0);
+		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
+		
 		createControler(config, otfvis).run();
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 
-		Controler controler = new Controler(scenario);
 		
-		controler.addOverridingModule(new TaxiOutputModule());
+		Controler controler = DrtControlerCreator.createControler(config, otfvis);
 
-        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+	
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,7 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.run;
+/**
+ * 
+ */
+package playground.jbischoff.sharedTaxiBerlin.run;
 
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -25,17 +28,33 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-public class RunSharedTaxiBerlin {
+import playground.michalm.drt.run.DrtConfigGroup;
+import playground.michalm.drt.run.DrtControlerCreator;
+
+/**
+ * @author  jbischoff
+ *
+ */
+/**
+ *
+ */
+public class RunSharedTaxiBatch {
+
 	public static void main(String[] args) {
-		String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
-		RunSharedTaxiBerlin.run(configFile, false);
-	}
 
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
-				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
-		DrtControlerCreator.createControler(config, otfvis).run();
+		int capacity = 1;
+		for (int i = 100; i<150; i=i+25){
+			String runId = "v"+i+"c"+capacity;
+			String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
+			Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
+					new OTFVisConfigGroup(), new TaxiFareConfigGroup());
+			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+			drt.setEstimatedBeelineDistanceFactor(1.5);
+			drt.setVehiclesFile("vehicles_net_bvg/cap_"+capacity+"/taxis_"+i+".xml.gz");
+			config.controler().setRunId(runId);
+			config.controler().setOutputDirectory("D:/runs-svn/bvg_sharedTaxi/demand01/"+runId);
+			DrtControlerCreator.createControler(config, false).run();
+		}
+		
 	}
-
-	
 }

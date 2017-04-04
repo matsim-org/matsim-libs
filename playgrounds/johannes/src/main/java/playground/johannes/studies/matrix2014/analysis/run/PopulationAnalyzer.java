@@ -37,6 +37,7 @@ import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.gis.DataPool;
 import playground.johannes.synpop.gis.FacilityDataLoader;
 import playground.johannes.synpop.gis.ZoneDataLoader;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.processing.GuessMissingActTypes;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.processing.ValidateMissingAttribute;
@@ -103,6 +104,7 @@ public class PopulationAnalyzer {
         new GuessMissingActTypes(random).apply(persons);
         TaskRunner.run(new Route2GeoDistance(new playground.johannes.studies.matrix2014.sim.Simulator.Route2GeoDistFunction()), persons);
 
+        TaskRunner.run(new WeCommuterSynthesizer(), persons);
         /*
         Build analyzer...
          */
@@ -118,5 +120,22 @@ public class PopulationAnalyzer {
 
         Executor.shutdown();
         logger.info("Done.");
+    }
+
+    public static class WeCommuterSynthesizer implements EpisodeTask {
+
+        @Override
+        public void apply(Episode episode) {
+            for(Segment leg : episode.getLegs()) {
+                String dist = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
+                String purpose = leg.getAttribute(CommonKeys.LEG_PURPOSE);
+                if(dist != null && purpose != null) {
+                    double d = Double.parseDouble(dist);
+                    if(d > 100000 && purpose.equalsIgnoreCase(ActivityTypes.WORK)) {
+                        leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.WECOMMUTER);
+                    }
+                }
+            }
+        }
     }
 }

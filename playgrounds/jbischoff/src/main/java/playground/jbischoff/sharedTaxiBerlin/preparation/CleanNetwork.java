@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.run;
+/**
+ * 
+ */
+package playground.jbischoff.sharedTaxiBerlin.preparation;
 
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.io.MatsimNetworkReader;
 
-public class RunSharedTaxiBerlin {
-	public static void main(String[] args) {
-		String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
-		RunSharedTaxiBerlin.run(configFile, false);
-	}
-
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
-				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
-		DrtControlerCreator.createControler(config, otfvis).run();
-	}
-
-	
+/**
+ * @author  jbischoff
+ *
+ */
+/**
+ *
+ */
+public class CleanNetwork {
+public static void main(String[] args) {
+	Network net = NetworkUtils.createNetwork();
+	new MatsimNetworkReader(net).readFile("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/input/network-bvg_25833_cut.xml.gz");
+	new NetworkCleaner().run(net);
+	new NetworkWriter(net).write("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/input/network-bvg_25833_cut_cleaned.xml.gz");
+}
 }

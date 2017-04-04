@@ -77,6 +77,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		this.yMin = yMin;
 		this.xMax = xMax;
 		this.yMax = yMax;
+		log.warn("Constructor----------------- minX = " + xMin + "; minY = " + yMin + "; maxX = " + xMax + ";maxY = " + yMax);
 		this.cellSize = cellSize;
 		this.ptMatrix = ptMatrix;
 		this.opportunities = opportunities;
@@ -116,6 +117,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		// new
 		for (String mode : accessibilityCalculator.getModes() ) {
 			log.warn("put accessibility grid for mode=" + mode ); 
+			log.warn("----------------- minX = " + xMin + "; minY = " + yMin + "; maxX = " + xMax + ";maxY = " + yMax);
 			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 		}
 //		for ( Modes4Accessibility mode : accessibilityCalculator.getIsComputingMode()) {

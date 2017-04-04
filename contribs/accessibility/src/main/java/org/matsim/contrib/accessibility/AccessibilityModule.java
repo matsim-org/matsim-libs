@@ -130,10 +130,12 @@ public final class AccessibilityModule extends AbstractModule {
 					boundingBox = BoundingBox.createBoundingBox(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize_m);
 					LOG.info("Using shape file to determine the area for accessibility computation.");
+				
 				} else if(acg.getAreaOfAccessibilityComputation()==AreaOfAccesssibilityComputation.fromBoundingBox) {
 					boundingBox = BoundingBox.createBoundingBox(acg.getBoundingBoxLeft(), acg.getBoundingBoxBottom(), acg.getBoundingBoxRight(), acg.getBoundingBoxTop());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m);
 					LOG.info("Using custom bounding box to determine the area for accessibility computation.");
+				
 				} else if(acg.getAreaOfAccessibilityComputation()==AreaOfAccesssibilityComputation.fromFile){
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
@@ -143,12 +145,16 @@ public final class AccessibilityModule extends AbstractModule {
 					new FacilitiesReaderMatsimV1(measuringPointsSc).readFile(measuringPointsFile);
 					measuringPoints = (ActivityFacilitiesImpl) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, activityType);
 					LOG.info("Using measuring points from file: " + measuringPointsFile);
+				
 				} else {
 					boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, cellSize_m) ;
 					LOG.info("Using the boundary of the network file to determine the area for accessibility computation.");
 					LOG.warn("This can lead to memory issues when the network is large and/or the cell size is too fine!");
 				}
+				
+				LOG.warn("boundingBox = " + boundingBox);
+				
 				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
 				for ( Modes4Accessibility mode : acg.getIsComputingMode() ) {
 					AccessibilityContributionCalculator calc = null ;

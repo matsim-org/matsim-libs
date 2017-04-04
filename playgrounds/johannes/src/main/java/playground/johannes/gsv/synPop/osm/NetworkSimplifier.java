@@ -31,7 +31,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.ArrayList;
@@ -214,7 +213,7 @@ public class NetworkSimplifier {
 		nodeTypesToMerge.add(new Integer(6));
 		nodeTypesToMerge.add(new Integer(7));
 
-		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 
