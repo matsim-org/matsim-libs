@@ -102,7 +102,9 @@ public class InsertionCostCalculator {
 		double fromDropoffTT = insertion.dropoffIdx == vEntry.stops.size() ? // DROPOFF->STAY ?
 				0 //
 				: insertion.pathFromDropoff.path.travelTime + insertion.pathFromDropoff.firstAndLastLinkTT;
-		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, insertion.dropoffIdx);
+		double replacedDriveTT = insertion.dropoffIdx == insertion.pickupIdx ? // PICKUP->DROPOFF ?
+				0 // replacedDriveTT already taken into account in pickupDetourTimeLoss
+				: calculateReplacedDriveDuration(vEntry, insertion.dropoffIdx);
 		return toDropoffTT + stopDuration + fromDropoffTT - replacedDriveTT;
 	}
 
@@ -113,7 +115,7 @@ public class InsertionCostCalculator {
 
 		double replacedDriveStartTime = (insertionIdx == 0) ? vEntry.start.time //
 				: vEntry.stops.get(insertionIdx - 1).task.getEndTime();
-		double replacedDriveEndTime = vEntry.stops.get(insertionIdx).task.getEndTime();
+		double replacedDriveEndTime = vEntry.stops.get(insertionIdx).task.getBeginTime();
 		return replacedDriveEndTime - replacedDriveStartTime;
 	}
 
