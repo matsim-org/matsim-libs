@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,14 +24,15 @@ import javax.swing.event.ChangeListener;
 
 import org.matsim.api.core.v01.Coord;
 
-import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import playground.clruch.jmapviewer.Coordinate;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.JMapViewerTree;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
+import playground.clruch.net.IterationStorage;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 /**
@@ -39,11 +41,13 @@ import playground.clruch.utils.gui.SpinnerLabel;
  * adapted from code by Jan Peter Stotz
  */
 public class MatsimViewerFrame implements Runnable {
-    boolean isLaunched = true;
-    final JToggleButton jToggleButton = new JToggleButton("auto");
-    JSlider jSlider = null;
-    Scalar playbackSpeed = RealScalar.of(4);
-    final Thread thread;
+    public int STEPSIZE_SECONDS = 10; // TODO this should be derived from storage files
+    // ---
+    private boolean isLaunched = true;
+    private final JToggleButton jToggleButton = new JToggleButton("auto");
+    private JSlider jSlider = null;
+    private Scalar playbackSpeed = RealScalar.of(10);
+    private final Thread thread;
 
     public final JFrame jFrame = new JFrame();
     private final JMapViewerTree treeMap;
@@ -88,6 +92,16 @@ public class MatsimViewerFrame implements Runnable {
             spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "alpha cover");
         }
         {
+            List<IterationStorage> list = StorageUtils.getAvailableIterations();
+            if (!list.isEmpty()) {
+                SpinnerLabel<IterationStorage> spinnerLabel = new SpinnerLabel<>();
+                spinnerLabel.setList(list);
+                spinnerLabel.setValueSafe(list.get(list.size() - 1));
+                // spinnerLabel.addSpinnerListener(i -> matsimJMapViewer.setMapAlphaCover(i));
+                spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "iteration");
+
+            }
+
             StorageSupplier storageSupplier = StorageSupplier.getDefault();
             final int size = storageSupplier.size();
             if (size == 0) {
@@ -125,12 +139,14 @@ public class MatsimViewerFrame implements Runnable {
                 {
                     SpinnerLabel<Scalar> spinnerLabel = new SpinnerLabel<>();
                     spinnerLabel.setArray( //
-                            RationalScalar.of(1, 2), //
-                            RealScalar.of(1), //
+                            RealScalar.of(200), //
+                            RealScalar.of(100), //
+                            RealScalar.of(50), //
+                            RealScalar.of(25), //
+                            RealScalar.of(10), //
+                            RealScalar.of(5), //
                             RealScalar.of(2), //
-                            RealScalar.of(4), //
-                            RealScalar.of(8), //
-                            RealScalar.of(16) //
+                            RealScalar.of(1) //
                     );
                     spinnerLabel.setValueSafe(playbackSpeed);
                     spinnerLabel.addSpinnerListener(i -> playbackSpeed = i);
@@ -226,7 +242,7 @@ public class MatsimViewerFrame implements Runnable {
             int millis = 500;
             if (jSlider != null && jToggleButton.isSelected()) {
                 jSlider.setValue(jSlider.getValue() + 1);
-                millis = RealScalar.of(1000).divide(playbackSpeed).number().intValue();
+                millis = RealScalar.of(1000 * STEPSIZE_SECONDS).divide(playbackSpeed).number().intValue();
             }
             try {
                 Thread.sleep(millis);

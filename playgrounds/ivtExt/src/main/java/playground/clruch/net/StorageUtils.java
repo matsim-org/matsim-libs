@@ -2,17 +2,26 @@ package playground.clruch.net;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import playground.clruch.utils.GlobalAssert;
 
 public enum StorageUtils {
     ;
     // ---
-    public static final File OUTPUT = new File("output");
+    public static final File OUTPUT = new File("output"); // folder created by MATSim
     public static final File DIRECTORY = new File(OUTPUT, "simobj");
 
+    /**
+     * function only called from {@link StorageSubscriber} when data is recorded during simulation
+     * 
+     * @param simulationObject
+     * @return file to store given simulationObject
+     */
     public static File getFileForStorageOf(SimulationObject simulationObject) {
         GlobalAssert.that(OUTPUT.exists());
         DIRECTORY.mkdir();
@@ -25,7 +34,17 @@ public enum StorageUtils {
         return new File(folder, String.format("%07d.bin", simulationObject.now));
     }
 
-    public static NavigableMap<Integer, File> getAvailable() {
+    public static List<IterationStorage> getAvailableIterations() {
+        if (!DIRECTORY.isDirectory()) {
+            System.out.println("no iterations found");
+            return Collections.emptyList();
+        }
+        return Stream.of(DIRECTORY.listFiles()).sorted() //
+                .map(IterationStorage::new) //
+                .collect(Collectors.toList());
+    }
+
+    static NavigableMap<Integer, File> getAvailable() {
         if (!DIRECTORY.isDirectory()) {
             System.out.println("no files found");
             return Collections.emptyNavigableMap();

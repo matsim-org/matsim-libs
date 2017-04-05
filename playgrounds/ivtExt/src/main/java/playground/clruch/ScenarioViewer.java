@@ -8,6 +8,7 @@ import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.gfx.PointCloud;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
+import playground.clruch.net.StorageUtils;
 
 /**
  * the viewer allows to connect to the scenario server
@@ -19,7 +20,6 @@ public class ScenarioViewer {
      *            /media/bubba/data/ethz/2017_03_13_Sioux_LP_improved/av_config.xml
      */
     public static void main(String[] args) {
-
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
         
@@ -44,6 +44,8 @@ public class ScenarioViewer {
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(800, 900);
         matsimViewer.jFrame.setVisible(true);
+        
+        StorageUtils.getAvailableIterations();
     }
 
 }
