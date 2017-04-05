@@ -13,7 +13,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.demo.AnalyzeAll;
+import playground.joel.analysis.AnalyzeAll;
+//import playground.clruch.demo.AnalyzeAll;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
@@ -27,7 +28,7 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * main entry point
  */
 public class ScenarioServer {
-    public static void main(String[] args) throws MalformedURLException {
+    public static void main(String[] args) throws MalformedURLException, Exception {
         File configFile = new File(args[0]);
 
         // open server port for clients to connect to
@@ -48,7 +49,7 @@ public class ScenarioServer {
 
 
 
-        TheApocalypse.decimatesThe(population).toNoMoreThan(1200).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(10000).people();
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));

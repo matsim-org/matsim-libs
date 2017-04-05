@@ -1,8 +1,8 @@
 package playground.joel.analysis;
 
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Dimensions;
+import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.MathematicaFormat;
@@ -51,10 +51,19 @@ public class AnalyzeAll {
     }
 
     static void plot(String csv, String name, String title, int from, int to) throws Exception {
-        plot(csv, name, title, from, to, 1.1);
+        plot(csv, name, title, from, to, 1.05);
     }
 
-    public static void analyze(String[] args){
+    // TODO: fix tensor fusion
+    static void collectAndPlot(Tensor table1/*, Tensor table2*/) throws Exception {
+        Tensor summary = Join.of(table1/*, table2*/);
+        saveFile(summary, "summary");
+        AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3,6, 5000.0);
+        AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
+        //AnalyzeAll.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
+    }
+
+    public static void analyze(String[] args) throws Exception {
 
         File config = new File(args[0]);
         File data = new File(config.getParent(), "output/data");
@@ -76,11 +85,13 @@ public class AnalyzeAll {
         CoreAnalysis coreAnalysis = new CoreAnalysis(storageSupplier);
         DistanceAnalysis distanceAnalysis = new DistanceAnalysis(storageSupplier);
         try {
-            coreAnalysis.analyze(data.toString());
+            coreAnalysis.analyze();
             distanceAnalysis.analzye();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        collectAndPlot(coreAnalysis.summary/*, distanceAnalysis.summary*/);
 
     }
 }

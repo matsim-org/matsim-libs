@@ -1,21 +1,16 @@
 package playground.joel.analysis;
 
-import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.io.CsvFormat;
-import ch.ethz.idsc.tensor.io.MathematicaFormat;
-import ch.ethz.idsc.tensor.io.MatlabExport;
+
+import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.stream.IntStream;
 
 /**
@@ -24,6 +19,7 @@ import java.util.stream.IntStream;
 public class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;
+    Tensor summary = Tensors.empty();
 
     DistanceAnalysis(StorageSupplier storageSupplierIn) {
         storageSupplier = storageSupplierIn;
@@ -37,7 +33,7 @@ public class DistanceAnalysis {
         System.out.println("found vehicles: " + numVehicles);
 
         List<VehicleStatistic> list = new ArrayList<>();
-        IntStream.range(0, numVehicles).forEach(i -> list.add(new VehicleStatistic(size - 1)));
+        IntStream.range(0, numVehicles).forEach(i -> list.add(new VehicleStatistic(size)));
 
         for (int index = 0; index < size - 1; ++index) {
             SimulationObject s = storageSupplier.getSimulationObject(1 + index);
@@ -54,6 +50,7 @@ public class DistanceAnalysis {
         Tensor table1 = list.stream().map(vs -> vs.distanceTotal).reduce(Tensor::add).get();
         Tensor table2 = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get();
         Tensor table3 = table1.map(InvertUnlessZero.function).pmul(table2);
+        summary = Join.of(table1, table2, table3);
         {
             AnalyzeAll.saveFile(table1, "distanceTotal");
             AnalyzeAll.saveFile(table2, "distanceWithCustomer");

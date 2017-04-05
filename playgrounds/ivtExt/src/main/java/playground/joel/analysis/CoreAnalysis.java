@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
-    double maxWait = 5000;
+    Tensor summary = Tensors.empty();
 
     CoreAnalysis(StorageSupplier storageSupplierIn){
         storageSupplier = storageSupplierIn;
@@ -32,7 +32,7 @@ public class CoreAnalysis {
     }
 
 
-    public void analyze(String directory) throws Exception {
+    public void analyze() throws Exception {
 
 
         Tensor table = Tensors.empty();
@@ -98,8 +98,7 @@ public class CoreAnalysis {
 
         AnalyzeAll.saveFile(table, "basicDemo");
 
-        AnalyzeAll.plot("basicDemo", "binnedWaitingTimes", "waiting times", 3,6, maxWait);
-        AnalyzeAll.plot("basicDemo", "binnedTimeRatios", "occupancy ratio", 10, 11);
+        summary = table;
 
     }
 }
