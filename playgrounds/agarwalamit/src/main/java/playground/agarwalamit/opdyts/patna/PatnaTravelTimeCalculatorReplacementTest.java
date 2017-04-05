@@ -33,8 +33,13 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
@@ -67,33 +72,35 @@ public class PatnaTravelTimeCalculatorReplacementTest {
         // run for 20 itertaions
 
         {
-            boolean injectingTravelTime = false;
             Config config= ConfigUtils.loadConfig(configFile);
+            config.linkStats().setAverageLinkStatsOverIterations(1);
             config.controler().setOutputDirectory(OUT_DIR+"/noReplacementOfTravelTime/");
             config.controler().setFirstIteration( 0 );
             config.controler().setLastIteration( 20 );
             config.controler().setCreateGraphs(true);
             config.strategy().setFractionOfIterationsToDisableInnovation(1); // this is must
-            Controler controler = getControler(config, injectingTravelTime);
+            Controler controler = getControler(config);
             controler.run();
         }
 
-        //=========== 1 ==================
+        //=========== 2 ==================
         // run for 10 itertaions; replace travel times; run again for 10 iterations
 
         {
-            boolean injectingTravelTime = true;
+            modalTravelTimeForReplacement.clear();
             Config config1= ConfigUtils.loadConfig(configFile);
+            config1.linkStats().setAverageLinkStatsOverIterations(1);
             config1.controler().setOutputDirectory(OUT_DIR+"/beforeReplacementOfTravelTime/");
             config1.controler().setFirstIteration( 0 );
             config1.controler().setLastIteration( 10 );
             config1.controler().setCreateGraphs(true);
             config1.strategy().setFractionOfIterationsToDisableInnovation(1); // this is must
-            Controler controler1 = getControler(config1, injectingTravelTime);
+            Controler controler1 = getControler(config1);
             controler1.run();
 
             Config config2= ConfigUtils.loadConfig(configFile);
-            config2.controler().setOutputDirectory(OUT_DIR+"/afterReplacementOfTravelTime/");
+            config2.linkStats().setAverageLinkStatsOverIterations(1);
+            config2.controler().setOutputDirectory(OUT_DIR+"/afterReplacementOfTravelTime2/");
             config2.controler().setFirstIteration( 10 );
             config2.controler().setLastIteration( 20 );
             config2.controler().setCreateGraphs(true);
@@ -101,7 +108,7 @@ public class PatnaTravelTimeCalculatorReplacementTest {
 
             config2.plans().setInputFile( config1.controler().getOutputDirectory()+"/output_plans.xml.gz" );
 
-            Controler controler2 = getControler(config2,injectingTravelTime);
+            Controler controler2 = getControler(config2);
 
             controler2.addOverridingModule(new AbstractModule() {
                 @Override
@@ -114,11 +121,12 @@ public class PatnaTravelTimeCalculatorReplacementTest {
                     );
                 }
             });
+
             controler2.run();
         }
     }
 
-    private static Controler getControler(Config config, boolean injectingTravelTime ){
+    private static Controler getControler(Config config){
 
         config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 
@@ -167,20 +175,30 @@ public class PatnaTravelTimeCalculatorReplacementTest {
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                if (injectingTravelTime) this.addControlerListenerBinding().to(MyControlerListener.class);
+                this.addControlerListenerBinding().to(MyControlerListener.class);
             }
         });
 
         return controler;
     }
 
-    private static class MyControlerListener implements ShutdownListener {
+    private static class MyControlerListener implements ShutdownListener, IterationStartsListener, StartupListener {
         @Inject
         Map<String, TravelTime> modalTravelTimes ;
 
         @Override
         public void notifyShutdown(ShutdownEvent event) {
-            modalTravelTimeForReplacement = modalTravelTimes;
+            modalTravelTimeForReplacement.putAll( modalTravelTimes );
+        }
+
+        @Override
+        public void notifyIterationStarts(IterationStartsEvent event) {
+            MatsimRandom.reset();
+        }
+
+        @Override
+        public void notifyStartup(StartupEvent event) {
+            MatsimRandom.reset();
         }
     }
 }
