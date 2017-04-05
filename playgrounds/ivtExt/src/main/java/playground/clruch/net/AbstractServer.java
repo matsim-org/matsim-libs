@@ -29,7 +29,7 @@ public abstract class AbstractServer {
                         handleConnection(socket, timer); // this blocks until socket connection or server is closed
                     }
                 } catch (Exception exception) {
-                    if (!exception.getMessage().equals("socket closed"))
+                    if (!exception.getMessage().equalsIgnoreCase("Socket closed"))
                         exception.printStackTrace();
                 }
                 timer.cancel();
@@ -52,9 +52,10 @@ public abstract class AbstractServer {
             try {
                 serverSocket.close();
                 serverSocket = null;
-            } catch (Exception myException) {
-                myException.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
+        System.out.println("server closed.");
     }
 
 }
