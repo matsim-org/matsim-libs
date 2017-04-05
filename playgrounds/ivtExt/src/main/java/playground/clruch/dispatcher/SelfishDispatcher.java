@@ -34,53 +34,92 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	private final int dispatchPeriod;
 	private final int updateRefPeriod; // implementation may not use this
 	private Tensor printVals = Tensors.empty();
+	private final int numberofVehicles;
 
 	// specific to SelfishDispatcher
-	HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
-	HashMap<AVVehicle, Link> refPositions = new HashMap<>();
+	private boolean vehiclesInitialized = false;
+	private HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
+	private HashMap<AVVehicle, Link> refPositions = new HashMap<>();
+	private final Network network;
 
 	private SelfishDispatcher( //
 			AVDispatcherConfig avDispatcherConfig, //
+			AVGeneratorConfig generatorConfig, //
 			TravelTime travelTime, //
 			ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
 			EventsManager eventsManager, //
-			Network network, AbstractRequestSelector abstractRequestSelector) {
+			Network networkIn, AbstractRequestSelector abstractRequestSelector) {
 		super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
 		SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
 		dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
 		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", Integer.MAX_VALUE);
+		numberofVehicles = (int) generatorConfig.getNumberOfVehicles();
+		network = networkIn;
 
 	}
 
 	@Override
 	public void redispatch(double now) {
 		final long round_now = Math.round(now);
-		if (requestsServed.keySet().size() == 0) {
+		if (!vehiclesInitialized) {
 			initializeVehicles();
 		} else {
-			// match vehicles on same link as request
-			new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-					.matchRecord(getStayVehicles(), getAVRequestsAtLinks(), requestsServed);
-			// ensure all requests recorded properly
-			GlobalAssert.that(requestsServed.values().stream().mapToInt(List::size).sum() == super.getTotalMatchedRequests());
-			
-			
-			
 			if (round_now % dispatchPeriod == 0) {
-				if (round_now == 11890) {
-					System.out.println("arrived at problem");
-				}
-			}
+				// match vehicles on same link as request
+				new InOrderOfArrivalMatcher(this::setAcceptRequest) //
+						.matchRecord(getStayVehicles(), getAVRequestsAtLinks(), requestsServed);
 
+				// ensure all requests recorded properly
+				GlobalAssert.that(
+						requestsServed.values().stream().mapToInt(List::size).sum() == super.getTotalMatchedRequests());
+
+				// update ref positions periodically
+				if (round_now % updateRefPeriod == 0) updateRefPositions();
+				
+				// send every vehicle to closest customer
+				
+				
+				// send remaining vehicles to their reference position
+				getDivertableVehicles().stream().forEach(v->setVehicleDiversion(v,refPositions.get(v.avVehicle)));
+
+			}
 		}
 	}
 
-	void initializeVehicles() {
+	/**
+	 * update the reference positions of all AVs
+	 */
+	private void updateRefPositions() {
+
+		// get list of all links in network
+		Collection<? extends Link> networkLinksC = network.getLinks().values();
+		List<Link> networkLinks = new ArrayList<>();
+		for (Link link : networkLinksC) {
+			networkLinks.add(link);
+		}
+
+		// currently implemented, assign a random link from the network to every
+		// AV
+		for (AVVehicle avVehicle : refPositions.keySet()) {
+			Collections.shuffle(networkLinks);
+			refPositions.put(avVehicle, networkLinks.get(0));
+		}
+	}
+
+	/**
+	 * initializes the vehicle Lists which are used for vehicle specific
+	 * tracking
+	 */
+	private void initializeVehicles() {
 		for (AVVehicle avVehicle : getAVList()) {
 			requestsServed.put(avVehicle, new ArrayList<AVRequest>());
 			refPositions.put(avVehicle, null);
 		}
-		System.out.println("number of AVs " + requestsServed.keySet().size() + " == " + refPositions.keySet().size());
+		if (requestsServed.keySet().size() == numberofVehicles) {
+			updateRefPositions();
+			vehiclesInitialized = true;
+		}
+
 	}
 
 	public static class Factory implements AVDispatcherFactory {
@@ -102,7 +141,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
 		public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 			AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
 			return new SelfishDispatcher( //
-					config, travelTime, router, eventsManager, network, abstractRequestSelector);
+					config, generatorConfig, travelTime, router, eventsManager, network, abstractRequestSelector);
 		}
 	}
 }
