@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -18,19 +19,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.matsim.api.core.v01.Coord;
 
-import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import playground.clruch.jmapviewer.Coordinate;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.JMapViewerTree;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
+import playground.clruch.net.DummyStorageSupplier;
+import playground.clruch.net.IterationFolder;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 /**
@@ -39,14 +40,18 @@ import playground.clruch.utils.gui.SpinnerLabel;
  * adapted from code by Jan Peter Stotz
  */
 public class MatsimViewerFrame implements Runnable {
-    boolean isLaunched = true;
-    final JToggleButton jToggleButton = new JToggleButton("auto");
-    JSlider jSlider = null;
-    Scalar playbackSpeed = RealScalar.of(4);
-    final Thread thread;
+    public int STEPSIZE_SECONDS = 10; // TODO this should be derived from storage files
+    // ---
+    private final MatsimJMapViewer matsimJMapViewer;
+    private boolean isLaunched = true;
+    private final JToggleButton jToggleButton = new JToggleButton("auto");
+    private final JSlider jSlider = new JSlider(0, 1, 0);
+    private Scalar playbackSpeed = RealScalar.of(50);
+    private final Thread thread;
 
     public final JFrame jFrame = new JFrame();
     private final JMapViewerTree treeMap;
+    StorageSupplier storageSupplier = new DummyStorageSupplier();
 
     public static FlowLayout createFlowLayout() {
         FlowLayout flowLayout = new FlowLayout();
@@ -56,6 +61,7 @@ public class MatsimViewerFrame implements Runnable {
 
     /** Constructs the {@code Demo}. */
     public MatsimViewerFrame(MatsimJMapViewer matsimJMapViewer) {
+        this.matsimJMapViewer = matsimJMapViewer;
         treeMap = new JMapViewerTree(matsimJMapViewer, "Zones", false);
         // ---
         jFrame.setTitle("ETH Z\u00fcrich MATSim Viewer");
@@ -87,30 +93,27 @@ public class MatsimViewerFrame implements Runnable {
             spinnerLabel.addSpinnerListener(i -> matsimJMapViewer.setMapAlphaCover(i));
             spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "alpha cover");
         }
+        panelNorth.add(jSlider, BorderLayout.SOUTH);
         {
-            StorageSupplier storageSupplier = StorageSupplier.getDefault();
-            final int size = storageSupplier.size();
-            if (size == 0) {
+            List<IterationFolder> list = StorageUtils.getAvailableIterations();
+            if (list.isEmpty()) {
                 panelControls.add(new JLabel("no playback"));
             } else {
-                System.out.println("points to playback = " + size);
                 {
-                    jSlider = new JSlider(0, size - 1, 0);
-                    jSlider.addChangeListener(new ChangeListener() {
-                        @Override
-                        public void stateChanged(ChangeEvent e) {
-                            int index = jSlider.getValue();
-                            try {
-                                matsimJMapViewer.simulationObject = storageSupplier.getSimulationObject(index);
-                                matsimJMapViewer.repaint();
-                            } catch (Exception exception) {
-                                System.out.println("cannot load: " + index);
-                            }
-                        }
+                    SpinnerLabel<IterationFolder> spinnerLabel = new SpinnerLabel<>();
+                    spinnerLabel.setList(list);
+                    IterationFolder last = list.get(list.size() - 1);
+                    storageSupplier = last.storageSupplier;
+                    spinnerLabel.setValueSafe(last);
+                    jSlider.setMaximum(storageSupplier.size() - 1);
+                    spinnerLabel.addSpinnerListener(i -> {
+                        storageSupplier = i.storageSupplier;
+                        jSlider.setMaximum(storageSupplier.size() - 1);
+                        updateFromStorage(jSlider.getValue());
                     });
-                    jSlider.setPreferredSize(new Dimension(400, 30));
-                    panelNorth.add(jSlider, BorderLayout.SOUTH);
+                    spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "iteration");
                 }
+                jSlider.addChangeListener(e -> updateFromStorage(jSlider.getValue()));
                 {
                     JButton jButton = new JButton("<");
                     jButton.addActionListener(e -> jSlider.setValue(jSlider.getValue() - 1));
@@ -125,16 +128,17 @@ public class MatsimViewerFrame implements Runnable {
                 {
                     SpinnerLabel<Scalar> spinnerLabel = new SpinnerLabel<>();
                     spinnerLabel.setArray( //
-                            RationalScalar.of(1, 2), //
-                            RealScalar.of(1), //
+                            RealScalar.of(200), //
+                            RealScalar.of(100), //
+                            RealScalar.of(50), //
+                            RealScalar.of(25), //
+                            RealScalar.of(10), //
+                            RealScalar.of(5), //
                             RealScalar.of(2), //
-                            RealScalar.of(4), //
-                            RealScalar.of(8), //
-                            RealScalar.of(16) //
+                            RealScalar.of(1) //
                     );
                     spinnerLabel.setValueSafe(playbackSpeed);
                     spinnerLabel.addSpinnerListener(i -> playbackSpeed = i);
-
                     spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "playback factor");
                 }
             }
@@ -206,6 +210,17 @@ public class MatsimViewerFrame implements Runnable {
         thread.start();
     }
 
+    void updateFromStorage(int index) {
+        try {
+            matsimJMapViewer.simulationObject = storageSupplier.getSimulationObject(index);
+            matsimJMapViewer.repaint();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            System.out.println("cannot load: " + index);
+        }
+
+    }
+
     private JMapViewer getJMapViewer() {
         return treeMap.getViewer();
     }
@@ -226,7 +241,7 @@ public class MatsimViewerFrame implements Runnable {
             int millis = 500;
             if (jSlider != null && jToggleButton.isSelected()) {
                 jSlider.setValue(jSlider.getValue() + 1);
-                millis = RealScalar.of(1000).divide(playbackSpeed).number().intValue();
+                millis = RealScalar.of(1000 * STEPSIZE_SECONDS).divide(playbackSpeed).number().intValue();
             }
             try {
                 Thread.sleep(millis);

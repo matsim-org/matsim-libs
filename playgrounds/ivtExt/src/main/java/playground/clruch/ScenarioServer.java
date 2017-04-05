@@ -26,30 +26,42 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
 /**
  * main entry point
+ * 
+ * only one ScenarioServer can run at one time, since a fixed network port is reserved
+ * to serve the simulation status
+ * 
+ * if you wish to run multiple simulations at the same time use for instance
+ * {@link RunAVScenario}
  */
 public class ScenarioServer {
+
     public static void main(String[] args) throws MalformedURLException, Exception {
-        File configFile = new File(args[0]);
+
+        // BEGIN: CUSTOMIZE -----------------------------------------------
+        // set manually depending on the scenario:
+
+        int maxPopulationSize = 1000;
+
+        // set to true in order to make server wait for at least 1 client, for instance viewer client
+        boolean waitForClients = false;
+
+        // END: CUSTOMIZE -------------------------------------------------
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
-
-        // set to true in order to make server wait for at least 1 client, for instance viewer client
-        SimulationServer.INSTANCE.setWaitForClients(false);
+        SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
+        File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
-
         MatsimStaticDatabase.initializeSingletonInstance( //
                 scenario.getNetwork(), ReferenceFrame.IDENTITY);
 
-
-
-        TheApocalypse.decimatesThe(population).toNoMoreThan(10000).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
@@ -58,7 +70,7 @@ public class ScenarioServer {
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.run();
 
-        SimulationServer.INSTANCE.stopAccepting();
+        SimulationServer.INSTANCE.stopAccepting(); // close port
 
         // EventFileToProcessingXML.convert(dir);
         AnalyzeAll.analyze(args);

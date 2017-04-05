@@ -15,12 +15,6 @@ import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.alg.Sort;
-import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.MatsimStaticDatabase;
@@ -100,7 +94,7 @@ public class MatsimJMapViewer extends JMapViewer {
         if (ref != null) {
 
             infoStrings.clear();
-            append(new SecondsToHMS(ref.now).toDigitalWatch());
+            append("i=%-3s %s", "" + ref.iteration, new SecondsToHMS(ref.now).toDigitalWatch());
             appendSeparator();
 
             viewerLayers.forEach(viewerLayer -> viewerLayer.paint(graphics, ref));
