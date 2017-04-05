@@ -159,8 +159,7 @@ public final class AccessibilityModule extends AbstractModule {
 						break;
 					case matrixBasedPt:
 						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
-								config.planCalcScore(),
-								ptMatrix.asPathCalculator(config.planCalcScore()));
+								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()));
 						break;
 						//$CASES-OMITTED$
 					default:

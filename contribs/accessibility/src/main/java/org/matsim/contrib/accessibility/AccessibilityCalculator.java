@@ -100,8 +100,9 @@ public final class AccessibilityCalculator {
 		LOG.info("Iterating over all aggregated measuring points...");
 		// ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 		
-		for (Id<Node> nodeId : aggregatedOrigins.keySet()) { // Go through all nodes (keys) that have a measuring point (origin) assigned
-			LOG.info("Calculate accessibility for node = " + nodeId);
+		// Go through all nodes (keys) that have a measuring point (origin) assigned
+		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
+			LOG.info("Calculate accessibility for all measuring points assigned to node = " + nodeId);
 			// progressBar.update();
 
 			Node fromNode = network.getNodes().get(nodeId);
@@ -112,24 +113,30 @@ public final class AccessibilityCalculator {
 			}
 
 			// Get list with measuring points that are assigned to "fromNode"
+			// Go through all measuring points assigned to current node
 			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
+				LOG.info("Now considering measuring point = " + origin.getId());
 				assert(origin.getCoord() != null);
 
 				for (String key : expSums.keySet()) { // Is it really necessary to reset here?
 					expSums.put(key, 0.);
 				}
 				
-				//Gbl.assertIf(aggregatedOpportunities.length > 0);
+				// Gbl.assertIf(aggregatedOpportunities.length > 0);
 				// yyyyyy a test fails when this line is made active; cannot say why an execution path where there are now opportunities can make sense for a test.  kai, mar'17
 				
+				// Go through all aggregated facilities (i.e. network nodes to which at least one facility is assigned)
 				for (final AggregationObject aggregatedFacility : aggregatedOpportunities) {
+					// Go through all calculators
 					for (String mode : calculators.keySet()) {
-						final double expVhk = calculators.get(mode).computeContributionOfOpportunity(origin , aggregatedFacility, departureTime);
+						final double expVhk = calculators.get(mode).computeContributionOfOpportunity(origin, aggregatedFacility, departureTime);
 						expSums.put(mode, expSums.get(mode) + expVhk);
+						LOG.info("mode = " + mode + " --- aggregatedFacility = " + aggregatedFacility.getNearestNode().getCoord() + " --- expSums.get(mode) = " + expSums.get(mode));
 					}
+					LOG.info("----");
 				}
 				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
-				// points separately anyways?  Answer: The trees need to be computed only once.  (But one could save more.) kai, feb'14
+				// points separately anyways? Answer: The trees need to be computed only once. (But one could save more.) kai, feb'14
 
 				// aggregated value
 				Map<String, Double> accessibilities  = new LinkedHashMap<>();

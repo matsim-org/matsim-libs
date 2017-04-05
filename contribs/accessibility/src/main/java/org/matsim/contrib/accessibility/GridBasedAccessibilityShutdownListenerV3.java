@@ -109,6 +109,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 							scenario.getConfig()));	// this could be zero if no input files for pseudo pt are given ...
 		}
 		// yyyyyy todo: get rid of the above special case. kai, nov'16
+		// TODO I think when using AccessibilityModule it is created twice and overwritten. So, the above could be deleted. dz, apr'17
 
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 		for (String mode : accessibilityCalculator.getModes() ) {
