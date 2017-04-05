@@ -57,7 +57,7 @@ public class InOrderOfArrivalMatcher extends AbstractVehicleRequestMatcher {
                 	AVVehicle toMatchVehicle = vehicleQueue.poll();
                 	AVRequest toMatchRequest = requestIterator.next();
                 	biConsumer.accept(toMatchVehicle, toMatchRequest);
-                    //requestsServed.get(toMatchVehicle).add(toMatchRequest);
+                    requestsServed.get(toMatchVehicle).add(toMatchRequest);
                     ++num_matchedRequests;
                 }
             }

@@ -50,39 +50,37 @@ public class SelfishDispatcher extends UniversalDispatcher {
 		dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
 		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", Integer.MAX_VALUE);
 
-		/*
-		for (AVVehicle avVehicle : getAVList()) {
-			requestsServed.put(avVehicle, new ArrayList<AVRequest>());
-			refPositions.put(avVehicle, null);
-		}
-		System.out.println("number of AVs " + requestsServed.keySet().size() + " == " + refPositions.keySet().size());
-		*/
 	}
 
 	@Override
 	public void redispatch(double now) {
 		final long round_now = Math.round(now);
-
-		// match vehicles on same link as request
-		new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-				.matchRecord(getStayVehicles(), getAVRequestsAtLinks(), requestsServed);
-		// ensure all requests recorded properly
-		/*
-		GlobalAssert
-				.that(requestsServed.values().stream().mapToInt(List::size).sum() == super.getTotalMatchedRequests());
-		if (getTotalMatchedRequests() > 0) {
-			System.out.println("matched requests total: " + super.getTotalMatchedRequests());
-			System.out.println(
-					"matched requests summed : " + requestsServed.values().stream().mapToInt(List::size).sum());
-
-		}
-		*/
-
-		if (round_now % dispatchPeriod == 0) {
-			if (round_now == 11890) {
-				System.out.println("arrived at problem");
+		if (requestsServed.keySet().size() == 0) {
+			initializeVehicles();
+		} else {
+			// match vehicles on same link as request
+			new InOrderOfArrivalMatcher(this::setAcceptRequest) //
+					.matchRecord(getStayVehicles(), getAVRequestsAtLinks(), requestsServed);
+			// ensure all requests recorded properly
+			GlobalAssert.that(requestsServed.values().stream().mapToInt(List::size).sum() == super.getTotalMatchedRequests());
+			
+			
+			
+			if (round_now % dispatchPeriod == 0) {
+				if (round_now == 11890) {
+					System.out.println("arrived at problem");
+				}
 			}
+
 		}
+	}
+
+	void initializeVehicles() {
+		for (AVVehicle avVehicle : getAVList()) {
+			requestsServed.put(avVehicle, new ArrayList<AVRequest>());
+			refPositions.put(avVehicle, null);
+		}
+		System.out.println("number of AVs " + requestsServed.keySet().size() + " == " + refPositions.keySet().size());
 	}
 
 	public static class Factory implements AVDispatcherFactory {

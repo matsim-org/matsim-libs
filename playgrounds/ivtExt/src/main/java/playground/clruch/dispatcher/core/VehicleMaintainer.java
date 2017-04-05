@@ -240,11 +240,11 @@ abstract class VehicleMaintainer implements AVDispatcher {
         // intentionally empty
     }
     
-    /*
+    
     public List<AVVehicle> getAVList(){
     	return Collections.unmodifiableList(vehicles);
     }
-    */
+
     
     
 }
