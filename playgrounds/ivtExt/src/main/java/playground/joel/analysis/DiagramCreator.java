@@ -1,4 +1,4 @@
-package playground.joel.data;
+package playground.joel.analysis;
 
 import ch.ethz.idsc.tensor.Tensor;
 import org.jfree.chart.ChartFactory;
@@ -30,40 +30,13 @@ public class DiagramCreator {
         return second;
     }
 
-    public static void createDiagram(File directory, String fileTitle, String diagramTitle, NavigableMap<Long, Double> map) throws Exception
-    {
-        final TimeSeries series = new TimeSeries( "time series");
-        for(Long key: map.keySet()) {
-            try
-            {
-                Second time = toTime(key.doubleValue());
-                series.add(time, map.get(key));
-                GlobalAssert.that(!series.isEmpty());
-            }
-            catch ( SeriesException e  )
-            {
-                System.err.println( "Error adding to series" );
-            }
-        }
-
-
-        final XYDataset dataset=( XYDataset )new TimeSeriesCollection(series);
-        JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Time", "Value", dataset,false,false,false);
-        timechart.getXYPlot().getRangeAxis().setRange(0, 1.1);
-        timechart.getPlot().setBackgroundPaint(Color.white);
-        timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
-        timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
-
-        int width = 1200; /* Width of the image */
-        int height = 900; /* Height of the image */
-        File timeChart = new File( directory,fileTitle + ".png" );
-        ChartUtilities.saveChartAsPNG( timeChart, timechart, width, height );
-        GlobalAssert.that(timeChart.exists() && !timeChart.isDirectory());
-        System.out.println("exported " + fileTitle + ".png");
+    public static void createDiagram(File directory, String fileTitle, String diagramTitle,
+                                     Tensor time, Tensor values) throws Exception {
+        createDiagram(directory, fileTitle, diagramTitle, time, values, 1.1);
     }
 
     public static void createDiagram(File directory, String fileTitle, String diagramTitle,
-                                     Tensor time, Tensor values) throws Exception
+                                     Tensor time, Tensor values, Double maxRange) throws Exception
     {
         final TimeSeriesCollection dataset = new TimeSeriesCollection();
         for (int i = 0; i < values.length(); i++) {
@@ -79,7 +52,7 @@ public class DiagramCreator {
 
 
         JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Time", "Value", dataset,false,false,false);
-        //timechart.getXYPlot().getRangeAxis().setRange(0, maxWait);
+        timechart.getXYPlot().getRangeAxis().setRange(0, maxRange);
         timechart.getPlot().setBackgroundPaint(Color.white);
         timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
         timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);

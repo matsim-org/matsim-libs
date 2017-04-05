@@ -6,24 +6,16 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Join;
-import ch.ethz.idsc.tensor.io.CsvFormat;
-import ch.ethz.idsc.tensor.io.MathematicaFormat;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Quantile;
 import playground.clruch.export.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
-import playground.joel.data.DiagramCreator;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 class CoreAnalysis {
@@ -102,17 +94,6 @@ class CoreAnalysis {
         }
 
         AnalyzeAll.saveFile(table, "basicDemo");
-
-/*
-        DiagramCreator diagram = new DiagramCreator();
-        try{
-            File dir = new File(directory);
-            DiagramCreator.createDiagram(dir, "binnedWaitingTimes", "waiting times", quantile50, quantile95, mean, maxWait);
-            DiagramCreator.createDiagram(dir, "binnedTimeRatios", "occupancy ratio", occupancy);
-        }catch (Exception e){
-            System.out.println("Error creating the diagrams");
-        }
-        */
 
     }
 }

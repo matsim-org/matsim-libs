@@ -6,7 +6,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
-import playground.joel.data.DiagramCreator;
+import playground.joel.analysis.DiagramCreator;
 
 import java.io.File;
 import java.io.IOException;
