@@ -1,5 +1,6 @@
 package playground.clruch.dispatcher.utils;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -43,5 +44,26 @@ public class InOrderOfArrivalMatcher extends AbstractVehicleRequestMatcher {
         }
         return num_matchedRequests;
     }
+    
+    public int matchRecord(Map<Link, Queue<AVVehicle>> stayVehicles, Map<Link, List<AVRequest>> requestsAtLinks, HashMap<AVVehicle, List<AVRequest>> requestsServed) {
+        int num_matchedRequests = 0;
+        // match requests with stay vehicles
+        for (Entry<Link, List<AVRequest>> entry : requestsAtLinks.entrySet()) {
+            final Link link = entry.getKey();
+            if (stayVehicles.containsKey(link)) {
+                Iterator<AVRequest> requestIterator = entry.getValue().iterator();
+                Queue<AVVehicle> vehicleQueue = stayVehicles.get(link);
+                while (!vehicleQueue.isEmpty() && requestIterator.hasNext()) {
+                	AVVehicle toMatchVehicle = vehicleQueue.poll();
+                	AVRequest toMatchRequest = requestIterator.next();
+                	biConsumer.accept(toMatchVehicle, toMatchRequest);
+                    //requestsServed.get(toMatchVehicle).add(toMatchRequest);
+                    ++num_matchedRequests;
+                }
+            }
+        }
+        return num_matchedRequests;
+    }
+    
 
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
+import org.geotools.resources.UnmodifiableArrayList;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -238,4 +239,12 @@ abstract class VehicleMaintainer implements AVDispatcher {
     public final void onNextTaskStarted(AVTask task) {
         // intentionally empty
     }
+    
+    /*
+    public List<AVVehicle> getAVList(){
+    	return Collections.unmodifiableList(vehicles);
+    }
+    */
+    
+    
 }
