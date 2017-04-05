@@ -12,6 +12,9 @@ import playground.clruch.utils.CompressionUtils;
 
 public class StorageSupplier {
 
+    /**
+     * @return file index that contain simulation objects of last iteration
+     */
     public static StorageSupplier getDefault() {
         return new StorageSupplier(StorageUtils.getAvailable());
     }
@@ -19,7 +22,7 @@ public class StorageSupplier {
     private final NavigableMap<Integer, File> navigableMap;
     private final List<File> ordered;
 
-    private StorageSupplier(NavigableMap<Integer, File> map) {
+    StorageSupplier(NavigableMap<Integer, File> map) {
         this.navigableMap = map;
         ordered = new ArrayList<>(map.values());
     }
@@ -35,7 +38,8 @@ public class StorageSupplier {
         return readFromFile(ordered.get(index));
     }
 
-    public SimulationObject getSimulationObjectForTime(int now) throws Exception {
+    @Deprecated // not used
+    protected SimulationObject getSimulationObjectForTime(int now) throws Exception {
         Entry<Integer, File> entry = navigableMap.lowerEntry(now + 1);
         return readFromFile(entry.getValue());
     }
@@ -43,10 +47,9 @@ public class StorageSupplier {
     private static SimulationObject readFromFile(File file) throws Exception {
         byte[] bytes = CompressionUtils.decompress(Files.readAllBytes(file.toPath()));
         return (SimulationObject) ObjectFormat.from(bytes);
-
     }
 
-    public int size() {
+    public final int size() {
         return ordered.size();
     }
 

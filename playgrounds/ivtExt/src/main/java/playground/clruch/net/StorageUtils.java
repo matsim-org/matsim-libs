@@ -34,14 +34,24 @@ public enum StorageUtils {
         return new File(folder, String.format("%07d.bin", simulationObject.now));
     }
 
-    public static List<IterationStorage> getAvailableIterations() {
+    public static List<IterationFolder> getAvailableIterations() {
         if (!DIRECTORY.isDirectory()) {
             System.out.println("no iterations found");
             return Collections.emptyList();
         }
         return Stream.of(DIRECTORY.listFiles()).sorted() //
-                .map(IterationStorage::new) //
+                .map(IterationFolder::new) //
                 .collect(Collectors.toList());
+    }
+
+    public static NavigableMap<Integer, File> getFrom(File itDir) {
+        NavigableMap<Integer, File> navigableMap = new TreeMap<>();
+        for (File dir : itDir.listFiles())
+            if (dir.isDirectory())
+                for (File file : dir.listFiles())
+                    if (file.isFile())
+                        navigableMap.put(Integer.parseInt(file.getName().substring(0, 7)), file);
+        return navigableMap;
     }
 
     static NavigableMap<Integer, File> getAvailable() {
@@ -52,15 +62,16 @@ public enum StorageUtils {
         File[] files = DIRECTORY.listFiles(); // TODO probably not sorted
         if (files.length == 0)
             return Collections.emptyNavigableMap();
-        NavigableMap<Integer, File> navigableMap = new TreeMap<>();
+        // NavigableMap<Integer, File> navigableMap = new TreeMap<>();
         File lastIter = files[files.length - 1];
         System.out.println("loading last Iter = " + lastIter);
-        for (File dir : lastIter.listFiles())
-            if (dir.isDirectory())
-                for (File file : dir.listFiles())
-                    if (file.isFile())
-                        navigableMap.put(Integer.parseInt(file.getName().substring(0, 7)), file);
-        return navigableMap;
+        return getFrom(lastIter);
+        // for (File dir : lastIter.listFiles())
+        // if (dir.isDirectory())
+        // for (File file : dir.listFiles())
+        // if (file.isFile())
+        // navigableMap.put(Integer.parseInt(file.getName().substring(0, 7)), file);
+        // return navigableMap;
     }
 
 }
