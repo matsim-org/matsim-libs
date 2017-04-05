@@ -34,6 +34,13 @@ public class ScenarioViewer {
 
         MatsimStaticDatabase.initializeSingletonInstance(NetworkLoader.loadNetwork(args), referenceFrame);
         MatsimJMapViewer matsimJMapViewer = new MatsimJMapViewer(MatsimStaticDatabase.INSTANCE);
+
+        // this is optional and should not cause problems if file does not exist.
+        // temporary solution
+        /* TODO: resolve this such that cells plotted if present
+        matsimJMapViewer.virtualNetworkLayer.pc = PointCloud.fromCsvFile(new File("vN_debug_v0/voronoi_BoundaryPoints.csv"));
+        matsimJMapViewer.setTileGridVisible(false);
+        */
         // TODO temporary solution
         matsimJMapViewer.virtualNetworkLayer.setPointCloud(PointCloud.fromCsvFile( //
                 csvFile, MatsimStaticDatabase.INSTANCE.referenceFrame.coords_toWGS84));

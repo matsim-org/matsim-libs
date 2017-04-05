@@ -107,15 +107,22 @@ public class AVModule extends AbstractModule {
 
         bind(NotAsDumbDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(),NotAsDumbDispatcher.class.getSimpleName()).to(NotAsDumbDispatcher.Factory.class);
-        
+
         bind(HungarianDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), HungarianDispatcher.class.getSimpleName()).to(HungarianDispatcher.Factory.class);
-        
+
+
+        bind(DFRDispatcher_v0.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher_v0.class.getSimpleName()).to(DFRDispatcher_v0.Factory.class);
+
+        bind(DFRDispatcher_v1.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher_v1.class.getSimpleName()).to(DFRDispatcher_v1.Factory.class);
+
         /** dispatchers for PartitionedDispatcher */
-        bind(ConsensusDispatcherDFR.Factory.class);
+        //bind(ConsensusDispatcherDFR.Factory.class);
         bind(LPFeedbackLIPDispatcher.Factory.class);
         bind(LPFeedforwardDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
+        //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
     }

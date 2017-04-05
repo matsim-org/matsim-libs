@@ -21,10 +21,12 @@ import java.util.stream.IntStream;
 class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;
+    String dataPath;
 
-    DistanceAnalysis(StorageSupplier storageSupplierIn) {
+    DistanceAnalysis(StorageSupplier storageSupplierIn,String datapath) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
+        dataPath = datapath;
     }
 
     public void analzye() throws Exception {

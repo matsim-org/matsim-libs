@@ -46,6 +46,8 @@ public class ScenarioServer {
         MatsimStaticDatabase.initializeSingletonInstance( //
                 scenario.getNetwork(), ReferenceFrame.IDENTITY);
 
+
+
         TheApocalypse.decimatesThe(population).toNoMoreThan(1200).people();
 
         Controler controler = new Controler(scenario);

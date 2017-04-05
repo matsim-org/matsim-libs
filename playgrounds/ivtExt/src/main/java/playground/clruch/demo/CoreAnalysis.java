@@ -21,11 +21,13 @@ import java.util.stream.Collectors;
 class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
-    double maxWait = 5000;
+    String dataPath;
 
-    CoreAnalysis(StorageSupplier storageSupplierIn){
+
+    CoreAnalysis(StorageSupplier storageSupplierIn, String datapath){
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
+        dataPath = datapath;
     }
 
 
@@ -94,6 +96,7 @@ class CoreAnalysis {
         }
 
         AnalyzeAll.saveFile(table, "basicDemo");
+
 
     }
 }

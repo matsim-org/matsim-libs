@@ -50,6 +50,7 @@ public class VirtualNetworkLoader {
                 for (Element virtualNodeElement : virtualNodes) {
                     // get the virtual node and save it
                     String virtualNodeId = virtualNodeElement.getAttributeValue("id");
+                    int neighCount       = Integer.parseInt(virtualNodeElement.getAttributeValue("nNeigh"));
                     // get the links associated to the node from the XML
                     Element links = virtualNodeElement.getChild("links");
                     List<Element> linkList = links.getChildren("link");
@@ -65,7 +66,7 @@ public class VirtualNetworkLoader {
                             throw new RuntimeException("link key from not found in network");
                         }
                     }
-                    final VirtualNode virtualNode = virtualNetwork.addVirtualNode(virtualNodeId, linkSet);
+                    final VirtualNode virtualNode = virtualNetwork.addVirtualNode(virtualNodeId, linkSet,neighCount);
                     // new VirtualNode();
                     virtualNodeList.put(virtualNodeId, virtualNode);
 
