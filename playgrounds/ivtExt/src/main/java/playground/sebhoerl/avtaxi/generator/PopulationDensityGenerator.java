@@ -85,7 +85,6 @@ public class PopulationDensityGenerator implements AVGenerator {
 
         // Multinomial selection
         double r = MatsimRandom.getRandom().nextDouble();
-        r = .9; // uncomment this line to have all vehicles start in 1 link
         Link selectedLink = null;
 
         selectedLink = cumulativeDensity.lowerEntry(r).getValue();
