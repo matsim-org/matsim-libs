@@ -40,7 +40,7 @@ class DistanceAnalysis {
             for (VehicleContainer vc : s.vehicles)
                 list.get(vc.vehicleIndex).register(index, vc);
 
-            if (s.now % 1000 == 0)
+            if (s.now % 10000 == 0)
                 System.out.println(s.now);
 
         }

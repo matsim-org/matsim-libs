@@ -105,7 +105,7 @@ class CoreAnalysis {
 
             table.append(row);
 
-            if (s.now % 1000 == 0)
+            if (s.now % 10000 == 0)
                 System.out.println(s.now);
 
         }
