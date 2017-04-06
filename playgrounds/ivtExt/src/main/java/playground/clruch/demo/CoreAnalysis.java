@@ -1,13 +1,16 @@
 package playground.clruch.demo;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Join;
-import ch.ethz.idsc.tensor.io.CsvFormat;
-import ch.ethz.idsc.tensor.io.MathematicaFormat;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Quantile;
 import playground.clruch.export.AVStatus;
@@ -15,30 +18,20 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
     String dataPath;
 
-    CoreAnalysis(StorageSupplier storageSupplierIn, String datapath){
+    CoreAnalysis(StorageSupplier storageSupplierIn, String datapath) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
         dataPath = datapath;
     }
 
-
-    public void analyze() throws Exception {
-
+    public void analyze(String directory) throws Exception {
 
         Tensor table = Tensors.empty();
-
 
         for (int index = 0; index < size; ++index) {
 
@@ -46,7 +39,6 @@ class CoreAnalysis {
 
             final long now = s.now;
             Scalar time = RealScalar.of(s.now);
-
 
             // number of requests
             Scalar requestsSize = RealScalar.of(s.requests.size());
@@ -61,7 +53,7 @@ class CoreAnalysis {
                     waitTimeMean = Mean.of(submission);
                 } else {
                     waitTimeQuantile = Array.zeros(3);
-                    waitTimeMean = Array.zeros(1);
+                    waitTimeMean = Mean.of(Array.zeros(1));
                 }
             }
 
@@ -81,7 +73,6 @@ class CoreAnalysis {
                 }
             }
 
-
             // Distance ratio
             Tensor row = Join.of( //
                     Tensors.of(time, requestsSize), //
@@ -90,7 +81,6 @@ class CoreAnalysis {
                     numStatus, //
                     occupancyRatio);
 
-
             table.append(row);
 
             if (s.now % 1000 == 0)
@@ -98,10 +88,7 @@ class CoreAnalysis {
 
         }
 
-
-        Files.write(Paths.get(dataPath+"/basicdemo.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-       // Files.write(Paths.get("basicdemo.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+        // AnalyzeAll.saveFile(table, "basicDemo");
 
     }
 }
-

@@ -13,7 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.demo.AnalyzeAll;
+import playground.joel.analysis.AnalyzeAll;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
@@ -33,12 +33,13 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * {@link RunAVScenario}
  */
 public class ScenarioServer {
-    public static void main(String[] args) throws MalformedURLException {
+
+    public static void main(String[] args) throws MalformedURLException, Exception {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
 
-        int maxPopulationSize = 1000;
+        int maxPopulationSize = 12000;
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = false;
@@ -65,10 +66,9 @@ public class ScenarioServer {
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.run();
-
+        
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        // EventFileToProcessingXML.convert(dir);
         AnalyzeAll.analyze(args);
     }
 }

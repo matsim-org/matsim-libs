@@ -1,4 +1,4 @@
-package playground.clruch.demo.utils;
+package playground.clruch.utils;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
