@@ -142,6 +142,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     /**
      * @return return virtualNode related HashMaps
      */
+    // TODO move this to VirtualNetwork class
     protected <Type> Map<VirtualNode, List<Type>> createvNodeLinksMap() {
         Map<VirtualNode, List<Type>> returnMap = new HashMap<>();
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
