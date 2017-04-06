@@ -14,7 +14,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.joel.analysis.AnalyzeAll;
-//import playground.clruch.demo.AnalyzeAll;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
@@ -60,19 +59,16 @@ public class ScenarioServer {
         final Population population = scenario.getPopulation();
         MatsimStaticDatabase.initializeSingletonInstance( //
                 scenario.getNetwork(), ReferenceFrame.IDENTITY);
-
         TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
-
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.run();
-
+        
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        // EventFileToProcessingXML.convert(dir);
         AnalyzeAll.analyze(args);
     }
 }

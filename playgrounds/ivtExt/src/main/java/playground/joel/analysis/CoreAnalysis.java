@@ -1,8 +1,16 @@
 package playground.joel.analysis;
 
-import ch.ethz.idsc.tensor.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.alg.Flatten;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Quantile;
@@ -11,23 +19,17 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 /**
  * Created by Joel on 05.04.2017.
  */
-public class CoreAnalysis {
+class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
     Tensor summary = Tensors.empty();
     Tensor totalWaitTimeQuantile = Tensors.empty();
     Tensor totalWaitTimeMean = Tensors.empty();
 
-    CoreAnalysis(StorageSupplier storageSupplierIn){
+    CoreAnalysis(StorageSupplier storageSupplierIn) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
     }
@@ -48,9 +50,7 @@ public class CoreAnalysis {
         }
     }
 
-
     public void analyze() throws Exception {
-
 
         Tensor table = Tensors.empty();
         Tensor allSubmissions = Tensors.empty();
@@ -63,7 +63,6 @@ public class CoreAnalysis {
 
             final long now = s.now;
             Scalar time = RealScalar.of(s.now);
-
 
             // number of requests
             Scalar requestsSize = RealScalar.of(s.requests.size());
@@ -103,7 +102,6 @@ public class CoreAnalysis {
                     waitTimeMean, //
                     numStatus, //
                     occupancyRatio);
-
 
             table.append(row);
 

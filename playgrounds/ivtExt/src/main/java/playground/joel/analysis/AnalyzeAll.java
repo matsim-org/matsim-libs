@@ -1,5 +1,13 @@
 package playground.joel.analysis;
 
+import static playground.clruch.utils.NetworkLoader.loadNetwork;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.matsim.api.core.v01.network.Network;
+
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
@@ -7,20 +15,10 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.MathematicaFormat;
 import ch.ethz.idsc.tensor.io.MatlabExport;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-
 import playground.clruch.gfx.ReferenceFrame;
-import playground.clruch.gfx.helper.SiouxFallstoWGS84;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.joel.data.TotalData;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static playground.clruch.demo.utils.NetworkLoader.loadNetwork;
 
 /**
  * Created by Joel on 05.04.2017.
@@ -37,16 +35,15 @@ public class AnalyzeAll {
     }
 
     static void plot(String csv, String name, String title, int from, int to, Double maxRange) throws Exception {
-        Tensor table = CsvFormat.parse(
-                Files.lines(Paths.get("output/data/" + csv + ".csv")));
+        Tensor table = CsvFormat.parse(Files.lines(Paths.get("output/data/" + csv + ".csv")));
         System.out.println(Dimensions.of(table));
 
         table = Transpose.of(table);
 
-        try{
+        try {
             File dir = new File("output/data");
-            DiagramCreator.createDiagram(dir, name, title, table.get(0), table.extract(from,to), maxRange);
-        }catch (Exception e){
+            DiagramCreator.createDiagram(dir, name, title, table.get(0), table.extract(from, to), maxRange);
+        } catch (Exception e) {
             System.out.println("Error creating the diagrams");
         }
     }
@@ -58,8 +55,8 @@ public class AnalyzeAll {
     static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
-        AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3,6,
-                1200.0); // maximum waiting time in the plot to have this uniform for all simulations
+        AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3, 6, 1200.0); // maximum waiting time in the plot to have this uniform for all
+                                                                                         // simulations
         AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
         AnalyzeAll.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
         getTotals(summary, coreAnalysis);
@@ -79,12 +76,11 @@ public class AnalyzeAll {
             distance += table.Get(j, 11).number().doubleValue();
             distanceWithCust += table.Get(j, 12).number().doubleValue();
         }
-        timeRatio = timeRatio/size;
-        double distanceRatio = distanceWithCust/distance;
+        timeRatio = timeRatio / size;
+        double distanceRatio = distanceWithCust / distance;
 
         TotalData totalData = new TotalData();
-        totalData.generate(String.valueOf(timeRatio), String.valueOf(distanceRatio), String.valueOf(mean),
-                String.valueOf(quantile50), String.valueOf(quantile95),
+        totalData.generate(String.valueOf(timeRatio), String.valueOf(distanceRatio), String.valueOf(mean), String.valueOf(quantile50), String.valueOf(quantile95),
                 new File("output/data/totalData.xml"));
     }
 

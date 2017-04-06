@@ -1,5 +1,10 @@
 package playground.clruch.demo;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -13,29 +18,20 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
     String dataPath;
 
-
-    CoreAnalysis(StorageSupplier storageSupplierIn, String datapath){
+    CoreAnalysis(StorageSupplier storageSupplierIn, String datapath) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
         dataPath = datapath;
     }
 
-
     public void analyze(String directory) throws Exception {
 
-
         Tensor table = Tensors.empty();
-
 
         for (int index = 0; index < size; ++index) {
 
@@ -43,7 +39,6 @@ class CoreAnalysis {
 
             final long now = s.now;
             Scalar time = RealScalar.of(s.now);
-
 
             // number of requests
             Scalar requestsSize = RealScalar.of(s.requests.size());
@@ -78,7 +73,6 @@ class CoreAnalysis {
                 }
             }
 
-
             // Distance ratio
             Tensor row = Join.of( //
                     Tensors.of(time, requestsSize), //
@@ -87,7 +81,6 @@ class CoreAnalysis {
                     numStatus, //
                     occupancyRatio);
 
-
             table.append(row);
 
             if (s.now % 1000 == 0)
@@ -95,9 +88,7 @@ class CoreAnalysis {
 
         }
 
-        AnalyzeAll.saveFile(table, "basicDemo");
-
+        // AnalyzeAll.saveFile(table, "basicDemo");
 
     }
 }
-

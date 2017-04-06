@@ -1,22 +1,22 @@
 package playground.joel.analysis;
 
-import ch.ethz.idsc.tensor.Tensor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 
+import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
+import playground.clruch.net.VehicleStatistic;
 
 /**
  * Created by Joel on 05.04.2017.
  */
-public class DistanceAnalysis {
+class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;
     Tensor summary = Tensors.empty();
@@ -50,7 +50,7 @@ public class DistanceAnalysis {
         Tensor table1 = list.stream().map(vs -> vs.distanceTotal).reduce(Tensor::add).get();
         Tensor table2 = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get();
         Tensor table3 = table1.map(InvertUnlessZero.function).pmul(table2);
-        summary = Join.of(1,table1, table2, table3);
+        summary = Join.of(1, table1, table2, table3);
         {
             AnalyzeAll.saveFile(table1, "distanceTotal");
             AnalyzeAll.saveFile(table2, "distanceWithCustomer");
