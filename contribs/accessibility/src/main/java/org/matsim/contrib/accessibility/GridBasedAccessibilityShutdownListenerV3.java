@@ -102,6 +102,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		this.accessibilityCalculator.addFacilityDataExchangeListener(spatialGridAggregator);
 
 		if (ptMatrix != null) {
+			log.warn("Add pt-matrix accessibility calculator.");
 			accessibilityCalculator.putAccessibilityContributionCalculator(
 					Modes4Accessibility.matrixBasedPt.toString(),
 					PtMatrixAccessibilityUtils.createPtMatrixAccessibilityCalculator(
@@ -118,6 +119,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		}
 		
 		// always put the free speed grid (yyyy may not be necessary in the long run)
+		log.warn("Spatial grid for freespeed added (again) to make sure it exists in any case."); // TODO try to get rid of this duplication
 		spatialGridAggregator.getAccessibilityGrids().put(Modes4Accessibility.freespeed.name(),
 				new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 
