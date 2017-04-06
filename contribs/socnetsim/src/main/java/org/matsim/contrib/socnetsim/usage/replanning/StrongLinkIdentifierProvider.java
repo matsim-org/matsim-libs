@@ -20,6 +20,7 @@ package org.matsim.contrib.socnetsim.usage.replanning;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.CompositePlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.SocialNetworkPlanLinkIdentifier;
@@ -33,6 +34,7 @@ import org.matsim.contrib.socnetsim.usage.PlanLinkConfigGroup;
  * @author thibautd
  */
 public class StrongLinkIdentifierProvider implements Provider<PlanLinkIdentifier> {
+	private static final Logger log = Logger.getLogger( StrongLinkIdentifierProvider.class );
 	private final PlanLinkConfigGroup configGroup;
 	private final SocialNetwork socialNetwork;
 
@@ -62,6 +64,10 @@ public class StrongLinkIdentifierProvider implements Provider<PlanLinkIdentifier
 			for ( String activityType : configGroup.getJoinableTypes() ) {
 				id.addOrComponent( new JoinableActivitiesPlanLinkIdentifier( activityType ) );
 			}
+		}
+
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Created STRONG plan link identifier: "+id );
 		}
 
 		return id;

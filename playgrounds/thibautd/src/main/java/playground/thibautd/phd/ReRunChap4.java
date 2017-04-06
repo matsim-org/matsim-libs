@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.phd;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.controller.CliquesModule;
@@ -30,6 +31,8 @@ import org.matsim.contrib.socnetsim.usage.ConfigConfiguredPlanLinkIdentifierModu
 import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import org.matsim.contrib.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModule;
 import org.matsim.contrib.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
+import org.matsim.contrib.socnetsim.usage.replanning.StrongLinkIdentifierProvider;
+import org.matsim.contrib.socnetsim.usage.replanning.WeakLinkIdentifierProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
@@ -53,6 +56,9 @@ public class ReRunChap4 {
 	public static void main(final String[] args) {
 		OutputDirectoryLogging.catchLogEntries();
 		final String configFile = args[ 0 ];
+
+		Logger.getLogger( StrongLinkIdentifierProvider.class ).setLevel( Level.TRACE );
+		Logger.getLogger( WeakLinkIdentifierProvider.class ).setLevel( Level.TRACE );
 
 		final Config config = loadConfig(configFile);
 		if ( ((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME )).isUseKtiScoring() ) {
