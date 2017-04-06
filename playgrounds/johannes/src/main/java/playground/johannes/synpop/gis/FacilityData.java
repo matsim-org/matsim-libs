@@ -112,7 +112,7 @@ public class FacilityData {
 
                         if (list == null) {
                             list = new LinkedList<>();
-                            facilitiesMap.put(option.getType(), list);
+                            facilitiesMap.put(activityType, list);
                         }
 
                         list.add(facility);

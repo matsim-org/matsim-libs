@@ -25,7 +25,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.studies.matrix2014.analysis.AnalyzerTaskGroup;
-import playground.johannes.studies.matrix2014.sim.CachedModePredicate;
 import playground.johannes.studies.matrix2014.sim.CopyPersonAttToLeg;
 import playground.johannes.studies.matrix2014.sim.FacilityMutatorBuilder;
 import playground.johannes.synpop.analysis.*;
@@ -48,10 +47,12 @@ public class Simulator {
 
     private static final boolean USE_WEIGHTS = true;
 
-    private static final Predicate<Segment> DEFAULT_LEG_PREDICATE = new LegAttributePredicate(
-            CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
+//    private static final Predicate<Segment> DEFAULT_LEG_PREDICATE = new LegAttributePredicate(
+//            CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
+    private static final Predicate<Segment> DEFAULT_LEG_PREDICATE = null;
 
-    private static final String DEFAULT_PREDICATE_NAME = "car";
+//    private static final String DEFAULT_PREDICATE_NAME = "car";
+    private static final String DEFAULT_PREDICATE_NAME = "";
 
     private AnalyzerTaskComposite<Collection<? extends Person>> analyzerTasks;
 
@@ -155,11 +156,13 @@ public class Simulator {
         /*
         Load reference population...
          */
-        refPersons = RefPopulationBuilder.build(this, config);
+//        refPersons = RefPopulationBuilder.build(this, config);
+        refPersons = RefPopulationBuilderDrive.build(this, config);
         /*
         Generate the simulation population...
          */
-        simPersons = SimPopulationBuilder.build(this, config);
+//        simPersons = SimPopulationBuilder.build(this, config);
+        simPersons = SimPopulationBuilderDrive.build(this, config);
         /*
 		Setup listeners for changes on facilities and geo distance.
 		 */
@@ -167,7 +170,7 @@ public class Simulator {
         attributeListeners.put(CommonKeys.ACTIVITY_FACILITY, new AttributeChangeListenerComposite());
 
         GeoDistanceUpdater geoDistanceUpdater = new GeoDistanceUpdater(attributeListeners.get(CommonKeys.LEG_GEO_DISTANCE));
-        geoDistanceUpdater.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
+//        geoDistanceUpdater.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
 
         attributeListeners.get(CommonKeys.ACTIVITY_FACILITY).addComponent(geoDistanceUpdater);
         /*
@@ -186,8 +189,9 @@ public class Simulator {
         analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, ioContext, "hamiltonian"));
 
 //        GeoDistanceZoneDensityHamiltonian.build(this, config);
-        GeoDistanceZoneHamiltonian2.build(this, config);
-        PurposeHamiltonian.build(this, config);
+//        GeoDistanceZoneHamiltonian2.build(this, config);
+        GeoDistanceZoneHamiltonianDrive.build(this, config);
+//        PurposeHamiltonian.build(this, config);
 //        GeoDistanceTypeHamiltonian.build(this, config);
 //        GeoDistanceHamiltonian.build(this, config);
 //        GeoDistanceLAU2Hamiltonian.build(this, config);
@@ -205,11 +209,13 @@ public class Simulator {
          */
         logger.info("Analyzing reference population...");
         ioContext.append("ref");
+        getAnalyzerTasks().addComponent(new PopulationWriter(getIOContext()));
         AnalyzerTaskRunner.run(refPersons, analyzerTasks, ioContext);
         /*
         Extend the analyzer
          */
-        ExtendedAnalyzerBuilder.build(this, config);
+//        ExtendedAnalyzerBuilder.build(this, config);
+
 
         engineListeners.addComponent(new AnalyzerListener(analyzerTasks, ioContext, dumpInterval));
         /*
