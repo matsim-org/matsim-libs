@@ -23,7 +23,8 @@
 package org.matsim.contrib.parking.parkingsearch.sim;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
@@ -38,6 +39,8 @@ import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.StageActivityTypes;
+
+import com.google.inject.name.Names;
 
 
 /**
@@ -66,6 +69,7 @@ public class SetupParking {
 			@Override
 			public void install() {
 				addRoutingModuleBinding(TransportMode.car).toInstance(routingModuleCar);
+				bind(Network.class).annotatedWith(Names.named(DvrpModule.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
 				bind(WalkLegFactory.class).asEagerSingleton();
 				this.install(new ParkingSearchQSimModule());
