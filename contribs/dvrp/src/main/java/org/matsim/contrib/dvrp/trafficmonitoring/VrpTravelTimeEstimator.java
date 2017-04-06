@@ -24,7 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
@@ -48,7 +48,7 @@ public class VrpTravelTimeEstimator implements TravelTime, MobsimBeforeCleanupLi
 
 	@Inject
 	public VrpTravelTimeEstimator(@Named(VrpTravelTimeModules.DVRP_INITIAL) TravelTime initialTT,
-			@Named(TransportMode.car) TravelTime observedTT, Network network,
+			@Named(TransportMode.car) TravelTime observedTT, @Named(DvrpModule.DVRP_ROUTING) Network network,
 			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig) {
 		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
 	}
@@ -86,24 +86,9 @@ public class VrpTravelTimeEstimator implements TravelTime, MobsimBeforeCleanupLi
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		// This dirty hack makes taxi cabs stick to car links only. Waterways and subway tunnel are no place for cabs.
-		// Note that this also prevents taxi cabs from using bus lanes implemented as separate links with pt as
-		// transport mode.
-		// Maybe the user should tag links appropriate for taxi usage with the tag "taxi". This can later be used to
-		// filter the
-		// network for the routing algos of the dvrp/taxi packages.
-		// AN Aug'16
-
-		// would it be faster if we remove this hack to init()/updateTTs()???
-		// michalm Sep'16
-
-		if (link.getAllowedModes().contains(TransportMode.car)) {
-			// TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)
-			int idx = TimeBinUtils.getTimeBinIndex(time, interval, intervalCount);
-			return linkTTs.get(link.getId())[idx];
-		}
-
-		return Double.MAX_VALUE;
+		// TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)
+		int idx = TimeBinUtils.getTimeBinIndex(time, interval, intervalCount);
+		return linkTTs.get(link.getId())[idx];
 	}
 
 	@Override

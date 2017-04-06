@@ -3,6 +3,7 @@
 <config>
 	<module name="dvrp">
 		<param name="mode" value="taxi" />
+		<param name="vehiclesFile" value="one_taxi_vehicles.xml" />
 	</module>
 
 	<module name="network">

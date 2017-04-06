@@ -20,15 +20,18 @@
 package org.matsim.contrib.drt.taxibus.run.configuration;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
 import org.matsim.contrib.drt.taxibus.algorithm.utils.TaxibusUtils;
 import org.matsim.contrib.drt.taxibus.run.sim.TaxibusQSimProvider;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.*;
 import org.matsim.core.controler.*;
 
+import com.google.inject.name.*;
 import com.google.inject.util.Providers;
 
 /**
@@ -77,7 +80,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 				addRoutingModuleBinding(TaxibusUtils.TAXIBUS_MODE)
 						.toInstance(new DynRoutingModule(TaxibusUtils.TAXIBUS_MODE));
 				bind(Fleet.class).toInstance(fleetData);
-
+				bind(Network.class).annotatedWith(Names.named(DvrpModule.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
 			}
 		});
 

@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.taxi.run;
 
-import java.net.URL;
 import java.util.Map;
 
 import org.matsim.core.config.*;
@@ -42,9 +41,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	public static final String ONLINE_VEHICLE_TRACKER = "onlineVehicleTracker";
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 
-	// input
-	public static final String TAXIS_FILE = "taxisFile";
-
 	// output
 	public static final String TIME_PROFILES = "timeProfiles";
 	public static final String DETAILED_STATS = "detailedStats";
@@ -60,8 +56,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	private double AStarEuclideanOverdoFactor = 1.;
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;
-
-	private String taxisFile = null;
 
 	private boolean timeProfiles = false;
 	private boolean detailedStats = false;
@@ -89,7 +83,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE,
 				"If true, the startLink is changed to last link in the current schedule, so the taxi starts the next"
 						+ " day at the link where it stopped operating the day before");
-		map.put(TAXIS_FILE, "An XML file specifying the taxi fleet. The file format according to dvrp_vehicles_v1.dtd");
 		map.put(TIME_PROFILES,
 				"If true, writes time profiles of vehicle statuses (i.e. current task type) and the number of unplanned"
 						+ " requests are written to a text file (taxi_status_time_profiles) and saved as plots");
@@ -173,16 +166,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
 	}
 
-	@StringGetter(TAXIS_FILE)
-	public String getTaxisFile() {
-		return taxisFile;
-	}
-
-	@StringSetter(TAXIS_FILE)
-	public void setTaxisFile(String taxisFile) {
-		this.taxisFile = taxisFile;
-	}
-
 	@StringGetter(TIME_PROFILES)
 	public boolean getTimeProfiles() {
 		return timeProfiles;
@@ -220,9 +203,5 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	public void setOptimizerConfigGroup(ConfigGroup optimizerCfg) {
 		clearParameterSetsForType(OPTIMIZER_PARAMETER_SET);
 		addParameterSet(optimizerCfg);
-	}
-
-	public URL getTaxisFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.taxisFile);
 	}
 }

@@ -92,11 +92,11 @@ public class TaxiOptimizerTests {
 			String dir = "./src/main/resources/mielec_2014_02/";
 			String configFile = dir + "mielec_taxi_benchmark_config.xml";
 
-			TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-			config = ConfigUtils.loadConfig(configFile, taxiCfg, new DvrpConfigGroup());
+			DvrpConfigGroup dvrpCfg = new DvrpConfigGroup();
+			config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), dvrpCfg);
 
 			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
-			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
+			dvrpCfg.setVehiclesFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
 
 			controler = RunTaxiBenchmark.createControler(config, 1);
 		}

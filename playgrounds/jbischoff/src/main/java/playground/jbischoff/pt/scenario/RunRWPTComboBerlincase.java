@@ -26,17 +26,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
 import org.matsim.contrib.av.robotaxi.scoring.*;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.*;
-import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -48,12 +39,9 @@ import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromMod
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class RunRWPTComboBerlincase {
-public static void main(String[] args) {
 	
+	public static void main(String[] args) {
 		if (args.length!=1){
 			throw new RuntimeException("Wrong arguments");
 		}
@@ -64,28 +52,22 @@ public static void main(String[] args) {
 		
 		DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
 
-			
-	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
 
-       Scenario scenario = ScenarioUtils.loadScenario(config);
-       FleetImpl fleet = new FleetImpl();
-       new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
-       Controler controler = new Controler(scenario);
-       controler.addOverridingModule(new TaxiOutputModule());
-       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
-       controler.addOverridingModule(new VariableAccessTransitRouterModule());
-	   controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new TaxiOutputModule());
+		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+		controler.addOverridingModule(new VariableAccessTransitRouterModule());
+		controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
 
-	   controler.addOverridingModule(new AbstractModule() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
 			}
 		});
-       controler.run();
-
-
-}
+		controler.run();
+	}
 }

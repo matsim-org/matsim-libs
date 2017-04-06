@@ -3,6 +3,8 @@
 <config>
 	<module name="dvrp">
 		<param name="mode" value="taxi" />
+		<param name="vehiclesFile" value="taxis-25.xml" />
+		<!-- param name="vehiclesFile" value="taxis-50.xml" / -->
 	</module>
 
 	<module name="taxi">
@@ -11,9 +13,6 @@
 		<param name="pickupDuration" value="120" />
 		<param name="dropoffDuration" value="60" />
 		<param name="onlineVehicleTracker" value="false" />
-
-		<param name="taxisFile" value="taxis-25.xml" />
-		<!-- param name="taxisFile" value="taxis-50.xml" / -->
 
 		<param name="timeProfiles" value="true" />
 		<param name="detailedStats" value="true" />

@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -32,21 +31,19 @@ import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Provider;
 
-public class TaxiOptimizerModules {
+public class TaxiOptimizerModules {//rename to TaxiModules? or DvrpModulesForTaxi?
 	public static final String TAXI_MODE = "taxi";
 
-	public static AbstractModule createDefaultModule(Fleet fleet) {
-		return new DvrpModule(fleet, createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class),
-				TaxiOptimizer.class);
+	public static AbstractModule createDefaultModule() {
+		return new DvrpModule(createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class), TaxiOptimizer.class);
 	}
 
-	public static AbstractModule createModule(Fleet fleet,
-			Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return new DvrpModule(fleet, createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
+	public static AbstractModule createModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
+		return new DvrpModule(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
 	}
 
-	public static AbstractModule createBenchmarkModule(Fleet fleet) {
-		return new DvrpBenchmarkModule(fleet, createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class),
+	public static AbstractModule createBenchmarkModule() {
+		return new DvrpBenchmarkModule(createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class),
 				TaxiOptimizer.class);
 	}
 

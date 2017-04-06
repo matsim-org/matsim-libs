@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
-import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
@@ -39,19 +38,15 @@ public class DvrpBenchmarkModule extends DvrpModule {
 	@Inject
 	private DvrpConfigGroup dvrpCfg;
 
-	private final Fleet fleet;
-
 	@SafeVarargs
-	public DvrpBenchmarkModule(Fleet fleet, Module module, Class<? extends MobsimListener>... listeners) {
-		super(fleet, module, listeners);
-		this.fleet = fleet;
+	public DvrpBenchmarkModule(Module module, Class<? extends MobsimListener>... listeners) {
+		super(module, listeners);
 	}
 
 	@Override
 	public void install() {
 		String mode = dvrpCfg.getMode();
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-		bind(Fleet.class).toInstance(fleet);
 
 		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);

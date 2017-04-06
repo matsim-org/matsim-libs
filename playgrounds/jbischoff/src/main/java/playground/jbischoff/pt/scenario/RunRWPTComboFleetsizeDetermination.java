@@ -22,20 +22,12 @@
  */
 package playground.jbischoff.pt.scenario;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.flow.AvIncreasedCapacityModule;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
 import org.matsim.contrib.av.intermodal.router.config.*;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.*;
-import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -45,11 +37,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class RunRWPTComboFleetsizeDetermination {
-public static void main(String[] args) {
+	public static void main(String[] args) {
 	
 		if (args.length!=4){
 			throw new RuntimeException("Wrong arguments");
@@ -65,10 +54,9 @@ public static void main(String[] args) {
 		config.controler().setOutputDirectory(outPutDir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		DvrpConfigGroup.get(config).setMode("taxi");
-		
-		TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
-		tcg.setTaxisFile(taxisFile);
+		DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
+		dvrpCfg.setMode("taxi");
+		dvrpCfg.setVehiclesFile(taxisFile);
 		
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		
@@ -100,20 +88,16 @@ public static void main(String[] args) {
        config.checkConsistency();
 
        Scenario scenario = ScenarioUtils.loadScenario(config);
-       FleetImpl fleet = new FleetImpl();
-       new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
        controler.addOverridingModule(new AvIncreasedCapacityModule(avfactor));
        controler.addOverridingModule(new TaxiOutputModule());
 
-       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
 
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
 //       controler.addOverridingModule(new OTFVisLiveModule());
 
        controler.run();
-
-
-}
+	}
 }

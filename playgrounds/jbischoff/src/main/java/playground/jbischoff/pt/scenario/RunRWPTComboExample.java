@@ -26,17 +26,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
 import org.matsim.contrib.av.intermodal.router.config.*;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.*;
-import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -46,11 +37,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class RunRWPTComboExample {
-public static void main(String[] args) {
+	public static void main(String[] args) {
 	
 		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/config.xml", new TaxiConfigGroup(), new DvrpConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -81,13 +69,10 @@ public static void main(String[] args) {
 		config.transitRouter().setExtensionRadius(0);
 		
 		DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
-	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
 
        Scenario scenario = ScenarioUtils.loadScenario(config);
-       FleetImpl fleet = new FleetImpl();
-       new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
        controler.addOverridingModule(new TaxiOutputModule());
        
@@ -98,7 +83,7 @@ public static void main(String[] args) {
 		}
 	});
        
-       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
 //       controler.addOverridingModule(new OTFVisLiveModule());
@@ -106,5 +91,5 @@ public static void main(String[] args) {
        controler.run();
 
 
-}
+	}
 }

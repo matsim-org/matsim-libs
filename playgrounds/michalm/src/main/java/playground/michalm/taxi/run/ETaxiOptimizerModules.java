@@ -19,7 +19,6 @@
 
 package playground.michalm.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -33,12 +32,12 @@ import playground.michalm.taxi.optimizer.ETaxiOptimizerProvider;
 import playground.michalm.taxi.vrpagent.ETaxiActionCreator;
 
 public class ETaxiOptimizerModules {
-	public static AbstractModule createDefaultModule(Fleet fleet) {
-		return new DvrpModule(fleet, createModuleForQSimPlugin(), TaxiOptimizer.class);
+	public static AbstractModule createDefaultModule() {
+		return new DvrpModule(createModuleForQSimPlugin(), TaxiOptimizer.class);
 	}
 
-	public static AbstractModule createBenchmarkModule(Fleet fleet) {
-		return new DvrpBenchmarkModule(fleet, createModuleForQSimPlugin(), TaxiOptimizer.class);
+	public static AbstractModule createBenchmarkModule() {
+		return new DvrpBenchmarkModule(createModuleForQSimPlugin(), TaxiOptimizer.class);
 	}
 
 	private static com.google.inject.AbstractModule createModuleForQSimPlugin() {

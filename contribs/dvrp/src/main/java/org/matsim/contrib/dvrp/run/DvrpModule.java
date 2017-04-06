@@ -21,7 +21,9 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -32,23 +34,26 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.*;
+import com.google.inject.name.Named;
 
 public class DvrpModule extends AbstractModule {
+	public static final String DVRP_ROUTING = "dvrp_routing";
+
 	@Inject
 	private DvrpConfigGroup dvrpCfg;
 
-	private final Fleet fleet;
 	private final Module module;
 	private final List<Class<? extends MobsimListener>> listeners;
 
 	@SuppressWarnings("unchecked")
-	public DvrpModule(Fleet fleet, final Class<? extends VrpOptimizer> vrpOptimizerClass,
+	public DvrpModule(final Class<? extends VrpOptimizer> vrpOptimizerClass,
 			final Class<? extends PassengerRequestCreator> passengerRequestCreatorClass,
 			final Class<? extends DynActionCreator> dynActionCreatorClass) {
-		this.fleet = fleet;
 
 		module = new com.google.inject.AbstractModule() {
 			@Override
@@ -66,8 +71,7 @@ public class DvrpModule extends AbstractModule {
 	}
 
 	@SafeVarargs
-	public DvrpModule(Fleet fleet, Module module, Class<? extends MobsimListener>... listeners) {
-		this.fleet = fleet;
+	public DvrpModule(Module module, Class<? extends MobsimListener>... listeners) {
 		this.module = module;
 		this.listeners = Arrays.asList(listeners);
 	}
@@ -76,13 +80,39 @@ public class DvrpModule extends AbstractModule {
 	public void install() {
 		String mode = dvrpCfg.getMode();
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-		bind(Fleet.class).toInstance(fleet);
 
 		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 
 		// VrpTravelTimeEstimator
 		install(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+	}
+
+	@Provides
+	@Singleton
+	@Named(DvrpModule.DVRP_ROUTING)
+	private Network provideDvrpRoutingNetwork(Network network, DvrpConfigGroup dvrpCfg) {
+		if (dvrpCfg.getNetworkMode() == null) { // no mode filtering
+			return network;
+		}
+
+		Network drtNetwork = NetworkUtils.createNetwork();
+		new TransportModeNetworkFilter(network).filter(drtNetwork, Collections.singleton(dvrpCfg.getNetworkMode()));
+		return drtNetwork;
+	}
+
+	@Provides
+	@Singleton
+	private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
+			DvrpConfigGroup dvrpCfg) {
+		if (dvrpCfg.getVehiclesFile() == null) {
+			throw new RuntimeException("'vehicleFiles' not specified in DvrpConfigGroup. "
+					+ "Alternatively, bind Fleet.class to something else...");
+		}
+
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(network, fleet).parse(dvrpCfg.getVehiclesFileUrl(config.getContext()));
+		return fleet;
 	}
 
 	@Provides

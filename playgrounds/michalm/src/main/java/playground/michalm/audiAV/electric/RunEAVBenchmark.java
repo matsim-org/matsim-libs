@@ -20,7 +20,7 @@
 package playground.michalm.audiAV.electric;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.*;
 import org.matsim.contrib.taxi.run.*;
@@ -56,7 +56,7 @@ public class RunEAVBenchmark {
 		// TODO temp
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
 		EvConfigGroup evCfg = EvConfigGroup.get(config);
 		config.controler().setLastIteration(runs - 1);
 		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
@@ -65,7 +65,7 @@ public class RunEAVBenchmark {
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
 		final FleetImpl fleet = new FleetImpl();
-		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(dvrpCfg.getVehiclesFileUrl(config.getContext()));
 		EvData evData = new EvDataImpl();
 		new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
 		EAVUtils.initEvData(fleet, evData);
@@ -75,7 +75,7 @@ public class RunEAVBenchmark {
 		controler.addOverridingModule(new TaxiOutputModule());
 		controler.addOverridingModule(new EvModule(evData));
 
-		controler.addOverridingModule(ETaxiOptimizerModules.createBenchmarkModule(fleet));
+		controler.addOverridingModule(ETaxiOptimizerModules.createBenchmarkModule());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -83,6 +83,7 @@ public class RunEAVBenchmark {
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
 				addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
+				bind(Fleet.class).toInstance(fleet);//overrride the binding specified in DvrpModule
 			}
 		});
 

@@ -22,7 +22,6 @@ package playground.michalm.drt.run;
 import java.net.URL;
 import java.util.Map;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.*;
 
 public class DrtConfigGroup extends ReflectiveConfigGroup {
@@ -47,7 +46,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private static final String TRANSIT_STOP_FILE = "transitStopFile";
 	private static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
 	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
-	private static final String DRT_NET_MODE = "drtNetworkMode";
 
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 
@@ -62,7 +60,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	private String vehiclesFile = null;
 	private String transitStopFile = null;
-	private String drtNetworkMode = TransportMode.car;
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
@@ -90,7 +87,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(PLOT_CUST_STATS, "Writes out detailed DRT customer stats in each iteration.");
 		map.put(PLOT_VEH_STATS,
 				"Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration.");
-		map.put(DRT_NET_MODE, "DRT Network Mode. Default = car");
 		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased.");
 		map.put(MAXIMUM_WALK_DISTANCE, "Maximum walk distance to next stop location in stationbased system.");
 		map.put(TRANSIT_STOP_FILE, "Stop locations file (transit schedule format, but without lines) for DRT stops.");
@@ -101,23 +97,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 				"Number of threads used for parallel evaluation of request insertion into existing schedules. "
 						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
 		return map;
-	}
-
-	/**
-	 * @return the drtNetworkMode
-	 */
-	@StringGetter(DRT_NET_MODE)
-	public String getDrtNetworkMode() {
-		return drtNetworkMode;
-	}
-
-	/**
-	 * @param drtNetworkMode
-	 *            the drtNetworkMode to set
-	 */
-	@StringSetter(DRT_NET_MODE)
-	public void setDrtNetworkMode(String drtNetworkMode) {
-		this.drtNetworkMode = drtNetworkMode;
 	}
 
 	@StringGetter(STOP_DURATION)

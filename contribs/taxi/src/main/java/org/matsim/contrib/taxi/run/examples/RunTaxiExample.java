@@ -20,8 +20,6 @@
 package org.matsim.contrib.taxi.run.examples;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.*;
@@ -38,20 +36,15 @@ public class RunTaxiExample {
 		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// load fleet
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
-
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet)); // taxi optimiser
+		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule()); // taxi optimiser
 		controler.addOverridingModule(new TaxiOutputModule()); // taxi output (can be commented out)
 
 		if (otfvis) {

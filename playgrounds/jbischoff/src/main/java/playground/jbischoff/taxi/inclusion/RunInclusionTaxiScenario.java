@@ -20,16 +20,13 @@
 package playground.jbischoff.taxi.inclusion;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
 
 import playground.jbischoff.taxi.setup.*;
 
@@ -55,8 +52,8 @@ public class RunInclusionTaxiScenario
 //        config.plans().setInputFile("itaxi_"+i+".xml.gz");
         config.plans().setInputFile("itaxi_"+0+".xml.gz");
         DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
-        TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
-        taxi.setTaxisFile("hc_vehicles"+i+".xml.gz");
+        DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
+        dvrpCfg.setVehiclesFile("hc_vehicles"+i+".xml.gz");
         createControler(config, false).run();
     	}
     }
@@ -64,17 +61,14 @@ public class RunInclusionTaxiScenario
 
     public static Controler createControler(Config config, boolean otfvis)
     {
-        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        FleetImpl fleet = new FleetImpl();
-        new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new JbTaxiModule(fleet));
-        controler.addOverridingModule(TaxiOptimizerModules.createModule(fleet, JbTaxiOptimizerProvider.class));
+        controler.addOverridingModule(new JbTaxiModule());
+        controler.addOverridingModule(TaxiOptimizerModules.createModule(JbTaxiOptimizerProvider.class));
 
         if (otfvis) {
             controler.addOverridingModule(new OTFVisLiveModule());

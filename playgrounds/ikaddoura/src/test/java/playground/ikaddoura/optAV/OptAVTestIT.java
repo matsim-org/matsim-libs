@@ -22,28 +22,16 @@
  */
 package playground.ikaddoura.optAV;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.junit.*;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.noise.NoiseCalculationOnline;
-import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.*;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
-import org.matsim.contrib.taxi.run.TaxiOutputModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -51,15 +39,11 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup;
-import playground.ikaddoura.decongestion.DecongestionControlerListener;
+import playground.ikaddoura.decongestion.*;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
-import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
-import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
-import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
+import playground.ikaddoura.decongestion.handler.*;
+import playground.ikaddoura.decongestion.tollSetting.*;
+import playground.ikaddoura.moneyTravelDisutility.*;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
@@ -92,9 +76,6 @@ public class OptAVTestIT {
 		
 		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc1");
 
-		DvrpConfigGroup.get(config1).setMode(TaxiOptimizerModules.TAXI_MODE);
-
-		TaxiConfigGroup taxiCfg1 = TaxiConfigGroup.get(config1);
 		config1.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config1.checkConsistency();
 		
@@ -109,11 +90,8 @@ public class OptAVTestIT {
 		
 		// taxi
 
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario1.getNetwork(), fleet).readFile(taxiCfg1.getTaxisFileUrl(config1.getContext()).getFile());
-		
 		controler1.addOverridingModule(new TaxiOutputModule());
-		controler1.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+		controler1.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
         
         final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory1 =
         		new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler1.getConfig().planCalcScore());
@@ -152,9 +130,6 @@ public class OptAVTestIT {
 		
 		config2.controler().setOutputDirectory(testUtils.getOutputDirectory() + "n");
 
-		DvrpConfigGroup.get(config2).setMode(TaxiOptimizerModules.TAXI_MODE);
-
-		TaxiConfigGroup taxiCfg2 = TaxiConfigGroup.get(config2);
 		config2.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config2.checkConsistency();
 		
@@ -163,11 +138,8 @@ public class OptAVTestIT {
 		
 		// taxi
 
-		FleetImpl fleet2 = new FleetImpl();
-		new VehicleReader(scenario2.getNetwork(), fleet2).readFile(taxiCfg2.getTaxisFileUrl(config2.getContext()).getFile());
-		
 		controler2.addOverridingModule(new TaxiOutputModule());
-        controler2.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+        controler2.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
 		
 		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
@@ -240,9 +212,6 @@ public class OptAVTestIT {
 		
 		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc2");
 		
-		DvrpConfigGroup.get(config1).setMode(TaxiOptimizerModules.TAXI_MODE);
-
-		TaxiConfigGroup taxiCfg1 = TaxiConfigGroup.get(config1);
 		config1.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config1.checkConsistency();
 		
@@ -251,11 +220,8 @@ public class OptAVTestIT {
 		
 		// taxi
 
-		FleetImpl fleet1 = new FleetImpl();
-		new VehicleReader(scenario1.getNetwork(), fleet1).readFile(taxiCfg1.getTaxisFileUrl(config1.getContext()).getFile());
-		
 		controler1.addOverridingModule(new TaxiOutputModule());
-        controler1.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet1));
+        controler1.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
 		
         final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory1 =
         		new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler1.getConfig().planCalcScore());
@@ -291,11 +257,8 @@ public class OptAVTestIT {
 				new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		
-		DvrpConfigGroup.get(config2).setMode(TaxiOptimizerModules.TAXI_MODE);
-		
 		config2.controler().setOutputDirectory(testUtils.getOutputDirectory() + "c");
 		
-		TaxiConfigGroup taxiCfg2 = TaxiConfigGroup.get(config2);
 		config2.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config2.checkConsistency();
 		
@@ -340,11 +303,8 @@ public class OptAVTestIT {
 		
 		// taxi
 
-		FleetImpl fleet2 = new FleetImpl();
-		new VehicleReader(scenario1.getNetwork(), fleet2).readFile(taxiCfg2.getTaxisFileUrl(config2.getContext()).getFile());
-		
 		controler2.addOverridingModule(new TaxiOutputModule());
-        controler2.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet2));
+        controler2.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
 		
 		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory2 = new MoneyTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler2.getConfig().planCalcScore())

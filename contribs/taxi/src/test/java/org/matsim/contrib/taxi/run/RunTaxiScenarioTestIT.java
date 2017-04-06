@@ -48,10 +48,10 @@ public class RunTaxiScenarioTestIT {
 	private void runMielec(String plansFile, String taxisFile) {
 		String configFile = "mielec_2014_02/mielec_taxi_config.xml";
 
-		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		Config config = ConfigUtils.loadConfig(configFile, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
+		DvrpConfigGroup dvrpCfg = new DvrpConfigGroup();
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), dvrpCfg, new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
-		taxiCfg.setTaxisFile(taxisFile);
+		dvrpCfg.setVehiclesFile(taxisFile);
 		RunTaxiScenario.createControler(config, false).run();
 	}
 }

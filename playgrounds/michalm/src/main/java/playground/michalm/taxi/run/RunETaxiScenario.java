@@ -20,7 +20,7 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.*;
@@ -43,14 +43,14 @@ public class RunETaxiScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
 		EvConfigGroup evCfg = EvConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FleetImpl fleet = new FleetImpl();
-		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(dvrpCfg.getVehiclesFileUrl(config.getContext()));
 		EvData evData = new EvDataImpl();
 		new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
 		ETaxiUtils.initEvData(fleet, evData);
@@ -58,13 +58,14 @@ public class RunETaxiScenario {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiOutputModule());
 		controler.addOverridingModule(new EvModule(evData));
-		controler.addOverridingModule(ETaxiOptimizerModules.createDefaultModule(fleet));
+		controler.addOverridingModule(ETaxiOptimizerModules.createDefaultModule());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
+				bind(Fleet.class).toInstance(fleet);// overrride the binding specified in DvrpModule
 			}
 		});
 

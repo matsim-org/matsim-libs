@@ -28,7 +28,7 @@ public class PrtModule {
 		PrtTripRouterFactoryImpl factory = new PrtTripRouterFactoryImpl(vrpData, controler.getScenario(), ttime, tdis, prtData);
 		controler.setTripRouterFactory(factory);
 
-        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(null));
+        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
 
 		controler.addControlerListener(new PrtControllerListener(prtConfig, controler, prtData, vrpData, controler.getScenario()));
 		

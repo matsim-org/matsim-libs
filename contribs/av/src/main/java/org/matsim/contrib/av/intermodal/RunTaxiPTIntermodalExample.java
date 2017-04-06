@@ -25,9 +25,7 @@ package org.matsim.contrib.av.intermodal;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
 import org.matsim.contrib.av.intermodal.router.config.*;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
@@ -87,15 +85,11 @@ public class RunTaxiPTIntermodalExample {
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		FleetImpl fleet = new FleetImpl();
-		String taxiFileName = TaxiConfigGroup.get(config).getTaxisFileUrl(config.getContext()).getFile();
-		new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiFileName);
-		// ---
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new TaxiOutputModule());
 
-        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
 		
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {
