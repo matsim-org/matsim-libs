@@ -21,6 +21,15 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 
+/**
+ * THIS FILE IS A CONCISE DEMO OF FUNCTIONALITY
+ * 
+ * DO NOT MODIFY THIS FILE (unless you are the primary author),
+ * BUT DO NOT RELY ON THIS FILE NOT BEING CHANGED
+ * 
+ * IF YOU WANT TO MAKE A SIMILAR CLASS OR REPLY ON THIS IMPLEMENTATION
+ * THEN DUPLICATE THIS FILE AND MAKE THE CHANGES IN THE NEW FILE
+ */
 class PostProcessingDemo {
 
     /**

@@ -8,6 +8,15 @@ import org.gnu.glpk.SWIGTYPE_p_int;
 import org.gnu.glpk.glp_prob;
 import org.gnu.glpk.glp_smcp;
 
+/**
+ * THIS FILE IS A CONCISE DEMO OF FUNCTIONALITY
+ * 
+ * DO NOT MODIFY THIS FILE (unless you are the primary author),
+ * BUT DO NOT RELY ON THIS FILE NOT BEING CHANGED
+ * 
+ * IF YOU WANT TO MAKE A SIMILAR CLASS OR REPLY ON THIS IMPLEMENTATION
+ * THEN DUPLICATE THIS FILE AND MAKE THE CHANGES IN THE NEW FILE
+ */
 public class LpStandalone {
 
     public static void main(String[] args) {
