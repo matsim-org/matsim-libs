@@ -48,8 +48,9 @@ public class VrpTravelTimeEstimator implements TravelTime, MobsimBeforeCleanupLi
 
 	@Inject
 	public VrpTravelTimeEstimator(@Named(VrpTravelTimeModules.DVRP_INITIAL) TravelTime initialTT,
-			@Named(TransportMode.car) TravelTime observedTT, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig) {
+			@Named(VrpTravelTimeModules.DVRP_OBSERVED) TravelTime observedTT,
+			@Named(DvrpModule.DVRP_ROUTING) Network network, TravelTimeCalculatorConfigGroup ttCalcConfig,
+			DvrpConfigGroup dvrpConfig) {
 		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
 	}
 
