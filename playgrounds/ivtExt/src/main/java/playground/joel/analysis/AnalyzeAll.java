@@ -14,6 +14,7 @@ import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.gfx.helper.SiouxFallstoWGS84;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
+import playground.joel.data.TotalData;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -54,13 +55,37 @@ public class AnalyzeAll {
         plot(csv, name, title, from, to, 1.05);
     }
 
-    // TODO: fix tensor fusion
-    static void collectAndPlot(Tensor table1/*, Tensor table2*/) throws Exception {
-        Tensor summary = Join.of(table1/*, table2*/);
+    static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
+        Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
-        AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3,6, 5000.0);
+        AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3,6,
+                1200.0); // maximum waiting time in the plot to have this uniform for all simulations
         AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
-        //AnalyzeAll.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
+        AnalyzeAll.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
+        getTotals(summary, coreAnalysis);
+    }
+
+    // TODO: get mean and quantiles over entire day, placeholders
+    static void getTotals(Tensor table, CoreAnalysis coreAnalysis) {
+        int size = table.length();
+        double timeRatio = 0;
+        double distance = 0;
+        double distanceWithCust = 0;
+        double mean = coreAnalysis.totalWaitTimeMean.Get().number().doubleValue();
+        double quantile50 = coreAnalysis.totalWaitTimeQuantile.Get(1).number().doubleValue();
+        double quantile95 = coreAnalysis.totalWaitTimeQuantile.Get(2).number().doubleValue();
+        for (int j = 0; j < size; j++) {
+            timeRatio += table.Get(j, 10).number().doubleValue();
+            distance += table.Get(j, 11).number().doubleValue();
+            distanceWithCust += table.Get(j, 12).number().doubleValue();
+        }
+        timeRatio = timeRatio/size;
+        double distanceRatio = distanceWithCust/distance;
+
+        TotalData totalData = new TotalData();
+        totalData.generate(String.valueOf(timeRatio), String.valueOf(distanceRatio), String.valueOf(mean),
+                String.valueOf(quantile50), String.valueOf(quantile95),
+                new File("output/data/totalData.xml"));
     }
 
     public static void analyze(String[] args) throws Exception {
@@ -91,7 +116,7 @@ public class AnalyzeAll {
             e.printStackTrace();
         }
 
-        collectAndPlot(coreAnalysis.summary/*, distanceAnalysis.summary*/);
+        collectAndPlot(coreAnalysis, distanceAnalysis);
 
     }
 }

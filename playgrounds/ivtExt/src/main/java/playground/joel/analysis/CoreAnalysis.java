@@ -1,10 +1,8 @@
 package playground.joel.analysis;
 
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.alg.Flatten;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Quantile;
@@ -13,6 +11,7 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,10 +24,28 @@ public class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
     Tensor summary = Tensors.empty();
+    Tensor totalWaitTimeQuantile = Tensors.empty();
+    Tensor totalWaitTimeMean = Tensors.empty();
 
     CoreAnalysis(StorageSupplier storageSupplierIn){
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
+    }
+
+    static Tensor quantiles(Tensor submission) {
+        if (3 < submission.length()) {
+            return Quantile.of(submission, Tensors.vectorDouble(.1, .5, .95));
+        } else {
+            return Array.zeros(3);
+        }
+    }
+
+    static Tensor means(Tensor submission) {
+        if (3 < submission.length()) {
+            return Mean.of(submission);
+        } else {
+            return Mean.of(Array.zeros(1));
+        }
     }
 
 
@@ -36,7 +53,9 @@ public class CoreAnalysis {
 
 
         Tensor table = Tensors.empty();
+        Tensor allSubmissions = Tensors.empty();
 
+        Map<Integer, Double> requestWaitTimes = new HashMap<>();
 
         for (int index = 0; index < size; ++index) {
 
@@ -54,14 +73,12 @@ public class CoreAnalysis {
             Tensor waitTimeMean;
             {
                 Tensor submission = Tensor.of(s.requests.stream().map(rc -> RealScalar.of(now - rc.submissionTime)));
-                if (3 < submission.length()) {
-                    waitTimeQuantile = Quantile.of(submission, Tensors.vectorDouble(.1, .5, .95));
-                    waitTimeMean = Mean.of(submission);
-                } else {
-                    waitTimeQuantile = Array.zeros(3);
-                    waitTimeMean = Mean.of(Array.zeros(1));
-                }
+                waitTimeQuantile = quantiles(submission);
+                waitTimeMean = means(submission);
+                allSubmissions.append(submission);
             }
+
+            s.requests.stream().forEach(rc -> requestWaitTimes.put(rc.requestIndex, now - rc.submissionTime));
 
             // status of AVs and occupancy ratio
             Tensor numStatus = Array.zeros(AVStatus.values().length);
@@ -78,7 +95,6 @@ public class CoreAnalysis {
                     occupancyRatio = RealScalar.of(map.get(AVStatus.DRIVEWITHCUSTOMER).size() / (double) totVeh);
                 }
             }
-
 
             // Distance ratio
             Tensor row = Join.of( //
@@ -97,6 +113,13 @@ public class CoreAnalysis {
         }
 
         AnalyzeAll.saveFile(table, "basicDemo");
+
+        Tensor uniqueSubmissions = Tensor.of(requestWaitTimes.values().stream().map(RealScalar::of));
+
+        totalWaitTimeQuantile = quantiles(uniqueSubmissions);
+        System.out.println("Q = " + totalWaitTimeQuantile);
+        totalWaitTimeMean = means(uniqueSubmissions);
+        System.out.println("mean = " + totalWaitTimeMean);
 
         summary = table;
 
