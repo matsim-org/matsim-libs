@@ -28,7 +28,7 @@ public class ScenarioViewer {
         // set manually to display virtual network boundary (will be ignored if file doesn't exist)
         // this is optional and should not cause problems if file does not exist.
         
-        File csvFile = new File("dummy_vn/voronoi_BoundaryPoints.csv");
+        File csvFile = new File("vN_40vS_L1_v2/voronoi_BoundaryPoints.csv");
         
         // END: CUSTOMIZE -------------------------------------------------
 

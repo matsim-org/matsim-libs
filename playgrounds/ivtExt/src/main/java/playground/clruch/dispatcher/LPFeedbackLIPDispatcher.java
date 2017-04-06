@@ -241,10 +241,18 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
-            File virtualnetworkXML = new File(config.getParams().get("virtualNetworkFile"));
-            System.out.println("" + virtualnetworkXML.getAbsoluteFile());
-            virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkXML);
-            travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkXML, virtualNetwork, "Ttime");
+            
+
+			final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
+			GlobalAssert.that(virtualnetworkDir.isDirectory());
+			{
+				final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
+	            System.out.println("" + virtualnetworkFile.getAbsoluteFile());
+	            virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkFile);
+	            travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkFile, virtualNetwork, "Ttime");
+			}
+
+
 
             return new LPFeedbackLIPDispatcher(
                     config,

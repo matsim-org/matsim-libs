@@ -29,7 +29,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
             for (Coord coord : pointCloud) {
                 Point point = matsimJMapViewer.getMapPosition(coord);
                 if (point != null)
-                    graphics.drawRect(point.x, point.y, 0, 0);
+                    graphics.drawRect(point.x, point.y, 1, 1);
 
             }
         }
