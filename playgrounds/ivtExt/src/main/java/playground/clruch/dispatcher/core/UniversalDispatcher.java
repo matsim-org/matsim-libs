@@ -338,6 +338,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             }
         }
     }
+    
+    public int getTotalMatchedRequests(){
+    	return this.total_matchedRequests;
+    }
+    
 
     @Override
     public String getInfoLine() {

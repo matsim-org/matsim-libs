@@ -20,6 +20,10 @@
 
 package playground.meisterk.kti.scoring;
 
+class KTIYear3ScoringFunctionFactory {
+	
+}
+
 //public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 //
 //    private final Scenario scenario;

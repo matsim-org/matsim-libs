@@ -1,3 +1,10 @@
+package playground.clruch.dispatcher;
+
+class ConsensusDispatcherDFR{
+	
+}
+
+
 ///**
 // * Dispatcher implementing the linear program from
 // * Pavone, Marco, Stephen Smith, Emilio Frazzoli, and Daniela Rus. 2011.
