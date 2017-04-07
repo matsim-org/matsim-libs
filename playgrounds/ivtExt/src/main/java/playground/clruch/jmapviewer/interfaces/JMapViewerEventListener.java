@@ -3,8 +3,6 @@ package playground.clruch.jmapviewer.interfaces;
 
 import java.util.EventListener;
 
-import playground.clruch.jmapviewer.events.JMVCommandEvent;
-
 /**
  * Must be implemented for processing commands while user
  * interacts with map viewer.

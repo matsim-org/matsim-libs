@@ -18,7 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import playground.clruch.jmapviewer.events.JMVCommandEvent;
+import playground.clruch.jmapviewer.interfaces.JMVCommandEvent;
 import playground.clruch.jmapviewer.interfaces.JMapViewerEventListener;
 import playground.clruch.jmapviewer.interfaces.MapPolygon;
 import playground.clruch.jmapviewer.interfaces.TileLoader;

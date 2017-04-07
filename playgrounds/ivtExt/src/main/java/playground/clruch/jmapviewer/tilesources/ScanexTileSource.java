@@ -20,7 +20,7 @@ import playground.clruch.jmapviewer.interfaces.ICoordinate;
  *
  * TODO: correct getDistance() method.
  */
-public class ScanexTileSource extends TMSTileSource {
+class ScanexTileSource extends TMSTileSource {
     private static final String DEFAULT_URL = "http://maps.kosmosnimki.ru";
     private static final int DEFAULT_MAXZOOM = 14;
     private static final String API_KEY = "4018C5A9AECAD8868ED5DEB2E41D09F7";

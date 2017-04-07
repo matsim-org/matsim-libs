@@ -23,7 +23,7 @@ import java.util.Set;
  * @author Wiktor Niesiobędzki
  *
  */
-public abstract class AbstractTMSTileSource extends AbstractTileSource {
+abstract class AbstractTMSTileSource extends AbstractTileSource {
 
     protected String name;
     protected String baseUrl;

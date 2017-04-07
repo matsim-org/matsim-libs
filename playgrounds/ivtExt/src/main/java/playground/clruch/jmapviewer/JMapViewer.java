@@ -25,9 +25,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
 import playground.clruch.gfx.MatsimHeatMap;
-import playground.clruch.jmapviewer.events.JMVCommandEvent;
-import playground.clruch.jmapviewer.events.JMVCommandEvent.COMMAND;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
+import playground.clruch.jmapviewer.interfaces.JMVCommandEvent;
 import playground.clruch.jmapviewer.interfaces.JMapViewerEventListener;
 import playground.clruch.jmapviewer.interfaces.MapMarker;
 import playground.clruch.jmapviewer.interfaces.MapPolygon;
@@ -36,6 +35,7 @@ import playground.clruch.jmapviewer.interfaces.TileCache;
 import playground.clruch.jmapviewer.interfaces.TileLoader;
 import playground.clruch.jmapviewer.interfaces.TileLoaderListener;
 import playground.clruch.jmapviewer.interfaces.TileSource;
+import playground.clruch.jmapviewer.interfaces.JMVCommandEvent.COMMAND;
 import playground.clruch.jmapviewer.tilesources.OsmTileSource;
 
 /**

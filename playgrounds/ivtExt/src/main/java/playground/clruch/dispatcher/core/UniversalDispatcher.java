@@ -239,7 +239,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     @Override
-    protected final void notifySimulationSubscribers(long round_now) {
+    final void notifySimulationSubscribers(long round_now) {
         if (round_now % publishPeriod == 0) {
             SimulationObjectCompiler simulationObjectCompiler = SimulationObjectCompiler.create( //
                     round_now, getInfoLine(), total_matchedRequests);
