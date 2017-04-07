@@ -40,7 +40,7 @@ MouseWheelListener {
      * Constructs a new {@code DefaultMapController}.
      * @param map map panel
      */
-    public DefaultMapController(MapComponent map) {
+    public DefaultMapController(JMapViewer map) {
         super(map);
     }
 
@@ -87,7 +87,7 @@ MouseWheelListener {
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (wheelZoomEnabled) {
-            int rotation = MapComponent.zoomReverseWheel ? -e.getWheelRotation() : e.getWheelRotation();
+            int rotation = JMapViewer.zoomReverseWheel ? -e.getWheelRotation() : e.getWheelRotation();
             map.setZoom(map.getZoom() - rotation, e.getPoint());
         }
     }

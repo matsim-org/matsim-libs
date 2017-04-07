@@ -29,12 +29,12 @@ public class JMapViewerTree extends JPanel {
     /** Serial Version UID */
     private static final long serialVersionUID = 3050203054402323972L;
 
-    private final MapComponent map;
+    private final JMapViewer map;
     private CheckBoxTree tree;
     private JPanel treePanel;
     private JSplitPane splitPane;
 
-    public JMapViewerTree(MapComponent jMapViewer, String name, boolean treeVisible) {
+    public JMapViewerTree(JMapViewer jMapViewer, String name, boolean treeVisible) {
         super();
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
@@ -145,7 +145,7 @@ public class JMapViewerTree extends JPanel {
         return list == null ? 0 : list.size();
     }
 
-    public MapComponent getViewer() {
+    public JMapViewer getViewer() {
         return map;
     }
 

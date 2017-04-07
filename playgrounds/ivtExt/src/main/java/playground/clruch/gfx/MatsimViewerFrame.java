@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Coord;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import playground.clruch.jmapviewer.Coordinate;
-import playground.clruch.jmapviewer.MapComponent;
+import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.JMapViewerTree;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.DummyStorageSupplier;
@@ -35,7 +35,7 @@ import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 /**
- * Demonstrates the usage of {@link MapComponent}
+ * Demonstrates the usage of {@link JMapViewer}
  *
  * adapted from code by Jan Peter Stotz
  */
@@ -221,7 +221,7 @@ public class MatsimViewerFrame implements Runnable {
 
     }
 
-    private MapComponent getJMapViewer() {
+    private JMapViewer getJMapViewer() {
         return treeMap.getViewer();
     }
 

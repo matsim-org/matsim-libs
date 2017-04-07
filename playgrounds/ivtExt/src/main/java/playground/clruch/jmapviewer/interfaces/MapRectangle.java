@@ -5,14 +5,14 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 import playground.clruch.jmapviewer.Coordinate;
-import playground.clruch.jmapviewer.MapComponent;
+import playground.clruch.jmapviewer.JMapViewer;
 
 /**
  * Interface to be implemented by rectangles that can be displayed on the map.
  *
  * @author Stefan Zeller
- * @see MapComponent#addMapRectangle(MapRectangle)
- * @see MapComponent#getMapRectangleList()
+ * @see JMapViewer#addMapRectangle(MapRectangle)
+ * @see JMapViewer#getMapRectangleList()
  */
 public interface MapRectangle extends MapObject {
 

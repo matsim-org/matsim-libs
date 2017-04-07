@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import playground.clruch.jmapviewer.MapComponent;
+import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.Tile;
 import playground.clruch.jmapviewer.TileXY;
 
@@ -21,7 +21,7 @@ public interface TileSource extends Attributed {
      * {@link #getMaxZoom()}].
      *
      * @return maximum zoom value that has to be smaller or equal to
-     *         {@link MapComponent#MAX_ZOOM}
+     *         {@link JMapViewer#MAX_ZOOM}
      */
     int getMaxZoom();
 

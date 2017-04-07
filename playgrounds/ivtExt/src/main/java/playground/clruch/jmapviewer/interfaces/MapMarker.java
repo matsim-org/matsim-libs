@@ -5,14 +5,14 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 import playground.clruch.jmapviewer.Coordinate;
-import playground.clruch.jmapviewer.MapComponent;
+import playground.clruch.jmapviewer.JMapViewer;
 
 /**
  * Interface to be implemented by all one dimensional elements that can be displayed on the map.
  *
  * @author Jan Peter Stotz
- * @see MapComponent#addMapMarker(MapMarker)
- * @see MapComponent#getMapMarkerList()
+ * @see JMapViewer#addMapMarker(MapMarker)
+ * @see JMapViewer#getMapMarkerList()
  */
 public interface MapMarker extends MapObject, ICoordinate {
 
