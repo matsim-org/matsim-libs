@@ -18,7 +18,7 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -45,7 +45,7 @@ import playground.clruch.jmapviewer.tilesources.OsmTileSource;
  * @author Jan Peter Stotz
  * @author Jason Huntley
  */
-public class JMapViewer extends JPanel implements TileLoaderListener {
+public class MapComponent extends JComponent implements TileLoaderListener {
 
     /** whether debug mode is enabled or not */
     public static boolean debug;
@@ -114,19 +114,19 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
     protected EventListenerList evtListenerList = new EventListenerList();
 
     /**
-     * Creates a standard {@link JMapViewer} instance that can be controlled via
+     * Creates a standard {@link MapComponent} instance that can be controlled via
      * mouse: hold right mouse button for moving, double click left mouse button
      * or use mouse wheel for zooming. Loaded tiles are stored in a
      * {@link MemoryTileCache} and the tile loader uses 4 parallel threads for
      * retrieving the tiles.
      */
-    public JMapViewer() {
+    public MapComponent() {
         this(new MemoryTileCache());
         new DefaultMapController(this);
     }
 
     /**
-     * Creates a new {@link JMapViewer} instance.
+     * Creates a new {@link MapComponent} instance.
      * 
      * @param tileCache
      *            The cache where to store tiles
@@ -135,18 +135,18 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
      * @deprecated use {@link #JMapViewer(TileCache)}
      */
     @Deprecated
-    public JMapViewer(TileCache tileCache, int downloadThreadCount) {
+    public MapComponent(TileCache tileCache, int downloadThreadCount) {
         this(tileCache);
     }
 
     /**
-     * Creates a new {@link JMapViewer} instance.
+     * Creates a new {@link MapComponent} instance.
      * 
      * @param tileCache
      *            The cache where to store tiles
      *
      */
-    public JMapViewer(TileCache tileCache) {
+    public MapComponent(TileCache tileCache) {
         tileSource = new OsmTileSource.Mapnik();
         tileController = new TileController(tileSource, tileCache, this);
         mapMarkerList = Collections.synchronizedList(new LinkedList<MapMarker>());
@@ -181,7 +181,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
         zoomSlider.setFocusable(false);
         add(zoomSlider);
         int size = 18;
-        URL url = JMapViewer.class.getResource("images/plus.png");
+        URL url = MapComponent.class.getResource("images/plus.png");
         if (url != null) {
             ImageIcon icon = new ImageIcon(url);
             zoomInButton = new JButton(icon);
@@ -200,7 +200,7 @@ public class JMapViewer extends JPanel implements TileLoaderListener {
         });
         zoomInButton.setFocusable(false);
         add(zoomInButton);
-        url = JMapViewer.class.getResource("images/minus.png");
+        url = MapComponent.class.getResource("images/minus.png");
         if (url != null) {
             ImageIcon icon = new ImageIcon(url);
             zoomOutButton = new JButton(icon);

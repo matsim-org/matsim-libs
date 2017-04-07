@@ -27,7 +27,7 @@ import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
 import playground.clruch.jmapviewer.tilesources.OsmTileSource;
 
 /**
- * Demonstrates the usage of {@link JMapViewer}
+ * Demonstrates the usage of {@link MapComponent}
  *
  * @author Jan Peter Stotz
  *
@@ -51,7 +51,7 @@ public class Demo extends JFrame implements JMapViewerEventListener {
         super("JMapViewer Demo");
         setSize(400, 400);
 
-        treeMap = new JMapViewerTree(new JMapViewer(), "Zones", false);
+        treeMap = new JMapViewerTree(new MapComponent(), "Zones", false);
 
         // Listen to the map viewer for user operations so components will
         // receive events and update
@@ -229,7 +229,7 @@ public class Demo extends JFrame implements JMapViewerEventListener {
         });
     }
 
-    private JMapViewer map() {
+    private MapComponent map() {
         return treeMap.getViewer();
     }
 

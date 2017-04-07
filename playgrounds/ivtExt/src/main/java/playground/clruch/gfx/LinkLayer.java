@@ -12,18 +12,18 @@ public class LinkLayer extends ViewerLayer {
     private volatile boolean drawLinks = false;
     private static final Color LINKCOLOR = new Color(153, 153, 102, 64);
 
-    public LinkLayer(MatsimJMapViewer matsimJMapViewer) {
-        super(matsimJMapViewer);
+    public LinkLayer(MatsimMapComponent matsimMapComponent) {
+        super(matsimMapComponent);
     }
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
         if (drawLinks) {
             graphics.setColor(LINKCOLOR);
-            for (OsmLink osmLink : matsimJMapViewer.db.getOsmLinks()) {
-                Point p1 = matsimJMapViewer.getMapPosition(osmLink.coords[0]);
+            for (OsmLink osmLink : matsimMapComponent.db.getOsmLinks()) {
+                Point p1 = matsimMapComponent.getMapPosition(osmLink.coords[0]);
                 if (p1 != null) {
-                    Point p2 = matsimJMapViewer.getMapPositionAlways(osmLink.coords[1]);
+                    Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.coords[1]);
                     graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
                 }
             }
@@ -33,13 +33,13 @@ public class LinkLayer extends ViewerLayer {
 
     @Override
     void hud(Graphics2D graphics, SimulationObject ref) {
-        matsimJMapViewer.append("%5d streets", matsimJMapViewer.db.getOsmLinksSize());
-        matsimJMapViewer.appendSeparator();
+        matsimMapComponent.append("%5d streets", matsimMapComponent.db.getOsmLinksSize());
+        matsimMapComponent.appendSeparator();
     }
 
     public void setDraw(boolean selected) {
         drawLinks = selected;
-        matsimJMapViewer.repaint();
+        matsimMapComponent.repaint();
     }
 
     public boolean getDraw() {

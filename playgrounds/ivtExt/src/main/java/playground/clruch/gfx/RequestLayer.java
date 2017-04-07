@@ -25,8 +25,8 @@ public class RequestLayer extends ViewerLayer {
     MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.ORANGE.colorScheme);
     MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN.colorScheme);
 
-    public RequestLayer(MatsimJMapViewer matsimJMapViewer) {
-        super(matsimJMapViewer);
+    public RequestLayer(MatsimMapComponent matsimMapComponent) {
+        super(matsimMapComponent);
     }
 
     double maxWaitTime;
@@ -38,7 +38,7 @@ public class RequestLayer extends ViewerLayer {
             Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                     .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
             for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-                OsmLink osmLink = matsimJMapViewer.db.getOsmLink(entry.getKey());
+                OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
                 final int size = entry.getValue().size();
                 for (int count = 0; count < size; ++count) {
                     Coord coord = osmLink.getAt(count / (double) size);
@@ -52,7 +52,7 @@ public class RequestLayer extends ViewerLayer {
             Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                     .collect(Collectors.groupingBy(requestContainer -> requestContainer.toLinkIndex));
             for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-                OsmLink osmLink = matsimJMapViewer.db.getOsmLink(entry.getKey());
+                OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
                 final int size = entry.getValue().size();
                 for (int count = 0; count < size; ++count) {
                     Coord coord = osmLink.getAt(count / (double) size);
@@ -74,8 +74,8 @@ public class RequestLayer extends ViewerLayer {
             Point p1;
             {
                 int linkId = entry.getKey();
-                OsmLink osmLink = matsimJMapViewer.db.getOsmLink(linkId);
-                p1 = matsimJMapViewer.getMapPosition(osmLink.getAt(0.5));
+                OsmLink osmLink = matsimMapComponent.db.getOsmLink(linkId);
+                p1 = matsimMapComponent.getMapPosition(osmLink.getAt(0.5));
             }
             if (p1 != null) {
                 final int numRequests = entry.getValue().size();
@@ -100,8 +100,8 @@ public class RequestLayer extends ViewerLayer {
                     graphics.setColor(new Color(128, 128, 128, 64));
                     for (RequestContainer rc : entry.getValue()) {
                         int linkId = rc.toLinkIndex;
-                        OsmLink osmLink = matsimJMapViewer.db.getOsmLink(linkId);
-                        Point p2 = matsimJMapViewer.getMapPositionAlways(osmLink.getAt(0.5));
+                        OsmLink osmLink = matsimMapComponent.db.getOsmLink(linkId);
+                        Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getAt(0.5));
                         graphics.drawLine(x, y, p2.x, p2.y);
                     }
                 }
@@ -117,20 +117,20 @@ public class RequestLayer extends ViewerLayer {
         {
             InfoString infoString = new InfoString(String.format("%5d %s", ref.requests.size(), "open requests"));
             infoString.color = Color.BLACK; // new Color(204, 122, 0);
-            matsimJMapViewer.append(infoString);
+            matsimMapComponent.append(infoString);
         }
         {
             InfoString infoString = new InfoString(String.format("%5d %s", Math.round(maxWaitTime / 60), "maxWaitTime [min]"));
             infoString.color = Color.BLACK; // new Color(255, 102, 0);
-            matsimJMapViewer.append(infoString);
+            matsimMapComponent.append(infoString);
         }
-        matsimJMapViewer.append("%5d %s", ref.total_matchedRequests, "matched req.");
-        matsimJMapViewer.appendSeparator();
+        matsimMapComponent.append("%5d %s", ref.total_matchedRequests, "matched req.");
+        matsimMapComponent.appendSeparator();
     }
 
     public void setDrawDestinations(boolean selected) {
         drawRequestDestinations = selected;
-        matsimJMapViewer.repaint();
+        matsimMapComponent.repaint();
     }
 
     public boolean getDrawDestinations() {

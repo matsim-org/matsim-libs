@@ -34,7 +34,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import playground.clruch.jmapviewer.Coordinate;
-import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.jmapviewer.MapComponent;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 
 /**
@@ -193,14 +193,14 @@ public class BingAerialTileSource extends TMSTileSource {
     @Override
     public Image getAttributionImage() {
         try {
-            final InputStream imageResource = JMapViewer.class.getResourceAsStream("images/bing_maps.png");
+            final InputStream imageResource = MapComponent.class.getResourceAsStream("images/bing_maps.png");
             if (imageResource != null) {
                 return ImageIO.read(imageResource);
             } else {
                 // Some Linux distributions (like Debian) will remove Bing logo from sources, so get it at runtime
                 for (int i = 0; i < 5 && getAttribution() == null; i++) {
                     // Makes sure attribution is loaded
-                    if (JMapViewer.debug) {
+                    if (MapComponent.debug) {
                         System.out.println("Bing attribution attempt " + (i+1));
                     }
                 }

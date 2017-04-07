@@ -14,8 +14,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     private boolean drawCells = false;
 
-    public VirtualNetworkLayer(MatsimJMapViewer matsimJMapViewer) {
-        super(matsimJMapViewer);
+    public VirtualNetworkLayer(MatsimMapComponent matsimMapComponent) {
+        super(matsimMapComponent);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
         if (pointCloud != null && drawCells) {
             graphics.setColor(COLOR);
             for (Coord coord : pointCloud) {
-                Point point = matsimJMapViewer.getMapPosition(coord);
+                Point point = matsimMapComponent.getMapPosition(coord);
                 if (point != null)
                     graphics.drawRect(point.x, point.y, 1, 1);
 

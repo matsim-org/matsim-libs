@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Coord;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import playground.clruch.jmapviewer.Coordinate;
-import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.jmapviewer.MapComponent;
 import playground.clruch.jmapviewer.JMapViewerTree;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.DummyStorageSupplier;
@@ -35,14 +35,14 @@ import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 /**
- * Demonstrates the usage of {@link JMapViewer}
+ * Demonstrates the usage of {@link MapComponent}
  *
  * adapted from code by Jan Peter Stotz
  */
 public class MatsimViewerFrame implements Runnable {
     public int STEPSIZE_SECONDS = 10; // TODO this should be derived from storage files
     // ---
-    private final MatsimJMapViewer matsimJMapViewer;
+    private final MatsimMapComponent matsimMapComponent;
     private boolean isLaunched = true;
     private final JToggleButton jToggleButton = new JToggleButton("auto");
     private final JSlider jSlider = new JSlider(0, 1, 0);
@@ -60,9 +60,9 @@ public class MatsimViewerFrame implements Runnable {
     }
 
     /** Constructs the {@code Demo}. */
-    public MatsimViewerFrame(MatsimJMapViewer matsimJMapViewer) {
-        this.matsimJMapViewer = matsimJMapViewer;
-        treeMap = new JMapViewerTree(matsimJMapViewer, "Zones", false);
+    public MatsimViewerFrame(MatsimMapComponent matsimMapComponent) {
+        this.matsimMapComponent = matsimMapComponent;
+        treeMap = new JMapViewerTree(matsimMapComponent, "Zones", false);
         // ---
         jFrame.setTitle("ETH Z\u00fcrich MATSim Viewer");
         jFrame.setLayout(new BorderLayout());
@@ -82,15 +82,15 @@ public class MatsimViewerFrame implements Runnable {
 
         jFrame.add(panelNorth, BorderLayout.NORTH);
         jFrame.add(treeMap, BorderLayout.CENTER);
-        jFrame.add(matsimJMapViewer.jLabel, BorderLayout.SOUTH);
+        jFrame.add(matsimMapComponent.jLabel, BorderLayout.SOUTH);
 
-        panelControls.add(new MatsimToggleButton(matsimJMapViewer));
-        JMapTileSelector.install(panelControls, matsimJMapViewer);
+        panelControls.add(new MatsimToggleButton(matsimMapComponent));
+        JMapTileSelector.install(panelControls, matsimMapComponent);
         {
             SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
             spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 255);
-            spinnerLabel.setValueSafe(matsimJMapViewer.mapAlphaCover);
-            spinnerLabel.addSpinnerListener(i -> matsimJMapViewer.setMapAlphaCover(i));
+            spinnerLabel.setValueSafe(matsimMapComponent.mapAlphaCover);
+            spinnerLabel.addSpinnerListener(i -> matsimMapComponent.setMapAlphaCover(i));
             spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "alpha cover");
         }
         panelNorth.add(jSlider, BorderLayout.SOUTH);
@@ -146,26 +146,26 @@ public class MatsimViewerFrame implements Runnable {
         // ---
         {
             final JCheckBox jCheckBox = new JCheckBox("links");
-            jCheckBox.setSelected(matsimJMapViewer.linkLayer.getDraw());
-            jCheckBox.addActionListener(e -> matsimJMapViewer.linkLayer.setDraw(jCheckBox.isSelected()));
+            jCheckBox.setSelected(matsimMapComponent.linkLayer.getDraw());
+            jCheckBox.addActionListener(e -> matsimMapComponent.linkLayer.setDraw(jCheckBox.isSelected()));
             panelSettings.add(jCheckBox);
         }
         {
             final JCheckBox jCheckBox = new JCheckBox("req.dest");
-            jCheckBox.setSelected(matsimJMapViewer.requestLayer.getDrawDestinations());
-            jCheckBox.addActionListener(e -> matsimJMapViewer.requestLayer.setDrawDestinations(jCheckBox.isSelected()));
+            jCheckBox.setSelected(matsimMapComponent.requestLayer.getDrawDestinations());
+            jCheckBox.addActionListener(e -> matsimMapComponent.requestLayer.setDrawDestinations(jCheckBox.isSelected()));
             panelSettings.add(jCheckBox);
         }
         {
             final JCheckBox jCheckBox = new JCheckBox("veh.dest");
-            jCheckBox.setSelected(matsimJMapViewer.vehicleLayer.getDrawDestinations());
-            jCheckBox.addActionListener(e -> matsimJMapViewer.vehicleLayer.setDrawDestinations(jCheckBox.isSelected()));
+            jCheckBox.setSelected(matsimMapComponent.vehicleLayer.getDrawDestinations());
+            jCheckBox.addActionListener(e -> matsimMapComponent.vehicleLayer.setDrawDestinations(jCheckBox.isSelected()));
             panelSettings.add(jCheckBox);
         }
         {
             final JCheckBox jCheckBox = new JCheckBox("cells");
-            jCheckBox.setSelected(matsimJMapViewer.virtualNetworkLayer.getDrawCells());
-            jCheckBox.addActionListener(e -> matsimJMapViewer.virtualNetworkLayer.setDrawCells(jCheckBox.isSelected()));
+            jCheckBox.setSelected(matsimMapComponent.virtualNetworkLayer.getDrawCells());
+            jCheckBox.addActionListener(e -> matsimMapComponent.virtualNetworkLayer.setDrawCells(jCheckBox.isSelected()));
             panelSettings.add(jCheckBox);
         }
         {
@@ -212,8 +212,8 @@ public class MatsimViewerFrame implements Runnable {
 
     void updateFromStorage(int index) {
         try {
-            matsimJMapViewer.simulationObject = storageSupplier.getSimulationObject(index);
-            matsimJMapViewer.repaint();
+            matsimMapComponent.simulationObject = storageSupplier.getSimulationObject(index);
+            matsimMapComponent.repaint();
         } catch (Exception exception) {
             exception.printStackTrace();
             System.out.println("cannot load: " + index);
@@ -221,7 +221,7 @@ public class MatsimViewerFrame implements Runnable {
 
     }
 
-    private JMapViewer getJMapViewer() {
+    private MapComponent getJMapViewer() {
         return treeMap.getViewer();
     }
 

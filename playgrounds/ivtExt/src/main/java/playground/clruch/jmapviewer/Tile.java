@@ -80,7 +80,7 @@ public class Tile {
 
     private static BufferedImage loadImage(String path) {
         try {
-            return ImageIO.read(JMapViewer.class.getResourceAsStream(path));
+            return ImageIO.read(MapComponent.class.getResourceAsStream(path));
         } catch (IOException | IllegalArgumentException ex) {
             ex.printStackTrace();
             return null;
@@ -134,7 +134,7 @@ public class Tile {
             // first we check if there are already the 2^x tiles
             // of a higher detail level
             int zoomHigh = zoom + zoomDiff;
-            if (zoomDiff < 3 && zoomHigh <= JMapViewer.MAX_ZOOM) {
+            if (zoomDiff < 3 && zoomHigh <= MapComponent.MAX_ZOOM) {
                 int factor = 1 << zoomDiff;
                 int xtileHigh = xtile << zoomDiff;
                 int ytileHigh = ytile << zoomDiff;
@@ -170,7 +170,7 @@ public class Tile {
             }
 
             int zoomLow = zoom - zoomDiff;
-            if (zoomLow >= JMapViewer.MIN_ZOOM) {
+            if (zoomLow >= MapComponent.MIN_ZOOM) {
                 int xtileLow = xtile >> zoomDiff;
                 int ytileLow = ytile >> zoomDiff;
                 final int factor = 1 << zoomDiff;

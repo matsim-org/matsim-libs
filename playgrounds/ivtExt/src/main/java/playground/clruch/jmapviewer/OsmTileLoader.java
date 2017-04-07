@@ -156,7 +156,7 @@ public class OsmTileLoader implements TileLoader {
                 }
             } catch (NumberFormatException e) {
                 // ignore malformed Cache-Control headers
-                if (JMapViewer.debug) {
+                if (MapComponent.debug) {
                     System.err.println(e.getMessage());
                 }
             }

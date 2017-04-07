@@ -1,12 +1,12 @@
 // License: GPL. For details, see Readme.txt file.
 package playground.clruch.jmapviewer.interfaces;
 
-import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.jmapviewer.MapComponent;
 import playground.clruch.jmapviewer.Tile;
 
 /**
  * Implement this interface for creating your custom tile cache for
- * {@link JMapViewer}.
+ * {@link MapComponent}.
  *
  * @author Jan Peter Stotz
  */

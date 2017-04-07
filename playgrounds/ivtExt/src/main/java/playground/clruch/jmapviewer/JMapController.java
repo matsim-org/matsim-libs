@@ -19,9 +19,9 @@ import java.awt.event.MouseWheelListener;
  */
 public abstract class JMapController {
 
-    protected JMapViewer map;
+    protected MapComponent map;
 
-    public JMapController(JMapViewer map) {
+    public JMapController(MapComponent map) {
         this.map = map;
         if (this instanceof MouseListener)
             map.addMouseListener((MouseListener) this);

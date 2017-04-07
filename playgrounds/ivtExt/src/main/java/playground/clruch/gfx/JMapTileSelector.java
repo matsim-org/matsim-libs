@@ -4,14 +4,14 @@ import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
-import playground.clruch.jmapviewer.JMapViewer;
+import playground.clruch.jmapviewer.MapComponent;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
 import playground.clruch.jmapviewer.tilesources.OsmTileSource;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 public class JMapTileSelector {
-    public static void install(JPanel jPanel, JMapViewer jMapViewer) {
+    public static void install(JPanel jPanel, MapComponent jMapViewer) {
         TileSource[] tileSource = new TileSource[] { //
                 new OsmTileSource.Mapnik(), //
                 new OsmTileSource.CycleMap(), //
