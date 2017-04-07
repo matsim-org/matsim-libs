@@ -93,7 +93,7 @@ public class RunRWPTComboFleetsizeDetermination {
        controler.addOverridingModule(new AvIncreasedCapacityModule(avfactor));
        controler.addOverridingModule(new TaxiOutputModule());
 
-       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+       controler.addOverridingModule(new TaxiModule());
 
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());

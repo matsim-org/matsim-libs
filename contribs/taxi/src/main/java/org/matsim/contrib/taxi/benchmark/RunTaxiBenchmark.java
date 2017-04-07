@@ -55,7 +55,7 @@ public class RunTaxiBenchmark {
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
 		controler.addOverridingModule(new TaxiOutputModule());
-		controler.addOverridingModule(TaxiOptimizerModules.createBenchmarkModule());
+		controler.addOverridingModule(new TaxiBenchmarkModule());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

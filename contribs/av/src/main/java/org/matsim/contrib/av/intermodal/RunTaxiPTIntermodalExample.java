@@ -89,7 +89,7 @@ public class RunTaxiPTIntermodalExample {
 
 		controler.addOverridingModule(new TaxiOutputModule());
 
-        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+        controler.addOverridingModule(new TaxiModule());
 		
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {

@@ -91,7 +91,7 @@ public class OptAVTestIT {
 		// taxi
 
 		controler1.addOverridingModule(new TaxiOutputModule());
-		controler1.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+		controler1.addOverridingModule(new TaxiModule());
         
         final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory1 =
         		new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler1.getConfig().planCalcScore());
@@ -139,7 +139,7 @@ public class OptAVTestIT {
 		// taxi
 
 		controler2.addOverridingModule(new TaxiOutputModule());
-        controler2.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+        controler2.addOverridingModule(new TaxiModule());
 		
 		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
@@ -221,7 +221,7 @@ public class OptAVTestIT {
 		// taxi
 
 		controler1.addOverridingModule(new TaxiOutputModule());
-        controler1.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+        controler1.addOverridingModule(new TaxiModule());
 		
         final RandomizingTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory1 =
         		new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler1.getConfig().planCalcScore());
@@ -304,7 +304,7 @@ public class OptAVTestIT {
 		// taxi
 
 		controler2.addOverridingModule(new TaxiOutputModule());
-        controler2.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+        controler2.addOverridingModule(new TaxiModule());
 		
 		final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory2 = new MoneyTimeDistanceTravelDisutilityFactory(
 				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler2.getConfig().planCalcScore())

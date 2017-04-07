@@ -1,7 +1,7 @@
 package playground.dhosse.prt;
 
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.*;
@@ -28,7 +28,7 @@ public class PrtModule {
 		PrtTripRouterFactoryImpl factory = new PrtTripRouterFactoryImpl(vrpData, controler.getScenario(), ttime, tdis, prtData);
 		controler.setTripRouterFactory(factory);
 
-        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+        controler.addOverridingModule(new TaxiModule());
 
 		controler.addControlerListener(new PrtControllerListener(prtConfig, controler, prtData, vrpData, controler.getScenario()));
 		

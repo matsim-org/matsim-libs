@@ -19,14 +19,14 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
-import com.google.inject.*;
+import com.google.inject.Inject;
 
 /**
  * Behaves like DvrpModule except that VrpTravelTimeEstimator is not bound (install() is overridden)
@@ -34,15 +34,14 @@ import com.google.inject.*;
  * @author michalm
  *
  */
-public class DvrpBenchmarkModule extends DvrpModule {
+public class TaxiBenchmarkModule extends TaxiModule {
 	@Inject
 	private DvrpConfigGroup dvrpCfg;
 
-	@SafeVarargs
-	public DvrpBenchmarkModule(Module module, Class<? extends MobsimListener>... listeners) {
-		super(module, listeners);
-	}
-
+	/**
+	 * Overrides the {@link org.matsim.contrib.dvrp.run.DvrpModule#install() in order to install
+	 * freeSpeedTravelTimeForBenchmarkingModule instead of travelTimeEstimatorModule}
+	 */
 	@Override
 	public void install() {
 		String mode = dvrpCfg.getMode();

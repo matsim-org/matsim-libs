@@ -60,7 +60,7 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new DvrpConfigGroup(), new TaxiFareConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
 
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
@@ -86,7 +86,7 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiOutputModule());
-        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+        controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
 		controler.run();
 

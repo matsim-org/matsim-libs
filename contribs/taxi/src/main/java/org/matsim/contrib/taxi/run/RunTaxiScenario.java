@@ -42,7 +42,7 @@ public class RunTaxiScenario {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiOutputModule());
-		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+		controler.addOverridingModule(new TaxiModule());
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

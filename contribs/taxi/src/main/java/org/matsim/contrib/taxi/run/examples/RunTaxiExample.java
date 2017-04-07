@@ -44,7 +44,7 @@ public class RunTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule()); // taxi optimiser
+		controler.addOverridingModule(new TaxiModule()); // taxi optimiser
 		controler.addOverridingModule(new TaxiOutputModule()); // taxi output (can be commented out)
 
 		if (otfvis) {

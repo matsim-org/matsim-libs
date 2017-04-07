@@ -108,7 +108,7 @@ public class DvrpModule extends AbstractModule {
 		return plugins;
 	}
 
-	public class QSimPlugin extends AbstractQSimPlugin {
+	private class QSimPlugin extends AbstractQSimPlugin {
 		public QSimPlugin(Config config) {
 			super(config);
 		}

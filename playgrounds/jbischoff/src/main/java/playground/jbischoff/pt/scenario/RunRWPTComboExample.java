@@ -68,7 +68,7 @@ public class RunRWPTComboExample {
 		config.transitRouter().setSearchRadius(3000);
 		config.transitRouter().setExtensionRadius(0);
 		
-		DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
 
@@ -83,7 +83,7 @@ public class RunRWPTComboExample {
 		}
 	});
        
-       controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule());
+       controler.addOverridingModule(new TaxiModule());
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
 //       controler.addOverridingModule(new OTFVisLiveModule());

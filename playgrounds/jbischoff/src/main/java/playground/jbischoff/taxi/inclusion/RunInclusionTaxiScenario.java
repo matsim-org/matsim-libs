@@ -51,7 +51,7 @@ public class RunInclusionTaxiScenario
         config.controler().setRunId("veh_"+i);
 //        config.plans().setInputFile("itaxi_"+i+".xml.gz");
         config.plans().setInputFile("itaxi_"+0+".xml.gz");
-        DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
+        DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
         TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
         taxi.setTaxisFile("hc_vehicles"+i+".xml.gz");
         createControler(config, false).run();
@@ -68,7 +68,7 @@ public class RunInclusionTaxiScenario
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new JbTaxiModule());
-        controler.addOverridingModule(TaxiOptimizerModules.createModule(JbTaxiOptimizerProvider.class));
+        controler.addOverridingModule(new TaxiModule(JbTaxiOptimizerProvider.class));
 
         if (otfvis) {
             controler.addOverridingModule(new OTFVisLiveModule());

@@ -57,7 +57,7 @@ class KNTaxi {
 		Controler controler = RunTaxiScenario.createControler(config, otfvis);
 
 		if (removeNonPassengers) {
-			PopulationUtils.removePersonsNotUsingMode(TaxiOptimizerModules.TAXI_MODE, controler.getScenario());
+			PopulationUtils.removePersonsNotUsingMode(TaxiModule.TAXI_MODE, controler.getScenario());
 		}
 
 		if (endActivitiesAtTimeZero) {
