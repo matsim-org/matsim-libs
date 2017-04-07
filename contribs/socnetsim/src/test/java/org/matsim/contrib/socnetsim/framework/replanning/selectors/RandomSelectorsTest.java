@@ -19,7 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.misc.Counter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,27 +39,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.misc.Counter;
-
-import org.matsim.contrib.socnetsim.framework.population.JointPlans;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
-import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
  */
 public class RandomSelectorsTest {
-	private static interface SelectorFactory {
+	private interface SelectorFactory {
 		public GroupLevelPlanSelector create(Random r);
 	}
 
@@ -171,7 +169,7 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp3 ) );
 	}
 
-	@Before
+		@Before
 	public void createPartiallyJointPlansMessOfJointPlans() {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
@@ -283,6 +281,60 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp8 ) );
 	}
 
+	@Before
+	public void createPartiallyJointPlans() {
+		ReplanningGroup group = new ReplanningGroup();
+		testGroups.add( group );
+
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+
+		Id<Person> id = Id.createPersonId( "tintin" );
+		final Id<Person> id1 = id;
+		Person person = PopulationUtils.getFactory().createPerson(id1);
+		group.addPerson( person );
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
+		plan.setScore( 145d );
+		plan = PersonUtils.createAndAddPlan(person, true);
+		plan.setScore( 142d );
+		jp1.put( id , plan );
+
+		id = Id.createPersonId( "milou" );
+		final Id<Person> id2 = id;
+		person = PopulationUtils.getFactory().createPerson(id2);
+		group.addPerson( person );
+		plan = PersonUtils.createAndAddPlan(person, false);
+		plan.setScore( 116d );
+		plan = PersonUtils.createAndAddPlan(person, true);
+		plan.setScore( 115d );
+		jp1.put( id , plan );
+
+		id = Id.createPersonId( "tim" );
+		final Id<Person> id3 = id;
+		person = PopulationUtils.getFactory().createPerson(id3);
+		group.addPerson( person );
+		plan = PersonUtils.createAndAddPlan(person, false);
+		plan.setScore( 150.6 );
+		plan = PersonUtils.createAndAddPlan(person, true);
+		plan.setScore( 150.8 );
+		jp2.put( id , plan );
+
+		id = Id.createPersonId( "struppy" );
+		final Id<Person> id4 = id;
+		person = PopulationUtils.getFactory().createPerson(id4);
+		group.addPerson( person );
+		plan = PersonUtils.createAndAddPlan(person, false);
+		plan.setScore( 171.7 );
+		plan = PersonUtils.createAndAddPlan(person, true);
+		plan.setScore( 171.5 );
+		jp2.put( id , plan );
+
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp2 ) );
+	}
+
 	@Test
 	public void testRandomSelector() throws Exception {
 		testDeterminism( new SelectorFactory() {
@@ -293,6 +345,26 @@ public class RandomSelectorsTest {
 						new EmptyIncompatiblePlansIdentifierFactory());
 			}
 		});
+	}
+
+	@Test
+	public void testNoFailuresWithVariousSeeds() throws Exception {
+		final RandomGroupLevelSelector selector = new RandomGroupLevelSelector(
+				new Random( 123 ),
+				new EmptyIncompatiblePlansIdentifierFactory());
+
+		final Counter count = new Counter( "selection # " );
+		for (ReplanningGroup group : testGroups) {
+			for (int i=0; i<500; i++) {
+				count.incCounter();
+
+				final GroupPlans selected = selector.selectPlans(
+						jointPlans , group );
+
+				if (selected == null) throw new NullPointerException( "test is useless if the selector returns null" );
+			}
+		}
+		count.printCounter();
 	}
 
 	private void testDeterminism(
