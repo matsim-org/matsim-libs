@@ -5,6 +5,7 @@ package playground.tschlenther.parkingSearch.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,10 +76,9 @@ public class ZoneParkingOccupationListenerV2 implements MobsimBeforeCleanupListe
 		}
 	}
 
-	
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-		String fileName = services.getControlerIO().getIterationFilename(iteration, "OccupationStats_VERTICAL_it" + iteration + ".csv");
+		String fileName = services.getControlerIO().getIterationFilename(iteration, "OccupationStats.csv");
 		writeStatsVertical(fileName);
 		double lastOcc;
 		for(String zone : zoneManager.getZones()){
@@ -87,7 +87,8 @@ public class ZoneParkingOccupationListenerV2 implements MobsimBeforeCleanupListe
 			TreeSet<ParkingTuple> tSet = new TreeSet<ParkingTuple>();
 			tSet.add(new ParkingTuple(-1.0,lastOcc));
 			this.zoneOccupationPerTime.put(zone, tSet);
-			if(!this.allMonitoredTimeStamps.contains(-1.0)) this.allMonitoredTimeStamps.add(-1.0);
+			this.allMonitoredTimeStamps.clear();
+			this.allMonitoredTimeStamps.add(-1.0);
 		}		
 		iteration++;
 	}
@@ -146,7 +147,6 @@ public class ZoneParkingOccupationListenerV2 implements MobsimBeforeCleanupListe
 	log.error("FINISHED WRITING OCCUPANCY STATS");
 	}
 
-	
 	private void writeStatsVertical(String fileName) {
 		log.error("WRITING OCCUPANCY STATS TO " + fileName);
 
@@ -204,13 +204,14 @@ public class ZoneParkingOccupationListenerV2 implements MobsimBeforeCleanupListe
 			bw.newLine();
 			bw.write(subheader);
 			
+			DecimalFormat df = new DecimalFormat("##.##");
 			
 			for(int z = 0; z < numberOfSlots; z++){
 				bw.newLine();
 				
-				String line = "" + slotNumbers[z] + ";" + slotTimes[z] + ";";
+				String line = "" + slotNumbers[z] + ";" + df.format(slotTimes[z]) + ";";
 				for(int p = 0; p < this.zoneManager.getZones().size(); p++){
-					line += "" + zoneColumns.get(p)[z] + ";";
+					line += "" + df.format(zoneColumns.get(p)[z]) + ";";
 				}
 				
 				bw.write(line);
@@ -225,7 +226,6 @@ public class ZoneParkingOccupationListenerV2 implements MobsimBeforeCleanupListe
 	
 	log.error("FINISHED WRITING OCCUPANCY STATS");
 	}
-
 
 }
 

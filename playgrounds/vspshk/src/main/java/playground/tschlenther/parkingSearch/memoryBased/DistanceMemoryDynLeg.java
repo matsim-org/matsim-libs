@@ -21,7 +21,7 @@ import org.matsim.vehicles.Vehicle;
  * @author Work
  *
  */
-public class DistanceMemoryBasedDynLeg extends ParkingDynLeg {
+public class DistanceMemoryDynLeg extends ParkingDynLeg {
 
 	/**
 	 * @param mode
@@ -32,7 +32,7 @@ public class DistanceMemoryBasedDynLeg extends ParkingDynLeg {
 	 * @param timer
 	 * @param events
 	 */
-	public DistanceMemoryBasedDynLeg(String mode, NetworkRoute route, ParkingSearchLogic logic,
+	public DistanceMemoryDynLeg(String mode, NetworkRoute route, ParkingSearchLogic logic,
 			ParkingSearchManager parkingManager, Id<Vehicle> vehicleId, MobsimTimer timer, EventsManager events) {
 		super(mode, route, logic, parkingManager, vehicleId, timer, events);
 		// TODO Auto-generated constructor stub
@@ -47,7 +47,7 @@ public class DistanceMemoryBasedDynLeg extends ParkingDynLeg {
 				this.parkingMode = true;
 				this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
 				hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
-				((DistanceMemoryBasedParkingSearchLogic)this.logic).addToKnownLinks(currentLinkId);
+				((DistanceMemoryParkingSearchLogic)this.logic).addToKnownLinks(currentLinkId);
 			}
 		} else {
 			hasFoundParking = parkingManager.reserveSpaceIfVehicleCanParkHere(vehicleId, currentLinkId);
@@ -78,7 +78,7 @@ public class DistanceMemoryBasedDynLeg extends ParkingDynLeg {
 					}
 				}
 				// need to find the next link
-				Id<Link> nextLinkId = ((DistanceMemoryBasedParkingSearchLogic)this.logic).getNextLink(currentLinkId,route.getEndLinkId(), vehicleId);
+				Id<Link> nextLinkId = ((DistanceMemoryParkingSearchLogic)this.logic).getNextLink(currentLinkId,route.getEndLinkId(), vehicleId);
 				currentAndNextParkLink = new Tuple<Id<Link>, Id<Link>>(currentLinkId, nextLinkId);
 				return nextLinkId;
 			}

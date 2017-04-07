@@ -4,7 +4,10 @@
 package playground.tschlenther.parkingSearch.analysis;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -27,44 +30,27 @@ import playground.jbischoff.csberlin.evaluation.ParkingSearchEventsReader;
  * @author schlenther,jbischoff
  */
 public class TSParkingSearchEvaluation {
-	private final static String mierendorffLinks = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Zielzone.txt";
-	private final static String klausenerLinks = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Homezone.txt";
-	
+
+	private HashMap<String,SearchTimeEvaluator> zoneHandlers;
 	private static Logger log = Logger.getLogger(TSParkingSearchEvaluation.class);
 	
-	/**
-	 * wenn analysisDir == null, dann wird analysis-output nach runDirectory + "/ANALYSIS/" geschrieben
-	 * @param runDirectory
-	 * @param analysisDir
-	 */
-	public static void analyseRun(String runDirectory, int highestIterationNumber){
-		
+	public TSParkingSearchEvaluation(String[] pathToZoneTxtFiles){
+		this.zoneHandlers = new HashMap<String,SearchTimeEvaluator>();
+		for(String pathToZoneFile : pathToZoneTxtFiles){
+			String zone = pathToZoneFile.substring(pathToZoneFile.lastIndexOf("/")+1, pathToZoneFile.lastIndexOf("."));
+			SearchTimeEvaluator handler = new SearchTimeEvaluator(readLinks(pathToZoneFile));
+			this.zoneHandlers.put(zone, handler);
+		}
+	}
+	
+	public void analyseRun(String runDirectory, int highestIterationNumber){
 		log.info("STARTING TO ANALYSE RUN AT " + runDirectory);
 		
-//		if (analysisDir == null){
-//			analysisDir = runDirectory + "/ANALYSIS";
-//			File f = new File(analysisDir); 
-//			if(!f.exists()){
-//				if(!f.mkdirs())	throw new RuntimeException("couldn't create analysis folder at " + analysisDir);
-//			}
-//		}
-		
-		
-//		Network network = NetworkUtils.createNetwork();
-//		new MatsimNetworkReader(network).readFile(runDirectory + "/output_network.xml.gz");
-		
-		
 		EventsManager events = EventsUtils.createEventsManager();
-	
-//		ParkingSearchAndEgressTimeEvaluator mierendorffEval = new ParkingSearchAndEgressTimeEvaluator(readLinks("../../../shared-svn/projects/bmw_carsharing/data/gis/mierendorfflinks.txt"),network);	
-//		ParkingSearchAndEgressTimeEvaluator klausEval = new ParkingSearchAndEgressTimeEvaluator(readLinks("../../../shared-svn/projects/bmw_carsharing/data/gis/klausnerlinks.txt"),network);	
-
-		SearchTimeEvaluator klausEval = new SearchTimeEvaluator(readLinks(klausenerLinks));	
-		SearchTimeEvaluator mierendorffEval = new SearchTimeEvaluator(readLinks(mierendorffLinks));	
-//		
+		for(String zone : this.zoneHandlers.keySet()){
+			events.addHandler(this.zoneHandlers.get(zone));
+		}
 		ParkingSearchEvaluator egressWalkStatistics = new ParkingSearchEvaluator();
-		events.addHandler(mierendorffEval);
-		events.addHandler(klausEval);
 		events.addHandler(egressWalkStatistics);
 		
 		for (int i = 0; i <= highestIterationNumber; i++ ){
@@ -72,13 +58,13 @@ public class TSParkingSearchEvaluation {
 			String analysisDir = runDirectory + "/it." + i ;
 			log.info("RUNNING ANALYSIS OF ITERATION " +i);
 			if(!new File(analysisDir).exists()) throw new IllegalArgumentException("couldn't find " + analysisDir);
+			analysisDir += "/";
+			new ParkingSearchEventsReader(events).readFile(analysisDir + i + ".events.xml.gz");
 			
-			new ParkingSearchEventsReader(events).readFile(analysisDir + "/" + i + ".events.xml.gz");
-			
-			mierendorffEval.writeStats(analysisDir+ "/zielZoneParkvorgaengeUndZeiten_it" + i + ".csv");
-			mierendorffEval.writeLinkTimeStamps(analysisDir+"/zielZoneParkStamps_it" + i + ".csv");
-			klausEval.writeStats(analysisDir+"/homeZoneParkvorgaengeUndZeiten_it" + i + ".csv");
-			klausEval.writeLinkTimeStamps(analysisDir+"/homeZoneParkStamps_it" + i + ".csv");
+			for(String zone : this.zoneHandlers.keySet()){
+				zoneHandlers.get(zone).writeLinkTimeStamps(analysisDir + zone + "ParkStamps_it" + i + ".csv");
+				zoneHandlers.get(zone).writeStats(analysisDir + zone + "ParkStats_it" + i + ".csv");
+			}
 			
 			egressWalkStatistics.writeEgressWalkStatistics(analysisDir);
 		}
@@ -86,8 +72,18 @@ public class TSParkingSearchEvaluation {
 		log.info("FINISHED ANALYSIS");
 		
 	}
-
-	private static Set<Id<Link>> readLinks(String fileName) {
+	
+	private void runVBScript(){
+		try {
+	        Runtime.getRuntime().exec(new String[] {
+	        "wscript.exe", "C:\\path\\example.vbs"
+	        });        
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
+	}
+	
+	private Set<Id<Link>> readLinks(String fileName) {
 		final Set<Id<Link>> links = new HashSet<>();
 		TabularFileParserConfig config = new TabularFileParserConfig();
 	    config.setDelimiterTags(new String[] {"\t"});
@@ -102,7 +98,5 @@ public class TSParkingSearchEvaluation {
 		
 		return links;
 	}
-	
-	
 	
 }

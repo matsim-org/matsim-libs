@@ -29,11 +29,11 @@ import playground.tschlenther.parkingSearch.Benenson.BenensonDynLeg;
  * @author Work
  *
  */
-public class DistanceMemoryBasedParkingSearchLogic implements ParkingSearchLogic {
+public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 
-	private static final Logger logger = Logger.getLogger(DistanceMemoryBasedParkingSearchLogic.class);
+	private static final Logger logger = Logger.getLogger(DistanceMemoryParkingSearchLogic.class);
 
-	private static final boolean doLogging = true;
+	private static final boolean doLogging = false;
 	private int destLinkEnterCount = 1;
 	
 	private Network network;
@@ -43,7 +43,7 @@ public class DistanceMemoryBasedParkingSearchLogic implements ParkingSearchLogic
 	 * @param network 
 	 * 
 	 */
-	public DistanceMemoryBasedParkingSearchLogic(Network network) {
+	public DistanceMemoryParkingSearchLogic(Network network) {
 		this.network = network;
 		this.knownLinks = new HashSet<Id<Link>>();
 	}
@@ -84,11 +84,11 @@ public class DistanceMemoryBasedParkingSearchLogic implements ParkingSearchLogic
 		}
 		if(doLogging)logger.error("vehicle " + vehicleId + " knew " + nrKnownLinks + " out of " + outLinks.size() + " outlinks of link " + currentLinkId);
 		if(outLinks.size() == nrKnownLinks ){
-			logger.error("vehicle " + vehicleId + " knows all outlinks of link " + currentLinkId);
+			if(doLogging)logger.error("vehicle " + vehicleId + " knows all outlinks of link " + currentLinkId);
 			for(Id<Link> outLink : outLinks){
 				double distToDest = NetworkUtils.getEuclideanDistance(network.getLinks().get(outLink).getCoord(), network.getLinks().get(destLinkId).getCoord()); 
 				if (distToDest < shortestDistance){
-					if(distToDest == 0){
+					if(outLink.equals(destLinkId) && !(outLinks.size() == 1)){
 						double rnd = MatsimRandom.getRandom().nextDouble();
 						double thrshd = (2.0/3.0) * (1.0/destLinkEnterCount) ;
 						if( rnd < ( thrshd ) ){
