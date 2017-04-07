@@ -1,15 +1,8 @@
-package playground.clruch.gheat.datasources;
+package playground.clruch.gheat;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-
-import playground.clruch.gheat.DataPoint;
-import playground.clruch.gheat.HeatMap;
-import playground.clruch.gheat.MercatorProjection;
-import playground.clruch.gheat.PointLatLng;
-import playground.clruch.gheat.Projections;
-import playground.clruch.gheat.Size;
 
 public class DataManager {
     private Projections _projection = new MercatorProjection();

@@ -3,7 +3,8 @@ package playground.clruch.gheat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Opacity {
+@Deprecated
+class Opacity {
     /* Alpha value that indicates an image is not transparent */
     public static final int OPAQUE = 255;
     /* Alpha value that indicates that an image is transparent */
