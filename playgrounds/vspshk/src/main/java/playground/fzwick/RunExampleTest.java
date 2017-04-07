@@ -14,17 +14,15 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class RunExample {
+public class RunExampleTest {
 	
 	
 		
-		private final Controler controler;
+		
 
 		public static void main(String[] args) {
-			new RunExample().run();
-		}
-
-		public RunExample() {
+//			new RunExampleTest().run();
+		
 			
 			Config config = ConfigUtils.createConfig();
 			config.controler().setOutputDirectory("Z:/Berlin-Netz/");
@@ -36,7 +34,7 @@ public class RunExample {
 			NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sce.getNetwork());
 			reader.readFile("Z:/Berlin-Netz/mergedReducedSpeedSantiagoWay.xml");
 			config.network().setInputFile("Z:/Berlin-Netz/mergedReducedSpeedSantiagoWay.xml");
-			
+			final Controler controler;
 			controler = new Controler(sce);
 			controler.run();
 			
@@ -44,13 +42,13 @@ public class RunExample {
 			
 		}
 		
-		public void run(){
-			controler.run();
-		}
-
-		public Controler getControler() {
-			return controler;
-		}
+//		public void run(){
+//			controler.run();
+//		}
+//
+//		public Controler getControler() {
+//			return controler;
+//		}
 
 		
 
