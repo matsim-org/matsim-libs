@@ -101,7 +101,7 @@ public class TtRunCottbusSimulation {
 
 	private static final Logger LOG = Logger.getLogger(TtRunCottbusSimulation.class);
 	
-	private final static String RUN_ID = "3098";
+	private final static String RUN_ID = "3046";
 	
 	private final static NetworkType NETWORK_TYPE = NetworkType.V1;
 	public enum NetworkType {
@@ -120,7 +120,7 @@ public class TtRunCottbusSimulation {
 		WoMines // without mines as working places
 	}
 	
-	private final static SignalType SIGNAL_TYPE = SignalType.ALL_GREEN_INSIDE_ENVELOPE;
+	private final static SignalType SIGNAL_TYPE = SignalType.ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_GREEN;
 	public enum SignalType {
 		NONE, MS, MS_RANDOM_OFFSETS, MS_SYLVIA, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN, 
 		ALL_NODES_ALL_GREEN, ALL_NODES_DOWNSTREAM, ALL_GREEN_INSIDE_ENVELOPE, 
@@ -132,7 +132,7 @@ public class TtRunCottbusSimulation {
 	}
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.CORDON_INNERCITY;
+	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	private enum PricingType {
 		NONE, CP_V3, CP_V4, CP_V7, CP_V8, CP_V9, CP_V10, FLOWBASED, CORDON_INNERCITY, CORDON_RING
 	}
@@ -147,7 +147,7 @@ public class TtRunCottbusSimulation {
 	
 	private static final boolean WRITE_INITIAL_FILES = true;
 	private static final boolean USE_COUNTS = false;
-	private static final double SCALING_FACTOR = .9;
+	private static final double SCALING_FACTOR = 0.4;
 	
 	public static void main(String[] args) {		
 		Config config = defineConfig();
@@ -161,7 +161,7 @@ public class TtRunCottbusSimulation {
 		
 //		controler.addOverridingModule( new OTFVisWithSignalsLiveModule() ) ;
 		
-		controler.run();
+//		controler.run();
 	}
 
 	private static Config defineConfig() {
@@ -207,7 +207,7 @@ public class TtRunCottbusSimulation {
 		case WoMines:
 			// TODO choose one
 			// BaseCase output plans. the number specifies the flow and storage capacity that was used	
-			config.plans().setInputFile(OUTPUT_BASE_DIR + "run3090/3090.output_plans.xml.gz");
+			config.plans().setInputFile(OUTPUT_BASE_DIR + "run3040/3040.output_plans.xml.gz");
 			// BaseCase plans, no routes
 //			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
 			// BaseCase plans, no links for acitivties, no routes
