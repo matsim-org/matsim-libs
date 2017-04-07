@@ -84,7 +84,9 @@ public class MatsimViewerFrame implements Runnable {
         jFrame.add(treeMap, BorderLayout.CENTER);
         jFrame.add(matsimMapComponent.jLabel, BorderLayout.SOUTH);
 
-        panelControls.add(new MatsimToggleButton(matsimMapComponent));
+        MatsimToggleButton matsimToggleButton = new MatsimToggleButton(matsimMapComponent);
+        matsimToggleButton.addActionListener(l -> jSlider.setEnabled(!matsimToggleButton.isSelected()));
+        panelControls.add(matsimToggleButton);
         JMapTileSelector.install(panelControls, matsimMapComponent);
         {
             SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
