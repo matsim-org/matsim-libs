@@ -19,32 +19,64 @@
 
 package org.matsim.contrib.taxi.run;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.benchmark.DvrpBenchmarkModule;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 
-import com.google.inject.Provider;
+import com.google.inject.*;
+import com.google.inject.name.Named;
 
 public class TaxiOptimizerModules {//rename to TaxiModules? or DvrpModulesForTaxi?
 	public static final String TAXI_MODE = "taxi";
 
 	public static AbstractModule createDefaultModule() {
-		return new DvrpModule(createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class), TaxiOptimizer.class);
+		return new DvrpModule(createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class), TaxiOptimizer.class) {
+			@Provides
+			@Singleton
+			private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
+					TaxiConfigGroup taxiCfg) {
+				FleetImpl fleet = new FleetImpl();
+				new VehicleReader(network, fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+				return fleet;
+			}
+		};
 	}
 
 	public static AbstractModule createModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return new DvrpModule(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
+		return new DvrpModule(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class) {
+			@Provides
+			@Singleton
+			private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
+					TaxiConfigGroup taxiCfg) {
+				FleetImpl fleet = new FleetImpl();
+				new VehicleReader(network, fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+				return fleet;
+			}
+		};
 	}
 
 	public static AbstractModule createBenchmarkModule() {
 		return new DvrpBenchmarkModule(createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class),
-				TaxiOptimizer.class);
+				TaxiOptimizer.class) {
+			@Provides
+			@Singleton
+			private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
+					TaxiConfigGroup taxiCfg) {
+				FleetImpl fleet = new FleetImpl();
+				new VehicleReader(network, fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+				return fleet;
+			}
+		};
 	}
 
 	private static com.google.inject.AbstractModule createModuleForQSimPlugin(

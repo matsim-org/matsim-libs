@@ -52,8 +52,8 @@ public class RunInclusionTaxiScenario
 //        config.plans().setInputFile("itaxi_"+i+".xml.gz");
         config.plans().setInputFile("itaxi_"+0+".xml.gz");
         DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
-        DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
-        dvrpCfg.setVehiclesFile("hc_vehicles"+i+".xml.gz");
+        TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
+        taxi.setTaxisFile("hc_vehicles"+i+".xml.gz");
         createControler(config, false).run();
     	}
     }

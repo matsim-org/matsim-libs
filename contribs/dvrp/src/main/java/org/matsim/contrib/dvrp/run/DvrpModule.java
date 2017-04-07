@@ -22,8 +22,6 @@ package org.matsim.contrib.dvrp.run;
 import java.util.*;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -99,20 +97,6 @@ public class DvrpModule extends AbstractModule {
 		Network drtNetwork = NetworkUtils.createNetwork();
 		new TransportModeNetworkFilter(network).filter(drtNetwork, Collections.singleton(dvrpCfg.getNetworkMode()));
 		return drtNetwork;
-	}
-
-	@Provides
-	@Singleton
-	private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
-			DvrpConfigGroup dvrpCfg) {
-		if (dvrpCfg.getVehiclesFile() == null) {
-			throw new RuntimeException("'vehicleFiles' not specified in DvrpConfigGroup. "
-					+ "Alternatively, bind Fleet.class to something else...");
-		}
-
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(network, fleet).parse(dvrpCfg.getVehiclesFileUrl(config.getContext()));
-		return fleet;
 	}
 
 	@Provides

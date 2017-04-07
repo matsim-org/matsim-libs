@@ -51,7 +51,7 @@ public class RunETaxiBenchmark {
 	}
 
 	public static Controler createControler(Config config, int runs) {
-		DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		EvConfigGroup evCfg = EvConfigGroup.get(config);
 		config.controler().setLastIteration(runs - 1);
 		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
@@ -60,7 +60,7 @@ public class RunETaxiBenchmark {
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
 		final FleetImpl fleet = new FleetImpl();
-		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(dvrpCfg.getVehiclesFileUrl(config.getContext()));
+		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 		EvData evData = new EvDataImpl();
 		new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
 		ETaxiUtils.initEvData(fleet, evData);
@@ -78,7 +78,7 @@ public class RunETaxiBenchmark {
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
 				addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
-				bind(Fleet.class).toInstance(fleet);// overrride the binding specified in DvrpModule
+				bind(Fleet.class).toInstance(fleet);// overrride the binding specified in TaxiModule
 			}
 		});
 

@@ -54,9 +54,10 @@ public class RunRWPTComboFleetsizeDetermination {
 		config.controler().setOutputDirectory(outPutDir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
-		dvrpCfg.setMode("taxi");
-		dvrpCfg.setVehiclesFile(taxisFile);
+		DvrpConfigGroup.get(config).setMode("taxi");
+		
+		TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
+		tcg.setTaxisFile(taxisFile);
 		
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		

@@ -3,8 +3,6 @@
 <config>
 	<module name="dvrp">
 		<param name="mode" value="taxi" />
-		<param name="vehiclesFile" value="../../../../../../contribs/taxi/src/main/resources/mielec_2014_02/taxis-25.xml" />
-		<!-- param name="vehiclesFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/taxis-50.xml" / -->
 	</module>
 
 	<module name="taxi">
@@ -13,6 +11,9 @@
 		<param name="pickupDuration" value="120" />
 		<param name="dropoffDuration" value="60" />
 		<param name="onlineVehicleTracker" value="false" />
+
+		<param name="taxisFile" value="../../../../../../contribs/taxi/src/main/resources/mielec_2014_02/taxis-25.xml" />
+		<!-- param name="taxisFile" value="../../contribs/taxi/src/main/resources/mielec_2014_02/taxis-50.xml" / -->
 
 		<parameterset type="optimizer">
 			<param name="type" value="RULE_BASED" />

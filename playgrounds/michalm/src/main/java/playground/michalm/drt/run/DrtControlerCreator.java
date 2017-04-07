@@ -23,6 +23,9 @@
 package playground.michalm.drt.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.*;
@@ -30,11 +33,12 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.*;
 
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
+import com.google.inject.*;
+import com.google.inject.name.*;
 
 import playground.michalm.drt.analysis.DRTAnalysisModule;
 import playground.michalm.drt.optimizer.*;
@@ -56,7 +60,17 @@ public class DrtControlerCreator {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(
-				new DvrpModule(createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class));
+				new DvrpModule(createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class) {
+						@Provides
+						@Singleton
+						private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
+								DrtConfigGroup drtCfg) {
+							FleetImpl fleet = new FleetImpl();
+							new VehicleReader(network, fleet).parse(drtCfg.getVehiclesFileUrl(config.getContext()));
+							return fleet;
+						}
+
+				});
 		controler.addOverridingModule(new DRTAnalysisModule());
 
 		switch (drtCfg.getOperationalScheme()) {

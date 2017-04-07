@@ -98,7 +98,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 	}
 
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		if ((e.getSimulationTime() % (context.clustering_period_min * 60)) == 0) {
 			Set<DrtRequest> dueRequests = new HashSet<>();
 			for (DrtRequest r : unplannedRequests) {

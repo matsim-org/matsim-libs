@@ -43,14 +43,14 @@ public class RunETaxiScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		EvConfigGroup evCfg = EvConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FleetImpl fleet = new FleetImpl();
-		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(dvrpCfg.getVehiclesFileUrl(config.getContext()));
+		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 		EvData evData = new EvDataImpl();
 		new ChargerReader(scenario.getNetwork(), evData).parse(evCfg.getChargersFileUrl(config.getContext()));
 		ETaxiUtils.initEvData(fleet, evData);
@@ -65,7 +65,7 @@ public class RunETaxiScenario {
 			public void install() {
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
-				bind(Fleet.class).toInstance(fleet);// overrride the binding specified in DvrpModule
+				bind(Fleet.class).toInstance(fleet);// overrride the binding specified in TaxiModule
 			}
 		});
 

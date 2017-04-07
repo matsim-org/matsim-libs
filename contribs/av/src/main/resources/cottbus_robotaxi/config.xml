@@ -18,11 +18,6 @@
 
 	<module name="dvrp">
 		<param name="mode" value="taxi" />
-		<!-- An XML file specifying the taxi fleet. The file format according to 
-			dvrp_vehicles_v1.dtd -->
-		<!-- To create your own vehicles, see org.matsim.contrib.av.vehicles.CreateTaxiVehicles  -->
-		<param name="vehiclesFile" value="taxis_5000.xml" />
-		<!--  param name="vehiclesFile" value="taxis_2000.xml" /  -->
 	</module>
 
 	<module name="taxi">
@@ -53,6 +48,12 @@
 
 		<!-- Typically, 120 seconds -->
 		<param name="pickupDuration" value="120.0" />
+
+		<!-- An XML file specifying the taxi fleet. The file format according to 
+			dvrp_vehicles_v1.dtd -->
+		<!-- To create your own vehicles, see org.matsim.contrib.av.vehicles.CreateTaxiVehicles  -->
+		<param name="taxisFile" value="taxis_5000.xml" />
+		<!--  param name="taxisFile" value="taxis_2000.xml" /  -->
 
 		<!-- If true, time profiles of vehicle statuses (i.e. current task type) 
 			and the number of unplanned requests -->

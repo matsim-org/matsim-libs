@@ -100,10 +100,6 @@
 	
 	<module name="dvrp">
 		<param name="mode" value="taxi"/>
-
-		<!-- An XML file specifying the taxi fleet. The file format according to 
-			dvrp_vehicles_v1.dtd -->
-		<param name="vehiclesFile" value="taxis.xml" />
 	</module>
 	
 	<module name="taxi">
@@ -134,6 +130,10 @@
 
 		<!-- Typically, 120 seconds -->
 		<param name="pickupDuration" value="120.0" />
+
+		<!-- An XML file specifying the taxi fleet. The file format according to 
+			dvrp_vehicles_v1.dtd -->
+		<param name="taxisFile" value="taxis.xml" />
 
 		<!-- If true, time profiles of vehicle statuses (i.e. current task type) 
 			and the number of unplanned requests -->
