@@ -47,9 +47,9 @@ public class OSM2Network {
 		OsmNetworkReader reader = new OsmNetworkReader(network, transformation);
 		
 		logger.info("Loading OSM file...");
-		reader.setHierarchyLayer(60, 0, 40, 20, 5);
+		reader.setHierarchyLayer(60, 0, 40, 20, 6);
 		reader.setMemoryOptimization(true);
-		reader.setKeepPaths(true);
+		reader.setKeepPaths(false);
 		reader.parse(args[0]);
 
 		logger.info("Writing network file...");

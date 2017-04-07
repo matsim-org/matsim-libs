@@ -19,6 +19,8 @@
 
 package playground.agarwalamit.analysis.modalShare;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.inject.Inject;
@@ -37,6 +39,9 @@ public class ModalShareControlerListener implements StartupListener, IterationEn
 
 	private int firstIteration = 0;
 	private final SortedMap<String, double []> mode2numberofLegs = new TreeMap<>();
+
+	// following is required to fix if at some intermediate iteration, one of the mode type vanishes, the arrayCopy wont work
+	private final Set<String> modeHistory = new HashSet<>();
 
 	@Inject
 	private ModalShareEventHandler modalShareHandler;
@@ -57,6 +62,9 @@ public class ModalShareControlerListener implements StartupListener, IterationEn
 		String outputDir = event.getServices().getConfig().controler().getOutputDirectory();
 		
 		SortedMap<String, Integer > mode2legs = this.modalShareHandler.getMode2numberOflegs();
+		modeHistory.addAll(mode2legs.keySet());
+		modeHistory.stream().filter(e -> ! mode2legs.containsKey(e)).forEach(e -> mode2legs.put(e, 0));
+
 		int itNrIndex = event.getIteration() - this.firstIteration;
 
 		for(String mode : mode2legs.keySet()) {

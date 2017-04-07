@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * This class was used with individual xml files. It is now superceded by using
+ * This class was used with individual xml files. It is now superseded by using
  * a single vehicles container. Instead use {@link FacilityToActivityAssigner}.
  *
  * @author jwjoubert

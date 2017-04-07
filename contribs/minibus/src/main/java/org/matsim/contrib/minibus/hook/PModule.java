@@ -22,10 +22,13 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.fare.TicketMachineDefaultImpl;
 import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.operator.POperators;
+import org.matsim.contrib.minibus.operator.PerPassengerSubsidy;
+import org.matsim.contrib.minibus.operator.SubsidyI;
 import org.matsim.contrib.minibus.stats.PStatsModule;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
@@ -34,6 +37,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouter;
 
 public final class PModule extends AbstractModule {
+	private final static Logger log = Logger.getLogger(PModule.class);
 
 	@Override public void install() {
 		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(this.getConfig());
@@ -49,6 +53,30 @@ public final class PModule extends AbstractModule {
 		// kai, jan'17)
 
 		bind(TicketMachineI.class).to(TicketMachineDefaultImpl.class);
+		
+		if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach() == null ) {
+			log.info("There is no subsidy added to the operators' score.");
+			
+		} else if ( ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach().equals("perPassenger") )  {
+			log.warn("There is a subsidy added to the operators' score. Approach: 'perPassenger'."
+					+ " This approach is rather an example how to implement a subsidy computation approach and should not be used"
+					+ " for real studies...");
+			bind(SubsidyI.class).to(PerPassengerSubsidy.class);
+		
+		} else {
+			log.warn("Unknown subsidy approach: " + ConfigUtils.addOrGetModule(getConfig(), PConfigGroup.class ).getSubsidyApproach());
+			log.warn("Add the following lines of code to your run class:");
+			log.warn("");
+			log.warn("controler.addOverridingModule(new AbstractModule() {");
+			log.warn("");
+			log.warn("	@Override");
+			log.warn("	public void install() {");
+			log.warn("		this.bind(SubsidyI.class).to(<YourSubsidyApproach>.class)");
+			log.warn("	}");
+			log.warn("});");
+			log.warn("");
+			throw new RuntimeException("Aborting...");
+		}
 
 		bind(POperators.class).to(PBox.class).asEagerSingleton();
 		// (needs to be a singleton since it is a data container, and all clients should use the same data container. kai, jan'17)

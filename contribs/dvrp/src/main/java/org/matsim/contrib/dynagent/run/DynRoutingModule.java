@@ -21,6 +21,7 @@ package org.matsim.contrib.dynagent.run;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -41,11 +42,14 @@ public class DynRoutingModule implements RoutingModule {
 		Route route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		route.setDistance(Double.NaN);
 		route.setTravelTime(Double.NaN);
-
+		
 		Leg leg = PopulationUtils.createLeg(mode);
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(Double.NaN);
 		leg.setRoute(route);
+		if (fromFacility.getLinkId().equals(toFacility.getLinkId())){
+			leg.setMode(TransportMode.walk);
+		}
 
 		return Collections.singletonList(leg);
 	}

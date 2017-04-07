@@ -21,13 +21,14 @@ package playground.michalm.drt.optimizer;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
+import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.run.DrtConfigGroup;
 import playground.michalm.drt.schedule.*;
 import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
 
@@ -35,11 +36,11 @@ import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
  * @author michalm
  */
 public class VehicleData {
-
 	public static class Entry {
-		public Vehicle vehicle;
-		public LinkTimePair start;
-		public List<NDrtStopTask> stopTasks = new ArrayList<>();
+		public final Vehicle vehicle;
+		public final LinkTimePair start;// TODO what if start is just at the beginning of the first stopTask???
+		public int startOccupancy;
+		public final List<Stop> stops = new ArrayList<>();
 
 		public Entry(Vehicle vehicle, LinkTimePair start) {
 			this.vehicle = vehicle;
@@ -47,13 +48,51 @@ public class VehicleData {
 		}
 	}
 
+	public static class Stop {
+		public final NDrtStopTask task;
+		public final double maxArrivalTime;// relating to max pass drive time (for dropoff requests)
+		public final double maxDepartureTime;// relating to pass max wait time (for pickup requests)
+		public final int occupancyChange;// diff in pickups and dropoffs
+		public int outputOccupancy;
+
+		public Stop(NDrtStopTask task, DrtConfigGroup drtCfg) {
+			this.task = task;
+			maxArrivalTime = calcMaxArrivalTime();
+			maxDepartureTime = calcMaxDepartureTime(drtCfg.getMaxWaitTime());
+			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
+		}
+
+		private double calcMaxArrivalTime() {
+			double maxTime = Double.MAX_VALUE;
+			for (NDrtRequest r : task.getDropoffRequests()) {
+				double reqMaxArrivalTime = r.getEarliestStartTime() + 3600;// TODO temp
+				if (reqMaxArrivalTime < maxTime) {
+					maxTime = reqMaxArrivalTime;
+				}
+			}
+			return maxTime;
+		}
+
+		private double calcMaxDepartureTime(double maxWaitTime) {
+			double maxTime = Double.MAX_VALUE;
+			for (NDrtRequest r : task.getPickupRequests()) {
+				double reqMaxDepartureTime = r.getEarliestStartTime() + maxWaitTime;
+				if (reqMaxDepartureTime < maxTime) {
+					maxTime = reqMaxDepartureTime;
+				}
+			}
+			return maxTime;
+		}
+
+	}
+
+	private final DrtConfigGroup drtCfg;
 	private final List<Entry> entries = new ArrayList<>();
 	private final double currTime;
-	private final boolean vehicleDiversion;
 
-	public VehicleData(DrtOptimizerContext optimContext, Iterable<? extends Vehicle> vehicles) {
+	public VehicleData(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg, Iterable<? extends Vehicle> vehicles) {
+		this.drtCfg = drtCfg;
 		currTime = optimContext.timer.getTimeOfDay();
-		vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
 
 		for (Vehicle v : vehicles) {
 			Entry e = createVehicleData(v);
@@ -62,12 +101,16 @@ public class VehicleData {
 			}
 		}
 	}
+	
+	public void updateEntry(Entry vEntry) {
+		int idx = entries.indexOf(vEntry);//TODO inefficient! ==> use map instead of list for storing entries...  
+		entries.set(idx, createVehicleData(vEntry.vehicle));
+	}
 
 	private Entry createVehicleData(Vehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		ScheduleStatus status = schedule.getStatus();
-		if (currTime >= vehicle.getServiceEndTime() || // too late
-				status != ScheduleStatus.PLANNED || status != ScheduleStatus.STARTED) {
+		if (currTime >= vehicle.getServiceEndTime() || status == ScheduleStatus.COMPLETED) {
 			return null;
 		}
 
@@ -80,13 +123,8 @@ public class VehicleData {
 		if (status == ScheduleStatus.STARTED) {
 			switch (currentTask.getDrtTaskType()) {
 				case DRIVE:
-					if (vehicleDiversion) {
-						start = ((OnlineDriveTaskTracker)currentTask.getTaskTracker()).getDiversionPoint();
-					} else {
-						Link link = ((NDrtDriveTask)currentTask).getPath().getToLink();
-						start = new LinkTimePair(link, currentTask.getEndTime());
-					}
-
+					NDrtDriveTask driveTask = (NDrtDriveTask)currentTask;
+					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
 					break;
 
 				case STOP:
@@ -95,7 +133,7 @@ public class VehicleData {
 					break;
 
 				case STAY:
-					NDrtStopTask stayTask = (NDrtStopTask)currentTask;
+					NDrtStayTask stayTask = (NDrtStayTask)currentTask;
 					start = new LinkTimePair(stayTask.getLink(), currTime);
 					break;
 
@@ -113,9 +151,18 @@ public class VehicleData {
 		for (int i = nextTaskIdx; i < tasks.size(); i++) {
 			NDrtTask task = tasks.get(i);
 			if (task.getDrtTaskType() == NDrtTaskType.STOP) {
-				data.stopTasks.add((NDrtStopTask)task);
+				Stop stop = new Stop((NDrtStopTask)task, drtCfg);
+				data.stops.add(stop);
 			}
 		}
+
+		int outputOccupancy = 0;
+		for (int i = data.stops.size() - 1; i >= 0; i--) {
+			Stop s = data.stops.get(i);
+			s.outputOccupancy = outputOccupancy;
+			outputOccupancy -= s.occupancyChange;
+		}
+		data.startOccupancy = outputOccupancy;
 
 		return data;
 	}

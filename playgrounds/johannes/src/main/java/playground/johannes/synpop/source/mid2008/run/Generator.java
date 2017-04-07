@@ -50,6 +50,8 @@ public class Generator {
 
     public static final String JOURNEYS_FILE = "journeysFile";
 
+    public static final String PURPOSE_MAPPING_FILE = "purposeMappingFile";
+
     public static final String OUTPUT_DIR = "output";
 
     public static void main(String args[]) throws IOException {
@@ -59,6 +61,7 @@ public class Generator {
         String personsFile = config.getParam(MODULE_NAME, PERSONS_FILE);
         String tripsFile = config.getParam(MODULE_NAME, TRIPS_FILE);
         String journeysFile = config.getParam(MODULE_NAME, JOURNEYS_FILE);
+        String purposeMappingFile = config.getModule(MODULE_NAME).getValue(PURPOSE_MAPPING_FILE);
         String outDir = config.getParam(MODULE_NAME, OUTPUT_DIR);
 
         PlainFactory factory = new PlainFactory();
@@ -77,7 +80,8 @@ public class Generator {
 
         fileReader.addLegAttributeHandler(new LegDistanceHandler());
         fileReader.addLegAttributeHandler(new LegTimeHandler());
-        fileReader.addLegAttributeHandler(new LegPurposeHandler());
+//        fileReader.addLegAttributeHandler(new LegPurposeHandlerOld());
+        fileReader.addLegAttributeHandler(new LegPurposeHandler(LegPurposeHandler.loadMappingFromFile(purposeMappingFile)));
         fileReader.addLegAttributeHandler(new LegDestinationHandler());
         fileReader.addLegAttributeHandler(new LegOriginHandler());
         fileReader.addLegAttributeHandler(new LegModeHandler());

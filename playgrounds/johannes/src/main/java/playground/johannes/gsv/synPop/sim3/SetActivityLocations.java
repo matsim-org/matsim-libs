@@ -97,7 +97,7 @@ public class SetActivityLocations {
 
 		logger.info("Registering data loaders...");
 		DataPool dataPool = new DataPool();
-		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
+		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), null, random), FacilityDataLoader.KEY);
 		/*
 		 * Assign random facilities to acts
 		 */

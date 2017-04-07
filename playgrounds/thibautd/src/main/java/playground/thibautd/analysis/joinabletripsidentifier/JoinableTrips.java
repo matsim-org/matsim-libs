@@ -110,36 +110,31 @@ public class JoinableTrips {
 
 	private JoinableTripMap getJoinableTripMap(
 			final TripReconstructor tripReconstructor) {
-		List<Trip> trips = tripReconstructor.getTrips();
-		JoinableTripMap joinableTrips = new JoinableTripMap(); 
-		QuadTree<LinkInformation> linkInformation = tripReconstructor.getLinkInformationQuadTree();
-		Map<Id<Link>, ? extends Link> links = tripReconstructor.getNetwork().getLinks();
+		final List<Trip> trips = tripReconstructor.getTrips();
+		final JoinableTripMap joinableTrips = new JoinableTripMap();
+		final QuadTree<LinkInformation> linkInformation = tripReconstructor.getLinkInformationQuadTree();
+		final Map<Id<Link>, ? extends Link> links = tripReconstructor.getNetwork().getLinks();
 
 		// trip examination to identify joinable trips
-		Coord currentCoord;
-		Collection<LinkInformation> neighbourInformations;
-		List<LinkInformation.Entry> entries;
-		JoinableTrip currentJoinableTrip;
-		Id driverTripId;
-		JointTripCounter counter = new JointTripCounter(trips.size());
+		final JointTripCounter counter = new JointTripCounter(trips.size());
 
 		// FIXME: a lot of copy-paste here. try to "externalise" the common procedure
 		for ( Trip trip : trips ) {
 			counter.logCount();
-			driverTripId = trip.getId();
+			final Id driverTripId = trip.getId();
 			for ( Event event : trip.getRouteEvents() ) {
 				if ( event instanceof LinkLeaveEvent ) {
 					// for departures
-					double eventTime = event.getTime();
+					final double eventTime = event.getTime();
 
-					currentCoord = links.get(((LinkLeaveEvent) event).getLinkId()).getCoord();
-					neighbourInformations = linkInformation.getDisk(
+					final Coord currentCoord = links.get(((LinkLeaveEvent) event).getLinkId()).getCoord();
+					final Collection<LinkInformation> neighbourInformations = linkInformation.getDisk(
 							currentCoord.getX(),
 							currentCoord.getY(),
 							distanceRadius);
 
 					for (LinkInformation info : neighbourInformations) {
-						entries = info.getDepartures();
+						final List<LinkInformation.Entry> entries = info.getDepartures();
 
 						// use the fact that entries are sorted by time!
 						for (LinkInformation.Entry entry : entries) {
@@ -147,7 +142,7 @@ public class JoinableTrips {
 							if ( (entry.getDepartureTime() - timeRadius < eventTime) &&
 									// arrival time or latest arrival time?
 									(Math.max( entry.getArrivalTime(), entry.getDepartureTime() + timeRadius ) > eventTime) ) {
-								currentJoinableTrip = joinableTrips.get(
+								final JoinableTrip currentJoinableTrip = joinableTrips.get(
 										driverTripId,
 										entry.getTripId());
 								currentJoinableTrip.addPassage(
@@ -160,16 +155,16 @@ public class JoinableTrips {
 				}
 				else if ( event instanceof LinkEnterEvent ) {
 					// for arrivals
-					double eventTime = event.getTime();
+					final double eventTime = event.getTime();
 
-					currentCoord = links.get(((LinkEnterEvent) event).getLinkId()).getCoord();
-					neighbourInformations = linkInformation.getDisk(
+					final Coord currentCoord = links.get(((LinkEnterEvent) event).getLinkId()).getCoord();
+					final Collection<LinkInformation> neighbourInformations = linkInformation.getDisk(
 							currentCoord.getX(),
 							currentCoord.getY(),
 							distanceRadius);
 
 					for (LinkInformation info : neighbourInformations) {
-						entries = info.getArrivals();
+						final List<LinkInformation.Entry> entries = info.getArrivals();
 
 						// use the fact that entries are sorted by time!
 						for (LinkInformation.Entry entry : entries) {
@@ -177,7 +172,7 @@ public class JoinableTrips {
 							if ( (entry.getArrivalTime() + timeRadius > eventTime) &&
 									// departure time or sooner departure time ?
 									(Math.min( entry.getDepartureTime(), entry.getArrivalTime() - timeRadius ) < eventTime) ) {
-								currentJoinableTrip = joinableTrips.get(
+								final JoinableTrip currentJoinableTrip = joinableTrips.get(
 										driverTripId,
 										entry.getTripId());
 								currentJoinableTrip.addPassage(

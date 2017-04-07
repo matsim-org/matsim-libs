@@ -36,7 +36,6 @@ import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PPRestrictedT
 import org.matsim.contrib.parking.parkingchoice.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingBetas;
 import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingCostModel;
-import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.parkingchoice.PC2.scoring.RandomErrorTermManager;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.core.config.Config;
@@ -54,6 +53,7 @@ import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.priceoptimization.infrastracture.OptimizableParking;
 import playground.wrashid.parkingChoice.priceoptimization.scoring.FreeFloatingParkingScoringFunctionFactory;
+import playground.wrashid.parkingChoice.priceoptimization.scoring.ParkingScoreManager;
 import playground.wrashid.parkingChoice.priceoptimization.simulation.ParkingInfrastructureManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZone;
@@ -71,14 +71,16 @@ public class SetupParkingForOptimizationScenario {
 		String baseDir = config.getParam("parkingChoice.ZH", "parkingDataDirectory");
 		
 		LinkedList<PParking> parkings = getParking(config, baseDir);
+		String permitsFilePath = "C:\\LocalDocuments\\Projects\\Parking\\Tests\\Input\\permits.txt"; 		
+		Map<Id<Person>, Set<String>> permitsPerPerson = readPermits(permitsFilePath);
 	
-		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule, parkings, controler);
+		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule, parkings, 
+				controler, permitsPerPerson);
 		
 		
 		//TODO: input permits from a file
 		
-		String permitsFilePath = "C:\\permits.xml"; 		
-		Map<Id<Person>, Set<String>> permitsPerPerson = readPermits(permitsFilePath);
+		
 		ParkingInfrastructureManager pim = new ParkingInfrastructureManager(parkingScoreManager, null,
 				permitsPerPerson);
 		
@@ -189,8 +191,9 @@ public class SetupParkingForOptimizationScenario {
 		controler.setScoringFunctionFactory(new FreeFloatingParkingScoringFunctionFactory (controler.getScenario() ,parkingModule.getParkingScoreManager()));
 	}
 	
-	public static ParkingScoreManager prepareParkingScoreManager(OptimizationParkingModuleZH parkingModule, LinkedList<PParking> parkings, Controler controler) {
-		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(controler), controler.getScenario() );
+	public static ParkingScoreManager prepareParkingScoreManager(OptimizationParkingModuleZH parkingModule, 
+			LinkedList<PParking> parkings, Controler controler, Map<Id<Person>, Set<String>> permitsPerPerson) {
+		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(controler), controler.getScenario(), permitsPerPerson );
 
 
         ParkingBetas parkingBetas=new ParkingBetas(getHouseHoldIncomeCantonZH(controler.getScenario().getPopulation()));

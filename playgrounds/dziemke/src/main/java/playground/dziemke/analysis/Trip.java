@@ -19,7 +19,7 @@ public class Trip {
 	private Id<Household> householdId;
 	private Id<Person> personId;
 	private Id<Trip> tripId;
-	private String activityEndActType;
+	private String activityTypeBeforeTrip;
 	private Id<Link> departureLinkId;
 	private Id<Zone> departureZoneId;
 	private double departureTime_s;
@@ -39,7 +39,7 @@ public class Trip {
 	private Id<Zone> arrivalZoneId;
 	private double arrivalTime_s;
 	private String arrivalLegMode;
-	private String activityStartActType;
+	private String activityTypeAfterTrip;
 	private boolean tripComplete = false;
 	
 	private double weight;
@@ -81,12 +81,12 @@ public class Trip {
 	}
 	
 	
-	public String getActivityEndActType() {
-		return this.activityEndActType;
+	public String getActivityTypeBeforeTrip() {
+		return this.activityTypeBeforeTrip;
 	}
 	
-	public void setActivityEndActType(String activityEndActType) {
-		this.activityEndActType = activityEndActType;
+	public void setActivityTypeBeforeTrip(String activityTypeBeforeTrip) {
+		this.activityTypeBeforeTrip = activityTypeBeforeTrip;
 	}	
 
 	public Id<Link> getDepartureLinkId() {
@@ -241,12 +241,12 @@ public class Trip {
 		this.arrivalLegMode = arrivalLegMode;
 	}
 	
-	public String getActivityStartActType() {
-		return this.activityStartActType;
+	public String getActivityTypeAfterTrip() {
+		return this.activityTypeAfterTrip;
 	}
 	
-	public void setActivityStartActType(String activityStartActType) {
-		this.activityStartActType = activityStartActType;
+	public void setActivityTypeAfterTrip(String activityTypeAfterTrip) {
+		this.activityTypeAfterTrip = activityTypeAfterTrip;
 	}	
 	
 	public boolean getTripComplete() {
@@ -288,7 +288,7 @@ public class Trip {
 		return "householdId = " + householdId
 				+ " -- personId = " + personId
 				+ " -- tripId = "+ tripId
-				+ " -- activityEndActType = " + activityEndActType
+				+ " -- activityEndActType = " + activityTypeBeforeTrip
 				+ " -- departureLinkId = " + departureLinkId
 //	private Id<Zone> departureZoneId;
 //	private double departureTime_s;

@@ -47,7 +47,11 @@ public class JointPlan {
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": plans="+getIndividualPlans();
-			//", isSelected="+this.isSelected();
+		final StringBuilder builder = new StringBuilder( getClass().getSimpleName()+": plans=" );
+		for ( Plan p : getIndividualPlans().values() ) {
+			builder.append(
+				p.getPerson().getId()+": "+p.getPerson().getPlans().indexOf( p )+"; " );
+		}
+		return builder.toString();
 	}
 }

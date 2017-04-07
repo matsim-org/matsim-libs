@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
+import java.io.IOException;
 import java.util.Random;
 
 public class FacilityDataLoader implements DataLoader {
@@ -36,12 +37,15 @@ public class FacilityDataLoader implements DataLoader {
 	public static final String KEY = "facilityData";
 	
 	private final String file;
+
+	private final String mappingFile;
 	
 	private final Random random;
 	
-	public FacilityDataLoader(String file, Random random) {
+	public FacilityDataLoader(String file, String mappingFile, Random random) {
 		this.file = file;
 		this.random = random;
+		this.mappingFile = mappingFile;
 	}
 	
 	@Override
@@ -54,9 +58,16 @@ public class FacilityDataLoader implements DataLoader {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		FacilitiesReaderMatsimV1 reader = new FacilitiesReaderMatsimV1(scenario);
 		reader.readFile(file);
-		
-		FacilityData data = new FacilityData(scenario.getActivityFacilities(), random);
-		
+
+		FacilityData data = null;
+		try {
+			data = new FacilityData(scenario.getActivityFacilities(),
+                    FacilityData.loadTypeMapping(mappingFile),
+                    random);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		Logger.getRootLogger().setLevel(level);
 		
 		logger.info(String.format("Loaded %s facilities.", data.getAll().getFacilities().size()));

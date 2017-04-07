@@ -27,7 +27,7 @@ public class SelectedPlansAnalyzer {
 	public static final Logger log = Logger.getLogger(SelectedPlansAnalyzer.class);
 
 	// Parameters
-	private static String runId = "be_118a"; // <----------
+	private static String runId = "be_119b"; // <----------
 	private static int numberOfIterations = 300; // <----------
 	private static int plansFileInterval = 300; // <----------
 	private static boolean useInterimPlans = false;
@@ -55,7 +55,7 @@ public class SelectedPlansAnalyzer {
 			plansFileInterval = Integer.valueOf(args[3]);
 			useInterimPlans = Boolean.valueOf(args[4]);
 			useOutputPlans = Boolean.valueOf(args[5]);
-			if (args.length == 7) {
+			if (args.length >= 7) {
                 alternativeOutputDir = args[6];
                 log.info("AlternativeOutputDir: " + alternativeOutputDir);
             }
@@ -137,7 +137,7 @@ public class SelectedPlansAnalyzer {
 								counterWalkPlans++;
 								break;
 							default:
-								throw new RuntimeException("In current implementation leg mode must either be car, pt, or walk");
+								throw new RuntimeException("Unknown mode: " + mode + ". In current implementation leg mode must either be car, pt, slowPt or walk");
 						}
 						
 						// Break bricht die aktuelle Schleife ab; Continue leitet einen neuen Durchlauf ein.
@@ -157,7 +157,7 @@ public class SelectedPlansAnalyzer {
 		otherPlansMap.put(iteration, counterOtherPlans);
 		carPlansMap.put(iteration, counterCarPlans);
 		ptPlansMap.put(iteration, counterPtPlans);
-		slowPtPlansMap.put(iteration, counterPtPlans);
+		slowPtPlansMap.put(iteration, counterSlowPtPlans);
 		walkPlansMap.put(iteration, counterWalkPlans);
 	}
 
@@ -168,7 +168,7 @@ public class SelectedPlansAnalyzer {
 		if (alternativeOutputDir != null)
 			path = alternativeOutputDir + "/analysis";
 
-		if (new File(path).mkdir()) {
+		if (new File(path).mkdirs()) {
 			log.info(path + " was created");
 		} else {
 			log.warn(path + " was not created");
@@ -177,7 +177,7 @@ public class SelectedPlansAnalyzer {
 		BufferedWriter bufferedWriter = null;
 			
 		try {
-			File output = new File(directoryRoot + "/analysis/selectedPlans.txt");
+			File output = new File(path + "/selectedPlans.txt");
 			FileWriter fileWriter = new FileWriter(output);
 			bufferedWriter = new BufferedWriter(fileWriter);
 			
@@ -204,6 +204,6 @@ public class SelectedPlansAnalyzer {
 	            ex.printStackTrace();
 	        }
 	    }
-		System.out.println("Analysis file " + directoryRoot + "/analysis/selectedPlans.txt" + " written.");
+		System.out.println("Analysis file " + path + "/selectedPlans.txt" + " written.");
 	}
 }

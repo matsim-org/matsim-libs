@@ -54,16 +54,16 @@ public class CreateSharedTaxiVehicles {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		double operationStartTime = 17*3600; //t0
 		double operationEndTime = 31*3600.;	//t1
-		int seats = 4;
-		String networkfile = "../../../shared-svn/projects/bvg_sharedTaxi/input/network.xml.gz";
+		int seats = 6;
+		String networkfile = "../../../shared-svn/projects/bvg_sharedTaxi/input/network-bvg_25833_cut_cleaned.xml.gz";
 		List<Vehicle> vehicles = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfile);
 		List<Id<Link>> allLinks = new ArrayList<>();
 		allLinks.addAll(scenario.getNetwork().getLinks().keySet());
-		for (int numberofVehicles = 25; numberofVehicles<=500; numberofVehicles+=50){
+		for (int numberofVehicles = 25; numberofVehicles<=500; numberofVehicles+=25){
 		
-		String taxisFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/vehicles/taxis_"+numberofVehicles+".xml.gz";
+		String taxisFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/vehicles_net_bvg/cap_"+seats+"/taxis_"+numberofVehicles+".xml.gz";
 		for (int i = 0; i< numberofVehicles;i++){
 			Link startLink;
 			do {
@@ -76,6 +76,7 @@ public class CreateSharedTaxiVehicles {
 			while (!startLink.getAllowedModes().contains(TransportMode.car));
 			//for multi-modal networks: Only links where cars can ride should be used.
 			Vehicle v = new VehicleImpl(Id.create("taxi"+i, Vehicle.class), startLink, seats, operationStartTime, operationEndTime);
+			
 		    vehicles.add(v);    
 			
 		}

@@ -46,7 +46,7 @@ public class RunInclusionTaxiScenario
     }
     public static void runMany(String configFile)
     {
-    	for (int i = 30+0; i<=500; i=i+50){
+    	for (int i = 100; i<=250; i=i+50){
     	
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());

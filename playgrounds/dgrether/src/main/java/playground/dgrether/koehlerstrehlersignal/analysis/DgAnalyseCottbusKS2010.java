@@ -459,10 +459,7 @@ public class DgAnalyseCottbusKS2010 {
 	 */
 	public static List<Extent> createExtentList(){
 		List<Extent> l = new ArrayList<Extent>();
-		String filterFeatureFilename = DgPaths.REPOS
-				+ "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
-		//		String filterFeatureFilename = "C:/Users/Atany/Desktop/SHK/SVN/"
-		//				+ "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
+		String filterFeatureFilename = "../../../shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
 		Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple = CottbusUtils.loadCottbusFeature(filterFeatureFilename);
 		Envelope env = getTransformedEnvelope(featureTuple);
 		Extent e = null;
@@ -471,19 +468,16 @@ public class DgAnalyseCottbusKS2010 {
 		//		e.envelope = env;
 		//		l.add(e);
 
-		filterFeatureFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
-		//		filterFeatureFilename = "C:/Users/Atany/Desktop/SHK/SVN/"
-		//				+ "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
+		filterFeatureFilename = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
 //		featureTuple = CottbusUtils.loadFeature(filterFeatureFilename);
 //		env = getTransformedEnvelope(featureTuple);
 
-		String signalsBBNet = DgPaths.REPOS + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/network_small.xml.gz";
+		String signalsBBNet = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/network_small.xml.gz";
 		Scenario scSignalsBoundingBox = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scSignalsBoundingBox.getNetwork());
 		netReader.readFile(signalsBBNet);
 
-		String signalSystemsFile = DgPaths.REPOS + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/signal_systems_no_13.xml";
+		String signalSystemsFile = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/signal_systems_no_13.xml";
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		SignalSystemsReader20 signalsReader = new SignalSystemsReader20(signalSystems);
 		signalsReader.readFile(signalSystemsFile);
@@ -501,7 +495,7 @@ public class DgAnalyseCottbusKS2010 {
 //		l.add(e);
 		
 		
-		String cityNetwork = DgPaths.REPOS  + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
+		String cityNetwork = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader2= new MatsimNetworkReader(sc2.getNetwork());
 		netReader2.readFile(cityNetwork);
@@ -619,7 +613,7 @@ public class DgAnalyseCottbusKS2010 {
 	public static void main(String[] args) {
 		List<RunInfo> runIds = createRunsIdList();
 		String runIdsString = createRunIdIterationString(runIds);
-		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/data/optimization/cb2ks2010/" 
+		String outputDirectory = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/" 
 				+ "2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/results/";
 		List<TimeConfig> times = createTimeConfig();
 		String timesString = createTimesString(times);

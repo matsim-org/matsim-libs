@@ -7,7 +7,7 @@ import org.matsim.facilities.ActivityFacility;
 import java.util.HashMap;
 import java.util.Map;
 
-class SpatialGridAggregator implements FacilityDataExchangeInterface {
+public class SpatialGridAggregator implements FacilityDataExchangeInterface {
 
 	private Map<String, SpatialGrid> accessibilityGrids = new HashMap<>() ;
 
@@ -23,7 +23,7 @@ class SpatialGridAggregator implements FacilityDataExchangeInterface {
 
 	}
 
-	Map<String, SpatialGrid> getAccessibilityGrids() {
+	public Map<String, SpatialGrid> getAccessibilityGrids() {
 		return accessibilityGrids;
 	}
 

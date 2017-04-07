@@ -70,7 +70,7 @@ public class FacilityToActivityAssigner {
 	 * 				  will be written out to the xml folder. NOTE: It is, to my
 	 * 				  current knowledge (JWJ, Aug 2013), NECESSARY to use the 
 	 * 				  shapefile of the entire area, and <i><b>not</b></i> a 
-	 * 				  smaller demarcation shapefile, for example the GAP sones.
+	 * 				  smaller demarcation shapefile, for example the GAP zones.
 	 * <li> args[5] = the ID field for the shapefile.
 	 * <li> args[6] = the absolute path of the output {@link DigicoreVehicles} 
 	 * 				  container;

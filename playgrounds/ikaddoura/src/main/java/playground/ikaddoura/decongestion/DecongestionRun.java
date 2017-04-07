@@ -67,7 +67,7 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output-NEW-1000.output_plans-asInput/";
+			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output-1000.output_plans-Versuchsreihe2/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -78,8 +78,8 @@ public class DecongestionRun {
 	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(1.);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
+		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(20.);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.8);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 		decongestionSettings.setMsa(false);

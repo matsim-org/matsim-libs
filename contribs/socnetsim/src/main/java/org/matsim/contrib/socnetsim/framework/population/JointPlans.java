@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
@@ -41,14 +43,15 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  * @author thibautd
  */
 public class JointPlans implements MatsimToplevelContainer {
+	private static final Logger log = Logger.getLogger( JointPlans.class );
 	public static final String ELEMENT_NAME = "jointPlans";
 
 	private final Map<Plan, JointPlan> planToJointPlan = new ConcurrentHashMap<>();
 
 	private final JointPlanFactory factory = new JointPlanFactory();
 
-	private static int globalInstanceCount = 0;
-	private final int instanceId = globalInstanceCount++;
+	private static AtomicInteger globalInstanceCount = new AtomicInteger( 0 );
+	private final int instanceId = globalInstanceCount.getAndIncrement();
 	
 	public JointPlan getJointPlan(final Plan indivPlan) {
 		if ( indivPlan instanceof PlanWithCachedJointPlan ) {
@@ -67,6 +70,9 @@ public class JointPlans implements MatsimToplevelContainer {
 	}
 
 	public void removeJointPlan(final JointPlan jointPlan) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "remove joint plan "+jointPlan+" from JointPlans instance "+instanceId );
+		}
 		synchronized (jointPlan) {
 			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
 				if ( indivPlan instanceof PlanWithCachedJointPlan ) {
@@ -97,6 +103,9 @@ public class JointPlans implements MatsimToplevelContainer {
 	}
 
 	public void addJointPlan(final JointPlan jointPlan) {
+		if ( log.isTraceEnabled() ) {
+			log.trace( "add joint plan "+jointPlan+" to JointPlans instance "+instanceId );
+		}
 		synchronized (jointPlan) {
 			for (Plan indivPlan : jointPlan.getIndividualPlans().values()) {
 				if ( indivPlan instanceof PlanWithCachedJointPlan ) {

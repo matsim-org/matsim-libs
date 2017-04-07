@@ -19,23 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map.Entry;
-import java.util.Queue;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -178,43 +167,50 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		TreeMap<Double,Hole> consumableHoles = new TreeMap<>() ;
 		
 		// holes or kinematicWaves, if applicable:
-		if ( QSimConfigGroup.SnapshotStyle.withHoles==scenario.getConfig().qsim().getSnapshotStyle()
-				|| QSimConfigGroup.SnapshotStyle.withHolesAndShowHoles == scenario.getConfig().qsim().getSnapshotStyle()
-				|| QSimConfigGroup.SnapshotStyle.kinematicWaves==scenario.getConfig().qsim().getSnapshotStyle() ) {
-			if ( !holes.isEmpty() ) {
-				double firstHolePosition = Double.NaN ;
-				double distanceOfHoleFromFromNode = Double.NaN ;
-				double sum = 0 ;
-				for (Hole hole : holes) {
-					sum += hole.getSizeInEquivalents() ;
-					distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance( ttimeOfHoles, hole, now, curvedLength);
-					if ( Double.isNaN( firstHolePosition ) ) {
-						firstHolePosition = distanceOfHoleFromFromNode ;
-						sum = 0 ; // don't include first vehicle
-					}
-					
-					if ( Math.round(distanceOfHoleFromFromNode) == Math.round(curvedLength) ) {
-						// since hole is already created even if vehicle is in buffer, thus excluding such holes in vehicle position updating
-						// probably, don't create hole in visualizer also. amit May 2016						
-					} else {
-						consumableHoles.put( distanceOfHoleFromFromNode, hole ) ;
-					}
 
-					if ( QSimConfigGroup.SnapshotStyle.withHolesAndShowHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
-					addHolePosition( positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
+		switch (scenario.getConfig().qsim().getSnapshotStyle()) {
+			case equiDist:
+			case queue:
+				break;
+			case withHoles:
+			case withHolesAndShowHoles:
+			case kinematicWaves:
+				if ( !holes.isEmpty() ) {
+					double firstHolePosition = Double.NaN ;
+					double distanceOfHoleFromFromNode = Double.NaN ;
+					double sum = 0 ;
+					for (Hole hole : holes) {
+						sum += hole.getSizeInEquivalents() ;
+						distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance( ttimeOfHoles, hole, now, curvedLength);
+						if ( Double.isNaN( firstHolePosition ) ) {
+							firstHolePosition = distanceOfHoleFromFromNode ;
+							sum = 0 ; // don't include first vehicle
+						}
+
+						if ( Math.round(distanceOfHoleFromFromNode) == Math.round(curvedLength) ) {
+							// since hole is already created even if vehicle is in buffer, thus excluding such holes in vehicle position updating
+							// probably, don't create hole in visualizer also. amit May 2016
+						} else {
+							consumableHoles.put( distanceOfHoleFromFromNode, hole ) ;
+						}
+
+						if ( QSimConfigGroup.SnapshotStyle.withHolesAndShowHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
+							addHolePosition( positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
+						}
+					}
+					final double spaceConsumptionOfHoles = sum*spacingOfOnePCE;
+					final double spaceAvailableForHoles = distanceOfHoleFromFromNode - firstHolePosition;
+					if ( spaceConsumptionOfHoles >= spaceAvailableForHoles ) {
+						Logger.getLogger(getClass()).warn("we have a problem: holes consume too much space:" ) ;
+						Logger.getLogger(getClass()).warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
+						Logger.getLogger(getClass()).warn("distance bw first and last hole: " + spaceAvailableForHoles ) ;
+
 					}
 				}
-				final double spaceConsumptionOfHoles = sum*spacingOfOnePCE;
-				final double spaceAvailableForHoles = distanceOfHoleFromFromNode - firstHolePosition;
-				if ( spaceConsumptionOfHoles >= spaceAvailableForHoles ) {
-					Logger.getLogger(getClass()).warn("we have a problem: holes consume too much space:" ) ;
-					Logger.getLogger(getClass()).warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
-					Logger.getLogger(getClass()).warn("distance bw first and last hole: " + spaceAvailableForHoles ) ; 
-
-				}
-			}
+				break;
+			default: throw new RuntimeException("The traffic dynmics "+scenario.getConfig().qsim().getSnapshotStyle()+" is not implemented yet.");
 		}
-		
+
 		// yyyyyy might be faster by sorting holes into a regular array list ...
 
 		double freespeedTraveltime = curvedLength / freeSpeed ;
@@ -238,11 +234,17 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			Gbl.assertNotNull( downstreamCoord ) ;
 			this.positionAgentGivenDistanceFromFNode(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
 
-			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
-				while ( !consumableHoles.isEmpty() && distanceFromFromNode < consumableHoles.lastKey() ) {
-					Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
-					distanceFromFromNode -= spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
-				}
+			switch (this.scenario.getConfig().qsim().getTrafficDynamics()) {
+				case queue:
+					break;
+				case withHoles:
+				case kinematicWaves:
+					while ( !consumableHoles.isEmpty() && distanceFromFromNode < consumableHoles.lastKey() ) {
+						Map.Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
+						distanceFromFromNode -= spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+					}
+					break;
+				default: throw new RuntimeException("The traffic dynmics "+this.scenario.getConfig().qsim().getTrafficDynamics()+" is not implemented yet.");
 			}
 		}
 		
@@ -250,12 +252,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		 * the holes that this generates.  That space is added up until a full vehicle fits into it.  There must be some better way of
 		 * explaining this, but I don't know it right now.  kai, apr'16
 		 */
-		
-		
 		return positions;
-		
 	}
-
 
 
 	 private static double computeHolePositionAndReturnDistance(double freespeedTraveltime, Hole hole, double now, double curvedLength) 

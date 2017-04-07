@@ -67,7 +67,7 @@ public class TSSetupParking {
 			@Override
 			public void install() {
 				addRoutingModuleBinding(TransportMode.car).toInstance(routingModuleCar);
-				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
+				//bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
 				//bind(ParkingSearchManager.class).to(FacilityBasedBenensonParkingManager.class).asEagerSingleton();
 				bind(WalkLegFactory.class).asEagerSingleton();
 				this.install(new TSParkingSearchQSimModule());

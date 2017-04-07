@@ -57,8 +57,9 @@ public class RunTaxiScenario {
 	}
 
 	public static void main(String[] args) {
-		String configFile = "one_taxi/one_taxi_config.xml";
-		// String configFile = "mielec_2014_02/config.xml";
-		RunTaxiScenario.run(configFile, true);
+		if (args.length != 1) {
+			throw new IllegalArgumentException("RunTaxiScenario needs one argument: path to the configuration file");
+		}
+		RunTaxiScenario.run(args[0], false);
 	}
 }

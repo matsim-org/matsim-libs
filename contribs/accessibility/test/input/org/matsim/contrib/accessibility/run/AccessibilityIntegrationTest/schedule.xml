@@ -31,7 +31,7 @@
 				<link refId="16"/>
 			</route>
 			<departures>
-				<departure id="1-1a" departureTime="08:00:00" vehicleRefId="bus_1"/>
+				<departure id="1-1a" departureTime="08:03:00" vehicleRefId="bus_1"/>
 			</departures>
 		</transitRoute>
 		<transitRoute id="1-2">
@@ -56,7 +56,7 @@
 				<link refId="4"/>
 			</route>
 			<departures>
-				<departure id="1-2a" departureTime="08:00:00" vehicleRefId="bus_2"/>
+				<departure id="1-2a" departureTime="08:03:00" vehicleRefId="bus_2"/>
 			</departures>
 		</transitRoute>
 	</transitLine>

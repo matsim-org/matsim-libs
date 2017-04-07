@@ -112,17 +112,17 @@ public class ScheduleImpl implements Schedule {
 			}
 		}
 
-		if (taskIdx < taskCount) {
-			Task nextTask = tasks.get(taskIdx);// currently at taskIdx, but soon at taskIdx+1
-
-			if (nextTask.getBeginTime() != endTime) {
-				throw new IllegalArgumentException();
-			}
-
-			if (Tasks.getBeginLink(nextTask) != endLink) {
-				throw new IllegalArgumentException();
-			}
-		}
+//		if (taskIdx < taskCount) {
+//			Task nextTask = tasks.get(taskIdx);// currently at taskIdx, but soon at taskIdx+1
+//
+//			if (nextTask.getBeginTime() != endTime) {
+//				throw new IllegalArgumentException();
+//			}
+//
+//			if (Tasks.getBeginLink(nextTask) != endLink) {
+//				throw new IllegalArgumentException();
+//			}
+//		}
 	}
 
 	@Override
