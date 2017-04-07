@@ -247,8 +247,6 @@ public class SignalizeScenario {
 
 					// go through all ingoing links
 					for (Id<Link> linkId : node.getInLinks().keySet()) {
-						if (linkId.equals(Id.createLinkId(4909)))
-							LOG.warn("STOP");
 						if (useLanes && scenario.getLanes().getLanesToLinkAssignments().containsKey(linkId)) {
 							// go through all ingoing lanes
 							for (Lane lane : scenario.getLanes().getLanesToLinkAssignments().get(linkId).getLanes().values()) {
