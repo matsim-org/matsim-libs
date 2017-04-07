@@ -21,7 +21,7 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.GraphicsUtil;
 
-public class MatsimJMapViewer extends JMapViewer {
+public class MatsimMapComponent extends JMapViewer {
 
     final MatsimStaticDatabase db;
     private int repaint_count = 0;
@@ -40,7 +40,7 @@ public class MatsimJMapViewer extends JMapViewer {
 
     public JLabel jLabel = new JLabel(" ");
 
-    public MatsimJMapViewer(MatsimStaticDatabase db) {
+    public MatsimMapComponent(MatsimStaticDatabase db) {
         this.db = db;
 
         linkLayer = new LinkLayer(this);

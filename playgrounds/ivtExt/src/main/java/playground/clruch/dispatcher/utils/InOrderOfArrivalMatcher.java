@@ -24,54 +24,54 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
  * no more requests. customers who have waited longer are picked up first.
  */
 public class InOrderOfArrivalMatcher extends AbstractVehicleRequestMatcher {
-	final BiConsumer<AVVehicle, AVRequest> biConsumer;
+    final BiConsumer<AVVehicle, AVRequest> biConsumer;
 
-	public InOrderOfArrivalMatcher(BiConsumer<AVVehicle, AVRequest> biConsumer) {
-		this.biConsumer = biConsumer;
-	}
+    public InOrderOfArrivalMatcher(BiConsumer<AVVehicle, AVRequest> biConsumer) {
+        this.biConsumer = biConsumer;
+    }
 
-	@Override
-	public int match(Map<Link, Queue<AVVehicle>> stayVehicles, Map<Link, List<AVRequest>> requestsAtLinks) {
-		int num_matchedRequests = 0;
-		// match requests with stay vehicles
-		for (Entry<Link, List<AVRequest>> entry : requestsAtLinks.entrySet()) {
-			final Link link = entry.getKey();
-			if (stayVehicles.containsKey(link)) {
-				Iterator<AVRequest> requestIterator = entry.getValue().iterator();
-				Queue<AVVehicle> vehicleQueue = stayVehicles.get(link);
-				while (!vehicleQueue.isEmpty() && requestIterator.hasNext()) {
-					biConsumer.accept(vehicleQueue.poll(), requestIterator.next());
-					++num_matchedRequests;
-				}
-			}
-		}
-		return num_matchedRequests;
-	}
+    @Override
+    public int match(Map<Link, Queue<AVVehicle>> stayVehicles, Map<Link, List<AVRequest>> requestsAtLinks) {
+        int num_matchedRequests = 0;
+        // match requests with stay vehicles
+        for (Entry<Link, List<AVRequest>> entry : requestsAtLinks.entrySet()) {
+            final Link link = entry.getKey();
+            if (stayVehicles.containsKey(link)) {
+                Iterator<AVRequest> requestIterator = entry.getValue().iterator();
+                Queue<AVVehicle> vehicleQueue = stayVehicles.get(link);
+                while (!vehicleQueue.isEmpty() && requestIterator.hasNext()) {
+                    biConsumer.accept(vehicleQueue.poll(), requestIterator.next());
+                    ++num_matchedRequests;
+                }
+            }
+        }
+        return num_matchedRequests;
+    }
 
-	public int matchRecord(Map<Link, Queue<AVVehicle>> stayVehicles, Map<Link, List<AVRequest>> requestsAtLinks,
-			HashMap<AVVehicle, List<AVRequest>> requestsServed, HashSet<AVRequest> openRequests,
-			QuadTree<AVRequest> pendingRequestsTree) {
-		int num_matchedRequests = 0;
-		// match requests with stay vehicles
-		for (Entry<Link, List<AVRequest>> entry : requestsAtLinks.entrySet()) {
-			final Link link = entry.getKey();
-			if (stayVehicles.containsKey(link)) {
-				Iterator<AVRequest> requestIterator = entry.getValue().iterator();
-				Queue<AVVehicle> vehicleQueue = stayVehicles.get(link);
-				while (!vehicleQueue.isEmpty() && requestIterator.hasNext()) {
-					AVVehicle toMatchVehicle = vehicleQueue.poll();
-					AVRequest toMatchRequest = requestIterator.next();
-					Coord toMatchRequestCoord = toMatchRequest.getFromLink().getFromNode().getCoord();
-					biConsumer.accept(toMatchVehicle, toMatchRequest);
-					requestsServed.get(toMatchVehicle).add(toMatchRequest);
-					boolean orSucc = openRequests.remove(toMatchRequest);
-					boolean qtSucc = pendingRequestsTree.remove(toMatchRequestCoord.getX(), toMatchRequestCoord.getY(), toMatchRequest);
-					GlobalAssert.that(orSucc==qtSucc && orSucc==true);
-					++num_matchedRequests;
-				}
-			}
-		}
-		return num_matchedRequests;
-	}
+    public int matchRecord(Map<Link, Queue<AVVehicle>> stayVehicles, Map<Link, List<AVRequest>> requestsAtLinks, //
+            HashMap<AVVehicle, List<AVRequest>> requestsServed, HashSet<AVRequest> openRequests, //
+            QuadTree<AVRequest> pendingRequestsTree) {
+        int num_matchedRequests = 0;
+        // match requests with stay vehicles
+        for (Entry<Link, List<AVRequest>> entry : requestsAtLinks.entrySet()) {
+            final Link link = entry.getKey();
+            if (stayVehicles.containsKey(link)) {
+                Iterator<AVRequest> requestIterator = entry.getValue().iterator();
+                Queue<AVVehicle> vehicleQueue = stayVehicles.get(link);
+                while (!vehicleQueue.isEmpty() && requestIterator.hasNext()) {
+                    AVVehicle toMatchVehicle = vehicleQueue.poll();
+                    AVRequest toMatchRequest = requestIterator.next();
+                    Coord toMatchRequestCoord = toMatchRequest.getFromLink().getFromNode().getCoord();
+                    biConsumer.accept(toMatchVehicle, toMatchRequest);
+                    requestsServed.get(toMatchVehicle).add(toMatchRequest);
+                    boolean orSucc = openRequests.remove(toMatchRequest);
+                    boolean qtSucc = pendingRequestsTree.remove(toMatchRequestCoord.getX(), toMatchRequestCoord.getY(), toMatchRequest);
+                    GlobalAssert.that(orSucc == qtSucc && orSucc == true);
+                    ++num_matchedRequests;
+                }
+            }
+        }
+        return num_matchedRequests;
+    }
 
 }

@@ -2,7 +2,7 @@ package playground.clruch;
 
 import java.io.File;
 
-import playground.clruch.gfx.MatsimJMapViewer;
+import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.gfx.PointCloud;
 import playground.clruch.gfx.ReferenceFrame;
@@ -33,7 +33,7 @@ public class ScenarioViewer {
         // END: CUSTOMIZE -------------------------------------------------
 
         MatsimStaticDatabase.initializeSingletonInstance(NetworkLoader.loadNetwork(args), referenceFrame);
-        MatsimJMapViewer matsimJMapViewer = new MatsimJMapViewer(MatsimStaticDatabase.INSTANCE);
+        MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
 
         // this is optional and should not cause problems if file does not exist.
         // temporary solution

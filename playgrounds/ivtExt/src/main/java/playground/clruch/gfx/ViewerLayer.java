@@ -6,10 +6,10 @@ import playground.clruch.net.SimulationObject;
 
 public abstract class ViewerLayer {
 
-    final MatsimJMapViewer matsimJMapViewer;
+    final MatsimMapComponent matsimMapComponent;
 
-    public ViewerLayer(MatsimJMapViewer matsimJMapViewer) {
-        this.matsimJMapViewer = matsimJMapViewer;
+    public ViewerLayer(MatsimMapComponent matsimMapComponent) {
+        this.matsimMapComponent = matsimMapComponent;
     }
 
     public void prepareHeatmaps(SimulationObject ref) {        

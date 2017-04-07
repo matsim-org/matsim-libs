@@ -234,7 +234,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return Collections.emptyMap();
     }
 
-    private Link getVehicleLocation(AVVehicle avVehicle) {
+    /**
+     * @param avVehicle
+     * @return estimated current location of avVehicle, never null
+     */
+    protected Link getVehicleLocation(AVVehicle avVehicle) {
         Link link = vehicleLocations.get(avVehicle);
         GlobalAssert.that(link != null);
         return link;
@@ -316,7 +320,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             // in that case, the simObj will not be stored or communicated
             if (SimulationObjects.hasVehicles(simulationObject)) {
                 GlobalAssert.that(AVVEHILCECOUNT == simulationObject.vehicles.size());
-                
+
                 SimulationObjects.sortVehiclesAccordingToIndex(simulationObject);
 
                 new StorageSubscriber().handle(simulationObject);
@@ -338,11 +342,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             }
         }
     }
-    
-    public int getTotalMatchedRequests(){
-    	return this.total_matchedRequests;
+
+    /**
+     * @return total matched request until now
+     */
+    public int getTotalMatchedRequests() {
+        return total_matchedRequests;
     }
-    
 
     @Override
     public String getInfoLine() {
