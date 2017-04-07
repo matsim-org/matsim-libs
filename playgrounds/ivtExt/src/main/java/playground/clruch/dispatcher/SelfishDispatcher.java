@@ -39,17 +39,19 @@ import static java.lang.Math.sqrt;
 public class SelfishDispatcher extends UniversalDispatcher {
 
 	private final int dispatchPeriod;
-	private final int updateRefPeriod; 			// implementation may not use this
-	private final int weiszfeldMaxIter; 		// max iterations for the Weiszfeld algorithm
 	private Tensor printVals = Tensors.empty();
 	private final int numberofVehicles;
 
 	// specific to SelfishDispatcher
+	private final int updateRefPeriod; 			// implementation may not use this
+	private final int weiszfeldMaxIter; 		// max iterations for Weiszfeld's algorithm
+	private final double weiszfeldTol; 			// convergence tolerance for Weiszfeld's algorithm
 	private boolean vehiclesInitialized = false;
 	private HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
 	private HashMap<AVVehicle, Link> refPositions = new HashMap<>();
 	private final Network network;
 	private final QuadTree<AVRequest> pendingRequestsTree;
+	private final QuadTree<Link> networkLinksTree;
 	private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used to enable fast "contains" searching
 
 	private SelfishDispatcher( //
@@ -65,13 +67,14 @@ public class SelfishDispatcher extends UniversalDispatcher {
 		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", Integer.MAX_VALUE);
 		numberofVehicles = (int) generatorConfig.getNumberOfVehicles();
 		weiszfeldMaxIter = safeConfig.getInteger("weiszfeldMaxIter", 1000);
+		weiszfeldTol = safeConfig.getDouble("weiszfeldTol", 1.0);
 		network = networkIn;
 		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx,
 																					// miny,
 																					// maxx,
 																					// maxy
 		pendingRequestsTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
-
+		networkLinksTree = buildNetworkQuadTree();
 	}
 
 	@Override
@@ -112,6 +115,18 @@ public class SelfishDispatcher extends UniversalDispatcher {
 		}
 	}
 
+	private QuadTree<Link> buildNetworkQuadTree() {
+		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx, miny, maxx, maxy
+		QuadTree<Link> networkQuadTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
+		Collection<? extends Link> networkLinks = network.getLinks().values();
+		for (Link link : networkLinks) {
+			Coord linkCoord = link.getFromNode().getCoord();
+			boolean putSuccess = networkQuadTree.put(linkCoord.getX(), linkCoord.getY(), link);
+			GlobalAssert.that(putSuccess);
+		}
+		return networkQuadTree;
+	}
+
 	/** 
 	 * @param avRequests ensures that new open requests are added to a list with all open requests
 	 */
@@ -145,54 +160,44 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	 * update the reference positions of all AVs
 	 */
 	private void updateRefPositions() {
-
-		// get list of all links in network
-		Collection<? extends Link> networkLinksC = network.getLinks().values();
-		List<Link> networkLinks = new ArrayList<>();
-		for (Link link : networkLinksC) {
-			networkLinks.add(link);
-		}
-
-		// currently implemented, assign a random link from the network to every
-		// AV
 		for (AVVehicle avVehicle : refPositions.keySet()) {
-			Collections.shuffle(networkLinks);
-			refPositions.put(avVehicle, networkLinks.get(0));
+			// Coord initialGuess = refPositions.get(avVehicle).getFromNode().getCoord(); // initialize with previous Weber link
+			Coord initialGuess = new Coord(0.0,0.0);
+			Coord weberCoord = weberWeiszfeld(requestsServed.get(avVehicle), initialGuess);
+			Link weberLink = networkLinksTree.getClosest(weberCoord.getX(), weberCoord.getY());
+			refPositions.put(avVehicle, weberLink);
 		}
 	}
 
     /**
      *
-     * @param dataPoints
-     *          list of 2D points to compute the geometric median of
+     * @param avRequests
+     *          list of requests served so far
      * @param initialGuess
      *          2D-point initial guess for the iterative algorithm
-     * @param tolerance
-     *          defines when convergence occurs
-     * @param maxIter
-     *          maximum number of iterations to compute before terminating
-     * @return 2D Weber point approximated by Weiszfeld's algorithm
+     * @return 2D Weber point of past requests approximated by Weiszfeld's algorithm
      */
-	private Coord weberWeiszfeld(List<Coord> dataPoints, Coord initialGuess, double tolerance, int maxIter) {
+	private Coord weberWeiszfeld(List<AVRequest> avRequests, Coord initialGuess) {
         double weberX = initialGuess.getX();
 		double weberY = initialGuess.getY();
         int count = 0;
-        while (count <= maxIter) {
+        while (count <= weiszfeldMaxIter) {
         	double X = 0.0;
         	double Y = 0.0;
         	double normalizer = 0.0;
-            for (Coord point : dataPoints) {
-				double distance = Math.sqrt( Math.pow(point.getX()-weberX, 2.0) + Math.pow(point.getY()-weberY, 2.0) );
+            for (AVRequest avRequest : avRequests) {
+            	Coord point = avRequest.getFromLink().getCoord();
+				double distance = Math.sqrt( Math.pow(point.getX() - weberX, 2.0) + Math.pow(point.getY() - weberY, 2.0) );
 				X += point.getX()/distance;
 				Y += point.getY()/distance;
 				normalizer += 1.0/distance;
 			}
 			X /= normalizer;
             Y /= normalizer;
-            double change = Math.sqrt( Math.pow(X-weberX, 2.0) + Math.pow(Y-weberY, 2.0) );
+            double change = Math.sqrt( Math.pow(X - weberX, 2.0) + Math.pow(Y - weberY, 2.0) );
             weberX = X;
             weberY = Y;
-			if (change < tolerance) {
+			if (change < weiszfeldTol) {
 				break;
 			}
             count++;
