@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-import org.geotools.resources.UnmodifiableArrayList;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -81,9 +80,19 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return !private_vehicleDirectives.containsKey(avVehicle);
     }
 
-    protected /* package */ final Collection<AVVehicle> getFunctioningVehicles() { // <- function will be private in the future
+    /**
+     * @return collection of AVVehicles that have started their schedule
+     */
+    /* package */ final Collection<AVVehicle> getFunctioningVehicles() {
         if (vehicles.isEmpty() || !vehicles.get(0).getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
+        return Collections.unmodifiableList(vehicles);
+    }
+
+    /**
+     * @return collection of all vehicles available to {@link VehicleMaintainer} 
+     */
+    protected Collection<AVVehicle> getMaintainedVehicles() {
         return Collections.unmodifiableList(vehicles);
     }
 
@@ -239,12 +248,4 @@ abstract class VehicleMaintainer implements AVDispatcher {
     public final void onNextTaskStarted(AVTask task) {
         // intentionally empty
     }
-    
-    
-    public List<AVVehicle> getAVList(){
-    	return Collections.unmodifiableList(vehicles);
-    }
-
-    
-    
 }
