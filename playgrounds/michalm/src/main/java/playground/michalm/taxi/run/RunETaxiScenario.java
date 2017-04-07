@@ -49,6 +49,8 @@ public class RunETaxiScenario {
 		config.checkConsistency();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// TODO bind Fleet and EvData
 		FleetImpl fleet = new FleetImpl();
 		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 		EvData evData = new EvDataImpl();

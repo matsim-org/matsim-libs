@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -33,6 +34,7 @@ import org.matsim.core.events.*;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class ScheduleReconstructor {
 	final FleetImpl fleet = new FleetImpl();
@@ -47,7 +49,7 @@ public class ScheduleReconstructor {
 	private final RequestRecorder requestRecorder;
 
 	@Inject
-	public ScheduleReconstructor(Network network, EventsManager eventsManager) {
+	public ScheduleReconstructor(@Named(DvrpModule.DVRP_ROUTING) Network network, EventsManager eventsManager) {
 		links = network.getLinks();
 
 		driveRecorder = new DriveRecorder(this);

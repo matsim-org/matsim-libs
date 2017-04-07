@@ -22,9 +22,10 @@ package playground.jbischoff.taxi.setup;
 import javax.inject.Inject;
 
 import org.apache.commons.configuration.*;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -41,16 +42,16 @@ public class JbTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	public static final String TYPE = "type";
 
 	private final TaxiConfigGroup taxiCfg;
-	private final Scenario scenario;
+	private final Network network;
 	private final Fleet fleet;
 	private final TravelTime travelTime;
 	private final QSim qSim;
 
 	@Inject
-	public JbTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, Scenario scenario, Fleet fleet,
-			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
+	public JbTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
+			Fleet fleet, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
 		this.taxiCfg = taxiCfg;
-		this.scenario = scenario;
+		this.network = network;
 		this.fleet = fleet;
 		this.travelTime = travelTime;
 		this.qSim = qSim;
@@ -60,11 +61,11 @@ public class JbTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	public TaxiOptimizer get() {
 		TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(taxiCfg);
 		TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-		TaxiScheduler scheduler = new TaxiScheduler(scenario, fleet, qSim.getSimTimer(), schedulerParams, travelTime,
-				travelDisutility);
+		TaxiScheduler scheduler = new TaxiScheduler(taxiCfg, network, fleet, qSim.getSimTimer(), schedulerParams,
+				travelTime, travelDisutility);
 
-		TaxiOptimizerContext optimContext = new TaxiOptimizerContext(fleet, scenario.getNetwork(), qSim.getSimTimer(),
-				travelTime, travelDisutility, scheduler);
+		TaxiOptimizerContext optimContext = new TaxiOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
+				travelDisutility, scheduler);
 
 		Configuration optimizerConfig = new MapConfiguration(taxiCfg.getOptimizerConfigGroup().getParams());
 		return new InclusionRuleBasedTaxiOptimizer(optimContext,

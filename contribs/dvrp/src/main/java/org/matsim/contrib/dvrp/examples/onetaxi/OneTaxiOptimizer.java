@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -35,6 +36,7 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author michalm
@@ -51,7 +53,7 @@ public class OneTaxiOptimizer implements VrpOptimizer {
 	public static final double DROPOFF_DURATION = 60;
 
 	@Inject
-	public OneTaxiOptimizer(Network network, Fleet fleet, QSim qSim) {
+	public OneTaxiOptimizer(@Named(DvrpModule.DVRP_ROUTING) Network network, Fleet fleet, QSim qSim) {
 		timer = qSim.getSimTimer();
 		travelTime = new FreeSpeedTravelTime();
 		router = new Dijkstra(network, new TimeAsTravelDisutility(travelTime), travelTime);

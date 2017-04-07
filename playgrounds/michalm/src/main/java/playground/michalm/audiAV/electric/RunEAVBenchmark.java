@@ -64,6 +64,7 @@ public class RunEAVBenchmark {
 
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
+		// TODO bind Fleet and EvData
 		final FleetImpl fleet = new FleetImpl();
 		new EvrpVehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 		EvData evData = new EvDataImpl();
@@ -83,7 +84,7 @@ public class RunEAVBenchmark {
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyTimeProfileCollectorProvider.class);
 				addMobsimListenerBinding().toProvider(ETaxiChargerOccupancyXYDataProvider.class);
 				addControlerListenerBinding().to(ETaxiBenchmarkStats.class).asEagerSingleton();
-				bind(Fleet.class).toInstance(fleet);//overrride the binding specified in TaxiModule
+				bind(Fleet.class).toInstance(fleet);// overrride the binding specified in TaxiModule
 			}
 		});
 

@@ -40,7 +40,7 @@ import com.google.inject.*;
 import com.google.inject.name.Named;
 
 public class DvrpModule extends AbstractModule {
-	public static final String DVRP_ROUTING = "dvrp_routing";
+	public static final String DVRP_ROUTING = "dvrp_routing";// TODO ==> dvrp_optimizer???
 
 	@Inject
 	private DvrpConfigGroup dvrpCfg;
@@ -94,9 +94,9 @@ public class DvrpModule extends AbstractModule {
 			return network;
 		}
 
-		Network drtNetwork = NetworkUtils.createNetwork();
-		new TransportModeNetworkFilter(network).filter(drtNetwork, Collections.singleton(dvrpCfg.getNetworkMode()));
-		return drtNetwork;
+		Network dvrpNetwork = NetworkUtils.createNetwork();
+		new TransportModeNetworkFilter(network).filter(dvrpNetwork, Collections.singleton(dvrpCfg.getNetworkMode()));
+		return dvrpNetwork;
 	}
 
 	@Provides
