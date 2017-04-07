@@ -57,7 +57,6 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     public final int rebalancingPeriod;
     public final int redispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
-    final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
     final int numberOfAVs;
@@ -73,12 +72,11 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             EventsManager eventsManager, //
             VirtualNetwork virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractRequestSelector abstractRequestSelector, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
             Map<VirtualLink, Double> travelTimesIn) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         this.virtualNodeDest = abstractVirtualNodeDest;
-        this.requestSelector = abstractRequestSelector;
+
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
@@ -209,7 +207,6 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-            AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
             final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
@@ -222,7 +219,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             }
 
             return new LPFeedbackLIPDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork,
-                    abstractVirtualNodeDest, abstractRequestSelector, abstractVehicleDestMatcher, travelTimes);
+                    abstractVirtualNodeDest, abstractVehicleDestMatcher, travelTimes);
         }
     }
 }
