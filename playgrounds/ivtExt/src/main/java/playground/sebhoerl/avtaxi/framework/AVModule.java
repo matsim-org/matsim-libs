@@ -128,6 +128,11 @@ public class AVModule extends AbstractModule {
         //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
+        
+        // MPC dispatcher
+        bind(MPCDispatcher_1.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher_1.class.getSimpleName()).to(MPCDispatcher_1.Factory.class);
+        
     }
 
     private void configureGeneratorStrategies() {
