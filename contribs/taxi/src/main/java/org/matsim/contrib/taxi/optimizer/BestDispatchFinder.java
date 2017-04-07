@@ -102,7 +102,7 @@ public class BestDispatchFinder {
 			return null;
 		}
 
-		ImaginaryNode fromNodes = router.createImaginaryNode(initialNodes.values());
+		ImaginaryNode fromNodes = MultiNodeDijkstra.createImaginaryNode(initialNodes.values());
 
 		Path path = router.calcLeastCostPath(fromNodes, toNode, currTime, null, null);
 		// the calculated path contains real nodes (no imaginary/initial nodes),
@@ -150,7 +150,7 @@ public class BestDispatchFinder {
 			}
 		}
 
-		ImaginaryNode toNodes = router.createImaginaryNode(initialNodes.values());
+		ImaginaryNode toNodes = MultiNodeDijkstra.createImaginaryNode(initialNodes.values());
 
 		// calc path for departure.time+1 (we need 1 second to move over the node)
 		Path path = router.calcLeastCostPath(fromNode, toNodes, departure.time + 1, null, null);

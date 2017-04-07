@@ -25,7 +25,6 @@ import java.util.*;
 
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 
 public class FifoTaxiOptimizerTest {
 	@Test

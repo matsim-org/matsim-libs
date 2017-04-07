@@ -52,10 +52,12 @@ public class RunDrtWithStops {
 		drt.setMaximumWalkDistance(500);
 		drt.setTransitStopFile("stopsWRS_300m.xml");
 		drt.setOperationalScheme(DrtOperationalScheme.stationbased.toString());
-		drt.setDrtNetworkMode("av");
-		int threads = Runtime.getRuntime().availableProcessors() -2;
+		int threads = Runtime.getRuntime().availableProcessors() - 2;
 		System.out.println(threads + " threads used for drt.");
 		drt.setNumberOfThreads(threads);
+		
+		DvrpConfigGroup.get(config).setNetworkMode("av");
+		
 		
 		config.qsim().setStartTime(0);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);

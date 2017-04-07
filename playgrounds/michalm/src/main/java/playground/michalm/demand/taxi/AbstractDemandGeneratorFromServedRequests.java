@@ -22,7 +22,7 @@ package playground.michalm.demand.taxi;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
@@ -48,7 +48,7 @@ public abstract class AbstractDemandGeneratorFromServedRequests {
 		Activity endAct = createActivityFromCoord("end", request.getTo());
 
 		// trip
-		Leg leg = pf.createLeg(TaxiOptimizerModules.TAXI_MODE);
+		Leg leg = pf.createLeg(TaxiModule.TAXI_MODE);
 		leg.setRoute(new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId()));
 
 		plan.addActivity(startAct);

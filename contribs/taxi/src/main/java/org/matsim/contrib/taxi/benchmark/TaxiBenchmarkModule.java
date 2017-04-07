@@ -19,15 +19,14 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
-import com.google.inject.*;
+import com.google.inject.Inject;
 
 /**
  * Behaves like DvrpModule except that VrpTravelTimeEstimator is not bound (install() is overridden)
@@ -35,23 +34,18 @@ import com.google.inject.*;
  * @author michalm
  *
  */
-public class DvrpBenchmarkModule extends DvrpModule {
+public class TaxiBenchmarkModule extends TaxiModule {
 	@Inject
 	private DvrpConfigGroup dvrpCfg;
 
-	private final Fleet fleet;
-
-	@SafeVarargs
-	public DvrpBenchmarkModule(Fleet fleet, Module module, Class<? extends MobsimListener>... listeners) {
-		super(fleet, module, listeners);
-		this.fleet = fleet;
-	}
-
+	/**
+	 * Overrides the {@link org.matsim.contrib.dvrp.run.DvrpModule#install() in order to install
+	 * freeSpeedTravelTimeForBenchmarkingModule instead of travelTimeEstimatorModule}
+	 */
 	@Override
 	public void install() {
 		String mode = dvrpCfg.getMode();
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-		bind(Fleet.class).toInstance(fleet);
 
 		// Visualisation of schedules for DVRP DynAgents
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);

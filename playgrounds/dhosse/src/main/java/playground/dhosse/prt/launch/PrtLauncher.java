@@ -2,8 +2,6 @@ package playground.dhosse.prt.launch;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
@@ -33,9 +31,6 @@ public class PrtLauncher {
 		
         Scenario scenario = ScenarioUtils.loadScenario(config);
         
-        FleetImpl taxiData = new FleetImpl();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFile());
-		
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
@@ -43,7 +38,7 @@ public class PrtLauncher {
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		PrtModule module = new PrtModule();
-		module.configureControler(controler, taxiData);
+		module.configureControler(controler, null);
 		controler.run();
 
 	}

@@ -23,42 +23,31 @@
 package playground.michalm.drt.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.*;
 
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
+import com.google.inject.*;
+import com.google.inject.name.*;
 
 import playground.michalm.drt.analysis.DRTAnalysisModule;
-import playground.michalm.drt.optimizer.DefaultDrtOptimizerProvider;
-import playground.michalm.drt.optimizer.DrtOptimizer;
+import playground.michalm.drt.optimizer.*;
 import playground.michalm.drt.passenger.NDrtRequestCreator;
-import playground.michalm.drt.routing.DrtRoutingModule;
-import playground.michalm.drt.routing.StopBasedDrtRoutingModule;
+import playground.michalm.drt.routing.*;
 import playground.michalm.drt.vrpagent.NDrtActionCreator;
 
 /**
- * @author  jbischoff
- *
- */
-/**
+ * @author jbischoff
  *
  */
 public class DrtControlerCreator {
@@ -68,26 +57,24 @@ public class DrtControlerCreator {
 		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
 		config.checkConsistency();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Network drtNet = prepareDRTNetwork(scenario.getNetwork(), drtCfg.getDrtNetworkMode());
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(drtNet, fleet).parse(drtCfg.getVehiclesFileUrl(config.getContext()));
-	
+
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(fleet,
-				createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class));
+		controler.addOverridingModule(
+				new DvrpModule(createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class) {
+						@Provides
+						@Singleton
+						private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
+								DrtConfigGroup drtCfg) {
+							FleetImpl fleet = new FleetImpl();
+							new VehicleReader(network, fleet).parse(drtCfg.getVehiclesFileUrl(config.getContext()));
+							return fleet;
+						}
+
+				});
 		controler.addOverridingModule(new DRTAnalysisModule());
-		controler.addOverridingModule(new AbstractModule() {
-			
-			@Override
-			public void install() {
-				bind(Network.class).annotatedWith(Names.named(DrtConfigGroup.GROUP_NAME)).toInstance(drtNet);
-			}
-		});
-		
-		
-		switch (drtCfg.getOperationalScheme()){
-			case door2door:
-			{
+
+		switch (drtCfg.getOperationalScheme()) {
+			case door2door: {
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
@@ -96,28 +83,30 @@ public class DrtControlerCreator {
 				});
 				break;
 			}
-			case stationbased:
-			{
+			case stationbased: {
 				final Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new TransitScheduleReader(scenario2).readFile(drtCfg.getTransitStopsFileUrl(config.getContext()).getFile());
+				new TransitScheduleReader(scenario2)
+						.readFile(drtCfg.getTransitStopsFileUrl(config.getContext()).getFile());
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
-					bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRT_MODE)).toInstance(scenario2.getTransitSchedule());;
-					addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(StopBasedDrtRoutingModule.class).asEagerSingleton();
-						
+						bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRT_MODE))
+								.toInstance(scenario2.getTransitSchedule());;
+						addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(StopBasedDrtRoutingModule.class)
+								.asEagerSingleton();
+
 					}
 				});
 				break;
-				
+
 			}
 			default:
 				throw new IllegalStateException();
 		}
-			if (otfvis) {
+		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
-		
+
 		return controler;
 	}
 
@@ -133,19 +122,4 @@ public class DrtControlerCreator {
 			}
 		};
 	}
-	
-	private static Network prepareDRTNetwork(Network network, String drtNetworkMode) {
-		NetworkFilterManager nfm = new NetworkFilterManager(network);
-		nfm.addLinkFilter(new NetworkLinkFilter() {
-			
-			@Override
-			public boolean judgeLink(Link l) {
-				if (l.getAllowedModes().contains(drtNetworkMode))	return true;
-				else return false;
-			}
-		});
-		Network filteredNet = nfm.applyFilters();
-		return filteredNet;
-	}
-
 }

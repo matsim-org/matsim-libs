@@ -27,7 +27,7 @@ public class AutonomousTaxiLowMaxVelocityExample {
             @Override
             public void install()
             {
-                bind(VehicleType.class).annotatedWith(Names.named(TaxiOptimizerModules.TAXI_MODE))
+                bind(VehicleType.class).annotatedWith(Names.named(TaxiModule.TAXI_MODE))
                 .toInstance(avTaxiType);
             }
         });

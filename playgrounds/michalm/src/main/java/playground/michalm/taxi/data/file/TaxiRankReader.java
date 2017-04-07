@@ -22,7 +22,7 @@ package playground.michalm.taxi.data.file;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -37,9 +37,9 @@ public class TaxiRankReader extends MatsimXmlParser {
 	private final TaxiRankDataImpl data;
 	private Map<Id<Link>, ? extends Link> links;
 
-	public TaxiRankReader(Scenario scenario, TaxiRankDataImpl data) {
+	public TaxiRankReader(Network network, TaxiRankDataImpl data) {
 		this.data = data;
-		links = scenario.getNetwork().getLinks();
+		links = network.getLinks();
 	}
 
 	@Override

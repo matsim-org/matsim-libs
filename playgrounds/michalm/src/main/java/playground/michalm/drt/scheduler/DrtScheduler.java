@@ -21,7 +21,6 @@ package playground.michalm.drt.scheduler;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.*;
@@ -49,18 +48,18 @@ public class DrtScheduler implements ScheduleInquiry {
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
 
-	public DrtScheduler(Scenario scenario, Fleet fleet, MobsimTimer timer, DrtSchedulerParams params,
+	public DrtScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer, DrtSchedulerParams params,
 			TravelTime travelTime) {
 		this.fleet = fleet;
 		this.params = params;
 		this.timer = timer;
 		this.travelTime = travelTime;
 
-		initFleet(scenario);
+		initFleet(drtCfg);
 	}
 
-	private void initFleet(Scenario scenario) {
-		if (DrtConfigGroup.get(scenario.getConfig()).isChangeStartLinkToLastLinkInSchedule()) {
+	private void initFleet(DrtConfigGroup drtCfg) {
+		if (drtCfg.isChangeStartLinkToLastLinkInSchedule()) {
 			for (Vehicle veh : fleet.getVehicles().values()) {
 				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
 			}

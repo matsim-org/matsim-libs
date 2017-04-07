@@ -95,7 +95,7 @@ public class SharedTaxiDispatchFinder {
 			return null;
 		}
 
-		ImaginaryNode fromNodes = router.createImaginaryNode(initialNodes.values());
+		ImaginaryNode fromNodes = MultiNodeDijkstra.createImaginaryNode(initialNodes.values());
 
 		Path path = router.calcLeastCostPath(fromNodes, toNode, currTime, null, null);
 		// the calculated path contains real nodes (no imaginary/initial nodes),

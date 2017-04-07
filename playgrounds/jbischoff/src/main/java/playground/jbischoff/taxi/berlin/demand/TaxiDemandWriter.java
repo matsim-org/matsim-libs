@@ -348,7 +348,7 @@ public class TaxiDemandWriter
         double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
         //		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1200.);
         plan.addActivity(this.addActivity("home", 0.0, activityStart, fromLink));
-        plan.addLeg(this.addLeg(activityStart, TaxiOptimizerModules.TAXI_MODE, fromLink, toLink));
+        plan.addLeg(this.addLeg(activityStart, TaxiModule.TAXI_MODE, fromLink, toLink));
         plan.addActivity(this.addActivity("work", toLink));
 
         return plan;

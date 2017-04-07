@@ -20,12 +20,12 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -53,10 +53,16 @@ public class RunOneTaxiExample {
 		// setup controler
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule( //
-				fleet, // taxi fleet that will serve requests
 				OneTaxiOptimizer.class, // optimizer that dispatches taxis
 				OneTaxiRequestCreator.class, // converts departures of the "taxi" mode into taxi requests
 				OneTaxiActionCreator.class)); // converts scheduled tasks into simulated actions (legs and activities)
+		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Fleet.class).toInstance(fleet);
+			}
+		});
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation

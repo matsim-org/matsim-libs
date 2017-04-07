@@ -21,12 +21,12 @@ package playground.michalm.taxi.scheduler;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -39,9 +39,9 @@ import playground.michalm.taxi.ev.ETaxiChargingLogic;
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
 public class ETaxiScheduler extends TaxiScheduler {
-	public ETaxiScheduler(Scenario scenario, Fleet fleet, MobsimTimer timer, TaxiSchedulerParams params,
+	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Network network, Fleet fleet, MobsimTimer timer, TaxiSchedulerParams params,
 			TravelTime travelTime, TravelDisutility travelDisutility) {
-		super(scenario, fleet, timer, params, travelTime, travelDisutility);
+		super(taxiCfg, network, fleet, timer, params, travelTime, travelDisutility);
 	}
 
 	@Override

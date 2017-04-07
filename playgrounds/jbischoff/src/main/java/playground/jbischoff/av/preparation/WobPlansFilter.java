@@ -51,7 +51,7 @@ public class WobPlansFilter {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()){
 				if (pe instanceof Leg){
-					if (((Leg) pe).getMode().equals(TaxiOptimizerModules.TAXI_MODE)){
+					if (((Leg) pe).getMode().equals(TaxiModule.TAXI_MODE)){
 						copyPerson = true;
 					}
 				}
