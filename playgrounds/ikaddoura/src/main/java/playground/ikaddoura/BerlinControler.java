@@ -66,7 +66,7 @@ public class BerlinControler {
 	
 	private static double blendFactorQCP;
 	
-	private final double sigma = 0.;
+	private static double sigma;
 		
 	public static void main(String[] args) throws IOException {
 
@@ -96,6 +96,9 @@ public class BerlinControler {
 			
 			blendFactorQCP = Double.valueOf(args[3]);
 			log.info("blendFactorQCP: "+ blendFactorQCP);
+			
+			sigma = Double.valueOf(args[4]);
+			log.info("sigma: "+ sigma);
 			 
 		} else {
 			
@@ -103,6 +106,7 @@ public class BerlinControler {
 			outputDirectory = "../../../runs-svn/berlin-dz-time/output/";
 			pricingApproach = PricingApproach.NoPricing;
 			blendFactorQCP = 0.1;
+			sigma = 0.;
 		}
 		
 		BerlinControler berlin = new BerlinControler();
