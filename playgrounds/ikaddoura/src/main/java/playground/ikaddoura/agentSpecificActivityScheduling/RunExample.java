@@ -47,7 +47,7 @@ public class RunExample {
 		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
 		asasConfigGroup.setTolerance(0.);
 		
-		controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig(), scenario.getPopulation()));
+		controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario));
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();

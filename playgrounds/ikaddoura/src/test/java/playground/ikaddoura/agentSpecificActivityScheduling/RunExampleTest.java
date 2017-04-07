@@ -53,7 +53,7 @@ public class RunExampleTest {
 		
 		Controler controler = new Controler(scenario);
 		
-		controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig(), scenario.getPopulation()));
+		controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario));
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();

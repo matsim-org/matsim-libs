@@ -36,6 +36,7 @@ public class AgentSpecificActivitySchedulingConfigGroup extends ReflectiveConfig
 	private double activityDurationBin = 3600.;
 	private double tolerance = 900.;
 	private boolean removeNetworkSpecificInformation = false;
+	private boolean adjustPopulation = true;
 
 	@StringGetter( "activityDurationBin" )
 	public double getActivityDurationBin() {
@@ -65,6 +66,16 @@ public class AgentSpecificActivitySchedulingConfigGroup extends ReflectiveConfig
 	@StringSetter( "removeNetworkSpecificInformation" )
 	public void setRemoveNetworkSpecificInformation(boolean removeNetworkSpecificInformation) {
 		this.removeNetworkSpecificInformation = removeNetworkSpecificInformation;
+	}
+
+	@StringGetter( "adjustPopulation" )
+	public boolean isAdjustPopulation() {
+		return adjustPopulation;
+	}
+
+	@StringSetter( "adjustPopulation" )
+	public void setAdjustPopulation(boolean adjustPopulation) {
+		this.adjustPopulation = adjustPopulation;
 	}
 	
 }

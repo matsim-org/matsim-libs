@@ -21,8 +21,6 @@ package playground.ikaddoura;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -37,19 +35,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingConfigGroup;
-import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
-import playground.ikaddoura.decongestion.DecongestionControlerListener;
-import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.DelayAnalysis;
-import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
-import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
-import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
+import playground.ikaddoura.decongestion.DecongestionModule;
 import playground.ikaddoura.decongestion.routing.TollTimeDistanceTravelDisutilityFactory;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -66,20 +56,15 @@ public class BerlinControler {
 	private static final Logger log = Logger.getLogger(BerlinControler.class);
 	
 	private static String configFile;
-	private static String outputBaseDirectory;
-
-	// departure time choice settings
-	private static boolean agentSpecificActivityScheduling;
-	private static boolean adjustPopulation;
-	private static double activityDurationBin;
-	private static double tolerance;
+	private static String outputDirectory;
 	
 	private static PricingApproach pricingApproach;
-	private static double blendFactor;
 		
 	private enum PricingApproach {
-		NoPricing, PID, QBPV3, QBPV9, QBPV10
+		NoPricing, DecongestionPricing, QBPV3, QBPV9, QBPV10
 	}
+	
+	private static double blendFactorQCP;
 	
 	private final double sigma = 0.;
 		
@@ -90,22 +75,10 @@ public class BerlinControler {
 			configFile = args[0];		
 			log.info("configFile: "+ configFile);
 			
-			outputBaseDirectory = args[1];
-			log.info("outputBaseDirectory: "+ outputBaseDirectory);
-			
-			agentSpecificActivityScheduling = Boolean.parseBoolean(args[2]);
-			log.info("agentSpecificActivityScheduling: "+ agentSpecificActivityScheduling);
-			
-			adjustPopulation = Boolean.parseBoolean(args[3]);
-			log.info("adjustPopulation: "+ adjustPopulation);
+			outputDirectory = args[1];
+			log.info("outputDirectory: "+ outputDirectory);
 
-			activityDurationBin = Double.parseDouble(args[4]);
-			log.info("activityDurationBin: "+ activityDurationBin);
-			
-			tolerance = Double.parseDouble(args[5]);
-			log.info("tolerance: "+ tolerance);
-
-			String congestionTollingApproachString = args[6];
+			String congestionTollingApproachString = args[2];
 			if (congestionTollingApproachString.equals(PricingApproach.NoPricing.toString())) {
 				pricingApproach = PricingApproach.NoPricing;
 			} else if (congestionTollingApproachString.equals(PricingApproach.QBPV3.toString())) {
@@ -114,28 +87,22 @@ public class BerlinControler {
 				pricingApproach = PricingApproach.QBPV9;
 			} else if (congestionTollingApproachString.equals(PricingApproach.QBPV10.toString())) {
 				pricingApproach = PricingApproach.QBPV10;
-			} else if (congestionTollingApproachString.equals(PricingApproach.PID.toString())) {
-				pricingApproach = PricingApproach.PID;
+			} else if (congestionTollingApproachString.equals(PricingApproach.DecongestionPricing.toString())) {
+				pricingApproach = PricingApproach.DecongestionPricing;
 			} else {
 				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
 			}
 			log.info("pricingApproach: " + pricingApproach);
 			
-			blendFactor = Double.parseDouble(args[7]);
-			log.info("blendFactor: "+ blendFactor);
+			blendFactorQCP = Double.valueOf(args[3]);
+			log.info("blendFactorQCP: "+ blendFactorQCP);
 			 
 		} else {
 			
 			configFile = "../../../runs-svn/berlin-dz-time/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/berlin-dz-time/output/";
-			
-			agentSpecificActivityScheduling = true;
-			adjustPopulation = true;
-			activityDurationBin = 3600.;
-			tolerance = 3600.;
-			
+			outputDirectory = "../../../runs-svn/berlin-dz-time/output/";
 			pricingApproach = PricingApproach.NoPricing;
-			blendFactor = 0.1;
+			blendFactorQCP = 0.1;
 		}
 		
 		BerlinControler berlin = new BerlinControler();
@@ -144,88 +111,21 @@ public class BerlinControler {
 
 	private void run() throws IOException {
 		
-		Config config = ConfigUtils.loadConfig(configFile);
-		
-		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd_HH-mm-ss");
-		Date currentTime = new Date();
-		String dateTime = formatter.format(currentTime);
-		
-		String outputDirectory = outputBaseDirectory + "perf" + config.planCalcScore().getPerforming_utils_hr()
-					+ "_lateArrival" + config.planCalcScore().getLateArrival_utils_hr() + "_asas-" + String.valueOf(agentSpecificActivityScheduling) 
-					+ "_actDurBin" +  activityDurationBin + "_tolerance" + tolerance + "_pricing-" + pricingApproach.toString() + "_tollBlendFactor" + blendFactor + "_" + dateTime + "/";
-		
+		Config config = ConfigUtils.loadConfig(configFile, new AgentSpecificActivitySchedulingConfigGroup(), new DecongestionConfigGroup());
 		config.controler().setOutputDirectory(outputDirectory);
-		
-		// decongestion parameters
-		
-		double kp = 2 *
-				((config.planCalcScore().getPerforming_utils_hr() - config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling())
-						/ config.planCalcScore().getMarginalUtilityOfMoney()) / 3600.;
-		log.info("Kp: " + kp);
-		
-		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setKp(kp);
-		decongestionSettings.setKi(0.);
-		decongestionSettings.setKd(0.);
-		
-		if (blendFactor == 0.) {
-			log.info("blend factor is ignored. Using MSA instead.");
-			decongestionSettings.setMsa(true);
-		} else {
-			log.info("Using blend factor " + blendFactor);
-			decongestionSettings.setTOLL_BLEND_FACTOR(blendFactor);
-		}
-		decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-		decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-		config.addModule(decongestionSettings);
-		
-		// scenario + controler
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-				
-		if (agentSpecificActivityScheduling) {	
-			
-			AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
-			asasConfigGroup.setActivityDurationBin(activityDurationBin);
-			asasConfigGroup.setTolerance(tolerance);
-			
-			if (adjustPopulation) {
-				controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig(), scenario.getPopulation()));
-			} else {
-				controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig()));
-			}	
-		}
 				
 		if (pricingApproach.toString().equals(PricingApproach.NoPricing.toString())) {
 			
 			// no pricing
 			
-		} else if (pricingApproach.toString().equals(PricingApproach.PID.toString())) {
+		} else if (pricingApproach.toString().equals(PricingApproach.DecongestionPricing.toString())) {
 						
 			// congestion toll computation
 			
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					
-					this.bind(DecongestionInfo.class).asEagerSingleton();
-					
-					this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-					this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
-					
-					this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
-					this.bind(DelayAnalysis.class).asEagerSingleton();
-					this.bind(PersonVehicleTracker.class).asEagerSingleton();
-									
-					this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
-					this.addEventHandlerBinding().to(DelayAnalysis.class);
-					this.addEventHandlerBinding().to(PersonVehicleTracker.class);
-					
-					this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
-				}
-			});
+			controler.addOverridingModule(new DecongestionModule(scenario));
 			
 			// toll-adjusted routing
 			
@@ -247,7 +147,7 @@ public class BerlinControler {
 					congestionTollHandlerQBP, controler.getConfig().planCalcScore()
 				);
 			factory.setSigma(sigma);
-			factory.setBlendFactor(blendFactor);
+			factory.setBlendFactor(blendFactorQCP );
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -265,7 +165,7 @@ public class BerlinControler {
 					congestionTollHandlerQBP, controler.getConfig().planCalcScore()
 				);
 			factory.setSigma(sigma);
-			factory.setBlendFactor(blendFactor);
+			factory.setBlendFactor(blendFactorQCP);
 
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
@@ -283,7 +183,7 @@ public class BerlinControler {
 					congestionTollHandlerQBP, controler.getConfig().planCalcScore()
 				);
 			factory.setSigma(sigma);
-			factory.setBlendFactor(blendFactor);
+			factory.setBlendFactor(blendFactorQCP);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override

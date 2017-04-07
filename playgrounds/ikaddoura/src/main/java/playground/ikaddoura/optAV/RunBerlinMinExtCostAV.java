@@ -48,6 +48,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingConfigGroup;
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
@@ -117,7 +118,8 @@ public class RunBerlinMinExtCostAV {
 				new DvrpConfigGroup(),
 				new TaxiFareConfigGroup(),
 				new OTFVisConfigGroup(),
-				new NoiseConfigGroup());
+				new NoiseConfigGroup(),
+				new AgentSpecificActivitySchedulingConfigGroup());
 		
 		config.controler().setOutputDirectory(outputDirectory);
 		
@@ -140,7 +142,9 @@ public class RunBerlinMinExtCostAV {
 		Controler controler = new Controler(scenario);
 		
 		if (agentBasedActivityScheduling) {
-			controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario.getConfig()));
+			AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+			asasConfigGroup.setAdjustPopulation(false);
+			controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario));
 		}
 				
 		// #############################

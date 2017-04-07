@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -52,30 +53,37 @@ import playground.ikaddoura.utils.prepare.PopulationTools;
 public class AgentSpecificActivitySchedulingModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(AgentSpecificActivitySchedulingModule.class);	
 	private final List<ActivityParams> initialActivityParams = new ArrayList<>();
-		
-	public AgentSpecificActivitySchedulingModule(Config config) {
-		log.info("Not adjusting the population."
-				+ " Opening and closing times are expected to be provided as person attributes in the plans file.");
 	
-		adjustConfig(config);
-	}
-	
-	public AgentSpecificActivitySchedulingModule(Config config, Population population) {
+	public AgentSpecificActivitySchedulingModule(Scenario scenario) {
 		
-		adjustConfig(config);
-				
-		log.info("Adjusting the population...");
-
-		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) config.getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+		adjustConfig(scenario.getConfig());
 		
-		PopulationTools.setScoresToZero(population);
-		PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(population, asasConfigGroup.getActivityDurationBin());			
-		PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(population);
-		PopulationTools.analyze(population);
+		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
 			
-		if (asasConfigGroup.isRemoveNetworkSpecificInformation()) PopulationTools.removeNetworkSpecificInformation(population);
+		if (asasConfigGroup.isAdjustPopulation()) {
+			log.info("Adjusting the population...");
+			
+			Population population = scenario.getPopulation();
+			
+			if (population != null) {
+				
+				PopulationTools.setScoresToZero(population);
+				PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(population, asasConfigGroup.getActivityDurationBin());			
+				PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(population);
+				PopulationTools.analyze(population);
+					
+				if (asasConfigGroup.isRemoveNetworkSpecificInformation()) PopulationTools.removeNetworkSpecificInformation(population);
 
-		log.info("Adjusting the population... Done.");
+			} else {
+				throw new RuntimeException("Cannot adjust the population if the population is null. Aborting...");
+			}
+			
+			log.info("Adjusting the population... Done.");
+		
+		} else {
+			log.info("Not adjusting the population."
+					+ " Opening and closing times are expected to be provided as person attributes in the plans file.");
+		}
 	}
 
 	private void adjustConfig(Config config) {
