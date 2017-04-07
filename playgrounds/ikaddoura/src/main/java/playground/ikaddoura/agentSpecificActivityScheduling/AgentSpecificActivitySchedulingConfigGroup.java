@@ -33,6 +33,7 @@ public class AgentSpecificActivitySchedulingConfigGroup extends ReflectiveConfig
 		super(GROUP_NAME);
 	}
 
+	private boolean useAgentSpecificActivityScheduling = true;
 	private double activityDurationBin = 3600.;
 	private double tolerance = 900.;
 	private boolean removeNetworkSpecificInformation = false;
@@ -76,6 +77,16 @@ public class AgentSpecificActivitySchedulingConfigGroup extends ReflectiveConfig
 	@StringSetter( "adjustPopulation" )
 	public void setAdjustPopulation(boolean adjustPopulation) {
 		this.adjustPopulation = adjustPopulation;
+	}
+
+	@StringGetter( "useAgentSpecificActivityScheduling" )
+	public boolean isUseAgentSpecificActivityScheduling() {
+		return useAgentSpecificActivityScheduling;
+	}
+
+	@StringSetter( "useAgentSpecificActivityScheduling" )
+	public void setUseAgentSpecificActivityScheduling(boolean useAgentSpecificActivityScheduling) {
+		this.useAgentSpecificActivityScheduling = useAgentSpecificActivityScheduling;
 	}
 	
 }

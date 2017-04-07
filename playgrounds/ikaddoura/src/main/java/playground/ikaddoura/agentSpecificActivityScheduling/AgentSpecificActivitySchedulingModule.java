@@ -53,36 +53,42 @@ import playground.ikaddoura.utils.prepare.PopulationTools;
 public class AgentSpecificActivitySchedulingModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(AgentSpecificActivitySchedulingModule.class);	
 	private final List<ActivityParams> initialActivityParams = new ArrayList<>();
+	private final AgentSpecificActivitySchedulingConfigGroup asasConfigGroup;
 	
 	public AgentSpecificActivitySchedulingModule(Scenario scenario) {
-		
-		adjustConfig(scenario.getConfig());
-		
-		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
-			
-		if (asasConfigGroup.isAdjustPopulation()) {
-			log.info("Adjusting the population...");
-			
-			Population population = scenario.getPopulation();
-			
-			if (population != null) {
-				
-				PopulationTools.setScoresToZero(population);
-				PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(population, asasConfigGroup.getActivityDurationBin());			
-				PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(population);
-				PopulationTools.analyze(population);
-					
-				if (asasConfigGroup.isRemoveNetworkSpecificInformation()) PopulationTools.removeNetworkSpecificInformation(population);
 
+		asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+		
+		if (asasConfigGroup.isUseAgentSpecificActivityScheduling()) {
+			adjustConfig(scenario.getConfig());
+			
+			if (asasConfigGroup.isAdjustPopulation()) {
+				log.info("Adjusting the population...");
+				
+				Population population = scenario.getPopulation();
+				
+				if (population != null) {
+					
+					PopulationTools.setScoresToZero(population);
+					PopulationTools.setActivityTypesAccordingToDurationAndMergeOvernightActivities(population, asasConfigGroup.getActivityDurationBin());			
+					PopulationTools.addActivityTimesOfSelectedPlanToPersonAttributes(population);
+					PopulationTools.analyze(population);
+						
+					if (asasConfigGroup.isRemoveNetworkSpecificInformation()) PopulationTools.removeNetworkSpecificInformation(population);
+
+				} else {
+					throw new RuntimeException("Cannot adjust the population if the population is null. Aborting...");
+				}
+				
+				log.info("Adjusting the population... Done.");
+			
 			} else {
-				throw new RuntimeException("Cannot adjust the population if the population is null. Aborting...");
+				log.info("Not adjusting the population."
+						+ " Opening and closing times are expected to be provided as person attributes in the plans file.");
 			}
 			
-			log.info("Adjusting the population... Done.");
-		
 		} else {
-			log.info("Not adjusting the population."
-					+ " Opening and closing times are expected to be provided as person attributes in the plans file.");
+			log.info("Agent-specific activity scheduling disabled. Config and population are not adjusted.");
 		}
 	}
 
@@ -131,16 +137,20 @@ public class AgentSpecificActivitySchedulingModule extends AbstractModule {
 	@Override
 	public void install() {
 		
-		// adjust scoring
-		log.info("Replacing the default activity scoring by an agent-specific opening / closing time consideration...");
-				
-		this.bind(CountActEventHandler.class).asEagerSingleton();
-		this.addEventHandlerBinding().to(CountActEventHandler.class);
+		if (asasConfigGroup.isUseAgentSpecificActivityScheduling()) {
+			// adjust scoring
+			log.info("Replacing the default activity scoring by an agent-specific opening / closing time consideration...");
+					
+			this.bind(CountActEventHandler.class).asEagerSingleton();
+			this.addEventHandlerBinding().to(CountActEventHandler.class);
+			
+			this.bindScoringFunctionFactory().to(AgentSpecificScoringFunctionFactory.class);	
+			
+			log.info("Replacing the default activity scoring by an agent-specific opening / closing time consideration... Done.");
 		
-		this.bindScoringFunctionFactory().to(AgentSpecificScoringFunctionFactory.class);	
-		
-		log.info("Replacing the default activity scoring by an agent-specific opening / closing time consideration... Done.");
-		
+		} else {
+			log.info("Agent-specific activity scheduling disabled. Using the default scoring.");
+		}
 	}
 
 }
