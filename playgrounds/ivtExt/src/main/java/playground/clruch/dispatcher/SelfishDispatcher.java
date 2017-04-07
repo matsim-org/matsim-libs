@@ -62,12 +62,9 @@ public class SelfishDispatcher extends UniversalDispatcher {
 		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", Integer.MAX_VALUE);
 		numberofVehicles = (int) generatorConfig.getNumberOfVehicles();
 		network = networkIn;
-		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx,
-																					// miny,
-																					// maxx,
-																					// maxy
+		// minx, miny, maxx, maxy
+		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
 		pendingRequestsTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
-
 	}
 
 	@Override
@@ -162,7 +159,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	 * tracking
 	 */
 	private void initializeVehicles() {
-		for (AVVehicle avVehicle : getAVList()) {
+		for (AVVehicle avVehicle : getVehicles()) {
 			requestsServed.put(avVehicle, new ArrayList<AVRequest>());
 			refPositions.put(avVehicle, null);
 		}
