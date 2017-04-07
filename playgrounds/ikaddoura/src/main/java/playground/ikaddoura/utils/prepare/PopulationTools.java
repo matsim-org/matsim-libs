@@ -200,7 +200,7 @@ public class PopulationTools {
 				if (pE instanceof Activity) {
 				
 					Activity act = (Activity) pE;
-
+					
 					double startTime = Double.NEGATIVE_INFINITY;
 					double endTime = Double.NEGATIVE_INFINITY;
 				
@@ -238,6 +238,8 @@ public class PopulationTools {
 						endTime = Double.NEGATIVE_INFINITY;
 					}
 					
+					previousActEndTime = endTime;
+					
 					// set opening and closing time for overnight activity to -Infinity
 					
 					if (pECounter == 0) {
@@ -257,7 +259,6 @@ public class PopulationTools {
 							endTime = Double.NEGATIVE_INFINITY;
 						}
 					}
-
 					
 					if (actStartEndTimes == null) {
 						actStartEndTimes = startTime + ";" + endTime;
@@ -265,7 +266,6 @@ public class PopulationTools {
 						actStartEndTimes = actStartEndTimes + ";" + startTime + ";" + endTime;
 					}
 
-					previousActEndTime = endTime;
 				}
 				
 				pECounter++;

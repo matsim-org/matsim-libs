@@ -29,10 +29,13 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.utils.misc.Time;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 /**
  * @author thibautd
@@ -41,8 +44,6 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 	private static final Logger log = Logger.getLogger(StandardDeviationScorer.class);
 	private final TravelTimesRecord travelTimesRecord;
 	private final Set<String> activityType;
-
-	private boolean isInActivity = false;
 
 	private final List<ActivityValues> activityValues = new ArrayList<>( 2 );
 	private ActivityValues currentActivityValues = null;
@@ -75,11 +76,8 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 	}
 
 	private void handleActivityEndEvent(final ActivityEndEvent event) {
-		//isInActivity = false;
-
 		if ( currentActivityValues != null ) {
 			currentActivityValues.addDeparture( event.getPersonId() , event.getTime() );
-			//currentActivityValues = null;
 		}
 	}
 
@@ -143,9 +141,7 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 			assert arrivalTimes.size() == arrivalPersons.size();
 			for ( int i=0; i < arrivalTimes.size(); i++ ) {
 				final double tt =
-						travelTimesRecord.getTravelTimeBefore(
-								arrivalPersons.get( i ),
-								arrivalTimes.get( i ) );
+						getTravelTimeBefore( i );
 
 				travelTimes.adjustOrPutValue(
 						arrivalPersons.get( i ),
@@ -175,6 +171,25 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 			}
 
 			return calcNormalizedStdDev(travelTimes.valueCollection());
+		}
+
+		private double getTravelTimeBefore( final int i ) {
+			try {
+				return travelTimesRecord.getTravelTimeBefore(
+						arrivalPersons.get( i ),
+						arrivalTimes.get( i ) );
+			}
+			catch (Exception e) {
+				throw new RuntimeException(
+						"problem searching travel time before "+ Time.writeTime( arrivalTimes.get( i ) )+
+								" for person "+arrivalPersons.get( i )+" at index "+i+" in times "+
+								DoubleStream.of( arrivalTimes.toArray() )
+										.mapToObj( Time::writeTime )
+										.collect(
+												Collectors.toList() )+
+								" for persons "+arrivalPersons ,
+						e );
+			}
 		}
 
 		private double calcNormalizedStdDev(final TDoubleCollection travelTimes) {

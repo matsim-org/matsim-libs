@@ -218,6 +218,7 @@ public class CompactUnmodifiablePlanMap implements Map<Id<Person>,Plan> {
 	@Override
 	public String toString() {
 		return "CompactUnmodifiablePlanMap{" +
-					"size="+array.length+"}";
+					"size="+array.length+", " +
+					"plans="+Arrays.asList( array )+"}";
 	}
 }

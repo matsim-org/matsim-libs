@@ -30,15 +30,15 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	private static final boolean logForDebug = false;
 	
 	private Network network;
-	private static final double MIN_THRESHOLD_PROB_FUNCTION = 10;
-	private static final double MAX_THRESHOLD_PROB_FUNCTION = 30;
+	private static final double MIN_THRESHOLD_PROB_FUNCTION = 3;
+	private static final double MAX_THRESHOLD_PROB_FUNCTION = 1;
 	private static final double ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN = 30;
-	private static final double ACCEPTED_DISTANCE_MAX = 600;
+	private static final double ACCEPTED_DISTANCE_MAX = 400;
 	private final Random random = MatsimRandom.getLocalInstance();
 	
 	//Grenzen für Übergang von Phase 1 -> 2 bzw. 2->3
-	private static final double THRESHOLD_OBSERVING_METER = 500;
-	private static final double THRESHOLD_PARKING_METER = 210;	
+	private static final double THRESHOLD_OBSERVING_METER = 250;
+	private static final double THRESHOLD_PARKING_METER = 100;	
 
 	public BenensonParkingSearchLogic(Network network) {
 		this.network = network;

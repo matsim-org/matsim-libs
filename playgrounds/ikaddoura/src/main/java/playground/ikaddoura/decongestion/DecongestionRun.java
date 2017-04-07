@@ -67,7 +67,7 @@ public class DecongestionRun {
 
 		} else {
 			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
-			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output-1000.output_plans-Versuchsreihe2/";
+			outputBaseDirectory = "../../../runs-svn/vickrey-decongestion/output-FINAL/";
 		}
 		
 		DecongestionRun main = new DecongestionRun();
@@ -78,19 +78,20 @@ public class DecongestionRun {
 	private void run() throws IOException {
 
 		final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(20.);
-		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.8);
+		decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(1.0);
 		decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(0.0);
 		decongestionSettings.setUPDATE_PRICE_INTERVAL(1);
 		decongestionSettings.setMsa(false);
-		decongestionSettings.setTOLL_BLEND_FACTOR(0.1);
-		decongestionSettings.setDecongestionApproach(DecongestionApproach.BangBang);
+		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
+		decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
 		
-		decongestionSettings.setKd(0.);
-		decongestionSettings.setKi(0.05);
-		decongestionSettings.setKp(0.05);
+		decongestionSettings.setKd(0.0);
+		decongestionSettings.setKi(0.0);
+		decongestionSettings.setKp(0.01);
 		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
-		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(1.0);
+		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
+		decongestionSettings.setIntegralApproachAverageAlpha(0.0);
 		
 		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
 		decongestionSettings.setINITIAL_TOLL(1.0);

@@ -47,10 +47,15 @@ public class JointTravelUtils {
 		// pass 1 ...-----|############|--------------------...
 		// pass 2 ...-----|##########################|------...
 		// (TD, sept. 2012)
-		final List<DriverTrip> driverTrips = parseDriverTrips( plan );
-		final List<JointTrip> jointTrips = reconstructJointTrips( driverTrips , plan );
+		try {
+			final List<DriverTrip> driverTrips = parseDriverTrips( plan );
+			final List<JointTrip> jointTrips = reconstructJointTrips( driverTrips, plan );
 
-		return new JointTravelStructure( jointTrips );
+			return new JointTravelStructure( jointTrips );
+		}
+		catch (Exception e) {
+			throw new RuntimeException( "Problem analyzing joint plan "+plan , e );
+		}
 	}
 
 	private static List<JointTrip> reconstructJointTrips(

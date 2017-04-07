@@ -29,7 +29,12 @@ public class PredicateAndComposite<T extends Attributable> extends Composite<Pre
 
     public static <T extends Attributable> PredicateAndComposite<T> create(Predicate<T>... predicates) {
         PredicateAndComposite<T> composite = new PredicateAndComposite();
-        for (Predicate p : predicates) composite.addComponent(p);
+        for (Predicate p : predicates) {
+            /*
+            For convenience, allow null-predicates in constructor.
+             */
+            if(p != null) composite.addComponent(p);
+        }
         return composite;
     }
 

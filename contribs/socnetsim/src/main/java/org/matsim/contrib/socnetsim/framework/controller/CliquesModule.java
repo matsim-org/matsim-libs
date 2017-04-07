@@ -47,7 +47,7 @@ public class CliquesModule extends AbstractModule {
 			.in( Scopes.SINGLETON );
 		bind( SocialNetwork.class )
 			.toProvider( SocialNetworkProvider.class )
-			.in( Scopes.SINGLETON );
+			.asEagerSingleton();
 	}
 
 	private static class SocialNetworkProvider implements Provider<SocialNetwork> {
@@ -77,7 +77,7 @@ public class CliquesModule extends AbstractModule {
 				}
 			}
 
-			sc.addScenarioElement( SocialNetwork.ELEMENT_NAME , sc );
+			sc.addScenarioElement( SocialNetwork.ELEMENT_NAME , socNet );
 
 			return socNet;
 		}

@@ -23,10 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.LoggerUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.util.Executor;
 
 import java.util.*;
@@ -78,6 +75,24 @@ public class TaskRunner {
 
         if (verbose)
             ProgressLogger.terminate();
+    }
+
+    public static void runLegTask(SegmentTask task, Collection<? extends Person> persons) {
+        run(new EpisodeTask() {
+            @Override
+            public void apply(Episode episode) {
+                for(Segment leg : episode.getLegs()) task.apply(leg);
+            }
+        }, persons);
+    }
+
+    public static void runActTask(SegmentTask task, Collection<? extends Person> persons) {
+        run(new EpisodeTask() {
+            @Override
+            public void apply(Episode episode) {
+                for(Segment act : episode.getActivities()) task.apply(act);
+            }
+        }, persons);
     }
 
     private static final class RunThread implements Runnable {

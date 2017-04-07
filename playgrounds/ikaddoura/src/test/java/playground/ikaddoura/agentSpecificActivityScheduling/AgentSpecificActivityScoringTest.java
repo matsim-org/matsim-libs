@@ -83,7 +83,9 @@ public class AgentSpecificActivityScoringTest {
 		
 		// Activity parameters
 		
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.createConfig(new AgentSpecificActivitySchedulingConfigGroup());
+		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) config.getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+		
 		ActivityParams actParamsH = new ActivityParams("h");
 		actParamsH.setTypicalDuration(12 * 3600.);
 		actParamsH.setLatestStartTime(Double.NEGATIVE_INFINITY);
@@ -111,7 +113,8 @@ public class AgentSpecificActivityScoringTest {
 		
 		{
 			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 0.);
+			asasConfigGroup.setTolerance(0.);
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan1.getPerson());
 			scoringFunction.handleActivity(firstActivity1);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity1.getStartTime(), plan1.getPerson().getId(), null, null, "w"));
@@ -126,8 +129,9 @@ public class AgentSpecificActivityScoringTest {
 		assertEquals("default activity-related score of plan2 has changed", 139.15760679294863, defaultScorePlan2, MatsimTestUtils.EPSILON);
 		
 		{
-			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 3600.);
+			CountActEventHandler actCounter = new CountActEventHandler();
+			asasConfigGroup.setTolerance(3600.);
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan2.getPerson());
 			scoringFunction.handleActivity(firstActivity2);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity2.getStartTime(), plan2.getPerson().getId(), null, null, "w"));
@@ -139,8 +143,9 @@ public class AgentSpecificActivityScoringTest {
 		}
 		
 		{
-			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 0.);
+			CountActEventHandler actCounter = new CountActEventHandler();
+			asasConfigGroup.setTolerance(0.);
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan2.getPerson());
 			scoringFunction.handleActivity(firstActivity2);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity2.getStartTime(), plan2.getPerson().getId(), null, null, "w"));
@@ -187,7 +192,9 @@ public class AgentSpecificActivityScoringTest {
 		
 		// Activity parameters
 		
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.createConfig(new AgentSpecificActivitySchedulingConfigGroup());
+		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) config.getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+
 		ActivityParams actParamsH = new ActivityParams("h");
 		actParamsH.setTypicalDuration(12 * 3600.);
 		actParamsH.setLatestStartTime(Double.NEGATIVE_INFINITY);
@@ -214,8 +221,10 @@ public class AgentSpecificActivityScoringTest {
 		assertEquals("default activity-related score of plan1 has changed", 139.15760679294863, defaultScorePlan1, MatsimTestUtils.EPSILON);
 		
 		{
-			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 0.);
+			CountActEventHandler actCounter = new CountActEventHandler();
+			asasConfigGroup.setTolerance(0.);
+
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan1.getPerson());
 			scoringFunction.handleActivity(firstActivity1);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity1.getStartTime(), plan1.getPerson().getId(), null, null, "w"));
@@ -231,7 +240,9 @@ public class AgentSpecificActivityScoringTest {
 		
 		{
 			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 3600.);
+			asasConfigGroup.setTolerance(3600.);
+
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan2.getPerson());
 			scoringFunction.handleActivity(firstActivity2);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity2.getStartTime(), plan2.getPerson().getId(), null, null, "w"));
@@ -244,7 +255,9 @@ public class AgentSpecificActivityScoringTest {
 		
 		{
 			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 0.);
+			asasConfigGroup.setTolerance(0.);
+
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan2.getPerson());
 			scoringFunction.handleActivity(firstActivity2);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity2.getStartTime(), plan2.getPerson().getId(), null, null, "w"));
@@ -291,7 +304,9 @@ public class AgentSpecificActivityScoringTest {
 		
 		// Activity parameters
 		
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.createConfig(new AgentSpecificActivitySchedulingConfigGroup());
+		AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) config.getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+		
 		ActivityParams actParamsH = new ActivityParams("h");
 		actParamsH.setTypicalDuration(12 * 3600.);
 		actParamsH.setLatestStartTime(Double.NEGATIVE_INFINITY);
@@ -319,7 +334,9 @@ public class AgentSpecificActivityScoringTest {
 		
 		{
 			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 0.);
+			asasConfigGroup.setTolerance(0.);
+
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan1.getPerson());
 			scoringFunction.handleActivity(firstActivity1);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity1.getStartTime(), plan1.getPerson().getId(), null, null, "w"));
@@ -335,7 +352,9 @@ public class AgentSpecificActivityScoringTest {
 		
 		{
 			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 3600.);
+			asasConfigGroup.setTolerance(3600.);
+
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan2.getPerson());
 			scoringFunction.handleActivity(firstActivity2);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity2.getStartTime(), plan2.getPerson().getId(), null, null, "w"));
@@ -348,7 +367,8 @@ public class AgentSpecificActivityScoringTest {
 		
 		{
 			CountActEventHandler actCounter = new CountActEventHandler();	
-			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter , 0.);
+			asasConfigGroup.setTolerance(0.);
+			AgentSpecificScoringFunctionFactory agentSpecificScoringFunctionFactory = new AgentSpecificScoringFunctionFactory(scenario, actCounter);
 			ScoringFunction scoringFunction = agentSpecificScoringFunctionFactory.createNewScoringFunction(plan2.getPerson());
 			scoringFunction.handleActivity(firstActivity2);
 			actCounter.handleEvent(new ActivityStartEvent(secondActivity2.getStartTime(), plan2.getPerson().getId(), null, null, "w"));

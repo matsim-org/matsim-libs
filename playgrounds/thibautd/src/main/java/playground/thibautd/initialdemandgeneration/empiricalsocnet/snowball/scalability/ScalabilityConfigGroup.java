@@ -22,8 +22,6 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.stream.DoubleStream;
 
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.w;
-
 /**
  * @author thibautd
  */

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population>
+
+	<person id="person_0">
+		<attributes>
+			<attribute name="employed" class="java.lang.Boolean" >false</attribute>
+		</attributes>
+		<plan score="12345." selected="yes">
+			<activity type="home" link="link_0_3" x="-500.0" y="9000.0" end_time="08:00:00" >
+			</activity>
+			<leg mode="car">
+				<route type="links" start_link="link_0_3" end_link="link_6_9" trav_time="00:33:07" distance="28600.0">link_0_3 link_3_4 link_4_5 link_5_6 link_6_9</route>
+			</leg>
+			<activity type="work" link="link_6_9" x="10500.0" y="9000.0" end_time="16:00:01" >
+			</activity>
+			<leg mode="car">
+				<route type="links" start_link="link_6_9" end_link="link_0_3" trav_time="00:19:11" distance="17000.0">link_6_9 link_9_6 link_6_2 link_2_1 link_1_3 link_3_0 link_0_3</route>
+			</leg>
+			<activity type="home" link="link_0_3" x="-500.0" y="9000.0" >
+			</activity>
+		</plan>
+
+	</person>
+
+</population>

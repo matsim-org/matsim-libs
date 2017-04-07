@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="output_plans.xml" />
+		<param name="removingUnnecessaryPlanAttributes" value="true" />
+	</module>
+	
+	<module name="travelTimeCalculator" >
+		<param name="travelTimeBinSize" value="300" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+		<param name="mobsim" value="qsim" />
+	</module>
+
+	<module name="qsim">
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	
+		<param name="snapshotperiod" value="00:00:00"/>
+
+	</module>
+
+	<module name="planCalcScore" >
+	
+		<param name="performing" value="6.0" />
+		<param name="lateArrival" value="-18.0" />
+	
+		<parameterset type="activityParams" >
+			<param name="activityType" value="home" />
+			<param name="typicalDuration" value="43200.0" />
+		</parameterset>
+
+		<parameterset type="activityParams" >
+			<param name="activityType" value="work" />
+			<param name="typicalDuration" value="32400.0" />
+		</parameterset>
+
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> 
+
+		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
+
+		<param name="ModuleProbability_1" value="0.7" />
+		<param name="Module_1" value="ChangeExpBeta" />
+
+		<param name="ModuleProbability_2" value="0.3" />
+		<param name="Module_2" value="TimeAllocationMutator" />	
+	
+	</module>
+
+	<module name="TimeAllocationMutator" >
+		<param name="mutationAffectsDuration" value="true" />
+		<param name="mutationRange" value="7200" />
+	</module>
+	
+</config>

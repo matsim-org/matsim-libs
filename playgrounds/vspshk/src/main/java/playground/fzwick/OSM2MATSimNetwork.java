@@ -1,5 +1,6 @@
 package playground.fzwick;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -21,7 +22,7 @@ public class OSM2MATSimNetwork {
 		/*
 		 * The input file name.
 		 */
-		String osm = "C:/Users/Felix/Documents/VSP/Berlin-Netz/brandenburg2-latest.osm_02.osm";
+		String osm = "Z:/Berlin-Netz/merged.osm";
 		
 		
 		/*
@@ -55,12 +56,69 @@ public class OSM2MATSimNetwork {
 		 * to every other link. This may not be the case in the initial network converted from OpenStreetMap.
 		 */
 		new NetworkCleaner().run(network);
-		
+		reduceSpeedKN(network);
 		/*
 		 * Write the Network to a MATSim network file.
 		 */
-		new NetworkWriter(network).write("C:/Users/Felix/Documents/VSP/Berlin-Netz/brandenburgTest2.xml");
+		new NetworkWriter(network).write("Z:/Berlin-Netz/mergedReducedSpeedKNWay.xml");
 		
 	}
-
+	
+	private static void reduceSpeedKN(Network network){
+		
+		for ( Link link : network.getLinks().values() ) {
+			if ( link.getFreespeed() < 77/3.6 ) {
+				if ( link.getCapacity() >= 1001. ) { // cap >= 1000 is nearly everything 
+					link.setFreespeed( 1. * link.getFreespeed() );
+				}else {
+					link.setFreespeed( 0.5 * link.getFreespeed() );
+				}
+			}
+			if ( link.getLength()<100 ) {
+				link.setCapacity( 2. * link.getCapacity() ); // double capacity on short links, often roundabouts or short u-turns, etc., with the usual problem
+			}
+		}	
+		
+	}
+	
+	
+	private static void reduceSpeedAndAdjustCapacity(Network network){
+		for(Link ll : network.getLinks().values()){
+			double fs = ll.getFreespeed();
+			if(fs <= 8.333333334){ //30kmh
+				((Link) ll).setFreespeed(0.5 * ll.getFreespeed());
+			} else if(fs <= 11.111111112){ //40kmh
+				((Link) ll).setFreespeed(0.5 * ll.getFreespeed());
+			} else if(fs <= 13.888888889){ //50kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((Link) ll).setFreespeed(0.5 * ll.getFreespeed());
+				} else if(lanes <= 2.0){
+					((Link) ll).setFreespeed(0.75 * ll.getFreespeed());
+				} else if(lanes > 2.0){
+					// link assumed to not have second-row parking, traffic lights, bikers/pedestrians crossing etc.
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs <= 16.666666667){ //60kmh
+				double lanes = ll.getNumberOfLanes();
+				if(lanes <= 1.0){
+					((Link) ll).setFreespeed(0.5 * ll.getFreespeed());
+				} else if(lanes <= 2.0){
+					((Link) ll).setFreespeed(0.75 * ll.getFreespeed());
+				} else if(lanes > 2.0){
+					// link assumed to not have second-row parking, traffic lights, bikers/pedestrians crossing etc.
+				} else{
+					throw new RuntimeException("NoOfLanes not properly defined");
+				}
+			} else if(fs > 16.666666667){
+				// link assumed to not have second-row parking, traffic lights, bikers/pedestrians crossing etc.
+			} else{
+				throw new RuntimeException("Link not considered...");
+			}
+			if ( ll.getLength()<100 ) {
+				ll.setCapacity( 2. * ll.getCapacity() ); // double capacity on short links, often roundabouts or short u-turns, etc., with the usual problem
+			}
+		}
+	}
 }

@@ -19,7 +19,10 @@
 package playground.thibautd.socnetsimusages.traveltimeequity;
 
 import com.google.inject.Singleton;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -29,11 +32,17 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.misc.Time;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * @author thibautd
@@ -46,14 +55,6 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 	private final Set<Id<Person>> ignoreDeparture = new HashSet<>();
 
 	private final StageActivityTypes stageActivityTypes;
-
-	private final MapUtils.Factory<TravelTimesForPerson> factory =
-			new MapUtils.Factory<TravelTimesForPerson>() {
-				@Override
-				public TravelTimesForPerson create() {
-					return new TravelTimesForPerson();
-				}
-			};
 
 	public TravelTimesRecord(final StageActivityTypes stageActivityTypes) {
 		this.stageActivityTypes = stageActivityTypes;
@@ -72,7 +73,7 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 			MapUtils.getArbitraryObject(
 					event.getPersonId(),
 					times,
-					factory ).addArrival(event.getTime());
+					TravelTimesForPerson::new ).addArrival(event.getTime());
 		}
 	}
 
@@ -86,7 +87,7 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 			MapUtils.getArbitraryObject(
 					event.getPersonId(),
 					times,
-					factory).addDeparture(event.getTime());
+					TravelTimesForPerson::new ).addDeparture(event.getTime());
 		}
 	}
 
@@ -94,21 +95,21 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 		return MapUtils.getArbitraryObject(
 				person,
 				times,
-				factory).getTravelTimeBefore( time );
+				TravelTimesForPerson::new ).getTravelTimeBefore( time );
 	}
 
 	public boolean alreadyKnowsTravelTimeAfter( final Id<Person> person , final double time ) {
 		return MapUtils.getArbitraryObject(
 				person,
 				times,
-				factory).alreadyKnowsTravelTimeAfter(time);
+				TravelTimesForPerson::new ).alreadyKnowsTravelTimeAfter(time);
 	}
 
 	public double getTravelTimeAfter( final Id<Person> person , final double time ) {
 		return MapUtils.getArbitraryObject(
 				person,
 				times,
-				factory).getTravelTimeAfter(time);
+				TravelTimesForPerson::new ).getTravelTimeAfter(time);
 	}
 
 	@Override
@@ -119,20 +120,28 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 
 	private static class TravelTimesForPerson {
-		private final TDoubleArrayList departures = new TDoubleArrayList();
-		private final TDoubleArrayList arrivals = new TDoubleArrayList();
+		// work in full seconds to avoid numerical problems
+		private final TIntList departures = new TIntArrayList();
+		private final TIntList arrivals = new TIntArrayList();
 
 		public void addDeparture( final double time ) {
-			this.departures.add( time );
+			this.departures.add( (int) time );
 		}
 
 		public void addArrival( final double time ) {
-			this.arrivals.add( time );
+			this.arrivals.add( (int) time );
 		}
 
 		public double getTravelTimeBefore( final double time ) {
-			final int bs = arrivals.binarySearch( time );
+			final int bs = arrivals.binarySearch( (int) time );
 			final int index = bs < 0 ? -bs - 2 : bs;
+
+			if ( index < 0 ) {
+				throw new RuntimeException(
+						"error search travel time before "+
+								Time.writeTime( time )+" with "+arrivals.size()+" arrivals "+
+								IntStream.of( arrivals.toArray() ).mapToObj( Time::writeTime ).collect( Collectors.toList() ) );
+			}
 
 			final double tt = arrivals.get( index ) - departures.get( index );
 			assert tt >= 0;
@@ -150,7 +159,7 @@ public class TravelTimesRecord implements PersonDepartureEventHandler,
 
 		public double getTravelTimeAfter( final double time ) {
 			assert arrivals.size() == departures.size();
-			final int bs = departures.binarySearch( time );
+			final int bs = departures.binarySearch( (int) time );
 			final int index = bs < 0 ? -bs -1 : bs;
 
 			final double tt = arrivals.get( index ) - departures.get( index );

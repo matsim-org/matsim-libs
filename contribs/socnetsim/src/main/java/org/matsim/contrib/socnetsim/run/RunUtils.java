@@ -184,7 +184,7 @@ public class RunUtils {
 			scenario.addScenarioElement(
 							VehicleRessources.ELEMENT_NAME,
 							new HouseholdBasedVehicleRessources(
-								((MutableScenario) scenario).getHouseholds() ) );
+								scenario.getHouseholds() ) );
 		}
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -192,7 +192,7 @@ public class RunUtils {
 				for (Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE )) {
 					if (act.getCoord() != null) continue;
 					if (act.getLinkId() == null) throw new NullPointerException();
-					((Activity) act).setCoord(
+					act.setCoord(
 						scenario.getNetwork().getLinks().get( act.getLinkId() ).getCoord() );
 				}
 			}
@@ -203,7 +203,7 @@ public class RunUtils {
 		if ( scenario.getActivityFacilities() != null ) {
 			new WorldConnectLocations( scenario.getConfig() ).connectFacilitiesWithLinks(
 					scenario.getActivityFacilities(),
-					(Network) scenario.getNetwork() );
+					scenario.getNetwork() );
 		}
 	}
 }
