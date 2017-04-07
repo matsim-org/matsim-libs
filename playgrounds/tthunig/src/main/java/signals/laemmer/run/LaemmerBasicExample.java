@@ -56,31 +56,30 @@ public class LaemmerBasicExample {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-//        for(int i = 0; i<=1080; i+=60){
+//        for(int i = 0; i<=1200; i+=60){
 //            run(i);
 //        }
-        run(1200);
+        run(180, 900);
 
     }
 
-    private static void run(double flowWE) {
+    private static void run(double flowNS, double flowWE) {
         final Config config = defineConfig(flowWE);
 
         // simulate traffic dynamics with holes (default would be without)
 //        config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
-        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
-        config.qsim().setNodeOffset(5.);
+//        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
+//        config.qsim().setNodeOffset(5.);
 
-//         add the OTFVis config group
-        OTFVisConfigGroup otfvisConfig =
-                ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-//         make links visible beyond screen edge
-        otfvisConfig.setScaleQuadTreeRect(true);
-        otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
-        otfvisConfig.setAgentSize(240);
+////         add the OTFVis config group
+//        OTFVisConfigGroup otfvisConfig =
+//                ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+////         make links visible beyond screen edge
+//        otfvisConfig.setScaleQuadTreeRect(true);
+//        otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
+//        otfvisConfig.setAgentSize(240);
 
-        final Scenario scenario = defineScenario(config, 180, flowWE);
-        Controler controler = new Controler(scenario);
+
 
         // add the general signals module
 
@@ -92,8 +91,11 @@ public class LaemmerBasicExample {
         laemmerConfig.setMAX_PERIOD(180);
         module.setLaemmerConfig(laemmerConfig);
 
+        final Scenario scenario = defineScenario(config, flowNS, flowWE, laemmerConfig);
+        Controler controler = new Controler(scenario);
+
         controler.addOverridingModule(module);
-        controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
+//        controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
 
         LaemmerSignalController.log.setLevel(Level.OFF);
         LaemmerSignalController.signalLog.setLevel(Level.OFF);
@@ -108,7 +110,7 @@ public class LaemmerBasicExample {
 
     private static Config defineConfig(double flowWE) {
         Config config = ConfigUtils.createConfig();
-        config.controler().setOutputDirectory("output/laemmerexampleBasic_"+flowWE+"_e_w/");
+        config.controler().setOutputDirectory("output/laemmerexampleStabilisierungBasic_"+flowWE+"_e_w/");
 
         config.controler().setLastIteration(0);
         config.travelTimeCalculator().setMaxTime(60 * 120);
@@ -133,7 +135,7 @@ public class LaemmerBasicExample {
         return config;
     }
 
-    private static Scenario defineScenario(Config config, double flowNS, double flowWE) {
+    private static Scenario defineScenario(Config config, double flowNS, double flowWE, LaemmerConfig laemmerConfig) {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         // add missing scenario elements
         SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -142,7 +144,7 @@ public class LaemmerBasicExample {
         createNetwork(scenario);
         createPopulation(scenario, flowNS, flowWE);
 
-        createSignals(scenario);
+        createSignals(scenario, laemmerConfig, flowNS, flowWE);
         return scenario;
     }
 
@@ -270,7 +272,7 @@ public class LaemmerBasicExample {
         }
     }
 
-    private static void createSignals(Scenario scenario) {
+    private static void createSignals(Scenario scenario, LaemmerConfig laemmerConfig, double flowNS, double flowWE) {
 
         SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
@@ -295,25 +297,33 @@ public class LaemmerBasicExample {
         Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
         SignalGroupData signalGroup1 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId1);
-        signalGroup1.addSignalId(Id.create("Signal2_3", Signal.class));
+        Id<Signal> id2_3 = Id.create("Signal2_3", Signal.class);
+        signalGroup1.addSignalId(id2_3);
+        laemmerConfig.addArrivalRateForSignal(id2_3, flowWE);
         signalGroups.addSignalGroupData(signalGroup1);
 
         Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
         SignalGroupData signalGroup2 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId2);
-        signalGroup2.addSignalId(Id.create("Signal7_3", Signal.class));
+        Id<Signal> id7_3 = Id.create("Signal7_3", Signal.class);
+        signalGroup1.addSignalId(id7_3);
+        laemmerConfig.addArrivalRateForSignal(id7_3, flowNS);
         signalGroups.addSignalGroupData(signalGroup2);
 
         Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
         SignalGroupData signalGroup3 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId3);
-        signalGroup3.addSignalId(Id.create("Signal4_3", Signal.class));
+        Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
+        signalGroup1.addSignalId(id4_3);
+        laemmerConfig.addArrivalRateForSignal(id4_3, flowWE);
         signalGroups.addSignalGroupData(signalGroup3);
 
         Id<SignalGroup> signalGroupId4 = Id.create("SignalGroup4", SignalGroup.class);
         SignalGroupData signalGroup4 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId4);
-        signalGroup4.addSignalId(Id.create("Signal8_3", Signal.class));
+        Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
+        signalGroup1.addSignalId(id8_3);
+        laemmerConfig.addArrivalRateForSignal(id8_3, flowWE);
         signalGroups.addSignalGroupData(signalGroup4);
 
         // create the signal control

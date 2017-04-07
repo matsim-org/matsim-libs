@@ -1,5 +1,11 @@
 package signals.laemmer.model;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.model.Signal;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by nkuehnel on 03.04.2017.
  */
@@ -8,11 +14,21 @@ public class LaemmerConfig {
     private double MAX_PERIOD = 120;
     private double DESIRED_PERIOD = 70;
 
+    private Map<Id<Signal>, Double> avgArrivalRatePerSignal = new HashMap<>();
+
     private boolean useBasicIntergreenTime = true;
 
     private double DEFAULZT_INTERGREEN = 5;
 
     private boolean analysisEnabled = true;
+
+    public void addArrivalRateForSignal(Id<Signal> signalId, double arrivalRate) {
+        avgArrivalRatePerSignal.put(signalId, arrivalRate);
+    }
+
+    public Double getArrivalRateForSignal(Id<Signal> signalId) {
+        return avgArrivalRatePerSignal.get(signalId);
+    }
 
     public double getMAX_PERIOD() {
         return MAX_PERIOD;
