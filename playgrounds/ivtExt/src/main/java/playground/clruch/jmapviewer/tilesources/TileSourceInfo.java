@@ -9,7 +9,7 @@ import java.util.Set;
  *
  * @since 31122
  */
-public class TileSourceInfo {
+class TileSourceInfo {
     /** id for this imagery entry, optional at the moment */
     protected String id;
 

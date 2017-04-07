@@ -2,7 +2,6 @@ package playground.clruch.gheat;
 
 import java.awt.image.BufferedImage;
 
-import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.gheat.graphics.ColorScheme;
 import playground.clruch.gheat.graphics.DotImages;
 
@@ -27,6 +26,6 @@ public class HeatMap {
                 zoom, //
                 x, //
                 y, //
-                dataManager.GetPointsForTile(x, y, DotImages.get(zoom), zoom));
+                dataManager.GetPointsForTile(x, y, DotImages.get(zoom).bufferedImageRGB, zoom));
     }
 }

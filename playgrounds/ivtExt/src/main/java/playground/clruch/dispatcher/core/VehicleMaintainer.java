@@ -177,7 +177,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     private String previousInfoMarker = "";
 
-    protected abstract void notifySimulationSubscribers(long round_now);
+    abstract void notifySimulationSubscribers(long round_now);
 
     /**
      * invoked at the beginning of every iteration

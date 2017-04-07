@@ -1,6 +1,6 @@
 package playground.clruch.gheat;
 
-public class PointLatLng implements Comparable {
+public class PointLatLng implements Comparable<PointLatLng> {
     private double weight;
     private double longitude;
     private double latitude;
@@ -60,7 +60,8 @@ public class PointLatLng implements Comparable {
         return "(" + this.longitude + ", " + this.latitude + ")";
     }
 
-    public int compareTo(Object o) {
+    @Override
+    public int compareTo(PointLatLng o) {
         PointLatLng tmp = (PointLatLng) o;
         if (this.longitude < tmp.longitude) {
             return -1;

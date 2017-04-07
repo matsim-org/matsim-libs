@@ -8,7 +8,7 @@ import playground.clruch.jmapviewer.interfaces.ICoordinate;
 /**
  * Abstract class for OSM Tile sources
  */
-public abstract class AbstractOsmTileSource extends TMSTileSource {
+abstract class AbstractOsmTileSource extends TMSTileSource {
 
     /**
      * The OSM attribution. Must be always in line with

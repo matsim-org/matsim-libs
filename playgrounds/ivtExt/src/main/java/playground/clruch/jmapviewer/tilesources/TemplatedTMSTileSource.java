@@ -28,7 +28,7 @@ import playground.clruch.jmapviewer.interfaces.TemplatedTileSource;
  *                                  used to specify many tile servers
  * {header:(HEADER_NAME,HEADER_VALUE)} - sets the headers to be sent to tile server
  */
-public class TemplatedTMSTileSource extends TMSTileSource implements TemplatedTileSource {
+class TemplatedTMSTileSource extends TMSTileSource implements TemplatedTileSource {
 
     private Random rand;
     private String[] randomParts;

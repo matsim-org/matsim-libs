@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playground.clruch.gheat.DataPoint;
+import playground.clruch.gheat.HeatMapDataSource;
 import playground.clruch.gheat.PointLatLng;
 import playground.clruch.gheat.Projections;
-import playground.clruch.gheat.datasources.HeatMapDataSource;
 
 class MatsimDataSource implements HeatMapDataSource {
     private List<PointLatLng> _pointList = null;

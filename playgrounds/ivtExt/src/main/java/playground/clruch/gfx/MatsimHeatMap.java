@@ -8,9 +8,9 @@ import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.clruch.gheat.DataManager;
 import playground.clruch.gheat.HeatMap;
 import playground.clruch.gheat.PointLatLng;
-import playground.clruch.gheat.datasources.DataManager;
 import playground.clruch.gheat.graphics.ColorScheme;
 import playground.clruch.jmapviewer.Tile;
 

@@ -1,5 +1,5 @@
 // License: GPL. For details, see Readme.txt file.
-package playground.clruch.jmapviewer.events;
+package playground.clruch.jmapviewer.interfaces;
 
 import java.util.EventObject;
 

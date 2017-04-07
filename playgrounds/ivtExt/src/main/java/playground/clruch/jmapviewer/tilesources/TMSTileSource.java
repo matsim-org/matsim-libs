@@ -11,7 +11,7 @@ import playground.clruch.jmapviewer.interfaces.ICoordinate;
 /**
  * TMS tile source.
  */
-public class TMSTileSource extends AbstractTMSTileSource {
+class TMSTileSource extends AbstractTMSTileSource {
 
     protected int maxZoom;
     protected int minZoom;
