@@ -53,12 +53,11 @@ public class VrpPaths {
 		}
 
 		int count = path.links.size();
-		//@Michal: I'm switching this to Id check rather than checking the links. Result should usually be the same, but it avoids a lot of fuss when the network used for DVRP routing is different to the one where everything else is happening.
 		if (count > 0) {
-			if (!fromLink.getToNode().getId().equals(path.links.get(0).getFromNode().getId())) {
+			if (fromLink.getToNode() != path.links.get(0).getFromNode()) {
 				throw new IllegalArgumentException("fromLink and path are not connected; fromLink: "+fromLink +"\n path beg"+path.links.get(0));
 			}
-			if (!path.links.get(count - 1).getToNode().getId().equals(toLink.getFromNode().getId())) {
+			if (path.links.get(count - 1).getToNode() != toLink.getFromNode()) {
 				throw new IllegalArgumentException("path and toLink are not connected; path end:"+path.links.get(count - 1).toString()+ "\n toLink: "+toLink.toString());
 			}
 		}
