@@ -91,6 +91,9 @@ class LatexResultsWriter {
 //		header.append("$\\Delta$ \\#trips [veh]");
 //		header.append(separator);
 		header.append("$\\Delta$ \\#trips [%]");
+		header.append(separator);
+		
+		header.append("\\#stucked [veh]");		
 		
 		header.append("\t\\\\");
 		
@@ -147,7 +150,9 @@ class LatexResultsWriter {
 //		out.append(formatDoubleInt(r.deltaNoTrips));
 //		out.append(separator);
 		out.append(formatDouble(r.noTripsPercent));
+		out.append(separator);
 		
+		out.append(formatDoubleInt(r.noStuckedVeh));
 		
 		out.append("\t\\\\");
 		

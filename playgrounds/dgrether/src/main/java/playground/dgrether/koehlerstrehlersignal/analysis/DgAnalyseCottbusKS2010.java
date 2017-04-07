@@ -83,7 +83,7 @@ import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 public class DgAnalyseCottbusKS2010 {
 
-	private static final Logger log = Logger.getLogger(DgAnalyseCottbusKS2010.class);
+	private static final Logger LOG = Logger.getLogger(DgAnalyseCottbusKS2010.class);
 
 	private static final CoordinateReferenceSystem crs = MGC
 			.getCRS(TransformationFactory.WGS84_UTM33N);
@@ -137,6 +137,7 @@ public class DgAnalyseCottbusKS2010 {
 		Double delayPercent;
 		Double distancePercent;
 		public Set<Id<Person>> seenPersonIds;
+		int noStuckedVeh;
 	}
 
 	static class Results {
@@ -247,11 +248,11 @@ public class DgAnalyseCottbusKS2010 {
 			if (! r.runInfo.baseCase && r.extent.createPersonDiff) {
 				this.createAndWritePersonDiff(baseResult, r);
 //				this.createAndWriteSimSimComparison(baseResult, r);
-				log.warn("sim sim compare currently disabled");
+				LOG.warn("sim sim compare currently disabled");
 			}
 
 			this.writeMfd(r);
-			this.writeLhi(r);
+//			this.writeLhi(r);
 		}
 	}
 
@@ -349,10 +350,11 @@ public class DgAnalyseCottbusKS2010 {
 					net = runDir.getNetwork();
 				}
 				
-				EventsManager eventsManagerUnfiltered = new EventsManagerImpl();
-				LegModeHistogramImproved lhi = new LegModeHistogramImproved();
-				eventsManagerUnfiltered.addHandler(lhi);
-				this.processEvents(eventsManagerUnfiltered, inMemoryEvents, eventsFilename);
+				/* TODO skipped to save some time. see also lhi in method analyseResults and result.legHistogram below. theresa mar'17 */
+//				EventsManager eventsManagerUnfiltered = new EventsManagerImpl();
+//				LegModeHistogramImproved lhi = new LegModeHistogramImproved();
+//				eventsManagerUnfiltered.addHandler(lhi);
+//				this.processEvents(eventsManagerUnfiltered, inMemoryEvents, eventsFilename);
 				
 				for (TimeConfig time : times) {
 					Result result = new Result();
@@ -361,7 +363,7 @@ public class DgAnalyseCottbusKS2010 {
 					result.extent = extent;
 					result.timeConfig = time;
 					result.network = net;
-					result.legHistogram = lhi;
+//					result.legHistogram = lhi;
 					results.addResult(result);
 
 					EventsFilterManager eventsManager = new EventsFilterManagerImpl();
@@ -375,6 +377,7 @@ public class DgAnalyseCottbusKS2010 {
 					}
 
 					DgAverageTravelTimeSpeed avgTtSpeed = new DgAverageTravelTimeSpeed(net);
+					avgTtSpeed.considerStuckAndAbortTravelTimesAndSpeeds();
 					eventsManager.addHandler(avgTtSpeed);
 
 					VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600, net);
@@ -384,6 +387,7 @@ public class DgAnalyseCottbusKS2010 {
 					eventsManager.addHandler(mfd);
 
 					TtTotalDelay totalDelay = new TtTotalDelay(net);
+					totalDelay.considerDelayOfStuckedOrAbortedVehicles();
 					eventsManager.addHandler(totalDelay);
 
 					this.processEvents(eventsManager, inMemoryEvents, eventsFilename);
@@ -396,12 +400,18 @@ public class DgAnalyseCottbusKS2010 {
 					result.totalDelay = totalDelay.getTotalDelay();
 					result.distanceMeter = avgTtSpeed.getDistanceMeter();
 					result.noTrips = avgTtSpeed.getNumberOfTrips();
+					result.noStuckedVeh = avgTtSpeed.getNumberOfStuckedVeh();
+					// TODO for debugging
+					LOG.warn("number of trips: " + avgTtSpeed.getNumberOfTrips());
+					LOG.warn("number of vehicles: " + avgTtSpeed.getNumberOfVehicles());
+					LOG.warn("number of agents: " + avgTtSpeed.getNumberOfPersons());
+					LOG.warn("number of stucked/aborted agents: " + avgTtSpeed.getNumberOfStuckedVeh());
 					result.seenPersonIds = avgTtSpeed.getSeenPersonIds();
-					log.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfVehicles());
+					LOG.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfVehicles());
 				}
 			}
 		}
-		log.info("Calculated results.");
+		LOG.info("Calculated results.");
 	}
 	
 	private void processEvents(EventsManager eventsManager, InMemoryEventsManager inMemoryEvents, String eventsFilename){
@@ -628,7 +638,7 @@ public class DgAnalyseCottbusKS2010 {
 		// parameter test
 //		CottbusRuns.addOptAndRouteChoice1400(l, 2054, 2055);
 		
-		int cap = 7;
+		int cap = 5;
 		
 		RunInfo ri = null;
 		ri = new RunInfo();
@@ -714,7 +724,7 @@ public class DgAnalyseCottbusKS2010 {
 		for (Entry<Extent, List<Result>> extent : resultsByExtent.entrySet()) {
 			new LatexResultsWriter().writeResultsTable(extent.getValue(), outputFilename + extent.getKey().name + ".tex");
 		}
-		log.info("Output written to " + outputFilename);
+		LOG.info("Output written to " + outputFilename);
 
 	}
 
