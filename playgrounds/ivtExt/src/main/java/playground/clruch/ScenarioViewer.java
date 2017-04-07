@@ -2,13 +2,13 @@ package playground.clruch;
 
 import java.io.File;
 
-import playground.clruch.demo.utils.NetworkLoader;
 import playground.clruch.gfx.MatsimJMapViewer;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.gfx.PointCloud;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageUtils;
+import playground.clruch.utils.NetworkLoader;
 
 /**
  * the viewer allows to connect to the scenario server

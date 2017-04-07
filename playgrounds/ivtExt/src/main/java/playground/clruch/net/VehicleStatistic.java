@@ -1,4 +1,4 @@
-package playground.clruch.demo;
+package playground.clruch.net;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,13 +12,11 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 import playground.clruch.export.AVStatus;
-import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.net.VehicleContainer;
 
 public class VehicleStatistic {
 
-    final Tensor distanceTotal;
-    final Tensor distanceWithCustomer;
+    public final Tensor distanceTotal;
+    public final Tensor distanceWithCustomer;
 
     public VehicleStatistic(int tics) {
         distanceTotal = Array.zeros(tics);
