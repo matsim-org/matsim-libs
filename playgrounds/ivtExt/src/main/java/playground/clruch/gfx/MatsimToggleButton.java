@@ -11,7 +11,6 @@ import playground.clruch.net.SimulationSubscriber;
 
 public class MatsimToggleButton extends JToggleButton {
 
-    // JToggleButton jToggleButton = new JToggleButton("connect...");
     ObjectClient client = null;
 
     public MatsimToggleButton(MatsimMapComponent matsimJMapViewer) {

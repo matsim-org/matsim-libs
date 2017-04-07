@@ -7,7 +7,6 @@ import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.gfx.PointCloud;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.NetworkLoader;
 
 /**
@@ -22,14 +21,14 @@ public class ScenarioViewer {
     public static void main(String[] args) {
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-        
+
         ReferenceFrame referenceFrame = ReferenceFrame.SIOUXFALLS;
-        
+
         // set manually to display virtual network boundary (will be ignored if file doesn't exist)
         // this is optional and should not cause problems if file does not exist.
-        
+
         File csvFile = new File("vN_40vS_L1_v2/voronoi_BoundaryPoints.csv");
-        
+
         // END: CUSTOMIZE -------------------------------------------------
 
         MatsimStaticDatabase.initializeSingletonInstance(NetworkLoader.loadNetwork(args), referenceFrame);
@@ -44,8 +43,6 @@ public class ScenarioViewer {
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(800, 900);
         matsimViewer.jFrame.setVisible(true);
-        
-        StorageUtils.getAvailableIterations();
     }
 
 }

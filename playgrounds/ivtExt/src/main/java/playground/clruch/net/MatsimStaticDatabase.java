@@ -74,13 +74,6 @@ public class MatsimStaticDatabase {
         }
     }
 
-    public SimulationObject createSimulationObject(long now) {
-        SimulationObject simulationObject = new SimulationObject();
-        simulationObject.iteration = iteration;
-        simulationObject.now = now;
-        return simulationObject;
-    }
-
     public int getLinkIndex(Link link) {
         return linkInteger.get(link);
     }
@@ -112,8 +105,12 @@ public class MatsimStaticDatabase {
         return vehicleIdIntegerDatabase.getId(avVehicle.getId().toString());
     }
 
-    public void setIteration(Integer iteration) {
+    void setIteration(Integer iteration) {
         this.iteration = iteration;
         System.out.println("set iteration=" + iteration);
+    }
+    
+    int getIteration() {
+        return iteration;
     }
 }
