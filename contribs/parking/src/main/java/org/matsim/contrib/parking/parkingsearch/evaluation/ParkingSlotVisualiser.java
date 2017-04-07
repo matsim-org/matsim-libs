@@ -4,18 +4,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.apache.commons.lang3.mutable.MutableLong;
-import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,7 +25,6 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
-import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -145,8 +139,6 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 	}
 	
 	public void finishDay(){
-		// alle freeeSlots 1) mit timeSinceFree = 0.0 2)restlichen freeSlots
-		// alle occupiedSlots
 		
 		for(Id<Link> linkId : this.slotsOnLink.keySet()){
 			ParkingSlotManager manager = this.slotsOnLink.get(linkId);
@@ -160,7 +152,6 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 			}
 			
 			List<Tuple<Coord,Double>> freeSlots = manager.getFreeSlots();
-			
 			for(Tuple<Coord,Double> parkingTuple : freeSlots){
 				this.parkings.add(manager.getLinkId() + ";" + parkingTuple.getSecond() + ";" + endOfDay + ";" +
 						parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "free");
@@ -180,7 +171,6 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Logger.getLogger(getClass()).info("FINISHED WRITING PARKING SLOT VISUALISATION FILE TO: " +filename);
