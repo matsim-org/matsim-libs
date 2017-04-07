@@ -55,8 +55,7 @@ public class TtBasicController {
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsDataLoader(config).loadSignalsData());
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		}
 		
 		Controler controler = new Controler( scenario );
