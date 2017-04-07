@@ -20,33 +20,39 @@
 package playground.dgrether.koehlerstrehlersignal.analysis;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
 
 /**
- * Determines delay of all vehicles inside a given subnetwork.
+ * Determines delay of all agents inside a given subnetwork.
+ * Delay occurring between PersonDeparture and VehicleEntersTraffic event is included (that is also why it is not enough to consider only vehicle events).
  * 
  * @author dgrether
  * @author tthunig
  *
  */
-public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler{
+public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler{
 
 	private static final Logger LOG = Logger.getLogger(TtTotalDelay.class);
 	
@@ -54,8 +60,9 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private Network network;
 	private boolean considerStuckAbortDelay = false;
 	
-	private Map<Id<Vehicle>, Double> earliestLinkExitTimePerVeh;
-	private double totalVehDelay;
+	private Map<Id<Person>, Double> earliestLinkExitTimePerAgent;
+	private Map<Id<Vehicle>, Set<Id<Person>>> vehicleIdToPassengerIds;
+	private double agentsTotalDelay;
 
 	public TtTotalDelay(Network network) {
 		this.network = network;
@@ -64,16 +71,25 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void reset(int iteration) {
-		this.earliestLinkExitTimePerVeh = new HashMap<>();
-		this.totalVehDelay = 0.0;
+		this.earliestLinkExitTimePerAgent = new HashMap<>();
+		this.vehicleIdToPassengerIds = new HashMap<>();
+		this.agentsTotalDelay = 0.0;
 	}
 
 	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (this.network.getLinks().containsKey(event.getLinkId())){
-			// for the first link every vehicle needs one second without delay
-			this.earliestLinkExitTimePerVeh.put(event.getVehicleId(), event.getTime() + 1);
+			// for the first link every agent needs one second without delay
+			this.earliestLinkExitTimePerAgent.put(event.getPersonId(), event.getTime() + 1);
 		}
+	}
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!vehicleIdToPassengerIds.containsKey(event.getVehicleId())){
+			vehicleIdToPassengerIds.put(event.getVehicleId(), new HashSet<Id<Person>>());
+		}
+		vehicleIdToPassengerIds.get(event.getVehicleId()).add(event.getPersonId());
 	}
 
 	@Override
@@ -83,44 +99,48 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 			double freespeedTT = link.getLength()/link.getFreespeed();
 			// this is the earliest time where matsim sets the agent to the next link
 			double matsimFreespeedTT = Math.floor(freespeedTT + 1);
-			this.earliestLinkExitTimePerVeh.put(event.getVehicleId(), event.getTime() + matsimFreespeedTT);
+			for (Id<Person> passengerId : vehicleIdToPassengerIds.get(event.getVehicleId())){
+				this.earliestLinkExitTimePerAgent.put(passengerId, event.getTime() + matsimFreespeedTT);
+			}
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
-			Double earliestLinkExitTime = this.earliestLinkExitTimePerVeh.remove(event.getVehicleId());
-			if (earliestLinkExitTime != null) {
-				// add the number of seconds the vehicle is later as the earliest link exit time as delay
-				this.totalVehDelay += event.getTime() - earliestLinkExitTime;
+			for (Id<Person> passengerId : vehicleIdToPassengerIds.get(event.getVehicleId())) {
+				Double earliestLinkExitTime = this.earliestLinkExitTimePerAgent.remove(passengerId);
+				if (earliestLinkExitTime != null) {
+					// add the number of seconds the agent is later as the earliest link exit time as delay
+					this.agentsTotalDelay += event.getTime() - earliestLinkExitTime;
+				}
 			}
 		}
 	}
 
 	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		// no delay occurs on the arrival link
-		this.earliestLinkExitTimePerVeh.remove(event.getVehicleId());		
+		this.earliestLinkExitTimePerAgent.remove(event.getPersonId());		
 	}
 
 	@Override
-	public void handleEvent(VehicleAbortsEvent event) {
-		Double earliestLinkExitTime = this.earliestLinkExitTimePerVeh.remove(event.getVehicleId());
+	public void handleEvent(PersonStuckEvent event) {
+		Double earliestLinkExitTime = this.earliestLinkExitTimePerAgent.remove(event.getPersonId());
 		if (this.considerStuckAbortDelay){
 			if (this.network.getLinks().containsKey(event.getLinkId())) {
 				if (earliestLinkExitTime != null) {
-					// add the number of seconds the vehicle is later as the earliest link exit time as delay
+					// add the number of seconds the agent is later as the earliest link exit time as delay
 					double stuckAbortDelay = event.getTime() - earliestLinkExitTime;
-					this.totalVehDelay += stuckAbortDelay;
-					LOG.warn("Add delay " + stuckAbortDelay + " of vehicle " + event.getVehicleId() + " that had a vehicleAbortsEvent on link " + event.getLinkId());
+					this.agentsTotalDelay += stuckAbortDelay;
+					LOG.warn("Add delay " + stuckAbortDelay + " of agent " + event.getPersonId() + " that stucked on link " + event.getLinkId());
 				}
 			}
 		}
 	}
 
 	public double getTotalDelay() {
-		return totalVehDelay;
+		return agentsTotalDelay;
 	}
 	
 	public void considerDelayOfStuckedOrAbortedVehicles(){
