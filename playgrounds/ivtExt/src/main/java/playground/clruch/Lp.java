@@ -1,7 +1,11 @@
 package playground.clruch;
 
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.io.Pretty;
+
 import org.gnu.glpk.glp_smcp;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -21,6 +25,33 @@ import java.util.Map;
 public class Lp {
 
     public static void main(String[] args) {
+    	
+    	Tensor mytensor = Tensors.matrix((i,j) -> RealScalar.of(1),4,4);
+    	//Tensor myrow = Tensors.matrix((i,j) -> RealScalar.of(2),1,1);
+    	//mytensor.set(myrow,1,2);
+    	
+    	/*
+		Tensor lineToUpdate = mytensor.get(1);
+		lineToUpdate.set(RealScalar.of(10), 1);
+		mytensor.set(lineToUpdate, 1);
+		*/
+    	
+    	mytensor.set(RealScalar.of(3),1,1);
+
+
+    	System.out.println(Pretty.of(mytensor));
+    	
+    	System.out.println("now printing flattened stuff");
+
+    	  
+    	int nVNodes = 10;
+    	Tensor lambdas = Tensors.matrix((i, j) -> RealScalar.of(1), 1, nVNodes);
+    	System.out.println(Pretty.of(lambdas));
+    	
+    	
+    	
+    	
+    	/*
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -74,7 +105,9 @@ public class Lp {
         System.out.println("Time with single setup: " + estimatedTimeRHS);
         System.out.println("Saved time: " + (1.0-(double) estimatedTimeRHS/ (double) estimatedTimeNewSetup)*100 + "%");
 
+    	 */
     }
+    
 }
 
 
