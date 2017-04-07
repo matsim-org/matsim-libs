@@ -55,7 +55,7 @@ public final class LaemmerSignalModelFactory implements SignalModelFactory {
 	public LaemmerSignalModelFactory(LaemmerConfig config, LinkSensorManager sensorManager, Scenario scenario, TtTotalDelay delayCalculator) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
-		this.provider = new LaemmerSignalController.SignalControlProvider(config, sensorManager, signalsData, network, delayCalculator);
+		this.provider = new LaemmerSignalController.SignalControlProvider(config, sensorManager,  network, delayCalculator);
 	}
 
 	@Override

@@ -12,6 +12,8 @@ public class LaemmerConfig {
 
     private double DEFAULZT_INTERGREEN = 5;
 
+    private boolean analysisEnabled = true;
+
     public double getMAX_PERIOD() {
         return MAX_PERIOD;
     }
@@ -45,4 +47,7 @@ public class LaemmerConfig {
     }
 
 
+    public boolean analysisEnabled() {
+        return analysisEnabled;
+    }
 }

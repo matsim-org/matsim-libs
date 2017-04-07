@@ -21,6 +21,7 @@
  */
 package signals;
 
+import com.google.inject.Singleton;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
@@ -42,6 +43,7 @@ import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
 import signals.laemmer.model.LaemmerConfig;
+import signals.laemmer.model.SignalAnalyzer;
 
 /**
  * Add this module if you want to simulate fixed-time signals, sylvia, laemmer, gershenson or the downstream signals or different control schemes together at different intersections (i.e. systems) in
@@ -77,6 +79,8 @@ public class CombinedSignalsModule extends AbstractModule {
 			bind(SignalModelFactory.class).to(CombinedSignalModelFactory.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
 			bind(LinkSensorManager.class);
+			bind(SignalAnalyzer.class);
+			addMobsimListenerBinding().to(SignalAnalyzer.class);
 			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
@@ -88,7 +92,7 @@ public class CombinedSignalsModule extends AbstractModule {
 		}
 	}
 
-	@Provides
+	@Singleton @Provides
 	SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, SignalSystemsModelBuilder modelBuilder) {
 		SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		signalSystemsManager.resetModel(replanningContext.getIteration());

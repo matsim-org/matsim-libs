@@ -48,7 +48,7 @@ public class LaemmerMain {
 		if (args == null || args.length == 0){
 			log.info("No args given, running local config...");
 			args = new String[1];
-			args[0] = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/config.xml";
+			args[0] = "../../playgrounds/tthunig/examples/laemmer/config.xml";
 		}
 
 		Config config = ConfigUtils.loadConfig(args[0]);
@@ -56,8 +56,8 @@ public class LaemmerMain {
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		
 		Controler controler = new Controler(scenario);
-//		controler.addOverridingModule(new LaemmerSignalsModule());
-		controler.addOverridingModule(new CombinedSignalsModule());
+		controler.addOverridingModule(new LaemmerSignalsModule());
+		//controler.addOverridingModule(new CombinedSignalsModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 

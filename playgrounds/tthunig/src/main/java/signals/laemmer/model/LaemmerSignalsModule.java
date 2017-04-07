@@ -22,6 +22,7 @@
 package signals.laemmer.model;
 
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
@@ -67,6 +68,9 @@ public class LaemmerSignalsModule extends AbstractModule{
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
             addMobsimListenerBinding().to(QSimSignalEngine.class);
+
+            bind(SignalAnalyzer.class);
+            addMobsimListenerBinding().to(SignalAnalyzer.class);
             
             // bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
@@ -74,7 +78,8 @@ public class LaemmerSignalsModule extends AbstractModule{
         }
 	}
 	
-	@Provides SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, SignalSystemsModelBuilder modelBuilder) {	
+	@Provides @Singleton
+	SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, SignalSystemsModelBuilder modelBuilder) {
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		signalManager.resetModel(replanningContext.getIteration());		
 		return signalManager;

@@ -1,9 +1,6 @@
 package signals.laemmer.run;
 
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -16,17 +13,20 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.*;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactoryImpl;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
+import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -36,19 +36,19 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import signals.CombinedSignalsModule;
-import signals.laemmer.model.LaemmerConfig;
-import signals.laemmer.model.LaemmerSignalController;
-import signals.laemmer.model.LaemmerSignalsModule;
+import signals.advancedPlanbased.AdvancedPlanBasedSignalSystemController;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Created by nkuehnel on 03.04.2017.
  */
-public class LaemmerBasicExample {
+public class FixedTimeLaemmer {
     private static final Logger log = Logger.getLogger(LaemmerMain.class);
+    private static final double T_CYC = 120;
+    private static final double TAU_SUM = 20;
+
 
     /**
      * @param args
@@ -56,62 +56,38 @@ public class LaemmerBasicExample {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-//        for(int i = 0; i<=1080; i+=60){
-//            run(i);
-//        }
-        run(1200);
-
-    }
-
-    private static void run(double flowWE) {
-        final Config config = defineConfig(flowWE);
+        final Config config = defineConfig();
 
         // simulate traffic dynamics with holes (default would be without)
 //        config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
-        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
-        config.qsim().setNodeOffset(5.);
+//        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
+//        config.qsim().setNodeOffset(5.);
 
-//         add the OTFVis config group
-        OTFVisConfigGroup otfvisConfig =
-                ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-//         make links visible beyond screen edge
-        otfvisConfig.setScaleQuadTreeRect(true);
-        otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
-        otfvisConfig.setAgentSize(240);
+        // add the OTFVis config group
+//        OTFVisConfigGroup otfvisConfig =
+//                ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+        // make links visible beyond screen edge
+//        otfvisConfig.setScaleQuadTreeRect(true);
+//        otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
+//        otfvisConfig.setAgentSize(240);
 
-        final Scenario scenario = defineScenario(config, 180, flowWE);
+        final Scenario scenario = defineScenario(config, 180, 900);
         Controler controler = new Controler(scenario);
 
-        // add the general signals module
+//        controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
+        controler.addOverridingModule(new CombinedSignalsModule());
 
-        CombinedSignalsModule module = new CombinedSignalsModule();
-        //set laemmer params
-        LaemmerConfig laemmerConfig = new LaemmerConfig();
-        laemmerConfig.setDEFAULZT_INTERGREEN(5);
-        laemmerConfig.setDESIRED_PERIOD(120);
-        laemmerConfig.setMAX_PERIOD(180);
-        module.setLaemmerConfig(laemmerConfig);
 
-        controler.addOverridingModule(module);
-        controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
-
-        LaemmerSignalController.log.setLevel(Level.OFF);
-        LaemmerSignalController.signalLog.setLevel(Level.OFF);
-//        try {
-//            LaemmerSignalController.log.addAppender(new FileAppender(new SimpleLayout(), "logs/main.txt"));
-//            LaemmerSignalController.signalLog.addAppender(new FileAppender(new SimpleLayout(), "logs/driveways.txt"));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         controler.run();
     }
 
-    private static Config defineConfig(double flowWE) {
+
+    private static Config defineConfig() {
         Config config = ConfigUtils.createConfig();
-        config.controler().setOutputDirectory("output/laemmerexampleBasic_"+flowWE+"_e_w/");
+        config.controler().setOutputDirectory("output/laemmerexampleFixedTime_900_e_w/");
 
         config.controler().setLastIteration(0);
-        config.travelTimeCalculator().setMaxTime(60 * 120);
+        config.travelTimeCalculator().setMaxTime(60 * 840);
         config.qsim().setStartTime(0);
         config.qsim().setEndTime(60 * 120);
         config.qsim().setUsingFastCapacityUpdate(true);
@@ -142,7 +118,13 @@ public class LaemmerBasicExample {
         createNetwork(scenario);
         createPopulation(scenario, flowNS, flowWE);
 
-        createSignals(scenario);
+        double lambda1 = flowNS / (scenario.getNetwork().getLinks().get(Id.createLinkId("7_3")).getCapacity());
+        double lambda2 = flowWE / (scenario.getNetwork().getLinks().get(Id.createLinkId("4_3")).getCapacity());
+        double lambda3 = flowNS / (scenario.getNetwork().getLinks().get(Id.createLinkId("8_3")).getCapacity());
+        double lambda4 = flowWE / (scenario.getNetwork().getLinks().get(Id.createLinkId("2_3")).getCapacity());
+
+
+        createSignals(scenario, lambda1, lambda2, lambda3, lambda4);
         return scenario;
     }
 
@@ -243,51 +225,50 @@ public class LaemmerBasicExample {
                 for (double i = 0; i < 5400; i+=nthSecond) {
 
 
-                    // create a person
-                    Person person = population.getFactory().createPerson(Id.createPersonId(od + "-" + i));
-                    population.addPerson(person);
+                        // create a person
+                        Person person = population.getFactory().createPerson(Id.createPersonId(od + "-" + i));
+                        population.addPerson(person);
 
-                    // create a plan for the person that contains all this
-                    // information
-                    Plan plan = population.getFactory().createPlan();
-                    person.addPlan(plan);
+                        // create a plan for the person that contains all this
+                        // information
+                        Plan plan = population.getFactory().createPlan();
+                        person.addPlan(plan);
 
-                    // create a start activity at the from link
-                    Activity startAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(fromLinkId));
-                    // distribute agents uniformly during one hour.
-                    startAct.setEndTime(i);
-                    plan.addActivity(startAct);
+                        // create a start activity at the from link
+                        Activity startAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(fromLinkId));
+                        // distribute agents uniformly during one hour.
+                        startAct.setEndTime(i);
+                        plan.addActivity(startAct);
 
-                    // create a dummy leg
-                    plan.addLeg(population.getFactory().createLeg(TransportMode.car));
+                        // create a dummy leg
+                        plan.addLeg(population.getFactory().createLeg(TransportMode.car));
 
-                    // create a drain activity at the to link
-                    Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(toLinkId));
-                    plan.addActivity(drainAct);
+                        // create a drain activity at the to link
+                        Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(toLinkId));
+                        plan.addActivity(drainAct);
 
                 }
             }
         }
     }
 
-    private static void createSignals(Scenario scenario) {
-
+    private static void createSignals(Scenario scenario, double lambda1, double lambda2, double lambda3, double lambda4) {
         SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
-        SignalSystemsDataFactory sysFac = signalSystems.getFactory();
+        SignalSystemsDataFactory sysFac = new SignalSystemsDataFactoryImpl();
         SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
         SignalControlData signalControl = signalsData.getSignalControlData();
-        SignalControlDataFactory conFac = signalControl.getFactory();
+        SignalControlDataFactory conFac = new SignalControlDataFactoryImpl();
 
         // create signal system
         Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
-        SignalSystemData signalSystem1 = sysFac.createSignalSystemData(signalSystemId);
-        signalSystems.addSignalSystemData(signalSystem1);
+        SignalSystemData signalSystem = sysFac.createSignalSystemData(signalSystemId);
+        signalSystems.addSignalSystemData(signalSystem);
 
         // create a signal for every inLink
         for (Id<Link> inLinkId : scenario.getNetwork().getNodes().get(Id.createNodeId(3)).getInLinks().keySet()) {
             SignalData signal = sysFac.createSignalData(Id.create("Signal" + inLinkId, Signal.class));
-            signalSystem1.addSignalData(signal);
+            signalSystem.addSignalData(signal);
             signal.setLinkId(inLinkId);
         }
 
@@ -295,30 +276,48 @@ public class LaemmerBasicExample {
         Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
         SignalGroupData signalGroup1 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId1);
-        signalGroup1.addSignalId(Id.create("Signal2_3", Signal.class));
+        signalGroup1.addSignalId(Id.create("Signal7_3", Signal.class));
         signalGroups.addSignalGroupData(signalGroup1);
 
         Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
         SignalGroupData signalGroup2 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId2);
-        signalGroup2.addSignalId(Id.create("Signal7_3", Signal.class));
+        signalGroup2.addSignalId(Id.create("Signal4_3", Signal.class));
         signalGroups.addSignalGroupData(signalGroup2);
 
         Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
         SignalGroupData signalGroup3 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId3);
-        signalGroup3.addSignalId(Id.create("Signal4_3", Signal.class));
+        signalGroup3.addSignalId(Id.create("Signal8_3", Signal.class));
         signalGroups.addSignalGroupData(signalGroup3);
 
         Id<SignalGroup> signalGroupId4 = Id.create("SignalGroup4", SignalGroup.class);
         SignalGroupData signalGroup4 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId4);
-        signalGroup4.addSignalId(Id.create("Signal8_3", Signal.class));
+        signalGroup4.addSignalId(Id.create("Signal2_3", Signal.class));
         signalGroups.addSignalGroupData(signalGroup4);
 
         // create the signal control
         SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
-        signalSystemControl.setControllerIdentifier(LaemmerSignalController.IDENTIFIER);
+        signalSystemControl.setControllerIdentifier(AdvancedPlanBasedSignalSystemController.IDENTIFIER);
         signalControl.addSignalSystemControllerData(signalSystemControl);
+
+        // create a plan for the signal system (with defined cycle time and offset 0)
+        SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 120, 0, Id.create("SignalPlan1", SignalPlan.class));
+        signalSystemControl.addSignalPlanData(signalPlan);
+
+        double lambdaSum = lambda1 + lambda2 + lambda3 + lambda4;
+        int g1 = (int) Math.rint((lambda1 / lambdaSum) * ((T_CYC) - TAU_SUM));
+        int g2 = (int) Math.rint((lambda2 / lambdaSum) * ((T_CYC) - TAU_SUM));
+        int g3 = (int) Math.rint((lambda3 / lambdaSum) * ((T_CYC) - TAU_SUM));
+        int g4 = (int) Math.rint((lambda4 / lambdaSum) * ((T_CYC) - TAU_SUM));
+
+        // specify signal group settings for all signal groups
+        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, g1));
+        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, g1 + 5, g1 + 5 + g2));
+        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId3, g1 + g2 + 10, g1 + g2 + 10 + g3));
+        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId4, g1 + g2 + g3 + 15, g1 + g2 + g3 + 15 + g4));
+        signalPlan.setOffset(0);
     }
+
 }
