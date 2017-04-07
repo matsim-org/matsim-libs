@@ -1,5 +1,6 @@
 package playground.clruch.gheat.graphics;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import ch.ethz.idsc.tensor.RealScalar;
@@ -10,7 +11,8 @@ import ch.ethz.idsc.tensor.io.ImageFormat;
 public class DotImage {
 
     final int size;
-    final BufferedImage bufferedImage;
+    public final BufferedImage bufferedImage;
+    public final BufferedImage bufferedImageRGB;
 
     public DotImage(int zoom) {
         size = 3 * (zoom + 1);
@@ -23,10 +25,24 @@ public class DotImage {
                 img.set(RealScalar.of(rgb), x, y);
             }
         bufferedImage = ImageFormat.of(img);
+        bufferedImageRGB = convert(bufferedImage, BufferedImage.TYPE_INT_RGB);
     }
 
     private static double poly(double x) {
         // 0.498335 + 0.258199 x + 0.7263 x^2 - 0.482759 x^3
         return 0.498335 + 0.258199 * x + 0.7263 * x * x - 0.482759 * x * x * x;
     }
+
+    public int getWidth() {
+        return size;
+    }
+
+    private static BufferedImage convert(BufferedImage src, int bufImgType) {
+        BufferedImage img = new BufferedImage(src.getWidth(), src.getHeight(), bufImgType);
+        Graphics2D g2d = img.createGraphics();
+        g2d.drawImage(src, 0, 0, null);
+        g2d.dispose();
+        return img;
+    }
+
 }

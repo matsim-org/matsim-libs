@@ -27,6 +27,6 @@ public class HeatMap {
                 zoom, //
                 x, //
                 y, //
-                dataManager.GetPointsForTile(x, y, DotImages.get(zoom), zoom));
+                dataManager.GetPointsForTile(x, y, DotImages.get(zoom).bufferedImageRGB, zoom));
     }
 }

@@ -8,13 +8,14 @@ import java.awt.image.BufferedImage;
 
 import playground.clruch.gheat.graphics.BlendComposite;
 import playground.clruch.gheat.graphics.ColorScheme;
+import playground.clruch.gheat.graphics.DotImage;
 import playground.clruch.gheat.graphics.GammaCorrection;
 
 public class Tile {
     private Tile() {
     }
 
-    public static BufferedImage Generate(ColorScheme colorScheme, BufferedImage dot, //
+    public static BufferedImage Generate(ColorScheme colorScheme, DotImage dot, //
             int zoom, int tileX, int tileY, DataPoint[] points) throws Exception {
         int expandedWidth;
         int expandedHeight;
@@ -41,7 +42,7 @@ public class Tile {
         } else {
             tile = GetBlankImage(expandedHeight, expandedWidth);
             tile = AddPoints(tile, dot, points);
-            tile = Trim(tile, dot);
+            tile = Trim(tile, dot.bufferedImage);
             tile = Colorize(tile, colorScheme.bufferedImage);
         }
         return tile;
@@ -92,23 +93,16 @@ public class Tile {
     /// <param name="tile"></param>
     /// <param name="points"></param>
     /// <returns></returns>
-    public static BufferedImage AddPoints(BufferedImage tile, BufferedImage dot, DataPoint[] points) {
+    public static BufferedImage AddPoints(BufferedImage tile, DotImage dot, DataPoint[] points) {
         Graphics2D g = tile.createGraphics();
         g.setComposite(BlendComposite.Multiply);
         for (int i = 0; i < points.length; i++) {
-            BufferedImage src = points[i].getWeight() != 0 ? ApplyWeightToImage(dot, points[i].getWeight()) : dot;
-            g.drawImage(convert(src, BufferedImage.TYPE_INT_RGB), (int) (points[i].getX() + dot.getWidth()), (int) (points[i].getY() + dot.getWidth()), null);
+            // double weight = points[i].getWeight();
+            // BufferedImage src = dot; // weight != 0 ? ApplyWeightToImage(dot, weight) : dot;
+            g.drawImage(dot.bufferedImageRGB, (int) (points[i].getX() + dot.getWidth()), (int) (points[i].getY() + dot.getWidth()), null);
         }
         g.dispose();
         return tile;
-    }
-
-    public static BufferedImage convert(BufferedImage src, int bufImgType) {
-        BufferedImage img = new BufferedImage(src.getWidth(), src.getHeight(), bufImgType);
-        Graphics2D g2d = img.createGraphics();
-        g2d.drawImage(src, 0, 0, null);
-        g2d.dispose();
-        return img;
     }
 
     /// <summary>
