@@ -34,10 +34,13 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.sqrt;
+
 public class SelfishDispatcher extends UniversalDispatcher {
 
 	private final int dispatchPeriod;
-	private final int updateRefPeriod; // implementation may not use this
+	private final int updateRefPeriod; 			// implementation may not use this
+	private final int weiszfeldMaxIter; 		// max iterations for the Weiszfeld algorithm
 	private Tensor printVals = Tensors.empty();
 	private final int numberofVehicles;
 
@@ -61,6 +64,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
 		dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
 		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", Integer.MAX_VALUE);
 		numberofVehicles = (int) generatorConfig.getNumberOfVehicles();
+		weiszfeldMaxIter = safeConfig.getInteger("weiszfeldMaxIter", 1000);
 		network = networkIn;
 		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx,
 																					// miny,
@@ -156,6 +160,45 @@ public class SelfishDispatcher extends UniversalDispatcher {
 			refPositions.put(avVehicle, networkLinks.get(0));
 		}
 	}
+
+    /**
+     *
+     * @param dataPoints
+     *          list of 2D points to compute the geometric median of
+     * @param initialGuess
+     *          2D-point initial guess for the iterative algorithm
+     * @param tolerance
+     *          defines when convergence occurs
+     * @param maxIter
+     *          maximum number of iterations to compute before terminating
+     * @return 2D Weber point approximated by Weiszfeld's algorithm
+     */
+	private Coord weberWeiszfeld(List<Coord> dataPoints, Coord initialGuess, double tolerance, int maxIter) {
+        double weberX = initialGuess.getX();
+		double weberY = initialGuess.getY();
+        int count = 0;
+        while (count <= maxIter) {
+        	double X = 0.0;
+        	double Y = 0.0;
+        	double normalizer = 0.0;
+            for (Coord point : dataPoints) {
+				double distance = Math.sqrt( Math.pow(point.getX()-weberX, 2.0) + Math.pow(point.getY()-weberY, 2.0) );
+				X += point.getX()/distance;
+				Y += point.getY()/distance;
+				normalizer += 1.0/distance;
+			}
+			X /= normalizer;
+            Y /= normalizer;
+            double change = Math.sqrt( Math.pow(X-weberX, 2.0) + Math.pow(Y-weberY, 2.0) );
+            weberX = X;
+            weberY = Y;
+			if (change < tolerance) {
+				break;
+			}
+            count++;
+        }
+        return new Coord(weberX, weberY);
+    }
 
 	/**
 	 * initializes the vehicle Lists which are used for vehicle specific
