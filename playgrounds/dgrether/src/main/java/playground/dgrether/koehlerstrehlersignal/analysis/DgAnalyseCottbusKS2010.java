@@ -85,8 +85,9 @@ public class DgAnalyseCottbusKS2010 {
 
 	private static final Logger LOG = Logger.getLogger(DgAnalyseCottbusKS2010.class);
 
-	private static final CoordinateReferenceSystem crs = MGC
-			.getCRS(TransformationFactory.WGS84_UTM33N);
+	private static final CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+	
+	private static String svnBaseDir;
 	
 	static class TimeConfig {
 		String name;
@@ -273,8 +274,8 @@ public class DgAnalyseCottbusKS2010 {
 		
 		Network n = baseResult.runLoader.getNetwork();
 		Population pop = baseResult.runLoader.getPopulation();
-		String outDir = "../../../runs-svn/cottbus/createGridLock/analysis/";
-//				DgPaths.REPOS + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/diffs/";
+		String outDir = svnBaseDir + "runs-svn/cottbus/createGridLock/analysis/";
+//				svnBaseDir + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/diffs/"; // old path
 		File out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/");
 		Population newPop = this.getFilteredPopulation(pop, disattractedPersonIds);
 		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
@@ -329,7 +330,7 @@ public class DgAnalyseCottbusKS2010 {
 	private void calculateResults(List<RunInfo> runInfos, List<TimeConfig> times, List<Extent> extents) {
 		for (RunInfo runInfo: runInfos) {
 			String runId = runInfo.runId;
-			String runDirectory = "../../../runs-svn/cottbus/createGridLock/run"+runId+"/";
+			String runDirectory = svnBaseDir + "runs-svn/cottbus/createGridLock/run"+runId+"/";
 			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
 			String eventsFilename = //runDirectory + runId + ".output_events.xml";
 					runDir.getEventsFilename(runInfo.iteration);
@@ -476,7 +477,7 @@ public class DgAnalyseCottbusKS2010 {
 	 * In this method one can compose spatial extends that are used for analysis.
 	 */
 	public static List<Extent> createExtentList(){
-		String inputBaseDir = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
+		String inputBaseDir = svnBaseDir + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
 		
 		List<Extent> l = new ArrayList<Extent>();
 //		String filterFeatureFilename = "../../../shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
@@ -494,7 +495,7 @@ public class DgAnalyseCottbusKS2010 {
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scFullNetwork.getNetwork());
 		netReader.readFile(fullNetFile);
 		
-		String filterFeatureFilename = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/shape_files/signal_systems/bounding_box.shp";
+		String filterFeatureFilename = inputBaseDir + "shape_files/signal_systems/bounding_box.shp";
 //				"../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
 		Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple = CottbusUtils.loadFeature(filterFeatureFilename);
 //		Envelope env = getTransformedEnvelope(featureTuple);
@@ -586,7 +587,7 @@ public class DgAnalyseCottbusKS2010 {
 	}
 
 	
-	public static List<RunInfo> createRunsIdList(){
+	public static List<RunInfo> createRunsIdList(String[] args){
 		List<RunInfo> l = new ArrayList<RunInfo>();
 		
 //		CottbusRuns.addReduceFlowCapacityRunsNoIterations(l);
@@ -638,62 +639,104 @@ public class DgAnalyseCottbusKS2010 {
 		// parameter test
 //		CottbusRuns.addOptAndRouteChoice1400(l, 2054, 2055);
 		
-		int cap = 5;
-		
-		RunInfo ri = null;
-		ri = new RunInfo();
-		ri.runId = "30"+cap+"1";
-		ri.iteration = 200;
-		ri.baseCase = true;
-		ri.remark = "all green";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "30"+cap+"2";
-		ri.iteration = 200;
-		ri.remark = "fixed MS";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "30"+cap+"3";
-		ri.iteration = 200;
-		ri.remark = "sylvia MS";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "30"+cap+"4";
-		ri.iteration = 200;
-		ri.remark = "bp MS";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "30"+cap+"5";
-		ri.iteration = 200;
-		ri.remark = "bp MS+green";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "30"+cap+"6";
-		ri.iteration = 200;
-		ri.remark = "bp green";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "30"+cap+"7";
-		ri.iteration = 200;
-		ri.remark = "toll ring";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "30"+cap+"8";
-		ri.iteration = 200;
-		ri.remark = "toll w/oRing";
-		l.add(ri);
-		
+		if (args != null && args.length != 0){
+			for (int i = 0; i < args.length; i++){
+				RunInfo ri = new RunInfo();
+				ri.runId = args[i];
+				ri.iteration = 200;
+				ri.baseCase = args[i].endsWith("1")? true : false;
+				switch (args[i].substring(3)){
+//				switch (args[i].charAt(3)){
+				case "1":
+					ri.remark = "all green";
+					break;
+				case "2":
+					ri.remark = "fixed MS";
+					break;
+				case "3":
+					ri.remark = "sylvia MS";
+					break;
+				case "4":
+					ri.remark = "bp MS";
+					break;
+				case "5":
+					ri.remark = "bp MS+green";
+					break;
+				case "6":
+					ri.remark = "bp green";
+					break;
+				case "7":
+					ri.remark = "toll ring";
+					break;
+				case "8":
+					ri.remark = "toll w/oRing";
+					break;
+				default:
+					throw new IllegalArgumentException("Unknown run type.");
+				}
+				l.add(ri);
+			}
+		} else { // args is empty
+			int cap = 5;
+			
+			RunInfo ri = null;
+			ri = new RunInfo();
+			ri.runId = "30"+cap+"1";
+			ri.iteration = 200;
+			ri.baseCase = true;
+			ri.remark = "all green";
+			l.add(ri);
+			
+			ri = new RunInfo();
+			ri.runId = "30"+cap+"2";
+			ri.iteration = 200;
+			ri.remark = "fixed MS";
+			l.add(ri);
+			
+			ri = new RunInfo();
+			ri.runId = "30"+cap+"3";
+			ri.iteration = 200;
+			ri.remark = "sylvia MS";
+			l.add(ri);
+			
+			ri = new RunInfo();
+			ri.runId = "30"+cap+"4";
+			ri.iteration = 200;
+			ri.remark = "bp MS";
+			l.add(ri);
+			
+			ri = new RunInfo();
+			ri.runId = "30"+cap+"5";
+			ri.iteration = 200;
+			ri.remark = "bp MS+green";
+			l.add(ri);
+			
+			ri = new RunInfo();
+			ri.runId = "30"+cap+"6";
+			ri.iteration = 200;
+			ri.remark = "bp green";
+			l.add(ri);
+			
+			ri = new RunInfo();
+			ri.runId = "30"+cap+"7";
+			ri.iteration = 200;
+			ri.remark = "toll ring";
+			l.add(ri);
+			
+			ri = new RunInfo();
+			ri.runId = "30"+cap+"8";
+			ri.iteration = 200;
+			ri.remark = "toll w/oRing";
+			l.add(ri);
+		}
 		return l;
 	}
 	
 
+	/**
+	 * if args is not empty it should contain the runIds of runs that should be analyzed
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		// get the current date in format "yyyy-mm-dd"
 		Calendar cal = Calendar.getInstance();
@@ -704,11 +747,14 @@ public class DgAnalyseCottbusKS2010 {
 			monthStr = "0" + month;
 		String date = cal.get(Calendar.YEAR) + "-" + monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 
-		List<RunInfo> runIds = createRunsIdList();
+		// TODO choose correct version
+		svnBaseDir = "/net/ils3/thunig/"; // cluster
+//		basePath = "../../../"; // local
+		
+		List<RunInfo> runIds = createRunsIdList(args);
 		String runIdsString = createRunIdIterationString(runIds);
-		String outputDirectory = "../../../runs-svn/cottbus/createGridLock/analysis/";
-//				DgPaths.SHAREDSVN + "projects/cottbus/data/optimization/cb2ks2010/" 
-//				+ "2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/results/";
+		String outputDirectory = svnBaseDir + "runs-svn/cottbus/createGridLock/analysis/";
+//				svnBaseDir + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/results/"; // old
 		List<TimeConfig> times = createTimeConfig();
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
