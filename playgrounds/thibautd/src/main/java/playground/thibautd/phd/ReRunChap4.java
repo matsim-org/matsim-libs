@@ -23,6 +23,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.framework.controller.CliquesModule;
 import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
+import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.GroupStrategyManager;
 import org.matsim.contrib.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
 import org.matsim.contrib.socnetsim.jointtrips.JointTripsModule;
 import org.matsim.contrib.socnetsim.run.RunUtils;
@@ -59,6 +61,8 @@ public class ReRunChap4 {
 
 		Logger.getLogger( StrongLinkIdentifierProvider.class ).setLevel( Level.TRACE );
 		Logger.getLogger( WeakLinkIdentifierProvider.class ).setLevel( Level.TRACE );
+		Logger.getLogger( GroupStrategyManager.class ).setLevel( Level.TRACE );
+		Logger.getLogger( JointPlans.class ).setLevel( Level.TRACE );
 
 		final Config config = loadConfig(configFile);
 		if ( ((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME )).isUseKtiScoring() ) {

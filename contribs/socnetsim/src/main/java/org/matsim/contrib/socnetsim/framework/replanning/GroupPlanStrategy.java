@@ -87,9 +87,12 @@ public class GroupPlanStrategy {
 
 		// the modules are allowed to modify joint structure:
 		// register joint plans afterhand only.
+		final Counter jpCounter = new Counter( "Register joint plans for group # " , " / "+plansToHandle.size() );
 		for (GroupPlans groupPlans : plansToHandle) {
+			jpCounter.incCounter();
 			jointPlans.addJointPlans( groupPlans.getJointPlans() );
 		}
+		jpCounter.printCounter();
 	}
 
 	private static boolean jointPlansAreRegistered(
