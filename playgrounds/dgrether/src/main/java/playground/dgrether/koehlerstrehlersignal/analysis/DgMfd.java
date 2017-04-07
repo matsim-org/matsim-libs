@@ -50,10 +50,10 @@ import org.matsim.vehicles.Vehicle;
  */
 public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler, VehicleEntersTrafficEventHandler {
 	
-	private static final Logger log = Logger.getLogger(DgMfd.class);
+	private static final Logger LOG = Logger.getLogger(DgMfd.class);
 	
-	private static final double binSizeSeconds = 5.0 * 60.0;
-	private static final double vehicleSize = 7.5;
+	private static final double BIN_SIZE_S = 5.0 * 60.0;
+	private static final double VEH_SIZE = 7.5;
 	
 	private Map<Id<Vehicle>, Double> firstTimeSeenMap = new HashMap<>();
 	private Map<Id<Vehicle>, LinkLeaveEvent> lastTimeSeenMap = new HashMap<>();
@@ -62,6 +62,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Vehi
 	private double networkLengthKm;
 	private Data data;
 	private double storagecap;
+	private int abortCounter = 0;
 
 	
 	public DgMfd(Network network, double storagecap){
@@ -76,6 +77,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Vehi
 		this.firstTimeSeenMap.clear();
 		this.lastTimeSeenMap.clear();
 		this.data.reset();
+		this.abortCounter = 0;
 	}
 
 	
@@ -119,7 +121,10 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Vehi
 	
 	@Override
 	public void handleEvent(VehicleAbortsEvent event) {
-		log.warn("got VehicleAbortEvent, the code might not be correct if removeStuckVehicles config switch is set to true");
+		if (abortCounter < 1){
+			LOG.warn("got VehicleAbortEvent, the code might not be correct if removeStuckVehicles config switch is set to true. This message is only given once.");
+		}
+		abortCounter++;
 	}
 	
 	@Override
@@ -145,7 +150,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Vehi
 	}
 
 	private int getBinIndex(double time){
-		return (int)(time / binSizeSeconds);
+		return (int)(time / BIN_SIZE_S);
 	}
 	
 	private double calcNetworkLengthKm() {
@@ -190,8 +195,8 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Vehi
 			depnew = slotData.departures;
 			noVehicles = noVehicles + depnew - arnew ;
 			density = (noVehicles) / this.networkLengthKm;
-			densityNorm = (noVehicles) / ((this.networkLengthKm*1000.0 / vehicleSize) * this.storagecap);
-			double timeSec = slot * binSizeSeconds;
+			densityNorm = (noVehicles) / ((this.networkLengthKm*1000.0 / VEH_SIZE) * this.storagecap);
+			double timeSec = slot * BIN_SIZE_S;
 			int hour = (int) (timeSec / 3600);	
 			StringBuffer line = new StringBuffer();
 			line.append(slot);

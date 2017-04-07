@@ -68,9 +68,9 @@ import utils.ModifyPopulation;
  * @author tthunig
  *
  */
-public class TtRunCapAdopForBraess {
+public class TtRunCapAdopForBraessIterative {
 	
-	private static final Logger LOG = Logger.getLogger(TtRunCapAdopForBraess.class);
+	private static final Logger LOG = Logger.getLogger(TtRunCapAdopForBraessIterative.class);
 	
 	private static final int flowValueStepSize = 2;
 	private static final int iterationNumberPerStep = 100;
@@ -78,7 +78,7 @@ public class TtRunCapAdopForBraess {
 	
 	// defines which kind of pricing should be used
 	private static final PricingType PRICING_TYPE = PricingType.V9;
-	private enum PricingType {
+	enum PricingType {
 		V3, V4, V7, V8, V9, V10
 	}
 

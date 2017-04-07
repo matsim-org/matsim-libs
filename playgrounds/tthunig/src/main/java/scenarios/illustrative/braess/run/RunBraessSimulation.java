@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
@@ -62,11 +61,6 @@ import org.matsim.lanes.data.LanesWriter;
 import analysis.signals.TtSignalAnalysisListener;
 import analysis.signals.TtSignalAnalysisTool;
 import analysis.signals.TtSignalAnalysisWriter;
-//import matsimConnector.congestionpricing.MSACongestionHandler;
-//import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
-//import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
-//import matsimConnector.congestionpricing.MSATollHandler;
-import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.Decongestion;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
@@ -92,6 +86,7 @@ import scenarios.illustrative.braess.createInput.TtCreateBraessSignals;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalBasePlan;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlLogic;
 import scenarios.illustrative.braess.signals.ResponsiveLocalDelayMinimizingSignal;
+import signals.CombinedSignalsModule;
 import signals.downstreamSensor.DownstreamSignalsModule;
 
 /**
@@ -112,15 +107,16 @@ public final class RunBraessSimulation {
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
-	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.NONE;
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = null;
+	// TODO try with null - nicht alle wechseln auf mitte, weil alle zusammen außen ausprobieren, 100+105- geht nicht, 110 - noch zu klein... lieber zu hoch als zu niedrig?
 
 	// defines which kind of signals should be used. use 'SIGNAL_LOGIC = SignalControlLogic.NONE' if signals should not be used
-	private static final SignalBasePlan SIGNAL_BASE_PLAN = SignalBasePlan.ALL_NODES_ALL_GREEN;
+	private static final SignalBasePlan SIGNAL_BASE_PLAN = SignalBasePlan.NONE;
 	// if SignalBasePlan SIGNAL4_X_Seconds_Z.. is used, SECONDS_Z_GREEN gives the green time for Z
 	private static final int SECONDS_Z_GREEN = 59;
-	private static final SignalControlLogic SIGNAL_LOGIC = SignalControlLogic.DOWNSTREAM_RESPONSIVE;
+	private static final SignalControlLogic SIGNAL_LOGIC = SignalControlLogic.NONE;
 	
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
@@ -137,7 +133,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/downstream/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/hEART_congestionPricing/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -165,6 +161,7 @@ public final class RunBraessSimulation {
 
 		// set number of iterations
 		config.controler().setLastIteration(100);
+		// TODO try 100 vs 500
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes(LANE_TYPE.equals(LaneType.NONE) ? false : true);
@@ -173,6 +170,7 @@ public final class RunBraessSimulation {
 
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta(2);
+		// TODO try 20 vs 2
 
 		// choose between link to link and node to node routing
 		// (only has effect if lanes are used)
@@ -183,7 +181,8 @@ public final class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize(600);
+		config.travelTimeCalculator().setTraveltimeBinSize(10);
+		// TODO try with 10 vs 900
 //		config.travelTimeCalculator().setMaxTime((int) (3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2)));
 		config.travelTimeCalculator().setMaxTime(3600 * 24);
 
@@ -197,7 +196,7 @@ public final class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-			strat.setWeight(0.0);
+			strat.setWeight(0.1);
 			strat.setDisableAfter(config.controler().getLastIteration() - 50);
 			config.strategy().addStrategySettings(strat);
 		}
@@ -296,8 +295,10 @@ public final class RunBraessSimulation {
 		Controler controler = new Controler(scenario);
 	
 		switch (SIGNAL_LOGIC){
-		// add responsive signal controler if enabled
+		case NONE:
+			break;
 		case SIMPLE_RESPONSIVE:
+			// add responsive signal controler if enabled
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -306,15 +307,12 @@ public final class RunBraessSimulation {
 				}
 			});
 			break;
-		case DOWNSTREAM_RESPONSIVE:
-			controler.addOverridingModule(new DownstreamSignalsModule());
-			break;
 		default:
-			// add general sylvia signals module (also works when no signals or only planbased signals are used)
+			// add combined signals module (works for different signal types as sylvia, downstream or planbased)
 			boolean alwaysSameMobsimSeed = false;
-			SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
-			sylviaSignalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
-			controler.addOverridingModule(sylviaSignalsModule);
+			CombinedSignalsModule signalsModule = new CombinedSignalsModule();
+			signalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
+			controler.addOverridingModule(signalsModule);
 			break;
 		}
 		

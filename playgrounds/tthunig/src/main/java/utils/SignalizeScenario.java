@@ -23,8 +23,10 @@ package utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +44,6 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerDa
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactoryImpl;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -58,11 +59,7 @@ import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
 
-import com.amazonaws.services.kms.model.UnsupportedOperationException;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-
-import playground.dgrether.DgPaths;
 
 /**
  * This class converts a scenario without signals into a scenario with signals at all intersections.
@@ -73,9 +70,15 @@ import playground.dgrether.DgPaths;
  */
 public class SignalizeScenario {
 	
-	Scenario scenario;
-	Envelope bbEnv;
-	String signalControlIdentifier = DefaultPlanbasedSignalSystemController.IDENTIFIER;
+	private static final Logger LOG = Logger.getLogger(SignalizeScenario.class);
+	
+	private Scenario scenario;
+	private Envelope bbEnv;
+	private String signalControlIdentifier = DefaultPlanbasedSignalSystemController.IDENTIFIER;
+	private boolean overwriteSignals = true;
+	
+	private SignalsData signalsData;
+	private List<Id<Node>> signalizedNodes = new LinkedList<>();
 	
 	/**
 	 * constructor.
@@ -91,12 +94,15 @@ public class SignalizeScenario {
 	}
 	
 	public void setBoundingBox(String bbShapeFile){
-//		String boundingBoxShape = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shape_files/signal_systems/cottbus_city_bounding_box.shp";
 		ShapeFileReader shapeReader = new ShapeFileReader();
 		shapeReader.readFileAndInitialize(bbShapeFile);
 		SimpleFeature f = shapeReader.getFeatureSet().iterator().next();
 		BoundingBox bb = f.getBounds();
 		bbEnv = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
+	}
+	
+	public void setOverwriteSignals(boolean overwriteSignals){
+		this.overwriteSignals = overwriteSignals;
 	}
 	
 	/**
@@ -108,12 +114,17 @@ public class SignalizeScenario {
 		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalsConfigGroup.setUseSignalSystems(true);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
+		if (!signalsConfigGroup.isUseSignalSystems()){
+			signalsConfigGroup.setUseSignalSystems(true);
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
+		} 
+		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		
+		initSignalizedNodes();
 	
-		createSystemAtEveryNode(scenario, false);
-		createGroupForEverySignal(scenario);
-		createControlForEveryGroup(scenario, signalControlIdentifier);
+		createSystemAtEveryNode(false);
+		createGroupForEverySignal();
+		createControlForEveryGroup();
 	}
 
 	/**
@@ -126,35 +137,60 @@ public class SignalizeScenario {
 		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), 
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalsConfigGroup.setUseSignalSystems(true);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
+		if (!signalsConfigGroup.isUseSignalSystems()){
+			signalsConfigGroup.setUseSignalSystems(true);
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
+		} 
+		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		
 		scenario.getConfig().qsim().setUseLanes(true);
+		
+		initSignalizedNodes();
+		
+		createLanesForEveryInLinkOutLinkPair();
+		createSystemAtEveryNode(true);
+		createGroupForEverySignal();
+		createControlForEveryGroup();
+	}
 
-		createLanesForEveryInLinkOutLinkPair(scenario);
-		createSystemAtEveryNode(scenario, true);
-		createGroupForEverySignal(scenario);
-		createControlForEveryGroup(scenario, signalControlIdentifier);
+	/**
+	 * create a list with all signalized nodes.
+	 * is necessary when overwriteSignals is set to false.
+	 */
+	private void initSignalizedNodes() {
+		if (!overwriteSignals){
+			for (SignalSystemData signalSystem : signalsData.getSignalSystemsData().getSignalSystemData().values()){
+				for (SignalData signal : signalSystem.getSignalData().values()){
+					// take node of the first signal of the system, i.e. assume all systems signal belong to the same node
+					signalizedNodes.add(scenario.getNetwork().getLinks().get(signal.getLinkId()).getToNode().getId());
+					break;
+				}
+			}
+		}
 	}
 
 	/**
 	 * for every link with more than one outgoing link, this method creates an original lane and outgoing lanes for all turning possibilities.
 	 * if a bounding box envelope is used, lanes are only created for links that lead to nodes inside the envelope.
-	 * 
-	 * @param scenario
 	 */
-	private void createLanesForEveryInLinkOutLinkPair(Scenario scenario) {
+	private void createLanesForEveryInLinkOutLinkPair() {
 		Lanes lanes = scenario.getLanes();
 		LanesFactory fac = lanes.getFactory();
-
-		if (!lanes.getLanesToLinkAssignments().isEmpty()){
-			throw new UnsupportedOperationException("Creating lanes and signals at all intersections is only supported for scenarios that do not contain lanes yet.");
+		if (!lanes.getLanesToLinkAssignments().isEmpty() && this.overwriteSignals){
+			LOG.warn("This class will overwrite existing lane information");
 		}
 		
 		for (Link inLink : scenario.getNetwork().getLinks().values()) {
 			// to node lies inside the bounding box envelope
 			if (bbEnv != null && bbEnv.contains(MGC.coord2Coordinate(inLink.getToNode().getCoord()))) {
 				// Create lanes for every link with more than one outgoing link
-				if ((inLink.getToNode().getOutLinks() != null) && (inLink.getToNode().getOutLinks().size() > 1)) {
+				if ((inLink.getToNode().getOutLinks() != null) && (inLink.getToNode().getOutLinks().size() > 1)){	
+					// except the link already contains lane information and overwriteSignals is set to false
+					// or if there already exists a signal at the links to node
+					if (!overwriteSignals && lanes.getLanesToLinkAssignments().containsKey(inLink.getId())
+							|| signalizedNodes.contains(inLink.getToNode().getId())) {
+						continue;
+					} // else, i.e. the link either does not contain lane information or overwriteSignals is set to true:
 					LanesToLinkAssignment linkLanes = fac.createLanesToLinkAssignment(inLink.getId());
 					lanes.addLanesToLinkAssignment(linkLanes);
 					List<Id<Lane>> linkLaneIds = new ArrayList<>();
@@ -177,16 +213,13 @@ public class SignalizeScenario {
 	/**
 	 * create a signal system at every node inside the bounding box envelope.
 	 * creates signals at all links or lanes (if useLanes is true)
-	 * 
-	 * @param scenario
 	 * @param useLanes
 	 */
-	private void createSystemAtEveryNode(Scenario scenario, boolean useLanes) {
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
-	
-		if (!signalsData.getSignalSystemsData().getSignalSystemData().isEmpty()){
-			throw new UnsupportedOperationException("Creating signals at all intersections is only supported for scenarios that do not contain signals yet.");
+	private void createSystemAtEveryNode(boolean useLanes) {
+		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
+		SignalSystemsDataFactory fac = signalSystems.getFactory();
+		if (!signalSystems.getSignalSystemData().isEmpty() && this.overwriteSignals){
+			LOG.warn("This class will overwrite existing signal data");
 		}
 		
 		for (Node node : scenario.getNetwork().getNodes().values()){
@@ -195,6 +228,13 @@ public class SignalizeScenario {
 
 				// Create system for every node with outgoing and ingoing links
 				if ((node.getOutLinks() != null) && (!node.getOutLinks().isEmpty()) && (node.getInLinks() != null) && (!node.getInLinks().isEmpty())) {
+					Id<SignalSystem> signalSystemId = Id.create("signalSystem" + node.getId(), SignalSystem.class);
+					
+					// except the node already contains system information and overwriteSignals is set to false
+					if (!overwriteSignals && signalizedNodes.contains(node.getId())) {
+						continue;
+					} // else, i.e. the node either does not contain system information or overwriteSignals is set to true:
+					
 					// if (node.getOutLinks().size() == 1 && node.getInLinks().size() == 1
 					// && node.getOutLinks().get(0).getToNode().equals(node.getInLinks().get(0).getFromNode())){
 					// // do not create signals at dead end streets
@@ -202,8 +242,8 @@ public class SignalizeScenario {
 					// }
 
 					// create signal system
-					SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem" + node.getId(), SignalSystem.class));
-					signalsData.getSignalSystemsData().addSignalSystemData(signalSystem);
+					SignalSystemData signalSystem = fac.createSignalSystemData(signalSystemId);
+					signalSystems.addSignalSystemData(signalSystem);
 
 					// go through all ingoing links
 					for (Id<Link> linkId : node.getInLinks().keySet()) {
@@ -232,41 +272,44 @@ public class SignalizeScenario {
 		}
 	}
 
-	private void createGroupForEverySignal(Scenario scenario) {
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+	private void createGroupForEverySignal() {
+		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		for (SignalSystemData system : signalsData.getSignalSystemsData().getSignalSystemData().values()) {
-			SignalUtils.createAndAddSignalGroups4Signals(signalsData.getSignalGroupsData(), system);
+			// create single element groups for the systems signal if no groups exist yet or overwriteSignals is set to true anyways
+			if (overwriteSignals || !signalGroups.getSignalGroupDataBySignalSystemId().containsKey(system.getId())){
+				SignalUtils.createAndAddSignalGroups4Signals(signalGroups, system);
+			}
 		}
 	}
 
 	/**
 	 * Create an all day green signal control for every signal group.
-	 * 
-	 * @param scenario
-	 * @param signalControlIdentifier 
 	 */
-	private void createControlForEveryGroup(Scenario scenario, String signalControlIdentifier) {
+	private void createControlForEveryGroup() {
 		int CYCLE_TIME = 90;
 		
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
 		SignalControlDataFactory fac = signalControl.getFactory();
 		
 		// create a signal control for all signal systems
-		for (SignalSystemData signalSystem : signalSystems.getSignalSystemData().values()) {
-
-			SignalSystemControllerData signalSystemControl = fac.createSignalSystemControllerData(signalSystem.getId());
+		for (Id<SignalSystem> signalSystemId : signalSystems.getSignalSystemData().keySet()) {
+			// except the system already contains control data and overwriteSignals is set to false
+			if (!overwriteSignals && signalControl.getSignalSystemControllerDataBySystemId().containsKey(signalSystemId)) {
+				continue;
+			} // else, i.e. there is either no control data for this system or overwriteSignals is set to true:
+			
+			SignalSystemControllerData signalSystemControl = fac.createSignalSystemControllerData(signalSystemId);
 			// create a default plan for the signal system (with defined cycle time and offset 0)
 			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
 			signalSystemControl.addSignalPlanData(signalPlan);
 			signalSystemControl.setControllerIdentifier(signalControlIdentifier);
-			// add the signalSystemControl to the signalControl
+			// add the systems control to the control container
 			signalControl.addSignalSystemControllerData(signalSystemControl);
 
 			// specify signal group settings for all signal groups of this signal system
-			for (SignalGroupData signalGroup : signalGroups.getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
+			for (SignalGroupData signalGroup : signalGroups.getSignalGroupDataBySystemId(signalSystemId).values()) {
 				/* TODO decide which kind of signal control to create
 				 * devide 90 sec into equal time slots for all directions?! 
 				 * problem: corresponding directions cannot be found easily
