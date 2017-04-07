@@ -59,6 +59,6 @@ public class RunOneTaxiExample {
 	}
 
 	public static void main(String... args) {
-		run(false, 3); // switch to 'false' to turn off visualisation
+		run(true, 0); // switch to 'false' to turn off visualisation
 	}
 }
