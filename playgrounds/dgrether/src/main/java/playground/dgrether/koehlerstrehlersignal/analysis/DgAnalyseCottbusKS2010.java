@@ -252,7 +252,7 @@ public class DgAnalyseCottbusKS2010 {
 			}
 
 			this.writeMfd(r);
-//			this.writeLhi(r);
+			this.writeLhi(r);
 		}
 	}
 
@@ -350,11 +350,11 @@ public class DgAnalyseCottbusKS2010 {
 					net = runDir.getNetwork();
 				}
 				
-				/* TODO skipped to save some time. see also lhi in method analyseResults and result.legHistogram below. theresa mar'17 */
-//				EventsManager eventsManagerUnfiltered = new EventsManagerImpl();
-//				LegModeHistogramImproved lhi = new LegModeHistogramImproved();
-//				eventsManagerUnfiltered.addHandler(lhi);
-//				this.processEvents(eventsManagerUnfiltered, inMemoryEvents, eventsFilename);
+				// TODO skip this if you use inMemoryEvents=false
+				EventsManager eventsManagerUnfiltered = new EventsManagerImpl();
+				LegModeHistogramImproved lhi = new LegModeHistogramImproved();
+				eventsManagerUnfiltered.addHandler(lhi);
+				this.processEvents(eventsManagerUnfiltered, inMemoryEvents, eventsFilename);
 				
 				for (TimeConfig time : times) {
 					Result result = new Result();
@@ -363,7 +363,7 @@ public class DgAnalyseCottbusKS2010 {
 					result.extent = extent;
 					result.timeConfig = time;
 					result.network = net;
-//					result.legHistogram = lhi;
+					result.legHistogram = lhi;
 					results.addResult(result);
 
 					EventsFilterManager eventsManager = new EventsFilterManagerImpl();
@@ -716,7 +716,7 @@ public class DgAnalyseCottbusKS2010 {
 		String outputFilename = outputDirectory + date + "_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
-		ana.setUseInMemoryEvents(false);
+		ana.setUseInMemoryEvents(true);
 		ana.calculateResults(runIds, times, extents);
 		ana.analyseResults();
 		new ResultsWriter().writeResultsTable(ana.results, outputFilename + extentString +".txt");
