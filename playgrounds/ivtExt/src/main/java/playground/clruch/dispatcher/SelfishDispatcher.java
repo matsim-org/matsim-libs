@@ -1,9 +1,11 @@
 package playground.clruch.dispatcher;
 
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -13,32 +15,29 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.dispatcher.utils.*;
-import playground.clruch.simonton.Cluster;
-import playground.clruch.simonton.EuclideanDistancer;
-import playground.clruch.simonton.MyTree;
+import playground.clruch.dispatcher.utils.AbstractRequestSelector;
+import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
+import playground.clruch.dispatcher.utils.OldestRequestSelector;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
-
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class SelfishDispatcher extends UniversalDispatcher {
 
 	private final int dispatchPeriod;
 	private final int updateRefPeriod; // implementation may not use this
-	private Tensor printVals = Tensors.empty();
+	// private Tensor printVals = Tensors.empty();
 	private final int numberofVehicles;
 
 	// specific to SelfishDispatcher
@@ -85,18 +84,17 @@ public class SelfishDispatcher extends UniversalDispatcher {
 
 				// ensure all requests recorded properly
 				GlobalAssert.that(
-						requestsServed.values().stream().mapToInt(List::size).sum() == super.getTotalMatchedRequests());
+						requestsServed.values().stream().mapToInt(List::size).sum() == getTotalMatchedRequests());
 
 				// update ref positions periodically
 				if (round_now % updateRefPeriod == 0)
 					updateRefPositions();
 
 				// if requests present, send every vehicle to closest customer
-				if(getAVRequests().size()>0){
-					getDivertableVehicles().stream()
-					.forEach(v -> setVehicleDiversion(v, findClosestRequest(v, getAVRequests())));
-				}
-
+                if (getAVRequests().size() > 0) {
+                    getDivertableVehicles().stream() //
+                            .forEach(v -> setVehicleDiversion(v, findClosestRequest(v, getAVRequests())));
+                }
 
 				// send remaining vehicles to their reference position
 				getDivertableVehicles().stream().forEach(v -> setVehicleDiversion(v, refPositions.get(v.avVehicle)));
@@ -113,8 +111,10 @@ public class SelfishDispatcher extends UniversalDispatcher {
 			if (!openRequests.contains(avRequest)) {
 				Coord toMatchRequestCoord = avRequest.getFromLink().getFromNode().getCoord();
 				boolean orSucc = openRequests.add(avRequest);
-				boolean qtSucc = pendingRequestsTree.put(toMatchRequestCoord.getX(), toMatchRequestCoord.getY(),
-						avRequest);
+                boolean qtSucc = pendingRequestsTree.put( //
+                        toMatchRequestCoord.getX(), //
+                        toMatchRequestCoord.getY(), //
+                        avRequest);
 				GlobalAssert.that(orSucc == qtSucc && orSucc == true);
 			}
 		}
@@ -146,8 +146,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
 			networkLinks.add(link);
 		}
 
-		// currently implemented, assign a random link from the network to every
-		// AV
+		// currently implemented, assign a random link from the network to every AV
 		for (AVVehicle avVehicle : refPositions.keySet()) {
 			Collections.shuffle(networkLinks);
 			refPositions.put(avVehicle, networkLinks.get(0));
@@ -159,8 +158,8 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	 * tracking
 	 */
 	private void initializeVehicles() {
-		for (AVVehicle avVehicle : getVehicles()) {
-			requestsServed.put(avVehicle, new ArrayList<AVRequest>());
+		for (AVVehicle avVehicle : getMaintainedVehicles()) {
+			requestsServed.put(avVehicle, new ArrayList<>());
 			refPositions.put(avVehicle, null);
 		}
 		if (requestsServed.keySet().size() == numberofVehicles) {
