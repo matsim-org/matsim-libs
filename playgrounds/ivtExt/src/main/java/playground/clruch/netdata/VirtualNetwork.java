@@ -67,14 +67,14 @@ public class VirtualNetwork {
      * @return the virtualLink belonging to a certain index.
      */
     public final VirtualLink getVirtualLink(int index) {
-        return this.getVirtualLinks().stream().filter(v -> v.getIndex() == index).findAny().get();
+        // return this.getVirtualLinks().stream().filter(v -> v.getIndex() == index).findAny().get();
+        return virtualLinks.get(index);
     }
 
-
-    public final VirtualNode getVirtualNode(int index){
-        return this.getVirtualNodes().stream().filter(v->v.getIndex() == index).findAny().get();
+    public final VirtualNode getVirtualNode(int index) {
+        // return this.getVirtualNodes().stream().filter(v->v.getIndex() == index).findAny().get();
+        return virtualNodes.get(index);
     }
-
 
     /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn,int neighCount) {
         VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount);
