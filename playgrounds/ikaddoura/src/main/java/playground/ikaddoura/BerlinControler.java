@@ -35,6 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingConfigGroup;
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
@@ -120,6 +121,8 @@ public class BerlinControler {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
+		
+		controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario));
 				
 		if (pricingApproach.toString().equals(PricingApproach.NoPricing.toString())) {
 			
@@ -134,7 +137,7 @@ public class BerlinControler {
 			// toll-adjusted routing
 			
 			final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-			travelDisutilityFactory.setSigma(this.sigma);
+			travelDisutilityFactory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){
 				@Override
