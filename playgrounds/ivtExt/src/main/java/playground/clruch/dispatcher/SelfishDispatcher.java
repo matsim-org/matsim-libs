@@ -47,33 +47,35 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	private final int weiszfeldMaxIter; 		// max iterations for Weiszfeld's algorithm
 	private final double weiszfeldTol; 			// convergence tolerance for Weiszfeld's algorithm
 	private boolean vehiclesInitialized = false;
-	private HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
-	private HashMap<AVVehicle, Link> refPositions = new HashMap<>();
+	private final HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
+	private final HashMap<AVVehicle, Link> refPositions = new HashMap<>();
 	private final Network network;
 	private final QuadTree<AVRequest> pendingRequestsTree;
 	private final QuadTree<Link> networkLinksTree;
 	private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used to enable fast "contains" searching
+	private final double[] networkBounds;
 
-	private SelfishDispatcher( //
-			AVDispatcherConfig avDispatcherConfig, //
-			AVGeneratorConfig generatorConfig, //
-			TravelTime travelTime, //
-			ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-			EventsManager eventsManager, //
+	private SelfishDispatcher( 													//
+			AVDispatcherConfig avDispatcherConfig, 								//
+			AVGeneratorConfig generatorConfig, 									//
+			TravelTime travelTime, 												//
+			ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, 	//
+			EventsManager eventsManager, 										//
 			Network networkIn, AbstractRequestSelector abstractRequestSelector) {
+
 		super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+
+		// Load parameters from av.xml
 		SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
 		dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
-		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", Integer.MAX_VALUE);
-		numberofVehicles = (int) generatorConfig.getNumberOfVehicles();
+		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", 3600);
 		weiszfeldMaxIter = safeConfig.getInteger("weiszfeldMaxIter", 1000);
 		weiszfeldTol = safeConfig.getDouble("weiszfeldTol", 1.0);
+		numberofVehicles = (int) generatorConfig.getNumberOfVehicles();
+
 		network = networkIn;
-		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx,
-																					// miny,
-																					// maxx,
-																					// maxy
-		pendingRequestsTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
+		networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values()); 		// minx, miny, maxx, maxy
+		pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
 		networkLinksTree = buildNetworkQuadTree();
 	}
 
@@ -109,17 +111,22 @@ public class SelfishDispatcher extends UniversalDispatcher {
 
 
 				// send remaining vehicles to their reference position
-				getDivertableVehicles().stream().forEach(v -> setVehicleDiversion(v, refPositions.get(v.avVehicle)));
-
+				// getDivertableVehicles().stream().forEach(v -> setVehicleDiversion(v, ));
+				for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+					GlobalAssert.that(refPositions.containsKey(vehicleLinkPair.avVehicle));
+					Link link = refPositions.get(vehicleLinkPair.avVehicle);
+					GlobalAssert.that(link!=null);
+					setVehicleDiversion(vehicleLinkPair, link);
+				}
 			}
 		}
 	}
 
 	private QuadTree<Link> buildNetworkQuadTree() {
-		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx, miny, maxx, maxy
-		QuadTree<Link> networkQuadTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
+		QuadTree<Link> networkQuadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
 		Collection<? extends Link> networkLinks = network.getLinks().values();
 		for (Link link : networkLinks) {
+			GlobalAssert.that(link != null);
 			Coord linkCoord = link.getFromNode().getCoord();
 			boolean putSuccess = networkQuadTree.put(linkCoord.getX(), linkCoord.getY(), link);
 			GlobalAssert.that(putSuccess);
@@ -160,11 +167,20 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	 * update the reference positions of all AVs
 	 */
 	private void updateRefPositions() {
-		for (AVVehicle avVehicle : refPositions.keySet()) {
+		GlobalAssert.that(!getAVList().isEmpty());
+		GlobalAssert.that(0 < networkLinksTree.size());
+		for (AVVehicle avVehicle : getAVList()) {
 			// Coord initialGuess = refPositions.get(avVehicle).getFromNode().getCoord(); // initialize with previous Weber link
-			Coord initialGuess = new Coord(0.0,0.0);
+			Coord initialGuess = new Coord(networkBounds[0],networkBounds[1]);
 			Coord weberCoord = weberWeiszfeld(requestsServed.get(avVehicle), initialGuess);
+
+			/*GlobalAssert.that((weberCoord.getX() >= networkBounds[0]) &&
+					                (weberCoord.getY() >= networkBounds[1]) &&
+									(weberCoord.getX() <= networkBounds[2]) &&
+									(weberCoord.getY() <= networkBounds[3]) ); */
+
 			Link weberLink = networkLinksTree.getClosest(weberCoord.getX(), weberCoord.getY());
+			GlobalAssert.that(weberLink != null);
 			refPositions.put(avVehicle, weberLink);
 		}
 	}
@@ -178,6 +194,9 @@ public class SelfishDispatcher extends UniversalDispatcher {
      * @return 2D Weber point of past requests approximated by Weiszfeld's algorithm
      */
 	private Coord weberWeiszfeld(List<AVRequest> avRequests, Coord initialGuess) {
+		if (avRequests.isEmpty()) {
+			return initialGuess;
+		}
         double weberX = initialGuess.getX();
 		double weberY = initialGuess.getY();
         int count = 0;
@@ -188,15 +207,22 @@ public class SelfishDispatcher extends UniversalDispatcher {
             for (AVRequest avRequest : avRequests) {
             	Coord point = avRequest.getFromLink().getCoord();
 				double distance = Math.sqrt( Math.pow(point.getX() - weberX, 2.0) + Math.pow(point.getY() - weberY, 2.0) );
-				X += point.getX()/distance;
-				Y += point.getY()/distance;
-				normalizer += 1.0/distance;
+				if (distance != 0) {
+					X += point.getX() / distance;
+					Y += point.getY() / distance;
+					normalizer += 1.0 / distance;
+				} else {
+					X = point.getX();
+					Y = point.getY();
+					normalizer = 1.0;
+					break;
+				}
 			}
 			X /= normalizer;
-            Y /= normalizer;
-            double change = Math.sqrt( Math.pow(X - weberX, 2.0) + Math.pow(Y - weberY, 2.0) );
-            weberX = X;
-            weberY = Y;
+			Y /= normalizer;
+			double change = Math.sqrt(Math.pow(X - weberX, 2.0) + Math.pow(Y - weberY, 2.0));
+			weberX = X;
+			weberY = Y;
 			if (change < weiszfeldTol) {
 				break;
 			}
@@ -212,12 +238,10 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	private void initializeVehicles() {
 		for (AVVehicle avVehicle : getAVList()) {
 			requestsServed.put(avVehicle, new ArrayList<AVRequest>());
-			refPositions.put(avVehicle, null);
+			//refPositions.put(avVehicle, null);
 		}
-		if (requestsServed.keySet().size() == numberofVehicles) {
-			updateRefPositions();
-			vehiclesInitialized = true;
-		}
+		updateRefPositions();
+		vehiclesInitialized = true;
 
 	}
 
