@@ -64,7 +64,7 @@ public class OsmTileSource {
     }
     
     /**
-     * The "Cycle Map" OSM tile source.
+     * Humanitarian focused OSM base layer
      */
     public static class HotMap extends AbstractOsmTileSource {
 
@@ -93,4 +93,36 @@ public class OsmTileSource {
             return 18;
         }
     }
+    
+    /**
+     * Humanitarian focused OSM base layer
+     */
+    public static class WikimediaMap extends AbstractOsmTileSource {
+
+        private static final String PATTERN = "https://%s.wikimedia.org/osm-intl";
+
+        private static final String[] SERVER = {"maps"};
+
+        private int serverNum;
+
+        /**
+         * Constructs a new {@code CycleMap} tile source.
+         */
+        public WikimediaMap() {
+            super("Wikimedia", PATTERN, "hot");
+        }
+
+        @Override
+        public String getBaseUrl() {
+            String url = String.format(this.baseUrl, new Object[] {SERVER[serverNum]});
+            serverNum = (serverNum + 1) % SERVER.length;
+            return url;
+        }
+
+        @Override
+        public int getMaxZoom() {
+            return 18;
+        }
+    }
+    // https://maps.wikimedia.org/osm-intl/3/3/3.png
 }
