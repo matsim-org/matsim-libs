@@ -35,8 +35,8 @@ import playground.clruch.jmapviewer.interfaces.TileCache;
 import playground.clruch.jmapviewer.interfaces.TileLoader;
 import playground.clruch.jmapviewer.interfaces.TileLoaderListener;
 import playground.clruch.jmapviewer.interfaces.TileSource;
+import playground.clruch.jmapviewer.tilesources.Mapnik;
 import playground.clruch.jmapviewer.interfaces.JMVCommandEvent.COMMAND;
-import playground.clruch.jmapviewer.tilesources.OsmTileSource;
 
 /**
  * Provides a simple panel that displays pre-rendered map tiles loaded from the
@@ -133,7 +133,7 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
      *
      */
     JMapViewer(TileCache tileCache) {
-        tileSource = new OsmTileSource.Mapnik();
+        tileSource = new Mapnik();
         tileController = new TileController(tileSource, tileCache, this);
         mapMarkerList = Collections.synchronizedList(new LinkedList<MapMarker>());
         mapPolygonList = Collections.synchronizedList(new LinkedList<MapPolygon>());
