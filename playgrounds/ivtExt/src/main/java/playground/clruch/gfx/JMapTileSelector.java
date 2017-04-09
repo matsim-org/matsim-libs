@@ -18,6 +18,8 @@ public class JMapTileSelector {
                 new OsmTileSource.WikimediaMap(), //
                 new OsmTileSource.FrenchMap(), //
                 new OsmTileSource.HikebikeMap(), //
+                new OsmTileSource.BlackWhiteMap(), //
+                new OsmTileSource.WatercolorMap(), //
                 new OsmTileSource.HotMap(), //
                 new OsmTileSource.HikingMap(), //
                 new OsmTileSource.SeamarkMap(), //
