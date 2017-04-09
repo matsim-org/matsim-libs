@@ -34,13 +34,11 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static java.lang.Math.sqrt;
-
 public class SelfishDispatcher extends UniversalDispatcher {
 
 	private final int dispatchPeriod;
-	private Tensor printVals = Tensors.empty();
-	private final int numberofVehicles;
+	private Tensor printVals = Tensors.empty();    // TODO never used; delete?
+	private final int numberofVehicles;            // TODO never used; delete?
 
 	// specific to SelfishDispatcher
 	private final int updateRefPeriod; 			// implementation may not use this
@@ -55,9 +53,9 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used to enable fast "contains" searching
 	private final double[] networkBounds;
 
-	private SelfishDispatcher( 													//
-			AVDispatcherConfig avDispatcherConfig, 								//
-			AVGeneratorConfig generatorConfig, 									//
+	private SelfishDispatcher(                                                  //
+			AVDispatcherConfig avDispatcherConfig,                              //
+			AVGeneratorConfig generatorConfig,                                  //
 			TravelTime travelTime, 												//
 			ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, 	//
 			EventsManager eventsManager, 										//
@@ -170,16 +168,8 @@ public class SelfishDispatcher extends UniversalDispatcher {
 		GlobalAssert.that(!getAVList().isEmpty());
 		GlobalAssert.that(0 < networkLinksTree.size());
 		for (AVVehicle avVehicle : getAVList()) {
-			// Coord initialGuess = refPositions.get(avVehicle).getFromNode().getCoord(); // initialize with previous Weber link
-			Coord initialGuess = new Coord(networkBounds[0],networkBounds[1]);
-			Coord weberCoord = weberWeiszfeld(requestsServed.get(avVehicle), initialGuess);
-
-			/*GlobalAssert.that((weberCoord.getX() >= networkBounds[0]) &&
-					                (weberCoord.getY() >= networkBounds[1]) &&
-									(weberCoord.getX() <= networkBounds[2]) &&
-									(weberCoord.getY() <= networkBounds[3]) ); */
-
-			Link weberLink = networkLinksTree.getClosest(weberCoord.getX(), weberCoord.getY());
+			Link initialGuess = refPositions.get(avVehicle);               // initialize with previous Weber link
+			Link weberLink = weberWeiszfeld(requestsServed.get(avVehicle), initialGuess);
 			GlobalAssert.that(weberLink != null);
 			refPositions.put(avVehicle, weberLink);
 		}
@@ -193,12 +183,12 @@ public class SelfishDispatcher extends UniversalDispatcher {
      *          2D-point initial guess for the iterative algorithm
      * @return 2D Weber point of past requests approximated by Weiszfeld's algorithm
      */
-	private Coord weberWeiszfeld(List<AVRequest> avRequests, Coord initialGuess) {
+	private Link weberWeiszfeld(List<AVRequest> avRequests, Link initialGuess) {
 		if (avRequests.isEmpty()) {
 			return initialGuess;
 		}
-        double weberX = initialGuess.getX();
-		double weberY = initialGuess.getY();
+        double weberX = initialGuess.getFromNode().getCoord().getX();
+		double weberY = initialGuess.getFromNode().getCoord().getY();
         int count = 0;
         while (count <= weiszfeldMaxIter) {
         	double X = 0.0;
@@ -228,7 +218,15 @@ public class SelfishDispatcher extends UniversalDispatcher {
 			}
             count++;
         }
-        return new Coord(weberX, weberY);
+        GlobalAssert.that((weberX >= networkBounds[0]) &&
+                          (weberY >= networkBounds[1]) &&
+                          (weberX <= networkBounds[2]) &&
+                          (weberY <= networkBounds[3]) );   // Weber point must be inside the network
+
+        Link weberLink = networkLinksTree.getClosest(weberX, weberY);
+        GlobalAssert.that(weberLink != null);
+        
+        return weberLink;
     }
 
 	/**
@@ -236,13 +234,17 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	 * tracking
 	 */
 	private void initializeVehicles() {
+	    Collection<? extends Link> networkLinksCol = network.getLinks().values();     // collection of all links in the network
+        List<Link> networkLinks = new ArrayList<>();                                  // create a list from this collection
+        for (Link link : networkLinksCol) {
+            networkLinks.add(link);
+        }
 		for (AVVehicle avVehicle : getAVList()) {
 			requestsServed.put(avVehicle, new ArrayList<AVRequest>());
-			//refPositions.put(avVehicle, null);
+			Collections.shuffle(networkLinks);
+			refPositions.put(avVehicle, networkLinks.get(0));    // assign a random link from the network to every AV
 		}
-		updateRefPositions();
 		vehiclesInitialized = true;
-
 	}
 
 	public static class Factory implements AVDispatcherFactory {
