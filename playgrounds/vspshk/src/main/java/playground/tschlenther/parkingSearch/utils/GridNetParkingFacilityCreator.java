@@ -1,27 +1,15 @@
 package playground.tschlenther.parkingSearch.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesFactory;
-import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.FacilitiesParserWriterTest;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.core.utils.io.tabularFileParser.*;
+import org.matsim.facilities.*;
 
 public class GridNetParkingFacilityCreator {
 
