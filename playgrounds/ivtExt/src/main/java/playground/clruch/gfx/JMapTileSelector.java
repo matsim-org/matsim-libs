@@ -15,6 +15,7 @@ public class JMapTileSelector {
         TileSource[] tileSource = new TileSource[] { //
                 new OsmTileSource.Mapnik(), //
                 new OsmTileSource.CycleMap(), //
+                new OsmTileSource.HotMap(), //
                 new BingAerialTileSource() };
         SpinnerLabel<TileSource> spinnerLabel = new SpinnerLabel<>();
         spinnerLabel.setArray(tileSource);
