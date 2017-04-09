@@ -14,10 +14,14 @@ public class JMapTileSelector {
     public static void install(JPanel jPanel, JMapViewer jMapViewer) {
         TileSource[] tileSource = new TileSource[] { //
                 new OsmTileSource.Mapnik(), //
-                new OsmTileSource.HotMap(), //
-                new OsmTileSource.FrenchMap(), //
+                new OsmTileSource.GrayMapnik(), //
                 new OsmTileSource.WikimediaMap(), //
+                new OsmTileSource.FrenchMap(), //
+                new OsmTileSource.HikebikeMap(), //
+                new OsmTileSource.HotMap(), //
+                new OsmTileSource.HikingMap(), //
                 new OsmTileSource.SeamarkMap(), //
+                new OsmTileSource.HillshadingMap(), //
                 new OsmTileSource.CycleMap(), //
                 new BingAerialTileSource() };
         SpinnerLabel<TileSource> spinnerLabel = new SpinnerLabel<>();
