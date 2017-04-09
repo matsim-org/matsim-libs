@@ -15,6 +15,7 @@ public class JMapTileSelector {
         TileSource[] tileSource = new TileSource[] { //
                 new OsmTileSource.Mapnik(), //
                 new OsmTileSource.HotMap(), //
+                new OsmTileSource.FrenchMap(), //
                 new OsmTileSource.WikimediaMap(), //
                 new OsmTileSource.CycleMap(), //
                 new BingAerialTileSource() };
