@@ -16,6 +16,7 @@ import playground.clruch.jmapviewer.tilesources.HikingMap;
 import playground.clruch.jmapviewer.tilesources.HillshadingMap;
 import playground.clruch.jmapviewer.tilesources.HotMap;
 import playground.clruch.jmapviewer.tilesources.Mapnik;
+import playground.clruch.jmapviewer.tilesources.OpenCycleMap;
 import playground.clruch.jmapviewer.tilesources.SeamarkMap;
 import playground.clruch.jmapviewer.tilesources.WatercolorMap;
 import playground.clruch.jmapviewer.tilesources.WikimediaMap;
@@ -26,6 +27,7 @@ public class JMapTileSelector {
         TileSource[] tileSource = new TileSource[] { //
                 new Mapnik(), //
                 new GrayMapnik(), //
+                new OpenCycleMap(), //
                 new WikimediaMap(), //
                 new FrenchMap(), //
                 new HikebikeMap(), //
