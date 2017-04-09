@@ -8,6 +8,8 @@ import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
 import playground.clruch.jmapviewer.tilesources.BlackWhiteMap;
+import playground.clruch.jmapviewer.tilesources.CartoDarkMap;
+import playground.clruch.jmapviewer.tilesources.CartocdnMap;
 import playground.clruch.jmapviewer.tilesources.CycleMap;
 import playground.clruch.jmapviewer.tilesources.FrenchMap;
 import playground.clruch.jmapviewer.tilesources.GrayMapnik;
@@ -15,6 +17,7 @@ import playground.clruch.jmapviewer.tilesources.HikebikeMap;
 import playground.clruch.jmapviewer.tilesources.HikingMap;
 import playground.clruch.jmapviewer.tilesources.HillshadingMap;
 import playground.clruch.jmapviewer.tilesources.HotMap;
+import playground.clruch.jmapviewer.tilesources.LandscapeMap;
 import playground.clruch.jmapviewer.tilesources.Mapnik;
 import playground.clruch.jmapviewer.tilesources.OpenCycleMap;
 import playground.clruch.jmapviewer.tilesources.SeamarkMap;
@@ -29,12 +32,16 @@ public class JMapTileSelector {
                 new GrayMapnik(), //
                 new OpenCycleMap(), //
                 new WikimediaMap(), //
+                new CartocdnMap(), //
+                new CartoDarkMap(), //
+                new LandscapeMap(), //
                 new FrenchMap(), //
                 new HikebikeMap(), //
                 new BlackWhiteMap(), //
                 new WatercolorMap(), //
                 new HotMap(), //
                 new HikingMap(), //
+                // new RailwayOverlay(), //
                 new SeamarkMap(), //
                 new HillshadingMap(), //
                 new CycleMap(), //
