@@ -88,10 +88,10 @@ public class OsmTileSource {
             return url;
         }
 
-        @Override
-        public int getMaxZoom() {
-            return 18;
-        }
+        // @Override
+        // public int getMaxZoom() {
+        // return 18;
+        // }
     }
 
     /**
@@ -119,10 +119,10 @@ public class OsmTileSource {
             return url;
         }
 
-        @Override
-        public int getMaxZoom() {
-            return 18;
-        }
+        // @Override
+        // public int getMaxZoom() {
+        // return 18;
+        // }
     }
 
     /**
@@ -130,11 +130,7 @@ public class OsmTileSource {
      */
     public static class WikimediaMap extends AbstractOsmTileSource {
 
-        private static final String PATTERN = "https://%s.wikimedia.org/osm-intl";
-
-        private static final String[] SERVER = { "maps" };
-
-        private int serverNum;
+        private static final String PATTERN = "https://maps.wikimedia.org/osm-intl";
 
         /**
          * Constructs a new {@code CycleMap} tile source.
@@ -145,14 +141,34 @@ public class OsmTileSource {
 
         @Override
         public String getBaseUrl() {
-            String url = String.format(this.baseUrl, new Object[] { SERVER[serverNum] });
-            serverNum = (serverNum + 1) % SERVER.length;
-            return url;
+            return PATTERN;
+        }
+
+        // @Override
+        // public int getMaxZoom() {
+        // return 30; // TODO check
+        // }
+    }
+    
+    /**
+     * Wikimedia experimental
+     */
+    public static class SeamarkMap extends AbstractOsmTileSource {
+
+        private static final String PATTERN = "http://tiles.openseamap.org/seamark";
+
+        public SeamarkMap() {
+            super("Seamark", PATTERN, "seamark");
         }
 
         @Override
-        public int getMaxZoom() {
-            return 18;
+        public String getBaseUrl() {
+            return PATTERN;
         }
+
+        // @Override
+        // public int getMaxZoom() {
+        // return 30; // TODO check
+        // }
     }
 }

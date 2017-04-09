@@ -17,6 +17,7 @@ public class JMapTileSelector {
                 new OsmTileSource.HotMap(), //
                 new OsmTileSource.FrenchMap(), //
                 new OsmTileSource.WikimediaMap(), //
+                new OsmTileSource.SeamarkMap(), //
                 new OsmTileSource.CycleMap(), //
                 new BingAerialTileSource() };
         SpinnerLabel<TileSource> spinnerLabel = new SpinnerLabel<>();
