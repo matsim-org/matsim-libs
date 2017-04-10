@@ -45,12 +45,13 @@ public class MatsimMapComponent extends JMapViewer {
         addLayer(new RequestsLayer(this));
         addLayer(new LinkLayer(this));
         addLayer(virtualNetworkLayer);
-    }
     
+    }
+
     public void addLayer(ViewerLayer viewerLayer) {
         viewerLayers.add(viewerLayer);
         for (MatsimHeatMap m : viewerLayer.getHeatmaps())
-        matsimHeatmaps.add(m);
+            matsimHeatmaps.add(m);
     }
 
     /**

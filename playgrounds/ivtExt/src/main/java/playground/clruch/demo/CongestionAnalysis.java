@@ -12,6 +12,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
+import ch.ethz.idsc.tensor.io.ObjectFormat;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Max;
 import playground.clruch.gfx.ReferenceFrame;
@@ -59,16 +60,15 @@ class CongestionAnalysis {
                 System.out.println(s.now);
         }
 
-        Tensor table1 = Tensor.of(list.stream().map(ls -> ls.maxWaitTime.flatten(0).reduce(Max::of).get()));
-        Tensor table2 = Tensor.of(list.stream().map(ls -> ls.vehicleCount.flatten(0).reduce(Max::of).get()));
-        Tensor table3 = Tensor.of(list.stream().map(ls -> ls.requestCount.flatten(0).reduce(Max::of).get()));
+        // compute max
+        Tensor vector1 = Tensor.of(list.stream().map(ls -> ls.maxWaitTime.flatten(0).reduce(Max::of).get()));
+        Tensor vector2 = Tensor.of(list.stream().map(ls -> ls.vehicleCount.flatten(0).reduce(Max::of).get()));
+        Tensor vector3 = Tensor.of(list.stream().map(ls -> ls.requestCount.flatten(0).reduce(Max::of).get()));
 
-        // System.out.println(Dimensions.of(Range.of(table1.length())));
-        // System.out.println(Dimensions.of(table1));
-        // System.out.println(Dimensions.of(table2));
-        // Range.of(table1.length()),
-        Tensor matrix = Transpose.of(Tensors.of(table1, table2, table3));
+        Tensor matrix = Transpose.of(Tensors.of(vector1, vector2, vector3));
         System.out.println(Pretty.of(matrix));
+        
+        Files.write(Paths.get("output/linkstats.obj"), ObjectFormat.of(matrix));
 
         Files.write(Paths.get("output/linkstats.csv"), (Iterable<String>) CsvFormat.of(matrix)::iterator);
     }
@@ -79,9 +79,9 @@ class CongestionAnalysis {
         // load coordinate system
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
-        CongestionAnalysis da = new CongestionAnalysis(StorageSupplier.getDefault());
+        CongestionAnalysis ca = new CongestionAnalysis(StorageSupplier.getDefault());
         try {
-            da.analzye();
+            ca.analzye();
         } catch (Exception exception) {
             exception.printStackTrace();
         }

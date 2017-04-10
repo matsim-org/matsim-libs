@@ -50,7 +50,6 @@ public class MatsimViewerFrame implements Runnable {
     private final Thread thread;
 
     public final JFrame jFrame = new JFrame();
-    // private final JMapViewerTree treeMap;
     StorageSupplier storageSupplier = new DummyStorageSupplier();
 
     public static FlowLayout createFlowLayout() {
@@ -78,9 +77,7 @@ public class MatsimViewerFrame implements Runnable {
         });
         JPanel panelNorth = new JPanel(new BorderLayout());
         JPanel panelControls = new JPanel(createFlowLayout());
-//        JPanel panelSettings = new JPanel(createFlowLayout());
         panelNorth.add(panelControls, BorderLayout.NORTH);
-//        panelNorth.add(panelSettings, BorderLayout.CENTER);
 
         jFrame.add(panelNorth, BorderLayout.NORTH);
         for (ViewerLayer viewerLayer : matsimMapComponent.viewerLayers)
@@ -155,14 +152,7 @@ public class MatsimViewerFrame implements Runnable {
                 }
             }
         }
-        // ---
-//        {
-//            final JCheckBox jCheckBox = new JCheckBox("grid");
-//            jCheckBox.setSelected(getJMapViewer().isTileGridVisible());
-//            jCheckBox.addActionListener(e -> getJMapViewer().setTileGridVisible(jCheckBox.isSelected()));
-//            panelSettings.add(jCheckBox);
-//        }
-
+        
         getJMapViewer().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -205,7 +195,7 @@ public class MatsimViewerFrame implements Runnable {
     }
 
     private JMapViewer getJMapViewer() {
-        return matsimMapComponent; // treeMap.getViewer();
+        return matsimMapComponent;
     }
 
     public void setDisplayPosition(Coord coord, int zoom) {
