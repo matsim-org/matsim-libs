@@ -8,6 +8,7 @@ public enum ColorSchemes {
     GREEN(CommonPalettes.createGreen()), //
     GREEN_CONTOUR(CommonPalettes.createGreenContour()), //
     BLACK(CommonPalettes.createBlack()), //
+    CLASSIC(CommonPalettes.createClassic()), //
     ;
 
     public final ColorScheme colorScheme;

@@ -23,7 +23,7 @@ public class RequestLayer extends ViewerLayer {
     private volatile boolean drawRequestDestinations = false;
 
     MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.ORANGE.colorScheme);
-    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN.colorScheme);
+    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN_CONTOUR.colorScheme);
 
     public RequestLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
