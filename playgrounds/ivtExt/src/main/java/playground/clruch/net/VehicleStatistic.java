@@ -18,21 +18,21 @@ public class VehicleStatistic {
     public final Tensor distanceTotal;
     public final Tensor distanceWithCustomer;
 
-    public VehicleStatistic(int tics) {
-        distanceTotal = Array.zeros(tics);
-        distanceWithCustomer = Array.zeros(tics);
+    private int lastIndex = -1;
+    private int offset = -1;
+    // this is used as a buffer and is periodically empty
+    private final List<VehicleContainer> list = new LinkedList<>();
+
+    public VehicleStatistic(int tics_max) {
+        distanceTotal = Array.zeros(tics_max);
+        distanceWithCustomer = Array.zeros(tics_max);
     }
 
-    private int lastIndex = -1;
-
-    int offset = -1;
-    List<VehicleContainer> list = new LinkedList<>();
-
-    public void register(int index, VehicleContainer vehicleContainer) {
+    public void register(int tics, VehicleContainer vehicleContainer) {
         if (vehicleContainer.linkIndex != lastIndex) {
             consolidate();
             list.clear();
-            offset = index;
+            offset = tics;
         }
         list.add(vehicleContainer);
     }
