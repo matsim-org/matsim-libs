@@ -1,6 +1,8 @@
 package playground.clruch.gfx;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -22,7 +24,9 @@ public abstract class ViewerLayer {
     public final JPanel createPanel() {
         RowPanel rowPanel = new RowPanel();
         String string = getClass().getSimpleName();
-        rowPanel.add(new JLabel(string.substring(0, string.length() - 5))); // remove "Layer"
+        JLabel jLabel = new JLabel(string.substring(0, string.length() - 5));
+        jLabel.setForeground(Color.BLUE);
+        rowPanel.add(jLabel); // remove "Layer"
         createPanel(rowPanel);
         return rowPanel.jPanel;
     }
@@ -39,5 +43,7 @@ public abstract class ViewerLayer {
 
     abstract void hud(Graphics2D graphics, SimulationObject ref);
 
-    public abstract List<MatsimHeatMap> getHeatmaps();
+    public List<MatsimHeatMap> getHeatmaps() {
+        return Collections.emptyList();
+    }
 }

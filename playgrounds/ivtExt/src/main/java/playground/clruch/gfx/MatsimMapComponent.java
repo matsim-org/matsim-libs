@@ -28,7 +28,7 @@ public class MatsimMapComponent extends JMapViewer {
 
     SimulationObject simulationObject = null;
 
-    public final VirtualNetworkLayer virtualNetworkLayer;
+    public final VirtualNetLayer virtualNetworkLayer;
 
     public final List<ViewerLayer> viewerLayers = new ArrayList<>();
     private final List<InfoString> infoStrings = new LinkedList<>();
@@ -39,7 +39,7 @@ public class MatsimMapComponent extends JMapViewer {
 
     public MatsimMapComponent(MatsimStaticDatabase db) {
         this.db = db;
-        virtualNetworkLayer = new VirtualNetworkLayer(this);
+        virtualNetworkLayer = new VirtualNetLayer(this);
 
         addLayer(new VehiclesLayer(this));
         addLayer(new RequestsLayer(this));

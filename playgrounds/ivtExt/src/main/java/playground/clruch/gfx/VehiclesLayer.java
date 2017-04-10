@@ -3,7 +3,6 @@ package playground.clruch.gfx;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,9 +24,9 @@ public class VehiclesLayer extends ViewerLayer {
     public VehiclesLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
     }
-    
+
     @Override
-    public void prepareHeatmaps(SimulationObject ref) {        
+    public void prepareHeatmaps(SimulationObject ref) {
     }
 
     @Override
@@ -98,8 +97,4 @@ public class VehiclesLayer extends ViewerLayer {
         }
     }
 
-    @Override
-    public List<MatsimHeatMap> getHeatmaps() {
-        return Collections.emptyList();
-    }
 }

@@ -62,9 +62,4 @@ public class LinkLayer extends ViewerLayer {
         
     }
 
-    @Override
-    public List<MatsimHeatMap> getHeatmaps() {
-        return Collections.emptyList();
-    }
-
 }

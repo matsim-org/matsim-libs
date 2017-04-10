@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.util.Collections;
-import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 
@@ -76,12 +74,7 @@ class IsolineLayer extends ViewerLayer {
 
     @Override
     protected void createPanel(RowPanel rowPanel) {
-        
-    }
-    
-    @Override
-    public List<MatsimHeatMap> getHeatmaps() {
-        return Collections.emptyList();
+
     }
 
 }
