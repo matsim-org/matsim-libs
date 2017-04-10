@@ -24,8 +24,8 @@ import playground.clruch.jmapviewer.interfaces.MapPolygon;
 import playground.clruch.jmapviewer.interfaces.TileLoader;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
-import playground.clruch.jmapviewer.tilesources.CycleMap;
-import playground.clruch.jmapviewer.tilesources.Mapnik;
+import playground.clruch.jmapviewer.tilesources.CycleTileSource;
+import playground.clruch.jmapviewer.tilesources.MapnikTileSource;
 
 /**
  * Demonstrates the usage of {@link JMapViewer}
@@ -87,8 +87,8 @@ public class Demo extends JFrame implements JMapViewerEventListener {
             }
         });
         JComboBox<TileSource> tileSourceSelector = new JComboBox<>(new TileSource[] {
-                new Mapnik(),
-                new CycleMap(),
+                new MapnikTileSource(),
+                new CycleTileSource(),
                 new BingAerialTileSource(),
         });
         tileSourceSelector.addItemListener(new ItemListener() {

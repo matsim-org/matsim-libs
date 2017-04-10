@@ -1,11 +1,11 @@
 package playground.clruch.jmapviewer.tilesources;
 
 /**
- * French OSM base layer
+ * The "Cycle Map" OSM tile source.
  */
-public class FrenchMap extends AbstractOsmTileSource {
+public class CycleTileSource extends AbstractOsmTileSource {
 
-    private static final String PATTERN = "http://%s.tile.openstreetmap.fr/osmfr";
+    private static final String PATTERN = "http://%s.tile.opencyclemap.org/cycle";
 
     private static final String[] SERVER = { "a", "b", "c" };
 
@@ -14,8 +14,8 @@ public class FrenchMap extends AbstractOsmTileSource {
     /**
      * Constructs a new {@code CycleMap} tile source.
      */
-    public FrenchMap() {
-        super("FrenchMap", PATTERN, "french");
+    public CycleTileSource() {
+        super("Cyclemap", PATTERN, "opencyclemap");
     }
 
     @Override
@@ -25,8 +25,8 @@ public class FrenchMap extends AbstractOsmTileSource {
         return url;
     }
 
-    // @Override
-    // public int getMaxZoom() {
-    // return 18;
-    // }
+    @Override
+    public int getMaxZoom() {
+        return 18;
+    }
 }

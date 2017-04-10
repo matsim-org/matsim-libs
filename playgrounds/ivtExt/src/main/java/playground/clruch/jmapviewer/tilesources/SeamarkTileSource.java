@@ -3,11 +3,11 @@ package playground.clruch.jmapviewer.tilesources;
 /**
  * Seamark overlay
  */
-public class SeamarkMap extends AbstractOsmTileSource {
+public class SeamarkTileSource extends AbstractOsmTileSource {
 
     private static final String PATTERN = "http://tiles.openseamap.org/seamark";
 
-    public SeamarkMap() {
+    public SeamarkTileSource() {
         super("Seamark", PATTERN, "seamark");
     }
 

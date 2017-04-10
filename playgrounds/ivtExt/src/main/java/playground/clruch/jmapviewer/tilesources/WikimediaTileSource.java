@@ -3,14 +3,11 @@ package playground.clruch.jmapviewer.tilesources;
 /**
  * Wikimedia experimental
  */
-public class WikimediaMap extends AbstractOsmTileSource {
+public class WikimediaTileSource extends AbstractOsmTileSource {
 
     private static final String PATTERN = "https://maps.wikimedia.org/osm-intl";
 
-    /**
-     * Constructs a new {@code CycleMap} tile source.
-     */
-    public WikimediaMap() {
+    public WikimediaTileSource() {
         super("Wikimedia", PATTERN, "wikimedia");
     }
 

@@ -1,27 +1,15 @@
 package playground.clruch.jmapviewer.tilesources;
 
 /**
- * The default "Mapnik" OSM tile source.
+ * tiles are of different size
  */
-public class RailwayOverlay extends AbstractOsmTileSource {
-
-    private static final String PATTERN = "http://%s.tiles.openrailwaymap.org/standard";
+@Deprecated
+public class RailwayOverlay extends CyclicTileSource {
 
     private static final String[] SERVER = { "a", "b", "c" };
 
-    private int serverNum;
-
-    /**
-     * Constructs a new {@code "Mapnik"} tile source.
-     */
     public RailwayOverlay() {
-        super("RailwayOverlay", PATTERN, "RailwayOverlay");
+        super("RailwayOverlay", "http://%s.tiles.openrailwaymap.org/standard", "RailwayOverlay", SERVER);
     }
 
-    @Override
-    public String getBaseUrl() {
-        String url = String.format(this.baseUrl, new Object[] { SERVER[serverNum] });
-        serverNum = (serverNum + 1) % SERVER.length;
-        return url;
-    }
 }

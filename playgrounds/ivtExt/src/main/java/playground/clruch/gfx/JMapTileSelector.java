@@ -7,45 +7,45 @@ import javax.swing.JPanel;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
-import playground.clruch.jmapviewer.tilesources.BlackWhiteMap;
-import playground.clruch.jmapviewer.tilesources.CartoDarkMap;
-import playground.clruch.jmapviewer.tilesources.CartocdnMap;
-import playground.clruch.jmapviewer.tilesources.CycleMap;
-import playground.clruch.jmapviewer.tilesources.FrenchMap;
-import playground.clruch.jmapviewer.tilesources.GrayMapnik;
-import playground.clruch.jmapviewer.tilesources.HikebikeMap;
-import playground.clruch.jmapviewer.tilesources.HikingMap;
-import playground.clruch.jmapviewer.tilesources.HillshadingMap;
-import playground.clruch.jmapviewer.tilesources.HotMap;
-import playground.clruch.jmapviewer.tilesources.LandscapeMap;
-import playground.clruch.jmapviewer.tilesources.Mapnik;
-import playground.clruch.jmapviewer.tilesources.OpenCycleMap;
-import playground.clruch.jmapviewer.tilesources.SeamarkMap;
-import playground.clruch.jmapviewer.tilesources.WatercolorMap;
-import playground.clruch.jmapviewer.tilesources.WikimediaMap;
+import playground.clruch.jmapviewer.tilesources.BlackWhiteTileSource;
+import playground.clruch.jmapviewer.tilesources.DarkCartocdnTileSource;
+import playground.clruch.jmapviewer.tilesources.LightCartocdnTileSource;
+import playground.clruch.jmapviewer.tilesources.CycleTileSource;
+import playground.clruch.jmapviewer.tilesources.FrenchTileSource;
+import playground.clruch.jmapviewer.tilesources.GrayMapnikTileSource;
+import playground.clruch.jmapviewer.tilesources.HikebikeTileSource;
+import playground.clruch.jmapviewer.tilesources.HikingTileSource;
+import playground.clruch.jmapviewer.tilesources.HillshadingTileSource;
+import playground.clruch.jmapviewer.tilesources.HotTileSource;
+import playground.clruch.jmapviewer.tilesources.LandscapeTileSource;
+import playground.clruch.jmapviewer.tilesources.MapnikTileSource;
+import playground.clruch.jmapviewer.tilesources.OpenCycleTileSource;
+import playground.clruch.jmapviewer.tilesources.SeamarkTileSource;
+import playground.clruch.jmapviewer.tilesources.WatercolorTileSource;
+import playground.clruch.jmapviewer.tilesources.WikimediaTileSource;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 public class JMapTileSelector {
     public static void install(JPanel jPanel, JMapViewer jMapViewer) {
         TileSource[] tileSource = new TileSource[] { //
-                new Mapnik(), //
-                new GrayMapnik(), //
-                new OpenCycleMap(), //
-                new WikimediaMap(), //
-                new CartocdnMap(), //
-                new CartoDarkMap(), //
-                new LandscapeMap(), //
-                new FrenchMap(), //
-                new HikebikeMap(), //
-                new BlackWhiteMap(), //
-                new WatercolorMap(), //
-                new HotMap(), //
-                new HikingMap(), //
-                // new RailwayOverlay(), //
-                new SeamarkMap(), //
-                new HillshadingMap(), //
-                new CycleMap(), //
-                new BingAerialTileSource() };
+                new MapnikTileSource(), //
+                new GrayMapnikTileSource(), //
+                new WikimediaTileSource(), //
+                new LightCartocdnTileSource(), //
+                new DarkCartocdnTileSource(), //
+                new FrenchTileSource(), //
+                new BlackWhiteTileSource(), //
+                new WatercolorTileSource(), //
+                new HotTileSource(), //
+                new BingAerialTileSource(), // (APIkey)
+                new HikebikeTileSource(), // slow!
+                new HikingTileSource(), // overlay
+                new SeamarkTileSource(), // overlay
+                new HillshadingTileSource(), // slow
+                new OpenCycleTileSource(), // APIkey
+                new CycleTileSource(), // APIkey
+                new LandscapeTileSource(), // APIkey
+                };
         SpinnerLabel<TileSource> spinnerLabel = new SpinnerLabel<>();
         spinnerLabel.setArray(tileSource);
         spinnerLabel.setIndex(0);

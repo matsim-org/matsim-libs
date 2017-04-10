@@ -35,7 +35,7 @@ import playground.clruch.jmapviewer.interfaces.TileCache;
 import playground.clruch.jmapviewer.interfaces.TileLoader;
 import playground.clruch.jmapviewer.interfaces.TileLoaderListener;
 import playground.clruch.jmapviewer.interfaces.TileSource;
-import playground.clruch.jmapviewer.tilesources.Mapnik;
+import playground.clruch.jmapviewer.tilesources.MapnikTileSource;
 import playground.clruch.jmapviewer.interfaces.JMVCommandEvent.COMMAND;
 
 /**
@@ -133,7 +133,7 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
      *
      */
     JMapViewer(TileCache tileCache) {
-        tileSource = new Mapnik();
+        tileSource = new MapnikTileSource();
         tileController = new TileController(tileSource, tileCache, this);
         mapMarkerList = Collections.synchronizedList(new LinkedList<MapMarker>());
         mapPolygonList = Collections.synchronizedList(new LinkedList<MapPolygon>());
