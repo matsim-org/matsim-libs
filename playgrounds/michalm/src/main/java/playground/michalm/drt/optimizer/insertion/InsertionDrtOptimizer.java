@@ -73,7 +73,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 	}
 
 	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
 		insertionProblem.shutdown();
 	}
 
@@ -83,7 +83,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 			return;
 		}
 
-		VehicleData vData = new VehicleData(getOptimContext(), drtCfg, getOptimContext().fleet.getVehicles().values());
+		VehicleData vData = new VehicleData(getOptimContext(), getOptimContext().fleet.getVehicles().values());
 
 		Iterator<NDrtRequest> reqIter = getUnplannedRequests().iterator();
 		while (reqIter.hasNext()) {

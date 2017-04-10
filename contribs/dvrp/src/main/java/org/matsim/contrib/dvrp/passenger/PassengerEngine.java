@@ -136,8 +136,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 		Link toLink = links.get(toLinkId);
 		Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
 
-		PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime,
-				departureTime, now);
+		PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);
 		return request;
 	}
 

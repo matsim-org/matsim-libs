@@ -24,16 +24,36 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.utils.geometry.CoordUtils;
+
+import com.google.inject.Inject;
 
 import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.run.DrtConfigGroup;
 
 /**
  * @author michalm
  */
 public class NDrtRequestCreator implements PassengerRequestCreator {
+	private final DrtConfigGroup drtCfg;
+
+	@Inject
+	public NDrtRequestCreator(DrtConfigGroup drtCfg) {
+		this.drtCfg = drtCfg;
+	}
+
 	@Override
 	public NDrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-			double earliestStartTime, double latestStartTime, double submissionTime) {
-		return new NDrtRequest(id, passenger, fromLink, toLink, earliestStartTime, submissionTime);
+			double departureTime, double submissionTime) {
+		double latestDepartureTime = departureTime + drtCfg.getMaxWaitTime();
+
+		double estimatedDistance = drtCfg.getEstimatedBeelineDistanceFactor()
+				* CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord());
+		double estimatedTravelTime = estimatedDistance / drtCfg.getEstimatedDrtSpeed();
+		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * estimatedTravelTime + drtCfg.getMaxTravelTimeBeta();
+		double latestArrivalTime = departureTime + maxTravelTime;
+
+		return new NDrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
+				submissionTime);
 	}
 }

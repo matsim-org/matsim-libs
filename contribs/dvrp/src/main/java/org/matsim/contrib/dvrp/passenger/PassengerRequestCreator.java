@@ -29,5 +29,5 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
  */
 public interface PassengerRequestCreator {
 	PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-			double earliestStartTime, double latestStartTime, double submissionTime);
+			double departureTime, double submissionTime);
 }

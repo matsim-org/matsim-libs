@@ -98,7 +98,7 @@ public class StopBasedDRTRoutingModuleTest {
 	private Scenario createTestScenario() {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup.setMaximumWalkDistance(200);
+		drtConfigGroup.setMaxWalkDistance(200);
 		drtConfigGroup.setTransitStopFile("./src/test/resources/cottbus/stops-schedule.xml.gz");
 		config.addModule(drtConfigGroup);
 		

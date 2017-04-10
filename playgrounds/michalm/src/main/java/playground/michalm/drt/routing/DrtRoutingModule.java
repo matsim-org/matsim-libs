@@ -52,7 +52,7 @@ public class DrtRoutingModule implements RoutingModule {
 		Route route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		double distanceEstimate = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord())*drtconfig.getEstimatedBeelineDistanceFactor();
 		route.setDistance(distanceEstimate);
-		route.setTravelTime(distanceEstimate/drtconfig.getEstimatedSpeed());
+		route.setTravelTime(distanceEstimate/drtconfig.getEstimatedDrtSpeed());
 		
 		Leg leg = PopulationUtils.createLeg(DrtConfigGroup.DRT_MODE);
 		leg.setDepartureTime(departureTime);

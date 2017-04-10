@@ -29,7 +29,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.michalm.drt.run.DrtConfigGroup;
-import playground.michalm.drt.run.DrtConfigGroup.DrtOperationalScheme;
+import playground.michalm.drt.run.DrtConfigGroup.OperationalScheme;
 import playground.michalm.drt.run.DrtControlerCreator;
 
 
@@ -49,9 +49,9 @@ public class RunDrtWithStops {
 		
 		drt.setEstimatedBeelineDistanceFactor(1.3);
 		drt.setEstimatedSpeed(30/3.6);
-		drt.setMaximumWalkDistance(500);
+		drt.setMaxWalkDistance(500);
 		drt.setTransitStopFile("stopsWRS_300m.xml");
-		drt.setOperationalScheme(DrtOperationalScheme.stationbased.toString());
+		drt.setOperationalScheme(OperationalScheme.stationbased.toString());
 		int threads = Runtime.getRuntime().availableProcessors() - 2;
 		System.out.println(threads + " threads used for drt.");
 		drt.setNumberOfThreads(threads);

@@ -38,6 +38,7 @@ public class MultiVehicleInsertionProblem {
 		return findBestInsertion(drtRequest, vData.getEntries());
 	}
 
+	//TODO run Dijkstra once for all vehicles instead of running it separately for each one
 	public BestInsertion findBestInsertion(NDrtRequest drtRequest, Iterable<Entry> vEntries) {
 		double minCost = Double.MAX_VALUE;
 		BestInsertion fleetBestInsertion = null;

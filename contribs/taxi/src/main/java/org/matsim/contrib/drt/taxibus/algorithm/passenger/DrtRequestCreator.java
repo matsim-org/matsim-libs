@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 public class DrtRequestCreator implements PassengerRequestCreator {
 	@Override
 	public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-			double earliestStartTime, double latestStartTime, double submissionTime) {
-		return new DrtRequest(id, passenger, fromLink, toLink, earliestStartTime, latestStartTime, submissionTime);
+			double departureTime, double submissionTime) {
+		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, departureTime, submissionTime);
 	}
 }

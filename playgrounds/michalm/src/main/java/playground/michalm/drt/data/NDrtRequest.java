@@ -47,13 +47,15 @@ public class NDrtRequest extends RequestImpl implements PassengerRequest {
 	private final Link toLink;
 	private NDrtStopTask pickupTask = null;
 	private NDrtStopTask dropoffTask = null;
+	private final double latestArrivalTime;
 
-	public NDrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double t0,
-			double submissionTime) {
-		super(id, 1, t0, t0, submissionTime);
+	public NDrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+			double earliestStartTime, double latestStartTime, double latestArrivalTime, double submissionTime) {
+		super(id, 1, earliestStartTime, latestStartTime, submissionTime);
 		this.passenger = passenger;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
+		this.latestArrivalTime = latestArrivalTime;
 	}
 
 	@Override
@@ -85,6 +87,10 @@ public class NDrtRequest extends RequestImpl implements PassengerRequest {
 
 	public void setDropoffTask(NDrtStopTask dropoffTask) {
 		this.dropoffTask = dropoffTask;
+	}
+
+	public double getLatestArrivalTime() {
+		return latestArrivalTime;
 	}
 
 	public DrtRequestStatus getStatus() {

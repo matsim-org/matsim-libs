@@ -107,7 +107,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		
 		Route drtRoute = new GenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
 	    drtRoute.setDistance(drtconfig.getEstimatedBeelineDistanceFactor()*CoordUtils.calcEuclideanDistance(accessFacility.getCoord(), egressFacility.getCoord()));
-	    drtRoute.setTravelTime(drtRoute.getDistance()/drtconfig.getEstimatedSpeed());
+	    drtRoute.setTravelTime(drtRoute.getDistance()/drtconfig.getEstimatedDrtSpeed());
 
 	    Leg drtLeg = PopulationUtils.createLeg(DrtConfigGroup.DRT_MODE);
         drtLeg.setDepartureTime(departureTime+walkLeg.getTravelTime()+1);
@@ -190,7 +190,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		Set<TransitStopFacility> stopCandidates = new HashSet<>();
 		for (TransitStopFacility stop : this.stops.values()){
 			double distance = walkBeelineFactor*CoordUtils.calcEuclideanDistance(coord, stop.getCoord());
-			if (distance<=drtconfig.getMaximumWalkDistance()){
+			if (distance<=drtconfig.getMaxWalkDistance()){
 				stopCandidates.add(stop);
 			}
 			

@@ -28,7 +28,6 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.michalm.drt.data.NDrtRequest;
-import playground.michalm.drt.run.DrtConfigGroup;
 import playground.michalm.drt.schedule.*;
 import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
 
@@ -55,17 +54,17 @@ public class VehicleData {
 		public final int occupancyChange;// diff in pickups and dropoffs
 		public int outputOccupancy;
 
-		public Stop(NDrtStopTask task, DrtConfigGroup drtCfg) {
+		public Stop(NDrtStopTask task) {
 			this.task = task;
 			maxArrivalTime = calcMaxArrivalTime();
-			maxDepartureTime = calcMaxDepartureTime(drtCfg.getMaxWaitTime());
+			maxDepartureTime = calcMaxDepartureTime();
 			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
 		}
 
 		private double calcMaxArrivalTime() {
 			double maxTime = Double.MAX_VALUE;
 			for (NDrtRequest r : task.getDropoffRequests()) {
-				double reqMaxArrivalTime = r.getEarliestStartTime() + 3600;// TODO temp
+				double reqMaxArrivalTime = r.getLatestArrivalTime();
 				if (reqMaxArrivalTime < maxTime) {
 					maxTime = reqMaxArrivalTime;
 				}
@@ -73,10 +72,10 @@ public class VehicleData {
 			return maxTime;
 		}
 
-		private double calcMaxDepartureTime(double maxWaitTime) {
+		private double calcMaxDepartureTime() {
 			double maxTime = Double.MAX_VALUE;
 			for (NDrtRequest r : task.getPickupRequests()) {
-				double reqMaxDepartureTime = r.getEarliestStartTime() + maxWaitTime;
+				double reqMaxDepartureTime = r.getLatestStartTime();
 				if (reqMaxDepartureTime < maxTime) {
 					maxTime = reqMaxDepartureTime;
 				}
@@ -86,12 +85,10 @@ public class VehicleData {
 
 	}
 
-	private final DrtConfigGroup drtCfg;
 	private final List<Entry> entries = new ArrayList<>();
 	private final double currTime;
 
-	public VehicleData(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg, Iterable<? extends Vehicle> vehicles) {
-		this.drtCfg = drtCfg;
+	public VehicleData(DrtOptimizerContext optimContext, Iterable<? extends Vehicle> vehicles) {
 		currTime = optimContext.timer.getTimeOfDay();
 
 		for (Vehicle v : vehicles) {
@@ -101,9 +98,9 @@ public class VehicleData {
 			}
 		}
 	}
-	
+
 	public void updateEntry(Entry vEntry) {
-		int idx = entries.indexOf(vEntry);//TODO inefficient! ==> use map instead of list for storing entries...  
+		int idx = entries.indexOf(vEntry);// TODO inefficient! ==> use map instead of list for storing entries...
 		entries.set(idx, createVehicleData(vEntry.vehicle));
 	}
 
@@ -151,7 +148,7 @@ public class VehicleData {
 		for (int i = nextTaskIdx; i < tasks.size(); i++) {
 			NDrtTask task = tasks.get(i);
 			if (task.getDrtTaskType() == NDrtTaskType.STOP) {
-				Stop stop = new Stop((NDrtStopTask)task, drtCfg);
+				Stop stop = new Stop((NDrtStopTask)task);
 				data.stops.add(stop);
 			}
 		}
