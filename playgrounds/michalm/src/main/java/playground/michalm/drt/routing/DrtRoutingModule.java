@@ -22,7 +22,6 @@ package playground.michalm.drt.routing;
 import java.util.*;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
@@ -37,13 +36,11 @@ import playground.michalm.drt.run.DrtConfigGroup;
 
 public class DrtRoutingModule implements RoutingModule {
 	private final DrtConfigGroup drtconfig;
-	private final Network network;
 	private StageActivityTypes stageActivityTypes;
 
 	@Inject
-	public DrtRoutingModule(Config config, Network network) {
+	public DrtRoutingModule(Config config) {
 		this.drtconfig = DrtConfigGroup.get(config);
-		this.network = network;
 	}
 
 	@Override

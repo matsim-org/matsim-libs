@@ -39,8 +39,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 
 	private boolean requiresReoptimization = false;
 
-	public AbstractDrtOptimizer(DrtOptimizerContext optimContext, AbstractDrtOptimizerParams params,
-			Collection<NDrtRequest> unplannedRequests) {
+	public AbstractDrtOptimizer(DrtOptimizerContext optimContext, Collection<NDrtRequest> unplannedRequests) {
 		this.optimContext = optimContext;
 		this.unplannedRequests = unplannedRequests;
 	}
@@ -63,8 +62,9 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	public void requestSubmitted(Request request) {
 		NDrtRequest drtRequest = (NDrtRequest)request;
 		if (drtRequest.getFromLink() == drtRequest.getToLink()) {
-			//throw new IllegalArgumentException("fromLink and toLink must be different");
-			Logger.getLogger(getClass()).error("fromLink and toLink must be different. Request "+request.getId() + " will not be served. The agent will stay in limbo." );
+			// throw new IllegalArgumentException("fromLink and toLink must be different");
+			Logger.getLogger(getClass()).error("fromLink and toLink must be different. Request " + request.getId()
+					+ " will not be served. The agent will stay in limbo.");
 			return;
 		}
 		unplannedRequests.add(drtRequest);

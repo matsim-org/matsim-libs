@@ -51,13 +51,8 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
-import playground.michalm.drt.run.DrtConfigGroup;
-
 /**
  * @author  jbischoff
- *
- */
-/**
  *
  */
 public class DynModePassengerStats implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, ActivityEndEventHandler{
@@ -195,12 +190,5 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	public Map<Id<Vehicle>, double[]> getVehicleDistances() {
 		return vehicleDistances;
 	}
-	
-
-	
-	
-
-
-	
 }
 

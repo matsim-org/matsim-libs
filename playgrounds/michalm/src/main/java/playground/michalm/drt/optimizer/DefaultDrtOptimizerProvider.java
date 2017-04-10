@@ -19,7 +19,6 @@
 
 package playground.michalm.drt.optimizer;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -32,7 +31,7 @@ import org.matsim.core.router.util.*;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 
-import playground.michalm.drt.optimizer.insertion.*;
+import playground.michalm.drt.optimizer.insertion.InsertionDrtOptimizer;
 import playground.michalm.drt.run.DrtConfigGroup;
 import playground.michalm.drt.scheduler.*;
 
@@ -64,15 +63,13 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 	@Override
 	public DrtOptimizer get() {
 		DrtSchedulerParams schedulerParams = new DrtSchedulerParams(60);
+		DrtScheduler scheduler = new DrtScheduler(drtCfg, fleet, qSim.getSimTimer(), schedulerParams, travelTime);
 
 		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
 				: travelDisutilityFactory.createTravelDisutility(travelTime);
-
-		DrtScheduler scheduler = new DrtScheduler(drtCfg, fleet, qSim.getSimTimer(), schedulerParams, travelTime);
-
 		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
 				travelDisutility, scheduler);
 
-		return new InsertionDrtOptimizer(optimContext, drtCfg, new InsertionDrtOptimizerParams(null));
+		return new InsertionDrtOptimizer(optimContext, drtCfg);
 	}
 }

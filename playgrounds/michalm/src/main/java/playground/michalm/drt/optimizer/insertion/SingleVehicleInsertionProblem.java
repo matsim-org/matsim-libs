@@ -95,8 +95,8 @@ public class SingleVehicleInsertionProblem {
 	// TODO maxWaitTime
 	// filter out stops which are visited too late
 	//
-	private boolean[] considerPickupInsertion;
-	private boolean[] considerDropoffInsertion;
+	// private boolean[] considerPickupInsertion;
+	// private boolean[] considerDropoffInsertion;
 
 	public SingleVehicleInsertionProblem(MultiNodePathCalculator router, BackwardMultiNodePathCalculator backwardRouter,
 			double stopDuration, double maxWaitTime) {
