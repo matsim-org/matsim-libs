@@ -33,6 +33,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
@@ -56,23 +57,14 @@ public class AccessibilityComputationSantaBarbaraTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-//	@Test
-//	public void testQuick() throws IOException, InterruptedException{
-//		run(1000., false, false);
-//	}
-//	@Test
-//	public void testLocal() throws IOException, InterruptedException{
-//		run(500., true, true);
-//	}
 	@Test
-	public void testOnServer() throws IOException, InterruptedException{
-		run(500., true, false);
-	}
-	
-	public void run(Double cellSize, boolean push2Geoserver, boolean createQGisOutput) throws IOException, InterruptedException {
+	public void runAccessibilityComputation() throws IOException {
+		Double cellSize = 1000.;
+		boolean push2Geoserver = false; // set true for run on server
+		boolean createQGisOutput = true; // set false for run on server
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
-		Envelope envelope = new Envelope(233000, 266000, 3808000, 3815000); // Notation: minX, maxX, minY, maxY
+		Envelope envelope = new Envelope(233000, 266000, 3790000, 3810000); // Notation: minX, maxX, minY, maxY
 		String scenarioCRS = "EPSG:26911"; // EPSG:26911 = NAD83 / UTM zone 11N, for Santa Barbara, California
 				
 		// Input (if pre-downloaded)
@@ -85,8 +77,11 @@ public class AccessibilityComputationSantaBarbaraTest {
 	
 		// Input (directly from OSM)
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(scenarioCRS, "EPSG:4326");
+		System.out.println("evelope = " + envelope);
 		Coord southwest = transformation.transform(new Coord(envelope.getMinX(), envelope.getMinY()));
 		Coord northeast = transformation.transform(new Coord(envelope.getMaxX(), envelope.getMaxY()));
+		System.out.println("southwest = " + southwest);
+		System.out.println("northeast = " + northeast);
 //		URL osm = new URL("http://api.openstreetmap.org/api/0.6/map?bbox=" + southwest.getX() + "," + southwest.getY() + "," + northeast.getX() + "," + northeast.getY());
 		URL osm = new URL("http://overpass.osm.rambler.ru/cgi/xapi_meta?*[bbox=" + southwest.getX() + "," + southwest.getY() + "," + northeast.getX() + "," + northeast.getY() +"]");
 		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
@@ -109,6 +104,13 @@ public class AccessibilityComputationSantaBarbaraTest {
 		acg.setEnvelope(envelope);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setOutputCrs(scenarioCRS);
+		
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		
+		LOG.warn("acg.getBoundingBoxBottom() = " + acg.getBoundingBoxBottom());
+		LOG.warn("acg.getBoundingBoxTop() = " + acg.getBoundingBoxTop());
+		LOG.warn("acg.getBoundingBoxLeft() = " + acg.getBoundingBoxLeft());
+		LOG.warn("acg.getBoundingBoxRight() = " + acg.getBoundingBoxRight());
 		
 		ConfigUtils.setVspDefaults(config);
 		

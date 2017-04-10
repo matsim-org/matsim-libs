@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,     *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,11 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.matrixbasedptrouter;
-
 
 import java.io.BufferedReader;
 import java.util.Arrays;
@@ -50,13 +46,11 @@ import org.matsim.matrices.Matrix;
 import org.matsim.vehicles.Vehicle;
 
 /**
- *
  * Calculates travel times and distances from Coord to Coord based on a file containing transit stops with coordinates,
  * and, optionally, two files containing travel times and distances between each pair of stops. If files for travel times and distances are not provided,
  * they are calculated based on the teleportedModeSpeed of the pt mode, and the beelineDistanceFactor.
  * 
  * @author thomas
- *
  */
 public final class PtMatrix {
 
@@ -78,11 +72,8 @@ public final class PtMatrix {
 	 * 
 	 * Even though the parameters are taken from the teleportation router config, the teleportation router is not actually used to calculate 
 	 * times and distances. I think this would be the more correct thing to do.
-	 * 
 	 */
-	public static PtMatrix createPtMatrix(
-			PlansCalcRouteConfigGroup plansCalcRoute, BoundingBox bb,
-			MatrixBasedPtRouterConfigGroup ippcm) {
+	public static PtMatrix createPtMatrix(PlansCalcRouteConfigGroup plansCalcRoute, BoundingBox bb,	MatrixBasedPtRouterConfigGroup ippcm) {
 
 		String ptStopInputFile = ippcm.getPtStopsInputFile();
 		QuadTree<PtStop> ptStops = FileUtils.readPtStops(ptStopInputFile, bb);
@@ -314,7 +305,7 @@ public final class PtMatrix {
 				// total travel distance including walking and pt distance from/to origin/destination location:
 				double ptTravelDistance_meter = getTotalWalkTravelDistance_meter(fromNode.getCoord(), toNode.getCoord());
 				// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
-				double ptTotalWalkDistance_meter= getPtTravelDistance_meter(fromNode.getCoord(), toNode.getCoord());
+				double ptTotalWalkDistance_meter = getPtTravelDistance_meter(fromNode.getCoord(), toNode.getCoord());
 
 				return new Path(
 						Arrays.asList(fromNode, toNode),

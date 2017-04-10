@@ -26,10 +26,14 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
+import playground.johannes.studies.matrix2014.analysis.LegPersonCollector;
 import playground.johannes.studies.matrix2014.analysis.SetSeason;
 import playground.johannes.studies.matrix2014.stats.Histogram;
 import playground.johannes.synpop.analysis.*;
-import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -62,7 +66,8 @@ public class SeasonTask implements AnalyzerTask<Collection<? extends Person>> {
         Set<String> seasons = new HashSet<>(seasonCollector.collect(persons));
         seasons.remove(null);
 
-        List<Pair<Map<String, String>, TObjectDoubleMap<String>>> values = new ArrayList<>();
+        List<Pair<Map<String, String>, TObjectDoubleMap<String>>> shareHists = new ArrayList<>();
+        List<Pair<Map<String, String>, TObjectDoubleMap<String>>> absoluteHists = new ArrayList<>();
 
         Predicate<Segment> modePredicate = new LegAttributePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
 
@@ -81,6 +86,7 @@ public class SeasonTask implements AnalyzerTask<Collection<? extends Person>> {
                 Predicate<Segment> distPrediate = new DistancePredicate(idx, discretizer);
 
                 TObjectDoubleMap<String> hist = new TObjectDoubleHashMap<>();
+                TObjectDoubleMap<String> histShare = new TObjectDoubleHashMap<>();
                 for (String season : seasons) {
                     Predicate<Segment> seasonPredicate = new LegPersonAttributePredicate(SetSeason.SEASON_KEY, season);
 
@@ -89,30 +95,39 @@ public class SeasonTask implements AnalyzerTask<Collection<? extends Person>> {
                             distPrediate,
                             seasonPredicate);
 
-                    LegCollector<Segment> counter = new LegCollector(new EntityProvider());
+                    LegPersonCollector<Double> counter = new LegPersonCollector(new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT));
                     counter.setPredicate(predicate);
-
-                    hist.put(season, counter.collect(persons).size());
+                    List<Double> weights = counter.collect(persons);
+                    hist.put(season, sum(weights));
+                    histShare.put(season, sum(weights));
                 }
-                Histogram.normalize(hist);
 
                 Map<String, String> dimensions = new HashMap<>();
                 dimensions.put(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
                 dimensions.put(CommonKeys.LEG_PURPOSE, purpose);
                 dimensions.put(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(borders.get(idx)));
 
-                values.add(new ImmutablePair<>(dimensions, hist));
+                absoluteHists.add(new ImmutablePair<>(dimensions, hist));
+                Histogram.normalize(histShare);
+                shareHists.add(new ImmutablePair<>(dimensions, histShare));
             }
         }
 
         if(ioContext != null) {
-            write(values);
+            write(absoluteHists, "season.txt");
+            write(shareHists, "season.share.txt");
         }
     }
 
-    private void write(List<Pair<Map<String, String>, TObjectDoubleMap<String>>> values) {
+    private double sum(List<Double> values) {
+        double sum = 0;
+        for(Double d : values) sum += d;
+        return sum;
+    }
+
+    private void write(List<Pair<Map<String, String>, TObjectDoubleMap<String>>> values, String filename) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/season-share.txt", ioContext.getPath())));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/%s", ioContext.getPath(), filename)));
 
             if (!values.isEmpty()) {
 
@@ -147,13 +162,13 @@ public class SeasonTask implements AnalyzerTask<Collection<? extends Person>> {
         }
     }
 
-    private static class EntityProvider implements ValueProvider<Integer, Attributable> {
-
-        @Override
-        public Integer get(Attributable attributable) {
-            return 1;
-        }
-    }
+//    private static class EntityProvider implements ValueProvider<Integer, Attributable> {
+//
+//        @Override
+//        public Integer get(Attributable attributable) {
+//            return 1;
+//        }
+//    }
 
     private static class DistancePredicate implements Predicate<Segment> {
 

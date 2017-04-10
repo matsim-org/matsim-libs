@@ -180,7 +180,7 @@ public class TripAnalyzerV1 {
 		AnalysisUtils.addToMapIntegerKeyCeiling(departureTimeMap, departureTime_h, binWidthTime_h, 1.);
 	
 		// store activities in a map
-		String activityType = trip.getActivityStartActType();
+		String activityType = trip.getActivityTypeAfterTrip();
 		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, 1.);
 	
 		// calculate (routed) distances and and store them in a map
@@ -296,7 +296,7 @@ public class TripAnalyzerV1 {
 //    		considerTrip = false;
 //    	}
     	if (onlyWorkTrips == true) {
-    		if (trip.getActivityEndActType().equals("work")) {
+    		if (trip.getActivityTypeBeforeTrip().equals("work")) {
     			considerTrip = false;
     		}
     	}

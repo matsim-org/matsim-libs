@@ -67,7 +67,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		trip.setDepartureLinkId(linkId);
 		trip.setDepartureTime_s(time_s);
 		//trip.setDepartureLegMode(legMode);
-		trip.setActivityEndActType(actType);
+		trip.setActivityTypeBeforeTrip(actType);
 		trip.setWeight(1.);
 		trips.put(tripId, trip);
 		
@@ -87,7 +87,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		if (activityEndCount.get(personId) >= 2) {
 			int numberOfLastArrival = activityStartCount.get(personId);
 			Id<Trip> lastTripId = Id.create(personId + "_" + numberOfLastArrival, Trip.class);
-			if (!trips.get(tripId).getActivityEndActType().equals(trips.get(lastTripId).getActivityStartActType())) {
+			if (!trips.get(tripId).getActivityTypeBeforeTrip().equals(trips.get(lastTripId).getActivityTypeAfterTrip())) {
 				//System.err.println("Type of ending activity is not the same as type of previously started activity.");
 				throw new RuntimeException("Type of ending activity is not the same as type of previously started activity.");
 			} 
@@ -125,7 +125,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 			trips.get(tripId).setArrivalLinkId(linkId);
 			trips.get(tripId).setArrivalTime_s(time_s);
 			//trips.get(tripId).setArrivalLegMode(legMode);
-			trips.get(tripId).setActivityStartActType(actType);
+			trips.get(tripId).setActivityTypeAfterTrip(actType);
 			trips.get(tripId).setTripComplete(true);
 		} else {
 			this.noPreviousEndOfActivityCounter++;

@@ -2,8 +2,7 @@ package playground.dhosse.prt.scheduler;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -25,10 +24,10 @@ public class PrtScheduler
     private final TaxiSchedulerParams params;
 
 
-    public PrtScheduler(Scenario scenario, Fleet taxiData, MobsimTimer timer,
+    public PrtScheduler(Network network, Fleet taxiData, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
-        super(scenario, taxiData, timer, params, travelTime, travelDisutility);
+        super(null, network, taxiData, timer, params, travelTime, travelDisutility);
         this.params = params;
     }
 

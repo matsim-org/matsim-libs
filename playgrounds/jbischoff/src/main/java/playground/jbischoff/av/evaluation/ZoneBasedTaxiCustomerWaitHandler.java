@@ -77,7 +77,7 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 	    
 	    @Override
 	    public void handleEvent(PersonDepartureEvent event){
-	        if (!event.getLegMode().equals(TaxiOptimizerModules.TAXI_MODE))
+	        if (!event.getLegMode().equals(TaxiModule.TAXI_MODE))
 	            return;
 	        String zoneId = getZoneForLinkId(event.getLinkId());
 	        if (zoneId!=null){

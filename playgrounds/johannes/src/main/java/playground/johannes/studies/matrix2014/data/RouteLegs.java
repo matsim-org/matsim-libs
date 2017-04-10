@@ -74,7 +74,7 @@ public class RouteLegs {
          */
         MatsimFacilitiesReader facilitiesReader = new MatsimFacilitiesReader(scenario);
         facilitiesReader.readFile(group.getValue(FACILITIES_FILE));
-        FacilityData facilityData = new FacilityData(scenario.getActivityFacilities(), new XORShiftRandom());
+        FacilityData facilityData = new FacilityData(scenario.getActivityFacilities(), null, new XORShiftRandom());
         /*
         Load persons.
          */

@@ -85,15 +85,15 @@ public class TaxiFareHandlerTest {
 		});
 		Id<Person> p1 = Id.createPersonId("p1");
 		Id<Vehicle> t1= Id.createVehicleId("v1"); 
-		events.processEvent(new PersonDepartureEvent(0.0, p1 , Id.createLinkId("12"), TaxiOptimizerModules.TAXI_MODE));
+		events.processEvent(new PersonDepartureEvent(0.0, p1 , Id.createLinkId("12"), TaxiModule.TAXI_MODE));
 		events.processEvent(new PersonEntersVehicleEvent(60.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(61,t1,Id.createLinkId("23")));
-		events.processEvent(new PersonArrivalEvent(120.0, p1, Id.createLinkId("23"), TaxiOptimizerModules.TAXI_MODE));
+		events.processEvent(new PersonArrivalEvent(120.0, p1, Id.createLinkId("23"), TaxiModule.TAXI_MODE));
 		
-		events.processEvent(new PersonDepartureEvent(180.0, p1 , Id.createLinkId("12"), TaxiOptimizerModules.TAXI_MODE));
+		events.processEvent(new PersonDepartureEvent(180.0, p1 , Id.createLinkId("12"), TaxiModule.TAXI_MODE));
 		events.processEvent(new PersonEntersVehicleEvent(240.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(241,t1,Id.createLinkId("23")));
-		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), TaxiOptimizerModules.TAXI_MODE));
+		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), TaxiModule.TAXI_MODE));
 		
 		//fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2 
 		Assert.assertEquals(-6.2, fare.getValue());

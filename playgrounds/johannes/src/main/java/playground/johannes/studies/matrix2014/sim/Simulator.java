@@ -217,7 +217,7 @@ public class Simulator {
 
     private static void loadGISData(DataPool dataPool, Config config, Random random) {
         logger.info("Registering data loaders...");
-        dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
+        dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), null, random), FacilityDataLoader.KEY);
         dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
 
         ValidateFacilities.validate(dataPool, "modena");

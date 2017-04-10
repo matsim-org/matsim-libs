@@ -19,13 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning;
 
-import java.util.Map;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeakSelector;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
 
-import org.matsim.core.controler.AbstractModule;
-
-import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
-import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Weak;
 import org.matsim.contrib.socnetsim.usage.replanning.removers.CoalitionMinSelectorFactory;
@@ -63,11 +59,10 @@ import org.matsim.contrib.socnetsim.usage.replanning.strategies.ParetoExpBetaFac
 import org.matsim.contrib.socnetsim.usage.replanning.strategies.RandomGroupPlanSelectorStrategyFactory;
 import org.matsim.contrib.socnetsim.usage.replanning.strategies.RandomJointLocationChoiceStrategyFactory;
 import org.matsim.contrib.socnetsim.usage.replanning.strategies.RandomSumGroupPlanSelectorStrategyFactory;
-import org.matsim.contrib.socnetsim.usage.replanning.strategies.WeakSelectorFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.multibindings.MapBinder;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * @author thibautd
@@ -174,10 +169,11 @@ public class DefaultJointStrategiesModule extends AbstractJointStrategiesModule 
 
 					@Override
 					public GroupLevelPlanSelector get() {
-						return new WeakSelectorFactory(
+						return new WeakSelector(
 								weakIdentifier,
-								new RandomGroupPlanSelectorStrategyFactory(
-										incompatiblePlansIdentifierFactory ) ).createSelector();
+								new RandomGroupLevelSelector(
+										MatsimRandom.getLocalInstance(),
+										incompatiblePlansIdentifierFactory ) );
 					}
 				});
 

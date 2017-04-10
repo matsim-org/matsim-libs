@@ -37,6 +37,7 @@ public class SocialNetworkPlanLinkIdentifier implements PlanLinkIdentifier {
 
 	public SocialNetworkPlanLinkIdentifier(
 			final SocialNetwork sn) {
+		if ( sn == null ) throw new NullPointerException( "Social Network is null!");
 		this.sn = sn;
 	}
 

@@ -57,15 +57,15 @@ public class VehicleData {
 
 		public Stop(NDrtStopTask task, DrtConfigGroup drtCfg) {
 			this.task = task;
-			maxArrivalTime = calcMaxArrivalTime(drtCfg.getMaxWaitTime());
-			maxDepartureTime = calcMaxDepartureTime();
+			maxArrivalTime = calcMaxArrivalTime();
+			maxDepartureTime = calcMaxDepartureTime(drtCfg.getMaxWaitTime());
 			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
 		}
 
-		private double calcMaxArrivalTime(double maxWaitTime) {
+		private double calcMaxArrivalTime() {
 			double maxTime = Double.MAX_VALUE;
 			for (NDrtRequest r : task.getDropoffRequests()) {
-				double reqMaxArrivalTime = r.getEarliestStartTime() + maxWaitTime;
+				double reqMaxArrivalTime = r.getEarliestStartTime() + 3600;// TODO temp
 				if (reqMaxArrivalTime < maxTime) {
 					maxTime = reqMaxArrivalTime;
 				}
@@ -73,10 +73,10 @@ public class VehicleData {
 			return maxTime;
 		}
 
-		private double calcMaxDepartureTime() {
+		private double calcMaxDepartureTime(double maxWaitTime) {
 			double maxTime = Double.MAX_VALUE;
 			for (NDrtRequest r : task.getPickupRequests()) {
-				double reqMaxDepartureTime = r.getEarliestStartTime() + 3600;// TODO temp
+				double reqMaxDepartureTime = r.getEarliestStartTime() + maxWaitTime;
 				if (reqMaxDepartureTime < maxTime) {
 					maxTime = reqMaxDepartureTime;
 				}

@@ -21,7 +21,6 @@ package playground.michalm.drt.scheduler;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.*;
@@ -49,18 +48,18 @@ public class DrtScheduler implements ScheduleInquiry {
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
 
-	public DrtScheduler(Scenario scenario, Fleet fleet, MobsimTimer timer, DrtSchedulerParams params,
+	public DrtScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer, DrtSchedulerParams params,
 			TravelTime travelTime) {
 		this.fleet = fleet;
 		this.params = params;
 		this.timer = timer;
 		this.travelTime = travelTime;
 
-		initFleet(scenario);
+		initFleet(drtCfg);
 	}
 
-	private void initFleet(Scenario scenario) {
-		if (DrtConfigGroup.get(scenario.getConfig()).isChangeStartLinkToLastLinkInSchedule()) {
+	private void initFleet(DrtConfigGroup drtCfg) {
+		if (drtCfg.isChangeStartLinkToLastLinkInSchedule()) {
 			for (Vehicle veh : fleet.getVehicles().values()) {
 				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
 			}
@@ -205,8 +204,7 @@ public class DrtScheduler implements ScheduleInquiry {
 				if (currentTask.getDrtTaskType() == NDrtTaskType.STAY) {
 					stayTask = (NDrtStayTask)currentTask; // ongoing stay task
 					double now = timer.getTimeOfDay();
-					if (stayTask.getEndTime() > now) { // split stay task into two, so that a new stop/drive task can be
-														// inserted now
+					if (stayTask.getEndTime() > now) { // stop stay task; a new stop/drive task can be inserted now
 						stayTask.setEndTime(now);
 					}
 				} else {
@@ -222,7 +220,7 @@ public class DrtScheduler implements ScheduleInquiry {
 				request.setPickupTask(stopTask);
 
 				/// ADDED
-				////TODO this is copied, but has not been updated !!!!!!!!!!!!!!!
+				//// TODO this is copied, but has not been updated !!!!!!!!!!!!!!!
 				// add drive from pickup
 				if (insertion.pickupIdx == insertion.dropoffIdx) {
 					// remove drive i->i+1 (if there is one)
@@ -358,10 +356,6 @@ public class DrtScheduler implements ScheduleInquiry {
 			if (taskIdx + 2 == schedule.getTaskCount()) {// remove stay task from the end of schedule,
 				NDrtStayTask oldStayTask = (NDrtStayTask)schedule.getTasks().get(taskIdx + 1);
 				schedule.removeTask(oldStayTask);
-
-				// TODO this should be enough
-				// schedule.removeLastTask();
-
 			}
 			if (taskIdx + 1 == schedule.getTaskCount()) {
 

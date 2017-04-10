@@ -59,7 +59,7 @@ public class RemoveLongTrips {
 		Random random = new XORShiftRandom(4711);
 		
 		DataPool dataPool = new DataPool();
-		dataPool.register(new FacilityDataLoader(args[2], random), FacilityDataLoader.KEY);
+		dataPool.register(new FacilityDataLoader(args[2], null, random), FacilityDataLoader.KEY);
 		FacilityData fData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 		
 		Set<Person> remove = new HashSet<>(persons.size());

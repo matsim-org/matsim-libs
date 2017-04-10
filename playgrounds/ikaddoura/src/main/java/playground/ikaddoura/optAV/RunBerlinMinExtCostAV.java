@@ -25,8 +25,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
@@ -35,10 +33,7 @@ import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
-import org.matsim.contrib.taxi.run.TaxiOutputModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -48,7 +43,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivityScheduling;
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingConfigGroup;
+import playground.ikaddoura.agentSpecificActivityScheduling.AgentSpecificActivitySchedulingModule;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
@@ -117,13 +113,13 @@ public class RunBerlinMinExtCostAV {
 				new DvrpConfigGroup(),
 				new TaxiFareConfigGroup(),
 				new OTFVisConfigGroup(),
-				new NoiseConfigGroup());
+				new NoiseConfigGroup(),
+				new AgentSpecificActivitySchedulingConfigGroup());
 		
 		config.controler().setOutputDirectory(outputDirectory);
 		
-		DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
 		
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 		
@@ -140,8 +136,9 @@ public class RunBerlinMinExtCostAV {
 		Controler controler = new Controler(scenario);
 		
 		if (agentBasedActivityScheduling) {
-			AgentSpecificActivityScheduling aa = new AgentSpecificActivityScheduling(controler);
-			controler = aa.prepareControler(false);
+			AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+			asasConfigGroup.setAdjustPopulation(false);
+			controler.addOverridingModule(new AgentSpecificActivitySchedulingModule(scenario));
 		}
 				
 		// #############################
@@ -193,11 +190,8 @@ public class RunBerlinMinExtCostAV {
 		// taxi
 		// #############################
 
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
-		
 		controler.addOverridingModule(new TaxiOutputModule());
-        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+        controler.addOverridingModule(new TaxiModule());
 
         // #############################
         // travel disutility

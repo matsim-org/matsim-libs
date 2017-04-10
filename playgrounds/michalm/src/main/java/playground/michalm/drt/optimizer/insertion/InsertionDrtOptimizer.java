@@ -23,6 +23,8 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.locationchoice.router.*;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 
@@ -34,13 +36,10 @@ import playground.michalm.drt.run.DrtConfigGroup;
 /**
  * @author michalm
  */
-public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
+public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements MobsimBeforeCleanupListener {
 	private final DrtConfigGroup drtCfg;
 
-	private final FastMultiNodeDijkstra router;
-	private final BackwardFastMultiNodeDijkstra backwardRouter;
-
-	private final MultiVehicleInsertionProblem insertionProblem;
+	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg,
 			InsertionDrtOptimizerParams params) {
@@ -55,16 +54,27 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer {
 
 		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
 				.createRoutingNetwork(optimContext.network);
-		router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility, optimContext.travelTime,
-				preProcessDijkstra, fastRouterFactory, true);
-
 		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(preProcessDijkstra)
 				.createRoutingNetwork(optimContext.network);
-		backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork, optimContext.travelDisutility,
-				optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
 
-		insertionProblem = new MultiVehicleInsertionProblem(new SingleVehicleInsertionProblem(router, backwardRouter,
-				optimContext.scheduler.getParams().stopDuration, drtCfg.getMaxWaitTime()));
+		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
+				.getNumberOfThreads()];
+		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
+			FastMultiNodeDijkstra router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility,
+					optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
+			BackwardFastMultiNodeDijkstra backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork,
+					optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra, fastRouterFactory,
+					true);
+			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(router, backwardRouter,
+					optimContext.scheduler.getParams().stopDuration, drtCfg.getMaxWaitTime());
+		}
+
+		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems);
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+		insertionProblem.shutdown();
 	}
 
 	@Override

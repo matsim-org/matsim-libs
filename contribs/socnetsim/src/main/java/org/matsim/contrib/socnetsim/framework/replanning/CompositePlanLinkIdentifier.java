@@ -88,5 +88,13 @@ public final class CompositePlanLinkIdentifier implements PlanLinkIdentifier {
 
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return "CompositePlanLinkIdentifier{" +
+				"ANDS=" + andDelegates +
+				", ORS=" + orDelegates +
+				'}';
+	}
 }
 

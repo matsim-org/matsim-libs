@@ -27,6 +27,7 @@ package playground.ikaddoura;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
@@ -35,12 +36,16 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
+import playground.ikaddoura.decongestion.DecongestionControlerListener;
+import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
@@ -91,10 +96,10 @@ public class CongestionPricingControler {
 			log.info("Sigma: " + sigma);
 
 		} else {
-			outputDirectory = null;
-			configFile = "../../shared-svn/studies/ihab/test_siouxFalls/input/config.xml";
+			outputDirectory = "../../../runs-svn/vickrey-decongestion/output-FINAL/V9/";
+			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
 			VTTSapproach = "different";
-			implementation = "V3";
+			implementation = "V9";
 			router = "standard";
 			sigma = 0.;
 		}
@@ -122,7 +127,8 @@ public class CongestionPricingControler {
 			config.controler().setOutputDirectory(outputDirectory);
 		}
 		
-		Controler controler = new Controler(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
 
 		if (implementation.equals("noPricing")) {
 			
@@ -225,10 +231,24 @@ public class CongestionPricingControler {
 
 		}
 		
+		// ***
+		
+		controler.addOverridingModule(new AbstractModule() {		
+			@Override
+			public void install() {
+				this.bind(DecongestionInfo.class).asEagerSingleton();
+				this.bind(DelayAnalysis.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(DelayAnalysis.class);
+				this.addControlerListenerBinding().to(DecongestionControlerListener.class);
+			}
+		});
+		
+		// ***
+		
 		controler.addControlerListener(new WelfareAnalysisControlerListener(controler.getScenario()));
 		
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 		controler.run();
 		
 		// analysis

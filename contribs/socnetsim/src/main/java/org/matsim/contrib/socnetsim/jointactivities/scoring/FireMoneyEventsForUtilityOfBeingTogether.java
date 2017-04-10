@@ -38,6 +38,7 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring;
 import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -140,7 +141,9 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 		final ActivityParams params = scenario.getConfig().planCalcScore().getActivityParams( type );
 		
 		if ( params == null ) {
-			throw new RuntimeException( "could not find typical duration for Person "+person.getId()+" for type "+type );
+			//throw new RuntimeException( "could not find typical duration for Person "+person.getId()+" for type "+type );
+			// not that nice, but needed for agents that might not have a preference. BeingTogetherScoring knows how to handle that
+			return Double.NEGATIVE_INFINITY;
 		}
 		
 		return params.getTypicalDuration();
@@ -199,7 +202,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	}
 
 	private <T extends Event & HasPersonId> void transmitEventToRelevantPersons( final T event ) {
-		final Id ego = event.getPersonId();
+		final Id<Person> ego = event.getPersonId();
 		if ( !socialNetwork.getEgos().contains( ego ) ) return;
 		final Iterable<Id<Person>> ids = cat( ego , socialNetwork.getAlters( ego ) );
 		for ( Id<Person> id : ids ) {
@@ -224,8 +227,8 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 		}
 	}
 
-	public Iterable<Id<Person>> cat(final Id ego, final Set<Id<Person>> alters) {
-		final Set<Id<Person>> ids = new HashSet<>( alters );
+	public Iterable<Id<Person>> cat(final Id<Person> ego, final Set<Id<Person>> alters) {
+		final Collection<Id<Person>> ids = new HashSet<>( alters );
 		ids.add( ego );
 		return ids;
 	}

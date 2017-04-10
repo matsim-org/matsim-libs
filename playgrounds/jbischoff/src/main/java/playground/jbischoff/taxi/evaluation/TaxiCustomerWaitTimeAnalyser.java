@@ -138,7 +138,7 @@ public class TaxiCustomerWaitTimeAnalyser
     @Override
     public void handleEvent(PersonDepartureEvent event)
     {
-        if (!event.getLegMode().equals(TaxiOptimizerModules.TAXI_MODE))
+        if (!event.getLegMode().equals(TaxiModule.TAXI_MODE))
             return;
         this.taxicalltime.put(event.getPersonId(), event.getTime());
         this.linkAg.put(event.getPersonId(), event.getLinkId());

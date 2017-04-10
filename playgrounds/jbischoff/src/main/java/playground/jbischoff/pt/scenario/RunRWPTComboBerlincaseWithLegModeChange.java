@@ -49,9 +49,6 @@ import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromMod
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class RunRWPTComboBerlincaseWithLegModeChange {
 	public static void main(String[] args) {
 
@@ -63,9 +60,8 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new DvrpConfigGroup(), new TaxiFareConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
 
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 
@@ -88,12 +84,9 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 		config.addModule(vacfg);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet)
-				.readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiOutputModule());
-        controler.addOverridingModule(TaxiOptimizerModules.createDefaultModule(fleet));
+        controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
 		controler.run();
 

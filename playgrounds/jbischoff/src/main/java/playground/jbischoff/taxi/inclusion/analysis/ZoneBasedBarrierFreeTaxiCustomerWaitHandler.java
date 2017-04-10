@@ -80,7 +80,7 @@ public class ZoneBasedBarrierFreeTaxiCustomerWaitHandler implements PersonDepart
 	    @Override
 	    public void handleEvent(PersonDepartureEvent event){
 	    	
-	        if (!event.getLegMode().equals(TaxiOptimizerModules.TAXI_MODE))
+	        if (!event.getLegMode().equals(TaxiModule.TAXI_MODE))
 	            return;
 	        if (onlyBarrierFreeRequests){
 	        	if (!event.getPersonId().toString().startsWith("hc_")){

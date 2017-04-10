@@ -69,7 +69,8 @@ public class PopGeoExtract {
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
-		FacilityDataLoader loader = new FacilityDataLoader(facFile, null);
+		//TODO: fix mapping
+		FacilityDataLoader loader = new FacilityDataLoader(facFile, null, null);
 		FacilityData fData = (FacilityData) loader.load();
 
 		String data = new String(Files.readAllBytes(Paths.get(geoFile)));

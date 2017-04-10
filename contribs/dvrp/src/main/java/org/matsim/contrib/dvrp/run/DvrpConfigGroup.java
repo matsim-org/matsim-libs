@@ -32,9 +32,12 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public static final String MODE = "mode";
+	public static final String NETWORK_MODE = "networkMode";
 	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
 
-	private String mode = null;
+	private String mode = null; // travel mode (passengers'/customers' perspective)
+	private String networkMode = null; // used for building routes, calculating travel times, etc.
+										// (dispatcher's perspective)
 	private double travelTimeEstimationAlpha = 0.05; // between 0 and 1; 0=> no averaging, only the initial time is used
 
 	public DvrpConfigGroup() {
@@ -44,7 +47,12 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		map.put(MODE, "Mode which will be handled by PassengerEngine and VrpOptimizer");
+		map.put(MODE, "Mode which will be handled by PassengerEngine and VrpOptimizer "
+				+ "(passengers'/customers' perspective)");
+		map.put(NETWORK_MODE,
+				"Mode of which the network will be used for routing vehicles, calculating trave times, "
+						+ "etc. (fleet operator's perspective). "
+						+ "If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used");
 		map.put(TRAVEL_TIME_ESTIMATION_ALPHA,
 				"Used for estimation of travel times for VrpOptimizer by means of the exponential moving average."
 						+ " The weighting decrease, alpha, must be in (0,1]."
@@ -63,6 +71,16 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	@StringGetter(NETWORK_MODE)
+	public String getNetworkMode() {
+		return networkMode;
+	}
+
+	@StringSetter(NETWORK_MODE)
+	public void setNetworkMode(String routingMode) {
+		this.networkMode = routingMode;
 	}
 
 	@StringGetter(TRAVEL_TIME_ESTIMATION_ALPHA)

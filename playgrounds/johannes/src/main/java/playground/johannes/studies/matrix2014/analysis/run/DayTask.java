@@ -26,6 +26,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
+import playground.johannes.studies.matrix2014.analysis.LegPersonCollector;
 import playground.johannes.studies.matrix2014.analysis.SetSeason;
 import playground.johannes.studies.matrix2014.stats.Histogram;
 import playground.johannes.synpop.analysis.*;
@@ -68,7 +69,8 @@ public class DayTask implements AnalyzerTask<Collection<? extends Person>> {
         Set<String> days = new HashSet<>(dayCollector.collect(persons));
         days.remove(null);
 
-        List<Pair<Map<String, String>, TObjectDoubleMap<String>>> values = new ArrayList<>();
+        List<Pair<Map<String, String>, TObjectDoubleMap<String>>> shareHists = new ArrayList<>();
+        List<Pair<Map<String, String>, TObjectDoubleMap<String>>> absoluteHists = new ArrayList<>();
 
         Predicate<Segment> modePredicate = new LegAttributePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
 
@@ -90,6 +92,8 @@ public class DayTask implements AnalyzerTask<Collection<? extends Person>> {
                     Predicate<Segment> distPrediate = new DistancePredicate(idx, discretizer);
 
                     TObjectDoubleMap<String> hist = new TObjectDoubleHashMap<>();
+                    TObjectDoubleMap<String> histShare = new TObjectDoubleHashMap<>();
+
                     for (String day : days) {
                         Predicate<Segment> dayPredicate = new LegPersonAttributePredicate(CommonKeys.DAY, day);
 
@@ -99,12 +103,17 @@ public class DayTask implements AnalyzerTask<Collection<? extends Person>> {
                                 distPrediate,
                                 dayPredicate);
 
-                        LegCollector<Segment> counter = new LegCollector(new EntityProvider());
+                        LegPersonCollector<Double> counter = new LegPersonCollector(new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT));
                         counter.setPredicate(predicate);
+                        List<Double> weights = counter.collect(persons);
+                        hist.put(day, sum(weights));
+                        histShare.put(day, sum(weights));
 
-                        hist.put(day, counter.collect(persons).size());
+//                        LegCollector<Segment> counter = new LegCollector(new EntityProvider());
+//                        counter.setPredicate(predicate);
+//
+//                        hist.put(day, counter.collect(persons).size());
                     }
-                    Histogram.normalize(hist);
 
                     Map<String, String> dimensions = new HashMap<>();
                     dimensions.put(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
@@ -112,19 +121,28 @@ public class DayTask implements AnalyzerTask<Collection<? extends Person>> {
                     dimensions.put(SetSeason.SEASON_KEY, season);
                     dimensions.put(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(borders.get(idx)));
 
-                    values.add(new ImmutablePair<>(dimensions, hist));
+                    absoluteHists.add(new ImmutablePair<>(dimensions, hist));
+                    Histogram.normalize(histShare);
+                    shareHists.add(new ImmutablePair<>(dimensions, histShare));
                 }
             }
         }
 
         if(ioContext != null) {
-            write(values);
+            write(absoluteHists, "day.txt");
+            write(shareHists, "day.share.txt");
         }
     }
 
-    private void write(List<Pair<Map<String, String>, TObjectDoubleMap<String>>> values) {
+    private double sum(List<Double> values) {
+        double sum = 0;
+        for(Double d : values) sum += d;
+        return sum;
+    }
+
+    private void write(List<Pair<Map<String, String>, TObjectDoubleMap<String>>> values, String filename) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/day-share.txt", ioContext.getPath())));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/%s", ioContext.getPath(), filename)));
 
             if (!values.isEmpty()) {
 

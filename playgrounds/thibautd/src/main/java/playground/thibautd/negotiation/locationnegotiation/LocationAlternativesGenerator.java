@@ -33,7 +33,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.thibautd.negotiation.framework.AlternativesGenerator;
 import playground.thibautd.negotiation.framework.NegotiationAgent;
-import playground.thibautd.utils.LambdaCounter;
 import playground.thibautd.utils.RandomUtils;
 import playground.thibautd.utils.spatialcollections.VPTree;
 

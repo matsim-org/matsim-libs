@@ -24,12 +24,10 @@ import com.google.inject.util.Types;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
 import org.matsim.contrib.socnetsim.framework.replanning.removers.LexicographicForCompositionExtraPlanRemover;
-import org.matsim.contrib.socnetsim.framework.replanning.selectors.LogitWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.ScoreWeight;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.ProportionBasedConflictSolver;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.gbl.MatsimRandom;
 import playground.thibautd.negotiation.framework.Proposition;
 
 /**

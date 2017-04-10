@@ -60,6 +60,11 @@ public class DistanceDimensionCalculator implements DimensionCalculator {
             distanceMatrix.add(destination, origin, d);
         }
 
-        return String.valueOf(discretizer.discretize(d));
+        double d2 = discretizer.discretize(d);
+
+        if(d2 == (long) d2)
+            return String.format("%d", (long)d2);
+        else
+            return String.format("%s", d2);
     }
 }
