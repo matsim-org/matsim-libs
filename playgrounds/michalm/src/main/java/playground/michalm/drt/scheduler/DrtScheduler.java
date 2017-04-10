@@ -376,4 +376,22 @@ public class DrtScheduler implements ScheduleInquiry {
 			updateTimelineStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2, driveFromDropoffTask.getEndTime());
 		}
 	}
+
+	public void relocateEmptyVehicle(Vehicle vehicle, VrpPathWithTravelData vrpPath) {
+		Schedule schedule = vehicle.getSchedule();
+		NDrtStayTask stayTask = (NDrtStayTask)schedule.getCurrentTask();
+		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
+			throw new IllegalStateException("The current STAY task is not last. Not possible without prebooking");
+		}
+
+		if (vrpPath.getDepartureTime() < timer.getTimeOfDay()) {
+			throw new IllegalArgumentException("Too late. Planned departureTime=" + vrpPath.getDepartureTime()
+					+ " currentTime=" + timer.getTimeOfDay());
+		}
+
+		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
+		schedule.addTask(new NDrtDriveTask(vrpPath)); // add DRIVE
+		// append STAY
+		schedule.addTask(new NDrtStayTask(vrpPath.getArrivalTime(), vehicle.getServiceEndTime(), vrpPath.getToLink()));
+	}
 }

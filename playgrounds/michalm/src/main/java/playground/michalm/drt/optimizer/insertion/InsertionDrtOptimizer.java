@@ -37,14 +37,11 @@ import playground.michalm.drt.run.DrtConfigGroup;
  * @author michalm
  */
 public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements MobsimBeforeCleanupListener {
-	private final DrtConfigGroup drtCfg;
-
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg,
 			InsertionDrtOptimizerParams params) {
 		super(optimContext, params, new TreeSet<NDrtRequest>(Requests.ABSOLUTE_COMPARATOR));
-		this.drtCfg = drtCfg;
 
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
 		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
