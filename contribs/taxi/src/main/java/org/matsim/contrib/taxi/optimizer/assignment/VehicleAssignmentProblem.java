@@ -74,8 +74,11 @@ public class VehicleAssignmentProblem<D> {
 		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
 
 		// TODO this kNN is slow
-		destinationFinder = StraightLineKnnFinders.createDestEntryFinder(nearestDestinationLimit);
-		vehicleFinder = StraightLineKnnFinders.createVehicleDepartureFinder(nearestVehicleLimit);
+		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
+		destinationFinder = nearestDestinationLimit < 0 ? null : new StraightLineKnnFinder<>(nearestDestinationLimit,
+				LinkProviders.VEHICLE_ENTRY_TO_LINK, linkProvider);
+		vehicleFinder = nearestVehicleLimit < 0 ? null
+				: new StraightLineKnnFinder<>(nearestVehicleLimit, linkProvider, LinkProviders.VEHICLE_ENTRY_TO_LINK);
 	}
 
 	public List<Dispatch<D>> findAssignments(VehicleData vData, AssignmentDestinationData<D> dData,
