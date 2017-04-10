@@ -37,13 +37,13 @@ import java.util.stream.Collectors;
 public class SelfishDispatcher extends UniversalDispatcher {
 
 	private final int dispatchPeriod;
-	private Tensor printVals = Tensors.empty();    // TODO never used; delete?
-	private final int numberofVehicles;            // TODO never used; delete?
+	// private Tensor printVals = Tensors.empty();     // TODO never used; delete?
+	// private final int numberofVehicles;             // TODO never used; delete?
 
 	// specific to SelfishDispatcher
-	private final int updateRefPeriod; 			// implementation may not use this
-	private final int weiszfeldMaxIter; 		// max iterations for Weiszfeld's algorithm
-	private final double weiszfeldTol; 			// convergence tolerance for Weiszfeld's algorithm
+	private final int updateRefPeriod;         // implementation may not use this
+	private final int weiszfeldMaxIter;        // max iterations for Weiszfeld's algorithm
+	private final double weiszfeldTol;         // convergence tolerance for Weiszfeld's algorithm
 	private boolean vehiclesInitialized = false;
 	private final HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
 	private final HashMap<AVVehicle, Link> refPositions = new HashMap<>();
@@ -53,12 +53,12 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used to enable fast "contains" searching
 	private final double[] networkBounds;
 
-	private SelfishDispatcher(                                                  //
-			AVDispatcherConfig avDispatcherConfig,                              //
-			AVGeneratorConfig generatorConfig,                                  //
-			TravelTime travelTime, 												//
-			ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, 	//
-			EventsManager eventsManager, 										//
+	private SelfishDispatcher(                                               //
+			AVDispatcherConfig avDispatcherConfig,                           //
+			AVGeneratorConfig generatorConfig,                               //
+			TravelTime travelTime,                                           //
+			ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+			EventsManager eventsManager,                                     //
 			Network networkIn, AbstractRequestSelector abstractRequestSelector) {
 
 		super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
@@ -69,7 +69,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
 		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", 3600);
 		weiszfeldMaxIter = safeConfig.getInteger("weiszfeldMaxIter", 1000);
 		weiszfeldTol = safeConfig.getDouble("weiszfeldTol", 1.0);
-		numberofVehicles = (int) generatorConfig.getNumberOfVehicles();
+		// numberofVehicles = (int) generatorConfig.getNumberOfVehicles();    // TODO never used; delete?
 
 		network = networkIn;
 		networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values()); 		// minx, miny, maxx, maxy
