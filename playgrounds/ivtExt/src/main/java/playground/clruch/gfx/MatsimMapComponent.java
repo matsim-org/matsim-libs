@@ -28,12 +28,9 @@ public class MatsimMapComponent extends JMapViewer {
 
     SimulationObject simulationObject = null;
 
-    public final LinkLayer linkLayer;
-    public final RequestLayer requestLayer;
-    public final VehicleLayer vehicleLayer;
-    public final VirtualNetworkLayer virtualNetworkLayer;
+    public final VirtualNetLayer virtualNetworkLayer;
 
-    private final List<ViewerLayer> viewerLayers = new ArrayList<>();
+    public final List<ViewerLayer> viewerLayers = new ArrayList<>();
     private final List<InfoString> infoStrings = new LinkedList<>();
     private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
     private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
@@ -42,18 +39,19 @@ public class MatsimMapComponent extends JMapViewer {
 
     public MatsimMapComponent(MatsimStaticDatabase db) {
         this.db = db;
+        virtualNetworkLayer = new VirtualNetLayer(this);
 
-        linkLayer = new LinkLayer(this);
-        requestLayer = new RequestLayer(this);
-        vehicleLayer = new VehicleLayer(this);
-        virtualNetworkLayer = new VirtualNetworkLayer(this);
+        addLayer(new VehiclesLayer(this));
+        addLayer(new RequestsLayer(this));
+        addLayer(new LinkLayer(this));
+        addLayer(virtualNetworkLayer);
+    
+    }
 
-        viewerLayers.add(linkLayer);
-        viewerLayers.add(requestLayer);
-        matsimHeatmaps.add(requestLayer.requestHeatMap);
-        matsimHeatmaps.add(requestLayer.requestDestMap);
-        viewerLayers.add(vehicleLayer);
-        viewerLayers.add(virtualNetworkLayer);
+    public void addLayer(ViewerLayer viewerLayer) {
+        viewerLayers.add(viewerLayer);
+        for (MatsimHeatMap m : viewerLayer.getHeatmaps())
+            matsimHeatmaps.add(m);
     }
 
     /**

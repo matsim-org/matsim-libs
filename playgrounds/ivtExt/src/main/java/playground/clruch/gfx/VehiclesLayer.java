@@ -8,37 +8,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.swing.JCheckBox;
+
 import playground.clruch.export.AVStatus;
 import playground.clruch.net.AbstractContainer;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.VehicleContainer;
+import playground.clruch.utils.gui.RowPanel;
 
-public class VehicleLayer extends ViewerLayer {
+public class VehiclesLayer extends ViewerLayer {
     // ---
     private volatile boolean drawVehicleDestinations = true;
 
-    public VehicleLayer(MatsimMapComponent matsimMapComponent) {
+    public VehiclesLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
     }
-    
+
     @Override
     public void prepareHeatmaps(SimulationObject ref) {
-        // {
-        // rebalanceHeatmap.clear();
-        // Map<Integer, List<VehicleContainer>> map = ref.vehicles.stream()
-        // .filter(v->v.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
-        // .collect(Collectors.groupingBy(r -> r.destinationLinkIndex));
-        //
-        // for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
-        // OsmLink osmLink = db.getOsmLink(entry.getKey());
-        // final int size = entry.getValue().size();
-        // for (int count = 0; count < size; ++count) {
-        // Coord coord = osmLink.getAt(count / (double) size);
-        // rebalanceHeatmap.addPoint(coord.getX(), coord.getY());
-        // }
-        // }
-        // }
     }
 
     @Override
@@ -98,4 +86,15 @@ public class VehicleLayer extends ViewerLayer {
     public boolean getDrawDestinations() {
         return drawVehicleDestinations;
     }
+
+    @Override
+    protected void createPanel(RowPanel rowPanel) {
+        {
+            final JCheckBox jCheckBox = new JCheckBox("destin.");
+            jCheckBox.setSelected(getDrawDestinations());
+            jCheckBox.addActionListener(e -> setDrawDestinations(jCheckBox.isSelected()));
+            rowPanel.add(jCheckBox);
+        }
+    }
+
 }

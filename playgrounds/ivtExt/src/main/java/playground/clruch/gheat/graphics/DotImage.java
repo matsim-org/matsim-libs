@@ -30,7 +30,7 @@ public class DotImage {
 
     private static double poly(double x) {
         // 0.498335 + 0.258199 x + 0.7263 x^2 - 0.482759 x^3
-        return 0.498335 + 0.258199 * x + 0.7263 * x * x - 0.482759 * x * x * x;
+        return Math.pow(0.498335 + 0.258199 * x + 0.7263 * x * x - 0.482759 * x * x * x, .25);
     }
 
     public int getWidth() {
