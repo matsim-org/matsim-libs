@@ -9,10 +9,14 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
+import org.matsim.contrib.util.LinkProvider;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+/**
+ * @author michalm
+ */
 public class BestDispatchFinder {
 	public static class Dispatch<D> {
 		public final Vehicle vehicle;

@@ -29,11 +29,15 @@ import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
+import org.matsim.contrib.util.*;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Lists;
 
+/**
+ * @author michalm
+ */
 public class VehicleAssignmentProblem<D> {
 	public static interface AssignmentCost<D> {
 		double calc(VehicleData.Entry departure, DestEntry<D> dest, PathData pathData);

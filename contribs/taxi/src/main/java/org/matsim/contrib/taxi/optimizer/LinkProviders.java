@@ -24,7 +24,11 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
+import org.matsim.contrib.util.LinkProvider;
 
+/**
+ * @author michalm
+ */
 public class LinkProviders {
 	public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = new LinkProvider<TaxiRequest>() {
 		public Link apply(TaxiRequest req) {

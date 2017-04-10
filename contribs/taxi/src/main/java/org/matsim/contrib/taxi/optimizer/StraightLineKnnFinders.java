@@ -20,9 +20,12 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
+import org.matsim.contrib.util.*;
 
 /**
  * kNN - k Nearest Neighbours
+ *
+ * @author michalm
  */
 public class StraightLineKnnFinders {
 	public static <D> StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> createDestEntryFinder(int k) {
