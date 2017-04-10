@@ -127,11 +127,11 @@ class ConsensusAnalysis {
         }
 
         {
-            playground.joel.analysis.AnalyzeAll.saveFile(MeanWaitTimes,"MeanWaitTimes");
-            playground.joel.analysis.AnalyzeAll.saveFile(Q10waitTimes,"Q10WaitTimes");
-            playground.joel.analysis.AnalyzeAll.saveFile(Q50waitTimes,"Q50WaitTimes");
-            playground.joel.analysis.AnalyzeAll.saveFile(Q95waitTimes,"Q95WaitTimes");
-            playground.joel.analysis.AnalyzeAll.saveFile(NoRequests,"NoRequests");
+            AnalyzeMarc.saveFile(MeanWaitTimes,"MeanWaitTimes");
+            AnalyzeMarc.saveFile(Q10waitTimes,"Q10WaitTimes");
+            AnalyzeMarc.saveFile(Q50waitTimes,"Q50WaitTimes");
+            AnalyzeMarc.saveFile(Q95waitTimes,"Q95WaitTimes");
+            AnalyzeMarc.saveFile(NoRequests,"NoRequests");
         }
         System.out.print("Done.\n");
     }

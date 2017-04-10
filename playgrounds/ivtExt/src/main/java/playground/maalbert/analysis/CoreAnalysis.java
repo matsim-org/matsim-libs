@@ -112,7 +112,7 @@ class CoreAnalysis {
 
         }
 
-        playground.joel.analysis.AnalyzeAll.saveFile(table, "basicDemo");
+        AnalyzeMarc.saveFile(table, "basicDemo");
 
         Tensor uniqueSubmissions = Tensor.of(requestWaitTimes.values().stream().map(RealScalar::of));
 
