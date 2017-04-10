@@ -20,6 +20,17 @@ public class SafeConfig {
         return alt;
     }
 
+    public double getDouble(String key, double alt) {
+        try {
+            String string = reflectiveConfigGroup.getParams().get(key);
+            if (string != null)
+                return Double.parseDouble(string);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return alt;
+    }
+
     public static SafeConfig wrap(ReflectiveConfigGroup reflectiveConfigGroup) {
         return new SafeConfig(reflectiveConfigGroup);
     }
