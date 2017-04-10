@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -363,6 +360,10 @@ public class RandomSelectorsTest {
 						jointPlans , group );
 
 				if (selected == null) throw new NullPointerException( "test is useless if the selector returns null" );
+
+				Assert.assertEquals( "unexpected selected plan size" ,
+						selected.getAllIndividualPlans().size(),
+						group.getPersons().size() );
 			}
 		}
 		count.printCounter();
