@@ -52,9 +52,9 @@ class DistanceAnalysis {
         Tensor table3 = table1.map(InvertUnlessZero.function).pmul(table2);
         summary = Join.of(1, table1, table2, table3);
         {
-            AnalyzeAll.saveFile(table1, "distanceTotal");
-            AnalyzeAll.saveFile(table2, "distanceWithCustomer");
-            AnalyzeAll.saveFile(table3, "distanceRatio");
+            AnalyzeMarc.saveFile(table1, "distanceTotal");
+            AnalyzeMarc.saveFile(table2, "distanceWithCustomer");
+            AnalyzeMarc.saveFile(table3, "distanceRatio");
         }
     }
 }

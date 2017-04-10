@@ -13,8 +13,6 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
-import ch.ethz.idsc.tensor.io.MathematicaFormat;
-import ch.ethz.idsc.tensor.io.MatlabExport;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
@@ -25,7 +23,7 @@ import playground.joel.data.TotalData;
 /**
  * Created by Joel on 05.04.2017.
  */
-public class AnalyzeAll {
+public class AnalyzeMarc {
 
     public static void main(String[] args) throws Exception {
         analyze(args);
@@ -69,10 +67,10 @@ public class AnalyzeAll {
     static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
-        AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3, 6, 1200.0); // maximum waiting time in the plot to have this uniform for all
+        AnalyzeMarc.plot("summary", "binnedWaitingTimes", "waiting times", 3, 6, 1200.0); // maximum waiting time in the plot to have this uniform for all
                                                                                          // simulations
-        AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
-        AnalyzeAll.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
+        AnalyzeMarc.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
+        AnalyzeMarc.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
         getTotals(summary, coreAnalysis);
     }
 
