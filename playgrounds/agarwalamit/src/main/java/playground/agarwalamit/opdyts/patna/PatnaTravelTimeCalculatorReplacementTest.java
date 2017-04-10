@@ -61,7 +61,7 @@ public class PatnaTravelTimeCalculatorReplacementTest {
     private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/input/";
 
     private static String configFile;
-    private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/outputTravelTime/";
+    private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/outputTravelTime_withoutReplacement/";
 
     private static Map<String, TravelTime> modalTravelTimeForReplacement = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class PatnaTravelTimeCalculatorReplacementTest {
             config.linkStats().setAverageLinkStatsOverIterations(1);
             config.controler().setOutputDirectory(OUT_DIR+"/noReplacementOfTravelTime/");
             config.controler().setFirstIteration( 0 );
-            config.controler().setLastIteration( 20 );
+            config.controler().setLastIteration( 40 );
             config.controler().setCreateGraphs(true);
             config.strategy().setFractionOfIterationsToDisableInnovation(1); // this is must
             Controler controler = getControler(config);
@@ -92,7 +92,7 @@ public class PatnaTravelTimeCalculatorReplacementTest {
             config1.linkStats().setAverageLinkStatsOverIterations(1);
             config1.controler().setOutputDirectory(OUT_DIR+"/beforeReplacementOfTravelTime/");
             config1.controler().setFirstIteration( 0 );
-            config1.controler().setLastIteration( 10 );
+            config1.controler().setLastIteration( 20 );
             config1.controler().setCreateGraphs(true);
             config1.strategy().setFractionOfIterationsToDisableInnovation(1); // this is must
             Controler controler1 = getControler(config1);
@@ -101,8 +101,8 @@ public class PatnaTravelTimeCalculatorReplacementTest {
             Config config2= ConfigUtils.loadConfig(configFile);
             config2.linkStats().setAverageLinkStatsOverIterations(1);
             config2.controler().setOutputDirectory(OUT_DIR+"/afterReplacementOfTravelTime2/");
-            config2.controler().setFirstIteration( 10 );
-            config2.controler().setLastIteration( 20 );
+            config2.controler().setFirstIteration( 20 );
+            config2.controler().setLastIteration( 40 );
             config2.controler().setCreateGraphs(true);
             config2.strategy().setFractionOfIterationsToDisableInnovation(1); // this is must
 
@@ -110,17 +110,17 @@ public class PatnaTravelTimeCalculatorReplacementTest {
 
             Controler controler2 = getControler(config2);
 
-            controler2.addOverridingModule(new AbstractModule() {
-                @Override
-                public void install() {
-
-                    modalTravelTimeForReplacement.entrySet().forEach(
-                            entry -> {
-                                addTravelTimeBinding(entry.getKey()).toInstance(entry.getValue());
-                            }
-                    );
-                }
-            });
+//            controler2.addOverridingModule(new AbstractModule() {
+//                @Override
+//                public void install() {
+//
+//                    modalTravelTimeForReplacement.entrySet().forEach(
+//                            entry -> {
+//                                addTravelTimeBinding(entry.getKey()).toInstance(entry.getValue());
+//                            }
+//                    );
+//                }
+//            });
 
             controler2.run();
         }
@@ -172,12 +172,12 @@ public class PatnaTravelTimeCalculatorReplacementTest {
         mp.setMarginalUtilityOfDistance(0.0);
         mp.setMonetaryDistanceRate(0.0);
 
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                this.addControlerListenerBinding().to(MyControlerListener.class);
-            }
-        });
+//        controler.addOverridingModule(new AbstractModule() {
+//            @Override
+//            public void install() {
+//                this.addControlerListenerBinding().to(MyControlerListener.class);
+//            }
+//        });
 
         return controler;
     }
