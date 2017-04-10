@@ -38,6 +38,7 @@ import playground.michalm.drt.run.DrtConfigGroup;
  */
 public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements MobsimBeforeCleanupListener {
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
+	private final RoutingNetwork routingNetwork;
 
 	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg,
 			InsertionDrtOptimizerParams params) {
@@ -49,7 +50,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
+		routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
 				.createRoutingNetwork(optimContext.network);
 		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(preProcessDijkstra)
 				.createRoutingNetwork(optimContext.network);
@@ -94,5 +95,9 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 			}
 			reqIter.remove();
 		}
+	}
+	
+	RoutingNetwork getRoutingNetwork() {
+		return routingNetwork;
 	}
 }

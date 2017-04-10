@@ -64,12 +64,12 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
-	private double maxWalkDistance = Double.NaN;// [m]
+	private double maxWalkDistance = Double.NaN;// [m]; only for stationbased DRT scheme
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
 	private String vehiclesFile = null;
-	private String transitStopFile = null;
+	private String transitStopFile = null; // only for stationbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;

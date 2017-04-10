@@ -21,13 +21,17 @@ package playground.michalm.drt.optimizer.insertion;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.core.router.*;
+import org.matsim.core.router.util.*;
 
 import playground.michalm.drt.optimizer.DrtOptimizerContext;
 import playground.michalm.drt.run.DrtConfigGroup;
-import playground.michalm.drt.schedule.NDrtTask;
+import playground.michalm.drt.schedule.*;
 import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
 
 /**
@@ -35,6 +39,7 @@ import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
  */
 public class InsertionDrtOptimizerWithDepots extends InsertionDrtOptimizer {
 	private final Set<Link> startLinks = new HashSet<>();
+	private final FastAStarEuclidean router;
 
 	public InsertionDrtOptimizerWithDepots(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg,
 			InsertionDrtOptimizerParams params) {
@@ -43,6 +48,14 @@ public class InsertionDrtOptimizerWithDepots extends InsertionDrtOptimizer {
 		for (Vehicle v : optimContext.fleet.getVehicles().values()) {
 			startLinks.add(v.getStartLink());
 		}
+
+		RoutingNetwork network = getRoutingNetwork();
+		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(optimContext.travelDisutility);
+		preProcessEuclidean.run(network);
+
+		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+		router = new FastAStarEuclidean(network, preProcessEuclidean, optimContext.travelDisutility,
+				optimContext.travelTime, 2., fastRouterFactory);
 	}
 
 	@Override
@@ -59,16 +72,34 @@ public class InsertionDrtOptimizerWithDepots extends InsertionDrtOptimizer {
 			if (previousTaskIdx >= 0 && ((NDrtTask)vehicle.getSchedule().getTasks().get(previousTaskIdx))
 					.getDrtTaskType() == NDrtTaskType.STOP) {
 
-				VrpPathWithTravelData relocation = calculateBestRelocation(vehicle);
-				if (relocation != null) {
-					getOptimContext().scheduler.relocateEmptyVehicle(vehicle, null);
+				Link currentLink = ((NDrtStayTask)currentTask).getLink();
+				Link bestStartLink = findBestStartLink(currentLink);
+				if (bestStartLink != null) {
+					System.err.println("sending vehicle to depot");
+					VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, bestStartLink,
+							currentTask.getBeginTime(), router, getOptimContext().travelTime);
+					getOptimContext().scheduler.relocateEmptyVehicle(vehicle, path);
 				}
 			}
 		}
 	}
 
-	private VrpPathWithTravelData calculateBestRelocation(Vehicle vehicle) {
-		// TODO add something more sophisticated than no relocation:)
-		return null;
+	// TODO a simple straight-line search (for the time being)... MultiNodeDijkstra should be the ultimate solution
+	private Link findBestStartLink(Link fromLink) {
+		if (startLinks.contains(fromLink)) {
+			return null;// stay where it is
+		}
+
+		Coord fromCoord = fromLink.getCoord();
+		double minDistance = Double.MAX_VALUE;
+		Link bestLink = null;
+		for (Link l : startLinks) {
+			double distance = DistanceUtils.calculateSquaredDistance(fromCoord, l.getCoord());
+			if (distance < minDistance) {
+				bestLink = l;
+			}
+		}
+
+		return bestLink;
 	}
 }
