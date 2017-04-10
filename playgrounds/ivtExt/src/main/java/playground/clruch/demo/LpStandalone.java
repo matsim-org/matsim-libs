@@ -17,7 +17,7 @@ import org.gnu.glpk.glp_smcp;
  * IF YOU WANT TO MAKE A SIMILAR CLASS OR REPLY ON THIS IMPLEMENTATION
  * THEN DUPLICATE THIS FILE AND MAKE THE CHANGES IN THE NEW FILE
  */
-public class LpStandalone {
+class LpStandalone {
 
     public static void main(String[] args) {
         glp_prob lp;
