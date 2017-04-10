@@ -3,9 +3,14 @@ package playground.clruch.gfx;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.JCheckBox;
 
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.utils.gui.RowPanel;
 
 public class LinkLayer extends ViewerLayer {
 
@@ -44,6 +49,22 @@ public class LinkLayer extends ViewerLayer {
 
     public boolean getDraw() {
         return drawLinks;
+    }
+
+    @Override
+    protected void createPanel(RowPanel rowPanel) {
+        {
+            final JCheckBox jCheckBox = new JCheckBox("links");
+            jCheckBox.setSelected(getDraw());
+            jCheckBox.addActionListener(e -> setDraw(jCheckBox.isSelected()));
+            rowPanel.add(jCheckBox);
+        }
+        
+    }
+
+    @Override
+    public List<MatsimHeatMap> getHeatmaps() {
+        return Collections.emptyList();
     }
 
 }

@@ -29,9 +29,9 @@ public class CheckBoxTree extends JTree {
 
     private final CheckBoxNodeEditor editor;
 
-    public CheckBoxTree(AbstractLayer layer) {
-        this(new CheckBoxNodeData(layer));
-    }
+    // public CheckBoxTree(AbstractLayer layer) {
+    // this(new CheckBoxNodeData(layer));
+    // }
 
     public CheckBoxTree(String rootName) {
         this(new CheckBoxNodeData(rootName));
@@ -69,17 +69,17 @@ public class CheckBoxTree extends JTree {
 
             @Override
             public void treeNodesInserted(final TreeModelEvent e) {
-                //System.out.println("nodes inserted");
+                // System.out.println("nodes inserted");
             }
 
             @Override
             public void treeNodesRemoved(final TreeModelEvent e) {
-                //System.out.println("nodes removed");
+                // System.out.println("nodes removed");
             }
 
             @Override
             public void treeStructureChanged(final TreeModelEvent e) {
-                //System.out.println("structure changed");
+                // System.out.println("structure changed");
             }
         });
     }
@@ -91,14 +91,12 @@ public class CheckBoxTree extends JTree {
     public static void main(final String[] args) {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode(new CheckBoxNodeData("Root", Boolean.TRUE));
 
-        final DefaultMutableTreeNode accessibility =
-            add(root, "Accessibility", true);
+        final DefaultMutableTreeNode accessibility = add(root, "Accessibility", true);
         add(accessibility, "Move system caret with focus/selection changes", false);
         add(accessibility, "Always expand alt text for images", true);
         root.add(accessibility);
 
-        final DefaultMutableTreeNode browsing =
-            new DefaultMutableTreeNode(new CheckBoxNodeData("Browsing", null));
+        final DefaultMutableTreeNode browsing = new DefaultMutableTreeNode(new CheckBoxNodeData("Browsing", null));
         add(browsing, "Notify when downloads complete", true);
         add(browsing, "Disable script debugging", true);
         add(browsing, "Use AutoComplete", true);
@@ -112,7 +110,7 @@ public class CheckBoxTree extends JTree {
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(final TreeSelectionEvent e) {
-                //System.out.println("selection changed");
+                // System.out.println("selection changed");
             }
         });
         // show the tree on screen
@@ -127,9 +125,7 @@ public class CheckBoxTree extends JTree {
     private static Boolean childStatus(DefaultMutableTreeNode node) {
         Boolean status = data(node.getChildAt(0)).isSelected();
         for (int i = 1; i < node.getChildCount() && status != null; i++) {
-            if (!status.equals(
-                    data(node.getChildAt(i)).isSelected()
-                    ))
+            if (!status.equals(data(node.getChildAt(i)).isSelected()))
                 return null;
         }
         return status;
@@ -205,18 +201,20 @@ public class CheckBoxTree extends JTree {
         return new DefaultMutableTreeNode(createNodeData(layer));
     }
 
-    /*public DefaultMutableTreeNode addLayerGroup(LayerGroup group) {
-        if (group != null){
-            if (group.getParent() == null){
-                return add(rootNode(), group);
-            } else {
-                DefaultMutableTreeNode parentGroup = searchNode(group.getParent());
-                if(parentGroup==null) parentGroup = addLayerGroup(group.getParent());
-                DefaultMutableTreeNode node = add(parentGroup, group);
-                return node;
-            }
-        }else return null;
-    }*/
+    /*
+     * public DefaultMutableTreeNode addLayerGroup(LayerGroup group) {
+     * if (group != null){
+     * if (group.getParent() == null){
+     * return add(rootNode(), group);
+     * } else {
+     * DefaultMutableTreeNode parentGroup = searchNode(group.getParent());
+     * if(parentGroup==null) parentGroup = addLayerGroup(group.getParent());
+     * DefaultMutableTreeNode node = add(parentGroup, group);
+     * return node;
+     * }
+     * }else return null;
+     * }
+     */
 
     public Layer addLayer(String name) {
         Layer layer = new Layer(name);
@@ -236,7 +234,8 @@ public class CheckBoxTree extends JTree {
                     parent = addLayer(layer.getParent());
             }
             return add(parent, layer);
-        } else return null;
+        } else
+            return null;
     }
 
     public DefaultMutableTreeNode add(DefaultMutableTreeNode parent, final AbstractLayer layer) {
@@ -244,7 +243,7 @@ public class CheckBoxTree extends JTree {
         DefaultMutableTreeNode node = createNode(layer);
         parent.add(node);
         ((DefaultTreeModel) getModel()).reload();
-        //System.out.println("Created node "+layer+" upper of "+data(parent));
+        // System.out.println("Created node "+layer+" upper of "+data(parent));
         return node;
     }
 
@@ -254,7 +253,8 @@ public class CheckBoxTree extends JTree {
 
     public DefaultMutableTreeNode searchNode(DefaultMutableTreeNode node, AbstractLayer layer) {
         CheckBoxNodeData data = CheckBoxTree.data(node);
-        if (data.getAbstractLayer() == layer) return node;
+        if (data.getAbstractLayer() == layer)
+            return node;
         else {
             DefaultMutableTreeNode found = null;
             for (int i = 0; i < node.getChildCount() && found == null; i++) {

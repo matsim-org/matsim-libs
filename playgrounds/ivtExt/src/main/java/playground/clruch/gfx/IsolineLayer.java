@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.Collections;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 
@@ -14,6 +16,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Sort;
 import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.utils.gui.RowPanel;
 
 class IsolineLayer extends ViewerLayer {
 
@@ -69,6 +72,16 @@ class IsolineLayer extends ViewerLayer {
                 prev = point;
             }
         }
+    }
+
+    @Override
+    protected void createPanel(RowPanel rowPanel) {
+        
+    }
+    
+    @Override
+    public List<MatsimHeatMap> getHeatmaps() {
+        return Collections.emptyList();
     }
 
 }

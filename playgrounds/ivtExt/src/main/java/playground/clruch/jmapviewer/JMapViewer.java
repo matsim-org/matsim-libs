@@ -9,7 +9,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +26,7 @@ import javax.swing.event.EventListenerList;
 import playground.clruch.gfx.MatsimHeatMap;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.jmapviewer.interfaces.JMVCommandEvent;
+import playground.clruch.jmapviewer.interfaces.JMVCommandEvent.COMMAND;
 import playground.clruch.jmapviewer.interfaces.JMapViewerEventListener;
 import playground.clruch.jmapviewer.interfaces.MapMarker;
 import playground.clruch.jmapviewer.interfaces.MapPolygon;
@@ -36,7 +36,6 @@ import playground.clruch.jmapviewer.interfaces.TileLoader;
 import playground.clruch.jmapviewer.interfaces.TileLoaderListener;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.MapnikTileSource;
-import playground.clruch.jmapviewer.interfaces.JMVCommandEvent.COMMAND;
 
 /**
  * Provides a simple panel that displays pre-rendered map tiles loaded from the
@@ -71,7 +70,7 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
     protected boolean mapRectanglesVisible;
     protected boolean mapPolygonsVisible;
 
-    protected boolean tileGridVisible = false;
+    protected boolean tileGridVisible = false; // <- for debug purposes
     protected boolean scrollWrapEnabled;
 
     protected transient TileController tileController;
@@ -584,7 +583,7 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
 
     @Override
     protected void paintComponent(Graphics g) {
-        //super.paintComponent(g);
+        // super.paintComponent(g);
 
         int iMove = 0;
 
