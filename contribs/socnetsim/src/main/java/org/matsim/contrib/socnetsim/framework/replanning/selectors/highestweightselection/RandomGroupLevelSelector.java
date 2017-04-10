@@ -127,39 +127,20 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 	private GroupPlans searchForRandomCombination(
 			final IncompatiblePlanRecords incompatibleRecords,
 			final List<PersonRecord> persons) {
-		final Queue<PlanRecord> plansStack =
-				Collections.asLifoQueue(
-						new ArrayDeque<>(
-								shuffle(
-										persons.get(0).plans)));
-
-		final Queue<FeasibilityChanger> feasibilityStack =
-				Collections.asLifoQueue(
-						new ArrayDeque<FeasibilityChanger>());
-
-		final FeasibilityChanger inactive = new FeasibilityChanger();
-		feasibilityStack.add( inactive );
-
-		final Queue<PlanRecord> answerStack =
-				Collections.asLifoQueue(
-						new ArrayDeque<PlanRecord>());
+		final Queue<AnswerNode> plansStack = getInitialNodes( persons.get(0).plans );
 
 		while ( !plansStack.isEmpty() ) {
-			final PlanRecord currentPlan = plansStack.remove();
-			if ( currentPlan.isStillFeasible ) {
-				if ( !answerStack.isEmpty() && answerStack.element().person == currentPlan.person ) {
-					answerStack.remove();
-				}
-				answerStack.add( currentPlan );
+			final AnswerNode currentPlan = plansStack.remove();
+			if ( currentPlan.record.isStillFeasible ) {
 
-				assert !containsSamePersonTwice( answerStack ) : "plans="+ plansStack +"\n       answer="+ answerStack+"\n      current="+currentPlan;
+				assert !containsSamePersonTwice( currentPlan ) : "plans="+ plansStack +"\n       answer="+ currentPlan;
 
-				final List<PersonRecord> actuallyRemainingPersons = remainingPersons(persons, answerStack);
+				final List<PersonRecord> actuallyRemainingPersons = remainingPersons(persons, currentPlan);
 
 				if (!actuallyRemainingPersons.isEmpty()) {
 					final FeasibilityChanger feasibilityChanger = new FeasibilityChanger();
 					SelectorUtils.tagIncompatiblePlansAsInfeasible(
-							currentPlan,
+							currentPlan.record,
 							incompatibleRecords,
 							feasibilityChanger);
 
@@ -168,34 +149,41 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 					for (PlanRecord r : shuffle(nextPerson.plans)) {
 						// TODO: only add one plan per planComposition-incompatibility "branch"
 						if (!r.isStillFeasible) continue;
-						plansStack.add(r);
-						// add active changer at the beginning of the sequence,
-						// to reset feasibilities when we "go out" of the person
-						feasibilityStack.add(added ? inactive : feasibilityChanger);
+						plansStack.add(
+								new AnswerNode( r , currentPlan,
+										// add active changer at the beginning of the sequence,
+										// to reset feasibilities when we "go out" of the person
+										added ? null : feasibilityChanger ) );
 						added = true;
 					}
 				}
 				else {
 					final GroupPlans constructedPlan = new GroupPlans();
-					for (PlanRecord p : answerStack) {
-						SelectorUtils.add(constructedPlan, p);
+					for ( AnswerNode p : currentPlan ) {
+						SelectorUtils.add( constructedPlan, p.record );
 					}
 					return constructedPlan;
 				}
 			}
 
-			feasibilityStack.remove().resetFeasibilities();
+			currentPlan.resetFeasibilities();
 		}
 
 		return null;
 	}
 
-	private boolean containsSamePersonTwice(Queue<PlanRecord> answerStack) {
+	private Queue<AnswerNode> getInitialNodes(List<PlanRecord> plans ) {
+		final Queue<AnswerNode> queue = Collections.asLifoQueue( new ArrayDeque<AnswerNode>() );
+		for ( PlanRecord p : plans ) queue.add( new AnswerNode( p , null, null ) );
+		return queue;
+	}
+
+	private boolean containsSamePersonTwice(AnswerNode answerStack) {
 		final Set<Id<Person>> ps = new HashSet<>();
 
-		for ( PlanRecord p : answerStack ) {
-			if ( !ps.add( p.person.person.getId() ) ) return true;
-			for ( PlanRecord l : p.linkedPlans ) {
+		for ( AnswerNode p : answerStack ) {
+			if ( !ps.add( p.record.person.person.getId() ) ) return true;
+			for ( PlanRecord l : p.record.linkedPlans ) {
 				if ( !ps.add( l.person.person.getId() ) ) return true;
 			}
 		}
@@ -203,11 +191,11 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 		return false;
 	}
 
-	private List<PersonRecord> remainingPersons(List<PersonRecord> persons, Queue<PlanRecord> plansStack) {
+	private List<PersonRecord> remainingPersons(List<PersonRecord> persons, AnswerNode plansStack) {
 		final List<PersonRecord> rem = new ArrayList<>( persons );
-		for ( PlanRecord p : plansStack ) {
-			rem.remove( p.person );
-			for ( PlanRecord l : p.linkedPlans ) rem.remove( l.person );
+		for ( AnswerNode p : plansStack ) {
+			rem.remove( p.record.person );
+			for ( PlanRecord l : p.record.linkedPlans ) rem.remove( l.person );
 		}
 		return rem;
 	}
@@ -217,4 +205,53 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 		return plans;
 	}
 
+	private static class AnswerNode implements Iterable<AnswerNode> {
+		private final PlanRecord record;
+		private final AnswerNode parent;
+		private final FeasibilityChanger feasibilityChanger;
+
+		private AnswerNode(PlanRecord record, AnswerNode parent, FeasibilityChanger feasibilityChanger) {
+			this.record = record;
+			this.parent = parent;
+			this.feasibilityChanger = feasibilityChanger;
+		}
+
+
+		@Override
+		public Iterator<AnswerNode> iterator() {
+			return new Iterator<AnswerNode>() {
+				@Override
+				public void remove() {
+					throw new UnsupportedOperationException();
+				}
+
+				AnswerNode current = AnswerNode.this;
+
+				@Override
+				public boolean hasNext() {
+					return current != null;
+				}
+
+				@Override
+				public AnswerNode next() {
+					AnswerNode n = current;
+					current = current.parent;
+					return n;
+				}
+			};
+		}
+
+		public void resetFeasibilities() {
+			if ( feasibilityChanger == null ) return;
+			feasibilityChanger.resetFeasibilities();
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder s = new StringBuilder( "AnswerNode{ " );
+			for ( AnswerNode n : this ) s.append( n.record.toString() );
+			s.append( " } " );
+			return s.toString();
+		}
+	}
 }

@@ -45,7 +45,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author thibautd
  */
-@Ignore( "to fix" )
 public class RandomSelectorsTest {
 	private interface SelectorFactory {
 		public GroupLevelPlanSelector create(Random r);
