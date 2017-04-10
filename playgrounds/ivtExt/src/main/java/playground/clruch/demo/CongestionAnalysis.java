@@ -1,5 +1,7 @@
 package playground.clruch.demo;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -8,9 +10,10 @@ import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.alg.Range;
 import ch.ethz.idsc.tensor.alg.Transpose;
+import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.Pretty;
+import ch.ethz.idsc.tensor.red.Max;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.LinkStatistic;
 import playground.clruch.net.MatsimStaticDatabase;
@@ -33,13 +36,12 @@ class CongestionAnalysis {
     final StorageSupplier storageSupplier;
     final int size;
 
-    CongestionAnalysis(StorageSupplier storageSupplierIn) {
-        storageSupplier = storageSupplierIn;
+    CongestionAnalysis(StorageSupplier storageSupplier) {
+        this.storageSupplier = storageSupplier;
         size = storageSupplier.size();
     }
 
     public void analzye() throws Exception {
-        SimulationObject init = storageSupplier.getSimulationObject(0);
         final int numLinks = MatsimStaticDatabase.INSTANCE.getOsmLinksSize();
         System.out.println("found links: " + numLinks);
 
@@ -51,24 +53,24 @@ class CongestionAnalysis {
             for (VehicleContainer vc : s.vehicles)
                 list.get(vc.linkIndex).register(tics, vc);
             for (RequestContainer rc : s.requests)
-                list.get(rc.fromLinkIndex).register(tics, rc);
+                list.get(rc.fromLinkIndex).register(tics, s.now, rc);
 
             if (s.now % 10000 == 0)
                 System.out.println(s.now);
         }
 
-        list.forEach(LinkStatistic::consolidate);
-
-        Tensor table1 = list.stream().map(vs -> vs.maxWaitTime).reduce(Tensor::add).get();
-        Tensor table2 = list.stream().map(vs -> vs.vehicleCount).reduce(Tensor::add).get();
-        Tensor table3 = list.stream().map(vs -> vs.requestCount).reduce(Tensor::add).get();
+        Tensor table1 = Tensor.of(list.stream().map(ls -> ls.maxWaitTime.flatten(0).reduce(Max::of).get()));
+        Tensor table2 = Tensor.of(list.stream().map(ls -> ls.vehicleCount.flatten(0).reduce(Max::of).get()));
+        Tensor table3 = Tensor.of(list.stream().map(ls -> ls.requestCount.flatten(0).reduce(Max::of).get()));
 
         // System.out.println(Dimensions.of(Range.of(table1.length())));
         // System.out.println(Dimensions.of(table1));
         // System.out.println(Dimensions.of(table2));
+        // Range.of(table1.length()),
+        Tensor matrix = Transpose.of(Tensors.of(table1, table2, table3));
+        System.out.println(Pretty.of(matrix));
 
-        Tensor matrix = Transpose.of(Tensors.of(Range.of(table1.length()), table1, table2, table3));
-        System.out.println(Pretty.of(matrix.extract(2000, 4000)));
+        Files.write(Paths.get("output/linkstats.csv"), (Iterable<String>) CsvFormat.of(matrix)::iterator);
     }
 
     public static void main(String[] args) {

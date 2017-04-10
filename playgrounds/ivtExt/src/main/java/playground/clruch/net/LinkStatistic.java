@@ -1,9 +1,12 @@
 package playground.clruch.net;
 
+import java.util.function.Function;
+
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.red.Max;
 
 public class LinkStatistic {
     public final Tensor vehicleCount;
@@ -20,13 +23,14 @@ public class LinkStatistic {
         vehicleCount.set(s -> s.add(RealScalar.ONE), tics);
     }
 
-    public void register(int tics, RequestContainer rc) {
-        requestCount.set(s -> s.add(RealScalar.ONE), tics);
-        Scalar v = RealScalar.of(tics).subtract(RealScalar.of(rc.submissionTime));
-        maxWaitTime.set(s -> RealScalar.max((RealScalar) s, (RealScalar) v), tics);
+    static Function<Tensor, Tensor> max(Scalar s) {
+        return v -> Max.of(s, v);
     }
 
-    public void consolidate() {
+    public void register(int tics, long now, RequestContainer rc) {
+        requestCount.set(s -> s.add(RealScalar.ONE), tics);
+        Scalar v = RealScalar.of(now).subtract(RealScalar.of(rc.submissionTime));
+        maxWaitTime.set(max(v), tics);
     }
 
 }
