@@ -23,7 +23,13 @@ public enum SimulationObjects {
         }
     };
 
+    /**
+     * sorts the vehicles in the given simulationObject
+     * 
+     * @param simulationObject
+     */
     public static void sortVehiclesAccordingToIndex(SimulationObject simulationObject) {
         Collections.sort(simulationObject.vehicles, VEHICLEINDEX_COMPARATOR);
     }
+
 }

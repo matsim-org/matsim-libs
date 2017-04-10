@@ -13,12 +13,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.demo.AnalyzeAll;
+import playground.joel.analysis.AnalyzeAll;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.prep.TheApocalypse;
+import playground.maalbert.analysis.AnalyzeMarc;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -33,7 +34,8 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * {@link RunAVScenario}
  */
 public class ScenarioServer {
-    public static void main(String[] args) throws MalformedURLException {
+
+    public static void main(String[] args) throws MalformedURLException, Exception {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
@@ -65,10 +67,10 @@ public class ScenarioServer {
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.run();
-
+        
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        // EventFileToProcessingXML.convert(dir);
         AnalyzeAll.analyze(args);
+        AnalyzeMarc.analyze(args);
     }
 }

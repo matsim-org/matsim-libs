@@ -1,24 +1,29 @@
 package playground.clruch.demo;
 
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.io.CsvFormat;
-import ch.ethz.idsc.tensor.io.MathematicaFormat;
-import playground.clruch.net.SimulationObject;
-import playground.clruch.net.StorageSupplier;
-import playground.clruch.net.VehicleContainer;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import playground.clruch.net.SimulationObject;
+import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.VehicleContainer;
+import playground.clruch.net.VehicleStatistic;
+
+/**
+ * THIS FILE IS A CONCISE DEMO OF FUNCTIONALITY
+ * 
+ * DO NOT MODIFY THIS FILE (unless you are the primary author),
+ * BUT DO NOT RELY ON THIS FILE NOT BEING CHANGED
+ * 
+ * IF YOU WANT TO MAKE A SIMILAR CLASS OR REPLY ON THIS IMPLEMENTATION
+ * THEN DUPLICATE THIS FILE AND MAKE THE CHANGES IN THE NEW FILE
+ */
 class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;
     String dataPath;
 
-    DistanceAnalysis(StorageSupplier storageSupplierIn,String datapath) {
+    DistanceAnalysis(StorageSupplier storageSupplierIn, String datapath) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
         dataPath = datapath;
@@ -45,15 +50,13 @@ class DistanceAnalysis {
 
         list.forEach(VehicleStatistic::consolidate);
 
-        {
-            Tensor table = list.stream().map(vs -> vs.distanceTotal).reduce(Tensor::add).get();
-            Files.write(Paths.get(dataPath+"/distanceTotal.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-            //Files.write(Paths.get("distanceTotal.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
-        }
-        {
-            Tensor table = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get();
-            Files.write(Paths.get(dataPath+"/distanceWithCustomer.csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-            //Files.write(Paths.get("distanceWithCustomer.mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
-        }
+        // Tensor table1 = list.stream().map(vs -> vs.distanceTotal).reduce(Tensor::add).get();
+        // Tensor table2 = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get();
+        // Tensor table3 = table1.map(InvertUnlessZero.function).pmul(table2);
+        // {
+        // AnalyzeMarc.saveFile(table1, "distanceTotal");
+        // AnalyzeMarc.saveFile(table2, "distanceWithCustomer");
+        // AnalyzeMarc.saveFile(table3, "distanceRatio");
+        // }
     }
 }

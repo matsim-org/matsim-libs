@@ -35,7 +35,8 @@ public class ArrivalInformation {
     // private final Scalar factor;
     VirtualNetwork virtualNetwork;
 
-    public ArrivalInformation(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize, int rebalancingPeriod) throws JDOMException, IOException {
+    public ArrivalInformation(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize,
+            int rebalancingPeriod) throws JDOMException, IOException {
         virtualNetwork = virtualNetworkIn;
         this.populationSize = populationSize;
         System.out.println("reading historic travel data");
@@ -53,7 +54,8 @@ public class ArrivalInformation {
             // construct matrices based on xml
             // the lambdas are normalized of their population size and time bin width
             Scalar factor = RealScalar.of(populationSize * rebalancingPeriod);
-            lambda = Tensors.matrix((i, j) -> getLambdafromFile(i, j, rootNode).multiply(factor), numberTimeSteps, virtualNetwork.getvNodesCount()-1);
+            lambda = Tensors.matrix((i, j) -> getLambdafromFile(i, j, rootNode).multiply(factor), numberTimeSteps,
+                    virtualNetwork.getvNodesCount());
         }
         {// transition probabilities pij
             SAXBuilder builder = new SAXBuilder();
@@ -64,7 +66,8 @@ public class ArrivalInformation {
             pij = Tensors.empty();
             for (int k = 0; k < numberTimeSteps; ++k) {
                 final int timestep = k;
-                pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount()-1, virtualNetwork.getvNodesCount()-1));
+                pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
+                        virtualNetwork.getvNodesCount()));
             }
             System.out.println("Do we get here?");
         }
@@ -77,7 +80,8 @@ public class ArrivalInformation {
             alpha_ij = Tensors.empty();
             for (int k = 0; k < numberTimeSteps; ++k) {
                 final int timestep = k;
-                alpha_ij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount()-1, virtualNetwork.getvNodesCount()-1));
+                alpha_ij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
+                        virtualNetwork.getvNodesCount()));
             }
             System.out.println("Do we get here?");
         }
@@ -101,7 +105,8 @@ public class ArrivalInformation {
 
         // get element with virtualNode col
         VirtualNode correctNode = virtualNetwork.getVirtualNode(col);
-        Element vNodeelem = children.stream().filter(v -> v.getAttribute("id").getValue().toString().equals(correctNode.getId())).findFirst().get();
+        Element vNodeelem = children.stream().filter(v -> v.getAttribute("id").getValue().toString().equals(correctNode.getId()))
+                .findFirst().get();
 
         // get element with number row
         Element timeatvNode = vNodeelem.getChildren().get(row);
@@ -117,9 +122,8 @@ public class ArrivalInformation {
         VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
         VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
 
-        Optional<Element> optional = children.stream()
-                .filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId()) && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId()))
-                .findFirst();
+        Optional<Element> optional = children.stream().filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId())
+                && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId())).findFirst();
 
         if (optional.isPresent()) {
             Element vLinkElem = optional.get();
@@ -138,9 +142,8 @@ public class ArrivalInformation {
         VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
         VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
 
-        Optional<Element> optional = children.stream()
-                .filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId()) && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId()))
-                .findFirst();
+        Optional<Element> optional = children.stream().filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId())
+                && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId())).findFirst();
 
         if (optional.isPresent()) {
             Element vLinkElem = optional.get();
@@ -160,32 +163,32 @@ public class ArrivalInformation {
     public Scalar getLambdaforTime(int time, int vNodeindex) {
         return getLambdaforTime(time).Get(vNodeindex);
     }
+
     public Tensor getNextNonZeroLambdaforTime(int time) {
         List<Integer> dim_lambda = Dimensions.of(lambda);
-        int N                    = dim_lambda.get(1);
+        int N = dim_lambda.get(1);
         Tensor nZlambda = Array.zeros(N);
 
-        for (int i=0;i<N;i++){
-            nZlambda.set(getNextNonZeroLambdaforTime(time,i),i);
+        for (int i = 0; i < N; i++) {
+            nZlambda.set(getNextNonZeroLambdaforTime(time, i), i);
         }
         return nZlambda;
     }
 
     public Scalar getNextNonZeroLambdaforTime(int time, int vNodeindex) {
-        int row           = (int) Math.min(time / dtSeconds, numberTimeSteps - 1);
-        Scalar nZ_lambda  = lambda.Get(row, vNodeindex);
+        int row = (int) Math.min(time / dtSeconds, numberTimeSteps - 1);
+        Scalar nZ_lambda = lambda.Get(row, vNodeindex);
         List<Integer> dim_lambda = Dimensions.of(lambda);
 
-        while (nZ_lambda.number().doubleValue() == 0){
+        while (nZ_lambda.number().doubleValue() == 0) {
             row++;
-            if (!(row<dim_lambda.get(0))){
-                row = 0; //Cylcic Search for non-zero element
+            if (!(row < dim_lambda.get(0))) {
+                row = 0; // Cylcic Search for non-zero element
             }
             nZ_lambda = lambda.Get(row, vNodeindex);
-         }
-         return nZ_lambda;
+        }
+        return nZ_lambda;
     }
-
 
     public Scalar getpijforTime(int time, int from, int to) {
         int timestep = (int) Math.min(time / dtSeconds, numberTimeSteps - 1);

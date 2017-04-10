@@ -35,7 +35,7 @@ public class MemoryTileCache implements TileCache {
      * Constructs a new {@code MemoryTileCache}.
      */
     public MemoryTileCache() {
-        this(200);
+        this(500);
     }
 
     /**

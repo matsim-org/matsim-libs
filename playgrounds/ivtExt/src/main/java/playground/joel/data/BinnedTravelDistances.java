@@ -84,7 +84,7 @@ class BinnedTravelDistances extends AbstractData {
     }
 
     double calculateDistanceRatio(String key) {
-        double ratio = 0;
+        double ratio = 0.0;
         if(traveledDistance.containsKey(key) && traveledDistanceWithCust.containsKey(key)) {
             ratio = traveledDistanceWithCust.get(key)/traveledDistance.get(key);
         } // else System.out.println("entry/entries not found while calculating the time ratio");
@@ -97,8 +97,8 @@ class BinnedTravelDistances extends AbstractData {
     }
 
     private void setStartTime(VehicleEntersTrafficEvent event) {
-        avLinkStart.put(event.getPersonId().toString(), event.getTime());
-        //System.out.println("added " + event.getPersonId().toString() + ", " + event.getTime() + " to avLinkStart");
+        avLinkStart.put(event.getVehicleId().toString(), event.getTime());
+        //System.out.println("added " + event.getVehicleId().toString() + ", " + event.getTime() + " to avLinkStart");
     }
 
     private double getStartTime(LinkLeaveEvent event) {
@@ -202,6 +202,33 @@ class BinnedTravelDistances extends AbstractData {
                 }
             });
 
+            // trafficenter
+            events.addHandler(new VehicleEntersTrafficEventHandler() {
+
+                public void handleEvent(VehicleEntersTrafficEvent event) {
+                    setStartTime(event);
+                }
+
+                @Override
+                public void reset(int iteration) {
+                    // intentionally empty
+                }
+            });
+
+            // trafficleave
+            events.addHandler(new VehicleLeavesTrafficEventHandler() {
+
+                public void handleEvent(VehicleLeavesTrafficEvent event) {
+                    final String vehicle = event.getVehicleId().toString();
+                    put(event.getLinkId(), vehicle, getStartTime(event), event.getTime());
+                }
+
+                @Override
+                public void reset(int iteration) {
+                    // intentionally empty
+                }
+            });
+
             // linkenter
             events.addHandler(new LinkEnterEventHandler() {
 
@@ -240,7 +267,7 @@ class BinnedTravelDistances extends AbstractData {
 
         calculateDistanceRatio();
 
-        for(String key: traveledDistanceWithCust.keySet()) {
+        for(String key: traveledDistance.keySet()) {
             GlobalAssert.that(traveledDistance.get(key) != 0);
             binnedData.put(key, calculateDistanceRatio(key));
         }
@@ -249,7 +276,7 @@ class BinnedTravelDistances extends AbstractData {
         NavigableMap<String, NavigableMap<String, Double>> binnedRatios = new TreeMap<>();
         binnedHelper.checkFull(binnedData, binSize, keyMap);
         binnedRatios.put("bins", binnedData);
-        new BinnedRatiosXML("binnedTimeRatio").generate(binnedRatios, fileExport);
+        new BinnedRatiosXML("binnedDistanceRatio").generate(binnedRatios, fileExport);
 
         // export to time series diagram PNG
         TimeDiagramCreator diagram = new TimeDiagramCreator();

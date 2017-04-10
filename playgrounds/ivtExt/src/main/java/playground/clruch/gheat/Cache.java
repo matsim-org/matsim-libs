@@ -6,12 +6,11 @@ import java.util.Map;
 
 import playground.clruch.gheat.graphics.ColorScheme;
 
-public class Cache {
+enum Cache {
+    ;
+    // ---
     private static Map<ColorScheme, BufferedImage> _emptyTile = new HashMap<>();
     private static Object syncroot = new Object();
-
-    private Cache() {
-    }
 
     public static boolean hasEmptyTile(ColorScheme key) {
         return _emptyTile.containsKey(key);

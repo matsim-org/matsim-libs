@@ -3,6 +3,9 @@ package playground.clruch.gheat;
 public class DataPoint {
     private double x;
     private double y;
+    /**
+     * WARNING: WEIGHT IS EFFECTIVELY NOT USED ANYWHERE/CORRECTLY
+     */
     private double weight;
 
     public DataPoint(double x, double y, double weight) {

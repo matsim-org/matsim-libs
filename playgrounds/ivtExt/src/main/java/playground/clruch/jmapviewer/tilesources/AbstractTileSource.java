@@ -8,7 +8,7 @@ import java.util.Map;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 
-public abstract class AbstractTileSource implements TileSource {
+abstract class AbstractTileSource implements TileSource {
 
     protected String attributionText;
     protected String attributionLinkURL;

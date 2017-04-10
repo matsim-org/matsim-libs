@@ -17,8 +17,8 @@ import playground.clruch.net.SimulationObject;
 
 class IsolineLayer extends ViewerLayer {
 
-    public IsolineLayer(MatsimJMapViewer matsimJMapViewer) {
-        super(matsimJMapViewer);
+    public IsolineLayer(MatsimMapComponent matsimMapComponent) {
+        super(matsimMapComponent);
     }
 
     @Override
@@ -28,12 +28,12 @@ class IsolineLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        final Dimension dimension = matsimJMapViewer.getSize();
+        final Dimension dimension = matsimMapComponent.getSize();
 
-        Coord NW = matsimJMapViewer.getCoordPositionXY(new Point(0, 0));
-        Coord NE = matsimJMapViewer.getCoordPositionXY(new Point(dimension.width, 0));
-        Coord SW = matsimJMapViewer.getCoordPositionXY(new Point(0, dimension.height));
-        Coord SE = matsimJMapViewer.getCoordPositionXY(new Point(dimension.width, dimension.height));
+        Coord NW = matsimMapComponent.getCoordPositionXY(new Point(0, 0));
+        Coord NE = matsimMapComponent.getCoordPositionXY(new Point(dimension.width, 0));
+        Coord SW = matsimMapComponent.getCoordPositionXY(new Point(0, dimension.height));
+        Coord SE = matsimMapComponent.getCoordPositionXY(new Point(dimension.width, dimension.height));
 
         Tensor X = Sort.of(Tensors.vectorDouble(NW.getX(), NE.getX(), SW.getX(), SE.getX()));
         Tensor Y = Sort.of(Tensors.vectorDouble(NW.getY(), NE.getY(), SW.getY(), SE.getY()));
@@ -59,9 +59,9 @@ class IsolineLayer extends ViewerLayer {
             for (int j = 0; j < 10; ++j) {
                 Scalar pX = ofsX.add(dX.multiply(RealScalar.of(i)));
                 Scalar pY = ofsY.add(dY.multiply(RealScalar.of(j)));
-                Coord mat = matsimJMapViewer.db.referenceFrame.coords_toWGS84.transform( //
+                Coord mat = matsimMapComponent.db.referenceFrame.coords_toWGS84.transform( //
                         new Coord(pX.number().doubleValue(), pY.number().doubleValue()));
-                Point point = matsimJMapViewer.getMapPositionAlways(mat);
+                Point point = matsimMapComponent.getMapPositionAlways(mat);
                 graphics.fillRect(point.x, point.y, 2, 2);
                 if (prev != null) {
                     graphics.drawLine(prev.x, prev.y, point.x, point.y);

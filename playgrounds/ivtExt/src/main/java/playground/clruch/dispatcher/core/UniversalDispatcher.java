@@ -20,16 +20,10 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.clruch.export.AVStatus;
-import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.net.RequestContainer;
-import playground.clruch.net.SimulationClientSet;
+import playground.clruch.net.SimulationDistribution;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.net.SimulationObjectCompiler;
 import playground.clruch.net.SimulationObjects;
-import playground.clruch.net.SimulationServer;
-import playground.clruch.net.SimulationSubscriber;
-import playground.clruch.net.StorageSubscriber;
-import playground.clruch.net.VehicleContainer;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.AVLocation;
@@ -234,115 +228,42 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return Collections.emptyMap();
     }
 
-    private Link getVehicleLocation(AVVehicle avVehicle) {
+    /**
+     * @param avVehicle
+     * @return estimated current location of avVehicle, never null
+     */
+    protected Link getVehicleLocation(AVVehicle avVehicle) {
         Link link = vehicleLocations.get(avVehicle);
         GlobalAssert.that(link != null);
         return link;
     }
 
     @Override
-    protected final void notifySimulationSubscribers(long round_now) {
-
+    final void notifySimulationSubscribers(long round_now) {
         if (round_now % publishPeriod == 0) {
-
-            final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
-
-            final SimulationObject simulationObject = db.createSimulationObject(round_now);
-            simulationObject.infoLine = getInfoLine();
-            simulationObject.total_matchedRequests = total_matchedRequests;
-            {
-                // REQUESTS
-                for (AVRequest avRequest : getAVRequests()) {
-                    RequestContainer requestContainer = new RequestContainer();
-                    requestContainer.requestIndex = db.getRequestIndex(avRequest);
-                    requestContainer.fromLinkIndex = db.getLinkIndex(avRequest.getFromLink());
-                    requestContainer.submissionTime = avRequest.getSubmissionTime();
-                    requestContainer.toLinkIndex = db.getLinkIndex(avRequest.getToLink());
-                    simulationObject.requests.add(requestContainer);
-                }
-            }
-            {
-                // VEHICLES
-                final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
-
-                for (Entry<AVVehicle, Link> entry : getVehiclesWithCustomer().entrySet()) {
-                    VehicleContainer vehicleContainer = new VehicleContainer();
-                    AVVehicle avVehicle = entry.getKey();
-                    final String key = avVehicle.getId().toString();
-                    final Link fromLink = getVehicleLocation(avVehicle);
-                    vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
-                    vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
-                    vehicleContainer.avStatus = AVStatus.DRIVEWITHCUSTOMER;
-                    vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
-                    vehicleMap.put(key, vehicleContainer);
-                }
-
-                for (Entry<AVVehicle, Link> entry : getRebalancingVehicles().entrySet()) {
-                    VehicleContainer vehicleContainer = new VehicleContainer();
-                    AVVehicle avVehicle = entry.getKey();
-                    final String key = avVehicle.getId().toString();
-                    final Link fromLink = getVehicleLocation(avVehicle);
-                    vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
-                    vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
-                    vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
-                    vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
-                    vehicleMap.put(key, vehicleContainer);
-                }
-
-                // divertible vehicles are either stay, pickup, or rebalancing...
-                for (VehicleLinkPair vlp : getDivertableVehicles()) {
-                    final String key = vlp.avVehicle.getId().toString();
-                    if (!vehicleMap.containsKey(key)) {
-                        AVVehicle avVehicle = vlp.avVehicle;
-                        VehicleContainer vehicleContainer = new VehicleContainer();
-                        vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
-                        final Link fromLink = getVehicleLocation(avVehicle);
-                        GlobalAssert.that(fromLink == vlp.linkTimePair.link);
-                        vehicleContainer.linkIndex = db.getLinkIndex(vlp.linkTimePair.link);
-                        if (vlp.isVehicleInStayTask()) {
-                            vehicleContainer.avStatus = AVStatus.STAY;
-                        } else {
-                            vehicleContainer.avStatus = AVStatus.DRIVETOCUSTMER;
-                            vehicleContainer.destinationLinkIndex = db.getLinkIndex(vlp.getCurrentDriveDestination());
-                        }
-                        vehicleMap.put(key, vehicleContainer);
-                    }
-                }
-
-                simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
-            }
+            SimulationObjectCompiler simulationObjectCompiler = SimulationObjectCompiler.create( //
+                    round_now, getInfoLine(), total_matchedRequests);
+            simulationObjectCompiler.addRequests(getAVRequests());
+            simulationObjectCompiler.addVehiclesWithCustomer(getVehiclesWithCustomer(), vehicleLocations);
+            simulationObjectCompiler.addRebalancingVehicles(getRebalancingVehicles(), vehicleLocations);
+            SimulationObject simulationObject = simulationObjectCompiler.compile( //
+                    getDivertableVehicles(), vehicleLocations);
 
             // in the first pass, the vehicles is typically empty
             // in that case, the simObj will not be stored or communicated
             if (SimulationObjects.hasVehicles(simulationObject)) {
                 GlobalAssert.that(AVVEHILCECOUNT == simulationObject.vehicles.size());
-                
-                SimulationObjects.sortVehiclesAccordingToIndex(simulationObject);
-
-                new StorageSubscriber().handle(simulationObject);
-
-                if (SimulationServer.INSTANCE.getWaitForClients()) { // <- server is running && wait for clients is set
-                    if (SimulationClientSet.INSTANCE.isEmpty())
-                        System.out.println("waiting for connections...");
-                    // block for connections
-                    while (SimulationClientSet.INSTANCE.isEmpty())
-                        try {
-                            Thread.sleep(300);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                }
-
-                for (SimulationSubscriber simulationSubscriber : SimulationClientSet.INSTANCE)
-                    simulationSubscriber.handle(simulationObject);
+                SimulationDistribution.of(simulationObject); // store simObj and distribute to clients
             }
         }
     }
-    
-    public int getTotalMatchedRequests(){
-    	return this.total_matchedRequests;
+
+    /**
+     * @return total matched request until now
+     */
+    public int getTotalMatchedRequests() {
+        return total_matchedRequests;
     }
-    
 
     @Override
     public String getInfoLine() {
