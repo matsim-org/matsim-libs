@@ -19,6 +19,7 @@ import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.prep.TheApocalypse;
+import playground.maalbert.analysis.AnalyzeMarc;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -70,5 +71,6 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
         AnalyzeAll.analyze(args);
+        AnalyzeMarc.analyze(args);
     }
 }
