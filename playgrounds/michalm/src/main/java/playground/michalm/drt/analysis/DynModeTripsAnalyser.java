@@ -109,15 +109,15 @@ public class DynModeTripsAnalyser {
 	    format.setGroupingUsed(false);
 		
 	    for (DynModeTrip trip : trips) {
-			waitStats.addValue(trip.getWaitTime());
 			if (trip.getToLinkId()==null){
 				continue;
 			}
+			waitStats.addValue(trip.getWaitTime());
 			rideStats.addValue(trip.getInVehicleTravelTime());
 			distanceStats.addValue(trip.getTravelDistance());
 			traveltimes.addValue(trip.getInVehicleTravelTime()+trip.getWaitTime());
 		}
-		String value = format.format(waitStats.getN()) + delimiter + format.format(waitStats.getMean()) + delimiter
+		String value = format.format(waitStats.getValues().length) + delimiter + format.format(waitStats.getMean()) + delimiter
 				+ format.format(waitStats.getMax()) + delimiter + format.format(waitStats.getPercentile(95)) + delimiter
 				+ format.format(rideStats.getMean()) + delimiter + format.format(distanceStats.getMean()) + delimiter
 				+ format.format(traveltimes.getMean());
