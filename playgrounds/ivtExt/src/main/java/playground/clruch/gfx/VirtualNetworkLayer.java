@@ -11,13 +11,13 @@ import org.matsim.api.core.v01.Coord;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.RowPanel;
 
-public class VirtualNetLayer extends ViewerLayer {
+public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 255);
     private PointCloud pointCloud = null;
 
     private boolean drawCells = false;
 
-    public VirtualNetLayer(MatsimMapComponent matsimMapComponent) {
+    public VirtualNetworkLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
     }
 
