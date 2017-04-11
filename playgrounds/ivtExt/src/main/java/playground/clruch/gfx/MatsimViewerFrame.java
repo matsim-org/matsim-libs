@@ -82,7 +82,6 @@ public class MatsimViewerFrame implements Runnable {
             for (ViewerLayer viewerLayer : matsimMapComponent.viewerLayers)
                 rowPanel.add(viewerLayer.createPanel());
             JPanel jPanel = new JPanel(new BorderLayout());
-//            rowPanel.jPanel.setPreferredSize(new Dimension(150, 0));
             jPanel.add(rowPanel.jPanel, BorderLayout.NORTH);
             JScrollPane jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPane.setPreferredSize(new Dimension(150, 0));
