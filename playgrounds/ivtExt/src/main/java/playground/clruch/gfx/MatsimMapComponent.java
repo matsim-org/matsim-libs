@@ -19,7 +19,6 @@ import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.utils.gui.GraphicsUtil;
 
 public class MatsimMapComponent extends JMapViewer {
 
@@ -46,6 +45,7 @@ public class MatsimMapComponent extends JMapViewer {
         addLayer(new RequestsLayer(this));
         addLayer(new LinkLayer(this));
         addLayer(virtualNetworkLayer);
+        addLayer(new ClockLayer(this));
     
     }
 
@@ -106,8 +106,6 @@ public class MatsimMapComponent extends JMapViewer {
             jLabel.setText(ref.infoLine);
 
             drawInfoStrings(graphics);
-            GraphicsUtil.setQualityHigh(graphics);
-            new SbbClockDisplay().drawClock(graphics, ref.now, new Point(dimension.width - 70, 70));
         }
         {
             graphics.setFont(debugStringFont);
