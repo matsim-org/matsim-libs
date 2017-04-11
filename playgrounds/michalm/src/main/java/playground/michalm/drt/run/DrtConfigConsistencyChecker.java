@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,31 +19,26 @@
 
 package playground.michalm.drt.run;
 
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.Controler;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import org.matsim.core.config.Config;
 
-/**
- * @author michalm
- */
-public class RunDrtScenario {
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		createControler(config, otfvis).run();
-	}
+public class DrtConfigConsistencyChecker extends DvrpConfigConsistencyChecker {
+	private static final Logger log = Logger.getLogger(DrtConfigConsistencyChecker.class);
 
-	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
-		return DrtControlerCreator.createControler(config, otfvis);
-	}
+	@Override
+	public void checkConsistency(Config config) {
+		super.checkConsistency(config);
 
-	public static void main(String[] args) {
-		if (args.length != 1) {
-			throw new IllegalArgumentException("RunDrtScenario needs one argument: path to the configuration file");
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		if (drtCfg.getMaxTravelTimeAlpha() < 1) {
+			log.warn(DrtConfigGroup.MAX_TRAVEL_TIME_ALPHA + " is below 1.0! See comments in the DrtConfigGroup");
 		}
-		RunDrtScenario.run(args[0], false);
+		if (drtCfg.getMaxTravelTimeBeta() < 0) {
+			log.warn(DrtConfigGroup.MAX_TRAVEL_TIME_BETA + " is below 0.0! See comments in the DrtConfigGroup");
+		}
+		if (drtCfg.getMaxWaitTime() < 0) {
+			log.warn(DrtConfigGroup.MAX_WAIT_TIME + " is below 0.0! See comments in the DrtConfigGroup");
+		}
 	}
 }

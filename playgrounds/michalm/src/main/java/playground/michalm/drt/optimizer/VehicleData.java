@@ -37,7 +37,7 @@ import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
 public class VehicleData {
 	public static class Entry {
 		public final Vehicle vehicle;
-		public final LinkTimePair start;// TODO what if start is just at the beginning of the first stopTask???
+		public final LinkTimePair start;
 		public int startOccupancy;
 		public final List<Stop> stops = new ArrayList<>();
 
