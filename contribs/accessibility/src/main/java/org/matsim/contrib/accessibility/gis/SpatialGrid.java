@@ -72,7 +72,6 @@ public final class SpatialGrid{
 		minY = ymin;
 		maxX = xmax;
 		maxY = ymax;
-		LOG.warn("minX = " + xmin + "; minY = " + ymin + "; maxX = " + xmax + "; maxY = " + ymax);
 		this.resolution = resolution;
 		int numXBins = (int)Math.ceil((maxX - minX) / resolution) + 1;
 		int numYBins = (int)Math.ceil((maxY - minY) / resolution) + 1;
