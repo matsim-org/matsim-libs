@@ -97,17 +97,17 @@ public class InsertionDrtOptimizerWithDepots extends InsertionDrtOptimizer {
 		if (startLinks.contains(fromLink)) {
 			return null;// stay where it is
 		}
-
-		Coord fromCoord = fromLink.getCoord();
-		double minDistance = Double.MAX_VALUE;
 		Link bestLink = null;
-		for (Link l : startLinks) {
-			double distance = DistanceUtils.calculateSquaredDistance(fromCoord, l.getCoord());
-			if (distance < minDistance) {
+		double bestDistance = Double.MAX_VALUE;
+		for (Link l : startLinks){
+			double currentDistance = DistanceUtils.calculateSquaredDistance(fromLink.getCoord(), l.getCoord());
+			if (currentDistance < bestDistance)
+			{
+				bestDistance = currentDistance;
 				bestLink = l;
 			}
 		}
-
+		
 		return bestLink;
 	}
 }
