@@ -13,10 +13,10 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 
@@ -58,12 +58,9 @@ public class MatsimViewerFrame implements Runnable {
         return flowLayout;
     }
 
-    RowPanel rowPanel = new RowPanel();
-
     /** Constructs the {@code Demo}. */
     public MatsimViewerFrame(MatsimMapComponent matsimMapComponent) {
         this.matsimMapComponent = matsimMapComponent;
-        // treeMap = new JMapViewerTree(matsimMapComponent, "Zones", false);
         // ---
         jFrame.setTitle("ETH Z\u00fcrich MATSim Viewer");
         jFrame.setLayout(new BorderLayout());
@@ -80,13 +77,14 @@ public class MatsimViewerFrame implements Runnable {
         panelNorth.add(panelControls, BorderLayout.NORTH);
 
         jFrame.add(panelNorth, BorderLayout.NORTH);
-        for (ViewerLayer viewerLayer : matsimMapComponent.viewerLayers)
-            rowPanel.add(viewerLayer.createPanel());
-
         {
+            RowPanel rowPanel = new RowPanel();
+            for (ViewerLayer viewerLayer : matsimMapComponent.viewerLayers)
+                rowPanel.add(viewerLayer.createPanel());
             JPanel jPanel = new JPanel(new BorderLayout());
             jPanel.add(rowPanel.jPanel, BorderLayout.NORTH);
-            jFrame.add(jPanel, BorderLayout.WEST);
+            JScrollPane jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            jFrame.add(jScrollPane, BorderLayout.EAST);
         }
         jFrame.add(matsimMapComponent, BorderLayout.CENTER);
         jFrame.add(matsimMapComponent.jLabel, BorderLayout.SOUTH);
@@ -94,14 +92,7 @@ public class MatsimViewerFrame implements Runnable {
         MatsimToggleButton matsimToggleButton = new MatsimToggleButton(matsimMapComponent);
         matsimToggleButton.addActionListener(l -> jSlider.setEnabled(!matsimToggleButton.isSelected()));
         panelControls.add(matsimToggleButton);
-        JMapTileSelector.install(panelControls, matsimMapComponent);
-        {
-            SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
-            spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 255);
-            spinnerLabel.setValueSafe(matsimMapComponent.mapAlphaCover);
-            spinnerLabel.addSpinnerListener(i -> matsimMapComponent.setMapAlphaCover(i));
-            spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "alpha cover");
-        }
+
         panelNorth.add(jSlider, BorderLayout.SOUTH);
         {
             List<IterationFolder> list = StorageUtils.getAvailableIterations();
@@ -152,7 +143,7 @@ public class MatsimViewerFrame implements Runnable {
                 }
             }
         }
-        
+
         getJMapViewer().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

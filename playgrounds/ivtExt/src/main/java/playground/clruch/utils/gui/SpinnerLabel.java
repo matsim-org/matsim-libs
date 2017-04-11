@@ -301,6 +301,10 @@ public class SpinnerLabel<Type> {
         myJLabel.setText(stringFormat(getValue()));
         myJSpinner.setEnabled(1 < myList.size()); // added recently to indicate that there is nothing to scroll
     }
+    
+    public JComponent getLabelComponent() {
+        return myJLabel;
+    }
 
     public JComponent getSpinnerComponent() {
         return myJSpinner;
