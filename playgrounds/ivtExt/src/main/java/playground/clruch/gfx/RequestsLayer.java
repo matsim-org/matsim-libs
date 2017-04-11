@@ -26,8 +26,8 @@ public class RequestsLayer extends ViewerLayer {
     // ---
     private volatile boolean drawRequestDestinations = false;
 
-    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.ORANGE.colorScheme);
-    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN_CONTOUR.colorScheme);
+    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.Orange);
+    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GreenContour);
 
     public RequestsLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
@@ -149,24 +149,8 @@ public class RequestsLayer extends ViewerLayer {
             jCheckBox.addActionListener(e -> setDrawDestinations(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);
         }
-        {
-            final JCheckBox jCheckBox = new JCheckBox("source");
-            jCheckBox.setSelected(requestHeatMap.show);
-            jCheckBox.addActionListener(e -> {
-                requestHeatMap.show = jCheckBox.isSelected();
-                matsimMapComponent.repaint();
-            });
-            rowPanel.add(jCheckBox);
-        }
-        {
-            final JCheckBox jCheckBox = new JCheckBox("sink");
-            jCheckBox.setSelected(requestDestMap.show);
-            jCheckBox.addActionListener(e -> {
-                requestDestMap.show = jCheckBox.isSelected();
-                matsimMapComponent.repaint();
-            });
-            rowPanel.add(jCheckBox);
-        }
+        createHeatmapPanel(rowPanel, "source", requestHeatMap);
+        createHeatmapPanel(rowPanel, "sink", requestDestMap);
     }
 
     @Override
