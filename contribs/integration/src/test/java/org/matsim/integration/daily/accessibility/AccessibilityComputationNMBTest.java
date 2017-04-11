@@ -51,22 +51,14 @@ public class AccessibilityComputationNMBTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-//	@Test
-//	public void testQuick() {
-//		run(1000., false, false);
-//	}
-//	@Test
-//	public void testLocal_beta10() {
-//		run(500., false, true);
-//	}
 	@Test
-	public void testOnServer() {
-		run(1000., true, false);
-	}
-	
-	public void run(Double cellSize, boolean push2Geoserver, boolean createQGisOutput) {
+	public void runAccessibilityComputation() {
+		Double cellSize = 1000.;
+		boolean push2Geoserver = true; // set true for run on server
+		boolean createQGisOutput = false; // set false for run on server
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
+		Envelope envelope = new Envelope(100000,180000,-3720000,-3675000); // Notation: minX, maxX, minY, maxY
 		
 		// Network file
 		String folderStructure = "../../";
@@ -75,7 +67,7 @@ public class AccessibilityComputationNMBTest {
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 		config.network().setInputFile(folderStructure + networkFile);
 		
-		// ---------- Change Events
+		// ---------- Experiment: Change Events
 //		String changeEventsInputFile = "/Users/Dominik/Accessibility/Data/nmbm_change/changeevents200.xml.gz";
 //		config.network().setTimeVariantNetwork(true);
 //		config.network().setChangeEventsInputFile(changeEventsInputFile);
@@ -87,16 +79,19 @@ public class AccessibilityComputationNMBTest {
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
-		config.controler().setRunId("za_nmb_" + AccessibilityUtils.getDate() + "_" + cellSize.toString().split("\\.")[0]);
+		config.controler().setRunId("za_nmb_" + cellSize.toString().split("\\.")[0]);
 		
-		// Use other beta
+		// ---------- Experiment: Use other beta
 //		config.planCalcScore().setBrainExpBeta(10);
-		//
+		// ----------
 		
 //		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/46/";
+		
+		// ---------- Matrix-based pt
 //		final String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
 //		final String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
 //		final String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
+		// ---------- 
 		
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setCellSizeCellBasedAccessibility(cellSize.intValue());
@@ -106,7 +101,7 @@ public class AccessibilityComputationNMBTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setOutputCrs(TransformationFactory.WGS84_SA_Albers);
 		
-		// ---------- Change Events
+		// ---------- Experiment: Change Events
 //		acg.setTimeOfDay(16.*60.*60.);
 		// ----------
 		
@@ -119,7 +114,7 @@ public class AccessibilityComputationNMBTest {
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		// ---------- Change speeds
+		// ---------- Experiment: Change speeds
 //		Network network = scenario.getNetwork();
 //		double maxSpeed = 35./3.6;
 //		for (Link link : network.getLinks().values()) {
@@ -129,16 +124,16 @@ public class AccessibilityComputationNMBTest {
 //		}
 		// ----------
 		
-		// Matrix-based pt
+		// ---------- Matrix-based pt
 //		MatrixBasedPtRouterConfigGroup mbpcg = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class);
 //		mbpcg.setPtStopsInputFile(ptStopsFile);
 //		mbpcg.setUsingTravelTimesAndDistances(true);
 //		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFile);
 //		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFile);
+		// ---------- 
 		
 		// Activity types
 		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION});
-//		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.EDUCATION});
 		log.info("Using activity types: " + activityTypes);
 		
 		// Combine certain activity options into one combined computation
@@ -178,9 +173,7 @@ public class AccessibilityComputationNMBTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
-					// TODO maybe use envelope and crs from above
-//					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(115000,161000,-3718000,-3679000), workingDirectory, TransformationFactory.WGS84_SA_Albers, includeDensityLayer,
-					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(100000,180000,-3720000,-3675000), workingDirectory, TransformationFactory.WGS84_SA_Albers, includeDensityLayer,
+					VisualizationUtils.createQGisOutput(actType, mode.toString(), envelope, workingDirectory, acg.getOutputCrs(), includeDensityLayer,
 							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}
