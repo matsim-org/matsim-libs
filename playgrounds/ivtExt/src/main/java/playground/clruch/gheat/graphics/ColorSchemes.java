@@ -3,12 +3,12 @@ package playground.clruch.gheat.graphics;
 import java.awt.image.BufferedImage;
 
 public enum ColorSchemes {
-    ORANGE(CommonPalettes.createOrange()), //
-    ORANGE_CONTOUR(CommonPalettes.createOrangeContour()), //
-    GREEN(CommonPalettes.createGreen()), //
-    GREEN_CONTOUR(CommonPalettes.createGreenContour()), //
-    BLACK(CommonPalettes.createBlack()), //
-    CLASSIC(CommonPalettes.createClassic()), //
+    Classic(CommonPalettes.createClassic()), //
+    Orange(CommonPalettes.createOrange()), //
+    OrangeContour(CommonPalettes.createOrangeContour()), //
+    Green(CommonPalettes.createGreen()), //
+    GreenContour(CommonPalettes.createGreenContour()), //
+    Black(CommonPalettes.createBlack()), //
     ;
 
     public final ColorScheme colorScheme;

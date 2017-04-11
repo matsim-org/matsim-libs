@@ -41,6 +41,7 @@ public class MatsimMapComponent extends JMapViewer {
         this.db = db;
         virtualNetworkLayer = new VirtualNetLayer(this);
 
+        addLayer(new TilesLayer(this));
         addLayer(new VehiclesLayer(this));
         addLayer(new RequestsLayer(this));
         addLayer(new LinkLayer(this));

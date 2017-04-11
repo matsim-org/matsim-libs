@@ -73,7 +73,7 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
     protected boolean tileGridVisible = false; // <- for debug purposes
     protected boolean scrollWrapEnabled;
 
-    protected transient TileController tileController;
+    private transient TileController tileController;
 
     protected List<MatsimHeatMap> matsimHeatmaps = new ArrayList<>();
 
@@ -106,7 +106,7 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
 
     protected ZOOM_BUTTON_STYLE zoomButtonStyle;
 
-    protected transient TileSource tileSource;
+    private transient TileSource tileSource;
 
     protected transient AttributionSupport attribution = new AttributionSupport();
 

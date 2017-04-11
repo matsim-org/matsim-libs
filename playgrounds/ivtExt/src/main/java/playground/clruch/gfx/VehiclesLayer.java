@@ -3,6 +3,7 @@ package playground.clruch.gfx;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,11 +19,14 @@ import playground.clruch.net.VehicleContainer;
 import playground.clruch.utils.gui.RowPanel;
 
 public class VehiclesLayer extends ViewerLayer {
-    // ---
-    private volatile boolean drawVehicleDestinations = true;
+    private static final AVStatus[] aVStatusArray = new AVStatus[] { //
+            AVStatus.DRIVETOCUSTMER, AVStatus.DRIVEWITHCUSTOMER, AVStatus.REBALANCEDRIVE };
+    private BitSet bits = new BitSet();
 
     public VehiclesLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
+        bits.set(AVStatus.DRIVETOCUSTMER.ordinal());
+        bits.set(AVStatus.REBALANCEDRIVE.ordinal());
     }
 
     @Override
@@ -47,7 +51,7 @@ public class VehiclesLayer extends ViewerLayer {
                         graphics.setColor(vc.avStatus.color);
                         graphics.fillRect(p1.x, p1.y, carwidth, carwidth);
                         if (vc.destinationLinkIndex != AbstractContainer.LINK_UNSPECIFIED && //
-                                drawVehicleDestinations) {
+                                bits.get(vc.avStatus.ordinal())) {
                             OsmLink toOsmLink = matsimMapComponent.db.getOsmLink(vc.destinationLinkIndex);
                             Point p2 = matsimMapComponent.getMapPositionAlways(toOsmLink.getAt(0.5));
                             Color col = new Color(vc.avStatus.color.getRGB() & (0x60ffffff), true);
@@ -78,21 +82,17 @@ public class VehiclesLayer extends ViewerLayer {
         matsimMapComponent.appendSeparator();
     }
 
-    public void setDrawDestinations(boolean selected) {
-        drawVehicleDestinations = selected;
+    void setDrawDestinations(AVStatus status, boolean selected) {
+        bits.set(status.ordinal(), selected);
         matsimMapComponent.repaint();
-    }
-
-    public boolean getDrawDestinations() {
-        return drawVehicleDestinations;
     }
 
     @Override
     protected void createPanel(RowPanel rowPanel) {
-        {
-            final JCheckBox jCheckBox = new JCheckBox("destin.");
-            jCheckBox.setSelected(getDrawDestinations());
-            jCheckBox.addActionListener(e -> setDrawDestinations(jCheckBox.isSelected()));
+        for (AVStatus status : aVStatusArray) {
+            final JCheckBox jCheckBox = new JCheckBox(status.description);
+            jCheckBox.setSelected(bits.get(status.ordinal()));
+            jCheckBox.addActionListener(e -> setDrawDestinations(status, jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);
         }
     }
