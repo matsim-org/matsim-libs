@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.contrib.accessibility;
 
 import java.io.File;
@@ -114,7 +133,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 		for (String mode : accessibilityCalculator.getModes() ) {
-			log.warn("put accessibility grid for mode=" + mode );
+//			log.warn("put accessibility grid for mode=" + mode );
 			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 		}
 		
