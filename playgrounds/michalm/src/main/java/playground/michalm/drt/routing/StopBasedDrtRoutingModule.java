@@ -109,6 +109,11 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	    drtRoute.setDistance(drtconfig.getEstimatedBeelineDistanceFactor()*CoordUtils.calcEuclideanDistance(accessFacility.getCoord(), egressFacility.getCoord()));
 	    drtRoute.setTravelTime(drtRoute.getDistance()/drtconfig.getEstimatedDrtSpeed());
 
+	    if (drtRoute.getStartLinkId() == drtRoute.getEndLinkId()){
+			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
+
+	    }
+	    
 	    Leg drtLeg = PopulationUtils.createLeg(DrtConfigGroup.DRT_MODE);
         drtLeg.setDepartureTime(departureTime+walkLeg.getTravelTime()+1);
         drtLeg.setTravelTime(drtRoute.getTravelTime());

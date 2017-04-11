@@ -26,7 +26,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
 import org.matsim.core.config.Config;
@@ -58,6 +60,14 @@ public class VariableAccessMainModeIdentifier implements MainModeIdentifier {
 	 */
 	@Override
 	public String identifyMainMode(List<? extends PlanElement> tripElements) {
+		String mode = ((Leg) tripElements.get( 0 )).getMode();
+
+		if ( mode.equals( TransportMode.transit_walk ) ) {
+			return TransportMode.pt ;
+
+		}
+		
+		
 		for (PlanElement pe : tripElements)
 		{
 			if (pe instanceof Activity){
