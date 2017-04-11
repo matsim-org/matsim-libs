@@ -121,7 +121,7 @@ public class AccessibilityComputationNairobiTest {
 		acg.setBoundingBoxBottom(envelope.getMinY());
 		acg.setBoundingBoxTop(envelope.getMaxY());
 		acg.setBoundingBoxLeft(envelope.getMinX());
-		acg.setBoundingBoxRight(envelope.getMaxY());
+		acg.setBoundingBoxRight(envelope.getMaxX());
 		acg.setCellSizeCellBasedAccessibility(cellSize.intValue());
 //		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
