@@ -22,10 +22,8 @@ public class ClockLayer extends ViewerLayer {
     void paint(Graphics2D graphics, SimulationObject ref) {
         if (show) {
             final Dimension dimension = matsimMapComponent.getSize();
-            // GraphicsState gs = new GraphicsState(graphics);
             GraphicsUtil.setQualityHigh(graphics);
             new SbbClockDisplay().drawClock(graphics, ref.now, new Point(dimension.width - 70, 70));
-            // gs.restore();
             GraphicsUtil.setQualityDefault(graphics);
         }
     }
