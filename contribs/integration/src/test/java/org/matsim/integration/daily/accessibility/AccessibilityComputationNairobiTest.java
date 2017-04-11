@@ -20,7 +20,6 @@ package org.matsim.integration.daily.accessibility;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -32,18 +31,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.MutableScenario;
@@ -65,8 +62,8 @@ public class AccessibilityComputationNairobiTest {
 	
 	@Test
 	public void runAccessibilityComputation() throws IOException {
-		Double cellSize = 1000.;
-		boolean push2Geoserver = true; // set true for run on server
+		Double cellSize = 2000.;
+		boolean push2Geoserver = false; // set true for run on server
 		boolean createQGisOutput = true; // set false for run on server
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
@@ -113,20 +110,25 @@ public class AccessibilityComputationNairobiTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
-		config.controler().setRunId("ke_nairobi_" + cellSize.toString().split("\\.")[0] + "_kodi_sec");
+		config.controler().setRunId("ke_nairobi_" + cellSize.toString().split("\\.")[0]);
 		
 //		String travelTimeMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/tt.csv";
 //		String travelDistanceMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/td.csv";
 //		String ptStops = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/IDs.csv";
 		
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(envelope.getMinY());
+		acg.setBoundingBoxTop(envelope.getMaxY());
+		acg.setBoundingBoxLeft(envelope.getMinX());
+		acg.setBoundingBoxRight(envelope.getMaxY());
 		acg.setCellSizeCellBasedAccessibility(cellSize.intValue());
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, false);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
 //		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true );
-		acg.setOutputCrs("EPSG:21037"); // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		acg.setOutputCrs(scenarioCRS); // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
 //		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
 ////		mbConfig.setPtStopsInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/IDs.csv");
@@ -146,9 +148,37 @@ public class AccessibilityComputationNairobiTest {
 		
 //		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		
-		config.transit().setUseTransit(true);
+		config.global().setCoordinateSystem(scenarioCRS);
+		
+//		config.transit().setUseTransit(true);
+//		//
+//		config.transit().setInputScheduleCRS("EPSG:4326");
+//		config.transit().setTransitScheduleFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16_2/schedule2.xml");
+//		config.transit().setVehiclesFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16_2/vehicles.xml");
 		//
-		config.transit().setTransitScheduleFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16/schedule.xml.gz");
+//		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		new MatsimNetworkReader(TransformationFactory.getCoordinateTransformation("EPSG:4326", scenarioCRS), 
+//				scenario2.getNetwork()).readFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16_2/network.xml");
+		
+//		MergeNetworks.merge(network, null, scenario2.getNetwork());
+		//
+		
+		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
+		config.planCalcScore().addModeParams(ptParams);
+
+		//
+		// ... trying to alter settings to drive down the number of "35527609 transfer links to be added".
+//		config.transitRouter().setAdditionalTransferTime(additionalTransferTime);
+//		config.transitRouter().setDirectWalkFactor(directWalkFactor);
+		config.transitRouter().setMaxBeelineWalkConnectionDistance(0.);
+		config.transitRouter().setExtensionRadius(0.);
+		config.transitRouter().setSearchRadius(0.);
+		// defaults
+//		additionalTransferTime = 0.0;
+//		directWalkFactor = 1. ;
+//		maxBeelineWalkConnectionDistance = 100.0;
+//		extensionRadius = 200.0;
+//		searchRadius = 1000.0;
 		//
 		{
 			ModeRoutingParams walkPars = new ModeRoutingParams( TransportMode.walk ) ;
@@ -160,6 +190,8 @@ public class AccessibilityComputationNairobiTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
 		scenario.setNetwork(network);
+//		scenario.setNetwork(scenario2.getNetwork());
+		
 		scenario.setActivityFacilities(facilities);
 //		scenario.setTransitSchedule(schedule);
 //		scenario.setTransitVehicles(vehicles);
@@ -170,20 +202,22 @@ public class AccessibilityComputationNairobiTest {
 //		scenario.addScenarioElement(PtMatrix.NAME, ptMatrix);
 		
 		// Activity types
-//		final List<String> activityTypes = Arrays.asList(new String[]{"airport"}); 
-		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING}); // land-use file version
+//		final List<String> activityTypes = Arrays.asList(new String[]{"airport"});
+		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.EDUCATION});
+//		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING});
 //		activityTypes.add("Commercial"); // land-use file version
 //		activityTypes.add("Industrial"); // land-use file version
 //		activityTypes.add("Public Purpose"); // land-use file version
-//		activityTypes.add("Recreational"); // land-use file version
-//		activityTypes.add("Hospital"); // kodi file version
+//		 activityTypes.add("Recreational"); // land-use file version
+//		 activityTypes.add("Hospital"); // kodi file version
 		log.info("Using activity types: " + activityTypes);
-		
+
 		// Network density points (as proxy for population density)
-		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork()); // will be aggregated in downstream code!
-		
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork());
+		// will be aggregated in downstream code!
+
 		final Controler controler = new Controler(scenario);
-		
+
 		for (String activityType : activityTypes) {
 			AccessibilityModule module = new AccessibilityModule();
 			module.setConsideredActivityType(activityType);
@@ -191,34 +225,35 @@ public class AccessibilityComputationNairobiTest {
 			module.setPushing2Geoserver(push2Geoserver);
 			controler.addOverridingModule(module);
 		}
-		
-//		controler.addOverridingModule(new AbstractModule() {			
+
+//		controler.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
 //				bind(PtMatrix.class).toInstance(ptMatrix);
 //			}
 //		});
-		
+
 		controler.run();
-		
+
 		// QGis
 		if (createQGisOutput) {
 			final boolean includeDensityLayer = true;
 			final Integer range = 9; // In the current implementation, this must always be 9
-			final Double lowerBound = -7.; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+			final Double lowerBound = -7.; // (upperBound - lowerBound) ideally	nicely divisible by (range - 2)
 			final Double upperBound = 0.;
-			final int populationThreshold = (int) (50 / (1000/cellSize * 1000/cellSize));
-			
+			final int populationThreshold = (int) (50 / (1000 / cellSize * 1000 / cellSize));
+
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
-					VisualizationUtils.createQGisOutput(actType, mode.toString(), envelope, workingDirectory, scenarioCRS, includeDensityLayer,
-							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
+					VisualizationUtils.createQGisOutput(actType, mode.toString(), envelope, workingDirectory,
+							scenarioCRS, includeDensityLayer, lowerBound, upperBound, range, cellSize.intValue(),
+							populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}
-			}  
+			}
 		}
 	}
 }
