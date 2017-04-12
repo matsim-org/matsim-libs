@@ -105,7 +105,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(PLOT_CUST_STATS, "Writes out detailed DRT customer stats in each iteration. True by default.");
 		map.put(PLOT_VEH_STATS,
 				"Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. "
-				+ "False by default.");
+						+ "False by default.");
 		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased. door2door by default");
 		map.put(MAX_WALK_DISTANCE, "Maximum walk distance to next stop location in stationbased system.");
 		map.put(TRANSIT_STOP_FILE, "Stop locations file (transit schedule format, but without lines) for DRT stops. "

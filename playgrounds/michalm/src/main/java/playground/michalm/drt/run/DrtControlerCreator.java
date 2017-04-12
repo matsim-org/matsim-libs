@@ -40,11 +40,11 @@ import org.matsim.pt.transitSchedule.api.*;
 import com.google.inject.*;
 import com.google.inject.name.*;
 
-import playground.michalm.drt.analysis.DRTAnalysisModule;
+import playground.michalm.drt.analysis.DrtAnalysisModule;
 import playground.michalm.drt.optimizer.*;
-import playground.michalm.drt.passenger.NDrtRequestCreator;
+import playground.michalm.drt.passenger.DrtRequestCreator;
 import playground.michalm.drt.routing.*;
-import playground.michalm.drt.vrpagent.NDrtActionCreator;
+import playground.michalm.drt.vrpagent.DrtActionCreator;
 
 /**
  * @author jbischoff
@@ -61,17 +61,17 @@ public class DrtControlerCreator {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(
 				new DvrpModule(createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class) {
-						@Provides
-						@Singleton
-						private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
-								DrtConfigGroup drtCfg) {
-							FleetImpl fleet = new FleetImpl();
-							new VehicleReader(network, fleet).parse(drtCfg.getVehiclesFileUrl(config.getContext()));
-							return fleet;
-						}
+					@Provides
+					@Singleton
+					private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
+							DrtConfigGroup drtCfg) {
+						FleetImpl fleet = new FleetImpl();
+						new VehicleReader(network, fleet).parse(drtCfg.getVehiclesFileUrl(config.getContext()));
+						return fleet;
+					}
 
 				});
-		controler.addOverridingModule(new DRTAnalysisModule());
+		controler.addOverridingModule(new DrtAnalysisModule());
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door: {
@@ -117,8 +117,8 @@ public class DrtControlerCreator {
 			protected void configure() {
 				bind(DrtOptimizer.class).toProvider(providerClass).asEagerSingleton();
 				bind(VrpOptimizer.class).to(DrtOptimizer.class);
-				bind(DynActionCreator.class).to(NDrtActionCreator.class).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(NDrtRequestCreator.class).asEagerSingleton();
+				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
 			}
 		};
 	}

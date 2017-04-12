@@ -34,7 +34,7 @@ import org.matsim.core.router.util.*;
 import playground.michalm.drt.optimizer.DrtOptimizerContext;
 import playground.michalm.drt.run.DrtConfigGroup;
 import playground.michalm.drt.schedule.*;
-import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
+import playground.michalm.drt.schedule.DrtTask.DrtTaskType;
 
 /**
  * @author michalm
@@ -71,17 +71,17 @@ public class InsertionDrtOptimizerWithDepots extends InsertionDrtOptimizer {
 			return;
 		}
 
-		NDrtTask currentTask = (NDrtTask)schedule.getCurrentTask();
+		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
 
 		// current task is STAY
-		if (currentTask != null && currentTask.getDrtTaskType() == NDrtTaskType.STAY) {
+		if (currentTask != null && currentTask.getDrtTaskType() == DrtTaskType.STAY) {
 			int previousTaskIdx = currentTask.getTaskIdx() - 1;
 
 			// previous task is STOP
 			if (previousTaskIdx >= 0
-					&& ((NDrtTask)schedule.getTasks().get(previousTaskIdx)).getDrtTaskType() == NDrtTaskType.STOP) {
+					&& ((DrtTask)schedule.getTasks().get(previousTaskIdx)).getDrtTaskType() == DrtTaskType.STOP) {
 
-				Link currentLink = ((NDrtStayTask)currentTask).getLink();
+				Link currentLink = ((DrtStayTask)currentTask).getLink();
 				Link bestStartLink = findBestStartLink(currentLink);
 				if (bestStartLink != null) {
 					VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, bestStartLink,
@@ -99,15 +99,14 @@ public class InsertionDrtOptimizerWithDepots extends InsertionDrtOptimizer {
 		}
 		Link bestLink = null;
 		double bestDistance = Double.MAX_VALUE;
-		for (Link l : startLinks){
+		for (Link l : startLinks) {
 			double currentDistance = DistanceUtils.calculateSquaredDistance(fromLink.getCoord(), l.getCoord());
-			if (currentDistance < bestDistance)
-			{
+			if (currentDistance < bestDistance) {
 				bestDistance = currentDistance;
 				bestLink = l;
 			}
 		}
-		
+
 		return bestLink;
 	}
 }

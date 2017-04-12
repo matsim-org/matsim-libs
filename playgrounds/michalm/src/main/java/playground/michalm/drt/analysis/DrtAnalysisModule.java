@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,19 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.schedule;
+/**
+ * 
+ */
+package playground.michalm.drt.analysis;
 
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.core.controler.AbstractModule;
 
 /**
- * @author michalm
+ * @author jbischoff
+ *
  */
-public interface NDrtTask extends Task {
-	public static enum NDrtTaskType {
-		STAY, // idle
-		STOP, // stopped to drop off and pick up passengers
-		DRIVE; // driving with/without passengers
+public class DrtAnalysisModule extends AbstractModule {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.core.controler.AbstractModule#install()
+	 */
+	@Override
+	public void install() {
+		bind(DrtVehicleOccupancyEvaluator.class).asEagerSingleton();
+		bind(DynModePassengerStats.class).asEagerSingleton();
+		addControlerListenerBinding().to(DrtAnalysisControlerListener.class).asEagerSingleton();
 	}
 
-	NDrtTaskType getDrtTaskType();
 }

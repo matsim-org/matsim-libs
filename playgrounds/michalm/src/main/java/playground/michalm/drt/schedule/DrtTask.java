@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,47 +19,17 @@
 
 package playground.michalm.drt.schedule;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
-
-import playground.michalm.drt.data.NDrtRequest;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
  * @author michalm
  */
-public class NDrtStopTask extends StayTaskImpl implements NDrtTask {
-	private final Set<NDrtRequest> dropoffRequests = new HashSet<>();
-	private final Set<NDrtRequest> pickupRequests = new HashSet<>();
-
-	public NDrtStopTask(double beginTime, double endTime, Link link) {
-		super(beginTime, endTime, link);
+public interface DrtTask extends Task {
+	public static enum DrtTaskType {
+		STAY, // idle
+		STOP, // stopped to drop off and pick up passengers
+		DRIVE; // driving with/without passengers
 	}
 
-	@Override
-	public NDrtTaskType getDrtTaskType() {
-		return NDrtTaskType.STOP;
-	}
-
-	public Set<NDrtRequest> getDropoffRequests() {
-		return Collections.unmodifiableSet(dropoffRequests);
-	}
-
-	public Set<NDrtRequest> getPickupRequests() {
-		return Collections.unmodifiableSet(pickupRequests);
-	}
-
-	public void addDropoffRequest(NDrtRequest request) {
-		dropoffRequests.add(request);
-	}
-
-	public void addPickupRequest(NDrtRequest request) {
-		pickupRequests.add(request);
-	}
-
-	@Override
-	protected String commonToString() {
-		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
-	}
+	DrtTaskType getDrtTaskType();
 }

@@ -28,22 +28,22 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import com.google.inject.Inject;
 
-import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.data.DrtRequest;
 import playground.michalm.drt.run.DrtConfigGroup;
 
 /**
  * @author michalm
  */
-public class NDrtRequestCreator implements PassengerRequestCreator {
+public class DrtRequestCreator implements PassengerRequestCreator {
 	private final DrtConfigGroup drtCfg;
 
 	@Inject
-	public NDrtRequestCreator(DrtConfigGroup drtCfg) {
+	public DrtRequestCreator(DrtConfigGroup drtCfg) {
 		this.drtCfg = drtCfg;
 	}
 
 	@Override
-	public NDrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+	public DrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
 		double latestDepartureTime = departureTime + drtCfg.getMaxWaitTime();
 
@@ -53,7 +53,7 @@ public class NDrtRequestCreator implements PassengerRequestCreator {
 		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * estimatedTravelTime + drtCfg.getMaxTravelTimeBeta();
 		double latestArrivalTime = departureTime + maxTravelTime;
 
-		return new NDrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
+		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
 				submissionTime);
 	}
 }

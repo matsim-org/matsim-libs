@@ -22,7 +22,7 @@ package playground.michalm.drt.optimizer.insertion;
 import java.util.*;
 import java.util.concurrent.*;
 
-import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.data.DrtRequest;
 import playground.michalm.drt.optimizer.VehicleData;
 import playground.michalm.drt.optimizer.VehicleData.Entry;
 import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
@@ -39,7 +39,7 @@ public class ParallelMultiVehicleInsertionProblem {
 			this.multiInsertionProblem = new MultiVehicleInsertionProblem(singleInsertionProblem);
 		}
 
-		private BestInsertion findBestInsertion(NDrtRequest drtRequest) {
+		private BestInsertion findBestInsertion(DrtRequest drtRequest) {
 			BestInsertion bestInsertion = multiInsertionProblem.findBestInsertion(drtRequest, vEntries);
 			vEntries.clear();
 			return bestInsertion;
@@ -59,7 +59,7 @@ public class ParallelMultiVehicleInsertionProblem {
 		executorService = Executors.newFixedThreadPool(threads);
 	}
 
-	public BestInsertion findBestInsertion(NDrtRequest drtRequest, VehicleData vData) {
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData vData) {
 		divideTasksIntoGroups(vData);
 		return findBestInsertion(submitTasks(drtRequest));
 	}
@@ -81,7 +81,7 @@ public class ParallelMultiVehicleInsertionProblem {
 		}
 	}
 
-	private List<Future<BestInsertion>> submitTasks(NDrtRequest drtRequest) {
+	private List<Future<BestInsertion>> submitTasks(DrtRequest drtRequest) {
 		List<Future<BestInsertion>> bestInsertionFutures = new ArrayList<>();
 		for (int i = 0; i < threads; i++) {
 			final TaskGroup taskGroup = taskGroups[i];

@@ -27,9 +27,9 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.data.DrtRequest;
 import playground.michalm.drt.schedule.*;
-import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
+import playground.michalm.drt.schedule.DrtTask.DrtTaskType;
 
 /**
  * @author michalm
@@ -48,13 +48,13 @@ public class VehicleData {
 	}
 
 	public static class Stop {
-		public final NDrtStopTask task;
+		public final DrtStopTask task;
 		public final double maxArrivalTime;// relating to max pass drive time (for dropoff requests)
 		public final double maxDepartureTime;// relating to pass max wait time (for pickup requests)
 		public final int occupancyChange;// diff in pickups and dropoffs
 		public int outputOccupancy;
 
-		public Stop(NDrtStopTask task) {
+		public Stop(DrtStopTask task) {
 			this.task = task;
 			maxArrivalTime = calcMaxArrivalTime();
 			maxDepartureTime = calcMaxDepartureTime();
@@ -63,7 +63,7 @@ public class VehicleData {
 
 		private double calcMaxArrivalTime() {
 			double maxTime = Double.MAX_VALUE;
-			for (NDrtRequest r : task.getDropoffRequests()) {
+			for (DrtRequest r : task.getDropoffRequests()) {
 				double reqMaxArrivalTime = r.getLatestArrivalTime();
 				if (reqMaxArrivalTime < maxTime) {
 					maxTime = reqMaxArrivalTime;
@@ -74,7 +74,7 @@ public class VehicleData {
 
 		private double calcMaxDepartureTime() {
 			double maxTime = Double.MAX_VALUE;
-			for (NDrtRequest r : task.getPickupRequests()) {
+			for (DrtRequest r : task.getPickupRequests()) {
 				double reqMaxDepartureTime = r.getLatestStartTime();
 				if (reqMaxDepartureTime < maxTime) {
 					maxTime = reqMaxDepartureTime;
@@ -112,15 +112,15 @@ public class VehicleData {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<NDrtTask> tasks = (List<NDrtTask>)schedule.getTasks();
-		NDrtTask currentTask = (NDrtTask)schedule.getCurrentTask();
+		List<DrtTask> tasks = (List<DrtTask>)schedule.getTasks();
+		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
 
 		LinkTimePair start;
 		int nextTaskIdx;
 		if (status == ScheduleStatus.STARTED) {
 			switch (currentTask.getDrtTaskType()) {
 				case DRIVE:
-					NDrtDriveTask driveTask = (NDrtDriveTask)currentTask;
+					DrtDriveTask driveTask = (DrtDriveTask)currentTask;
 					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
 					if (start == null) { // too late to divert a vehicle
 						start = new LinkTimePair(driveTask.getPath().getToLink(), driveTask.getEndTime());
@@ -128,12 +128,12 @@ public class VehicleData {
 					break;
 
 				case STOP:
-					NDrtStopTask stopTask = (NDrtStopTask)currentTask;
+					DrtStopTask stopTask = (DrtStopTask)currentTask;
 					start = new LinkTimePair(stopTask.getLink(), stopTask.getEndTime());
 					break;
 
 				case STAY:
-					NDrtStayTask stayTask = (NDrtStayTask)currentTask;
+					DrtStayTask stayTask = (DrtStayTask)currentTask;
 					start = new LinkTimePair(stayTask.getLink(), currTime);
 					break;
 
@@ -149,9 +149,9 @@ public class VehicleData {
 
 		Entry data = new Entry(vehicle, start);
 		for (int i = nextTaskIdx; i < tasks.size(); i++) {
-			NDrtTask task = tasks.get(i);
-			if (task.getDrtTaskType() == NDrtTaskType.STOP) {
-				Stop stop = new Stop((NDrtStopTask)task);
+			DrtTask task = tasks.get(i);
+			if (task.getDrtTaskType() == DrtTaskType.STOP) {
+				Stop stop = new Stop((DrtStopTask)task);
 				data.stops.add(stop);
 			}
 		}

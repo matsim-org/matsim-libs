@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 
-import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.data.DrtRequest;
 import playground.michalm.drt.optimizer.*;
 import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import playground.michalm.drt.run.DrtConfigGroup;
@@ -40,7 +40,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg) {
-		super(optimContext, new TreeSet<NDrtRequest>(Requests.ABSOLUTE_COMPARATOR));
+		super(optimContext, new TreeSet<DrtRequest>(Requests.ABSOLUTE_COMPARATOR));
 
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
 		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
@@ -81,9 +81,9 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 
 		VehicleData vData = new VehicleData(getOptimContext(), getOptimContext().fleet.getVehicles().values());
 
-		Iterator<NDrtRequest> reqIter = getUnplannedRequests().iterator();
+		Iterator<DrtRequest> reqIter = getUnplannedRequests().iterator();
 		while (reqIter.hasNext()) {
-			NDrtRequest req = reqIter.next();
+			DrtRequest req = reqIter.next();
 			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
 			if (best == null) {
 				// throw new RuntimeException("No feasible solution");

@@ -95,39 +95,40 @@ public class DynModeTripsAnalyser {
 		return splitTrips;
 
 	}
-	
+
 	public static String summarizeTrips(List<DynModeTrip> trips, String delimiter) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
 		DescriptiveStatistics traveltimes = new DescriptiveStatistics();
-		
+
 		DecimalFormat format = new DecimalFormat();
-	    format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-	    format.setMinimumIntegerDigits(1);
-	    format.setMaximumFractionDigits(2);
-	    format.setGroupingUsed(false);
-		
-	    for (DynModeTrip trip : trips) {
-			if (trip.getToLinkId()==null){
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+
+		for (DynModeTrip trip : trips) {
+			if (trip.getToLinkId() == null) {
 				continue;
 			}
 			waitStats.addValue(trip.getWaitTime());
 			rideStats.addValue(trip.getInVehicleTravelTime());
 			distanceStats.addValue(trip.getTravelDistance());
-			traveltimes.addValue(trip.getInVehicleTravelTime()+trip.getWaitTime());
+			traveltimes.addValue(trip.getInVehicleTravelTime() + trip.getWaitTime());
 		}
-		String value = format.format(waitStats.getValues().length) + delimiter + format.format(waitStats.getMean()) + delimiter
-				+ format.format(waitStats.getMax()) + delimiter + format.format(waitStats.getPercentile(95)) + delimiter
-				+ format.format(rideStats.getMean()) + delimiter + format.format(distanceStats.getMean()) + delimiter
-				+ format.format(traveltimes.getMean());
+		String value = format.format(waitStats.getValues().length) + delimiter + format.format(waitStats.getMean())
+				+ delimiter + format.format(waitStats.getMax()) + delimiter + format.format(waitStats.getPercentile(95))
+				+ delimiter + format.format(rideStats.getMean()) + delimiter + format.format(distanceStats.getMean())
+				+ delimiter + format.format(traveltimes.getMean());
 		return value;
 	}
 
 	public static void analyseDetours(Network network, List<DynModeTrip> trips, double beelineDistanceFactor,
 			double freeSpeedModeFactor, String fileName) {
-		if (trips==null) return;
-		
+		if (trips == null)
+			return;
+
 		List<String> detours = new ArrayList<String>();
 		XYSeriesCollection distances = new XYSeriesCollection();
 		XYSeries dist = new XYSeries("distances", true, true);
@@ -137,7 +138,7 @@ public class DynModeTripsAnalyser {
 		distances.addSeries(dist);
 		for (DynModeTrip trip : trips) {
 			Coord fromCoord = network.getLinks().get(trip.getFromLinkId()).getCoord();
-			if (trip.getToLinkId()==null){
+			if (trip.getToLinkId() == null) {
 				continue;
 			}
 			Coord toCoord = network.getLinks().get(trip.getToLinkId()).getCoord();
@@ -162,15 +163,15 @@ public class DynModeTripsAnalyser {
 			final JFreeChart chart = ChartFactory.createScatterPlot("Travel Distances", "travelled Distance [m]",
 					"estimated Distances [m]", distances);
 
-			NumberAxis yAxis = (NumberAxis) ((XYPlot) chart.getPlot()).getRangeAxis();
-			NumberAxis xAxis = (NumberAxis) ((XYPlot) chart.getPlot()).getDomainAxis();
+			NumberAxis yAxis = (NumberAxis)((XYPlot)chart.getPlot()).getRangeAxis();
+			NumberAxis xAxis = (NumberAxis)((XYPlot)chart.getPlot()).getDomainAxis();
 			yAxis.setUpperBound(xAxis.getUpperBound());
 			ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
 		}
 		final JFreeChart chart2 = ChartFactory.createScatterPlot("Travel Times", "travelled time [s]",
 				"estimated Time [s]", times);
-		NumberAxis yAxis = (NumberAxis) ((XYPlot) chart2.getPlot()).getRangeAxis();
-		NumberAxis xAxis = (NumberAxis) ((XYPlot) chart2.getPlot()).getDomainAxis();
+		NumberAxis yAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getRangeAxis();
+		NumberAxis xAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getDomainAxis();
 		yAxis.setUpperBound(xAxis.getUpperBound());
 		ChartSaveUtils.saveAsPNG(chart2, fileName + "_timePlot", 1500, 1500);
 
@@ -178,9 +179,10 @@ public class DynModeTripsAnalyser {
 
 	public static void analyseWaitTimes(String fileName, List<DynModeTrip> trips, int binsize_s) {
 		Collections.sort(trips);
-		if (trips.size()==0) return;
-		int startTime = ((int) (trips.get(0).getDepartureTime() / binsize_s)) * binsize_s;
-		int endTime = ((int) (trips.get(trips.size() - 1).getDepartureTime() / binsize_s) + binsize_s) * binsize_s;
+		if (trips.size() == 0)
+			return;
+		int startTime = ((int)(trips.get(0).getDepartureTime() / binsize_s)) * binsize_s;
+		int endTime = ((int)(trips.get(trips.size() - 1).getDepartureTime() / binsize_s) + binsize_s) * binsize_s;
 		Map<Double, List<DynModeTrip>> splitTrips = splitTripsIntoBins(trips, startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
@@ -273,7 +275,7 @@ public class DynModeTripsAnalyser {
 		plot.setDomainGridlinesVisible(false);
 		plot.setBackgroundPaint(Color.white);
 
-		NumberAxis yAxis = (NumberAxis) plot.getRangeAxis();
+		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
 		yAxis.setAutoRange(true);
 
 		XYItemRenderer renderer = plot.getRenderer();
@@ -318,13 +320,14 @@ public class DynModeTripsAnalyser {
 		format.setGroupingUsed(false);
 		try {
 			bw.write(header);
-			for (Entry<Id<Vehicle>, double[]> e : vehicleDistances.entrySet()){
+			for (Entry<Id<Vehicle>, double[]> e : vehicleDistances.entrySet()) {
 				double drivenDistance = e.getValue()[0];
 				double revenueDistance = e.getValue()[1];
 				double occDistance = e.getValue()[2];
-				double emptyDistance = drivenDistance-occDistance;
+				double emptyDistance = drivenDistance - occDistance;
 				bw.newLine();
-				bw.write(e.getKey().toString()+";"+format.format(drivenDistance)+";"+format.format(occDistance)+";"+format.format(emptyDistance)+";"+format.format(revenueDistance));
+				bw.write(e.getKey().toString() + ";" + format.format(drivenDistance) + ";" + format.format(occDistance)
+						+ ";" + format.format(emptyDistance) + ";" + format.format(revenueDistance));
 			}
 			bw.flush();
 			bw.close();
@@ -346,22 +349,24 @@ public class DynModeTripsAnalyser {
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
-		
+
 		DescriptiveStatistics driven = new DescriptiveStatistics();
 		DescriptiveStatistics revenue = new DescriptiveStatistics();
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
-		
-		for (double[] dist : vehicleDistances.values()){
+
+		for (double[] dist : vehicleDistances.values()) {
 			driven.addValue(dist[0]);
 			revenue.addValue(dist[1]);
 			occupied.addValue(dist[2]);
-			double emptyD = dist[0]- dist[2];
+			double emptyD = dist[0] - dist[2];
 			empty.addValue(emptyD);
 		}
-//		bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
-		String result = vehicleDistances.size()+del+format.format(driven.getSum())+del+format.format(empty.getSum())+del+format.format(empty.getSum()/driven.getSum())+del+format.format(revenue.getSum())
-		+del+format.format(driven.getMean())+del+format.format(empty.getMean())+del+format.format(revenue.getMean());
+		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
+		String result = vehicleDistances.size() + del + format.format(driven.getSum()) + del
+				+ format.format(empty.getSum()) + del + format.format(empty.getSum() / driven.getSum()) + del
+				+ format.format(revenue.getSum()) + del + format.format(driven.getMean()) + del
+				+ format.format(empty.getMean()) + del + format.format(revenue.getMean());
 		return result;
 	}
 }

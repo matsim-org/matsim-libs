@@ -19,7 +19,7 @@
 
 package playground.michalm.drt.optimizer.insertion;
 
-import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.data.DrtRequest;
 import playground.michalm.drt.optimizer.VehicleData;
 import playground.michalm.drt.optimizer.VehicleData.Entry;
 import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
@@ -34,12 +34,12 @@ public class MultiVehicleInsertionProblem {
 		this.insertionProblem = insertionProblem;
 	}
 
-	public BestInsertion findBestInsertion(NDrtRequest drtRequest, VehicleData vData) {
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData vData) {
 		return findBestInsertion(drtRequest, vData.getEntries());
 	}
 
-	//TODO run Dijkstra once for all vehicles instead of running it separately for each one
-	public BestInsertion findBestInsertion(NDrtRequest drtRequest, Iterable<Entry> vEntries) {
+	// TODO run Dijkstra once for all vehicles instead of running it separately for each one
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, Iterable<Entry> vEntries) {
 		double minCost = Double.MAX_VALUE;
 		BestInsertion fleetBestInsertion = null;
 		for (Entry vEntry : vEntries) {

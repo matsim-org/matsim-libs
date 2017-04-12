@@ -25,13 +25,13 @@ import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 /**
  * @author michalm
  */
-public class NDrtDriveTask extends DriveTaskImpl implements NDrtTask {
-	public NDrtDriveTask(VrpPathWithTravelData path) {
+public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
+	public DrtDriveTask(VrpPathWithTravelData path) {
 		super(path);
 	}
 
 	@Override
-	public NDrtTaskType getDrtTaskType() {
-		return NDrtTaskType.DRIVE;
+	public DrtTaskType getDrtTaskType() {
+		return DrtTaskType.DRIVE;
 	}
 }

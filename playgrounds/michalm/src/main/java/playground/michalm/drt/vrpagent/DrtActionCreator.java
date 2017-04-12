@@ -33,14 +33,14 @@ import playground.michalm.drt.schedule.*;
 /**
  * @author michalm
  */
-public class NDrtActionCreator implements VrpAgentLogic.DynActionCreator {
+public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	public static final String DRT_STAY_NAME = "DrtStay";
 	public final static String DRT_STOP_NAME = "DrtBusStop";
 	private final PassengerEngine passengerEngine;
 	private final VrpLegs.LegCreator legCreator;
 
 	@Inject
-	public NDrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, QSim qSim) {
+	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, QSim qSim) {
 		this.passengerEngine = passengerEngine;
 		legCreator = VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer,
 				qSim.getSimTimer());
@@ -48,18 +48,18 @@ public class NDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	@Override
 	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
-		NDrtTask task = (NDrtTask)vehicle.getSchedule().getCurrentTask();
+		DrtTask task = (DrtTask)vehicle.getSchedule().getCurrentTask();
 		switch (task.getDrtTaskType()) {
 			case DRIVE:
 				return legCreator.createLeg(vehicle);
 
 			case STOP:
-				NDrtStopTask t = (NDrtStopTask)task;
+				DrtStopTask t = (DrtStopTask)task;
 				return new BusStopActivity(passengerEngine, dynAgent, t, t.getDropoffRequests(), t.getPickupRequests(),
 						DRT_STOP_NAME);
 
 			case STAY:
-				return new VrpActivity(DRT_STAY_NAME, (NDrtStayTask)task);
+				return new VrpActivity(DRT_STAY_NAME, (DrtStayTask)task);
 
 			default:
 				throw new IllegalStateException();

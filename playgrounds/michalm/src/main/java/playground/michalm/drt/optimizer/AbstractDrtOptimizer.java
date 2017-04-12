@@ -27,19 +27,19 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
-import playground.michalm.drt.data.NDrtRequest;
-import playground.michalm.drt.schedule.NDrtTask;
+import playground.michalm.drt.data.DrtRequest;
+import playground.michalm.drt.schedule.DrtTask;
 
 /**
  * @author michalm
  */
 public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	private final DrtOptimizerContext optimContext;
-	private final Collection<NDrtRequest> unplannedRequests;
+	private final Collection<DrtRequest> unplannedRequests;
 
 	private boolean requiresReoptimization = false;
 
-	public AbstractDrtOptimizer(DrtOptimizerContext optimContext, Collection<NDrtRequest> unplannedRequests) {
+	public AbstractDrtOptimizer(DrtOptimizerContext optimContext, Collection<DrtRequest> unplannedRequests) {
 		this.optimContext = optimContext;
 		this.unplannedRequests = unplannedRequests;
 	}
@@ -60,7 +60,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		NDrtRequest drtRequest = (NDrtRequest)request;
+		DrtRequest drtRequest = (DrtRequest)request;
 		if (drtRequest.getFromLink() == drtRequest.getToLink()) {
 			// throw new IllegalArgumentException("fromLink and toLink must be different");
 			Logger.getLogger(getClass()).error("fromLink and toLink must be different. Request " + request.getId()
@@ -78,11 +78,11 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 		Task newCurrentTask = vehicle.getSchedule().nextTask();
 
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-			requiresReoptimization = doReoptimizeAfterNextTask((NDrtTask)newCurrentTask);
+			requiresReoptimization = doReoptimizeAfterNextTask((DrtTask)newCurrentTask);
 		}
 	}
 
-	protected boolean doReoptimizeAfterNextTask(NDrtTask newCurrentTask) {
+	protected boolean doReoptimizeAfterNextTask(DrtTask newCurrentTask) {
 		return false;
 	}
 
@@ -94,7 +94,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 		// if (delays/speedups encountered) {requiresReoptimization = true;}
 	}
 
-	protected Collection<NDrtRequest> getUnplannedRequests() {
+	protected Collection<DrtRequest> getUnplannedRequests() {
 		return unplannedRequests;
 	}
 

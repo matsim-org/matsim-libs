@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.core.router.MultiNodePathCalculator;
 
-import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.data.DrtRequest;
 import playground.michalm.drt.optimizer.VehicleData;
 
 /**
@@ -51,7 +51,7 @@ public class SingleVehicleInsertionProblem {
 			this.pathToDropoff = pathToDropoff;
 			this.pathFromDropoff = pathFromDropoff;
 		}
-		
+
 		@Override
 		public String toString() {
 			return "Insertion: pickupIdx=" + pickupIdx + ", dropoffIdx=" + dropoffIdx;
@@ -107,13 +107,13 @@ public class SingleVehicleInsertionProblem {
 		costCalculator = new InsertionCostCalculator(stopDuration, maxWaitTime);
 	}
 
-	public BestInsertion findBestInsertion(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		initPathData(drtRequest, vEntry);
 		findPickupDropoffInsertions(drtRequest, vEntry);
 		return selectBestInsertion(costCalculator, drtRequest, vEntry);
 	}
 
-	private void initPathData(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
+	private void initPathData(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		stopCount = vEntry.stops.size();
 
 		ArrayList<Link> links = new ArrayList<>(stopCount + 1);
@@ -150,7 +150,7 @@ public class SingleVehicleInsertionProblem {
 		pathsFromDropoff = forwardPathSearch.calcPaths(drtRequest.getToLink(), links, minDropoffTime);
 	}
 
-	private void findPickupDropoffInsertions(NDrtRequest drtRequest, VehicleData.Entry vEntry) {
+	private void findPickupDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		insertions = new ArrayList<>();
 		for (int i = 0; i <= stopCount; i++) {
 			// pickup is inserted after node i, where
@@ -180,7 +180,7 @@ public class SingleVehicleInsertionProblem {
 		}
 	}
 
-	private void iterateDropoffInsertions(NDrtRequest drtRequest, VehicleData.Entry vEntry, int i) {
+	private void iterateDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry, int i) {
 		for (int j = i; j <= stopCount; j++) {
 			// dropoff is inserted after node j, where
 			// node j=i is 'pickup'
@@ -206,7 +206,7 @@ public class SingleVehicleInsertionProblem {
 		}
 	}
 
-	private void addInsertion(NDrtRequest drtRequest, VehicleData.Entry vEntry, int i, int j) {
+	private void addInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry, int i, int j) {
 		// i -> pickup
 		PathData toPickup = pathsToPickup[i]; // i -> pickup
 		PathData fromPickup = pathsFromPickup[i == j ? 0 : i + 1]; // pickup -> (dropoff | i+1)
@@ -218,7 +218,7 @@ public class SingleVehicleInsertionProblem {
 		insertions.add(new Insertion(i, j, toPickup, fromPickup, toDropoff, fromDropoff));
 	}
 
-	private BestInsertion selectBestInsertion(InsertionCostCalculator costCalculator, NDrtRequest drtRequest,
+	private BestInsertion selectBestInsertion(InsertionCostCalculator costCalculator, DrtRequest drtRequest,
 			VehicleData.Entry vEntry) {
 		double minCost = Double.MAX_VALUE;
 		Insertion bestInsertion = null;

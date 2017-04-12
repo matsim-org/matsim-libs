@@ -39,8 +39,8 @@ import playground.michalm.taxi.ev.ETaxiChargingLogic;
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
 public class ETaxiScheduler extends TaxiScheduler {
-	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Network network, Fleet fleet, MobsimTimer timer, TaxiSchedulerParams params,
-			TravelTime travelTime, TravelDisutility travelDisutility) {
+	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Network network, Fleet fleet, MobsimTimer timer,
+			TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility) {
 		super(taxiCfg, network, fleet, timer, params, travelTime, travelDisutility);
 	}
 

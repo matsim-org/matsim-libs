@@ -47,15 +47,16 @@ public class DrtRoutingModule implements RoutingModule {
 	public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
 			Person person) {
 		Route route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		double distanceEstimate = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord())*drtconfig.getEstimatedBeelineDistanceFactor();
+		double distanceEstimate = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord())
+				* drtconfig.getEstimatedBeelineDistanceFactor();
 		route.setDistance(distanceEstimate);
-		route.setTravelTime(distanceEstimate/drtconfig.getEstimatedDrtSpeed());
-		
+		route.setTravelTime(distanceEstimate / drtconfig.getEstimatedDrtSpeed());
+
 		Leg leg = PopulationUtils.createLeg(DrtConfigGroup.DRT_MODE);
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(route.getTravelTime());
 		leg.setRoute(route);
-		if (fromFacility.getLinkId().equals(toFacility.getLinkId())){
+		if (fromFacility.getLinkId().equals(toFacility.getLinkId())) {
 			leg.setMode(TransportMode.walk);
 		}
 

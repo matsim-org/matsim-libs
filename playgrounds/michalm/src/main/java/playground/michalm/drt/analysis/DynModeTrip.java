@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-public class DynModeTrip implements Comparable<DynModeTrip>{
-	private final double departureTime; 
-	private final Id<Person> person; 
-	private final Id<Vehicle> vehicle; 
-	private final Id<Link> fromLinkId; 
+public class DynModeTrip implements Comparable<DynModeTrip> {
+	private final double departureTime;
+	private final Id<Person> person;
+	private final Id<Vehicle> vehicle;
+	private final Id<Link> fromLinkId;
 	private final double waitTime;
 	private double travelTime = Double.NaN;
 	private double travelDistance_m = Double.NaN;
@@ -40,11 +40,13 @@ public class DynModeTrip implements Comparable<DynModeTrip>{
 	private double arrivalTime = Double.NaN;
 	private final Coord fromCoord;
 	private Coord toCoord = null;
-	
-	
+
 	static final String demitter = ";";
-	public static final String HEADER = "departureTime"+demitter+"personId"+demitter+"vehicleId"+demitter+"fromLinkId"+demitter+"fromX"+demitter+"fromY"+demitter+"toLinkId"+demitter+"toX"+demitter+"toY"+demitter+"waitTime"+demitter+"arrivalTime"+demitter+"travelTime"+demitter+"travelDistance_m";
-	
+	public static final String HEADER = "departureTime" + demitter + "personId" + demitter + "vehicleId" + demitter
+			+ "fromLinkId" + demitter + "fromX" + demitter + "fromY" + demitter + "toLinkId" + demitter + "toX"
+			+ demitter + "toY" + demitter + "waitTime" + demitter + "arrivalTime" + demitter + "travelTime" + demitter
+			+ "travelDistance_m";
+
 	DynModeTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
 			double waitTime) {
 		this.departureTime = departureTime;
@@ -74,7 +76,6 @@ public class DynModeTrip implements Comparable<DynModeTrip>{
 	public double getWaitTime() {
 		return waitTime;
 	}
-	
 
 	public double getInVehicleTravelTime() {
 		return travelTime;
@@ -107,7 +108,6 @@ public class DynModeTrip implements Comparable<DynModeTrip>{
 	public void setArrivalTime(double arrivalTime) {
 		this.arrivalTime = arrivalTime;
 	}
-	
 
 	public Coord getToCoord() {
 		return toCoord;
@@ -121,48 +121,40 @@ public class DynModeTrip implements Comparable<DynModeTrip>{
 		return fromCoord;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
 	public int compareTo(DynModeTrip o) {
 		return getDepartureTime().compareTo(o.getDepartureTime());
 	}
-	
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		double fromCoordX = Double.NaN;
 		double fromCoordY = Double.NaN;
-		
-		
+
 		double toCoordX = Double.NaN;
 		double toCoordY = Double.NaN;
-		if (toCoord!=null){
+		if (toCoord != null) {
 			toCoordX = toCoord.getX();
 			toCoordY = toCoord.getY();
 		}
-		if (fromCoord!=null){
+		if (fromCoord != null) {
 			fromCoordX = fromCoord.getX();
 			fromCoordY = fromCoord.getY();
 		}
-		return getDepartureTime()+demitter+
-				getPerson()+demitter+
-				getVehicle()+demitter+
-				getFromLinkId()+demitter+
-				fromCoordX+ demitter+
-				fromCoordY+ demitter+
-				getToLinkId()+demitter+
-				toCoordX+ demitter+
-				toCoordY+ demitter+
-				getWaitTime()+demitter+
-				getArrivalTime()+demitter+
-				getInVehicleTravelTime()+demitter+
-				getTravelDistance();
+		return getDepartureTime() + demitter + getPerson() + demitter + getVehicle() + demitter + getFromLinkId()
+				+ demitter + fromCoordX + demitter + fromCoordY + demitter + getToLinkId() + demitter + toCoordX
+				+ demitter + toCoordY + demitter + getWaitTime() + demitter + getArrivalTime() + demitter
+				+ getInVehicleTravelTime() + demitter + getTravelDistance();
 	}
-	
-	
+
 }

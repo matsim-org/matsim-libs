@@ -21,12 +21,12 @@ package playground.michalm.drt.optimizer.insertion;
 
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
-import playground.michalm.drt.data.NDrtRequest;
+import playground.michalm.drt.data.DrtRequest;
 import playground.michalm.drt.optimizer.VehicleData;
 import playground.michalm.drt.optimizer.VehicleData.Stop;
 import playground.michalm.drt.optimizer.insertion.SingleVehicleInsertionProblem.Insertion;
 import playground.michalm.drt.schedule.*;
-import playground.michalm.drt.schedule.NDrtTask.NDrtTaskType;
+import playground.michalm.drt.schedule.DrtTask.DrtTaskType;
 
 /**
  * @author michalm
@@ -48,7 +48,7 @@ public class InsertionCostCalculator {
 	// the insertion is invalid if some maxTravel/Wait constraints are not fulfilled
 	// ==> checks if all the constraints are satisfied for all passengers/requests ==> if not ==>
 	// INFEASIBLE_SOLUTION_COST is returned
-	public double calculate(NDrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion) {
+	public double calculate(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion) {
 		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(drtRequest, vEntry, insertion);
 		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(drtRequest, vEntry, insertion);
 
@@ -60,11 +60,10 @@ public class InsertionCostCalculator {
 		return constraintsSatisfied ? totalTimeLoss : INFEASIBLE_SOLUTION_COST;
 	}
 
-	private double calculatePickupDetourTimeLoss(NDrtRequest drtRequest, VehicleData.Entry vEntry,
-			Insertion insertion) {
+	private double calculatePickupDetourTimeLoss(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion) {
 		// 'no detour' is also possible now for pickupIdx==0 if the currentTask is STOP
 		boolean ongoingStopTask = insertion.pickupIdx == 0
-				&& ((NDrtTask)vEntry.vehicle.getSchedule().getCurrentTask()).getDrtTaskType() == NDrtTaskType.STOP;
+				&& ((DrtTask)vEntry.vehicle.getSchedule().getCurrentTask()).getDrtTaskType() == DrtTaskType.STOP;
 
 		if ((ongoingStopTask && drtRequest.getFromLink() == vEntry.start.link) //
 				|| (insertion.pickupIdx > 0 //
@@ -86,7 +85,7 @@ public class InsertionCostCalculator {
 		return toPickupTT + stopDuration + fromPickupTT - replacedDriveTT;
 	}
 
-	private double calculateDropoffDetourTimeLoss(NDrtRequest drtRequest, VehicleData.Entry vEntry,
+	private double calculateDropoffDetourTimeLoss(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			Insertion insertion) {
 		if (insertion.dropoffIdx > 0
 				&& drtRequest.getToLink() == vEntry.stops.get(insertion.dropoffIdx - 1).task.getLink()) {
@@ -116,7 +115,7 @@ public class InsertionCostCalculator {
 		return replacedDriveEndTime - replacedDriveStartTime;
 	}
 
-	private boolean areConstraintsSatisfied(NDrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion,
+	private boolean areConstraintsSatisfied(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion,
 			double pickupDetourTimeLoss, double totalTimeLoss) {
 		// this is what we cannot violate
 		for (int s = insertion.pickupIdx; s < insertion.dropoffIdx; s++) {
@@ -150,7 +149,7 @@ public class InsertionCostCalculator {
 		}
 
 		// vehicle's time window cannot be violated
-		NDrtStayTask lastTask = (NDrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
+		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
 		double timeSlack = vEntry.vehicle.getServiceEndTime() - lastTask.getBeginTime();
 		if (timeSlack < totalTimeLoss) {
 			return false;

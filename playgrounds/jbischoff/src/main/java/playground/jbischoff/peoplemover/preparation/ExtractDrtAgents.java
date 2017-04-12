@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  *
  */
-public class ExtractDRTAgents {
+public class ExtractDrtAgents {
 public static void main(String[] args) {
 	
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

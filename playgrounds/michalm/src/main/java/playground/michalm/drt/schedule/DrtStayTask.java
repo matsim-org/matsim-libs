@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.michalm.drt.analysis;
+package playground.michalm.drt.schedule;
 
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
 /**
- * @author  jbischoff
- *
+ * @author michalm
  */
-/**
- *
- */
-public class DRTAnalysisModule extends AbstractModule {
-
-	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.AbstractModule#install()
-	 */
-	@Override
-	public void install() {
-		bind(DrtVehicleOccupancyEvaluator.class).asEagerSingleton();
-		bind(DynModePassengerStats.class).asEagerSingleton();
-		addControlerListenerBinding().to(DRTAnalysisControlerListener.class).asEagerSingleton();
+public class DrtStayTask extends StayTaskImpl implements DrtTask {
+	public DrtStayTask(double beginTime, double endTime, Link link) {
+		super(beginTime, endTime, link);
 	}
 
+	@Override
+	public DrtTaskType getDrtTaskType() {
+		return DrtTaskType.STAY;
+	}
+
+	@Override
+	protected String commonToString() {
+		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+	}
 }

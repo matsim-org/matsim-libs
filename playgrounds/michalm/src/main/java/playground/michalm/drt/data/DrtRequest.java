@@ -25,12 +25,12 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-import playground.michalm.drt.schedule.NDrtStopTask;
+import playground.michalm.drt.schedule.DrtStopTask;
 
 /**
  * @author michalm
  */
-public class NDrtRequest extends RequestImpl implements PassengerRequest {
+public class DrtRequest extends RequestImpl implements PassengerRequest {
 
 	public enum DrtRequestStatus {
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
@@ -45,11 +45,11 @@ public class NDrtRequest extends RequestImpl implements PassengerRequest {
 	private final MobsimPassengerAgent passenger;
 	private final Link fromLink;
 	private final Link toLink;
-	private NDrtStopTask pickupTask = null;
-	private NDrtStopTask dropoffTask = null;
+	private DrtStopTask pickupTask = null;
+	private DrtStopTask dropoffTask = null;
 	private final double latestArrivalTime;
 
-	public NDrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double earliestStartTime, double latestStartTime, double latestArrivalTime, double submissionTime) {
 		super(id, 1, earliestStartTime, latestStartTime, submissionTime);
 		this.passenger = passenger;
@@ -73,19 +73,19 @@ public class NDrtRequest extends RequestImpl implements PassengerRequest {
 		return passenger;
 	}
 
-	public NDrtStopTask getPickupTask() {
+	public DrtStopTask getPickupTask() {
 		return pickupTask;
 	}
 
-	public void setPickupTask(NDrtStopTask pickupTask) {
+	public void setPickupTask(DrtStopTask pickupTask) {
 		this.pickupTask = pickupTask;
 	}
 
-	public NDrtStopTask getDropoffTask() {
+	public DrtStopTask getDropoffTask() {
 		return dropoffTask;
 	}
 
-	public void setDropoffTask(NDrtStopTask dropoffTask) {
+	public void setDropoffTask(DrtStopTask dropoffTask) {
 		this.dropoffTask = dropoffTask;
 	}
 

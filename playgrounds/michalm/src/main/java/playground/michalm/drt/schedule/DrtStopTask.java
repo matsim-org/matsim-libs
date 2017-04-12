@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,20 +19,43 @@
 
 package playground.michalm.drt.schedule;
 
+import java.util.*;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+
+import playground.michalm.drt.data.DrtRequest;
 
 /**
  * @author michalm
  */
-public class NDrtStayTask extends StayTaskImpl implements NDrtTask {
-	public NDrtStayTask(double beginTime, double endTime, Link link) {
+public class DrtStopTask extends StayTaskImpl implements DrtTask {
+	private final Set<DrtRequest> dropoffRequests = new HashSet<>();
+	private final Set<DrtRequest> pickupRequests = new HashSet<>();
+
+	public DrtStopTask(double beginTime, double endTime, Link link) {
 		super(beginTime, endTime, link);
 	}
 
 	@Override
-	public NDrtTaskType getDrtTaskType() {
-		return NDrtTaskType.STAY;
+	public DrtTaskType getDrtTaskType() {
+		return DrtTaskType.STOP;
+	}
+
+	public Set<DrtRequest> getDropoffRequests() {
+		return Collections.unmodifiableSet(dropoffRequests);
+	}
+
+	public Set<DrtRequest> getPickupRequests() {
+		return Collections.unmodifiableSet(pickupRequests);
+	}
+
+	public void addDropoffRequest(DrtRequest request) {
+		dropoffRequests.add(request);
+	}
+
+	public void addPickupRequest(DrtRequest request) {
+		pickupRequests.add(request);
 	}
 
 	@Override
