@@ -49,7 +49,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGrou
 public class CoalitionSelectorTest {
 	private final FixtureFactory fixtureFactory;
 
-	public static interface FixtureFactory {
+	public interface FixtureFactory {
 		public Fixture create();
 	}
 
@@ -71,9 +71,6 @@ public class CoalitionSelectorTest {
 		}
 	}
 
-	// XXX the SAME instance is used for all tests!
-	// should not be a problem, but this is contrary to the idea of "fixture"
-	// Should be a "fixture factory", but it becomes messy.
 	public CoalitionSelectorTest(final FixtureFactory fixture) {
 		this.fixtureFactory = fixture;
 	}

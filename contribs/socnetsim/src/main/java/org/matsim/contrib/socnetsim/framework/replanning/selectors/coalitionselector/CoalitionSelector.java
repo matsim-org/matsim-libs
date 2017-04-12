@@ -107,11 +107,18 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 						while( nAllocated > nextSize ) nextSize *= 2;
 					}
 				}
-				doIteration(
-						jointPlans,
-						agents,
-						recordsPerJointPlan,
-						groupPlans );
+				try {
+					doIteration(
+							jointPlans,
+							agents,
+							recordsPerJointPlan,
+							groupPlans);
+				}
+				catch ( Throwable e ) {
+					log.error( "got error searching for plans for group "+group );
+					log.error( "plan allocation at time of error: "+groupPlans );
+					throw e;
+				}
 			}
 			if ( log.isTraceEnabled() )
 				log.trace( "did "+counter.getCounter()+
@@ -167,7 +174,9 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 			}
 		}
 
-		if ( !didSomething ) {
+		// need to check that agents are not empty, as there might be a last iteration just to remove "switched off" agents,
+		// that might cause problems with some conflict solvers (as there is no conflict to solve)
+		if ( !didSomething && !agents.isEmpty() ) {
 			conflictSolver.attemptToSolveConflicts(
 					recordsPerJointPlan );
 		}
@@ -265,6 +274,14 @@ public class CoalitionSelector implements GroupLevelPlanSelector {
 
 		public int getMaxJointPlanSize() {
 			return maxJointPlanSize;
+		}
+
+		@Override
+		public String toString() {
+			return "RecordsOfJointPlan{" +
+					"recordsPerJointPlan ("+recordsPerJointPlan.size()+")=" + recordsPerJointPlan +
+					", recordsPerIndividualPlan ("+recordsPerIndividualPlan.size()+")=" + recordsPerIndividualPlan +
+					'}';
 		}
 	}
 }
