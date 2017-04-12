@@ -72,7 +72,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 			endActivity( ( ActivityEndEvent ) event );
 		}
 		if ( event instanceof CourtesyEvent ) {
-			handleCoutesy( ( CourtesyEvent ) event );
+			handleCourtesy( ( CourtesyEvent ) event );
 		}
 	}
 
@@ -84,7 +84,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 		currentNCoparticipants = 0;
 	}
 
-	private void handleCoutesy( final CourtesyEvent event ) {
+	private void handleCourtesy( final CourtesyEvent event ) {
 		if ( !inAct ) return;
 		updateScore( event.getTime() );
 
@@ -115,8 +115,8 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 			(time - lastChangeInNCoparticipants );
 	}
 
-	public static interface UtilityOfTimeCalculator {
-		public double getUtilityOfTime( int nCoParticipants );
+	public interface UtilityOfTimeCalculator {
+		double getUtilityOfTime( int nCoParticipants );
 	}
 
 	public static class MinGroupSizeLinearUtilityOfTime implements UtilityOfTimeCalculator {
