@@ -37,8 +37,8 @@ import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.*;
 

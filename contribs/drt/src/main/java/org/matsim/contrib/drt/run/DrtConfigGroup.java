@@ -39,7 +39,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 
+	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
 	private static final String OPERATIONAL_SCHEME = "operationalScheme";
+
 	private static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	private static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
 	private static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
@@ -63,7 +65,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private double maxTravelTimeBeta = Double.NaN;// [s], >= 0.0
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
+	private boolean idleVehiclesReturnToDepots = false;
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
+
 	private double maxWalkDistance = Double.NaN;// [m]; only for stationbased DRT scheme
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
@@ -106,6 +110,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(PLOT_VEH_STATS,
 				"Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. "
 						+ "False by default.");
+		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS,
+				"Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()");
 		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased. door2door by default");
 		map.put(MAX_WALK_DISTANCE, "Maximum walk distance to next stop location in stationbased system.");
 		map.put(TRANSIT_STOP_FILE, "Stop locations file (transit schedule format, but without lines) for DRT stops. "
@@ -182,6 +188,16 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	public URL getVehiclesFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
+	}
+
+	@StringGetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
+	public boolean getIdleVehiclesReturnToDepots() {
+		return idleVehiclesReturnToDepots;
+	}
+
+	@StringSetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
+	public void setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {
+		this.idleVehiclesReturnToDepots = idleVehiclesReturnToDepots;
 	}
 
 	@StringGetter(OPERATIONAL_SCHEME)
