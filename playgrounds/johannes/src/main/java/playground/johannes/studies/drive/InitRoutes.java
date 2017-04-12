@@ -17,17 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid.run;
+package playground.johannes.studies.drive;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.PlanRouter;
@@ -51,16 +52,20 @@ import java.util.concurrent.Future;
  */
 public class InitRoutes {
 
+	private static final Logger logger = Logger.getLogger(InitRoutes.class);
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		
+
+		logger.info("Loading population...");
 		PopulationReader popReader = new PopulationReader(scenario);
 		popReader.readFile(args[0]);
-		
+
+		logger.info("Loading network...");
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(args[1]);
 		
@@ -70,22 +75,35 @@ public class InitRoutes {
 		
 		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 		Future<?>[] futures = new Future[numThreads];
+
+		Population pop = scenario.getPopulation();
+		Collection<Person> plans = (Collection<Person>) pop.getPersons().values();
+		/*
+		Set links for activities.
+		 */
+		logger.info("Setting activity links...");
+		for(Person person : plans) {
+			for(Plan plan : person.getPlans()) {
+				for(int i = 0; i < plan.getPlanElements().size(); i+=2) {
+					Activity act = (Activity) plan.getPlanElements().get(i);
+					Link link = NetworkUtils.getNearestLink(scenario.getNetwork(), act.getCoord());
+					act.setLinkId(link.getId());
+				}
+			}
+		}
 		/*
 		 * split collection in approx even segments
 		 */
-		Population pop = scenario.getPopulation();
-		Collection<Person> plans = (Collection<Person>) pop.getPersons().values();
-		
 		int n = Math.min(plans.size(), wrappers.length);
 		List<Person>[] segments = CollectionUtils.split(plans, n);
 		/*
 		 * submit tasks
 		 */
+		logger.info("Routing...");
 		for(int i = 0; i < segments.length; i++) {
 			if(wrappers[i] == null) {
 				wrappers[i] = new RunThread(scenario, config, segments[i]);
 			}
-//			wrappers[i].init(segments[i]);
 			futures[i] = executor.submit(wrappers[i]);
 		}
 		/*
@@ -103,10 +121,11 @@ public class InitRoutes {
 		}
 		
 		executor.shutdown();
-		
+
+		logger.info("Writing population...");
 		PopulationWriter writer = new PopulationWriter(pop);
 		writer.write(args[2]);
-		
+		logger.info("Done.");
 	}
 
 	private static class RunThread implements Runnable {
