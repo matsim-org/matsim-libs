@@ -38,7 +38,6 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -47,7 +46,6 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
@@ -67,6 +65,11 @@ public class GroupCompositionPenalizerTest {
 	@Test
 	public void testFullOverlap() {
 		test( 10 , 20 , 5 , 25 );
+	}
+
+	@Test
+	public void testInnerOverlap() {
+		test( 5 , 25 , 10 , 20 );
 	}
 
 	@Test
