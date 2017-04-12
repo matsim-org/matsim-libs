@@ -32,15 +32,6 @@ public class RunTaxibusScenarioTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunSharedTaxiExample() {
-		String configFile = "./src/main/resources/taxibus_example/configShared.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new TaxibusConfigGroup(), new DvrpConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		new RunSharedTaxiExample().run(config, false);
-	}
-
-	@Test
 	public void testRunTaxibusJspritExample() {
 		String configFile = "./src/main/resources/taxibus_example/configClustered.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new TaxibusConfigGroup(), new DvrpConfigGroup());

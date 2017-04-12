@@ -22,21 +22,20 @@ package org.matsim.contrib.taxibus.run.sim;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.taxibus.TaxibusActionCreator;
-import org.matsim.contrib.taxibus.algorithm.optimizer.*;
-import org.matsim.contrib.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
-import org.matsim.contrib.taxibus.algorithm.optimizer.prebooked.clustered.*;
-import org.matsim.contrib.taxibus.algorithm.optimizer.prebooked.jsprit.JspritTaxibusOptimizer;
-import org.matsim.contrib.taxibus.algorithm.optimizer.sharedTaxi.SharedTaxiOptimizer;
-import org.matsim.contrib.taxibus.algorithm.passenger.*;
-import org.matsim.contrib.taxibus.algorithm.scheduler.*;
-import org.matsim.contrib.taxibus.algorithm.utils.TaxibusUtils;
-import org.matsim.contrib.taxibus.run.configuration.TaxibusConfigGroup;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
+import org.matsim.contrib.taxibus.TaxibusActionCreator;
+import org.matsim.contrib.taxibus.algorithm.optimizer.*;
+import org.matsim.contrib.taxibus.algorithm.optimizer.prebooked.PrebookedTaxibusOptimizerContext;
+import org.matsim.contrib.taxibus.algorithm.optimizer.prebooked.clustered.*;
+import org.matsim.contrib.taxibus.algorithm.optimizer.prebooked.jsprit.JspritTaxibusOptimizer;
+import org.matsim.contrib.taxibus.algorithm.passenger.*;
+import org.matsim.contrib.taxibus.algorithm.scheduler.*;
+import org.matsim.contrib.taxibus.algorithm.utils.TaxibusUtils;
+import org.matsim.contrib.taxibus.run.configuration.TaxibusConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.router.util.*;
@@ -88,7 +87,8 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		}
 
 		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
-		TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legCreator, tbcg.getPickupDuration());
+		TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legCreator,
+				tbcg.getPickupDuration());
 		qSim.addAgentSource(new VrpAgentSource(actionCreator, fleetData, optimizer, qSim));
 
 		return qSim;
@@ -100,14 +100,8 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 		TaxibusSchedulerParams params = new TaxibusSchedulerParams(tbcg.getPickupDuration(), tbcg.getDropoffDuration());
 		TaxibusScheduler scheduler = new TaxibusScheduler(fleetData, qSim.getSimTimer(), params);
-		TaxibusOptimizerContext optimizerContext = new TaxibusOptimizerContext(fleetData, scenario, qSim.getSimTimer(),
-				travelTime, travelDisutility, scheduler, tbcg);
 
 		switch (tbcg.getAlgorithm()) {
-
-			case "sharedTaxi":
-				return new SharedTaxiOptimizer(optimizerContext, false, tbcg.getDetourFactor());
-
 			case "jsprit": {
 				PrebookedTaxibusOptimizerContext context = new PrebookedTaxibusOptimizerContext(fleetData, scenario,
 						qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg);
