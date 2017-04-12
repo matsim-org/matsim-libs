@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.analysis.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -35,10 +36,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 
 import playground.jbischoff.utils.JbUtils;
-import playground.michalm.drt.analysis.DynModeTrip;
-import playground.michalm.drt.analysis.DynModeTripsAnalyser;
-import playground.michalm.drt.analysis.DrtVehicleOccupancyEvaluator;
-import playground.michalm.drt.analysis.DynModePassengerStats;
 
 /**
  * @author  jbischoff

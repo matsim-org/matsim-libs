@@ -115,6 +115,7 @@
 		<module>analysis</module>
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
+		<module>drt</module>
 		<module>dvrp</module>
 		<module>taxi</module>
 		<module>emissions</module>

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.run;
+package org.matsim.contrib.drt.run;
 
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.*;
+import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-public class RunSharedTaxiBerlin {
-	public static void main(String[] args) {
-		String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
-		RunSharedTaxiBerlin.run(configFile, false);
+/**
+ * @author michalm
+ */
+public class RunDrtScenario {
+	public static void run(String configFile, boolean otfvis) {
+		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		createControler(config, otfvis).run();
 	}
 
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
-				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
-		DrtControlerCreator.createControler(config, otfvis).run();
+	public static Controler createControler(Config config, boolean otfvis) {
+		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
+		config.checkConsistency();
+		return DrtControlerCreator.createControler(config, otfvis);
+	}
+
+	public static void main(String[] args) {
+		if (args.length != 1) {
+			throw new IllegalArgumentException("RunDrtScenario needs one argument: path to the configuration file");
+		}
+		RunDrtScenario.run(args[0], false);
 	}
 }
