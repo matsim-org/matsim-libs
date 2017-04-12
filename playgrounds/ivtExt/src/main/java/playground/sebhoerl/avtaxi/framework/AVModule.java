@@ -30,6 +30,7 @@ import com.google.inject.name.Names;
 
 import org.opengis.filter.Not;
 import playground.clruch.dispatcher.*;
+import playground.fseccamo.dispatcher.MPCDispatcher_1;
 import playground.maalbert.dispatcher.DFRDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
