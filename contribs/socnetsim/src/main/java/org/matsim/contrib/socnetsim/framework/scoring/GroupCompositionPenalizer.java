@@ -22,11 +22,9 @@ package org.matsim.contrib.socnetsim.framework.scoring;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
 import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
 
-import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
-
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -63,7 +61,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 
 	@Override
 	public void finish() {
-
+		buffer.moveToBuffer();
 	}
 
 	@Override
@@ -74,12 +72,15 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 
 	@Override
 	public void handleEvent( final Event event ) {
+		if ( !(event instanceof ActivityStartEvent) && !(event instanceof ActivityEndEvent) && !(event instanceof CourtesyEvent) ) return;
+		if ( !event.getAttributes().get( "actType" ).equals( activityType ) ) return;
 		buffer.addEvent( event );
 		bufferToScore();
 	}
 
 	private void bufferToScore() {
-		for ( Event event : buffer.buffer ) {
+		while ( !buffer.outBuffer.isEmpty() ) {
+			final Event event = buffer.outBuffer.poll();
 			if ( event instanceof ActivityStartEvent ) {
 				startActivity( (ActivityStartEvent) event );
 			}
@@ -90,7 +91,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 				handleCourtesy( (CourtesyEvent) event );
 			}
 		}
-		buffer.buffer.clear();
+		buffer.outBuffer.clear();
 	}
 
 	private void startActivity( final ActivityStartEvent event ) {
@@ -166,33 +167,22 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 	 * ensures the events of a time step are properly ordered by type
 	 */
 	private static class EventBuffer {
-		private final List<ActivityStartEvent> startQueue = new ArrayList<>();
-		private final List<ActivityEndEvent> endQueue = new ArrayList<>();
-		private final List<CourtesyEvent> courtesyQueue = new ArrayList<>();
+		private final List<Event> inBuffer = new ArrayList<>();
 
-		private final List<Event> buffer = new ArrayList<>();
+		private final Queue<Event> outBuffer = new PriorityQueue<>( 11 , new EventComparator() );
 
 		private double lastTime = -1;
 
 		void addEvent( final Event event ) {
 			if ( event.getTime() > lastTime ) moveToBuffer();
-			lastTime = event.getTime();
 
-			if ( event instanceof ActivityStartEvent ) {
-				startQueue.add( ( ActivityStartEvent ) event );
-			}
-			if ( event instanceof ActivityEndEvent ) {
-				endQueue.add( ( ActivityEndEvent ) event );
-			}
-			if ( event instanceof CourtesyEvent ) {
-				courtesyQueue.add( ( CourtesyEvent ) event );
-			}
+			inBuffer.add( event );
+			lastTime = event.getTime();
 		}
 
-		private void moveToBuffer() {
-			buffer.addAll( startQueue );
-			buffer.addAll( courtesyQueue );
-			buffer.addAll( endQueue );
+		void moveToBuffer() {
+			outBuffer.addAll( inBuffer );
+			inBuffer.clear();
 		}
 	}
 
@@ -200,27 +190,17 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 		@Override
 		public int compare( final Event o1, final Event o2 ) {
 			if ( o1.getTime() != o2.getTime() ) return Double.compare( o1.getTime() , o2.getTime() );
-			final boolean isSameAct = o1.getAttributes().get( "actType" ).equals( o2.getAttributes().get( "actType" ) );
-			return getTypeOrder( o1.getEventType() , isSameAct ) - getTypeOrder( o2.getEventType() , isSameAct );
+			return getTypeOrder( o1.getEventType() ) - getTypeOrder( o2.getEventType() );
 		}
 
-		private int getTypeOrder( final String eventType , final boolean isSameAct ) {
-			if ( isSameAct ) {
-				switch ( eventType ) {
-					case "actStart": return 1;
-					case "sayHelloEvent": return 2;
-					case "sayGoodbyeEvent": return 3;
-					case "actEnd": return 4;
-				}
+		private int getTypeOrder( final String eventType  ) {
+			switch ( eventType ) {
+				case "actstart": return 1;
+				case "sayHelloEvent": return 2;
+				case "sayGoodbyeEvent": return 3;
+				case "actend": return 4;
 			}
-			else {
-				switch ( eventType ) {
-					case "actEnd": return 1;
-					case "sayHelloEvent": return 2;
-					case "sayGoodbyeEvent": return 3;
-					case "actStart": return 4;
-				}
-			}
+
 			throw new RuntimeException( eventType );
 		}
 	}
