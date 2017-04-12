@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -192,11 +193,23 @@ public class DrtScheduler implements ScheduleInquiry {
 		NDrtTask currentTask = (NDrtTask)schedule.getCurrentTask();
 		Task beforePickupTask;
 
-		if (insertion.pickupIdx == 0 && currentTask.getDrtTaskType() == NDrtTaskType.DRIVE) { // divert vehicle
-			beforePickupTask = currentTask;
-			VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
-					vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
-			((OnlineDriveTaskTracker)beforePickupTask.getTaskTracker()).divertPath(vrpPath);
+		if (insertion.pickupIdx == 0 && currentTask.getDrtTaskType() == NDrtTaskType.DRIVE) {
+			LinkTimePair diversion = ((OnlineDriveTaskTracker)currentTask.getTaskTracker()).getDiversionPoint();
+			if (diversion != null) { // divert vehicle
+				beforePickupTask = currentTask;
+				VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
+						vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
+				((OnlineDriveTaskTracker)beforePickupTask.getTaskTracker()).divertPath(vrpPath);
+			} else { // too late for diversion
+				if (request.getFromLink() != vehicleEntry.start.link) { // add a new drive task
+					VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
+							vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
+					beforePickupTask = new NDrtDriveTask(vrpPath);
+					schedule.addTask(currentTask.getTaskIdx() + 1, beforePickupTask);
+				} else { // no need for a new drive task
+					beforePickupTask = currentTask;
+				}
+			}
 		} else { // insert pickup after an existing stop/stay task
 			NDrtStayTask stayTask = null;
 			NDrtStopTask stopTask = null;

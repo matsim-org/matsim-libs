@@ -122,6 +122,9 @@ public class VehicleData {
 				case DRIVE:
 					NDrtDriveTask driveTask = (NDrtDriveTask)currentTask;
 					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
+					if (start == null) { // too late to divert a vehicle
+						start = new LinkTimePair(driveTask.getPath().getToLink(), driveTask.getEndTime());
+					}
 					break;
 
 				case STOP:
