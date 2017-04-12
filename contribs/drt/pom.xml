@@ -7,9 +7,8 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
-	<artifactId>taxi</artifactId>
-	<name>taxi</name>
-
+	<artifactId>drt</artifactId>
+	<name>drt</name>
 	<build>
 		<plugins>
 			<plugin>
@@ -27,24 +26,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>1.10</version>
-		</dependency>
-		
-			<dependency>
-			<groupId>com.graphhopper</groupId>
-			<artifactId>jsprit-core</artifactId>
-			<version>1.7-RC1</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
-		<dependency>
-	    		<groupId>com.beust</groupId>
-	    		<artifactId>jcommander</artifactId>
-	    		<version>1.48</version>
-		</dependency>
-		
 	</dependencies>
 
 </project>

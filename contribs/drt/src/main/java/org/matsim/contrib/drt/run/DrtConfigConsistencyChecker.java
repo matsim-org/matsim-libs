@@ -17,23 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.drt.run;
+package org.matsim.contrib.drt.run;
 
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.drt.run.*;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.*;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import org.matsim.core.config.Config;
 
-public class RunSharedTaxiBerlin {
-	public static void main(String[] args) {
-		String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
-		RunSharedTaxiBerlin.run(configFile, false);
-	}
+public class DrtConfigConsistencyChecker extends DvrpConfigConsistencyChecker {
+	private static final Logger log = Logger.getLogger(DrtConfigConsistencyChecker.class);
 
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
-				new OTFVisConfigGroup(), new TaxiFareConfigGroup());
-		DrtControlerCreator.createControler(config, otfvis).run();
+	@Override
+	public void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		if (drtCfg.getMaxTravelTimeAlpha() < 1) {
+			log.warn(DrtConfigGroup.MAX_TRAVEL_TIME_ALPHA + " is below 1.0! See comments in the DrtConfigGroup");
+		}
+		if (drtCfg.getMaxTravelTimeBeta() < 0) {
+			log.warn(DrtConfigGroup.MAX_TRAVEL_TIME_BETA + " is below 0.0! See comments in the DrtConfigGroup");
+		}
+		if (drtCfg.getMaxWaitTime() < 0) {
+			log.warn(DrtConfigGroup.MAX_WAIT_TIME + " is below 0.0! See comments in the DrtConfigGroup");
+		}
 	}
 }
