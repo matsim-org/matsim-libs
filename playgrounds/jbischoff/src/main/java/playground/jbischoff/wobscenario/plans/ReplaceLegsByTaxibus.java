@@ -19,18 +19,12 @@
 
 package playground.jbischoff.wobscenario.plans;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.text.*;
 import java.util.Locale;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.drt.taxibus.algorithm.utils.TaxibusUtils;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.taxibus.algorithm.utils.TaxibusUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
