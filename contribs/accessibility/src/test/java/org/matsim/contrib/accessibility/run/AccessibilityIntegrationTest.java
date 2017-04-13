@@ -70,7 +70,6 @@ public class AccessibilityIntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@SuppressWarnings("static-method")
-	@Ignore
 	@Test
 	public void testMainMethod() {
 		Config config = ConfigUtils.createConfig();
@@ -150,7 +149,6 @@ public class AccessibilityIntegrationTest {
 	}
 
 
-	@Ignore
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = createTestConfig() ;
@@ -181,7 +179,6 @@ public class AccessibilityIntegrationTest {
 	}
 
 
-	@Ignore
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
 
@@ -278,45 +275,14 @@ public class AccessibilityIntegrationTest {
 		String networkFile = utils.getOutputDirectory() + "network.xml";
 		new NetworkWriter(network).write(networkFile);
 		config.network().setInputFile(networkFile);
-		
-		//
-//		List<String> mainModes = new ArrayList<>();
-//		mainModes.add("car");
-//		mainModes.add("bus");
-//		config.qsim().setMainModes(mainModes);
-		//
 
 		config.transit().setUseTransit(true);
 //		config.transit().setTransitScheduleFile(utils.getClassInputDirectory() + "schedule.xml");
-//		config.transit().setVehiclesFile(utils.getClassInputDirectory() + "vehicles.xml");
 		config.transit().setTransitScheduleFile(utils.getClassInputDirectory() + "schedule2.xml");
 		config.transit().setVehiclesFile(utils.getClassInputDirectory() + "vehicles.xml");
-		
-		//
-		Set<String> transitModes = new HashSet<>();
-		transitModes.add(TransportMode.pt);
-		config.transit().setTransitModes(transitModes);
-		//
-		
-		//
-//		{
-//			ModeRoutingParams walkPars = new ModeRoutingParams(TransportMode.walk);
-//			walkPars.setBeelineDistanceFactor(1.3);
-//			walkPars.setTeleportedModeSpeed(4.);
-//			config.plansCalcRoute().addModeRoutingParams(walkPars);
-//		}
-		//
 
-//		{
-			ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
-			config.planCalcScore().addModeParams(ptParams);
-//		}
-		
-//		{
-//			ModeParams ptParams = new ModeParams(TransportMode.pt);
-//			ptParams.setMarginalUtilityOfDistance(1.);
-//			config.planCalcScore().addModeParams(ptParams);
-//		}
+		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
+		config.planCalcScore().addModeParams(ptParams);
 
 		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
 		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");

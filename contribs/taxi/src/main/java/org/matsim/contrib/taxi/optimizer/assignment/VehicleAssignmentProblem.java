@@ -29,11 +29,15 @@ import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
+import org.matsim.contrib.util.*;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Lists;
 
+/**
+ * @author michalm
+ */
 public class VehicleAssignmentProblem<D> {
 	public static interface AssignmentCost<D> {
 		double calc(VehicleData.Entry departure, DestEntry<D> dest, PathData pathData);
@@ -70,8 +74,11 @@ public class VehicleAssignmentProblem<D> {
 		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
 
 		// TODO this kNN is slow
-		destinationFinder = StraightLineKnnFinders.createDestEntryFinder(nearestDestinationLimit);
-		vehicleFinder = StraightLineKnnFinders.createVehicleDepartureFinder(nearestVehicleLimit);
+		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
+		destinationFinder = nearestDestinationLimit < 0 ? null : new StraightLineKnnFinder<>(nearestDestinationLimit,
+				LinkProviders.VEHICLE_ENTRY_TO_LINK, linkProvider);
+		vehicleFinder = nearestVehicleLimit < 0 ? null
+				: new StraightLineKnnFinder<>(nearestVehicleLimit, linkProvider, LinkProviders.VEHICLE_ENTRY_TO_LINK);
 	}
 
 	public List<Dispatch<D>> findAssignments(VehicleData vData, AssignmentDestinationData<D> dData,

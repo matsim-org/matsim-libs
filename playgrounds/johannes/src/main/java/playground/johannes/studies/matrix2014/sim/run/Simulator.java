@@ -215,6 +215,7 @@ public class Simulator {
         Extend the analyzer
          */
 //        ExtendedAnalyzerBuilder.build(this, config);
+        ExtendedAnalyzerBuilderDrive.build(this, config);
 
 
         engineListeners.addComponent(new AnalyzerListener(analyzerTasks, ioContext, dumpInterval));

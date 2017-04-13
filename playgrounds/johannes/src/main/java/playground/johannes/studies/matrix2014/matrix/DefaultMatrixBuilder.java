@@ -82,6 +82,9 @@ public class DefaultMatrixBuilder implements MatrixBuilder {
                 Zone zone = zones.get(location.getGeometry().getCoordinate());
                 if(zone != null) {
                     zoneId = zone.getAttribute(zones.getPrimaryKey());
+                } else {
+                    // facility is outside bounds of zones
+                    return null;
                 }
             }
             zoneIds.put(facilityId, zoneId);

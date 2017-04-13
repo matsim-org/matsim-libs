@@ -22,9 +22,14 @@ package org.matsim.contrib.socnetsim.framework.scoring;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
 import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
 
-import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Scoring element that computes a penalty for "joint activities"
@@ -45,6 +50,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 	private int currentNCoparticipants = 0;
 
 	private double score = 0;
+	private final EventBuffer buffer = new EventBuffer();
 
 	public GroupCompositionPenalizer(
 			final String activityType,
@@ -55,25 +61,37 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 
 	@Override
 	public void finish() {
-
+		buffer.moveToBuffer();
 	}
 
 	@Override
 	public double getScore() {
+		bufferToScore();
 		return score;
 	}
 
 	@Override
 	public void handleEvent( final Event event ) {
-		if ( event instanceof ActivityStartEvent ) {
-			startActivity( ( ActivityStartEvent ) event );
+		if ( !(event instanceof ActivityStartEvent) && !(event instanceof ActivityEndEvent) && !(event instanceof CourtesyEvent) ) return;
+		if ( !event.getAttributes().get( "actType" ).equals( activityType ) ) return;
+		buffer.addEvent( event );
+		bufferToScore();
+	}
+
+	private void bufferToScore() {
+		while ( !buffer.outBuffer.isEmpty() ) {
+			final Event event = buffer.outBuffer.poll();
+			if ( event instanceof ActivityStartEvent ) {
+				startActivity( (ActivityStartEvent) event );
+			}
+			if ( event instanceof ActivityEndEvent ) {
+				endActivity( (ActivityEndEvent) event );
+			}
+			if ( event instanceof CourtesyEvent ) {
+				handleCourtesy( (CourtesyEvent) event );
+			}
 		}
-		if ( event instanceof ActivityEndEvent ) {
-			endActivity( ( ActivityEndEvent ) event );
-		}
-		if ( event instanceof CourtesyEvent ) {
-			handleCoutesy( ( CourtesyEvent ) event );
-		}
+		buffer.outBuffer.clear();
 	}
 
 	private void startActivity( final ActivityStartEvent event ) {
@@ -84,7 +102,9 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 		currentNCoparticipants = 0;
 	}
 
-	private void handleCoutesy( final CourtesyEvent event ) {
+	private void handleCourtesy( final CourtesyEvent event ) {
+		if ( !event.getActType().equals( activityType ) ) return;
+
 		if ( !inAct ) return;
 		updateScore( event.getTime() );
 
@@ -115,13 +135,13 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 			(time - lastChangeInNCoparticipants );
 	}
 
-	public static interface UtilityOfTimeCalculator {
-		public double getUtilityOfTime( int nCoParticipants );
+	public interface UtilityOfTimeCalculator {
+		double getUtilityOfTime( int nCoParticipants );
 	}
 
 	public static class MinGroupSizeLinearUtilityOfTime implements UtilityOfTimeCalculator {
 		private final int minGroupSize;
-		private double utilOfMissingContact;
+		private final double utilOfMissingContact;
 
 		public MinGroupSizeLinearUtilityOfTime(
 				final int minGroupSize,
@@ -140,6 +160,48 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 			assert util <= 0 : util;
 
 			return util;
+		}
+	}
+
+	/**
+	 * ensures the events of a time step are properly ordered by type
+	 */
+	private static class EventBuffer {
+		private final List<Event> inBuffer = new ArrayList<>();
+
+		private final Queue<Event> outBuffer = new PriorityQueue<>( 11 , new EventComparator() );
+
+		private double lastTime = -1;
+
+		void addEvent( final Event event ) {
+			if ( event.getTime() > lastTime ) moveToBuffer();
+
+			inBuffer.add( event );
+			lastTime = event.getTime();
+		}
+
+		void moveToBuffer() {
+			outBuffer.addAll( inBuffer );
+			inBuffer.clear();
+		}
+	}
+
+	private static class EventComparator implements Comparator<Event> {
+		@Override
+		public int compare( final Event o1, final Event o2 ) {
+			if ( o1.getTime() != o2.getTime() ) return Double.compare( o1.getTime() , o2.getTime() );
+			return getTypeOrder( o1.getEventType() ) - getTypeOrder( o2.getEventType() );
+		}
+
+		private int getTypeOrder( final String eventType  ) {
+			switch ( eventType ) {
+				case "actstart": return 1;
+				case "sayHelloEvent": return 2;
+				case "sayGoodbyeEvent": return 3;
+				case "actend": return 4;
+			}
+
+			throw new RuntimeException( eventType );
 		}
 	}
 }

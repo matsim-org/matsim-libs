@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.contrib.accessibility.utils;
 
 import java.io.IOException;
@@ -30,7 +49,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
-	static Logger log = Logger.getLogger(GeoserverUpdater.class);
+	static Logger LOG = Logger.getLogger(GeoserverUpdater.class);
 
 	private String crs;
 	private String name;
@@ -41,6 +60,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		this.name = name;
 	}
 
+	
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 	@Override
@@ -53,7 +73,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		// lockedForAdditionalFacilityData = true;
 
 //		log.info("starting setAndProcessSpatialGrids ...");
-		log.info("starting setAndProcess ??? ...");
+		LOG.info("starting setAndProcess ??? ...");
 
 		GeometryFactory geometryFactory = new GeometryFactory();
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
@@ -69,8 +89,8 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			builder.add(mode.toString(), Double.class);
 		}
 
-//		for ( ActivityFacilities facilities : additionalFacilityData ) {
-//			b.add( facilities.getName(), Double.class );
+//		for (ActivityFacilities facilities : additionalFacilityData) {
+//			b.add(facilities.getName(), Double.class);
 //		}
 		// yyyyyy add population here
 
@@ -97,16 +117,13 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			for (Modes4Accessibility modeEnum : Modes4Accessibility.values()) {
 				String mode = modeEnum.toString(); // TODO only temporarily
 				Double accessibility = accessibilities.get(mode);
-				System.out.println("mode = " + mode + " -- accessibility = " + accessibility);
 				if (accessibility != null && !Double.isNaN(accessibility)) {
 					featureBuilder.add(accessibility);
 				} else {
 					featureBuilder.add(null);
 				}
 			}
-
-			// yyyyyy write population density here.  Probably not aggregated to grid.
-
+			// yyyyyy write population density here. Probably not aggregated to grid.
 
 			SimpleFeature feature = featureBuilder.buildFeature(null);
 			collection.add(feature);
@@ -126,7 +143,7 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			try {
 				dataStore.removeSchema(name);
 			} catch (IllegalArgumentException e) {
-				log.warn("Could not remove schema. Perhaps it does not exist. Probably doesn't matter.");
+				LOG.warn("Could not remove schema. Perhaps it does not exist. Probably doesn't matter.");
 			}
 			dataStore.createSchema(featureType);
 			SimpleFeatureStore featureStore = (SimpleFeatureStore) dataStore.getFeatureSource(name);
@@ -152,11 +169,9 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			throw new RuntimeException(e);
 		}
 //		log.info("ending setAndProcessSpatialGrids.");
-		log.info("ending setAndProcess ???.");
+		LOG.info("ending setAndProcess ???.");
 
 		// re-publish layer using the REST api (of geoserver; the above is the postgis db) if we want to automatically recompute the
 		// bounding box.  mz & kai, nov'15
-
 	}
-
 }

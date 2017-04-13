@@ -19,17 +19,12 @@
 
 package playground.jbischoff.wobscenario.plans;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.taxibus.algorithm.utils.TaxibusUtils;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.taxibus.algorithm.utils.TaxibusUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;

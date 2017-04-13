@@ -37,8 +37,8 @@ public class TaxiRequestCreator implements PassengerRequestCreator {
 
 	@Override
 	public TaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-			double earliestStartTime, double latestStartTime, double submissionTime) {
-		TaxiRequest request = new TaxiRequest(id, passenger, fromLink, toLink, earliestStartTime, submissionTime);
+			double departureTime, double submissionTime) {
+		TaxiRequest request = new TaxiRequest(id, passenger, fromLink, toLink, departureTime, submissionTime);
 		if (requestsCollector != null) {
 			requestsCollector.addRequest(request);
 		}

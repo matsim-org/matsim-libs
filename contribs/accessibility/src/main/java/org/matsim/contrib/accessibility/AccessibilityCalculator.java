@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -90,7 +89,6 @@ public final class AccessibilityCalculator {
 
 		Map<String,Double> expSums = new HashMap<>();
 		for (String mode : calculators.keySet()) {
-			LOG.warn("Calculate ExpSum for mode = " + mode);
 			expSums.put(mode, 0.);
 		}
 
@@ -98,12 +96,11 @@ public final class AccessibilityCalculator {
 		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
 
 		LOG.info("Iterating over all aggregated measuring points...");
-		// ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
+		ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 		
 		// Go through all nodes (keys) that have a measuring point (origin) assigned
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
-			LOG.info("Calculate accessibility for all measuring points assigned to node = " + nodeId);
-			// progressBar.update();
+			progressBar.update();
 
 			Node fromNode = network.getNodes().get(nodeId);
 
@@ -115,7 +112,6 @@ public final class AccessibilityCalculator {
 			// Get list with measuring points that are assigned to "fromNode"
 			// Go through all measuring points assigned to current node
 			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
-				LOG.info("Now considering measuring point = " + origin.getId());
 				assert(origin.getCoord() != null);
 
 				for (String key : expSums.keySet()) { // Is it really necessary to reset here?
@@ -131,9 +127,7 @@ public final class AccessibilityCalculator {
 					for (String mode : calculators.keySet()) {
 						final double expVhk = calculators.get(mode).computeContributionOfOpportunity(origin, aggregatedFacility, departureTime);
 						expSums.put(mode, expSums.get(mode) + expVhk);
-						LOG.info("mode = " + mode + " --- aggregatedFacility = " + aggregatedFacility.getNearestNode().getCoord() + " --- expSums.get(mode) = " + expSums.get(mode));
 					}
-					LOG.info("----");
 				}
 				// What does the aggregation of the starting locations save if we do the just ended loop for all starting
 				// points separately anyways? Answer: The trees need to be computed only once. (But one could save more.) kai, feb'14
@@ -142,9 +136,7 @@ public final class AccessibilityCalculator {
 				Map<String, Double> accessibilities  = new LinkedHashMap<>();
 
 				for (String mode : calculators.keySet()) {
-					LOG.info("---- calculate accessibility for mode=" + mode );
 					if(!acg.isUsingRawSumsWithoutLn()){
-						LOG.info("expSums.get(mode).getSum() = " + expSums.get(mode));
 						// logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 						accessibilities.put(mode, (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode)));
 					} else {
@@ -152,13 +144,6 @@ public final class AccessibilityCalculator {
 						accessibilities.put(mode, expSums.get(mode));
 					}
 				}
-
-				LOG.warn("");
-				LOG.warn("SENDING accessibilities; start zone=" + origin.getId() );
-				for ( Entry<String, Double> entry : accessibilities.entrySet() ) {
-					LOG.warn( "mode=" + entry.getKey() + "; accessibility=" + entry.getValue() ) ;
-				}
-
 				
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
@@ -243,7 +228,7 @@ public final class AccessibilityCalculator {
 
 
 	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
-		LOG.warn("Adding accessibility calculator for mode = " + mode ) ;
+		LOG.info("Adding accessibility calculator for " + mode ) ;
 		Gbl.assertNotNull(calc);
 		this.calculators.put(mode , calc) ;
 	}
