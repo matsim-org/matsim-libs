@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -64,6 +65,7 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private Map<Id<Vehicle>, Set<Id<Person>>> vehicleIdToPassengerIds;
 	private double agentsTotalDelay;
 
+	@Inject
 	public TtTotalDelay(Network network) {
 		this.network = network;
 		this.reset(0);

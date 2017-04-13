@@ -33,7 +33,6 @@ import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import signals.Analyzable;
 
-import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -55,7 +54,6 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private Queue<LaemmerSignal> regulationQueue = new LinkedList<>();
 
     LaemmerConfig laemmerConfig;
-    private BufferedWriter writer;
 
     private final double DESIRED_PERIOD;
 
@@ -74,6 +72,54 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private double flowSum;
 
     private TtTotalDelay delayCalculator;
+
+
+    public final static class SignalControlProvider implements Provider<SignalController> {
+        private final LaemmerConfig laemmerConfig;
+        private final LinkSensorManager sensorManager;
+        private final Network network;
+        private final TtTotalDelay delayCalculator;
+
+        public SignalControlProvider(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Network network, TtTotalDelay delayCalculator) {
+            this.laemmerConfig = laemmerConfig;
+            this.sensorManager = sensorManager;
+            this.network = network;
+            this.delayCalculator = delayCalculator;
+        }
+
+        @Override
+        public SignalController get() {
+            return new LaemmerSignalController(laemmerConfig, sensorManager, network, delayCalculator);
+        }
+    }
+
+
+    private LaemmerSignalController(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Network network, TtTotalDelay delayCalculator) {
+        this.laemmerConfig = laemmerConfig;
+        this.sensorManager = sensorManager;
+        this.network = network;
+        this.delayCalculator = delayCalculator;
+        DESIRED_PERIOD = laemmerConfig.getDESIRED_PERIOD();
+        MAX_PERIOD = laemmerConfig.getMAX_PERIOD();
+    }
+
+    @Override
+    public void simulationInitialized(double simStartTimeSeconds) {
+        signalId2LaemmerSignal = new HashMap<>();
+        this.initializeSensoring();
+        for (SignalGroup group : this.system.getSignalGroups().values()) {
+            this.system.scheduleDropping(simStartTimeSeconds, group.getId());
+            for (Signal signal : group.getSignals().values()) {
+                flowSum += network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
+                signalId2LaemmerSignal.put(signal.getId(), new LaemmerSignal(group.getId(), signal));
+            }
+        }
+    }
+
+    @Override
+    public boolean analysisEnabled() {
+        return this.laemmerConfig.analysisEnabled();
+    }
 
 
     @Override
@@ -122,58 +168,11 @@ public class LaemmerSignalController extends AbstractSignalController implements
     }
 
     @Override
-    public boolean analysisEnabled() {
-        return this.laemmerConfig.analysisEnabled();
-    }
-
-    public final static class SignalControlProvider implements Provider<SignalController> {
-        private final LaemmerConfig laemmerConfig;
-        private final LinkSensorManager sensorManager;
-        private final Network network;
-        private final TtTotalDelay delayCalculator;
-
-        public SignalControlProvider(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Network network, TtTotalDelay delayCalculator) {
-            this.laemmerConfig = laemmerConfig;
-            this.sensorManager = sensorManager;
-            this.network = network;
-            this.delayCalculator = delayCalculator;
-        }
-
-        @Override
-        public SignalController get() {
-            return new LaemmerSignalController(laemmerConfig, sensorManager, network, delayCalculator);
-        }
-    }
-
-
-    private LaemmerSignalController(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Network network, TtTotalDelay delayCalculator) {
-        this.laemmerConfig = laemmerConfig;
-        this.sensorManager = sensorManager;
-        this.network = network;
-        this.delayCalculator = delayCalculator;
-        DESIRED_PERIOD = laemmerConfig.getDESIRED_PERIOD();
-        MAX_PERIOD = laemmerConfig.getMAX_PERIOD();
-    }
-
-    @Override
-    public void simulationInitialized(double simStartTimeSeconds) {
-        signalId2LaemmerSignal = new HashMap<>();
-        this.initializeSensoring();
-        for (SignalGroup group : this.system.getSignalGroups().values()) {
-            this.system.scheduleDropping(simStartTimeSeconds, group.getId());
-            for (Signal signal : group.getSignals().values()) {
-                flowSum += network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
-                signalId2LaemmerSignal.put(signal.getId(), new LaemmerSignal(group.getId(), signal));
-            }
-        }
-    }
-
-    @Override
     public void updateState(double now) {
         log.info("-------------------------------------------------------------");
         log.info("Updating System" + this.system.getId() + ". Time: " + now);
+        updateTIdle();
         updateActiveRegulation(now);
-        updateParameters(now);
         log.debug("T_Idle = " + tIdle);
         log.debug("Updating signals");
         updateSignals(now);
@@ -182,11 +181,11 @@ public class LaemmerSignalController extends AbstractSignalController implements
     }
 
     private void updateActiveRegulation(double now) {
-        if (!regulationQueue.isEmpty() && regulationQueue.peek().equals(activeRequest.signal)) {
+        if (activeRequest!= null && !regulationQueue.isEmpty() && regulationQueue.peek().equals(activeRequest.signal)) {
             LaemmerSignal signal = regulationQueue.peek();
-            log.info("Remaining regulation time for " + signal.signalId + ": " + (activeRequest.time + activeRequest.regulationTime - now));
+            log.info("Remaining regulation time for " + signal.signalId + ": " + (activeRequest.time + activeRequest.signal.regulationTime - now));
             int n = getNumberOfExpectedVehicles(now, signal.link.getId());
-            if (activeRequest.regulationTime + activeRequest.time - now <= 0 || n == 0) {
+            if (activeRequest.signal.regulationTime + activeRequest.time - now <= 0 || n == 0) {
                 regulationQueue.poll();
                 log.info("Stopping regulation for " + signal.signalId + " remaining vehicles: " + n);
             }
@@ -194,35 +193,41 @@ public class LaemmerSignalController extends AbstractSignalController implements
     }
 
     private LaemmerSignal selectSignal() {
-        LaemmerSignal max = regulationQueue.peek();
-        if (max == null) {
-            log.debug("no queue selected.");
-        } else {
-            log.debug("regulating for " + max.signalId);
+        LaemmerSignal max = null;
+        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.OPTIMIZING)) {
+            max = regulationQueue.peek();
+            if (max == null) {
+                log.debug("no queue selected.");
+            } else {
+                log.debug("regulating for " + max.signalId);
+            }
         }
-//        if (max == null) {
-//            double index = 0;
-//            for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
-//                if (signal.index > index) {
-//                    max = signal;
-//                    index = signal.index;
-//                    log.debug("Max index of " + index + ".Signal " + max.signalId + " of Group " + max.group);
-//                }
-//            }
-//        }
+        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.STABILIZING)) {
+            if (max == null) {
+                double index = 0;
+                for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
+                    if (signal.index > index) {
+                        max = signal;
+                        index = signal.index;
+                        log.debug("Max index of " + index + ".Signal " + max.signalId + " of Group " + max.group);
+                    }
+                }
+            }
+        }
         return max;
     }
 
     private void processSelection(double now, LaemmerSignal max) {
+
         if (activeRequest != null && activeRequest.signal != max) {
             log.info("Dropping group " + activeRequest.signal.group + " after " + (now - activeRequest.time + "s."));
             this.system.scheduleDropping(now, activeRequest.signal.group);
             activeRequest = null;
         }
 
-        if (activeRequest == null && max != null || activeRequest != null && max != activeRequest.signal && max != null) {
+        if (activeRequest == null && max != null || activeRequest != null && max != null && !max.equals(activeRequest.signal)) {
             log.debug("Driveway changed. Creating new Request for " + (now + DEFAULT_INBETWEEN) + " granted time: " + max.regulationTime);
-            activeRequest = new Request(now + DEFAULT_INBETWEEN, max, max.regulationTime);
+            activeRequest = new Request(now + DEFAULT_INBETWEEN, max);
         }
 
         if (activeRequest != null) {
@@ -238,14 +243,16 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private void updateSignals(double now) {
         for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
             signal.update(now);
+            if(signal.stabilize  && !regulationQueue.contains(signal)) {
+                regulationQueue.add(signal);
+            }
         }
     }
 
-    private void updateParameters(double now) {
+    private void updateTIdle() {
         tIdle = DESIRED_PERIOD;
         for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
             tIdle -= (signal.loadFactor * DESIRED_PERIOD + DEFAULT_INBETWEEN);
-            signal.updateAbortionPenalty(now);
         }
     }
 
@@ -279,14 +286,12 @@ public class LaemmerSignalController extends AbstractSignalController implements
     }
 
     class Request {
-        final double time;
-        final LaemmerSignal signal;
-        final double regulationTime;
+        private final double time;
+        private final LaemmerSignal signal;
 
-        Request(double time, LaemmerSignal laemmerSignal, double regulationTime) {
+        Request(double time, LaemmerSignal laemmerSignal) {
             this.signal = laemmerSignal;
             this.time = time;
-            this.regulationTime = regulationTime;
         }
 
         public boolean isDue(double timeSeconds) {
@@ -296,6 +301,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
     class LaemmerSignal {
 
+        private boolean stabilize = false;
         private boolean liveArrivalRate;
         Id<SignalGroup> group;
         Id<Signal> signalId;
@@ -310,18 +316,22 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
         LaemmerSignal(Id<SignalGroup> signalGroup, Signal signal) {
 
+            this.group = signalGroup;
+            this.signalId = signal.getId();
+            link = network.getLinks().get(signal.getLinkId());
+            maxFlow = network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
+
+
             if (laemmerConfig.getArrivalRateForSignal(signal.getId()) == null) {
                 this.liveArrivalRate = true;
                 sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId());
             } else {
                 this.avgArrivalRate = laemmerConfig.getArrivalRateForSignal(signal.getId());
+                this.loadFactor = this.avgArrivalRate / this.maxFlow;
             }
 
-            this.group = signalGroup;
-            this.signalId = signal.getId();
-            link = network.getLinks().get(signal.getLinkId());
-            maxFlow = network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
             signalLog.debug("LaemmeSignal for signal " + signal.getId() + " created.");
+
         }
 
         public void update(double now) {
@@ -333,9 +343,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
             if (liveArrivalRate) {
                 updateArrivalRate(now);
             }
-            if (regulate(now)) {
-                return;
-            }
+            updateStabilization(now);
             calculatePriorityIndex(now);
         }
 
@@ -393,40 +401,41 @@ public class LaemmerSignalController extends AbstractSignalController implements
             signalLog.debug("Avg Arrival Rate: " + avgArrivalRate + ", load factor: " + loadFactor);
         }
 
-        private boolean regulate(double timeSeconds) {
+        private void updateStabilization(double timeSeconds) {
+
+            if(avgArrivalRate == 0) {
+                return;
+            }
 
             signalLog.debug("Checking for regulation");
 
             double n = getNumberOfExpectedVehicles(timeSeconds, link.getId());
 
-            if (n == 0) {
-                a = DEFAULT_INBETWEEN;
-                signalLog.debug("Queue length zero, setting a to inbetween time");
+            if(n == 0) {
+               a = DEFAULT_INBETWEEN;
             } else {
                 a++;
-                signalLog.debug("a set to " + a);
             }
+
             if (regulationQueue.contains(this)) {
                 signalLog.debug("Already in regulation queue. Aborting.");
-                return false;
+                return;
             }
+
             this.regulationTime = 0;
+            this.stabilize = false;
 
             double nCrit = avgArrivalRate * DESIRED_PERIOD
                     * ((MAX_PERIOD - (a / (1 - avgArrivalRate / maxFlow)))
                     / (MAX_PERIOD - DESIRED_PERIOD));
             signalLog.debug("n = " + n);
             signalLog.debug("nCrit = " + nCrit);
-            //TODO: keep n>=1?
-            if (n >= nCrit) { //&& n >= 1) {
+            if (n >= nCrit) {
                 regulationQueue.add(this);
                 signalLog.debug("Regulation time parameters: lambda: " + this.loadFactor + " | T: " + DESIRED_PERIOD + " | qmax: " + maxFlow + " | qsum: " + flowSum + " | T_idle:" + tIdle);
                 this.regulationTime = Math.rint(this.loadFactor * DESIRED_PERIOD + (maxFlow / flowSum) * tIdle);
-                signalLog.info("Adding to regulation queue with granted time " + regulationTime);
-                return true;
-            } else {
-                signalLog.debug("No need for regulation.");
-                return false;
+                signalLog.info("Granted time " + regulationTime);
+                this.stabilize = true;
             }
         }
     }

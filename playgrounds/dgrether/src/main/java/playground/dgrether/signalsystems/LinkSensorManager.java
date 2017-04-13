@@ -124,6 +124,17 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 	
 	}
 
+	public void registerAverageNumberOfCarsPerSecondMonitoring(Id<Link> linkId) {
+		if (!this.linkIdSensorMap.containsKey(linkId)){
+			Link link = this.network.getLinks().get(linkId);
+			if (link == null){
+				throw new IllegalStateException("Link with Id " + linkId + " is not in the network, can't register sensor");
+			}
+			this.linkIdSensorMap.put(link.getId(), new LinkSensor(link));
+		}
+		this.linkIdSensorMap.get(linkId).registerAverageVehiclesPerSecondToMonitor();
+	}
+
 	@Deprecated //not tested
 	private void registerCarsAtDistancePerSecondMonitoring(Id<Link> linkId, Double distanceMeter){
 		double firstDistanceMeter = distanceMeter;
@@ -175,6 +186,10 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
 		}
 		return this.linkIdSensorMap.get(linkId).getNumberOfCarsInDistance(distanceMeter, timeSeconds);
+	}
+
+	public double getAverageArrivalRate(Id<Link> linkId, double now) {
+		return this.linkIdSensorMap.get(linkId).getAvgVehiclesPerSecond(now);
 	}
 	
 	@Override
@@ -230,6 +245,4 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 			}
 		}
 	}
-
-	
 }

@@ -42,12 +42,15 @@ public final class LinkSensor {
 	
 	private Link link = null;
 	public int vehiclesOnLink = 0;
+	private double totalVehicles = 0;
 	
 	private boolean doDistanceMonitoring = false;
+	private boolean doAverageVehiclesPerSecondMonitoring = false;
 	private Map<Double, Map<Id<Vehicle>, CarLocator>> distanceMeterCarLocatorMap = null;
 	private Map<Id<Vehicle>, VehicleLeavesTrafficEvent> link2WaitEventPerVehicleId = null;
 	private Map<Double, Map<Id<Vehicle>, CarLocator>> inActivityDistanceCarLocatorMap = null;
-	
+	private double monitoringStartTime;
+
 	public LinkSensor(Link link){
 		this.link  = link;
 	}
@@ -63,7 +66,11 @@ public final class LinkSensor {
 		this.distanceMeterCarLocatorMap.put(distanceMeter, new HashMap<Id<Vehicle>, CarLocator>());
 		this.inActivityDistanceCarLocatorMap.put(distanceMeter, new HashMap<Id<Vehicle>, CarLocator>());
 	}
-	
+
+	public void registerAverageVehiclesPerSecondToMonitor() {
+		this.doAverageVehiclesPerSecondMonitoring = true;
+	}
+
 	private void enableDistanceMonitoring() {
 		this.doDistanceMonitoring = true;
 		this.distanceMeterCarLocatorMap = new HashMap<Double, Map<Id<Vehicle>, CarLocator>>();
@@ -71,23 +78,38 @@ public final class LinkSensor {
 		this.inActivityDistanceCarLocatorMap = new HashMap<Double, Map<Id<Vehicle>, CarLocator>>();
 	}
 
+
 	public int getNumberOfCarsOnLink() {
 		return this.vehiclesOnLink;
 	}
 
-	public int getNumberOfCarsInDistance(Double distanceMeter, double currentTime) {
+	public int getNumberOfCarsInDistance(Double distanceMeter, double now) {
 		Map<Id<Vehicle>, CarLocator> distSpecificCarLocators = this.distanceMeterCarLocatorMap.get(distanceMeter);
 		int count = 0;
 		for (CarLocator cl : distSpecificCarLocators.values()){
-			if (cl.isCarinDistance(currentTime)){
+			if (cl.isCarinDistance(now)){
 				count++;
 			}
 		}
 		return count;
 	}
 
+	public double getAvgVehiclesPerSecond(double now) {
+		if(now > monitoringStartTime) {
+			return totalVehicles / (now - monitoringStartTime);
+		} else {
+			return 0;
+		}
+	}
+
 	public void handleEvent(LinkEnterEvent event) {
 		this.vehiclesOnLink++;
+		if(this.doAverageVehiclesPerSecondMonitoring) {
+			totalVehicles ++;
+			if(totalVehicles == 1) {
+				monitoringStartTime = event.getTime();
+			}
+		}
 		if (this.doDistanceMonitoring){
 			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
 				Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
@@ -108,6 +130,7 @@ public final class LinkSensor {
 	
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		this.vehiclesOnLink--;
+		totalVehicles--;
 		if (this.doDistanceMonitoring){
 			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
 				Map<Id<Vehicle>, CarLocator> vehicleIdCarLocatorMap = this.distanceMeterCarLocatorMap.get(distance);
@@ -144,5 +167,4 @@ public final class LinkSensor {
 			}
 		}
 	}
-	
 }

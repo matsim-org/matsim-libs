@@ -22,6 +22,18 @@ public class LaemmerConfig {
 
     private boolean analysisEnabled = true;
 
+    public enum Regime {COMBINED, OPTIMIZING, STABILIZING};
+
+    public Regime getActiveRegime() {
+        return activeRegime;
+    }
+
+    public void setActiveRegime(Regime activeRegime) {
+        this.activeRegime = activeRegime;
+    }
+
+    private Regime activeRegime = Regime.COMBINED;
+
     public void addArrivalRateForSignal(Id<Signal> signalId, double arrivalRate) {
         avgArrivalRatePerSignal.put(signalId, arrivalRate);
     }
@@ -66,4 +78,6 @@ public class LaemmerConfig {
     public boolean analysisEnabled() {
         return analysisEnabled;
     }
+
+
 }

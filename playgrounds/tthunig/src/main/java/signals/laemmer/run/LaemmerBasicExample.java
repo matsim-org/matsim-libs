@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalgroups.v20.*;
@@ -38,11 +37,9 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import signals.CombinedSignalsModule;
 import signals.laemmer.model.LaemmerConfig;
 import signals.laemmer.model.LaemmerSignalController;
-import signals.laemmer.model.LaemmerSignalsModule;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by nkuehnel on 03.04.2017.
@@ -56,67 +53,70 @@ public class LaemmerBasicExample {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-//        for(int i = 0; i<=1200; i+=60){
-//            run(i);
-//        }
-        run(180, 900);
-
+        for (int i = 0; i <= 1200; i += 60) {
+            run(180, i, LaemmerConfig.Regime.COMBINED, false, false, false);
+//            run(180, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false);
+//            run(180, i, LaemmerConfig.Regime.STABILIZING, false, false, false);
+        }
     }
 
-    private static void run(double flowNS, double flowWE) {
-        final Config config = defineConfig(flowWE);
+    private static void run(double flowNS, double flowWE, LaemmerConfig.Regime regime, boolean vis, boolean log, boolean stochastic) {
 
-        // simulate traffic dynamics with holes (default would be without)
-//        config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
-//        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
-//        config.qsim().setNodeOffset(5.);
-
-////         add the OTFVis config group
-//        OTFVisConfigGroup otfvisConfig =
-//                ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-////         make links visible beyond screen edge
-//        otfvisConfig.setScaleQuadTreeRect(true);
-//        otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
-//        otfvisConfig.setAgentSize(240);
-
-
-
-        // add the general signals module
+        String outputPath;
+        if (stochastic) {
+            outputPath = "output/laemmerBasic" + regime.name() + "_ew" + flowWE + "_ns" + flowNS + "_stochastic";
+        } else {
+            outputPath = "output/laemmerBasic" + regime.name() + "_ew" + flowWE + "_ns" + flowNS + "_constant";
+        }
+        final Config config = defineConfig(outputPath);
 
         CombinedSignalsModule module = new CombinedSignalsModule();
-        //set laemmer params
         LaemmerConfig laemmerConfig = new LaemmerConfig();
         laemmerConfig.setDEFAULZT_INTERGREEN(5);
         laemmerConfig.setDESIRED_PERIOD(120);
         laemmerConfig.setMAX_PERIOD(180);
+        laemmerConfig.setActiveRegime(regime);
         module.setLaemmerConfig(laemmerConfig);
 
-        final Scenario scenario = defineScenario(config, flowNS, flowWE, laemmerConfig);
+        final Scenario scenario = defineScenario(config, flowNS, flowWE, laemmerConfig, stochastic);
         Controler controler = new Controler(scenario);
 
-        controler.addOverridingModule(module);
-//        controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
 
-        LaemmerSignalController.log.setLevel(Level.OFF);
+        controler.addOverridingModule(module);
+
+        if (vis) {
+            config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
+            config.qsim().setNodeOffset(5.);
+            OTFVisConfigGroup otfvisConfig =
+                    ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+            otfvisConfig.setScaleQuadTreeRect(true);
+            otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
+            otfvisConfig.setAgentSize(240);
+            controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
+        }
+        if (log) {
+            try {
+                LaemmerSignalController.log.addAppender(new FileAppender(new SimpleLayout(), "logs/main.txt"));
+//                LaemmerSignalController.signalLog.addAppender(new FileAppender(new SimpleLayout(), "logs/driveways.txt"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            LaemmerSignalController.log.setLevel(Level.OFF);
+        }
         LaemmerSignalController.signalLog.setLevel(Level.OFF);
-//        try {
-//            LaemmerSignalController.log.addAppender(new FileAppender(new SimpleLayout(), "logs/main.txt"));
-//            LaemmerSignalController.signalLog.addAppender(new FileAppender(new SimpleLayout(), "logs/driveways.txt"));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
         controler.run();
     }
 
-    private static Config defineConfig(double flowWE) {
+    private static Config defineConfig(String outputPath) {
         Config config = ConfigUtils.createConfig();
-        config.controler().setOutputDirectory("output/laemmerexampleStabilisierungBasic_"+flowWE+"_e_w/");
+        config.controler().setOutputDirectory(outputPath);
 
         config.controler().setLastIteration(0);
         config.travelTimeCalculator().setMaxTime(60 * 120);
         config.qsim().setStartTime(0);
         config.qsim().setEndTime(60 * 120);
-        config.qsim().setUsingFastCapacityUpdate(true);
+//        config.qsim().setUsingFastCapacityUpdate(true);
 
         SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
         signalConfigGroup.setUseSignalSystems(true);
@@ -135,15 +135,13 @@ public class LaemmerBasicExample {
         return config;
     }
 
-    private static Scenario defineScenario(Config config, double flowNS, double flowWE, LaemmerConfig laemmerConfig) {
+    private static Scenario defineScenario(Config config, double flowNS, double flowWE, LaemmerConfig laemmerConfig, boolean stochastic) {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         // add missing scenario elements
         SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
         scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-
         createNetwork(scenario);
-        createPopulation(scenario, flowNS, flowWE);
-
+        createPopulation(scenario, flowNS, flowWE, stochastic);
         createSignals(scenario, laemmerConfig, flowNS, flowWE);
         return scenario;
     }
@@ -159,7 +157,7 @@ public class LaemmerBasicExample {
      * ^
      * |
      * v
-     * 1 <----> 2 <----> 3 <----> 4 <----> 5
+     * 1 <===> 2 <===> 3 <===> 4 <===> 5
      * ^
      * |
      * v
@@ -224,17 +222,85 @@ public class LaemmerBasicExample {
 
     }
 
-    private static void createPopulation(Scenario scenario, double flowNS, double flowWE) {
+    private static void createPopulation(Scenario scenario, double flowNS, double flowWE, boolean stochastic) {
         Population population = scenario.getPopulation();
 
         String[] linksNS = {"6_7-8_9", "9_8-7_6"};
         String[] linksWE = {"5_4-2_1", "1_2-4_5"};
 
-        createPopulationForRelation(flowNS, population, linksNS);
-        createPopulationForRelation(flowWE, population, linksWE);
+        Random rnd = new Random(14);
+        createPopulationForRelation(flowNS, population, linksNS, stochastic, rnd);
+        createPopulationForRelation(flowWE, population, linksWE, stochastic, rnd);
     }
 
-    private static void createPopulationForRelation(double flow, Population population, String[] links) {
+    private static void createPopulationForRelation(double flow, Population population, String[] links, boolean stochastic, Random rnd) {
+
+        double lambdaT = (flow / 3600 ) / 5;
+        double lambdaN = 1./5.;
+
+        if(flow == 0) {
+            return;
+        }
+
+
+        for (String od : links) {
+            int totalN = 0;
+            String fromLinkId = od.split("-")[0];
+            String toLinkId = od.split("-")[1];
+            Map<Double, Integer> insertNAtSecond = new HashMap<>();
+            if (stochastic) {
+                for (double i = 0; i < 5400; i++) {
+
+                    double expT = 1 - Math.exp(-lambdaT);
+                    double p1 = rnd.nextDouble();
+                    if (p1 < expT) {
+                        double p2 = rnd.nextDouble();
+                        for(int n = 0; ; n++) {
+                            double expN = Math.exp(-lambdaN * n);
+                            if((p2 > expN)) {
+                                insertNAtSecond.put(i, n);
+                                totalN += n;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                double nthSecond = (3600 / flow);
+                for (double i = 0; i < 5400; i += nthSecond) {
+                    insertNAtSecond.put(i, 1);
+                }
+            }
+
+            for (Map.Entry<Double, Integer> entry : insertNAtSecond.entrySet()) {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    // create a person
+                    Person person = population.getFactory().createPerson(Id.createPersonId(od + "-" + entry.getKey()+"("+i+")"));
+                    population.addPerson(person);
+
+                    // create a plan for the person that contains all this
+                    // information
+                    Plan plan = population.getFactory().createPlan();
+                    person.addPlan(plan);
+
+                    // create a start activity at the from link
+                    Activity startAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(fromLinkId));
+                    // distribute agents uniformly during one hour.
+                    startAct.setEndTime(entry.getKey());
+                    plan.addActivity(startAct);
+
+                    // create a dummy leg
+                    plan.addLeg(population.getFactory().createLeg(TransportMode.car));
+
+                    // create a drain activity at the to link
+                    Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(toLinkId));
+                    plan.addActivity(drainAct);
+                }
+            }
+        }
+    }
+
+    private static void createPopulationForRelationStochastic(double flow, Population population, String[] links) {
         if (flow > 0) {
             for (String od : links) {
                 String fromLinkId = od.split("-")[0];
@@ -242,7 +308,7 @@ public class LaemmerBasicExample {
 
                 double nthSecond = (3600 / flow);
 
-                for (double i = 0; i < 5400; i+=nthSecond) {
+                for (double i = 0; i < 5400; i += nthSecond) {
 
 
                     // create a person
@@ -299,31 +365,31 @@ public class LaemmerBasicExample {
                 .createSignalGroupData(signalSystemId, signalGroupId1);
         Id<Signal> id2_3 = Id.create("Signal2_3", Signal.class);
         signalGroup1.addSignalId(id2_3);
-        laemmerConfig.addArrivalRateForSignal(id2_3, flowWE);
+        laemmerConfig.addArrivalRateForSignal(id2_3, flowWE / 3600);
         signalGroups.addSignalGroupData(signalGroup1);
 
         Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
         SignalGroupData signalGroup2 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId2);
         Id<Signal> id7_3 = Id.create("Signal7_3", Signal.class);
-        signalGroup1.addSignalId(id7_3);
-        laemmerConfig.addArrivalRateForSignal(id7_3, flowNS);
+        signalGroup2.addSignalId(id7_3);
+        laemmerConfig.addArrivalRateForSignal(id7_3, flowNS / 3600);
         signalGroups.addSignalGroupData(signalGroup2);
 
         Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
         SignalGroupData signalGroup3 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId3);
         Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
-        signalGroup1.addSignalId(id4_3);
-        laemmerConfig.addArrivalRateForSignal(id4_3, flowWE);
+        signalGroup3.addSignalId(id4_3);
+        laemmerConfig.addArrivalRateForSignal(id4_3, flowWE / 3600);
         signalGroups.addSignalGroupData(signalGroup3);
 
         Id<SignalGroup> signalGroupId4 = Id.create("SignalGroup4", SignalGroup.class);
         SignalGroupData signalGroup4 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId4);
         Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
-        signalGroup1.addSignalId(id8_3);
-        laemmerConfig.addArrivalRateForSignal(id8_3, flowWE);
+        signalGroup4.addSignalId(id8_3);
+        laemmerConfig.addArrivalRateForSignal(id8_3, flowNS / 3600);
         signalGroups.addSignalGroupData(signalGroup4);
 
         // create the signal control
