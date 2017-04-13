@@ -119,6 +119,24 @@ import java.util.Map;
 
 		links.put(link.getId(), link);
 
+		if (this.linkQuadTree != null) {
+			double linkMinX = Math.min(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
+			double linkMaxX = Math.max(link.getFromNode().getCoord().getX(), link.getToNode().getCoord().getX());
+			double linkMinY = Math.min(link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getY());
+			double linkMaxY = Math.max(link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getY());
+			if (Double.isInfinite(this.linkQuadTree.getMinEasting())) {
+				// looks like the quad tree was initialized with infinite bounds, see MATSIM-278.
+				this.linkQuadTree = null;
+			} else if (this.linkQuadTree.getMinEasting() <= linkMinX && this.linkQuadTree.getMaxEasting() > linkMaxX
+					&& this.linkQuadTree.getMinNorthing() <= linkMinY && this.linkQuadTree.getMaxNorthing() > linkMaxY) {
+				this.linkQuadTree.put(link);
+			} else {
+				// we add a link outside the current bounds, invalidate it
+				this.linkQuadTree = null;
+			}
+		}
+
+
 		// show counter
 		this.counter++;
 		if (this.counter % this.nextMsg == 0) {

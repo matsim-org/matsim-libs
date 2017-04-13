@@ -53,6 +53,22 @@ public final class LinkQuadTree {
 		this.top.remove(new LinkWrapper(link));
 	}
 
+	public double getMinEasting() {
+		return this.top.minX;
+	}
+
+	public double getMaxEasting() {
+		return this.top.maxX;
+	}
+
+	public double getMinNorthing() {
+		return this.top.minY;
+	}
+
+	public double getMaxNorthing() {
+		return this.top.maxY;
+	}
+
 	private static class Node {
 
 //		private final static int NO_CHILD = -1;
@@ -61,7 +77,7 @@ public final class LinkQuadTree {
 //		private final static int CHILD_SE = 2;
 //		private final static int CHILD_SW = 3;
 		
-		private static enum ChildPosition {CHILD_NW, CHILD_NE, CHILD_SE, CHILD_SW,NO_CHILD } ;
+		private enum ChildPosition {CHILD_NW, CHILD_NE, CHILD_SE, CHILD_SW,NO_CHILD } ;
 
 		// I replaced the "int" by an enum since I find it easier to read, and I needed/wanted to understand the code.  If this causes
 		// computational performance losses, we need to change it back.  kai, sep'16
