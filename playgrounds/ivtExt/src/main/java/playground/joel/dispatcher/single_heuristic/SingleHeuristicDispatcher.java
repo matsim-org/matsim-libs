@@ -10,6 +10,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
+import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVOperator;
@@ -28,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class SingleHeuristicDispatcher extends AbstractDispatcher {
+public class SingleHeuristicDispatcher extends UniversalDispatcher/*AbstractDispatcher*/ {
     final private Id<AVOperator> operatorId;
 
     final private List<AVVehicle> availableVehicles = new LinkedList<>();
@@ -42,11 +43,23 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     final private Map<AVVehicle, Link> vehicleLinks = new HashMap<>();
     final private Map<AVRequest, Link> requestLinks = new HashMap<>();
 
+    final private SingleRideAppender appender;
+
     private SimpleDispatcherHeuristicMode mode = SimpleDispatcherHeuristicMode.OVERSUPPLY;
 
-    public SingleHeuristicDispatcher(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, SingleRideAppender appender) {
-	super(eventsManager, appender);
-        this.operatorId = operatorId;
+    private SingleHeuristicDispatcher( //
+                                 AVDispatcherConfig avDispatcherConfig, //
+                                 TravelTime travelTime, //
+                                 ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+                                 EventsManager eventsManager, //
+                                 Network network) {
+        super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+    // public SingleHeuristicDispatcher(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, SingleRideAppender appender) {
+	// super(eventsManager, appender);
+
+        appender = new SingleRideAppender(avDispatcherConfig, parallelLeastCostPathCalculator, travelTime); // newly added
+
+        this.operatorId = avDispatcherConfig.getParent().getId(); // operatorId;
 
         double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx, miny, maxx, maxy
 
@@ -54,6 +67,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         pendingRequestsTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
     }
 
+    /*
     @Override
     public void onRequestSubmitted(AVRequest request) {
         addRequest(request, request.getFromLink());
@@ -71,8 +85,11 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
             private_addVehicle((AVVehicle) task.getSchedule().getVehicle(), ((AVStayTask) task).getLink());
         }
     }
+    */
 
-    private void reoptimize(double now) {
+    // from old private void reoptimize(double)
+    @Override
+    public void redispatch(double now) {
         while (pendingRequests.size() > 0 && availableVehicles.size() > 0) {
             //System.out.println("single heuristic dispatcher is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + "  availableVehicles.size()" + availableVehicles.size());
             AVRequest request = null;
@@ -92,7 +109,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
             removeRequest(request);
             private_removeVehicle(vehicle);
 
-            appender.schedule(request, vehicle, now);
+            appender.schedule(request, vehicle, now); // never updated because of diffrent onNextTimeStep
         }
 
         SimpleDispatcherHeuristicMode updatedMode = availableVehicles.size() > 0 ? SimpleDispatcherHeuristicMode.OVERSUPPLY : SimpleDispatcherHeuristicMode.UNDERSUPPLY;
@@ -102,11 +119,13 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         }
     }
 
+    /*
     @Override
     public void onNextTimestep(double now) {
         appender.update();
         reoptimize(now);
     }
+    */
 
     private AVRequest findRequest() {
         return pendingRequests.get(0);
@@ -126,6 +145,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         return pendingRequestsTree.getClosest(coord.getX(), coord.getY());
     }
 
+    /*
     @Override
     public void protected_registerVehicle(AVVehicle vehicle) {
         private_addVehicle(vehicle, vehicle.getStartLink());
@@ -137,6 +157,7 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         availableVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), vehicle);
         vehicleLinks.put(vehicle, link);
     }
+    */
 
     private void private_removeVehicle(AVVehicle vehicle) {
         availableVehicles.remove(vehicle);
@@ -162,12 +183,16 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+            /*
             return new SingleHeuristicDispatcher(
                     config.getParent().getId(),
                     eventsManager,
                     network,
                     new SingleRideAppender(config, router, travelTime)
             );
+            */
+            return new SingleHeuristicDispatcher( //
+                    config, travelTime, router, eventsManager, network);
         }
     }
 }
