@@ -1,9 +1,9 @@
 package org.matsim.core.network;
 
+import org.matsim.api.core.v01.network.Link;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * An optimized data structure to answer nearest-neighbor queries for links in a
@@ -47,6 +47,10 @@ public final class LinkQuadTree {
 			return null;
 		}
 		return w.link;
+	}
+
+	public void remove(final Link link) {
+		this.top.remove(new LinkWrapper(link));
 	}
 
 	private static class Node {
@@ -95,6 +99,20 @@ public final class LinkQuadTree {
 					this.children[pos.ordinal()].put(w);
 				}
 			}
+		}
+
+		public boolean remove(final LinkWrapper w) {
+			ChildPosition pos = getChildPosition(w);
+			if (pos == ChildPosition.NO_CHILD) {
+				for (int i = 0, n = this.links.size(); i < n; i++) {
+					LinkWrapper w2 = this.links.get(i);
+					if (w2.link.equals(w.link)) {
+						this.links.remove(i);
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		/**

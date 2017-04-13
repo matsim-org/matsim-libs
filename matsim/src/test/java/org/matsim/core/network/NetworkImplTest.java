@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author mrieser
@@ -230,4 +229,41 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Assert.assertEquals(node2, n);
 	}
 
+	@Test
+	public void testRemoveLink_alsoInQuadTrees() {
+		Network network = new NetworkImpl();
+		Node node1 = NetworkUtils.createNode(Id.create(1, Node.class), new Coord(100, 100));
+		Node node2 = NetworkUtils.createNode(Id.create(2, Node.class), new Coord(1000, 200));
+		Node node3 = NetworkUtils.createNode(Id.create(3, Node.class), new Coord(500, 700));
+		network.addNode(node1);
+		network.addNode(node2);
+		network.addNode(node3);
+		Link link1 = NetworkUtils.createLink(Id.create(1, Link.class), node1, node2, network, 800, 13.4, 2000, 1);
+		Link link2 = NetworkUtils.createLink(Id.create(2, Link.class), node2, node3, network, 800, 13.4, 2000, 1);
+		Link link3 = NetworkUtils.createLink(Id.create(3, Link.class), node3, node1, network, 800, 13.4, 2000, 1);
+		network.addLink(link1);
+		network.addLink(link2);
+		network.addLink(link3);
+
+		Assert.assertEquals(3, network.getLinks().size());
+		Assert.assertEquals(link1, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assert.assertEquals(link1, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
+
+		network.removeLink(link1.getId());
+
+		Assert.assertEquals(2, network.getLinks().size());
+		Assert.assertEquals(link3, NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assert.assertEquals(link3, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
+
+		network.removeLink(link3.getId());
+
+		Assert.assertEquals(1, network.getLinks().size());
+		Assert.assertEquals(link2, NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
+
+		network.removeLink(link2.getId());
+
+		Assert.assertEquals(0, network.getLinks().size());
+		Assert.assertNull(NetworkUtils.getNearestLink(network, new Coord(300, 200)));
+		Assert.assertNull(NetworkUtils.getNearestLinkExactly(network, new Coord(300, 200)));
+	}
 }

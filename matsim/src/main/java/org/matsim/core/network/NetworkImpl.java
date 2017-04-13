@@ -20,14 +20,6 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,6 +30,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Design thoughts:<ul>
@@ -206,10 +206,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		if (l == null) {
 			return null;
 		}
-		//		l.getFromNode().getOutLinks().remove(l.getId());
-		l.getFromNode().removeOutLink(l.getId()) ; 
-		//		l.getToNode().getInLinks().remove(l.getId());
+		l.getFromNode().removeOutLink(l.getId()) ;
 		l.getToNode().removeInLink(l.getId()) ;
+
+		if (this.linkQuadTree != null) {
+			this.linkQuadTree.remove(l);
+		}
+
 		return l;
 	}
 
