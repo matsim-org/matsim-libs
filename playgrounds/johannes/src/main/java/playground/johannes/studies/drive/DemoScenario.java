@@ -86,13 +86,14 @@ public class DemoScenario {
 		
 		logger.info("Blurring activity end times...");
 		Random random = new XORShiftRandom();
+		int range = 300;
 		for(Person person : population.getPersons().values()) {
 			for(Plan plan : person.getPlans()) {
 				for(int i = 0; i < plan.getPlanElements().size(); i+=2) {
 					Activity act = (Activity) plan.getPlanElements().get(i);
-					double endTim = act.getEndTime() - 15*60 + (random.nextDouble() * 30*60);
+					double endTim = act.getEndTime() - range + (random.nextDouble() * range * 2);
 					act.setEndTime(endTim);
-					double startTim = act.getStartTime() - 15*60 + (random.nextDouble() * 30*60);
+					double startTim = act.getStartTime() - range + (random.nextDouble() * range * 2);
 					act.setStartTime(startTim);
 
 				}

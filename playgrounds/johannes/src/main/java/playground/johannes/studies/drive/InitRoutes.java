@@ -124,7 +124,7 @@ public class InitRoutes {
 
 		logger.info("Writing population...");
 		PopulationWriter writer = new PopulationWriter(pop);
-		writer.write(args[2]);
+		writer.writeV5(args[2]);
 		logger.info("Done.");
 	}
 
@@ -157,6 +157,20 @@ public class InitRoutes {
 		
 			for(Person person : persons) {
 				router.run(person);
+
+				for(Plan plan : person.getPlans()) {
+					for(int i = 2; i < plan.getPlanElements().size(); i+=2) {
+						Activity act = (Activity) plan.getPlanElements().get(i);
+						Activity prev = (Activity) plan.getPlanElements().get(i - 2);
+						Leg leg = (Leg) plan.getPlanElements().get(i - 1);
+
+						act.setStartTime(prev.getEndTime() + leg.getTravelTime());
+						if(act.getEndTime() < act.getStartTime()) {
+							act.setEndTime(act.getStartTime() + 1);
+						}
+					}
+				}
+
 				ProgressLogger.step();
 			}
 		}
