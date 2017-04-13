@@ -4,10 +4,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
 
@@ -15,17 +18,18 @@ import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.utils.gui.RowPanel;
 
-public class RequestLayer extends ViewerLayer {
+public class RequestsLayer extends ViewerLayer {
 
     private static Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
     // ---
     private volatile boolean drawRequestDestinations = false;
 
-    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.ORANGE.colorScheme);
-    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN.colorScheme);
+    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.Orange);
+    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GreenContour);
 
-    public RequestLayer(MatsimMapComponent matsimMapComponent) {
+    public RequestsLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
     }
 
@@ -135,6 +139,23 @@ public class RequestLayer extends ViewerLayer {
 
     public boolean getDrawDestinations() {
         return drawRequestDestinations;
+    }
+
+    @Override
+    protected void createPanel(RowPanel rowPanel) {
+        {
+            final JCheckBox jCheckBox = new JCheckBox("destin.");
+            jCheckBox.setSelected(getDrawDestinations());
+            jCheckBox.addActionListener(e -> setDrawDestinations(jCheckBox.isSelected()));
+            rowPanel.add(jCheckBox);
+        }
+        createHeatmapPanel(rowPanel, "source", requestHeatMap);
+        createHeatmapPanel(rowPanel, "sink", requestDestMap);
+    }
+
+    @Override
+    public List<MatsimHeatMap> getHeatmaps() {
+        return Arrays.asList(requestHeatMap, requestDestMap);
     }
 
 }

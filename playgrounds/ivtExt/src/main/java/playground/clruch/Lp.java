@@ -22,7 +22,7 @@ import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import java.io.File;
 import java.util.Map;
 @Deprecated // new demo file is in demo/LpStandalone
-public class Lp {
+class Lp {
 
     public static void main(String[] args) {
     	

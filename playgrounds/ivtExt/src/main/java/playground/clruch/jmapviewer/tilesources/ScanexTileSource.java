@@ -26,8 +26,8 @@ class ScanexTileSource extends TMSTileSource {
     private static final String API_KEY = "4018C5A9AECAD8868ED5DEB2E41D09F7";
 
     private enum ScanexLayer {
-        IRS("irs", "/TileSender.ashx?ModeKey=tile&MapName=F7B8CF651682420FA1749D894C8AD0F6&LayerName=BAC78D764F0443BD9AF93E7A998C9F5B"),
-        SPOT("spot", "/TileSender.ashx?ModeKey=tile&MapName=F7B8CF651682420FA1749D894C8AD0F6&LayerName=F51CE95441284AF6B2FC319B609C7DEC");
+        IRS("irs", "/TileSender.ashx?ModeKey=tile&MapName=F7B8CF651682420FA1749D894C8AD0F6&LayerName=BAC78D764F0443BD9AF93E7A998C9F5B"), SPOT("spot",
+                "/TileSender.ashx?ModeKey=tile&MapName=F7B8CF651682420FA1749D894C8AD0F6&LayerName=F51CE95441284AF6B2FC319B609C7DEC");
 
         private final String name;
         private final String uri;
@@ -55,7 +55,9 @@ class ScanexTileSource extends TMSTileSource {
 
     /**
      * Constructs a new {@code ScanexTileSource}.
-     * @param info tile source info
+     * 
+     * @param info
+     *            tile source info
      */
     public ScanexTileSource(TileSourceInfo info) {
         super(info);
@@ -63,9 +65,9 @@ class ScanexTileSource extends TMSTileSource {
 
         /**
          * The formulae in tileYToLat() and latToTileY() have 2^8
-         * hardcoded in them, so explicitly state that.  For now
+         * hardcoded in them, so explicitly state that. For now
          * the assignment matches OsmMercator.DEFAUL_TILE_SIZE, and
-         * thus is extraneous.  But let it be there just in case if
+         * thus is extraneous. But let it be there just in case if
          * OsmMercator changes.
          */
         this.tileSize = 256;
@@ -90,7 +92,7 @@ class ScanexTileSource extends TMSTileSource {
         return "jpeg";
     }
 
-   @Override
+    @Override
     public String getTileUrl(int zoom, int tilex, int tiley) {
         if (this.TemplateSource != null)
             return this.TemplateSource.getTileUrl(zoom, tilex, tiley);
@@ -109,47 +111,35 @@ class ScanexTileSource extends TMSTileSource {
     }
 
     // Latitude to Y and back calculations.
-    private static double RADIUS_E = 6378137;   /* radius of Earth at equator, m */
+    private static double RADIUS_E = 6378137; /* radius of Earth at equator, m */
     private static double EQUATOR = 40075016.68557849; /* equator length, m */
-    private static double E = 0.0818191908426;  /* eccentricity of Earth's ellipsoid */
+    private static double E = 0.0818191908426; /* eccentricity of Earth's ellipsoid */
 
     @Override
     public Point latLonToXY(double lat, double lon, int zoom) {
-        return new Point(
-                (int) osmMercator.lonToX(lon, zoom),
-                (int) latToTileY(lat, zoom)
-                );
+        return new Point((int) osmMercator.lonToX(lon, zoom), (int) latToTileY(lat, zoom));
     }
 
     @Override
     public ICoordinate xyToLatLon(int x, int y, int zoom) {
-        return new Coordinate(
-                tileYToLat(y, zoom),
-                osmMercator.xToLon(x, zoom)
-                );
+        return new Coordinate(tileYToLat(y, zoom), osmMercator.xToLon(x, zoom));
     }
 
     @Override
     public TileXY latLonToTileXY(double lat, double lon, int zoom) {
-        return new TileXY(
-                osmMercator.lonToX(lon, zoom) / getTileSize(),
-                latToTileY(lat, zoom)
-                );
+        return new TileXY(osmMercator.lonToX(lon, zoom) / getTileSize(), latToTileY(lat, zoom));
     }
 
     @Override
     public ICoordinate tileXYToLatLon(int x, int y, int zoom) {
-        return new Coordinate(
-                tileYToLat(y, zoom),
-                osmMercator.xToLon(x * getTileSize(), zoom)
-                );
+        return new Coordinate(tileYToLat(y, zoom), osmMercator.xToLon(x * getTileSize(), zoom));
     }
 
     private double latToTileY(double lat, int zoom) {
-        double tmp = Math.tan(Math.PI/4 * (1 + lat/90));
-        double pow = Math.pow(Math.tan(Math.PI/4 + Math.asin(E * Math.sin(Math.toRadians(lat)))/2), E);
+        double tmp = Math.tan(Math.PI / 4 * (1 + lat / 90));
+        double pow = Math.pow(Math.tan(Math.PI / 4 + Math.asin(E * Math.sin(Math.toRadians(lat))) / 2), E);
 
-        return (EQUATOR/2 - (RADIUS_E * Math.log(tmp/pow))) * Math.pow(2.0, zoom) / EQUATOR;
+        return (EQUATOR / 2 - (RADIUS_E * Math.log(tmp / pow))) * Math.pow(2.0, zoom) / EQUATOR;
     }
 
     /*
@@ -166,8 +156,7 @@ class ScanexTileSource extends TMSTileSource {
             lat = lat - Math.toDegrees(nextTerm(Math.toRadians(lat), y, zoom));
             if (lat > OsmMercator.MAX_LAT || lat < OsmMercator.MIN_LAT) {
                 Random r = new Random();
-                lat = OsmMercator.MIN_LAT +
-                  r.nextInt((int) (OsmMercator.MAX_LAT - OsmMercator.MIN_LAT));
+                lat = OsmMercator.MIN_LAT + r.nextInt((int) (OsmMercator.MAX_LAT - OsmMercator.MIN_LAT));
             }
         } while (Math.abs(lat0 - lat) > 0.000001);
 
@@ -182,13 +171,11 @@ class ScanexTileSource extends TMSTileSource {
         double cosl = Math.cos(lat);
 
         zoom = (int) Math.pow(2.0, zoom - 1);
-        double ec = Math.exp((1 - y/zoom)*Math.PI);
+        double ec = Math.exp((1 - y / zoom) * Math.PI);
 
-        double f = Math.tan(Math.PI/4+lat/2) -
-            ec * Math.pow(Math.tan(Math.PI/4 + Math.asin(E * sinl)/2), E);
-        double df = 1/(1 - sinl) - ec * E * cosl/((1 - E * sinl) *
-            (Math.sqrt(1 - E * E * sinl * sinl)));
+        double f = Math.tan(Math.PI / 4 + lat / 2) - ec * Math.pow(Math.tan(Math.PI / 4 + Math.asin(E * sinl) / 2), E);
+        double df = 1 / (1 - sinl) - ec * E * cosl / ((1 - E * sinl) * (Math.sqrt(1 - E * E * sinl * sinl)));
 
-        return f/df;
+        return f / df;
     }
 }

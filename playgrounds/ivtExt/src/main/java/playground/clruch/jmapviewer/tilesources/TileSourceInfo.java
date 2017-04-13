@@ -43,9 +43,12 @@ class TileSourceInfo {
     /**
      * Create a TileSourceInfo class
      *
-     * @param name name
-     * @param baseUrl base URL
-     * @param id unique id
+     * @param name
+     *            name
+     * @param baseUrl
+     *            base URL
+     * @param id
+     *            unique id
      */
     public TileSourceInfo(String name, String baseUrl, String id) {
         this.name = name;
@@ -56,7 +59,8 @@ class TileSourceInfo {
     /**
      * Create a TileSourceInfo class
      *
-     * @param name name
+     * @param name
+     *            name
      */
     public TileSourceInfo(String name) {
         this(name, null, null);
@@ -71,6 +75,7 @@ class TileSourceInfo {
 
     /**
      * Request name of the tile source
+     * 
      * @return name of the tile source
      */
     public final String getName() {
@@ -79,6 +84,7 @@ class TileSourceInfo {
 
     /**
      * Request URL of the tile source
+     * 
      * @return url of the tile source
      */
     public final String getUrl() {
@@ -88,6 +94,7 @@ class TileSourceInfo {
     /**
      * Request ID of the tile source. Id can be null. This gets the configured id as is.
      * Due to a user error, this may not be unique.
+     * 
      * @return id of the tile source
      */
     public final String getId() {
@@ -96,6 +103,7 @@ class TileSourceInfo {
 
     /**
      * Request header information for empty tiles for servers delivering such tile types
+     * 
      * @return map of headers, that when set, means that this is "no tile at this zoom level" situation
      * @since 32022
      */
@@ -105,6 +113,7 @@ class TileSourceInfo {
 
     /**
      * Checkusm for empty tiles for servers delivering such tile types
+     * 
      * @return map of checksums, that when detected, means that this is "no tile at this zoom level" situation
      * @since 32022
      */
@@ -114,6 +123,7 @@ class TileSourceInfo {
 
     /**
      * Request supported minimum zoom level
+     * 
      * @return minimum zoom level supported by tile source
      */
     public int getMinZoom() {
@@ -122,6 +132,7 @@ class TileSourceInfo {
 
     /**
      * Request supported maximum zoom level
+     * 
      * @return maximum zoom level supported by tile source
      */
     public int getMaxZoom() {
@@ -130,6 +141,7 @@ class TileSourceInfo {
 
     /**
      * Request cookies to be sent together with request
+     * 
      * @return cookies to be sent along with request to tile source
      */
     public String getCookies() {
@@ -138,6 +150,7 @@ class TileSourceInfo {
 
     /**
      * Request tile size of this tile source
+     * 
      * @return tile size provided by this tile source, or -1 when default value should be used
      */
     public int getTileSize() {
@@ -146,6 +159,7 @@ class TileSourceInfo {
 
     /**
      * Request metadata headers
+     * 
      * @return mapping &lt;HTTP header name, Metadata key name&gt; for copying HTTP headers to Tile metadata
      * @since 31125
      */
@@ -155,7 +169,9 @@ class TileSourceInfo {
 
     /**
      * Sets the tile size provided by this tile source
-     * @param tileSize tile size in pixels
+     * 
+     * @param tileSize
+     *            tile size in pixels
      */
     public final void setTileSize(int tileSize) {
         if (tileSize == 0 || tileSize < -1) {
@@ -166,7 +182,9 @@ class TileSourceInfo {
 
     /**
      * Sets the tile URL.
-     * @param url tile URL
+     * 
+     * @param url
+     *            tile URL
      */
     public final void setUrl(String url) {
         this.url = url;
@@ -174,7 +192,9 @@ class TileSourceInfo {
 
     /**
      * Sets the tile name.
-     * @param name tile name
+     * 
+     * @param name
+     *            tile name
      */
     public final void setName(String name) {
         this.name = name;
@@ -182,7 +202,9 @@ class TileSourceInfo {
 
     /**
      * Sets the tile id.
-     * @param id tile id
+     * 
+     * @param id
+     *            tile id
      */
     public final void setId(String id) {
         this.id = id;

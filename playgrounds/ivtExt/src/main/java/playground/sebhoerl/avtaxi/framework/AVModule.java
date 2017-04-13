@@ -30,6 +30,8 @@ import com.google.inject.name.Names;
 
 import org.opengis.filter.Not;
 import playground.clruch.dispatcher.*;
+import playground.fseccamo.dispatcher.MPCDispatcher_1;
+import playground.maalbert.dispatcher.DFRDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -117,20 +119,17 @@ public class AVModule extends AbstractModule {
         bind(SelfishDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
 
-        bind(DFRDispatcher_v0.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher_v0.class.getSimpleName()).to(DFRDispatcher_v0.Factory.class);
 
-        bind(DFRDispatcher_v1.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher_v1.class.getSimpleName()).to(DFRDispatcher_v1.Factory.class);
-                
 
         /** dispatchers for PartitionedDispatcher */
         //bind(ConsensusDispatcherDFR.Factory.class);
         bind(LPFeedbackLIPDispatcher.Factory.class);
         bind(LPFeedforwardDispatcher.Factory.class);
+        bind(DFRDispatcher.Factory.class);
         //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
         
         // MPC dispatcher
         bind(MPCDispatcher_1.Factory.class);

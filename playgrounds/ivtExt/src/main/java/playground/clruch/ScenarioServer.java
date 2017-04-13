@@ -19,6 +19,7 @@ import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.prep.TheApocalypse;
+import playground.maalbert.analysis.AnalyzeMarc;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -38,8 +39,9 @@ public class ScenarioServer {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-
+            
         int maxPopulationSize = 12000;
+
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = false;
@@ -70,5 +72,6 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
         AnalyzeAll.analyze(args);
+        //AnalyzeMarc.analyze(args);
     }
 }

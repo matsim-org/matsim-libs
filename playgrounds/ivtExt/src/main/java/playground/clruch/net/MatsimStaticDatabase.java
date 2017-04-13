@@ -78,6 +78,8 @@ public class MatsimStaticDatabase {
         return linkInteger.get(link);
     }
 
+    public  Map<Link, Integer> getLinkInteger() {return Collections.unmodifiableMap(linkInteger);}
+
     public OsmLink getOsmLink(int index) {
         return list.get(index);
     }

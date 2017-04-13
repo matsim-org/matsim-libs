@@ -36,34 +36,47 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public class SelfishDispatcher extends UniversalDispatcher {
 
 	private final int dispatchPeriod;
-	private final int updateRefPeriod; // implementation may not use this
-	// private Tensor printVals = Tensors.empty();
-	private final int numberofVehicles;
 
 	// specific to SelfishDispatcher
+	private final int updateRefPeriod;         // implementation may not use this
+	private final int weiszfeldMaxIter;        // max iterations for Weiszfeld's algorithm
+	private final double weiszfeldTol;         // convergence tolerance for Weiszfeld's algorithm
 	private boolean vehiclesInitialized = false;
-	private HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
-	private HashMap<AVVehicle, Link> refPositions = new HashMap<>();
+	private final HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
+	private final HashMap<AVVehicle, Link> refPositions = new HashMap<>();
 	private final Network network;
 	private final QuadTree<AVRequest> pendingRequestsTree;
+	private final QuadTree<Link> networkLinksTree;
 	private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used to enable fast "contains" searching
+	private final double[] networkBounds;
 
-	private SelfishDispatcher( //
-			AVDispatcherConfig avDispatcherConfig, //
-			AVGeneratorConfig generatorConfig, //
-			TravelTime travelTime, //
+	private SelfishDispatcher(                                               //
+			AVDispatcherConfig avDispatcherConfig,                           //
+			AVGeneratorConfig generatorConfig,                               //
+			TravelTime travelTime,                                           //
 			ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-			EventsManager eventsManager, //
+			EventsManager eventsManager,                                     //
 			Network networkIn, AbstractRequestSelector abstractRequestSelector) {
+
 		super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+
+		// Load parameters from av.xml
 		SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
 		dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
-		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", Integer.MAX_VALUE);
-		numberofVehicles = (int) generatorConfig.getNumberOfVehicles();
-		network = networkIn;
-		// minx, miny, maxx, maxy
-		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
-		pendingRequestsTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
+
+		updateRefPeriod = safeConfig.getInteger("updateRefPeriod", 3600);
+		weiszfeldMaxIter = safeConfig.getInteger("weiszfeldMaxIter", 1000);
+		weiszfeldTol = safeConfig.getDouble("weiszfeldTol", 1.0);
+
+        network = networkIn;
+        // minx,
+        // miny,
+        // maxx,
+        // maxy
+        networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
+        pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+        networkLinksTree = buildNetworkQuadTree();
+
 	}
 
 	@Override
@@ -97,10 +110,27 @@ public class SelfishDispatcher extends UniversalDispatcher {
                 }
 
 				// send remaining vehicles to their reference position
-				getDivertableVehicles().stream().forEach(v -> setVehicleDiversion(v, refPositions.get(v.avVehicle)));
-
+				// getDivertableVehicles().stream().forEach(v -> setVehicleDiversion(v, ));
+				for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+					GlobalAssert.that(refPositions.containsKey(vehicleLinkPair.avVehicle));
+					Link link = refPositions.get(vehicleLinkPair.avVehicle);
+					GlobalAssert.that(link!=null);
+					setVehicleDiversion(vehicleLinkPair, link);
+				}
 			}
 		}
+	}
+
+	private QuadTree<Link> buildNetworkQuadTree() {
+		QuadTree<Link> networkQuadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+		Collection<? extends Link> networkLinks = network.getLinks().values();
+		for (Link link : networkLinks) {
+			GlobalAssert.that(link != null);
+			Coord linkCoord = link.getFromNode().getCoord();
+			boolean putSuccess = networkQuadTree.put(linkCoord.getX(), linkCoord.getY(), link);
+			GlobalAssert.that(putSuccess);
+		}
+		return networkQuadTree;
 	}
 
 	/** 
@@ -138,35 +168,86 @@ public class SelfishDispatcher extends UniversalDispatcher {
 	 * update the reference positions of all AVs
 	 */
 	private void updateRefPositions() {
-
-		// get list of all links in network
-		Collection<? extends Link> networkLinksC = network.getLinks().values();
-		List<Link> networkLinks = new ArrayList<>();
-		for (Link link : networkLinksC) {
-			networkLinks.add(link);
-		}
-
-		// currently implemented, assign a random link from the network to every AV
-		for (AVVehicle avVehicle : refPositions.keySet()) {
-			Collections.shuffle(networkLinks);
-			refPositions.put(avVehicle, networkLinks.get(0));
+		GlobalAssert.that(!getMaintainedVehicles().isEmpty());
+		GlobalAssert.that(0 < networkLinksTree.size());
+		for (AVVehicle avVehicle : getMaintainedVehicles()) {
+			Link initialGuess = refPositions.get(avVehicle);               // initialize with previous Weber link
+			Link weberLink = weberWeiszfeld(requestsServed.get(avVehicle), initialGuess);
+			GlobalAssert.that(weberLink != null);
+			refPositions.put(avVehicle, weberLink);
 		}
 	}
+
+    /**
+     *
+     * @param avRequests
+     *          list of requests served so far
+     * @param initialGuess
+     *          2D-point initial guess for the iterative algorithm
+     * @return 2D Weber point of past requests approximated by Weiszfeld's algorithm
+     */
+	private Link weberWeiszfeld(List<AVRequest> avRequests, Link initialGuess) {
+		if (avRequests.isEmpty()) {
+			return initialGuess;
+		}
+        double weberX = initialGuess.getFromNode().getCoord().getX();
+		double weberY = initialGuess.getFromNode().getCoord().getY();
+        int count = 0;
+        while (count <= weiszfeldMaxIter) {
+        	double X = 0.0;
+        	double Y = 0.0;
+        	double normalizer = 0.0;
+            for (AVRequest avRequest : avRequests) {
+            	Coord point = avRequest.getFromLink().getCoord();
+				double distance = Math.sqrt( Math.pow(point.getX() - weberX, 2.0) + Math.pow(point.getY() - weberY, 2.0) );
+				if (distance != 0) {
+					X += point.getX() / distance;
+					Y += point.getY() / distance;
+					normalizer += 1.0 / distance;
+				} else {
+					X = point.getX();
+					Y = point.getY();
+					normalizer = 1.0;
+					break;
+				}
+			}
+			X /= normalizer;
+			Y /= normalizer;
+			double change = Math.sqrt(Math.pow(X - weberX, 2.0) + Math.pow(Y - weberY, 2.0));
+			weberX = X;
+			weberY = Y;
+			if (change < weiszfeldTol) {
+				break;
+			}
+            count++;
+        }
+        GlobalAssert.that((weberX >= networkBounds[0]) &&
+                          (weberY >= networkBounds[1]) &&
+                          (weberX <= networkBounds[2]) &&
+                          (weberY <= networkBounds[3]) );   // Weber point must be inside the network
+
+        Link weberLink = networkLinksTree.getClosest(weberX, weberY);
+        GlobalAssert.that(weberLink != null);
+        
+        return weberLink;
+    }
 
 	/**
 	 * initializes the vehicle Lists which are used for vehicle specific
 	 * tracking
 	 */
 	private void initializeVehicles() {
+	    Collection<? extends Link> networkLinksCol = network.getLinks().values();     // collection of all links in the network
+        List<Link> networkLinks = new ArrayList<>();                                  // create a list from this collection
+        for (Link link : networkLinksCol) {
+            networkLinks.add(link);
+        }
 		for (AVVehicle avVehicle : getMaintainedVehicles()) {
-			requestsServed.put(avVehicle, new ArrayList<>());
-			refPositions.put(avVehicle, null);
+			requestsServed.put(avVehicle, new ArrayList<AVRequest>());
+			Collections.shuffle(networkLinks);
+			refPositions.put(avVehicle, networkLinks.get(0));    // assign a random link from the network to every AV
 		}
-		if (requestsServed.keySet().size() == numberofVehicles) {
-			updateRefPositions();
-			vehiclesInitialized = true;
-		}
-
+		vehiclesInitialized = true;
 	}
 
 	public static class Factory implements AVDispatcherFactory {

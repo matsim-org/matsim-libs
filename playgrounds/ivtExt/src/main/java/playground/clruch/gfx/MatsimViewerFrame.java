@@ -13,10 +13,10 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 
@@ -26,12 +26,12 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import playground.clruch.jmapviewer.Coordinate;
 import playground.clruch.jmapviewer.JMapViewer;
-import playground.clruch.jmapviewer.JMapViewerTree;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.DummyStorageSupplier;
 import playground.clruch.net.IterationFolder;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.StorageUtils;
+import playground.clruch.utils.gui.RowPanel;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 /**
@@ -50,7 +50,6 @@ public class MatsimViewerFrame implements Runnable {
     private final Thread thread;
 
     public final JFrame jFrame = new JFrame();
-    private final JMapViewerTree treeMap;
     StorageSupplier storageSupplier = new DummyStorageSupplier();
 
     public static FlowLayout createFlowLayout() {
@@ -62,7 +61,6 @@ public class MatsimViewerFrame implements Runnable {
     /** Constructs the {@code Demo}. */
     public MatsimViewerFrame(MatsimMapComponent matsimMapComponent) {
         this.matsimMapComponent = matsimMapComponent;
-        treeMap = new JMapViewerTree(matsimMapComponent, "Zones", false);
         // ---
         jFrame.setTitle("ETH Z\u00fcrich MATSim Viewer");
         jFrame.setLayout(new BorderLayout());
@@ -76,25 +74,26 @@ public class MatsimViewerFrame implements Runnable {
         });
         JPanel panelNorth = new JPanel(new BorderLayout());
         JPanel panelControls = new JPanel(createFlowLayout());
-        JPanel panelSettings = new JPanel(createFlowLayout());
         panelNorth.add(panelControls, BorderLayout.NORTH);
-        panelNorth.add(panelSettings, BorderLayout.CENTER);
 
         jFrame.add(panelNorth, BorderLayout.NORTH);
-        jFrame.add(treeMap, BorderLayout.CENTER);
+        {
+            RowPanel rowPanel = new RowPanel();
+            for (ViewerLayer viewerLayer : matsimMapComponent.viewerLayers)
+                rowPanel.add(viewerLayer.createPanel());
+            JPanel jPanel = new JPanel(new BorderLayout());
+            jPanel.add(rowPanel.jPanel, BorderLayout.NORTH);
+            JScrollPane jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            jScrollPane.setPreferredSize(new Dimension(150, 0));
+            jFrame.add(jScrollPane, BorderLayout.EAST);
+        }
+        jFrame.add(matsimMapComponent, BorderLayout.CENTER);
         jFrame.add(matsimMapComponent.jLabel, BorderLayout.SOUTH);
 
         MatsimToggleButton matsimToggleButton = new MatsimToggleButton(matsimMapComponent);
         matsimToggleButton.addActionListener(l -> jSlider.setEnabled(!matsimToggleButton.isSelected()));
         panelControls.add(matsimToggleButton);
-        JMapTileSelector.install(panelControls, matsimMapComponent);
-        {
-            SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
-            spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 255);
-            spinnerLabel.setValueSafe(matsimMapComponent.mapAlphaCover);
-            spinnerLabel.addSpinnerListener(i -> matsimMapComponent.setMapAlphaCover(i));
-            spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "alpha cover");
-        }
+
         panelNorth.add(jSlider, BorderLayout.SOUTH);
         {
             List<IterationFolder> list = StorageUtils.getAvailableIterations();
@@ -145,42 +144,6 @@ public class MatsimViewerFrame implements Runnable {
                 }
             }
         }
-        // ---
-        {
-            final JCheckBox jCheckBox = new JCheckBox("links");
-            jCheckBox.setSelected(matsimMapComponent.linkLayer.getDraw());
-            jCheckBox.addActionListener(e -> matsimMapComponent.linkLayer.setDraw(jCheckBox.isSelected()));
-            panelSettings.add(jCheckBox);
-        }
-        {
-            final JCheckBox jCheckBox = new JCheckBox("req.dest");
-            jCheckBox.setSelected(matsimMapComponent.requestLayer.getDrawDestinations());
-            jCheckBox.addActionListener(e -> matsimMapComponent.requestLayer.setDrawDestinations(jCheckBox.isSelected()));
-            panelSettings.add(jCheckBox);
-        }
-        {
-            final JCheckBox jCheckBox = new JCheckBox("veh.dest");
-            jCheckBox.setSelected(matsimMapComponent.vehicleLayer.getDrawDestinations());
-            jCheckBox.addActionListener(e -> matsimMapComponent.vehicleLayer.setDrawDestinations(jCheckBox.isSelected()));
-            panelSettings.add(jCheckBox);
-        }
-        {
-            final JCheckBox jCheckBox = new JCheckBox("cells");
-            jCheckBox.setSelected(matsimMapComponent.virtualNetworkLayer.getDrawCells());
-            jCheckBox.addActionListener(e -> matsimMapComponent.virtualNetworkLayer.setDrawCells(jCheckBox.isSelected()));
-            panelSettings.add(jCheckBox);
-        }
-        {
-            final JCheckBox jCheckBox = new JCheckBox("tree");
-            jCheckBox.addActionListener(e -> treeMap.setTreeVisible(jCheckBox.isSelected()));
-            panelSettings.add(jCheckBox);
-        }
-        {
-            final JCheckBox jCheckBox = new JCheckBox("grid");
-            jCheckBox.setSelected(getJMapViewer().isTileGridVisible());
-            jCheckBox.addActionListener(e -> getJMapViewer().setTileGridVisible(jCheckBox.isSelected()));
-            panelSettings.add(jCheckBox);
-        }
 
         getJMapViewer().addMouseListener(new MouseAdapter() {
             @Override
@@ -224,7 +187,7 @@ public class MatsimViewerFrame implements Runnable {
     }
 
     private JMapViewer getJMapViewer() {
-        return treeMap.getViewer();
+        return matsimMapComponent;
     }
 
     public void setDisplayPosition(Coord coord, int zoom) {

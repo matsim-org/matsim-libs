@@ -4,6 +4,7 @@ import playground.clruch.net.ObjectClient;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationSubscriber;
 
+@Deprecated
 class Test {
 
     public static void main(String[] args) {

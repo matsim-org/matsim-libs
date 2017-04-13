@@ -14,6 +14,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Sort;
 import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.utils.gui.RowPanel;
 
 class IsolineLayer extends ViewerLayer {
 
@@ -69,6 +70,11 @@ class IsolineLayer extends ViewerLayer {
                 prev = point;
             }
         }
+    }
+
+    @Override
+    protected void createPanel(RowPanel rowPanel) {
+
     }
 
 }

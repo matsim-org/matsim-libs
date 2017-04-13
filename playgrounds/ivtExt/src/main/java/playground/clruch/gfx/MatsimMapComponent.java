@@ -19,7 +19,6 @@ import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.utils.gui.GraphicsUtil;
 
 public class MatsimMapComponent extends JMapViewer {
 
@@ -28,12 +27,9 @@ public class MatsimMapComponent extends JMapViewer {
 
     SimulationObject simulationObject = null;
 
-    public final LinkLayer linkLayer;
-    public final RequestLayer requestLayer;
-    public final VehicleLayer vehicleLayer;
     public final VirtualNetworkLayer virtualNetworkLayer;
 
-    private final List<ViewerLayer> viewerLayers = new ArrayList<>();
+    public final List<ViewerLayer> viewerLayers = new ArrayList<>();
     private final List<InfoString> infoStrings = new LinkedList<>();
     private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
     private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
@@ -42,18 +38,21 @@ public class MatsimMapComponent extends JMapViewer {
 
     public MatsimMapComponent(MatsimStaticDatabase db) {
         this.db = db;
-
-        linkLayer = new LinkLayer(this);
-        requestLayer = new RequestLayer(this);
-        vehicleLayer = new VehicleLayer(this);
         virtualNetworkLayer = new VirtualNetworkLayer(this);
 
-        viewerLayers.add(linkLayer);
-        viewerLayers.add(requestLayer);
-        matsimHeatmaps.add(requestLayer.requestHeatMap);
-        matsimHeatmaps.add(requestLayer.requestDestMap);
-        viewerLayers.add(vehicleLayer);
-        viewerLayers.add(virtualNetworkLayer);
+        addLayer(new TilesLayer(this));
+        addLayer(new VehiclesLayer(this));
+        addLayer(new RequestsLayer(this));
+        addLayer(new LinkLayer(this));
+        addLayer(virtualNetworkLayer);
+        addLayer(new ClockLayer(this));
+    
+    }
+
+    public void addLayer(ViewerLayer viewerLayer) {
+        viewerLayers.add(viewerLayer);
+        for (MatsimHeatMap m : viewerLayer.getHeatmaps())
+            matsimHeatmaps.add(m);
     }
 
     /**
@@ -107,8 +106,6 @@ public class MatsimMapComponent extends JMapViewer {
             jLabel.setText(ref.infoLine);
 
             drawInfoStrings(graphics);
-            GraphicsUtil.setQualityHigh(graphics);
-            new SbbClockDisplay().drawClock(graphics, ref.now, new Point(dimension.width - 70, 70));
         }
         {
             graphics.setFont(debugStringFont);

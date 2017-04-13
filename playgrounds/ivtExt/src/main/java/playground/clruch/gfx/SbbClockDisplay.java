@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
 
-public class SbbClockDisplay {
+class SbbClockDisplay {
 
     int wid = 52;
     int hourRad = 32;
