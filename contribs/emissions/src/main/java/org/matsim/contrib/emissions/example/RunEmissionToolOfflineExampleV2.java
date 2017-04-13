@@ -57,11 +57,9 @@ public class RunEmissionToolOfflineExampleV2 {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
+
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		
@@ -73,7 +71,7 @@ public class RunEmissionToolOfflineExampleV2 {
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 
 	private static int getLastIteration() {

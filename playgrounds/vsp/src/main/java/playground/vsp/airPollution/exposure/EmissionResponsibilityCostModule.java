@@ -21,12 +21,14 @@ package playground.vsp.airPollution.exposure;
 
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 
 
@@ -44,12 +46,13 @@ public class EmissionResponsibilityCostModule {
 	private final ResponsibilityGridTools responsibilityGridTools;
 	private final boolean considerCO2Costs ;
 
+	@Inject
+	public EmissionResponsibilityCostModule(EmissionsConfigGroup emissionsConfigGroup, ResponsibilityGridTools rgt) {
+		this.emissionCostMultiplicationFactor = emissionsConfigGroup.getEmissionCostMultiplicationFactor();
+		this.considerCO2Costs = emissionsConfigGroup.isConsideringCO2Costs();
 
-	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt) {
-		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostMultiplicationFactor);
 
-		this.considerCO2Costs = considerCO2Costs;
 		if(this.considerCO2Costs){
 			logger.info("CO2 emission costs will be calculated... ");
 			logger.warn("The first iteration will include only flat CO2 emission costs because, " +
@@ -61,10 +64,6 @@ public class EmissionResponsibilityCostModule {
 		this.responsibilityGridTools = rgt;
 	}
 	
-	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, ResponsibilityGridTools rgt) {
-		this(emissionCostMultiplicationFactor, false, rgt);
-	}
-
 	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions, Id<Link> linkId, double time) {
 		double warmEmissionCosts = 0.0;
 		

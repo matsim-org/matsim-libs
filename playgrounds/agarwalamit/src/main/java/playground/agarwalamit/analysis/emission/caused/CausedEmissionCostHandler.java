@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.*;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.vehicles.Vehicle;
@@ -62,7 +63,12 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 	public static void main(String[] args) {
 		String emissionEventsFile = FileUtils.RUNS_SVN+ "/detEval/emissionCongestionInternalization/iatbr/output/ei/ITERS/it.1500/1500.emission.events.xml.gz";
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionCostModule ecm = new EmissionCostModule(1.0, true);
+
+		EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
+		emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.);
+		emissionsConfigGroup.setConsideringCO2Costs(true);
+
+		EmissionCostModule ecm = new EmissionCostModule(emissionsConfigGroup);
 		CausedEmissionCostHandler ech = new CausedEmissionCostHandler(ecm);
 		eventsManager.addHandler(ech);
 		new EmissionEventsReader(eventsManager).readFile(emissionEventsFile);

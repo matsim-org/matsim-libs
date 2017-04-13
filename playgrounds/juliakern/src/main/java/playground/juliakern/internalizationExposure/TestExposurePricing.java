@@ -234,7 +234,7 @@ public class TestExposurePricing {
         ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
         ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
         ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
-		
+
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 //		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 //		vcg.setWritingOutputEvents(false) ;
@@ -244,26 +244,25 @@ public class TestExposurePricing {
 //		services.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, services.getNetwork(), ecl));
 		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
 		
-		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.setEmissionEfficiencyFactor(1.0);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
+		ecg.setEmissionEfficiencyFactor(1.0);
 
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 //		links2xCells = gt.mapLinks2Xcells(noOfXCells);
 //		links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
 		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0,	false, rgt);
-		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
-				emissionCostModule, config.planCalcScore());
+		ecg.setConsideringCO2Costs(false);
+		ecg.setEmissionCostMultiplicationFactor(1.0);
+
+		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
+        );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
-				bind(EmissionModule.class).toInstance(emissionModule);
-				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionModule.class).asEagerSingleton();
+				bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
 				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}

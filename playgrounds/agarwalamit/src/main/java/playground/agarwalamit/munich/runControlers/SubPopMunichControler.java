@@ -43,7 +43,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
@@ -138,25 +137,32 @@ public class SubPopMunichControler {
 
 		ecg.setUsingDetailedEmissionCalculation(true);
 		//===only emission events genertaion; used with all runs for comparisons
-		EmissionModule emissionModule = new EmissionModule(ScenarioUtils.loadScenario(config));
-		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
+		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+		ecg.setConsideringCO2Costs(Boolean.parseBoolean(considerCO2Costs));
+		ecg.setEmissionCostMultiplicationFactor(Double.parseDouble(emissionCostFactor));
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton(); // need at many places even if not internalizing emissions
+				bind(EmissionCostModule.class).asEagerSingleton();
+			}
+		});
 
 		if(internalizeEmission){
 			// this is needed by *both* following modules:
-			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 			// this affects the router by overwriting its generalized cost function (TravelDisutility):
-			final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
-					emissionCostModule, config.planCalcScore());
+			final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
+            );
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
+					addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+
 					bindCarTravelDisutilityFactory().toInstance(emissionTducf);
 				}
 			});
-			controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 
 		} else if(internalizeCongestion){
 
@@ -174,16 +180,16 @@ public class SubPopMunichControler {
 		} else if(internalizeBoth) {
 
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
-			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-			final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
-					new EmissionCongestionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()), emissionCostModule, emissionModule, config.planCalcScore(), tollHandler);
+			final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory =
+					new EmissionCongestionTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()),
+							tollHandler);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bindCarTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
 				}
 			});
-			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionModule, emissionCostModule, (MutableScenario) controler.getScenario(), tollHandler));
+			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(tollHandler));
 		}
 
 		// ride is one of network mode, thus travel disutility is required and every link must allow rider too
@@ -213,8 +219,7 @@ public class SubPopMunichControler {
 
 		if(writeInfoForEachPersonInEachIteration){
 			// not sure for true functionality yet
-			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-			controler.addControlerListener(new MyEmissionCongestionMoneyEventControlerListener(emissionCostModule,emissionModule));
+			controler.addControlerListener(new MyEmissionCongestionMoneyEventControlerListener());
 		}
 
 		controler.run();

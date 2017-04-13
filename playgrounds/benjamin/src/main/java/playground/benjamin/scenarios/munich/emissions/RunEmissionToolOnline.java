@@ -22,12 +22,14 @@ package playground.benjamin.scenarios.munich.emissions;
 import java.util.HashSet;
 import java.util.Set;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
@@ -151,8 +153,14 @@ public class RunEmissionToolOnline {
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 		vcg.setWritingOutputEvents(false) ;
-		
-		controler.addControlerListener(new EmissionControlerListener());
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+				addControlerListenerBinding().to(EmissionControlerListener.class);
+			}
+		});
 		controler.run();
 	}
 }

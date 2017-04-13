@@ -21,7 +21,6 @@ package playground.benjamin.internalization;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,24 +28,16 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -56,7 +47,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
@@ -79,10 +69,7 @@ public class RunInternalizationTest {
 	private Config config;
 	private Scenario scenario;
 	private Controler controler;
-	private Vehicles emissionVehicles;
-	private EmissionModule emissionModule;
-	private EmissionCostModule emissionCostModule;
-	
+
 	private void run() {
 		
 		this.config = new Config();
@@ -99,21 +86,26 @@ public class RunInternalizationTest {
 		this.controler = new Controler(this.scenario);
 		specifyControler();
 
-		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
-		emissionCostModule = new EmissionCostModule(1.0, Boolean.parseBoolean("true"));
-		
+		EmissionsConfigGroup ecg = ((EmissionsConfigGroup)controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME));
+		ecg.setConsideringCO2Costs(true);
+		ecg.setEmissionCostMultiplicationFactor(1.0);
+
 //		installScoringFunctionFactory();
 		installTravelCostCalculatorFactory();
-		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+		this.controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+				bind(EmissionCostModule.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+			}
+		});
 		this.controler.run();
 	}
 
 	private void installTravelCostCalculatorFactory() {
-		final EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
-				emissionCostModule, config.planCalcScore());
+		final EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(
+        );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -247,12 +239,12 @@ public class RunInternalizationTest {
 	}
 
 	private void createVehicles() {
-		this.emissionVehicles = VehicleUtils.createVehiclesContainer();
+		Vehicles emissionVehicles = scenario.getVehicles();
 		Id<VehicleType> vehTypeId = Id.create(HbefaVehicleCategory.PASSENGER_CAR.toString(), VehicleType.class);
-		VehicleType vehicleType = this.emissionVehicles.getFactory().createVehicleType(vehTypeId);
+		VehicleType vehicleType = emissionVehicles.getFactory().createVehicleType(vehTypeId);
 		for(Person person : scenario.getPopulation().getPersons().values()){
-			Vehicle vehicle = this.emissionVehicles.getFactory().createVehicle(Id.create(person.getId(), Vehicle.class), vehicleType);
-			this.emissionVehicles.addVehicle( vehicle);
+			Vehicle vehicle = emissionVehicles.getFactory().createVehicle(Id.create(person.getId(), Vehicle.class), vehicleType);
+			emissionVehicles.addVehicle( vehicle);
 		}
 	}
 

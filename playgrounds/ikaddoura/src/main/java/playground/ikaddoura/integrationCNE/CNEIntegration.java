@@ -254,7 +254,6 @@ public class CNEIntegration {
 
 		// ########################## Air pollution ##########################
 
-		EmissionModule emissionModule = null;
 		EmissionResponsibilityCostModule emissionCostModule = null;
 
 		if (analyzeAirPollution) {
@@ -263,16 +262,12 @@ public class CNEIntegration {
 			final boolean considerCO2Costs = true;
 			final double emissionCostFactor = 1.0;
 
-			emissionModule = new EmissionModule(controler.getScenario());
-			emissionModule.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
-			emissionModule.createLookupTables();
-			emissionModule.createEmissionHandler();
-
-			emissionCostModule = new EmissionResponsibilityCostModule( emissionCostFactor, considerCO2Costs, this.responsibilityGridTools);
-
-			// final is required if binding. Amit Jan 17
-			final EmissionModule finalEmissionModule = emissionModule;
-			final EmissionResponsibilityCostModule finalEmissionCostModule = emissionCostModule;
+			/* TODO : since these params are in config now, plz check if the settings are same in the  output config.
+			 If these values are overridden by config file, we need to add them to config. Amit Mar'17 */
+			EmissionsConfigGroup emissionsConfigGroup = ((EmissionsConfigGroup) this.controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME));
+			emissionsConfigGroup.setConsideringCO2Costs(considerCO2Costs);
+			emissionsConfigGroup.setEmissionCostMultiplicationFactor(emissionCostFactor);
+			emissionsConfigGroup.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
 
 			if (airPollutionPricing) {
 				controler.addOverridingModule(new AbstractModule() {
@@ -280,8 +275,8 @@ public class CNEIntegration {
 					public void install() {
 						bind(GridTools.class).toInstance(gridTools);
 						bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
-						bind(EmissionModule.class).toInstance(finalEmissionModule);
-						bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
+						bind(EmissionModule.class).asEagerSingleton();
+						bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
 						addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 					}
 				});
@@ -292,7 +287,7 @@ public class CNEIntegration {
 					public void install() {
 						bind(GridTools.class).toInstance(gridTools);
 						bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
-						bind(EmissionResponsibilityCostModule.class).toInstance(finalEmissionCostModule);
+						bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
 
 						addControlerListenerBinding().to(EmissionControlerListener.class); // just to write the emission events
 

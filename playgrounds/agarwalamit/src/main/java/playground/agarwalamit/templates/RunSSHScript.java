@@ -20,6 +20,7 @@
 package playground.agarwalamit.templates;
 
 import java.util.Properties;
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
@@ -50,7 +51,15 @@ public class RunSSHScript {
             try {
                 session.connect();
 
-                System.out.println( session.getUserInfo() );
+                ChannelExec channel = (ChannelExec) session.openChannel("exec");
+                channel.setCommand("ls -l");
+
+                channel.connect();
+
+                while (channel.isConnected()) {
+                    System.out.println("connected.");
+                }
+                channel.disconnect();
 
             } finally {
                 session.disconnect();

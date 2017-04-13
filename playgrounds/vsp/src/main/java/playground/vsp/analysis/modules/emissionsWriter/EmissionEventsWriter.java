@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.ColdEmissionHandler;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.WarmEmissionHandler;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.MutableScenario;
@@ -62,9 +63,7 @@ public class EmissionEventsWriter extends AbstractAnalysisModule{
 	
 	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
-		this.emissionModule = new EmissionModule(scenario);
-		this.emissionModule.createLookupTables();
-		this.emissionModule.createEmissionHandler();
+		this.emissionModule = new EmissionModule(scenario, EventsUtils.createEventsManager());
 		this.wEmiHandler = emissionModule.getWarmEmissionHandler();
 		this.cEmiHandler = emissionModule.getColdEmissionHandler();
 		this.filename = "emission.events.xml.gz";
@@ -98,7 +97,7 @@ public class EmissionEventsWriter extends AbstractAnalysisModule{
 	public void writeResults(String outputFolder) {
 		// outputFolder is required earlier and therefore not used here, move in abstract class to constructor? ik
 		this.emissionEventWriter.closeFile();
-		this.emissionModule.writeEmissionInformation(this.outputPath + this.filename);
+		this.emissionModule.writeEmissionInformation();
 	}
 	
 }
