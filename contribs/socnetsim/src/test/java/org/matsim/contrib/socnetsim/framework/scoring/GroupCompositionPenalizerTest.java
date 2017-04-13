@@ -18,8 +18,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.scoring;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -62,33 +64,48 @@ public class GroupCompositionPenalizerTest {
 	private final double utilOneCopart = 100;
 	private final double utilAlone = -1;
 
+	@Before
+	public void setTrace() {
+		Logger.getLogger( GroupCompositionPenalizer.class ).setLevel( Level.TRACE );
+	}
+
 	@Test
 	public void testFullOverlap() {
-		test( 10 , 20 , 5 , 25 );
+		test( new double[]{10 , 20} , new double[]{5 , 25} );
 	}
 
 	@Test
 	public void testInnerOverlap() {
-		test( 5 , 25 , 10 , 20 );
+		test( new double[]{5 , 25} , new double[]{10 , 20} );
 	}
 
 	@Test
 	public void testPartialOverlap() {
-		test( 5 , 20 , 10 , 25 );
+		test( new double[]{5 , 20 } , new double[]{10 , 25} );
 	}
 
 	@Test
 	public void testExactOverlap() {
-		test( 10 , 20 , 10 , 20 );
+		test( new double[]{10 , 20} , new double[]{10 , 20} );
 	}
 
-	private void test( final double start1 , final double end1, final double start2, final double end2 ) {
+	@Test
+	public void testComeAndGo() {
+		test( new double[]{10 , 11 , 15 , 20} , new double[]{10 , 20} );
+	}
+
+	@Test
+	public void testInstantaneousComeAndGo() {
+		test( new double[]{10 , 15 , 15 , 20} , new double[]{5 , 20} );
+	}
+
+	private void test( final double[] times1 , final double[] times2 ) {
 		final Config config = ConfigUtils.createConfig();
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		createNetwork( sc );
 
-		createPerson( sc , 1 , start1 , end1 );
-		createPerson( sc , 2 , start2 , end2 );
+		createPerson( sc , 1 , times1 );
+		createPerson( sc , 2 , times2 );
 
 		final SocialNetwork sn = createSocialNetwork( sc );
 
@@ -105,7 +122,7 @@ public class GroupCompositionPenalizerTest {
 		);
 
 		events.addHandler( new CourtesyEventsGenerator( events , sn ) );
-		events.addHandler( new EventLogger() );
+		//events.addHandler( new EventLogger() );
 		final EventsToScore eventsToScore = EventsToScore.createWithoutScoreUpdating(
 				sc,
 				new ScoringFunctionFactory() {
@@ -137,7 +154,7 @@ public class GroupCompositionPenalizerTest {
 		final double score = penalizer.getScore();
 		Assert.assertEquals(
 				"unexpected score",
-				calcExpectedScore( start1 , end1 , start2 , end2),
+				calcExpectedScore( times1[ 0 ] , times1[ times1.length - 1 ] , times2[ 0 ] , times2[ times2.length - 1 ]),
 				score,
 				1E-9 );
 	}
@@ -168,8 +185,7 @@ public class GroupCompositionPenalizerTest {
 	private void createPerson(
 			final Scenario sc,
 			final int id,
-			final double start,
-			final double end ) {
+			final double[] times ) {
 		final PopulationFactory factory = sc.getPopulation().getFactory();
 		final Person person = factory.createPerson( Id.createPersonId( id ) );
 		sc.getPopulation().addPerson( person );
@@ -178,14 +194,16 @@ public class GroupCompositionPenalizerTest {
 		person.addPlan( plan );
 
 		final Activity firstHome = factory.createActivityFromLinkId( "home" , linkId );
-		firstHome.setEndTime( start );
+		firstHome.setEndTime( times[ 0 ] );
 		plan.addActivity( firstHome );
 
-		plan.addLeg( createLeg( factory ) );
+		for ( int i = 1; i < times.length; i++ ) {
+			plan.addLeg( createLeg( factory ) );
 
-		final Activity leisure = factory.createActivityFromLinkId( "leisure" , linkId );
-		leisure.setEndTime( end );
-		plan.addActivity( leisure );
+			final Activity leisure = factory.createActivityFromLinkId( "leisure", linkId );
+			leisure.setEndTime( times[ i ] );
+			plan.addActivity( leisure );
+		}
 
 		plan.addLeg( createLeg( factory ) );
 
