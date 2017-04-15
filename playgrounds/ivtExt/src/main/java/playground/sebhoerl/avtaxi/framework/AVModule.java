@@ -44,10 +44,7 @@ import playground.sebhoerl.avtaxi.data.AVOperatorFactory;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.MultiODHeuristic;
 import playground.sebhoerl.avtaxi.dispatcher.single_fifo.SingleFIFODispatcher;
-
-// import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
-import playground.joel.dispatcher.single_heuristic.SingleHeuristicDispatcher; // TODO: delete this or the other
-
+import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
 import playground.sebhoerl.avtaxi.replanning.AVOperatorChoiceStrategy;

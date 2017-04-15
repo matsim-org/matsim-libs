@@ -39,10 +39,12 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
     private final int dispatchPeriod;
     private final int maxMatchNumber; // implementation may not use this
-    private Tensor printVals = Tensors.empty();
 
     private List<AVVehicle> availableVehicles = new LinkedList<>();
     final private List<AVRequest> matchedRequests = new LinkedList<>();
+
+    /** data structure to find closest vehicles */
+    final private QuadTree<AVVehicle> availableVehiclesTree;
 
     private NewSingleHeuristicDispatcher( //
                                  AVDispatcherConfig avDispatcherConfig, //
@@ -54,6 +56,9 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
+
+        double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values()); // minx, miny, maxx, maxy
+        availableVehiclesTree = new QuadTree<>(bounds[0], bounds[1], bounds[2], bounds[3]);
     }
 
 
@@ -68,33 +73,63 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
         if (round_now % dispatchPeriod == 0) {
 
-            Collection<AVRequest> allRequests = new HashSet<>(getAVRequests());
-            allRequests.removeAll(matchedRequests);
+            Collection<AVRequest> unmatchedRequests = new HashSet<>(getAVRequests());
+            unmatchedRequests.removeAll(matchedRequests);
 
-            for(AVRequest request : allRequests) {
+            availableVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toList());
+            setUpVehiclesTree();
+
+            for(AVRequest request : unmatchedRequests) {
                 if(!availableVehicles.isEmpty()) {
-                    AVVehicle vehicle = availableVehicles.remove(0);
+
+                    // usefull stuff
+                    // request.getFromLink().getFromNode().getCoord();
+                    // getVehicleLocation(vehicle).getCoord();
+
+                    AVVehicle vehicle = findClosestVehicle(request.getFromLink()); // intended to replace vehicle
+                    // AVVehicle vehicle = availableVehicles.remove(0);
+
                     Collection<VehicleLinkPair> divVehicles = getDivertableVehicles();
+                    if (!divVehicles.stream().anyMatch(vlp -> vlp.avVehicle.equals(vehicle))) { // for debug purpose
+                        System.out.println(vehicle + " is no diverertable vehicle!");
+                        System.out.println("diverertable vehicles are:");
+                        for(VehicleLinkPair element : divVehicles) System.out.println("\t" + element.avVehicle);
+                        System.out.println("available vehicles are:");
+                        for(AVVehicle element : availableVehicles) System.out.println("\t" + element);
+                        System.out.println("vehicles in quadtree:");
+                        for(AVVehicle element : availableVehiclesTree.values()) System.out.println("\t" + element);
+                    } else System.out.println("matched request " + request.getId() + " with " + vehicle);
                     VehicleLinkPair pair = divVehicles.stream().filter(vlp -> vlp.avVehicle.equals(vehicle)).findFirst().get();
                     setVehicleDiversion(pair, request.getFromLink());
                     matchedRequests.add(request);
 
+                    removeVehicle(vehicle);
                 }
             }
 
             availableVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toList());
 
-            //printVals = globalBipartiteMatching(this, () -> getDivertableVehicles());
-
         }
     }
 
-    @Override
-    public String getInfoLine() {
-        return String.format("%s H=%s", //
-                super.getInfoLine(), //
-                printVals.toString() //
-        );
+    private void setUpVehiclesTree() {
+        availableVehiclesTree.clear();
+        for(AVVehicle car : availableVehicles) {
+            Link link = getVehicleLocation(car);
+            availableVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), car);
+            // System.out.println("added " + car + " to the quadtree");
+        }
+    }
+
+    private AVVehicle findClosestVehicle(Link link) {
+        Coord coord = link.getCoord();
+        return availableVehiclesTree.getClosest(coord.getX(), coord.getY());
+    }
+
+    private void removeVehicle(AVVehicle vehicle) {
+        availableVehicles.remove(vehicle);
+        Coord coord = getVehicleLocation(vehicle).getCoord();
+        availableVehiclesTree.remove(coord.getX(), coord.getY(), vehicle);
     }
 
     public static class Factory implements AVDispatcherFactory {
