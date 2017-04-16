@@ -32,7 +32,7 @@ public class LinkLayer extends ViewerLayer {
             File file = new File("output/linkstats.obj");
             if (file.isFile())
                 try {
-                    matrix = ObjectFormat.from(Files.readAllBytes(file.toPath()));
+                    matrix = ObjectFormat.parse(Files.readAllBytes(file.toPath()));
                     System.out.println("loaded: " + Dimensions.of(matrix));
                 } catch (Exception exception) {
                     exception.printStackTrace();
