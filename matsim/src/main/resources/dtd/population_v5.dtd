@@ -13,7 +13,7 @@
           car_avail      (always|never|sometimes) #IMPLIED
           employed       (yes|no)                 #IMPLIED>
 
-<!ELEMENT plan           (act|leg)*>
+<!ELEMENT plan           (act,(leg,act)*)>
 <!ATTLIST plan
           score          CDATA    #IMPLIED
           type           CDATA    #IMPLIED
