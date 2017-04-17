@@ -164,7 +164,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * @param timeOfDay
 	 * @return
 	 */
-	public boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId,	double firstDestLinkEnterTime, double timeOfDay) {
+	private boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId,	double firstDestLinkEnterTime, double timeOfDay) {
 
 		// if we're on the destinationLink, we always want to park
 		if(currentLinkId.equals(endLinkId)) return true;
