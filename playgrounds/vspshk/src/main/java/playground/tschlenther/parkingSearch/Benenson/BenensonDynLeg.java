@@ -68,7 +68,6 @@ public class BenensonDynLeg extends ParkingDynLeg{
 			
 			if(((BenensonParkingSearchLogic)this.logic).goIntoParking(currentLinkId, this.route.getEndLinkId())){
 				this.legStage = ParkingMode.SEARCH_WHILE_APPROACH;
-				this.events.processEvent(new StartParkingSearchEvent(timer.getTimeOfDay(), vehicleId, currentLinkId));
 				if(logForDebug)logger.error("vehicle " + this.vehicleId + " goes into parking on link " + this.currentLinkId);
 			}
 		}

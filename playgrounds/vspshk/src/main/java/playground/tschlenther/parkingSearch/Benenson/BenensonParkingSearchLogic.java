@@ -30,8 +30,8 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	private static final boolean logForDebug = false;
 	
 	private Network network;
-	private static final double MIN_THRESHOLD_PROB_FUNCTION = 3;
-	private static final double MAX_THRESHOLD_PROB_FUNCTION = 1;
+	private static final double MIN_THRESHOLD_PROB_FUNCTION = 1;
+	private static final double MAX_THRESHOLD_PROB_FUNCTION = 3;
 	private static final double ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN = 30;
 	private static final double ACCEPTED_DISTANCE_MAX = 400;
 	private final Random random = MatsimRandom.getLocalInstance();
@@ -113,7 +113,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 			if(keys.size() == 0){	//kein outlink in acceptaple Distance
 				keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
 				logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a random next link");
-				return nextLink;
+				return keys.get(random.nextInt(keys.size()));
 			}
 			nextLink= keys.get(random.nextInt(keys.size()));	
 		}

@@ -73,16 +73,6 @@ public class TSParkingSearchEvaluation {
 		
 	}
 	
-	private void runVBScript(){
-		try {
-	        Runtime.getRuntime().exec(new String[] {
-	        "wscript.exe", "C:\\path\\example.vbs"
-	        });        
-	    } catch (Exception ex) {
-	        ex.printStackTrace();
-	    }
-	}
-	
 	private Set<Id<Link>> readLinks(String fileName) {
 		final Set<Id<Link>> links = new HashSet<>();
 		TabularFileParserConfig config = new TabularFileParserConfig();
@@ -97,6 +87,17 @@ public class TSParkingSearchEvaluation {
 
 		
 		return links;
+	}
+	
+	public static void main(String[] args){
+		String[] zones = new String[2];
+		zones[0] = "C:/Users/Work/Bachelor Arbeit/input/Berlin/Klausener.txt";
+		zones[1] = "C:/Users/Work/Bachelor Arbeit/input/Berlin/Mierendorff.txt";
+		TSParkingSearchEvaluation eval = new TSParkingSearchEvaluation(zones);
+		
+		String runDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Benenson/Berlin/changeEvents/RUN_130417_22.14_1_3_1000_350_750_P.B.4.BUGFIX/ITERS";
+		eval.analyseRun(runDir, 7);
+		
 	}
 	
 }
