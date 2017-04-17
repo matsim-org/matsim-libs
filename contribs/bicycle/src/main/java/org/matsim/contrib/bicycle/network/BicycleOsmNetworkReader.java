@@ -52,7 +52,7 @@ import org.xml.sax.InputSource;
  * Reads in an OSM-File, exported from <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>,
  * and extracts information about roads to generate a MATSim-Network.
  * 
- This is an customized version of org.matsim.core.utils.io.OsmNetworkReader, which 
+ * This is an customized version of org.matsim.core.utils.io.OsmNetworkReader, which 
  * parses for the following additional tags:
  * 
  * \\TODO exchange the following tags for bike
@@ -137,8 +137,10 @@ public class BicycleOsmNetworkReader implements MatsimSomeReader {
 
 	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
+	// ----- Bicycle-specific
 	private boolean constructingBikeNetwork = true;
 	private boolean constructingCarNetwork = true;
+	// -----
 
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
@@ -281,11 +283,6 @@ public class BicycleOsmNetworkReader implements MatsimSomeReader {
 		log.info("BikeObjectAttributs for cyclewaytype created: " + countCyclewaytype + " which is " + ((float)countCyclewaytype/this.network.getLinks().size())*100 + "%");
 		log.info("BikeObjectAttributs for surface created:      " + countSurface      + " which is " + ((float)countSurface/this.network.getLinks().size())*100 + "%");
 		log.info("BikeObjectAttributs for smoothness created:   " + countSmoothness   + " which is " + ((float)countSmoothness/this.network.getLinks().size())*100 + "%");
-
-//		log.info("No of Signalnodes: " + signalNodes.size());
-//		log.info("BikeObjectAttributs for signalLink created: " + countSignalLinks);
-//
-//		log.info("No of Pegelnodes: " + monitorNodes.size());
 		// -----
 		
 		if (this.unknownHighways.size() > 0) {
@@ -997,7 +994,7 @@ public class BicycleOsmNetworkReader implements MatsimSomeReader {
 	}
 
 	
-	// ----- Bicycle-specific methods -----
+	// ----- From here on only bicycle-specific methods ----- ----- ----- ----- -----
 	public void constructBikeNetwork(String inputOSM) {
 		constructingBikeNetwork = true;
 		constructingCarNetwork = false;
