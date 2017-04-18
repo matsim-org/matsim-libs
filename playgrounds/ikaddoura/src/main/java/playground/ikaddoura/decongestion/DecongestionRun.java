@@ -86,15 +86,15 @@ public class DecongestionRun {
 		decongestionSettings.setTOLL_BLEND_FACTOR(1.0);
 		decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
 		
-		decongestionSettings.setKd(0.0);
-		decongestionSettings.setKi(0.0);
-		decongestionSettings.setKp(0.01);
+		decongestionSettings.setKd(0.005);
+		decongestionSettings.setKi(0.005);
+		decongestionSettings.setKp(0.005);
 		decongestionSettings.setIntegralApproach(IntegralApproach.UnusedHeadway);
 		decongestionSettings.setIntegralApproachUnusedHeadwayFactor(10.0);
 		decongestionSettings.setIntegralApproachAverageAlpha(0.0);
 		
-		decongestionSettings.setTOLL_ADJUSTMENT(1.0);
-		decongestionSettings.setINITIAL_TOLL(1.0);
+		decongestionSettings.setTOLL_ADJUSTMENT(0.0);
+		decongestionSettings.setINITIAL_TOLL(0.0);
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.addModule(decongestionSettings);
