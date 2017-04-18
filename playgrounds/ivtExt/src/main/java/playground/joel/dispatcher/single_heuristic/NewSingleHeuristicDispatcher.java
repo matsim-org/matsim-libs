@@ -44,9 +44,10 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
     /** data structure to find closest vehicles */
     final private QuadTree<AVVehicle> availableVehiclesTree;
-    final private HashMap<AVVehicle,Link> vehiclesInTree = new HashMap<>(); // two data structures are
-                                                                       // used to enable fast
-                                                                       // "contains" searching
+    final private HashMap<AVVehicle, Link> vehiclesInTree = new HashMap<>(); // two data structures
+                                                                             // are
+    // used to enable fast
+    // "contains" searching
 
     private NewSingleHeuristicDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -82,19 +83,10 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
             for (AVRequest request : unmatchedRequests) {
                 if (!availableVehicles.isEmpty()) {
 
-                    // usefull stuff
-                    // request.getFromLink().getFromNode().getCoord();
-                    // getVehicleLocation(vehicle).getCoord();
-
-                    AVVehicle vehicle = findClosestVehicle(request.getFromLink()); // intended to
-                                                                                   // replace
-                                                                                   // vehicle
-                    // AVVehicle vehicle = availableVehicles.remove(0);
+                    AVVehicle vehicle = findClosestVehicle(request.getFromLink());
 
                     Collection<VehicleLinkPair> divVehicles = getDivertableVehicles();
-                    if (!divVehicles.stream().anyMatch(vlp -> vlp.avVehicle.equals(vehicle))) { // for
-                                                                                                // debug
-                                                                                                // purpose
+                    if (!divVehicles.stream().anyMatch(vlp -> vlp.avVehicle.equals(vehicle))) { // for debugging purpose
                         System.out.println(vehicle + " is no diverertable vehicle!");
                         System.out.println("diverertable vehicles are:");
                         for (VehicleLinkPair element : divVehicles)
@@ -103,19 +95,14 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
                         for (AVVehicle element : availableVehicles)
                             System.out.println("\t" + element);
                         System.out.println("vehicles in quadtree:");
-                        for (AVVehicle element : availableVehiclesTree.values())
-                            System.out.println("\t" + element);
-                    } else
-                        System.out.println("matched request " + request.getId() + " with " + vehicle);
+                        for(AVVehicle element : availableVehiclesTree.values()) System.out.println("\t" + element);
+                    }
                     VehicleLinkPair pair = divVehicles.stream().filter(vlp -> vlp.avVehicle.equals(vehicle)).findFirst().get();
                     setVehicleDiversion(pair, request.getFromLink());
                     matchedRequests.add(request);
                     removeVehicle(vehicle);
                 }
             }
-
-            availableVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toList());
-
         }
         
 
@@ -127,7 +114,7 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
         for (AVVehicle car : availableVehicles) {
             if (!vehiclesInTree.keySet().contains(car)) {
                 Coord linkCoord = getVehicleLocation(car).getCoord();
-                boolean avSucc = vehiclesInTree.put(car,getVehicleLocation(car)) == null;
+                boolean avSucc = vehiclesInTree.put(car, getVehicleLocation(car)) == null;
                 boolean qtSucc = availableVehiclesTree.put(linkCoord.getX(), linkCoord.getY(), car);
                 GlobalAssert.that(avSucc == qtSucc && avSucc == true);
                 // System.out.println("added " + car + " to the quadtree");
@@ -136,9 +123,9 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
         System.out.println("size of availableVehicles tree = " + availableVehiclesTree.size() + " ==  " + availableVehicles.size()
                 + " = size of availableVehicles");
-        
+
         System.out.println("size of availableVehicles tree = " + availableVehiclesTree.size() + " ==  " + vehiclesInTree.size()
-        + " =  vehiclesInTree size");
+                + " =  vehiclesInTree size");
     }
 
     private AVVehicle findClosestVehicle(Link link) {
@@ -148,10 +135,10 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
     private void removeVehicle(AVVehicle vehicle) {
         availableVehicles.remove(vehicle);
-        Coord coord    = getVehicleLocation(vehicle).getCoord();
-        boolean avSucc = vehiclesInTree.remove(vehicle,getVehicleLocation(vehicle)); 
+        Coord coord = getVehicleLocation(vehicle).getCoord();
+        boolean avSucc = vehiclesInTree.remove(vehicle, getVehicleLocation(vehicle));
         boolean qtSucc = availableVehiclesTree.remove(coord.getX(), coord.getY(), vehicle);
-        GlobalAssert.that(avSucc == qtSucc && avSucc == true);        
+        GlobalAssert.that(avSucc == qtSucc && avSucc == true);
     }
 
     public static class Factory implements AVDispatcherFactory {
