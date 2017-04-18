@@ -27,20 +27,20 @@ public class RunExample {
 		public RunExample() {
 			
 			Config config = ConfigUtils.createConfig();
-			config.controler().setOutputDirectory("Z:/Berlin-Netz/");
-			config.controler().setLastIteration(5);
+			config.controler().setOutputDirectory("C:/Users/Felix/Documents/VSP/Berlin-Netz/Test3");
+			config.controler().setLastIteration(1);
 			
 			Scenario sce = ScenarioUtils.createScenario(config);
 			createPopulation(sce);
 			
 			NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sce.getNetwork());
-			reader.readFile("Z:/Berlin-Netz/mergedReducedSpeedSantiagoWay.xml");
-			config.network().setInputFile("Z:/Berlin-Netz/mergedReducedSpeedSantiagoWay.xml");
+			reader.readFile("C:/Users/Felix/Documents/VSP/Berlin-Netz/mergedReducedSpeedKNWay.xml");
+//			config.network().setInputFile("C:/Users/Felix/Documents/VSP/Berlin-Netz/mergedReducedSpeedSantiagoWay.xml");
 			
 			controler = new Controler(sce);
 			controler.run();
 			
-			new ConfigWriter(config).write("Z:/Berlin-Netz/config.xml");
+//			new ConfigWriter(config).write("C:/Users/Felix/Documents/VSP/Berlin-Netz/config.xml");
 			
 		}
 		
@@ -57,9 +57,9 @@ public class RunExample {
 		private static void createPopulation(Scenario scenario) {
 			Population population = scenario.getPopulation();			
 		
-				for (int i = 0; i >= 2; i++) {
+//				for (int i = 0; i >= 2; i++) {
 					// create a person
-					Person person = population.getFactory().createPerson(Id.createPersonId(i));
+					Person person = population.getFactory().createPerson(Id.createPersonId(1));
 					population.addPerson(person);
 		
 					// create a plan for the person that contains all this
@@ -68,18 +68,18 @@ public class RunExample {
 					person.addPlan(plan);
 		
 					// create a start activity at the from link
-					Activity startAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(27923));
+					Activity startAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(64032));
 					// distribute agents uniformly during one hour.
-					startAct.setEndTime(i);
+					startAct.setEndTime(1000);
 					plan.addActivity(startAct);
 		
 					// create a dummy leg
 					plan.addLeg(population.getFactory().createLeg(TransportMode.car));
 		
 					// create a drain activity at the to link
-					Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(88278));
+					Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(81440));
 					plan.addActivity(drainAct);
-				}
+//				}
 			
 		}
 
