@@ -390,6 +390,8 @@ public class EmissionModule {
 		return coldEmissionHandler;
 	}
 
+	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
+	// for the analysis purpose. Need a test. Amit Apr'17
 	public EventsManager getEmissionEventsManager() {
 		return eventsManager;
 	}

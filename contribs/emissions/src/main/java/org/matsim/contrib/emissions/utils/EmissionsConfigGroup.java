@@ -56,7 +56,7 @@ extends ReflectiveConfigGroup
 	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
 	private double emissionEfficiencyFactor = 1.0;
 
-	private static final String EMISSION_COST_MULTIPLICATION_FACTOR = "EMISSION_COST_MULTIPLICATION_FACTOR";
+	private static final String EMISSION_COST_MULTIPLICATION_FACTOR = "emissionCostMultiplicationFactor";
 	private double emissionCostMultiplicationFactor = 1.0;
 
 	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
@@ -73,8 +73,8 @@ extends ReflectiveConfigGroup
 			" - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
 			" - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
 			" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"."+
-			"\n" +
-			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n"+
+			"\n\t\t" +
+			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n\t\t"+
 			"FALSE: vehicle description is used for the emission specifications." +
 			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
 			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
