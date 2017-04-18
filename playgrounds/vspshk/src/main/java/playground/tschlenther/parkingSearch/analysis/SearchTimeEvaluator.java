@@ -39,8 +39,8 @@ public class SearchTimeEvaluator implements PersonArrivalEventHandler, StartPark
 	Map<Id<Vehicle>,Id<Person>> drivers = new HashMap<>();
 	private Set<Id<Link>> monitoredLinks;
 	private List<String> linkTimeStamps = new ArrayList<>();
-	private double[] parkingCounts = new double[24];
-	private double[] parkingTime = new double[24];
+	private double[] parkingCounts = new double[96];
+	private double[] parkingTime = new double[96];
 	
 	public SearchTimeEvaluator(Set<Id<Link>> monitoredLinks) {
 		this.monitoredLinks = monitoredLinks;
@@ -51,8 +51,8 @@ public class SearchTimeEvaluator implements PersonArrivalEventHandler, StartPark
 		this.searchTime.clear();;
 		this.drivers.clear();
 		this.linkTimeStamps.clear();
-		this.parkingCounts = new double[24];
-		this.parkingTime = new double[24];
+		this.parkingCounts = new double[96];
+		this.parkingTime = new double[96];
 	}
 
 	@Override
@@ -78,10 +78,11 @@ public class SearchTimeEvaluator implements PersonArrivalEventHandler, StartPark
 			if (event.getLegMode().equals(TransportMode.car)){
 				double parkingTime = event.getTime() - searchTime.remove(event.getPersonId());
 				int hour = (int) (event.getTime() / 3600);
-				if (hour<24){
-					this.parkingCounts[hour]++;
-					this.parkingTime[hour]+=parkingTime;
-					String stamp = "" + hour  + ";" + (int) (event.getTime()/900) + ";" + df.format(event.getTime()) + ";" + event.getLinkId() + ";"+ df.format(parkingTime);
+				int slot = (int) (event.getTime()/900);
+				if ((slot)<96){
+					this.parkingCounts[slot]++;
+					this.parkingTime[slot]+=parkingTime;
+					String stamp = "" + hour  + ";" + slot + ";" + df.format(event.getTime()) + ";" + event.getLinkId() + ";"+ df.format(parkingTime);
 					this.linkTimeStamps.add(stamp);
 				}
 			}

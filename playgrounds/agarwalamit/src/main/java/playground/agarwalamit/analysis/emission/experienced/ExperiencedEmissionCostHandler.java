@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.*;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -175,7 +176,11 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 					ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 					rgt.resetAndcaluculateRelativeDurationFactors(intervalHandler.getDuration());
 
-					EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0, true, rgt);
+					EmissionsConfigGroup emissionsConfigGroup  = new EmissionsConfigGroup();
+					emissionsConfigGroup.setConsideringCO2Costs(true);
+					emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.);
+
+					EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(emissionsConfigGroup, rgt);
 					ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, new MunichPersonFilter());
 
 					EventsManager events = EventsUtils.createEventsManager();

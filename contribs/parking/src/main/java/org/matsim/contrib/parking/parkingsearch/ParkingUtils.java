@@ -79,9 +79,9 @@ public class ParkingUtils {
 				return points;
 			}
 			
-			if(Math.abs(yDistance) > (nrSlots+5) ){
-				if(yDistance < -5 ) yDistance += 5;
-				if(yDistance < 0) yDistance -= 5;
+			if(Math.abs(yDistance) > (nrSlots+10) ){
+				if(yDistance < -5 ) yDistance += 10;
+				if(yDistance > 0) yDistance -= 10;
 			}
 			
 			for(int i = 1; i <= numberOfCoords ; i ++){
@@ -109,8 +109,8 @@ public class ParkingUtils {
 				if(tY<fY)	b -= 10;
 			}
 			if(m == 0){
-				if(tY == fY && tX > fX) b -= 10;
-				if(tY == fY && tX < fX) b += 10;
+				if(tX > fX) b -= 10;
+				if(tX < fX) b += 10;
 			}
 			
 			double xDistance = tX-fX;
@@ -125,8 +125,8 @@ public class ParkingUtils {
 			
 			//Abstand zu den Knoten
 			if(Math.abs(xDistance) > (nrSlots+10) ){
-				if(xDistance < -5 ) xDistance += 5;
-				if(xDistance < 0) xDistance -= 5;
+				if(xDistance < -5 ) xDistance += 10;
+				if(xDistance > 5) xDistance -= 10;
 			}
 			
 			for(int i = 1; i <= numberOfCoords ; i ++){

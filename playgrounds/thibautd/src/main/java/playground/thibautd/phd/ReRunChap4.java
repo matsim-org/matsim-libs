@@ -59,10 +59,10 @@ public class ReRunChap4 {
 		OutputDirectoryLogging.catchLogEntries();
 		final String configFile = args[ 0 ];
 
-		Logger.getLogger( StrongLinkIdentifierProvider.class ).setLevel( Level.TRACE );
-		Logger.getLogger( WeakLinkIdentifierProvider.class ).setLevel( Level.TRACE );
-		Logger.getLogger( GroupStrategyManager.class ).setLevel( Level.TRACE );
-		Logger.getLogger( JointPlans.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( StrongLinkIdentifierProvider.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( WeakLinkIdentifierProvider.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( GroupStrategyManager.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( JointPlans.class ).setLevel( Level.TRACE );
 
 		final Config config = loadConfig(configFile);
 		if ( ((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME )).isUseKtiScoring() ) {

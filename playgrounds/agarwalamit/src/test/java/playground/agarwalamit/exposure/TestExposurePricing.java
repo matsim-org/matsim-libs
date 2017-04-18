@@ -113,7 +113,7 @@ public class TestExposurePricing {
 	public void noPricingTest () {
 		logger.info("isConsideringCO2Costs = "+ this.isConsideringCO2Costs);
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
-		Scenario sc = minimalControlerSetting();
+		Scenario sc = minimalControlerSetting(isConsideringCO2Costs);
 		
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(true); 
 
@@ -143,7 +143,7 @@ public class TestExposurePricing {
 		logger.info("isConsideringCO2Costs = "+ this.isConsideringCO2Costs);
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
-		Scenario sc = minimalControlerSetting();
+		Scenario sc = minimalControlerSetting(isConsideringCO2Costs);
 		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(true); 
@@ -161,17 +161,14 @@ public class TestExposurePricing {
 		 ********************************************************************************************
 		 */
 
-		EmissionModule emissionModule = new EmissionModule(sc);
-		emissionModule.setEmissionEfficiencyFactor( 1.0 );
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt);
-		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule,sc.getConfig().planCalcScore());
+
+
+		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(
+        );
 
 		controler.addOverridingModule(new AbstractModule() {
 
@@ -179,8 +176,8 @@ public class TestExposurePricing {
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
-				bind(EmissionModule.class).toInstance(emissionModule);
-				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionModule.class).asEagerSingleton();
+				bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
 				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 
 				bindCarTravelDisutilityFactory().toInstance(emfac);
@@ -210,7 +207,7 @@ public class TestExposurePricing {
 		logger.info("isConsideringCO2Costs = "+ this.isConsideringCO2Costs);
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
-		Scenario sc = minimalControlerSetting();
+		Scenario sc = minimalControlerSetting(isConsideringCO2Costs);
 		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 		
 		sc.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
@@ -229,16 +226,10 @@ public class TestExposurePricing {
 		 ********************************************************************************************
 		 */
 
-		EmissionModule emissionModule = new EmissionModule(sc);
-		emissionModule.setEmissionEfficiencyFactor( 1.0 );
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-
 		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt);
 //		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, sc.getConfig().planCalcScore());
         final playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new playground.vsp.airPollution.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory(
                 new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore())
@@ -249,8 +240,8 @@ public class TestExposurePricing {
 			public void install() {
 				bind(GridTools.class).toInstance(gt);
 				bind(ResponsibilityGridTools.class).toInstance(rgt);
-				bind(EmissionModule.class).toInstance(emissionModule);
-				bind(EmissionResponsibilityCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionModule.class).asEagerSingleton();
+				bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
 				addControlerListenerBinding().to(InternalizeEmissionResponsibilityControlerListener.class);
 
 				bindCarTravelDisutilityFactory().toInstance(emfac);
@@ -333,7 +324,7 @@ public class TestExposurePricing {
 		}
 	}
 
-	private Scenario minimalControlerSetting() {
+	private Scenario minimalControlerSetting(boolean isConsideringCO2Costs) {
 	
 //		// since same files are used for multiple test, files are added to ONE MORE level up then the test package directory
 //		String packageInputDir = helper.getPackageInputDirectory();
@@ -371,6 +362,10 @@ public class TestExposurePricing {
 		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+
+		ecg.setEmissionEfficiencyFactor(1.0);
+		ecg.setConsideringCO2Costs(isConsideringCO2Costs);
+		ecg.setEmissionCostMultiplicationFactor(1.0);
 
 		config.addModule(ecg);
 

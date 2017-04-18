@@ -19,6 +19,7 @@
 package org.matsim.contrib.bicycle.network;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -48,21 +49,27 @@ public class CreateNetwork {
 		Network bikeNetwork = NetworkUtils.createNetwork();
 		Network carNetwork = NetworkUtils.createNetwork();
 		
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS); //TransformationFactory.WGS84
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
 
 		BicycleOsmNetworkReader bikeNetworkReader = new BicycleOsmNetworkReader(bikeNetwork, ct);
 		bikeNetworkReader.constructBikeNetwork(inputOSM); 
 		
 		new ObjectAttributesXmlWriter(bikeNetworkReader.getBikeAttributes()).writeFile(outputBikeXML);
 
-		BicycleOsmNetworkReader networkReader = new BicycleOsmNetworkReader(carNetwork,ct);
-		networkReader.constructCarNetwork(inputOSM);
+		BicycleOsmNetworkReader carNetworkReader = new BicycleOsmNetworkReader(carNetwork,ct);
+		carNetworkReader.constructCarNetwork(inputOSM);
 		
 		new NetworkCleaner().run(bikeNetwork);
 		new NetworkCleaner().run(carNetwork);
 		
 		Network mergedNetwork = NetworkUtils.createNetwork();
+		
+		List<Link> bikeLinks = new ArrayList<Link>(bikeNetwork.getLinks().values());
+		List<Link> carLinks = new ArrayList<Link>(carNetwork.getLinks().values());
+		
 		for (Node node : new ArrayList<Node>(bikeNetwork.getNodes().values())) {
+			// removeNode necessary to remove information about in-/outlinks in the node
+			// otherwise there would be problems in terms of already-existing in-/outlinks
 			bikeNetwork.removeNode(node.getId());
 			mergedNetwork.addNode(node);
 		}
@@ -72,10 +79,10 @@ public class CreateNetwork {
 				mergedNetwork.addNode(node);
 			}
 		}
-		for (Link link : bikeNetwork.getLinks().values()) {
-			mergedNetwork.addLink(link);
+		for (Link link : bikeLinks) {
+			// to add a link, its to/from nodes should not yet know them as in/outlinksmergedNetwork.addLink(link);
 		}
-		for (Link link : carNetwork.getLinks().values()) {
+		for (Link link : carLinks) {
 			mergedNetwork.addLink(link);
 		}
 		

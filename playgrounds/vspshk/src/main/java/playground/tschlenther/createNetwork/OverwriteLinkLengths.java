@@ -45,7 +45,7 @@ public class OverwriteLinkLengths {
 	 */
 	public static void main(String[] args) {
 		String input = "C:/Users/Work/Bachelor Arbeit/input/GridNet/grid_network_length200.xml";
-		String output = "C:/Users/Work/Bachelor Arbeit/input/GridNet/grid_network-ZONES-MARKED-EDIT_V2.xml.gz";
+		String output = "C:/Users/Work/Bachelor Arbeit/input/GridNet/grid_network-NACHFRAGEZONEN_MARKED.xml.gz";
 //		overwriteGridNetworkLengthsAllToGivenLength(input, output, 200);
 		markZones(input, output);
 	}
@@ -58,8 +58,8 @@ public class OverwriteLinkLengths {
 		MatsimNetworkReader oldReader = new MatsimNetworkReader(oldNet);
 		oldReader.readFile(inputFile);
 
-		Set<Id<Link>> mierrendorfLinks = readLinks("C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Links.txt");
-		Set<Id<Link>> klausenerLinks = readLinks("C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Rechts.txt");
+		Set<Id<Link>> mierrendorfLinks = readLinks("C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Links_Activities.txt");
+		Set<Id<Link>> klausenerLinks = readLinks("C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Rechts_Activities.txt");
 		
 		for(Id<Link> ll : mierrendorfLinks){
 			Link link = oldNet.getLinks().get(ll);

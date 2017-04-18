@@ -20,10 +20,12 @@
 package org.matsim.contrib.emissions.example.archive;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -62,7 +64,13 @@ public class RunEmissionToolOnlineExample {
 	public final void run() {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.addControlerListener(new EmissionControlerListener());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+				addControlerListenerBinding().toInstance(new EmissionControlerListener());
+			}
+		});
 		controler.run();
 	}
 	public static void main(String[] args) {

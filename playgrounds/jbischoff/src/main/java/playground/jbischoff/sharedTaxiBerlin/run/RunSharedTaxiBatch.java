@@ -23,14 +23,12 @@
 package playground.jbischoff.sharedTaxiBerlin.run;
 
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
+import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import playground.michalm.drt.run.DrtConfigGroup;
-import playground.michalm.drt.run.DrtControlerCreator;
 
 /**
  * @author  jbischoff

@@ -123,6 +123,27 @@ public class LinkQuadTreeTest {
 		Assert.assertEquals(l13, qt.getNearest(100, 800));
 	}
 
+	@Test
+	public void testRemove() {
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		LinkQuadTree qt = new LinkQuadTree(0, 0, 1000, 1000);
+		Link l13 = createLink(s, 0, 1000, 400, 400);
+		Link l23 = createLink(s, 1000, 1000, 400, 400);
+		Link l53 = createLink(s, 0, 0, 400, 400);
+		Link l63 = createLink(s, 1000, 0, 400, 400);
+		qt.put(l13);
+		qt.put(l23);
+		qt.put(l53);
+		qt.put(l63);
+
+		Assert.assertEquals(l13, qt.getNearest(100, 800));
+
+		qt.remove(l13);
+		Assert.assertEquals(l23, qt.getNearest(100, 800));
+
+	}
+
 	private Link createLink(Scenario s, double fromX, double fromY, double toX, double toY) {
 		NetworkFactory nf = s.getNetwork().getFactory();
 		Coord fc = new Coord(fromX, fromY);

@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -33,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
-public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
+public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, IterationEndsListener{
 	
 	Network network;
 
@@ -82,7 +84,9 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 	
 	@Override
 	public void reset(int iteration) {
-		
+		for(Id<Link> link : this.slotsOnLink.keySet()){
+			this.slotsOnLink.get(link).setAllParkingTimesToZero();
+		}
 	}
 	
 	@Override
@@ -148,7 +152,9 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 			for(Entry<Id<Vehicle>,Tuple<Coord,Double>> e : occupiedSlots.entrySet()){
 				Tuple<Coord, Double> parkingTuple = e.getValue();
 				this.parkings.add(manager.getLinkId() + ";" + parkingTuple.getSecond() + ";" + endOfDay + ";" +
-						parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + e.getKey());			
+						parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + e.getKey());
+				
+				// zurück auf 0 setzen
 			}
 			
 			List<Tuple<Coord,Double>> freeSlots = manager.getFreeSlots();
@@ -159,7 +165,7 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 		}
 	}
 	
-	public void plotCarPositions(String filename){
+	public void plotSlotOccupation(String filename){
 		String head = "LinkId;from;To;X;Y;OccupiedByVehicle";
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
@@ -175,6 +181,15 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 		}
 		Logger.getLogger(getClass()).info("FINISHED WRITING PARKING SLOT VISUALISATION FILE TO: " +filename);
 	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		String path = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "ParkingSlots_it"+event.getIteration()+".csv");
+		this.finishDay();
+		this.plotSlotOccupation(path);
+	}
+
+
 	
 }
 
@@ -203,6 +218,17 @@ class ParkingSlotManager{
 		return parkingTuple;
 	}
 	
+	public void setAllParkingTimesToZero(){
+		for (Tuple<Coord,Double> t : this.freeSlots){
+			Coord c = t.getFirst();
+			this.freeSlots.remove(t);
+			this.freeSlots.add(new Tuple<Coord, Double>(c,0.0));
+		}
+		for (Id<Vehicle> id : this.occupiedSlots.keySet()){
+			Coord c = this.occupiedSlots.get(id).getFirst();
+			this.occupiedSlots.put(id, new Tuple<Coord,Double>(c,0.0));
+		}
+	}
 	/**
 	 * 
 	 * @param timeOfParking

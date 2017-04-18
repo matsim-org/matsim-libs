@@ -21,6 +21,7 @@ package playground.benjamin.scenarios.munich;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -61,26 +62,27 @@ public class RunEmissionInternalizationMunich {
 		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configFile);
 
+		EmissionsConfigGroup ecg = ( (EmissionsConfigGroup) config.getModules().get(EmissionsConfigGroup.GROUP_NAME));
+		ecg.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
+		ecg.setEmissionCostMultiplicationFactor(Double.parseDouble(emissionCostFactor));
+		ecg.setConsideringCO2Costs(Boolean.parseBoolean(considerCO2Costs));
+
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 
-		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.setEmissionEfficiencyFactor(Double.parseDouble(emissionEfficiencyFactor));
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 
-		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-
-		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
-				emissionCostModule, config.planCalcScore());
+		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
+        );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+				bind(EmissionCostModule.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+
 				bindCarTravelDisutilityFactory().toInstance(emissionTducf);
 			}
 		});
-
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

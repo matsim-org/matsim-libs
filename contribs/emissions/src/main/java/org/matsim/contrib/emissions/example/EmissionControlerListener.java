@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
@@ -34,17 +34,22 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 
 
 /**
+ *
  * @author benjamin
  *
  */
 public class EmissionControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener {
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
 	
-	private MatsimServices controler;
 	private String emissionEventOutputFile;
 	private Integer lastIteration;
-	private EmissionModule emissionModule;
+
+	@Inject private MatsimServices controler;
+	@Inject private EmissionModule emissionModule;
+
 	private EventWriterXML emissionEventWriter;
+
+	// I dont see, a purpose of this now. Amit Mar'17
 
 	public EmissionControlerListener() {
 		
@@ -52,14 +57,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getServices();
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
-		
-		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 		
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
@@ -84,7 +83,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		if(lastIteration.equals(event.getIteration())){
 			logger.info("closing emission events file...");
 			emissionEventWriter.closeFile();
-			emissionModule.writeEmissionInformation(emissionEventOutputFile);
+			emissionModule.writeEmissionInformation();
 		}
 	}
 }

@@ -45,7 +45,6 @@ public class GridNetPopulationCreator {
 			Plan linkerPlan = fac.createPlan();
 			Id<Link> linkerhomeLink = linksOfZoneOne.get(rand.nextInt(linksOfZoneOne.size()));
 			Activity homeAct1 = fac.createActivityFromLinkId("home", linkerhomeLink);
-			homeAct1.setStartTime(0);
 			homeAct1.setEndTime(8*3600 + (i * 3600 / nrOfAgentsPerZone));
 			linkerPlan.addActivity(homeAct1);
 			
