@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
@@ -289,7 +288,9 @@ public class CNEIntegration {
 						bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
 						bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
 
-						addControlerListenerBinding().to(EmissionControlerListener.class); // just to write the emission events
+						// if EmissionModule is binded (necessary step), EmissionControlerListener is not required.
+						// It's sole purpose was to write the emission events if emission costs are not internalized. Amit Apr'17
+//						addControlerListenerBinding().to(EmissionControlerListener.class); // just to write the emission events
 
 						if(personFilter!=null) bind(PersonFilter.class).toInstance(personFilter);
 						bind(ExperiencedEmissionCostHandler.class);

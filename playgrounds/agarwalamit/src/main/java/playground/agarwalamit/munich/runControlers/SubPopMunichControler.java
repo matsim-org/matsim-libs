@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -213,9 +212,11 @@ public class SubPopMunichControler {
 		controler.getConfig().controler().setCreateGraphs(true);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		if(!internalizeEmission && !internalizeBoth){
-			controler.addControlerListener(new EmissionControlerListener());
-		}
+		// if EmissionModule is binded (necessary step), EmissionControlerListener is not required.
+		// It's sole purpose was to write the emission events if emission costs are not internalized. Amit Apr'17
+//		if(!internalizeEmission && !internalizeBoth){
+//			controler.addControlerListener(new EmissionControlerListener());
+//		}
 
 		if(writeInfoForEachPersonInEachIteration){
 			// not sure for true functionality yet
