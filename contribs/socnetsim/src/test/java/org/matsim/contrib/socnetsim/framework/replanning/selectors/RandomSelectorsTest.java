@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -45,9 +47,6 @@ import static org.junit.Assert.assertEquals;
  * @author thibautd
  */
 public class RandomSelectorsTest {
-	private interface SelectorFactory {
-		public GroupLevelPlanSelector create(Random r);
-	}
 
 	private final List<ReplanningGroup> testGroups = new ArrayList<ReplanningGroup>();
 	private JointPlans jointPlans = new JointPlans();
@@ -56,6 +55,11 @@ public class RandomSelectorsTest {
 	public void clear() {
 		testGroups.clear();
 		jointPlans = new JointPlans();
+	}
+
+	@Before
+	public void setTrace() {
+		if ( false ) Logger.getLogger( RandomGroupLevelSelector.class ).setLevel( Level.TRACE );
 	}
 
 	@Before
@@ -338,19 +342,19 @@ public class RandomSelectorsTest {
 	@Before
 	public void createRandomFixtures() {
 		final Random random = new Random( 42 );
-		for ( int i=0; i < 30; i++ ) {
+		for ( int i=0; i < 100; i++ ) {
 			ReplanningGroup group = new ReplanningGroup();
 			testGroups.add( group );
 
 			final List<List<Plan>> planLists = new ArrayList<>();
-			for ( int pNr=0; pNr < 10; pNr++ ) {
+			for ( int pNr=0; pNr < 5; pNr++ ) {
 				Person person = PopulationUtils.getFactory().createPerson( Id.create( pNr , Person.class ) );
 				group.addPerson( person );
 
 				final List<Plan> plans = new ArrayList<>();
 				planLists.add( plans );
 
-				for ( int planNr=0; planNr < 10; planNr++ ) {
+				for ( int planNr=0; planNr < 5; planNr++ ) {
 					final Plan plan = PopulationUtils.getFactory().createPlan();
 					plan.setScore( random.nextDouble() );
 					person.addPlan( plan );
