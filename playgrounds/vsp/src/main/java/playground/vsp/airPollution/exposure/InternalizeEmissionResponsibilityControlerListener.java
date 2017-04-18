@@ -74,7 +74,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		EventsManager eventsManager = controler.getEvents();
+		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
 
 		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
 		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gridTools);

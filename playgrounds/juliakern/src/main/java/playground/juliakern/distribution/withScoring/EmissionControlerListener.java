@@ -99,7 +99,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 //		emissionModule.createLookupTables();
 //		emissionModule.createEmissionHandler();
 		
-		EventsManager eventsManager = controler.getEvents();
+		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
 		// commenting the following lines could cause a problem if emission events are skipped.
 		// In that case, just use the events manager which is passed to the emission module. Amit Apr'17
 //		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());

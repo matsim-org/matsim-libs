@@ -22,7 +22,6 @@ package org.matsim.contrib.emissions.example;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -50,7 +49,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	private EventWriterXML emissionEventWriter;
 
 	// I dont see, a purpose of this now. Amit Mar'17
-
 	public EmissionControlerListener() {
 		
 	}
@@ -59,12 +57,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyStartup(StartupEvent event) {
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
-		
-		EventsManager eventsManager = controler.getEvents();
-		// commenting the following lines could cause a problem if emission events are skipped.
-        // In that case, just use the events manager which is passed to the emission module. Amit Apr'17
-//		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-//		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 	}
 
 	@Override

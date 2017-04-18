@@ -20,13 +20,11 @@
 package playground.vsp.airPollution.flatEmissions;
 
 import java.util.Set;
-
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -46,7 +44,6 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionsControlerListener.class);
 
 	@Inject private MatsimServices controler;
-	@Inject private EventsManager eventsManager;
 
 	private EmissionInternalizationHandler emissionInternalizationHandler;
 

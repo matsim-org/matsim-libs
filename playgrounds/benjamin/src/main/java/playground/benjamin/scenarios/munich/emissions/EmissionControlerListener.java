@@ -47,6 +47,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	Integer lastIteration;
 	EventWriterXML emissionEventWriter;
 
+	// probably, this is not required anymore. Amit Apr'17.
 	public EmissionControlerListener() {
 		
 	}
@@ -56,11 +57,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
-		EventsManager eventsManager = controler.getEvents();
-		// commenting the following lines could cause a problem if emission events are skipped.
-		// In that case, just use the events manager which is passed to the emission module. Amit Apr'17
-//		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-//		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
 	}
 
 	@Override
