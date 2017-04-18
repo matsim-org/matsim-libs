@@ -82,15 +82,10 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
             for(AVRequest request : unmatchedRequests) {
                 if(!availableVehicles.isEmpty()) {
 
-                    // usefull stuff
-                    // request.getFromLink().getFromNode().getCoord();
-                    // getVehicleLocation(vehicle).getCoord();
-
-                    AVVehicle vehicle = findClosestVehicle(request.getFromLink()); // intended to replace vehicle
-                    // AVVehicle vehicle = availableVehicles.remove(0);
+                    AVVehicle vehicle = findClosestVehicle(request.getFromLink());
 
                     Collection<VehicleLinkPair> divVehicles = getDivertableVehicles();
-                    if (!divVehicles.stream().anyMatch(vlp -> vlp.avVehicle.equals(vehicle))) { // for debug purpose
+                    if (!divVehicles.stream().anyMatch(vlp -> vlp.avVehicle.equals(vehicle))) { // for debugging purpose
                         System.out.println(vehicle + " is no diverertable vehicle!");
                         System.out.println("diverertable vehicles are:");
                         for(VehicleLinkPair element : divVehicles) System.out.println("\t" + element.avVehicle);
@@ -98,7 +93,7 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
                         for(AVVehicle element : availableVehicles) System.out.println("\t" + element);
                         System.out.println("vehicles in quadtree:");
                         for(AVVehicle element : availableVehiclesTree.values()) System.out.println("\t" + element);
-                    } else System.out.println("matched request " + request.getId() + " with " + vehicle);
+                    }
                     VehicleLinkPair pair = divVehicles.stream().filter(vlp -> vlp.avVehicle.equals(vehicle)).findFirst().get();
                     setVehicleDiversion(pair, request.getFromLink());
                     matchedRequests.add(request);
@@ -106,9 +101,6 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
                     removeVehicle(vehicle);
                 }
             }
-
-            availableVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toList());
-
         }
     }
 
@@ -117,7 +109,6 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
         for(AVVehicle car : availableVehicles) {
             Link link = getVehicleLocation(car);
             availableVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), car);
-            // System.out.println("added " + car + " to the quadtree");
         }
     }
 
