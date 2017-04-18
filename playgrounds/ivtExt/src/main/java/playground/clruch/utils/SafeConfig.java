@@ -31,6 +31,18 @@ public class SafeConfig {
         return alt;
     }
 
+    public int getIntegerStrict(String key) {
+        String string = reflectiveConfigGroup.getParams().get(key);
+        GlobalAssert.that(string != null);
+        return Integer.parseInt(string);
+    }
+
+    public double getDoubleStrict(String key) {
+        String string = reflectiveConfigGroup.getParams().get(key);
+        GlobalAssert.that(string != null);
+        return Double.parseDouble(string);
+    }
+
     public static SafeConfig wrap(ReflectiveConfigGroup reflectiveConfigGroup) {
         return new SafeConfig(reflectiveConfigGroup);
     }
