@@ -77,9 +77,6 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 		EventsManager eventsManager = this.controler.getEvents();
 		this.congestionHandler = new CongestionHandlerImplV3(eventsManager, this.scenario);
 
-		eventsManager.addHandler(this.emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(this.emissionModule.getColdEmissionHandler());
-
 		eventsManager.addHandler(this.congestionHandler);
 		eventsManager.addHandler(new MarginalCongestionPricingHandler(eventsManager, scenario));
 		eventsManager.addHandler(this.tollHandler);

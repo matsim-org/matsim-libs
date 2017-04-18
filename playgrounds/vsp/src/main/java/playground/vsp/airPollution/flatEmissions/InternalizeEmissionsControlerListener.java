@@ -57,8 +57,6 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 	}
 
 	@Override

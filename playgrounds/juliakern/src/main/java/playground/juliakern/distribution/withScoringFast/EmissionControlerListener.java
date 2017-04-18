@@ -160,8 +160,10 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		
 		}
 		logger.info("done parsing");
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+		// commenting the following lines could cause a problem if emission events are skipped.
+		// In that case, just use the events manager which is passed to the emission module. Amit Apr'17
+//		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
+//		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		geh = new GeneratedEmissionsHandler(0.0, timeBinSize, links2xcells, links2ycells);
 		emissionModule.getEmissionEventsManager().addHandler(geh);
 		

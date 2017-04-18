@@ -137,9 +137,6 @@ public class EmissionEventsTest {
         EventsManager emissionEventsManager = EventsUtils.createEventsManager();
         EmissionModule emissionModule = new EmissionModule(sc, emissionEventsManager);
 
-        emissionEventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-        emissionEventsManager.addHandler(emissionModule.getColdEmissionHandler());
-
         EventWriterXML emissionEventWriter;
 
         if (! this.isIgnoringEmissionsFromEventsFile ) { // if ignoring emission events,

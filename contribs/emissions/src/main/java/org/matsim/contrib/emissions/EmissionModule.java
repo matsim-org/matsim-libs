@@ -86,6 +86,10 @@ public class EmissionModule {
 
 		createLookupTables();
 		createEmissionHandler();
+
+		// add event handlers here and restrict the access outside the emission Module.  Amit Apr'17.
+		this.eventsManager.addHandler(warmEmissionHandler);
+		this.eventsManager.addHandler(coldEmissionHandler);
 	}
 	
 	private void createLookupTables() {
@@ -382,12 +386,8 @@ public class EmissionModule {
 		return hbefaTrafficSituation;
 	}
 
-	public WarmEmissionHandler getWarmEmissionHandler() {
-		return warmEmissionHandler;	
-	}
-
-	public ColdEmissionHandler getColdEmissionHandler() {
-		return coldEmissionHandler;
+	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
+		return this. warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
 	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
