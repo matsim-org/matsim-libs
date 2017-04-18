@@ -26,7 +26,10 @@ class PlanForResampling implements Alternative {
 
 	private final EpsilonDistribution epsDistr;
 
-	private Double matsimTimeScore = null;
+	// TODO NEW
+	private final double matsimTimeScoreOffset;
+
+	private double matsimTimeScore;
 
 	private Double epsilonRealization = null;
 
@@ -42,6 +45,14 @@ class PlanForResampling implements Alternative {
 		this.matsimTimeScore = sampersTravelTimeUtility;
 		this.sampersChoiceProba = sampersChoiceProba;
 		this.epsDistr = epsDistr;
+
+		// TODO NEW
+		if (TourSequence.Type.work_car.equals(tourSequence.type)
+				|| (TourSequence.Type.work_pt.equals(tourSequence.type))) {
+			this.matsimTimeScoreOffset = 102.0; // TODO HACK!!!
+		} else {
+			this.matsimTimeScoreOffset = 0.0;
+		}
 	}
 
 	// -------------------- FOR TESTING --------------------
@@ -74,7 +85,8 @@ class PlanForResampling implements Alternative {
 
 	@Override
 	public double getMATSimTimeScore() {
-		return this.matsimTimeScore;
+		// TODO NEW
+		return (this.matsimTimeScore + this.matsimTimeScoreOffset);
 	}
 
 	@Override
@@ -87,9 +99,16 @@ class PlanForResampling implements Alternative {
 		this.epsilonRealization = eps;
 	}
 
+	// TODO NEW
+	// @Override
+	// public void setMATSimTimeScore(double score) {
+	// this.matsimTimeScore = score;
+	// }
+
+	// TODO NEW
 	@Override
-	public void setMATSimTimeScore(double score) {
-		this.matsimTimeScore = score;
+	public void updateMATSimTimeScore(double score, double innovationWeight) {
+		this.matsimTimeScore = (1.0 - innovationWeight) * this.matsimTimeScore + innovationWeight * score;
 	}
 
 	@Override
@@ -106,7 +125,7 @@ class PlanForResampling implements Alternative {
 				+ this.tourSequence.type + "\n");
 		result.append("V(type,dest,mode) = " + this.activityModeUtility + "\n");
 		result.append("V_Sampers(time)   = " + this.sampersTravelTimeUtility + "\n");
-		result.append("V_MATSim(time)    = " + this.matsimTimeScore + "\n");
+		result.append("V_MATSim(time)    = " + this.matsimTimeScore + " + " + this.matsimTimeScoreOffset + "\n");
 		result.append("P_sampers(this)   = " + this.sampersChoiceProba);
 		return result.toString();
 	}

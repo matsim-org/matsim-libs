@@ -15,7 +15,9 @@ public interface Alternative {
 
 	public double getMATSimTimeScore();
 
-	public void setMATSimTimeScore(double score);
+	// TODO NEW
+	// public void setMATSimTimeScore(double score);
+	public void updateMATSimTimeScore(double score, double innovationWeight);
 	
 	public double getSampersChoiceProbability();
 

@@ -38,7 +38,7 @@ public class Main {
 
 	private static final Random rnd = new Random();
 
-	private static final int outerIts = 20; // 50;
+	private static final int outerIts = 100; // 50;
 	private static final int popSize = 1000; // 1000;
 
 	private static final double sampersLogitScale = 1.0;
@@ -48,8 +48,8 @@ public class Main {
 	private static Integer numberOfDrawsToGenerateChoiceSet = null;
 	private static final int numberOfDrawsToEstimateLogsum = 10 * 1000;
 
+	private static final double replanProba = 1.0;
 	private static final double explorationProba = 0.1;
-	private static final double innovationWeight = 1.0;
 
 	/*-
 	 * ============================================================ 
@@ -86,7 +86,7 @@ public class Main {
 			choiceManager.createChoiceSets(scenario.getPopulation(), choiceSetsFromFile);
 		}
 
-		choiceManager.simulateChoices(scenario.getPopulation(), explorationProba);
+		choiceManager.simulateChoices(scenario.getPopulation(), replanProba, explorationProba);
 
 		final PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write(populationFileName);
@@ -164,7 +164,7 @@ public class Main {
 					populationAnalyzer.registerExperiencedScore(person);
 				}
 
-				choiceManager.updateMATSimTimeScores(scenario.getPopulation(), outerIt == 1 ? 1.0 : innovationWeight);
+				choiceManager.updateMATSimTimeScores(scenario.getPopulation());
 
 				populationAnalyzer.registerEstimatedMaximumUtility(
 						choiceManager.getEstimatedMaximumUtility(scenario.getPopulation()));

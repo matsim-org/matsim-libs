@@ -32,6 +32,17 @@ public class ChoiceManager<A extends Alternative> {
 	private Map<Id<Person>, A> personId2choice = new LinkedHashMap<>();
 	private Map<Id<Person>, LinkedList<A>> personId2unexploredAlternatives = new LinkedHashMap<>();
 
+	private Map<A, Integer> alt2evalCnt = new LinkedHashMap<>();
+
+	private int getEvalCnt(final A alt) {
+		final Integer val = this.alt2evalCnt.get(alt);
+		return ((val != null) ? val : 0);
+	}
+
+	private void incEvalCnt(final A alt) {
+		this.alt2evalCnt.put(alt, this.getEvalCnt(alt) + 1);
+	}
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public ChoiceManager(final Random rnd, final int numberOfDrawsToGenerateChoiceSet,
@@ -54,7 +65,7 @@ public class ChoiceManager<A extends Alternative> {
 		}
 	}
 
-	public void simulateChoices(final Population population, final double explorationProba) {
+	public void simulateChoices(final Population population, final double replanProba, final double explorationProba) {
 
 		for (Map.Entry<Id<Person>, Set<A>> personId2choiceSetEntry : this.personId2choiceSet.entrySet()) {
 
@@ -71,20 +82,30 @@ public class ChoiceManager<A extends Alternative> {
 				choice.setSampersEpsilonRealization(0.0);
 				this.personId2choice.put(personId, choice);
 
-			} else if (this.rnd.nextDouble() < explorationProba) {
+			} else if (this.rnd.nextDouble() < replanProba) {
 
-				choice = (new ArrayList<>(choiceSet)).get(this.rnd.nextInt(choiceSet.size()));
-				choice.setSampersEpsilonRealization(0.0);
-				this.personId2choice.put(personId, choice);
+				if (this.rnd.nextDouble() < explorationProba) {
+
+					choice = (new ArrayList<>(choiceSet)).get(this.rnd.nextInt(choiceSet.size()));
+					choice.setSampersEpsilonRealization(0.0);
+					this.personId2choice.put(personId, choice);
+
+				} else {
+
+					final Sampers2MATSimResampler<A> resampler = new Sampers2MATSimResampler<>(this.rnd, choiceSet,
+							this.numberOfDrawsToGenerateChoiceSet);
+					choice = resampler.next();
+					this.personId2choice.put(personId, choice);
+
+				}
 
 			} else {
 
-				final Sampers2MATSimResampler<A> resampler = new Sampers2MATSimResampler<>(this.rnd, choiceSet,
-						this.numberOfDrawsToGenerateChoiceSet);
-				choice = resampler.next();
-				this.personId2choice.put(personId, choice);
+				choice = this.personId2choice.get(personId);
 
 			}
+
+			this.incEvalCnt(choice);
 
 			// wire choice into MATSim person
 
@@ -94,7 +115,12 @@ public class ChoiceManager<A extends Alternative> {
 			person.setSelectedPlan(null);
 			person.addPlan(plan);
 			plan.setPerson(person);
-			plan.setScore(choice.getSampersOnlyScore() + choice.getMATSimTimeScore());
+
+			// TODO NEW
+			plan.setScore(null);
+			// plan.setScore(choice.getSampersOnlyScore() +
+			// choice.getMATSimTimeScore());
+
 			person.setSelectedPlan(plan);
 
 		}
@@ -104,11 +130,27 @@ public class ChoiceManager<A extends Alternative> {
 		return this.personId2choice.get(personId);
 	}
 
-	public void updateMATSimTimeScores(final Population population, final double innoWeight) {
+	public void updateMATSimTimeScores(final Population population) {
 		for (Map.Entry<Id<Person>, ? extends Person> id2person : population.getPersons().entrySet()) {
-			final Alternative alt = this.personId2choice.get(id2person.getKey());
-			alt.setMATSimTimeScore(innoWeight * id2person.getValue().getSelectedPlan().getScore()
-					+ (1.0 - innoWeight) * alt.getMATSimTimeScore());
+			final A alt = this.personId2choice.get(id2person.getKey());
+
+			final int evalCnt = this.getEvalCnt(alt);
+			if (evalCnt <= 0) {
+				throw new RuntimeException("Evaluation count is " + evalCnt + " but should be at least one.");
+			}
+			final double innoWeight;
+			if (evalCnt <= 2) {
+				innoWeight = 1.0;
+			} else {
+				// do not include the first trial evaluation
+				innoWeight = 1.0 / (evalCnt - 1);
+			}
+
+			// TODO NEW
+			// alt.setMATSimTimeScore(innoWeight *
+			// id2person.getValue().getSelectedPlan().getScore()
+			// + (1.0 - innoWeight) * alt.getMATSimTimeScore());
+			alt.updateMATSimTimeScore(id2person.getValue().getSelectedPlan().getScore(), innoWeight);
 		}
 	}
 
@@ -139,7 +181,6 @@ public class ChoiceManager<A extends Alternative> {
 		}
 		return result;
 	}
-
 
 	public Map<A, Double> newAlternative2choiceProba(final Id<Person> personId) {
 
