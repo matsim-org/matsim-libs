@@ -158,7 +158,9 @@ public class RunEmissionToolOnline {
 			@Override
 			public void install() {
 				bind(EmissionModule.class).asEagerSingleton();
-				addControlerListenerBinding().to(EmissionControlerListener.class);
+				// if EmissionModule is binded (necessary step), EmissionControlerListener is not required.
+				// It's sole purpose was to write the emission events if emission costs are not internalized. Amit Apr'17
+//				addControlerListenerBinding().to(EmissionControlerListener.class);
 			}
 		});
 		controler.run();

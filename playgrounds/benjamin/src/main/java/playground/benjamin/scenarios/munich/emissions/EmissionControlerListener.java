@@ -47,7 +47,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	Integer lastIteration;
 	EventWriterXML emissionEventWriter;
 
-	// probably, this is not required anymore. Amit Apr'17.
 	public EmissionControlerListener() {
 		
 	}
