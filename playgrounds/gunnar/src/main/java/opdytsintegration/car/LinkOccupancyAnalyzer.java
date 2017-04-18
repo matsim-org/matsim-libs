@@ -61,6 +61,10 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 	// ---------- IMPLEMENTATION OF *EventHandler INTERFACES ----------
 
 	@Override
+	public void reset(int iteration) {
+	}
+
+	@Override
 	public void handleEvent(final VehicleEntersTrafficEvent event) {
 		if (this.relevant(event.getLinkId())) {
 			this.registerIncrease(event.getLinkId(), (int) event.getTime());
@@ -168,7 +172,6 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 		final LinkOccupancyAnalyzer analyzer = new LinkOccupancyAnalyzer(startTime_s, binSize_s, binCnt, null);
 		final Id<Link> linkId = Id.createLinkId("1");
 
-		
 		final int vehCnt = 100 * 1000;
 		double avg = 0.0;
 		final List<Event> events = new ArrayList<>();
@@ -182,9 +185,9 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 				timeIn_s = Math.min(time1_s, time2_s);
 				timeOut_s = Math.max(time1_s, time2_s);
 			}
-			
+
 			avg += (timeOut_s - timeIn_s) / Units.S_PER_D;
-						
+
 			final Id<Vehicle> vehId = Id.createVehicleId(veh);
 
 			if (rnd.nextBoolean()) {
@@ -201,7 +204,7 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 				events.add(new VehicleAbortsEvent(timeOut_s, vehId, linkId));
 			}
 		}
-		
+
 		Collections.sort(events, new Comparator<Event>() {
 			@Override
 			public int compare(Event o1, Event o2) {
@@ -221,20 +224,19 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 				analyzer.handleEvent((VehicleAbortsEvent) event);
 			} else {
 				throw new RuntimeException();
-			}			
+			}
 		}
-		
+
 		System.out.println("grand average = " + avg);
 		for (int bin = 0; bin < binCnt; bin++) {
 			System.out.println("bin = " + bin + ", value = " + analyzer.getCount(linkId, bin));
 		}
 
-		
 	}
 
 	// TODO make this a unit test
 	public static void main(String[] args) {
-//		constructedTest();
+		// constructedTest();
 		randomTest();
 	}
 }

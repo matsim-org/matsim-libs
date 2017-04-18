@@ -82,23 +82,30 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 	}
 	// ---------- IMPLEMENTATION OF *EventHandler INTERFACES ----------
 
-	@Override
-	public void reset(final int iteration) {
-		super.reset(iteration);
-		if(this.transitDrivers==null) {
+	// This replaces EventHandler.reset(int), which appears to be called before
+	// the "before mobsim" hook.
+	public void beforeIteration() {
+		super.beforeIteration();
+		if (this.transitDrivers == null) {
 			this.transitDrivers = new HashSet<Id<Person>>();
-		}else{
+		} else {
 			this.transitDrivers.clear();
 		}
-		if(this.transitVehicles==null) {
+		if (this.transitVehicles == null) {
 			this.transitVehicles = new HashSet<Id<Vehicle>>();
-		}else{
+		} else {
 			this.transitVehicles.clear();
 		}
-		if(this.personStops==null) {
+		if (this.personStops == null) {
 			this.personStops = new HashMap<Id<Person>, Id<TransitStopFacility>>();
-		}else{
-			this.personStops.clear();		}
+		} else {
+			this.personStops.clear();
+		}
+	}
+
+	@Override
+	public void reset(final int iteration) {
+		// see the explanation of beforeIteration()
 	}
 
 	@Override
@@ -118,7 +125,7 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
-			return; 
+			return;
 			// ignore transit drivers or persons entering non-transit vehicles
 		}
 		Id<Person> personId = event.getPersonId();

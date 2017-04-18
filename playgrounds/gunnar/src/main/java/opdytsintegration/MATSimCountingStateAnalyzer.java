@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.handler.EventHandler;
 
 import floetteroed.utilities.DynamicData;
 import opdytsintegration.utils.RecursiveCountAverage;
@@ -21,7 +20,7 @@ import opdytsintegration.utils.TimeDiscretization;
  * @author Gunnar Flötteröd
  *
  */
-public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandler {
+public class MATSimCountingStateAnalyzer<L extends Object> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -45,7 +44,8 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	public MATSimCountingStateAnalyzer(final int startTime_s, final int binSize_s, final int binCnt) {
 		this.counts = new DynamicData<>(startTime_s, binSize_s, binCnt);
-		this.reset(-1);
+		// this.reset(-1);
+		this.beforeIteration();
 	}
 
 	public MATSimCountingStateAnalyzer(final TimeDiscretization timeDiscr) {
@@ -54,13 +54,20 @@ public class MATSimCountingStateAnalyzer<L extends Object> implements EventHandl
 
 	// -------------------- IMPLEMENTATION OF EventHandler --------------------
 
-	@Override
-	public void reset(final int iteration) {
+	public void beforeIteration() {
 		this.locked = false;
 		this.counts.clear();
 		this.location2avgCnt.clear();
 		this.lastCompletedBin = -1;
 	}
+
+	// @Override
+	// public void reset(final int iteration) {
+	// this.locked = false;
+	// this.counts.clear();
+	// this.location2avgCnt.clear();
+	// this.lastCompletedBin = -1;
+	// }
 
 	// -------------------- INTERNALS --------------------
 
