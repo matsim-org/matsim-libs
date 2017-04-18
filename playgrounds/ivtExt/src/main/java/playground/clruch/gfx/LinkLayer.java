@@ -45,9 +45,9 @@ public class LinkLayer extends ViewerLayer {
         if (drawLinks) {
             graphics.setColor(LINKCOLOR);
             for (OsmLink osmLink : matsimMapComponent.db.getOsmLinks()) {
-                Point p1 = matsimMapComponent.getMapPosition(osmLink.coords[0]);
+                Point p1 = matsimMapComponent.getMapPosition(osmLink.getCoordFrom());
                 if (p1 != null) {
-                    Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.coords[1]);
+                    Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getCoordTo());
                     graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
                 }
             }
@@ -71,8 +71,10 @@ public class LinkLayer extends ViewerLayer {
 
     @Override
     void hud(Graphics2D graphics, SimulationObject ref) {
-        matsimMapComponent.append("%5d streets", matsimMapComponent.db.getOsmLinksSize());
-        matsimMapComponent.appendSeparator();
+        if (drawLinks) {
+            matsimMapComponent.append("%5d streets", matsimMapComponent.db.getOsmLinksSize());
+            matsimMapComponent.appendSeparator();
+        }
     }
 
     public void setDraw(boolean selected) {

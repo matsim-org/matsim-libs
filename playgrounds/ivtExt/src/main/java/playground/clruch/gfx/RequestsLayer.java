@@ -28,12 +28,12 @@ public class RequestsLayer extends ViewerLayer {
 
     MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.Orange);
     MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GreenContour);
+    double maxWaitTime;
 
     public RequestsLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
+        requestDestMap.show = false; // default: don't show distrib of request dest
     }
-
-    double maxWaitTime;
 
     @Override
     public void prepareHeatmaps(SimulationObject ref) {

@@ -35,7 +35,9 @@ public class VehiclesLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        int carwidth = (int) Math.max(3, Math.round(5 / matsimMapComponent.getMeterPerPixel()));
+        int zoom = matsimMapComponent.getZoom();
+        int carwidth = (int) Math.max(zoom <= 12 ? 2 : 3, Math.round(5 / matsimMapComponent.getMeterPerPixel()));
+        int car_half = carwidth / 2;
         Map<Integer, List<VehicleContainer>> map = //
                 ref.vehicles.stream().collect(Collectors.groupingBy(VehicleContainer::getLinkId));
         for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
@@ -49,7 +51,7 @@ public class VehiclesLayer extends ViewerLayer {
                     Point p1 = matsimMapComponent.getMapPosition(osmLink.getAt(sum));
                     if (p1 != null) {
                         graphics.setColor(vc.avStatus.color);
-                        graphics.fillRect(p1.x, p1.y, carwidth, carwidth);
+                        graphics.fillRect(p1.x - car_half, p1.y - car_half, carwidth, carwidth);
                         if (vc.destinationLinkIndex != AbstractContainer.LINK_UNSPECIFIED && //
                                 bits.get(vc.avStatus.ordinal())) {
                             OsmLink toOsmLink = matsimMapComponent.db.getOsmLink(vc.destinationLinkIndex);
