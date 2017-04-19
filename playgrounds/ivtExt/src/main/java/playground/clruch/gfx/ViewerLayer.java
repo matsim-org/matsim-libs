@@ -60,6 +60,7 @@ public abstract class ViewerLayer {
         rowPanel.add(jCheckBox);
         {
             SpinnerLabel<ColorSchemes> spinner = new SpinnerLabel<>();
+            spinner.setToolTipText("color scheme of heatmap");
             spinner.setArray(ColorSchemes.values());
             spinner.setValue(matsimHeatMap.colorSchemes);
             spinner.addSpinnerListener(cs -> {
