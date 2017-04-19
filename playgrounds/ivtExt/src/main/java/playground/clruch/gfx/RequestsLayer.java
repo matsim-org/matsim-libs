@@ -24,6 +24,7 @@ public class RequestsLayer extends ViewerLayer {
 
     private static Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
     // ---
+    private volatile boolean drawNumber = true;
     private volatile boolean drawRequestDestinations = false;
 
     MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.Orange);
@@ -109,8 +110,10 @@ public class RequestsLayer extends ViewerLayer {
                         graphics.drawLine(x, y, p2.x, p2.y);
                     }
                 }
-                graphics.setColor(Color.DARK_GRAY);
-                graphics.drawString("" + numRequests, x, y); // - numRequests
+                if (drawNumber) {
+                    graphics.setColor(Color.GRAY);
+                    graphics.drawString("" + numRequests, x, y); // - numRequests
+                }
             }
         }
 
@@ -144,9 +147,18 @@ public class RequestsLayer extends ViewerLayer {
     @Override
     protected void createPanel(RowPanel rowPanel) {
         {
+            final JCheckBox jCheckBox = new JCheckBox("number");
+            jCheckBox.setSelected(drawNumber);
+            jCheckBox.addActionListener(event -> {
+                drawNumber = jCheckBox.isSelected();
+                matsimMapComponent.repaint();
+            });
+            rowPanel.add(jCheckBox);
+        }
+        {
             final JCheckBox jCheckBox = new JCheckBox("destin.");
             jCheckBox.setSelected(getDrawDestinations());
-            jCheckBox.addActionListener(e -> setDrawDestinations(jCheckBox.isSelected()));
+            jCheckBox.addActionListener(event -> setDrawDestinations(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);
         }
         createHeatmapPanel(rowPanel, "source", requestHeatMap);

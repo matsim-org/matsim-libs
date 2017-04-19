@@ -108,7 +108,6 @@ public class VehiclesLayer extends ViewerLayer {
                 matsimMapComponent.repaint();
             });
             rowPanel.add(jCheckBox);
-
         }
         {
             SpinnerLabel<AvStatusColor> spinner = new SpinnerLabel<>();

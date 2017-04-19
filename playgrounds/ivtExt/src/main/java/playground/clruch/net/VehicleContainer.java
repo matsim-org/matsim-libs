@@ -17,7 +17,10 @@ public class VehicleContainer implements Serializable {
      */
 
     public int vehicleIndex = -1; // for tracking of individual vehicles
+    
+    // linkIndex is unrelated to MATSIM's LinkId, but is our own consecutive and memory efficient id
     public int linkIndex = -1;
+    
     public AVStatus avStatus = null;
     public int destinationLinkIndex = -1; // <- value -1 in case no particular destination
 
