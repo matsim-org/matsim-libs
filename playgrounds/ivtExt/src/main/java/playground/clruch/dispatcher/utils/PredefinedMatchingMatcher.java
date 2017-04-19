@@ -44,8 +44,9 @@ public class PredefinedMatchingMatcher extends AbstractVehicleRequestMatcher {
     
     public int matchPredefined(HashMap<AVVehicle, Link> stayVehicles, HashMap<AVRequest, AVVehicle> matchings) {
             int num_matchedRequests = 0;
+            HashMap<AVRequest, AVVehicle> matchingsIter = new HashMap<>(matchings);
             // match vehicles which have arrived at origin of request
-            for(Entry<AVRequest,AVVehicle> entry : matchings.entrySet()){
+            for(Entry<AVRequest,AVVehicle> entry : matchingsIter.entrySet()){
                 if(stayVehicles.containsKey(entry.getValue()) && stayVehicles.get(entry.getValue()) == entry.getKey().getFromLink()){
                     biConsumer.accept(entry.getValue(), entry.getKey());
                     ++num_matchedRequests;

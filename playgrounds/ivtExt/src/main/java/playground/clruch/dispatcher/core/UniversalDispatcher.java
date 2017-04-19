@@ -1,12 +1,15 @@
 package playground.clruch.dispatcher.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +22,8 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.common.collect.Maps;
 
 import playground.clruch.net.SimulationDistribution;
 import playground.clruch.net.SimulationObject;
@@ -49,10 +54,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via
                                                                           // getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
-    private final Set<AVRequest> assignedRequests = new HashSet<>(); // pending requests which are assigned to an AV
-    private final Set<AVRequest> unassignedRequests = new HashSet<>(); // pending requests which are still unassigned
+    private final Set<AVRequest> assignedRequests = new HashSet<>(); // pending requests which are
+                                                                     // assigned to an AV
+    private final Set<AVRequest> unassignedRequests = new HashSet<>(); // pending requests which are
+                                                                       // still unassigned
     private final Set<AVVehicle> assignedVehicles = new HashSet<>(); //
-    private final HashMap<AVRequest,AVVehicle> matchings = new HashMap<>(); // customer/AV matchings
+    private final HashMap<AVRequest, AVVehicle> matchings = new HashMap<>(); // customer/AV
+                                                                             // matchings
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
 
     /**
@@ -104,8 +112,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             GlobalAssert.that(AVVEHILCECOUNT == collection.size());
             GlobalAssert.that(AVVEHILCECOUNT == vehicleLocations.size());
         }
-        // if (0 < failed)
-        // System.out.println("failed to extract location for " + failed + " vehicles");
     }
 
     /**
@@ -119,20 +125,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         matchedRequests.clear();
         return Collections.unmodifiableCollection(pendingRequests);
     }
-    
-    
-    
-    protected synchronized final Collection<AVRequest> getUnassignedAVRequests(){
-        pendingRequests.removeAll(matchedRequests);
-        assignedRequests.removeAll(matchedRequests);
-        matchedRequests.stream().forEach(v->matchings.remove(v));
-        matchedRequests.clear();
-        unassignedRequests.removeAll(assignedRequests);
-        System.out.println(pendingRequests.size()+"<-pendingReq  ,   assigned Req->   "+ assignedRequests.size() +" unasisgnedReq -> "+ unassignedRequests.size());
+
+    protected synchronized final Collection<AVRequest> getUnassignedAVRequests() {
         GlobalAssert.that(pendingRequests.size() == assignedRequests.size() + unassignedRequests.size());
-        return Collections.unmodifiableCollection(unassignedRequests);        
+        return Collections.unmodifiableCollection(unassignedRequests);
     }
-    
 
     /**
      * function call leaves the state of the {@link UniversalDispatcher} unchanged. successive calls
@@ -164,8 +161,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         final Schedule schedule = avVehicle.getSchedule();
 
         // check that current task is last task in schedule
-        GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule)); 
-        
+        GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule));
+
         final double endPickupTime = getTimeNow() + pickupDurationPerStop;
         FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
                 avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
@@ -177,10 +174,16 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(returnVal == null);
 
         ++total_matchedRequests;
-        
-        // this is only functional if the Set "assignedVehicles" was used (e.g. by SingleHeuristicDispatcher)
-        assignedVehicles.remove(avVehicle);
-        assignedRequests.remove(avRequest);
+
+        // this is only functional if the Set "assignedVehicles" was used (e.g. by
+        // SingleHeuristicDispatcher)
+        boolean succPR = pendingRequests.remove(avRequest);
+        boolean succAR = assignedRequests.remove(avRequest);
+        boolean succAV = assignedVehicles.remove(avVehicle);
+        GlobalAssert.that(succAV == succAR && succAR == succPR);
+        GlobalAssert.that(succPR);
+        GlobalAssert.that(matchings.remove(avRequest) != null);
+        GlobalAssert.that(pendingRequests.size() == unassignedRequests.size() + assignedRequests.size());
     }
 
     /**
@@ -227,9 +230,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         };
     }
 
-    
     /**
-     * NEW FUNCTION UNDER DEVELOPMENT JOEL AND CLAUDIO
+     * Sends a stay vehicle to a customer in a way such that it can be made unavailalbe for future
+     * dispatcher calls
+     * 
      * @param avVehicle
      * @param avRequest
      */
@@ -263,25 +267,62 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                             vehicleLinkPair, customerOrig, futurePathContainer));
                 } else
                     assignDirective(vehicleLinkPair.avVehicle, new EmptyDirective());
-                
-                
-                // remove request
-                boolean succReq = assignedRequests.add(avRequest);
-                GlobalAssert.that(succReq);
-                
+
+                // move request from unassigned to assigned
+                boolean succReqU = unassignedRequests.remove(avRequest);
+                boolean succReqA = assignedRequests.add(avRequest);
+                GlobalAssert.that(succReqU == succReqA);
+                GlobalAssert.that(succReqA);
+
                 // declare vehicle as assigned
                 boolean succVeh = assignedVehicles.add(avVehicle);
-                GlobalAssert.that(succVeh);  
-                
+                GlobalAssert.that(succVeh);
+
                 // add pair to matchings
-                GlobalAssert.that(matchings.put(avRequest,avVehicle)==null);   
-                
+                GlobalAssert.that(matchings.put(avRequest, avVehicle) == null);
+
+                GlobalAssert.that(pendingRequests.size() == unassignedRequests.size() + assignedRequests.size());
+
             }
 
         };
 
         // pickup request (setAcceptRequest)
     }
+
+    
+    /**
+     * 
+     * @return available vehicles which are yet unassigned to a request
+     */
+    protected List<AVVehicle> getavailableUnassignedVehicles() {
+        // get the staying vehicles and requests
+        List<AVVehicle> availableVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toList());
+        return availableVehicles.stream().filter(v -> !assignedVehicles.contains(v)).collect(Collectors.toList());
+
+    }
+    
+    /**
+     * 
+     * @return available vehicles which are yet unassigned to a request as vehicle Link pairs
+     */
+    protected List<VehicleLinkPair> getavailableUnassignedVehicleLinkPairs() {
+        // get the staying vehicles and requests
+        List<AVVehicle> availableVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toList());
+        List<AVVehicle> availableUnassignedVehicles =  availableVehicles.stream().filter(v -> !assignedVehicles.contains(v)).collect(Collectors.toList());
+        List<VehicleLinkPair> returnList = new ArrayList<>();
+        
+        for(AVVehicle avVehicle : availableUnassignedVehicles ){
+            final Schedule schedule = avVehicle.getSchedule();
+            AVStayTask task = (AVStayTask) schedule.getCurrentTask();
+            LinkTimePair linkTimePair = new LinkTimePair(task.getLink(), getTimeNow());
+            VehicleLinkPair vehicleLinkPair = new VehicleLinkPair(avVehicle, linkTimePair, null);
+            returnList.add(vehicleLinkPair);
+        }
+        
+        return returnList;
+    }
+    
 
     public final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {
         setVehicleDiversion(entry.getKey(), entry.getValue());
@@ -294,8 +335,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     @Override
     public final void onRequestSubmitted(AVRequest request) {
-        pendingRequests.add(request); // <- store request
-        unassignedRequests.add(request);
+        boolean succAddP = pendingRequests.add(request); // <- store request
+        boolean succAddU = unassignedRequests.add(request);
+        GlobalAssert.that(succAddP == succAddU);
+        GlobalAssert.that(pendingRequests.size() == unassignedRequests.size() + assignedRequests.size());
     }
 
     /**
@@ -323,25 +366,22 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(link != null);
         return link;
     }
-    
-    
+
     /**
      * 
      * @return Set of vehicles currently assigned to a job
      */
-    protected Set<AVVehicle> getAssignedVehicles(){
+    protected Set<AVVehicle> getAssignedVehicles() {
         return assignedVehicles;
     }
-    
+
     /**
      * 
      * @return matchings between AVRequests and AVVehicles
      */
-    protected HashMap<AVRequest,AVVehicle> getMatchings(){
+    protected HashMap<AVRequest, AVVehicle> getMatchings() {
         return matchings;
     }
-    
-    
 
     @Override
     final void notifySimulationSubscribers(long round_now) {
