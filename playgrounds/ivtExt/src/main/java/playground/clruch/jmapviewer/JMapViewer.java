@@ -88,7 +88,7 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
      */
     protected int zoom;
 
-    public int mapAlphaCover = 128;
+    public int mapAlphaCover = 160;
 
     protected JSlider zoomSlider;
     protected JButton zoomInButton;
