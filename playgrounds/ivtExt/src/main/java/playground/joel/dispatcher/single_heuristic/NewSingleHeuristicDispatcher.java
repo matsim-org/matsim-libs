@@ -17,7 +17,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import playground.clruch.dispatcher.core.UniversalDispatcher;
+import playground.clruch.dispatcher.core.UniversalBindingDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
@@ -32,7 +32,7 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
+public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
 
     private final int dispatchPeriod;
     private final QuadTree<AVRequest> pendingRequestsTree;
