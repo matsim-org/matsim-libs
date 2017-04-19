@@ -104,7 +104,7 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
      */
     private AVRequest findClosestRequest(VehicleLinkPair vehicleLinkPair, Collection<AVRequest> avRequests) {
         Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
-        System.out.println("treesize " + pendingRequestsTree.size());
+        // System.out.println("treesize " + pendingRequestsTree.size());
         return pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());
     }
 
