@@ -25,6 +25,7 @@ public class VehiclesLayer extends ViewerLayer {
     private BitSet bits = new BitSet();
 
     AvStatusColor avStatusColors = AvStatusColor.Standard;
+    boolean showLocation = true;
 
     public VehiclesLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
@@ -38,6 +39,9 @@ public class VehiclesLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
+        if (!showLocation && bits.isEmpty())
+            return; // nothing to draw
+
         int zoom = matsimMapComponent.getZoom();
         int carwidth = (int) Math.max(zoom <= 12 ? 2 : 3, Math.round(5 / matsimMapComponent.getMeterPerPixel()));
         int car_half = carwidth / 2;
@@ -53,9 +57,11 @@ public class VehiclesLayer extends ViewerLayer {
                 for (VehicleContainer vc : entry.getValue()) {
                     Point p1 = matsimMapComponent.getMapPosition(osmLink.getAt(sum));
                     if (p1 != null) {
-                        Color color = avStatusColors.of(vc.avStatus);
-                        graphics.setColor(color);
-                        graphics.fillRect(p1.x - car_half, p1.y - car_half, carwidth, carwidth);
+                        if (showLocation) {
+                            Color color = avStatusColors.of(vc.avStatus);
+                            graphics.setColor(color);
+                            graphics.fillRect(p1.x - car_half, p1.y - car_half, carwidth, carwidth);
+                        }
                         if (vc.destinationLinkIndex != AbstractContainer.LINK_UNSPECIFIED && //
                                 bits.get(vc.avStatus.ordinal())) {
                             OsmLink toOsmLink = matsimMapComponent.db.getOsmLink(vc.destinationLinkIndex);
@@ -69,7 +75,6 @@ public class VehiclesLayer extends ViewerLayer {
                 }
             }
         }
-
     }
 
     @Override
@@ -95,6 +100,16 @@ public class VehiclesLayer extends ViewerLayer {
 
     @Override
     protected void createPanel(RowPanel rowPanel) {
+        {
+            final JCheckBox jCheckBox = new JCheckBox("location");
+            jCheckBox.setSelected(showLocation);
+            jCheckBox.addActionListener(event -> {
+                showLocation = jCheckBox.isSelected();
+                matsimMapComponent.repaint();
+            });
+            rowPanel.add(jCheckBox);
+
+        }
         {
             SpinnerLabel<AvStatusColor> spinner = new SpinnerLabel<>();
             spinner.setArray(AvStatusColor.values());
