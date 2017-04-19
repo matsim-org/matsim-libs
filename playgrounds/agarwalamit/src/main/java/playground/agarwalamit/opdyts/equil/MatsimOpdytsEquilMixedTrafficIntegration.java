@@ -68,8 +68,8 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
-	private static double randomVariance = 7;
-	private static int iterationsToConvergence = 400;
+	private static double randomVariance = 1;
+	private static int iterationsToConvergence = 600;
 
 	private static String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
 	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";

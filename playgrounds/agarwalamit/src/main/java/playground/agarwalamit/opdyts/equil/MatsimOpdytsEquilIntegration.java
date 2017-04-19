@@ -68,8 +68,8 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilIntegration {
 
-	private static int randomVariance = 7;
-	private static int iterationsToConvergence = 400;
+	private static double randomVariance = 3;
+	private static int iterationsToConvergence = 600;
 
 	private static String EQUIL_DIR = "./examples/scenarios/equil/";
 	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_holes_200its/";
@@ -80,7 +80,7 @@ public class MatsimOpdytsEquilIntegration {
 	public static void main(String[] args) {
 
 		if (args.length > 0) {
-			randomVariance = Integer.valueOf(args[0]);
+			randomVariance = Double.valueOf(args[0]);
 			iterationsToConvergence = Integer.valueOf(args[1]);
 			EQUIL_DIR = args[2];
 			OUT_DIR = args[3]+"/equil_car,pt_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
