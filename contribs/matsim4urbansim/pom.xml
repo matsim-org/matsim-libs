@@ -57,18 +57,8 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>net.sf.trove4j</groupId>
-			<artifactId>trove4j</artifactId>
-			<version>3.0.3</version>
-		</dependency>
-		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-xjc</artifactId>
-			<version>2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
 			<version>2.2</version>
 		</dependency>
 		<dependency>
@@ -84,17 +74,17 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
-			<version>0.43-RELEASE</version>
+			<version>0.45</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-xml</artifactId>
-			<version>0.43-RELEASE</version>
+			<version>0.45</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-tagfilter</artifactId>
-			<version>0.43-RELEASE</version>
+			<version>0.45</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.java-diff-utils</groupId>

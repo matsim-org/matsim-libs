@@ -131,7 +131,7 @@ public abstract class AbstractModule implements Module {
 	/**
 	 * See {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample} for an example.
 	 * 
-	 * @see {@link ControlerListener}
+	 * @see ControlerListener
 	 */
 	protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
 		return controlerListenerMultibinder.addBinding();
@@ -140,7 +140,7 @@ public abstract class AbstractModule implements Module {
 	/**
 	 * See {@link tutorial.programming.planStrategyForRemoval.RunPlanSelectorForRemovalExample} for an example.
 	 * 
-	 * @see {@link StrategyManagerModule}
+	 * @see StrategyManagerModule
 	 */
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
 		return bind(new TypeLiteral<PlanSelector<Plan, Person>>(){});

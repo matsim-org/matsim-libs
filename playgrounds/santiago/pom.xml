@@ -38,19 +38,15 @@
   		<scope>compile</scope>
   	</dependency>
 	<dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>mzilske</artifactId>
-  		<version>0.9.0-SNAPSHOT</version>
-  		<scope>compile</scope>
-  	</dependency>
-
-	
-	<dependency>
   		<groupId>playground</groupId>  
 		<artifactId>agarwalamit</artifactId>
   		<version>0.9.0-SNAPSHOT</version>
  		 <scope>compile</scope>
 	</dependency>
-	
+	<dependency>
+	  <groupId>org.matsim.contrib</groupId>
+	  <artifactId>matsim-gtfs</artifactId>
+	  <version>0.8.0</version>
+	</dependency>
   </dependencies>
 </project>
