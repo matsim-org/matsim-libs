@@ -104,6 +104,25 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 		}
 		this.linkIdSensorMap.get(linkId).registerDistanceToMonitor(distanceMeter);
 	}
+
+	public void registerNumberOfCarsOnLaneInDistanceMonitoring(Id<Link> linkId, Id<Lane> laneId, Double distanceMeter) {
+		Link link = this.network.getLinks().get(linkId);
+		if (link == null){
+			throw new IllegalStateException("Link with Id " + linkId + " is not in the network, can't register sensor");
+		}
+		if (this.laneDefinitions == null || this.laneDefinitions.getLanesToLinkAssignments().get(linkId) == null ||
+				this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId) == null) {
+			throw new IllegalStateException("No data found for lane  " + laneId + " on link  " + linkId + " is not in the network, can't register sensor");
+		}
+		if (! this.linkIdLaneIdSensorMap.containsKey(linkId)){
+			this.linkIdLaneIdSensorMap.put(linkId, new HashMap<>());
+		}
+		if (! this.linkIdLaneIdSensorMap.get(linkId).containsKey(laneId)){
+			Lane lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
+			this.linkIdLaneIdSensorMap.get(linkId).put(laneId, new LaneSensor(link, lane));
+		}
+		this.linkIdLaneIdSensorMap.get(linkId).get(laneId).registerDistanceToMonitor(distanceMeter);
+	}
 	
 	public void registerNumberOfCarsMonitoringOnLane(Id<Link> linkId, Id<Lane> laneId) {
 		Link link = this.network.getLinks().get(linkId);
@@ -186,6 +205,17 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 			throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
 		}
 		return this.linkIdSensorMap.get(linkId).getNumberOfCarsInDistance(distanceMeter, timeSeconds);
+	}
+
+	public int getNumberOfCarsInDistanceOnLane(Id<Link> linkId, Id<Lane> laneId, Double distanceMeter, double timeSeconds){
+        if (!this.linkIdLaneIdSensorMap.containsKey(linkId)){
+            throw new IllegalStateException("No sensor on link " + linkId + "! Register measurement for this link by calling one of the 'register...' methods of this class first.");
+        }
+        Map<Id<Lane>, LaneSensor> map = this.linkIdLaneIdSensorMap.get(linkId);
+        if (map == null || !map.containsKey(laneId)){
+            throw new IllegalStateException("No sensor on lane " + laneId + " of link " + linkId + "! Register measurement for this link lane pair!");
+        }
+		return map.get(laneId).getNumberOfCarsInDistance(distanceMeter, timeSeconds);
 	}
 
 	public double getAverageArrivalRate(Id<Link> linkId, double now) {

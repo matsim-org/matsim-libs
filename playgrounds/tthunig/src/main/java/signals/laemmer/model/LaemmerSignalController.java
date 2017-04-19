@@ -29,14 +29,12 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import signals.Analyzable;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 
 /**
@@ -53,7 +51,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
     private Queue<LaemmerSignal> regulationQueue = new LinkedList<>();
 
-    LaemmerConfig laemmerConfig;
+    private final LaemmerConfig laemmerConfig;
 
     private final double DESIRED_PERIOD;
 
@@ -65,6 +63,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private LinkSensorManager sensorManager;
 
     private Network network;
+    private Lanes lanes;
 
     private final double DEFAULT_INBETWEEN = 5;
     private double tIdle;
@@ -79,25 +78,28 @@ public class LaemmerSignalController extends AbstractSignalController implements
         private final LinkSensorManager sensorManager;
         private final Network network;
         private final TtTotalDelay delayCalculator;
+        private final Lanes lanes;
 
-        public SignalControlProvider(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Network network, TtTotalDelay delayCalculator) {
+        public SignalControlProvider(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Network network, Lanes lanes, TtTotalDelay delayCalculator) {
             this.laemmerConfig = laemmerConfig;
             this.sensorManager = sensorManager;
             this.network = network;
+            this.lanes = lanes;
             this.delayCalculator = delayCalculator;
         }
 
         @Override
         public SignalController get() {
-            return new LaemmerSignalController(laemmerConfig, sensorManager, network, delayCalculator);
+            return new LaemmerSignalController(laemmerConfig, sensorManager, network, lanes, delayCalculator);
         }
     }
 
 
-    private LaemmerSignalController(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Network network, TtTotalDelay delayCalculator) {
+    private LaemmerSignalController(LaemmerConfig laemmerConfig, LinkSensorManager sensorManager, Network network, Lanes lanes, TtTotalDelay delayCalculator) {
         this.laemmerConfig = laemmerConfig;
         this.sensorManager = sensorManager;
         this.network = network;
+        this.lanes = lanes;
         this.delayCalculator = delayCalculator;
         DESIRED_PERIOD = laemmerConfig.getDESIRED_PERIOD();
         MAX_PERIOD = laemmerConfig.getMAX_PERIOD();
@@ -110,8 +112,9 @@ public class LaemmerSignalController extends AbstractSignalController implements
         for (SignalGroup group : this.system.getSignalGroups().values()) {
             this.system.scheduleDropping(simStartTimeSeconds, group.getId());
             for (Signal signal : group.getSignals().values()) {
-                flowSum += network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
-                signalId2LaemmerSignal.put(signal.getId(), new LaemmerSignal(group.getId(), signal));
+                LaemmerSignal laemmerSignal = new LaemmerSignal(group.getId(), signal);
+                signalId2LaemmerSignal.put(signal.getId(), laemmerSignal);
+                flowSum += laemmerSignal.determiningOutflow;
             }
         }
     }
@@ -156,11 +159,11 @@ public class LaemmerSignalController extends AbstractSignalController implements
                 LaemmerSignal laemmerSignal = signalId2LaemmerSignal.get(signal.getId());
                 if (laemmerSignal != null) {
                     stringBuilder.append(laemmerSignal.index + ";")
-                            .append(laemmerSignal.loadFactor + ";")
+                            .append(laemmerSignal.determiningOutflow + ";")
                             .append(laemmerSignal.a + ";")
                             .append(laemmerSignal.abortionPenalty + ";")
-                            .append(laemmerSignal.regulationTime + ";")
-                            .append(getNumberOfExpectedVehicles(now, laemmerSignal.link.getId()) + ";");
+                            .append(laemmerSignal.regulationTime + ";");
+//                            .append(getNumberOfExpectedVehiclesOnLink(now, laemmerSignal.link.getId()) + ";");
                 }
             }
         }
@@ -172,7 +175,9 @@ public class LaemmerSignalController extends AbstractSignalController implements
         log.info("-------------------------------------------------------------");
         log.info("Updating System" + this.system.getId() + ". Time: " + now);
         updateTIdle();
-        updateActiveRegulation(now);
+        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.OPTIMIZING)) {
+            updateActiveRegulation(now);
+        }
         log.debug("T_Idle = " + tIdle);
         log.debug("Updating signals");
         updateSignals(now);
@@ -181,10 +186,10 @@ public class LaemmerSignalController extends AbstractSignalController implements
     }
 
     private void updateActiveRegulation(double now) {
-        if (activeRequest!= null && !regulationQueue.isEmpty() && regulationQueue.peek().equals(activeRequest.signal)) {
+        if (activeRequest != null && !regulationQueue.isEmpty() && regulationQueue.peek().equals(activeRequest.signal)) {
             LaemmerSignal signal = regulationQueue.peek();
             log.info("Remaining regulation time for " + signal.signalId + ": " + (activeRequest.time + activeRequest.signal.regulationTime - now));
-            int n = getNumberOfExpectedVehicles(now, signal.link.getId());
+            int n = getNumberOfExpectedVehiclesOnLink(now, signal.link.getId());
             if (activeRequest.signal.regulationTime + activeRequest.time - now <= 0 || n == 0) {
                 regulationQueue.poll();
                 log.info("Stopping regulation for " + signal.signalId + " remaining vehicles: " + n);
@@ -243,7 +248,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private void updateSignals(double now) {
         for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
             signal.update(now);
-            if(signal.stabilize  && !regulationQueue.contains(signal)) {
+            if (signal.stabilize && !regulationQueue.contains(signal)) {
                 regulationQueue.add(signal);
             }
         }
@@ -252,12 +257,20 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private void updateTIdle() {
         tIdle = DESIRED_PERIOD;
         for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
-            tIdle -= (signal.loadFactor * DESIRED_PERIOD + DEFAULT_INBETWEEN);
+            tIdle -= (signal.determiningLoad * DESIRED_PERIOD + DEFAULT_INBETWEEN);
         }
     }
 
-    private int getNumberOfExpectedVehicles(double timeSeconds, Id<Link> linkId) {
-        return this.sensorManager.getNumberOfCarsInDistance(linkId, 0., timeSeconds);
+    private int getNumberOfExpectedVehiclesOnLink(double now, Id<Link> linkId) {
+        return this.sensorManager.getNumberOfCarsInDistance(linkId, 0., now);
+    }
+
+    private int getNumberOfExpectedVehiclesOnLane(double now, Id<Link> linkId, Id<Lane> laneId) {
+        if(lanes.getLanesToLinkAssignments().get(linkId).getLanes().size()==1) {
+            return getNumberOfExpectedVehiclesOnLink(now, linkId);
+        } else {
+            return this.sensorManager.getNumberOfCarsInDistanceOnLane(linkId, laneId, 0., now);
+        }
     }
 
     private double getAverageArrivalRate(double timeSeconds, Id<Link> linkId) {
@@ -272,15 +285,13 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private void initializeSensoring() {
         for (SignalGroup group : this.system.getSignalGroups().values()) {
             for (Signal signal : group.getSignals().values()) {
-                if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()) {
-                    //					log.error("system: " + this.system.getId() + " signal: " + signal.getId() + " has no lanes...");
-                    this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), 0.);
-                } else {
+                if (signal.getLaneIds() != null || !(signal.getLaneIds().isEmpty())) {
                     for (Id<Lane> laneId : signal.getLaneIds()) {
-                        //TODO check this part again concerning implementation of CarsOnLaneHandler
-                        this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
+                        this.sensorManager.registerNumberOfCarsOnLaneInDistanceMonitoring(signal.getLinkId(), laneId, 0.);
                     }
                 }
+                //always register link in case only one lane is specified (-> no LaneEnter/Leave-Events?)
+                this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), 0.);
             }
         }
     }
@@ -294,47 +305,73 @@ public class LaemmerSignalController extends AbstractSignalController implements
             this.time = time;
         }
 
-        public boolean isDue(double timeSeconds) {
+        private boolean isDue(double timeSeconds) {
             return timeSeconds == this.time;
         }
     }
 
     class LaemmerSignal {
 
-        private boolean stabilize = false;
-        private boolean liveArrivalRate;
+        private Link link;
         Id<SignalGroup> group;
         Id<Signal> signalId;
+        private Collection<Id<Lane>> signalLanes = null;
+
         double index = 0;
         private double abortionPenalty = 0;
-        private double loadFactor;
+
+        private boolean liveArrivalRate;
+        private boolean stabilize = false;
+
         private double a = DEFAULT_INBETWEEN;
-        private Link link;
-        private double maxFlow;
         private double regulationTime = 0;
-        private double avgArrivalRate;
+
+        private Id<Lane> determiningLane;
+        private double determiningArrivalRate;
+        private double determiningOutflow;
+        private double determiningLoad;
 
         LaemmerSignal(Id<SignalGroup> signalGroup, Signal signal) {
 
             this.group = signalGroup;
             this.signalId = signal.getId();
             link = network.getLinks().get(signal.getLinkId());
-            maxFlow = network.getLinks().get(signal.getLinkId()).getCapacity() / 3600.;
 
+            if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
+                this.signalLanes = signal.getLaneIds();
+                if (laemmerConfig.getLaneArrivalRates(signal.getId()) == null || laemmerConfig.getLaneArrivalRates(signal.getId()).isEmpty()) {
+                    this.liveArrivalRate = true;
+                    //TODO: register method for lanes
+                } else {
+                    this.determiningLoad = 0;
+                    Map<Id<Lane>, Double> laneArrivalRates = laemmerConfig.getLaneArrivalRates(signal.getId());
+                    for (Id<Lane> laneId : signalLanes) {
+                        double arrivalRate = laneArrivalRates.get(laneId);
+                        double outflow = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(laneId).getCapacityVehiclesPerHour() / 3600;
+                        double tempLoad = arrivalRate / outflow;
+                        if (tempLoad > this.determiningLoad) {
+                            this.determiningOutflow = outflow;
+                            this.determiningLoad = tempLoad;
+                            this.determiningArrivalRate = arrivalRate;
+                            this.determiningLane = laneId;
+                        }
+                    }
+                }
 
-            if (laemmerConfig.getArrivalRateForSignal(signal.getId()) == null) {
-                this.liveArrivalRate = true;
-                sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId());
             } else {
-                this.avgArrivalRate = laemmerConfig.getArrivalRateForSignal(signal.getId());
-                this.loadFactor = this.avgArrivalRate / this.maxFlow;
+                if (laemmerConfig.getSignalArrivalRate(signal.getId()) == null) {
+                    this.liveArrivalRate = true;
+                    sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId());
+                } else {
+                    this.determiningOutflow = link.getCapacity() / 3600;
+                    this.determiningArrivalRate = laemmerConfig.getSignalArrivalRate(signal.getId());
+                    this.determiningLoad = this.determiningArrivalRate / this.determiningOutflow;
+                }
             }
-
             signalLog.debug("LaemmeSignal for signal " + signal.getId() + " created.");
-
         }
 
-        public void update(double now) {
+        private void update(double now) {
             signalLog.info("---------------------------------------------------");
             signalLog.info("UPDATING " + signalId + " at " + now);
 
@@ -343,26 +380,39 @@ public class LaemmerSignalController extends AbstractSignalController implements
             if (liveArrivalRate) {
                 updateArrivalRate(now);
             }
-            updateStabilization(now);
+            if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.OPTIMIZING)) {
+                updateStabilization(now);
+            }
             calculatePriorityIndex(now);
         }
 
         private void updateAbortionPenalty(double now) {
+            this.abortionPenalty = 0;
             if (activeRequest != null && this.equals(activeRequest.signal)) {
-                this.abortionPenalty = 0;
                 double waitingTimeSum = 0;
                 double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
                 for (double i = remainingInBetweenTime; i < DEFAULT_INBETWEEN; i++) {
-                    waitingTimeSum += getNumberOfExpectedVehicles(now + i, link.getId());
+                    if (signalLanes != null && !signalLanes.isEmpty()) {
+                        for (Id<Lane> laneId : signalLanes) {
+                            waitingTimeSum += getNumberOfExpectedVehiclesOnLane(now + i, link.getId(), laneId);
+                        }
+                    } else {
+                        waitingTimeSum += getNumberOfExpectedVehiclesOnLink(now + i, link.getId());
+                    }
                 }
-                double n = getNumberOfExpectedVehicles(now + DEFAULT_INBETWEEN, link.getId());
+                double n = 0;
+                if (signalLanes != null && !signalLanes.isEmpty()) {
+                    for (Id<Lane> laneId : signalLanes) {
+                        n += getNumberOfExpectedVehiclesOnLane(now + DEFAULT_INBETWEEN, link.getId(), laneId);
+                    }
+                } else {
+                    n = getNumberOfExpectedVehiclesOnLink(now + DEFAULT_INBETWEEN, link.getId());
+                }
                 if (n > 0) {
                     this.abortionPenalty += waitingTimeSum / n;
                 }
                 signalLog.debug("Waiting time sum of " + waitingTimeSum + " in case of abortion. Resulting in " + this.abortionPenalty + "s penalty");
                 signalLog.debug("Calculating Abortion Penalty.");
-            } else {
-                this.abortionPenalty = 0;
             }
         }
 
@@ -373,8 +423,22 @@ public class LaemmerSignalController extends AbstractSignalController implements
                 double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
                 signalLog.debug("Remaining in between time " + remainingInBetweenTime);
                 for (double i = remainingInBetweenTime; i <= DEFAULT_INBETWEEN; i++) {
-                    double nExpected = getNumberOfExpectedVehicles(now + i, link.getId());
-                    double reqGreenTime = nExpected / maxFlow;
+                    double nExpected = 0;
+                    double reqGreenTime = 0;
+                    if (signalLanes != null && !signalLanes.isEmpty()) {
+                        for (Id<Lane> laneId : signalLanes) {
+                            double nTemp = getNumberOfExpectedVehiclesOnLane(now + i, link.getId(), laneId);
+                            nExpected += nTemp;
+                            double laneFlow = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(laneId).getCapacityVehiclesPerHour() / 3600;
+                            double tempGreenTime = nTemp / laneFlow;
+                            if (tempGreenTime > reqGreenTime) {
+                                reqGreenTime = tempGreenTime;
+                            }
+                        }
+                    } else {
+                        nExpected = getNumberOfExpectedVehiclesOnLink(now + i, link.getId());
+                        reqGreenTime = nExpected / this.determiningOutflow;
+                    }
                     double tempIndex = nExpected / (i + reqGreenTime);
                     signalLog.debug("n=" + nExpected + " at second " + (now + i) + "resulting in " + reqGreenTime + " required green time. Index: " + tempIndex);
                     if (tempIndex > index) {
@@ -384,8 +448,22 @@ public class LaemmerSignalController extends AbstractSignalController implements
                 }
             } else {
                 signalLog.debug("Non-Active signal.");
-                double nExpected = getNumberOfExpectedVehicles(now + DEFAULT_INBETWEEN, link.getId());
-                double reqGreenTime = nExpected / maxFlow;
+                double nExpected = 0;
+                double reqGreenTime = 0;
+                if (signalLanes != null && !signalLanes.isEmpty()) {
+                    for (Id<Lane> laneId : signalLanes) {
+                        double nTemp = getNumberOfExpectedVehiclesOnLane(now + DEFAULT_INBETWEEN, link.getId(), laneId);
+                        nExpected += nTemp;
+                        double laneFlow = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(laneId).getCapacityVehiclesPerHour() / 3600;
+                        double tempGreenTime = nTemp / laneFlow;
+                        if (tempGreenTime > reqGreenTime) {
+                            reqGreenTime = tempGreenTime;
+                        }
+                    }
+                } else {
+                    nExpected = getNumberOfExpectedVehiclesOnLink(now + DEFAULT_INBETWEEN, link.getId());
+                    reqGreenTime = nExpected / this.determiningOutflow;
+                }
                 double penalty = 0;
                 if (activeRequest != null) {
                     penalty = activeRequest.signal.abortionPenalty;
@@ -396,23 +474,29 @@ public class LaemmerSignalController extends AbstractSignalController implements
         }
 
         private void updateArrivalRate(double now) {
-            avgArrivalRate = getAverageArrivalRate(now, link.getId());
-            loadFactor = avgArrivalRate / maxFlow;
-            signalLog.debug("Avg Arrival Rate: " + avgArrivalRate + ", load factor: " + loadFactor);
+            //TODO: update for lanes, determining lane loadfactor
+            determiningArrivalRate = getAverageArrivalRate(now, link.getId());
+            determiningLoad = determiningArrivalRate / determiningOutflow;
+            signalLog.debug("Avg Arrival Rate: " + determiningArrivalRate + ", load factor: " + determiningLoad);
         }
 
-        private void updateStabilization(double timeSeconds) {
+        private void updateStabilization(double now) {
 
-            if(avgArrivalRate == 0) {
+            if (determiningArrivalRate == 0) {
                 return;
             }
 
             signalLog.debug("Checking for regulation");
 
-            double n = getNumberOfExpectedVehicles(timeSeconds, link.getId());
+            double n = 0;
+            if (signalLanes != null && !signalLanes.isEmpty()) {
+                n = getNumberOfExpectedVehiclesOnLane(now, link.getId(), determiningLane);
+            } else {
+                n = getNumberOfExpectedVehiclesOnLink(now, link.getId());
+            }
 
-            if(n == 0) {
-               a = DEFAULT_INBETWEEN;
+            if (n == 0) {
+                a = DEFAULT_INBETWEEN;
             } else {
                 a++;
             }
@@ -424,16 +508,15 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
             this.regulationTime = 0;
             this.stabilize = false;
-
-            double nCrit = avgArrivalRate * DESIRED_PERIOD
-                    * ((MAX_PERIOD - (a / (1 - avgArrivalRate / maxFlow)))
+            double nCrit = determiningArrivalRate * DESIRED_PERIOD
+                    * ((MAX_PERIOD - (a / (1 - determiningLoad)))
                     / (MAX_PERIOD - DESIRED_PERIOD));
             signalLog.debug("n = " + n);
             signalLog.debug("nCrit = " + nCrit);
             if (n >= nCrit) {
                 regulationQueue.add(this);
-                signalLog.debug("Regulation time parameters: lambda: " + this.loadFactor + " | T: " + DESIRED_PERIOD + " | qmax: " + maxFlow + " | qsum: " + flowSum + " | T_idle:" + tIdle);
-                this.regulationTime = Math.rint(this.loadFactor * DESIRED_PERIOD + (maxFlow / flowSum) * tIdle);
+                signalLog.debug("Regulation time parameters: lambda: " + determiningLoad + " | T: " + DESIRED_PERIOD + " | qmax: " + determiningOutflow + " | qsum: " + flowSum + " | T_idle:" + tIdle);
+                this.regulationTime = Math.rint(determiningLoad * DESIRED_PERIOD + (determiningOutflow / flowSum) * tIdle);
                 signalLog.info("Granted time " + regulationTime);
                 this.stabilize = true;
             }

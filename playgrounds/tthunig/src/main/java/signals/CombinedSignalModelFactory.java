@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+import org.matsim.lanes.data.Lanes;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import playground.dgrether.signalsystems.LinkSensorManager;
 import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController;
@@ -71,10 +72,11 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 	public CombinedSignalModelFactory(Scenario scenario, LaemmerConfig laemmerConfig, DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, JDEQSimConfigGroup jdeQSim, TtTotalDelay delayCalculator) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
+		Lanes lanes = scenario.getLanes();
 		// prepare signal controller provider
 		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, signalsData));
 		signalControlProvider.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network, jdeQSim));
-		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(laemmerConfig, sensorManager, network, delayCalculator));
+		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(laemmerConfig, sensorManager, network, lanes, delayCalculator));
 		signalControlProvider.put(DgRoederGershensonSignalController.IDENTIFIER, new DgRoederGershensonSignalController.SignalControlProvider(sensorManager, scenario));
 		signalControlProvider.put(AdvancedPlanBasedSignalSystemController.IDENTIFIER, new AdvancedPlanBasedSignalSystemController.SignalControlProvider(sensorManager, delayCalculator));
 	}

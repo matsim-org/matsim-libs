@@ -21,6 +21,7 @@ package playground.dgrether.signalsystems;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.Lane;
 
 /**
  * This class provides methods to check, if a vehicle is approximately in a certain distance from a link's end.
@@ -41,6 +42,11 @@ public class CarLocator {
 	public CarLocator(Link link, double enterTime, double distance){
 		double dist = this.checkDistance(link.getLength(), distance);
 		this.calculateEarliestTimeInDistance(enterTime, dist, link);
+	}
+
+	public CarLocator(Lane lane, Link link, double enterTime, double distance){
+		double dist = this.checkDistance(lane.getStartsAtMeterFromLinkEnd(), distance);
+		this.calculateEarliestTimeInDistance(enterTime, dist, link, lane);
 	}
 
 	public void setEarliestTimeInDistance(double time){
@@ -65,7 +71,12 @@ public class CarLocator {
 	}
 
 	private void calculateEarliestTimeInDistance (double enterTime, double dist, Link link){
-		this.earliestTimeInDistance = enterTime + ((link.getLength() - dist) / link.getFreespeed(enterTime));		
+		this.earliestTimeInDistance = enterTime + ((link.getLength() - dist) / link.getFreespeed(enterTime));
+//		log.debug("link " + link.getId() + " enterTime: " + enterTime + " earliest time " + this.earliestTimeInDistance +  " distance " + d);
+	}
+
+	private void calculateEarliestTimeInDistance (double enterTime, double dist, Link link, Lane lane){
+		this.earliestTimeInDistance = enterTime + ((lane.getStartsAtMeterFromLinkEnd() - dist) / link.getFreespeed(enterTime));
 //		log.debug("link " + link.getId() + " enterTime: " + enterTime + " earliest time " + this.earliestTimeInDistance +  " distance " + d);
 	}
 	
@@ -74,11 +85,11 @@ public class CarLocator {
 	 * 
 	 * @return the minimum of given distance and link length.
 	 */
-	private double checkDistance(double linkLength, double distance) {
-		if (linkLength < distance){
-			log.warn("distance to measure " + distance + " m was longer than link " + linkLength 
-					 + " m . using linklength as distance");
-			return linkLength;
+	private double checkDistance(double length, double distance) {
+		if (length < distance){
+			log.warn("distance to measure " + distance + " m was longer than link / lane " + length
+					 + " m . using link/lane length as distance");
+			return length;
 		}
 		return distance;
 //		if (this.link instanceof QLinkLanesImpl){
