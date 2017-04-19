@@ -5,10 +5,13 @@ import java.awt.geom.AffineTransform;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
+// https://epsg.io/transform#s_srs=4326&t_srs=2056&x=7.6155211&y=47.5555322
+// https://www.geodata4edu.ch/
 public class WGS84toSiouxFalls implements CoordinateTransformation {
 
     /**
-     * can NOT be done with {@link AffineTransform} !
+     * functionality can NOT be reproduced by java's own {@link AffineTransform} !
+     * since the matrices are too singular
      */
 
     private static final double m00 = -2963.03282082134;

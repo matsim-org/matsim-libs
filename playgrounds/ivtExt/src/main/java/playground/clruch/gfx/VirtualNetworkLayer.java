@@ -8,11 +8,12 @@ import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.clruch.export.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.RowPanel;
 
 public class VirtualNetworkLayer extends ViewerLayer {
-    public static final Color COLOR = new Color(128, 153 / 2, 0, 255);
+    public static final Color COLOR = new Color(128, 153 / 2, 0, 128);
     private PointCloud pointCloud = null;
 
     private boolean drawCells = false;
@@ -27,16 +28,20 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        if (pointCloud != null && drawCells) {
+        boolean containsRebalance = ref.vehicles.stream() //
+                .filter(vc -> vc.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
+                .findAny().isPresent();
+        if (pointCloud != null && drawCells && containsRebalance) {
             graphics.setColor(COLOR);
+            int zoom = matsimMapComponent.getZoom();
+            int width = zoom <= 12 ? 0 : 1;
             for (Coord coord : pointCloud) {
                 Point point = matsimMapComponent.getMapPosition(coord);
                 if (point != null)
-                    graphics.drawRect(point.x, point.y, 1, 1);
+                    graphics.drawRect(point.x, point.y, width, width);
 
             }
         }
-
     }
 
     public void setPointCloud(PointCloud pointCloud) {
@@ -53,6 +58,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
     protected void createPanel(RowPanel rowPanel) {
         {
             final JCheckBox jCheckBox = new JCheckBox("cells");
+            jCheckBox.setToolTipText("voronoi boundaries of virtual nodes");
             jCheckBox.setSelected(drawCells);
             jCheckBox.addActionListener(e -> setDrawCells(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);

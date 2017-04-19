@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 
 import ch.ethz.idsc.tensor.io.ObjectFormat;
-import playground.clruch.utils.CompressionUtils;
 
 public class StorageSupplier {
 
@@ -18,7 +17,7 @@ public class StorageSupplier {
     public static StorageSupplier getDefault() {
         return new StorageSupplier(StorageUtils.getAvailable());
     }
-
+    
     private final NavigableMap<Integer, File> navigableMap;
     private final List<File> ordered;
 
@@ -45,8 +44,8 @@ public class StorageSupplier {
     }
 
     private static SimulationObject readFromFile(File file) throws Exception {
-        byte[] bytes = CompressionUtils.decompress(Files.readAllBytes(file.toPath()));
-        return (SimulationObject) ObjectFormat.from(bytes);
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        return (SimulationObject) ObjectFormat.parse(bytes);
     }
 
     public final int size() {

@@ -36,6 +36,7 @@ public class ClockLayer extends ViewerLayer {
     protected void createPanel(RowPanel rowPanel) {
         {
             JCheckBox jCheckBox = new JCheckBox("show");
+            jCheckBox.setToolTipText("time on clock");
             jCheckBox.setSelected(show);
             jCheckBox.addActionListener(e -> setShow(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);

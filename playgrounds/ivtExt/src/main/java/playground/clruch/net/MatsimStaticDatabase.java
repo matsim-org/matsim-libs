@@ -31,11 +31,10 @@ public class MatsimStaticDatabase {
         CoordinateTransformation coords_toWGS84 = referenceFrame.coords_toWGS84;
 
         for (Link link : network.getLinks().values()) {
-            OsmLink osmLink = new OsmLink(link);
-
-            osmLink.coords[0] = coords_toWGS84.transform(link.getFromNode().getCoord());
-            osmLink.coords[1] = coords_toWGS84.transform(link.getToNode().getCoord());
-
+            OsmLink osmLink = new OsmLink(link, //
+                    coords_toWGS84.transform(link.getFromNode().getCoord()), //
+                    coords_toWGS84.transform(link.getToNode().getCoord()) //
+            );
             linkMap.put(link.getId().toString(), osmLink);
         }
 
@@ -78,7 +77,9 @@ public class MatsimStaticDatabase {
         return linkInteger.get(link);
     }
 
-    public  Map<Link, Integer> getLinkInteger() {return Collections.unmodifiableMap(linkInteger);}
+    public Map<Link, Integer> getLinkInteger() {
+        return Collections.unmodifiableMap(linkInteger);
+    }
 
     public OsmLink getOsmLink(int index) {
         return list.get(index);
@@ -111,7 +112,7 @@ public class MatsimStaticDatabase {
         this.iteration = iteration;
         System.out.println("set iteration=" + iteration);
     }
-    
+
     int getIteration() {
         return iteration;
     }
