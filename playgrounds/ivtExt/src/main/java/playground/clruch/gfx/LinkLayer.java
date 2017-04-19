@@ -18,9 +18,11 @@ import javax.swing.JCheckBox;
 
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
+import ch.ethz.idsc.tensor.red.Total;
 import playground.clruch.export.AVStatus;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
@@ -66,20 +68,36 @@ public class LinkLayer extends ViewerLayer {
         }
 
         if (drawLoad) {
+
+            AVStatus[] INTERP = new AVStatus[] { //
+                    AVStatus.DRIVEWITHCUSTOMER, AVStatus.DRIVETOCUSTMER, AVStatus.REBALANCEDRIVE };
+
             Map<Integer, List<VehicleContainer>> map = ref.vehicles.stream() //
                     .collect(Collectors.groupingBy(VehicleContainer::getLinkId));
             graphics.setColor(STROKECOLOR);
+
+            Tensor colors = Tensors.empty();
+            for (AVStatus avStatus : INTERP)
+                colors.append(ColorFormat.toVector(AvStatusColor.Claudios.of(avStatus)));
+
             for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
                 OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
                 Point p1 = matsimMapComponent.getMapPosition(osmLink.getCoordFrom());
                 if (p1 != null) {
                     Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getCoordTo());
                     List<VehicleContainer> list = entry.getValue();
-                    Map<AVStatus, List<VehicleContainer>> map2 = //
-                            list.stream().collect(Collectors.groupingBy(vc -> vc.avStatus));
-                    // TODO use map2 for coloring
                     long count = list.stream().filter(vc -> !vc.avStatus.equals(AVStatus.STAY)).count();
                     if (0 < count) {
+                        Map<AVStatus, List<VehicleContainer>> classify = //
+                                list.stream().collect(Collectors.groupingBy(vc -> vc.avStatus));
+                        // TODO use map2 for coloring
+                        int[] counts = new int[3];
+                        for (AVStatus avStatus : INTERP)
+                            counts[avStatus.ordinal()] = classify.containsKey(avStatus) ? classify.get(avStatus).size() : 0;
+                        Tensor lhs = Tensors.vectorInt(counts);
+                        lhs = lhs.multiply(Total.of(lhs).Get().invert());
+                        Color blend = ColorFormat.toColor(lhs.dot(colors));
+                        graphics.setColor(blend);
                         Stroke stroke = new BasicStroke((float) Math.sqrt(count - 0.5));
                         graphics.setStroke(stroke);
                         Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
