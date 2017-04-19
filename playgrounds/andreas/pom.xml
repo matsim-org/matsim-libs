@@ -82,7 +82,7 @@
 	  <dependency>
 		  <groupId>org.openstreetmap.osmosis</groupId>
 		  <artifactId>osmosis-areafilter</artifactId>
-		  <version>0.43-RELEASE</version>
+		  <version>0.45</version>
 	  </dependency>
   </dependencies>
 </project>
