@@ -40,8 +40,8 @@ public class TripAnalyzerV2Extended {
 	private static boolean onlyAnalyzeTripsStartingOrEndingInArea = true; // formerly results labelled as "ber" (Berlin-based) <----------
 	private static final Integer areaId = 11000000; // 11000000 = Berlin; Set a shapefile that contains this area correctly!
 	
-	private static boolean onlyAnalyzeTripsInDistanceRange = false; // "dist"; usually varied for analysis // <----------
-//	private static final double minDistance_km = 0;
+	private static boolean onlyAnalyzeTripsInDistanceRange = true; // "dist"; usually varied for analysis // <----------
+	private static final double minDistance_km = 0;
 	private static final double maxDistance_km = 100;
 
 	private static final boolean onlyAnalyzeTripsWithActivityTypeBeforeTrip = false;
@@ -223,8 +223,8 @@ public class TripAnalyzerV2Extended {
 			outputDirectory = outputDirectory + "_soe-in-" + areaId;
 		}
 		if (onlyAnalyzeTripsInDistanceRange) {
-			outputDirectory = outputDirectory + "_dist-" + maxDistance_km;
-//			outputDirectory = outputDirectory + "_dist-" + minDistance_km + "-" + maxDistance_km;
+//			outputDirectory = outputDirectory + "_dist-" + maxDistance_km;
+			outputDirectory = outputDirectory + "_dist-" + minDistance_km + "-" + maxDistance_km;
 		}
 		if (onlyAnalyzeTripsWithActivityTypeBeforeTrip) {
 			outputDirectory = outputDirectory + "_act-bef-" + activityTypeBeforeTrip;
@@ -281,12 +281,12 @@ public class TripAnalyzerV2Extended {
 					continue;
 				}
 			}
-			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
+			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) > maxDistance_km) {
 				continue;
 			}
-//			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) <= minDistance_km) {
-//    			continue;
-//    		}
+			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) < minDistance_km) {
+    			continue;
+    		}
 			if (onlyAnalyzeTripsWithActivityTypeBeforeTrip && onlyAnalyzeTripsWithActivityTypeAfterTrip) {
 				Log.warn("onlyAnalyzeTripsWithActivityTypeBeforeTrip and onlyAnalyzeTripsWithActivityTypeAfterTrip activated at the same time."
 						+ "This may lead to results that are hard to interpret: rather not use these options simultaneously.");
