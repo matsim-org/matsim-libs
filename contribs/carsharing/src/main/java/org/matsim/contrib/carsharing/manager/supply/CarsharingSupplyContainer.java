@@ -12,7 +12,9 @@ import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.FreefloatingAreasReader;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-/** 
+import org.matsim.core.config.ConfigGroup;
+
+/**
  * @author balac
  */
 public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
@@ -102,7 +104,7 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 		String areasFile = ffConfigGroup.getAreas();
 		if (areasFile != null) {
 			FreefloatingAreasReader ffAreasReader = new FreefloatingAreasReader();
-			ffAreasReader.readFile(areasFile);
+			ffAreasReader.parse(ConfigGroup.getInputFileURL(scenario.getConfig().getContext(), areasFile));
 			reader.setFreefloatingAreas(ffAreasReader.getFreefloatingAreas());
 		}
 
