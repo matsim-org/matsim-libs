@@ -52,10 +52,10 @@ public class VehiclesLayer extends ViewerLayer {
             OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
             Point p1test = matsimMapComponent.getMapPosition(osmLink.getAt(0.5));
             if (p1test != null) {
-                double delta = 1.0 / size;
-                double sum = 0;
+                double ofs = 0.5 / size;
+                double delta = 2 * ofs;
                 for (VehicleContainer vc : entry.getValue()) {
-                    Point p1 = matsimMapComponent.getMapPosition(osmLink.getAt(sum));
+                    Point p1 = matsimMapComponent.getMapPosition(osmLink.getAt(ofs));
                     if (p1 != null) {
                         if (showLocation) {
                             Color color = avStatusColors.of(vc.avStatus);
@@ -71,7 +71,7 @@ public class VehiclesLayer extends ViewerLayer {
                             graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
                         }
                     }
-                    sum += delta;
+                    ofs += delta;
                 }
             }
         }
@@ -102,6 +102,7 @@ public class VehiclesLayer extends ViewerLayer {
     protected void createPanel(RowPanel rowPanel) {
         {
             final JCheckBox jCheckBox = new JCheckBox("location");
+            jCheckBox.setToolTipText("vehicle are small rectangles");
             jCheckBox.setSelected(showLocation);
             jCheckBox.addActionListener(event -> {
                 showLocation = jCheckBox.isSelected();
@@ -111,6 +112,7 @@ public class VehiclesLayer extends ViewerLayer {
         }
         {
             SpinnerLabel<AvStatusColor> spinner = new SpinnerLabel<>();
+            spinner.setToolTipText("color scheme for vehicle rectangles");
             spinner.setArray(AvStatusColor.values());
             spinner.setValue(avStatusColors);
             spinner.addSpinnerListener(cs -> {
@@ -122,6 +124,7 @@ public class VehiclesLayer extends ViewerLayer {
 
         for (AVStatus status : aVStatusArray) {
             final JCheckBox jCheckBox = new JCheckBox(status.description);
+            jCheckBox.setToolTipText("show vehicles in mode: " + status.description);
             jCheckBox.setSelected(bits.get(status.ordinal()));
             jCheckBox.addActionListener(e -> setDrawDestinations(status, jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);

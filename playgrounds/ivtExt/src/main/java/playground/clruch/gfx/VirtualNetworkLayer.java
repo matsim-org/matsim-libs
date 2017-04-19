@@ -54,6 +54,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
     protected void createPanel(RowPanel rowPanel) {
         {
             final JCheckBox jCheckBox = new JCheckBox("cells");
+            jCheckBox.setToolTipText("voronoi boundaries of virtual nodes");
             jCheckBox.setSelected(drawCells);
             jCheckBox.addActionListener(e -> setDrawCells(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);

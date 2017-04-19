@@ -148,6 +148,7 @@ public class RequestsLayer extends ViewerLayer {
     protected void createPanel(RowPanel rowPanel) {
         {
             final JCheckBox jCheckBox = new JCheckBox("number");
+            jCheckBox.setToolTipText("exact number of people waiting");
             jCheckBox.setSelected(drawNumber);
             jCheckBox.addActionListener(event -> {
                 drawNumber = jCheckBox.isSelected();
@@ -157,6 +158,7 @@ public class RequestsLayer extends ViewerLayer {
         }
         {
             final JCheckBox jCheckBox = new JCheckBox("destin.");
+            jCheckBox.setToolTipText("line of travel");
             jCheckBox.setSelected(getDrawDestinations());
             jCheckBox.addActionListener(event -> setDrawDestinations(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);

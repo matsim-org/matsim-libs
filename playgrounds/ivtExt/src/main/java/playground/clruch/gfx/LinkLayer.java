@@ -128,6 +128,7 @@ public class LinkLayer extends ViewerLayer {
     protected void createPanel(RowPanel rowPanel) {
         {
             final JCheckBox jCheckBox = new JCheckBox("load");
+            jCheckBox.setToolTipText("width proportional to number of vehicles on link");
             jCheckBox.setSelected(drawLoad);
             jCheckBox.addActionListener(event -> {
                 drawLoad = jCheckBox.isSelected();
@@ -137,6 +138,7 @@ public class LinkLayer extends ViewerLayer {
         }
         {
             final JCheckBox jCheckBox = new JCheckBox("streets");
+            jCheckBox.setToolTipText("each link as thin line");
             jCheckBox.setSelected(drawLinks);
             jCheckBox.addActionListener(event -> setDraw(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);
