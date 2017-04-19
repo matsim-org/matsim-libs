@@ -97,8 +97,9 @@ public class LinkLayer extends ViewerLayer {
                         Tensor lhs = Tensors.vectorInt(counts);
                         lhs = lhs.multiply(Total.of(lhs).Get().invert());
                         Color blend = ColorFormat.toColor(lhs.dot(colors));
-                        graphics.setColor(blend);
-                        Stroke stroke = new BasicStroke((float) Math.sqrt(count - 0.5));
+                        // graphics.setColor(blend);
+                        // Math.round(5 );
+                        Stroke stroke = new BasicStroke((float) (5 * Math.sqrt(count - 0.5) / matsimMapComponent.getMeterPerPixel()));
                         graphics.setStroke(stroke);
                         Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
                         graphics.draw(shape);

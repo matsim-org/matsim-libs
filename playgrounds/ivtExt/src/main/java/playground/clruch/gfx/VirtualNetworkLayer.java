@@ -8,6 +8,7 @@ import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.clruch.export.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.RowPanel;
 
@@ -27,7 +28,10 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        if (pointCloud != null && drawCells) {
+        boolean containsRebalance = ref.vehicles.stream() //
+                .filter(vc -> vc.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
+                .findAny().isPresent();
+        if (pointCloud != null && drawCells && containsRebalance) {
             graphics.setColor(COLOR);
             int zoom = matsimMapComponent.getZoom();
             int width = zoom <= 12 ? 0 : 1;
