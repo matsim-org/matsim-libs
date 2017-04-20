@@ -31,6 +31,7 @@ import com.google.inject.name.Names;
 import org.opengis.filter.Not;
 import playground.clruch.dispatcher.*;
 import playground.fseccamo.dispatcher.MPCDispatcher_1;
+import playground.joel.dispatcher.single_heuristic.NewSingleHeuristicDispatcher; // TODO: delete this or the other
 import playground.maalbert.dispatcher.DFRDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
@@ -115,6 +116,9 @@ public class AVModule extends AbstractModule {
         
         bind(SelfishDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
+
+        bind(NewSingleHeuristicDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
 
 
 
