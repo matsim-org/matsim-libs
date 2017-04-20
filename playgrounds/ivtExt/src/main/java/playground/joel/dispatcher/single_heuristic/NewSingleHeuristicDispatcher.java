@@ -1,10 +1,6 @@
 package playground.joel.dispatcher.single_heuristic;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -35,11 +31,11 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
 
     private final int dispatchPeriod;
-    private final QuadTree<AVRequest> pendingRequestsTree;
     private final double[] networkBounds;
-    private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used
-                                                                     // to enable fast "contains"
-                                                                     // searching
+    private final QuadTree<AVRequest> pendingRequestsTree;
+    private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used to enable fast "contains" searching
+    private final QuadTree<AVVehicle> unassignedVehiclesTree;
+    private final HashSet<AVVehicle> unassignedVehicles = new HashSet<>(); // two data structures are used to enable fast "contains" searching
 
     private NewSingleHeuristicDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -52,6 +48,7 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+        unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
     }
 
     @Override
@@ -59,14 +56,7 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
         final long round_now = Math.round(now);
 
         // get Map for Matcher
-        HashMap<AVVehicle, Link> stayVehiclesAtLinks = new HashMap<>();
-        Map<Link, Queue<AVVehicle>> stayVehicles = getStayVehicles();
-        for (Link link : stayVehicles.keySet()) {
-            Queue<AVVehicle> queue = stayVehicles.get(link);
-            for (AVVehicle avVehicle : queue) {
-                stayVehiclesAtLinks.put(avVehicle, link);
-            }
-        }
+        HashMap<AVVehicle, Link> stayVehiclesAtLinks = vehicleMapper();
 
         // match all matched av/request pairs which are at same link
         new PredefinedMatchingMatcher(this::setAcceptRequest) //
@@ -76,23 +66,33 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
 
             // add open requests to search tree
             addOpenRequests(getUnassignedAVRequests());
+            // add unassigned vehicles to search tree
+            addUnassignedVehicles(getavailableUnassignedVehicleLinkPairs());
             
-            if(getavailableUnassignedVehicleLinkPairs().size()>0){
-                VehicleLinkPair vehicleLinkPair = getavailableUnassignedVehicleLinkPairs().get(0);
-                if(getUnassignedAVRequests().size()>0){
-                    
-                    
-                    AVRequest closestRequest = findClosestRequest(vehicleLinkPair, getUnassignedAVRequests());
-                    if (closestRequest != null) {
-                        sendStayVehicleCustomer(vehicleLinkPair.avVehicle, closestRequest);
-                        Coord toMatchRequestCoord = closestRequest.getFromLink().getFromNode().getCoord();
-                        pendingRequestsTree.remove(toMatchRequestCoord.getX(),toMatchRequestCoord.getY(), closestRequest);
+            if(getavailableUnassignedVehicleLinkPairs().size()>0)
+                if(getUnassignedAVRequests().size()>0) {
+
+                    // oversupply case
+                    if (getavailableUnassignedVehicleLinkPairs().size() >= getUnassignedAVRequests().size()) {
+                        System.out.println("oversupply: more unassigned vehicles than unassigned requests; " +
+                                "("+getavailableUnassignedVehicleLinkPairs().size()+":"+getUnassignedAVRequests().size()+")");
+                        AVRequest request = getUnassignedAVRequests().iterator().next();
+                        AVVehicle closestVehicle = findClosestVehicle(request, getavailableUnassignedVehicleLinkPairs());
+                        if (closestVehicle != null)
+                            sendAndRemove(request, closestVehicle);
+                    }
+
+                    // undersupply case
+                    else {
+                        System.out.println("undersupply: more unassigned requests than unassigned vehicles; " +
+                                "("+getavailableUnassignedVehicleLinkPairs().size()+":"+getUnassignedAVRequests().size()+")");
+                        VehicleLinkPair vehicleLinkPair = getavailableUnassignedVehicleLinkPairs().get(0);
+                        AVRequest closestRequest = findClosestRequest(vehicleLinkPair, getUnassignedAVRequests());
+                        if (closestRequest != null)
+                            sendAndRemove(closestRequest, vehicleLinkPair.avVehicle);
                     }
                 }
-            }
-
         }
-
     }
 
     /**
@@ -109,6 +109,36 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
     }
 
     /**
+     * @param avRequest
+     *          some request
+     * @param avVehicles
+     *          list of currently unassigned VehicleLinkPairs
+     * @return the AVVehicle closest to the given request
+     */
+    private AVVehicle findClosestVehicle(AVRequest avRequest, List<VehicleLinkPair> avVehicles) {
+        Coord requestCoord = avRequest.getFromLink().getCoord();
+        // System.out.println("treesize " + unassignedVehiclesTree.size());
+        return unassignedVehiclesTree.getClosest(requestCoord.getX(), requestCoord.getY());
+    }
+
+    /**
+     *
+     * @return map containing all staying vehicles and their respective links needed for the matcher
+     */
+    private HashMap<AVVehicle, Link> vehicleMapper() {
+        // get Map for Matcher
+        HashMap<AVVehicle, Link> stayVehiclesAtLinks = new HashMap<>();
+        Map<Link, Queue<AVVehicle>> stayVehicles = getStayVehicles();
+        for (Link link : stayVehicles.keySet()) {
+            Queue<AVVehicle> queue = stayVehicles.get(link);
+            for (AVVehicle avVehicle : queue) {
+                stayVehiclesAtLinks.put(avVehicle, link);
+            }
+        }
+        return stayVehiclesAtLinks;
+    }
+
+    /**
      * @param avRequests
      *            ensures that new open requests are added to a list with all open requests
      */
@@ -121,10 +151,42 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
                         toMatchRequestCoord.getX(), //
                         toMatchRequestCoord.getY(), //
                         avRequest);
-                GlobalAssert.that(orSucc == qtSucc && orSucc == true);
+                GlobalAssert.that(orSucc && qtSucc);
             }
         }
+    }
 
+    /**
+     * @param vehicleLinkPair
+     *            ensures that new unassignedVehicles are added to a list with all unassigned vehicles
+     */
+    private void addUnassignedVehicles(List<VehicleLinkPair> vehicleLinkPair) {
+        for (VehicleLinkPair avLinkPair : vehicleLinkPair) {
+            if (!unassignedVehicles.contains(avLinkPair.avVehicle)) {
+                Coord toMatchVehicleCoord = getVehicleLocation(avLinkPair.avVehicle).getCoord();
+                boolean uaSucc = unassignedVehicles.add(avLinkPair.avVehicle);
+                boolean qtSucc = unassignedVehiclesTree.put( //
+                        toMatchVehicleCoord.getX(), //
+                        toMatchVehicleCoord.getY(), //
+                        avLinkPair.avVehicle);
+                GlobalAssert.that(uaSucc && qtSucc);
+            }
+        }
+    }
+
+    /**
+     * @param request
+     *          vehicle shoul be sent here
+     * @param vehicle
+     *          assigned to the request
+     */
+    private void sendAndRemove(AVRequest request, AVVehicle vehicle) {
+        sendStayVehicleCustomer(vehicle, request);
+        Coord toMatchRequestCoord = request.getFromLink().getFromNode().getCoord();
+        pendingRequestsTree.remove(toMatchRequestCoord.getX(), toMatchRequestCoord.getY(), request);
+        Coord toMatchVehicleCoord = getVehicleLocation(vehicle).getCoord();
+        unassignedVehicles.remove(vehicle);
+        unassignedVehiclesTree.remove(toMatchVehicleCoord.getX(), toMatchVehicleCoord.getY(), vehicle);
     }
 
     public static class Factory implements AVDispatcherFactory {

@@ -50,13 +50,10 @@ public abstract class UniversalBindingDispatcher extends VehicleMaintainer {
     private final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via
                                                                           // getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
-    private final Set<AVRequest> assignedRequests = new HashSet<>(); // pending requests which are
-                                                                     // assigned to an AV
-    private final Set<AVRequest> unassignedRequests = new HashSet<>(); // pending requests which are
-                                                                       // still unassigned
+    private final Set<AVRequest> assignedRequests = new HashSet<>(); // pending requests which are assigned to an AV
+    private final Set<AVRequest> unassignedRequests = new HashSet<>(); // pending requests which are still unassigned
     private final Set<AVVehicle> assignedVehicles = new HashSet<>(); //
-    private final HashMap<AVRequest, AVVehicle> matchings = new HashMap<>(); // customer/AV
-                                                                             // matchings
+    private final HashMap<AVRequest, AVVehicle> matchings = new HashMap<>(); // customer/AV matchings
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
 
     /**
