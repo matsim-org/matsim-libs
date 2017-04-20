@@ -18,15 +18,15 @@ import javax.swing.JCheckBox;
 
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
-import ch.ethz.idsc.tensor.red.Total;
 import playground.clruch.export.AVStatus;
+import playground.clruch.gheat.graphics.Hue;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.VehicleContainer;
+import playground.clruch.utils.gui.GraphicsUtil;
 import playground.clruch.utils.gui.RowPanel;
 
 public class LinkLayer extends ViewerLayer {
@@ -35,7 +35,6 @@ public class LinkLayer extends ViewerLayer {
     private volatile boolean drawLinks = false;
     private volatile boolean drawMaxCars = false;
     private static final Color LINKCOLOR = new Color(153, 153, 102, 64);
-    private static final Color STROKECOLOR = new Color(102, 153, 202, 128);
 
     Tensor matrix = null; //
 
@@ -74,38 +73,38 @@ public class LinkLayer extends ViewerLayer {
 
             Map<Integer, List<VehicleContainer>> map = ref.vehicles.stream() //
                     .collect(Collectors.groupingBy(VehicleContainer::getLinkId));
-            graphics.setColor(STROKECOLOR);
-
-            Tensor colors = Tensors.empty();
-            for (AVStatus avStatus : INTERP)
-                colors.append(ColorFormat.toVector(AvStatusColor.Claudios.of(avStatus)));
-
+            // TODO better gfx
+            // Tensor colors = Tensors.empty();
+            // for (AVStatus avStatus : INTERP)
+            // colors.append(ColorFormat.toVector(AvStatusColor.Claudios.of(avStatus)));
+            GraphicsUtil.setQualityHigh(graphics);
             for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
                 OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
+                final double factor = osmLink.getLength() * matsimMapComponent.getMeterPerPixel();
                 Point p1 = matsimMapComponent.getMapPosition(osmLink.getCoordFrom());
                 if (p1 != null) {
                     Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getCoordTo());
                     List<VehicleContainer> list = entry.getValue();
-                    long count = list.stream().filter(vc -> !vc.avStatus.equals(AVStatus.STAY)).count();
-                    if (0 < count) {
+                    final long total = list.stream().filter(vc -> !vc.avStatus.equals(AVStatus.STAY)).count();
+                    if (0 < total) {
                         Map<AVStatus, List<VehicleContainer>> classify = //
                                 list.stream().collect(Collectors.groupingBy(vc -> vc.avStatus));
-                        // TODO use map2 for coloring
                         int[] counts = new int[3];
                         for (AVStatus avStatus : INTERP)
                             counts[avStatus.ordinal()] = classify.containsKey(avStatus) ? classify.get(avStatus).size() : 0;
-                        Tensor lhs = Tensors.vectorInt(counts);
-                        lhs = lhs.multiply(Total.of(lhs).Get().invert());
-                        Color blend = ColorFormat.toColor(lhs.dot(colors));
-                        // graphics.setColor(blend);
-                        // Math.round(5 );
-                        Stroke stroke = new BasicStroke((float) (5 * Math.sqrt(count - 0.5) / matsimMapComponent.getMeterPerPixel()));
+                        final int customers = counts[0];
+                        final int carsEmpty = counts[1] + counts[2];
+                        double h = (carsEmpty / (double) total + 1.0) / 3;
+                        Color blend = new Hue(h, 1, .5, .75).rgba;
+                        graphics.setColor(blend);
+                        Stroke stroke = new BasicStroke((float) Math.sqrt(3000 * total / factor));
                         graphics.setStroke(stroke);
                         Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
                         graphics.draw(shape);
                     }
                 }
             }
+            GraphicsUtil.setQualityDefault(graphics);
             graphics.setStroke(new BasicStroke());
         }
 
