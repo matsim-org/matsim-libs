@@ -95,9 +95,9 @@ import playground.smetzler.parseElevationData.ParseEleDataFromGeoTiff;
  *
  * @author mrieser, aneumann
  */
-public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
+public class BikeCustomizedOsmNetworkReaderRelations implements MatsimSomeReader {
 
-	private final static Logger log = Logger.getLogger(BikeCustomizedOsmNetworkReader.class);
+	private final static Logger log = Logger.getLogger(BikeCustomizedOsmNetworkReaderRelations.class);
 
 	private final static String TAG_LANES = "lanes";
 	private final static String TAG_HIGHWAY = "highway";
@@ -130,12 +130,6 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 	List<Long> signalNodes = new ArrayList<Long>();
 	//	List<Long> crossingNodes = new ArrayList<Long>();
 	List<Long> monitorNodes = new ArrayList<Long>();
-	List<Long> monitorNodesUsed = new ArrayList<Long>();
-
-	//List<String> monitorNodeNames = new ArrayList<String>();
-	Map<Long,String> monitorNodeNames = new HashMap<Long,String>();
-
-	
 
 
 	Long currentNodeID = null;
@@ -168,7 +162,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 	 * @param network An empty network where the converted OSM data will be stored.
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 */
-	public BikeCustomizedOsmNetworkReader(final Network network, final CoordinateTransformation transformation) {
+	public BikeCustomizedOsmNetworkReaderRelations(final Network network, final CoordinateTransformation transformation) {
 		this(network, transformation, true);
 	}
 
@@ -179,7 +173,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
-	public BikeCustomizedOsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
+	public BikeCustomizedOsmNetworkReaderRelations(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
 		this.network = network;
 		this.transform = transformation;
 
@@ -1021,95 +1015,16 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 //		};
 
 
-		
-//	} else if ("tag".equals(name)) {
-//		///new
-//		String TagKey = StringCache.get(atts.getValue("k"));
-//		if (TagKey.equals("highway")){
-//			String TagVal = StringCache.get(atts.getValue("v"));
-//			if (TagVal.equals("traffic_signals")) {
-//				signalNodes.add(currentNodeID);}
-//			//					if (TagVal.equals("crossing")) {
-//			//						crossingNodes.add(currentNodeID);}
-//		}
-//
-//		if (TagKey.equals("monitoring:bicycle")){
-//			String TagVal = StringCache.get(atts.getValue("v"));
-//			if (TagVal.equals("yes")) {
-//				monitorNodes.add(currentNodeID);}
-//		}
-	
 //		///Monitoring tag
-		for (Long monNods : monitorNodes){ 
-			if ((monNods == toNode.id)) {
-				if (hinweg){
-//					for (Long monNodsSchrumpf : monitorNodesUsed) {
-//						if (monNodsSchrumpf != monNods) {}
-//						else {
-					bikeAttributes.putAttribute(matsimId, "pegel", monitorNodeNames.get(toNode.id));
-					System.out.println("Nametag:         " + monitorNodeNames.get(toNode.id));
-					System.out.println("monitorNodeNames:" + monitorNodeNames);
-					System.out.println("OSM fromNode:    " + fromNode.id);
-					System.out.println("OSM toNode:      " + toNode.id);
-					System.out.println("OSM link:        " + way.id);
-					System.out.println("matsim link:     " + matsimID);
-					System.out.println("monitorNodes.indexOf(toNode.id)  " + monitorNodes.indexOf(toNode.id));
-					System.out.println("monitorNodes     " + monitorNodes);
-					System.out.println("  ");
-					// damit nicht "den beide links die auf den zaehlstellenknoten füren, die Stelle zugeordnet wird, wird der node nach dem ersten link aus der liste entfernt
-					//monitorNodesUsed.set(monitorNodes.indexOf(toNode.id), (long) 1);
-					//monitorNodesUsed.add(toNode.id);
-//						}}
-			}}
-			}
-		
-////		///Monitoring tag
-//		//		// can locate count monitors taht are tagged in OSM	
-//		// andere zaehlstelle am testnetzt Paul und paule nicht drin wegen footway und kein bicycle yes
-//		for (Long monNods : monitorNodes){
-//			//			if (toNode.id == 2789821399)
-//			//					System.out.println("WOWOWOWOWOWOW"); 
-//			if ((monNods == toNode.id)) {
-//				System.out.println(toNode.id);
-//				//			for (Long monNodsMap : monitorNodeNames.keySet()){
-//				//				System.out.println("monNodsMap " + (monNodsMap));
-//				//				System.out.println("monNods " + (monNods));
-//				//			
-//				//
-//				//				System.out.println("monNodsMap == fromNode.id " + (monNodsMap == fromNode.id));
-//				//				System.out.println("monNods == toNode.id):    " + (monNods == toNode.id));
-//				//				System.out.println("monNods == fromNode.id):  " + (monNods == fromNode.id));
-//				//				System.out.println("monNodsMap == toNode.id): " + (monNodsMap == toNode.id));
-//
-//				for (Long monNods2 : monitorNodes){	
-//					if (!(monNods2 == fromNode.id)) {
-//						if (!(monNods == fromNode.id)) {
-//							System.out.println("monNods " + (monNods));
-//							System.out.println("toNode.id    " + (toNode.id));
-//							System.out.println("monNods2 " + (monNods2));
-//							System.out.println("fromNode.id    " + (fromNode.id));
-//
-//
-//							//			if ( !((fromNode.id == monNods) && (toNode.id== monNods2)) ||  !((fromNode.id==monNods2) && (toNode.id==monNods)) ) {
-//							if (hinweg){
-//								bikeAttributes.putAttribute(matsimId, "pegel", monitorNodeNames.get(toNode.id));
-//								System.out.println("Nametag:         " + monitorNodeNames.get(toNode.id));
-//								System.out.println("monitorNodeNames:" + monitorNodeNames);
-//								System.out.println("OSM fromNode:    " + fromNode.id);
-//								System.out.println("OSM toNode:      " + toNode.id);
-//								System.out.println("OSM link:        " + way.id);
-//								System.out.println("matsim link:     " + matsimID);
-//								System.out.println("monitorNodes.indexOf(toNode.id)  " + monitorNodes.indexOf(toNode.id));
-//								System.out.println("monitorNodes     " + monitorNodes);
-//								System.out.println("  ");
-//								// damit nicht "den beide links die auf den zaehlstellenknoten füren, die Stelle zugeordnet wird, wird der node nach dem ersten link aus der liste entfernt
-//								//					monitorNodes.set(monitorNodes.indexOf(toNode.id), (long) 1);
-//								monitorNodesUsed.add(toNode.id);
-//							}
-//						}
-//					}
+//		// can locate count monitors taht are tagged in OSM
+//		//iterates over all nodes that are on this way, is one of them a pegelnode?
+//		for(int i=0; i<way.nodes.size(); i++) {
+//			Long AllWayNodesIDs = way.nodes.get(i).longValue();
+//			for (Long MoniNodeID : monitorNodes) {
+//				if (MoniNodeID.equals(AllWayNodesIDs)) {
+//					bikeAttributes.putAttribute(matsimId, "pegel", 1);   
 //				}
-//			}
+//			};
 //		}
 		//new end
 
@@ -1269,23 +1184,6 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					if (TagVal.equals("bicycle")) {
 						monitorNodes.add(currentNodeID);}
 				}
-				if (TagKey.equals("monitoring:bicycle")){
-					String TagVal = StringCache.get(atts.getValue("v"));
-					if (TagVal.equals("yes")) {
-						monitorNodes.add(currentNodeID);}
-				}
-				//		if (TagKey.equals("monitoring:traffic") || TagKey.equals("monitoring:bicycle")){
-				if (TagKey.equals("name")){
-					String TagVal = StringCache.get(atts.getValue("v"));
-					for (Long MoniNodeID : monitorNodes) {
-						if (MoniNodeID == currentNodeID){
-							monitorNodeNames.put(currentNodeID, TagVal);
-						}
-					}
-				}
-		//		}
-				// eine zaehlstelle sollte nur einem link zugeordent werden, das ist nicht der fall
-				// probleme: wenn zaehlstelle an knotenpunkt oder auf langem osm-link ist, der von matsim zurschnitten wird
 				//new end			
 
 				if (this.currentWay != null) {
@@ -1305,17 +1203,17 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			if ("way".equals(name)) {
 				if (!this.currentWay.nodes.isEmpty()) {
 					boolean used = false;
-					OsmHighwayDefaults osmHighwayDefaults = BikeCustomizedOsmNetworkReader.this.highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
+					OsmHighwayDefaults osmHighwayDefaults = BikeCustomizedOsmNetworkReaderRelations.this.highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
 					if (osmHighwayDefaults != null) {
 						int hierarchy = osmHighwayDefaults.hierarchy;
 						this.currentWay.hierarchy = hierarchy;
-						if (BikeCustomizedOsmNetworkReader.this.hierarchyLayers.isEmpty()) {
+						if (BikeCustomizedOsmNetworkReaderRelations.this.hierarchyLayers.isEmpty()) {
 							used = true;
 						}
 						if (this.collectNodes) {
 							used = true;
 						} else {
-							for (OsmFilter osmFilter : BikeCustomizedOsmNetworkReader.this.hierarchyLayers) {
+							for (OsmFilter osmFilter : BikeCustomizedOsmNetworkReaderRelations.this.hierarchyLayers) {
 								for (Long nodeId : this.currentWay.nodes) {
 									OsmNode node = this.nodes.get(nodeId);
 									if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
