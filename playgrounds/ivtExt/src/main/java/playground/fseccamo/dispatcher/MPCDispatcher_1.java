@@ -11,7 +11,8 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPath;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -24,6 +25,10 @@ import ch.ethz.idsc.jmex.java.JavaContainerSocket;
 import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.io.ExtractPrimitives;
+import ch.ethz.idsc.tensor.sca.Plus;
+import jogamp.opengl.glu.mipmap.ExtractPrimitive;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
@@ -41,9 +46,11 @@ import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
@@ -188,17 +195,20 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
                         AVRequest r = null;
 
                         VirtualNode fromIn = null;
-                        VrpPathWithTravelData vrp = instantPathFactory.getVrpPathWithTravelData(r.getFromLink(), r.getToLink(), now);
-                        for (int index = 0; index < vrp.getLinkCount(); ++index) {
-                            Link link = vrp.getLink(index);
-                            final VirtualNode next = virtualNetwork.getVirtualNode(link);
+                        VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData(r.getFromLink(), r.getToLink(), now);
+                        for (int index = 0; index < vrpPath.getLinkCount(); ++index) {
+                            Link link = vrpPath.getLink(index);
+                            final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
                             if (fromIn == null)
-                                fromIn = next;
+                                fromIn = toIn;
                             else //
-                            if (fromIn != next) {
-                                final VirtualNode toIn = next;
-                                // FOUND adjacent node
-                                virtualNetwork.getVirtualLink(fromIn, toIn);
+                            if (fromIn != toIn) { // found adjacent node
+                                VirtualLink vl = virtualNetwork.getVirtualLink(fromIn, toIn);
+                                if (vl != null) {
+                                    // TODO
+                                } else {
+                                    // give up?
+                                }
                             }
                         }
                         double[] array = new double[m]; // TODO
@@ -222,7 +232,40 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
                         /**
                          * Vehicles with customers still within node_i traveling on link_k = (node_i, node_j)
                          */
-                        double[] array = new double[m]; // TODO
+                        final Tensor vector = Array.zeros(m);
+                        Map<AVVehicle, Link> map = getVehiclesWithCustomer();
+                        // Map<VirtualNode, List<AVVehicle>> map = getVirtualNodeVehiclesWithCustomer();
+                        for (Entry<AVVehicle, Link> entry : map.entrySet()) {
+                            final AVVehicle avVehicle = entry.getKey();
+                            final Link current = entry.getValue();
+                            Task task = avVehicle.getSchedule().getCurrentTask();
+                            AVDriveTask driveTask = (AVDriveTask) task;
+                            VrpPath vrpPath = driveTask.getPath();
+                            boolean fused = false;
+                            VirtualNode fromIn = null;
+                            VirtualNode toIn = null;
+
+                            for (Link link : vrpPath) {
+                                fused |= link == current;
+                                if (fused) {
+                                    if (fromIn == null)
+                                        fromIn = virtualNetwork.getVirtualNode(link);
+                                    else {
+                                        VirtualNode candidate = virtualNetwork.getVirtualNode(link);
+                                        if (fromIn != candidate) {
+                                            toIn = candidate;
+                                            VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
+                                            vector.set(Plus.ONE, virtualLink.index);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (toIn == null) {
+                                System.out.println("failed to find dest.");
+                            }
+                        }
+                        double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingVehiclesWithCustomersPerVLink", new int[] { m }, array);
                         container.add(doubleArray);
                     }
