@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityOption;
@@ -69,9 +69,9 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 				Double.POSITIVE_INFINITY) );
 	
 	private Plan plan;
-	private CharyparNagelScoringParameters params;
+	private ScoringParameters params;
 	
-	public KtiActivityScoring(final Plan plan, final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+	public KtiActivityScoring(final Plan plan, final ScoringParameters params, final ActivityFacilities facilities) {
 		this.params = params;
 		this.facilities = facilities;
 		this.plan = plan;

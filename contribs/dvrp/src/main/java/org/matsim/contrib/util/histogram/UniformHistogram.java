@@ -19,44 +19,32 @@
 
 package org.matsim.contrib.util.histogram;
 
-public class UniformHistogram
-    extends AbstractHistogram<Double>
-{
-    public static UniformHistogram create(double binSize, int binCount, double[] values)
-    {
-        UniformHistogram histogram = new UniformHistogram(binSize, binCount);
-        histogram.addValues(values);
-        return histogram;
-    }
+public class UniformHistogram extends AbstractHistogram<Double> {
+	public static UniformHistogram create(double binSize, int binCount, double[] values) {
+		UniformHistogram histogram = new UniformHistogram(binSize, binCount);
+		histogram.addValues(values);
+		return histogram;
+	}
 
+	private final double binSize;
 
-    private final double binSize;
+	public UniformHistogram(double binSize, int binCount) {
+		super(binCount);
+		this.binSize = binSize;
+	}
 
+	public void addValues(double[] values) {
+		for (double v : values) {
+			addValue(v);
+		}
+	}
 
-    public UniformHistogram(double binSize, int binCount)
-    {
-        super(binCount);
-        this.binSize = binSize;
-    }
+	public void addValue(double value) {
+		increment(Math.min((int)(value / binSize), counts.length - 1));
+	}
 
-
-    public void addValues(double[] values)
-    {
-        for (double v : values) {
-            addValue(v);
-        }
-    }
-
-
-    public void addValue(double value)
-    {
-        increment(Math.min((int) (value / binSize), counts.length - 1));
-    }
-
-
-    @Override
-    public Double getBin(int idx)
-    {
-        return idx * binSize;
-    }
+	@Override
+	public Double getBin(int idx) {
+		return idx * binSize;
+	}
 }

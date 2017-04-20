@@ -72,7 +72,7 @@
     </build>
 
     <properties>
-        <geotools.version>13.0</geotools.version>
+        <geotools.version>14.0</geotools.version>
     </properties>
 
 </project>

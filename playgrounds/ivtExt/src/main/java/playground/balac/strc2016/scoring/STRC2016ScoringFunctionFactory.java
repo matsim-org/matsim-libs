@@ -21,10 +21,10 @@ import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import com.google.inject.Inject;
@@ -32,14 +32,14 @@ import com.google.inject.Inject;
 public class STRC2016ScoringFunctionFactory implements ScoringFunctionFactory{
 
 	private Scenario scenario;
-	private CharyparNagelScoringParametersForPerson parameters;
-	private final Map<Id, CharyparNagelScoringParameters> individualParameters = new HashMap< >();
+	private ScoringParametersForPerson parameters;
+	private final Map<Id, ScoringParameters> individualParameters = new HashMap< >();
 
 	@Inject
 	public STRC2016ScoringFunctionFactory(
 			Scenario scenario) {
 		this.scenario = scenario;
-		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.parameters = new SubpopulationScoringParameters( scenario );
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class STRC2016ScoringFunctionFactory implements ScoringFunctionFactory{
 		ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
 		final PlanCalcScoreConfigGroup config = scenario.getConfig().planCalcScore();
 
-		CharyparNagelScoringParameters  params = createParams( person ,config , scenario.getConfig().scenario(), personAttributes );
+		ScoringParameters  params = createParams( person ,config , scenario.getConfig().scenario(), personAttributes );
 		
 		addScoringFunction(person.getId(), scoringFunctionSum, new CharyparNagelMoneyScoring(
 				parameters.getScoringParameters( person ) ) );
@@ -73,7 +73,7 @@ public class STRC2016ScoringFunctionFactory implements ScoringFunctionFactory{
 		return scoringFunctionSum;
 	}
 	
-	private CharyparNagelScoringParameters createParams(
+	private ScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
 			final ScenarioConfigGroup scenarioConfig,
@@ -82,8 +82,8 @@ public class STRC2016ScoringFunctionFactory implements ScoringFunctionFactory{
 			return individualParameters.get( person.getId() );
 		}
 
-		final CharyparNagelScoringParameters.Builder builder =
-				new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
+		final ScoringParameters.Builder builder =
+				new ScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , null ) ) {
 			
@@ -162,7 +162,7 @@ public class STRC2016ScoringFunctionFactory implements ScoringFunctionFactory{
 					typeBuilder );
 		}
 
-		final CharyparNagelScoringParameters params =
+		final ScoringParameters params =
 				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;

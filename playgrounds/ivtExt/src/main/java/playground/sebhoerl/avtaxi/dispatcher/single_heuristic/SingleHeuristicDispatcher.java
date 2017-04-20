@@ -62,9 +62,10 @@ public class SingleHeuristicDispatcher implements AVDispatcher {
     }
 
     @Override
-    public void onNextTaskStarted(AVTask task) {
+    public void onNextTaskStarted(AVVehicle vehicle) {
+    	AVTask task = (AVTask)vehicle.getSchedule().getCurrentTask();
         if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
-            addVehicle((AVVehicle) task.getSchedule().getVehicle(), ((AVStayTask) task).getLink());
+            addVehicle(vehicle, ((AVStayTask) task).getLink());
         }
     }
 

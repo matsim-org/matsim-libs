@@ -22,15 +22,7 @@ package playground.agarwalamit.opdyts.equil;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.utils.TimeDiscretization;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -48,8 +40,26 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import playground.agarwalamit.opdyts.*;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.utils.io.IOUtils;
+
+import floetteroed.opdyts.DecisionVariableRandomizer;
+import floetteroed.opdyts.ObjectiveFunction;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
+import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
+import opdytsintegration.MATSimSimulator;
+import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.utils.TimeDiscretization;
+import playground.agarwalamit.opdyts.DistanceDistribution;
+import playground.agarwalamit.opdyts.ModeChoiceDecisionVariable;
+import playground.agarwalamit.opdyts.ModeChoiceObjectiveFunction;
+import playground.agarwalamit.opdyts.ModeChoiceRandomizer;
+import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
+import playground.agarwalamit.opdyts.OpdytsScenario;
+import playground.agarwalamit.opdyts.RandomizedUtilityParametersChoser;
+import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
 /**
@@ -58,7 +68,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
-	private static int randomVariance = 7;
+	private static double randomVariance = 7;
 	private static int iterationsToConvergence = 400;
 
 	private static String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
@@ -70,10 +80,10 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 	public static void main(String[] args) {
 
 		if (args.length > 0) {
-			randomVariance = Integer.valueOf(args[0]);
+			randomVariance = Double.valueOf(args[0]);
 			iterationsToConvergence = Integer.valueOf(args[1]);
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
 		}
 
 		Set<String> modes2consider = new HashSet<>();
@@ -91,12 +101,12 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		config.changeMode().setModes( modes2consider.toArray(new String [modes2consider.size()]));
 		StrategySettings modeChoice = new StrategySettings();
-		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name()); // dont know, how it will work
+		modeChoice.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name());
 		modeChoice.setWeight(0.1);
 		config.strategy().addStrategySettings(modeChoice);
 
 		StrategySettings expChangeBeta = new StrategySettings();
-		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		expChangeBeta.setWeight(0.9);
 		config.strategy().addStrategySettings(expChangeBeta);
 
@@ -115,6 +125,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
 		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
+		mpBike.setMarginalUtilityOfTraveling(0.);
 
 
 		planCalcScoreConfigGroup.addModeParams(mpCar);
@@ -122,13 +133,9 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		//==
 
 		//==
-		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.KWM );
-
-//		if ( config.qsim().getTrafficDynamics()== QSimConfigGroup.TrafficDynamics.withHoles ) {
-//			config.qsim().setInflowConstraint(QSimConfigGroup.InflowConstraint.maxflowFromFdiag);
-//		}
-
+		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(true);
+
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		//==
 
@@ -153,10 +160,12 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new EquilDistanceDistribution(OpdytsScenario.EQUIL_MIXEDTRAFFIC)));
+					addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new EquilDistanceDistribution(EQUIL_MIXEDTRAFFIC)));
 				}
 			});
 			controler.run();
+
+			FileUtils.deleteIntermediateIterations(OUT_DIR,controler.getConfig().controler().getFirstIteration(), controler.getConfig().controler().getLastIteration());
 
 			// set back settings for opdyts
 			File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
@@ -175,7 +184,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
-		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(OpdytsScenario.EQUIL_MIXEDTRAFFIC);
+		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(EQUIL_MIXEDTRAFFIC);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts
@@ -192,7 +201,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				addControlerListenerBinding().toInstance(stasControlerListner);
 
-				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+				bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
 			}
 		});
 
@@ -241,5 +250,11 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
+
+		// remove the unused iterations
+		for (int index =0; index < maxIterations; index++) {
+			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
+				IOUtils.deleteDirectory(new File(dir2remove));
+		}
 	}
 }

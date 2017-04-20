@@ -20,20 +20,15 @@
 package playground.jbischoff.taxi.inclusion;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import playground.jbischoff.taxi.setup.JbTaxiModule;
+import playground.jbischoff.taxi.setup.*;
 
 
 public class RunInclusionTaxiScenario
@@ -41,19 +36,22 @@ public class RunInclusionTaxiScenario
     public static void run(String configFile, boolean otfvis)
     {
     	
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());
         createControler(config, otfvis).run();
     
     }
     public static void runMany(String configFile)
     {
-    	for (int i = 50; i<=1000; i=i+50){
+    	for (int i = 100; i<=250; i=i+50){
     	
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());
-        config.controler().setOutputDirectory("D:/runs-svn/barrierFreeTaxi/1500_run_"+i+"/");
-        config.controler().setRunId("taxis_"+i);
+        config.controler().setOutputDirectory("D:/runs-svn/barrierFreeTaxi/v2/veh_"+i+"/");
+        config.controler().setRunId("veh_"+i);
+//        config.plans().setInputFile("itaxi_"+i+".xml.gz");
+        config.plans().setInputFile("itaxi_"+0+".xml.gz");
+        DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
         TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
         taxi.setTaxisFile("hc_vehicles"+i+".xml.gz");
         createControler(config, false).run();
@@ -63,25 +61,14 @@ public class RunInclusionTaxiScenario
 
     public static Controler createControler(Config config, boolean otfvis)
     {
-        TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
         config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        TaxiData taxiData = new TaxiData();
-        new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
-        return createControler(scenario, taxiData, otfvis);
-    }
 
-
-    public static Controler createControler(Scenario scenario, TaxiData taxiData, boolean otfvis)
-    {
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new JbTaxiModule(taxiData));
-        double expAveragingAlpha = 0.05;//from the AV flow paper 
-        controler.addOverridingModule(
-                VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-        controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+        controler.addOverridingModule(new JbTaxiModule());
+        controler.addOverridingModule(new TaxiModule(JbTaxiOptimizerProvider.class));
 
         if (otfvis) {
             controler.addOverridingModule(new OTFVisLiveModule());

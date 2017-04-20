@@ -33,69 +33,52 @@ import org.opengis.referencing.operation.*;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
+public class Zones {
+	public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile) {
+		ZoneXmlReader xmlReader = new ZoneXmlReader();
+		xmlReader.readFile(zonesXmlFile);
+		Map<Id<Zone>, Zone> zones = xmlReader.getZones();
 
-public class Zones
-{
-    public static Map<Id<Zone>, Zone> readZones(String zonesXmlFile, String zonesShpFile)
-    {
-        ZoneXmlReader xmlReader = new ZoneXmlReader();
-        xmlReader.readFile(zonesXmlFile);
-        Map<Id<Zone>, Zone> zones = xmlReader.getZones();
+		ZoneShpReader shpReader = new ZoneShpReader(zones);
+		shpReader.readZones(zonesShpFile);
+		return zones;
+	}
 
-        ZoneShpReader shpReader = new ZoneShpReader(zones);
-        shpReader.readZones(zonesShpFile);
-        return zones;
-    }
+	public static void writeZones(Map<Id<Zone>, Zone> zones, String coordinateSystem, String zonesXmlFile,
+			String zonesShpFile) {
+		new ZoneXmlWriter(zones).write(zonesXmlFile);
+		new ZoneShpWriter(zones, coordinateSystem).write(zonesShpFile);
+	}
 
+	public static void transformZones(Map<Id<Zone>, Zone> zones, String fromCoordSystem, String toCoordSystem) {
+		MathTransform transform = getTransform(fromCoordSystem, toCoordSystem);
 
-    public static void writeZones(Map<Id<Zone>, Zone> zones, String coordinateSystem,
-            String zonesXmlFile, String zonesShpFile)
-    {
-        new ZoneXmlWriter(zones).write(zonesXmlFile);
-        new ZoneShpWriter(zones, coordinateSystem).write(zonesShpFile);
-    }
+		for (Zone z : zones.values()) {
+			z.setMultiPolygon(transformMultiPolygon(z.getMultiPolygon(), transform));
+		}
+	}
 
+	public static MathTransform getTransform(String fromCoordSystem, String toCoordSystem) {
+		CoordinateReferenceSystem fromCrs = MGC.getCRS(fromCoordSystem);
+		CoordinateReferenceSystem toCrs = MGC.getCRS(toCoordSystem);
 
-    public static void transformZones(Map<Id<Zone>, Zone> zones, String fromCoordSystem,
-            String toCoordSystem)
-    {
-        MathTransform transform = getTransform(fromCoordSystem, toCoordSystem);
+		try {
+			return CRS.findMathTransform(fromCrs, toCrs, true);
+		} catch (FactoryException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-        for (Zone z : zones.values()) {
-            z.setMultiPolygon(transformMultiPolygon(z.getMultiPolygon(), transform));
-        }
-    }
+	public static MultiPolygon transformMultiPolygon(MultiPolygon multiPolygon, MathTransform transform) {
+		try {
+			return (MultiPolygon)JTS.transform(multiPolygon, transform);
+		} catch (TransformException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-
-    public static MathTransform getTransform(String fromCoordSystem, String toCoordSystem)
-    {
-        CoordinateReferenceSystem fromCrs = MGC.getCRS(fromCoordSystem);
-        CoordinateReferenceSystem toCrs = MGC.getCRS(toCoordSystem);
-
-        try {
-            return CRS.findMathTransform(fromCrs, toCrs, true);
-        }
-        catch (FactoryException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    public static MultiPolygon transformMultiPolygon(MultiPolygon multiPolygon,
-            MathTransform transform)
-    {
-        try {
-            return (MultiPolygon)JTS.transform(multiPolygon, transform);
-        }
-        catch (TransformException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public static List<Polygon> getPolygons(Zone zone)
-    {
-        return PolygonExtracter.getPolygons(zone.getMultiPolygon());
-    }
+	@SuppressWarnings("unchecked")
+	public static List<Polygon> getPolygons(Zone zone) {
+		return PolygonExtracter.getPolygons(zone.getMultiPolygon());
+	}
 }

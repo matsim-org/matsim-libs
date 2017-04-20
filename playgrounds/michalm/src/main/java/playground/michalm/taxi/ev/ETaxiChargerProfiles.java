@@ -24,28 +24,24 @@ import org.matsim.contrib.taxi.util.stats.TimeProfiles;
 
 import playground.michalm.ev.data.*;
 
+public class ETaxiChargerProfiles {
+	public static ProfileCalculator createChargerOccupancyCalculator(final EvData evData) {
+		String[] header = { "plugged", "queued", "assigned" };
+		return new TimeProfiles.MultiValueProfileCalculator(header) {
+			@Override
+			public Integer[] calcValues() {
+				int plugged = 0;
+				int queued = 0;
+				int assigned = 0;
+				for (Charger c : evData.getChargers().values()) {
+					ETaxiChargingLogic logic = (ETaxiChargingLogic)c.getLogic();
+					plugged += logic.getPluggedCount();
+					queued += logic.getQueuedCount();
+					assigned += logic.getAssignedCount();
+				}
 
-public class ETaxiChargerProfiles
-{
-    public static ProfileCalculator createChargerOccupancyCalculator(final EvData evData)
-    {
-        String[] header = { "plugged", "queued", "assigned" };
-        return new TimeProfiles.MultiValueProfileCalculator(header) {
-            @Override
-            public String[] calcValues()
-            {
-                int plugged = 0;
-                int queued = 0;
-                int assigned = 0;
-                for (Charger c : evData.getChargers().values()) {
-                    ETaxiChargingLogic logic = (ETaxiChargingLogic)c.getLogic();
-                    plugged += logic.getPluggedCount();
-                    queued += logic.getQueuedCount();
-                    assigned += logic.getAssignedCount();
-                }
-
-                return new String[] { plugged + "", queued + "", assigned + "" };
-            }
-        };
-    }
+				return new Integer[] { plugged, queued, assigned };
+			}
+		};
+	}
 }

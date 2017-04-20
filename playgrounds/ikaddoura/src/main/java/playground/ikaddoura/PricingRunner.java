@@ -37,12 +37,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisRun;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
-import playground.ikaddoura.decongestion.Decongestion;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup.TollingApproach;
-import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -236,129 +232,6 @@ public class PricingRunner {
 			});
 
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV10(controler.getEvents(), controler.getScenario())));
-		
-		} else if (pricingApproach.equals(PricingApproach.DecongestionNoPricing)) {
-			log.info(">>> Decongestion No Pricing");
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.NoPricing);
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
-			
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();
-			
-		} else if (pricingApproach.equals(PricingApproach.DecongestionBangBangA)) {
-			log.info(">>> Decongestion Bang Bang A");
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.BangBang);
-			decongestionSettings.setINITIAL_TOLL(10.0);
-			decongestionSettings.setTOLL_ADJUSTMENT(1.0);
-			
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();	
-			
-		} else if (pricingApproach.equals(PricingApproach.DecongestionBangBangB)) {
-			log.info(">>> Decongestion Bang Bang B");
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.BangBang);
-			decongestionSettings.setINITIAL_TOLL(10.0);
-			decongestionSettings.setTOLL_ADJUSTMENT(10.0);
-			
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();		
-			
-		} else if (pricingApproach.equals(PricingApproach.DecongestionP)) {
-			log.info(">>> Decongestion P Controller");
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-			decongestionSettings.setKp(1.0);
-			decongestionSettings.setKi(0.0);
-			decongestionSettings.setKd(0.0);
-			
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();
-		
-		} else if (pricingApproach.equals(PricingApproach.DecongestionI)) {
-			log.info(">>> Decongestion I Controller");
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-			decongestionSettings.setKp(0.0);
-			decongestionSettings.setKi(1.0);
-			decongestionSettings.setKd(0.0);
-			
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();
-		
-		} else if (pricingApproach.equals(PricingApproach.DecongestionD)) {
-			log.info(">>> Decongestion D Controller");
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-			decongestionSettings.setKp(0.0);
-			decongestionSettings.setKi(0.0);
-			decongestionSettings.setKd(1.0);
-			
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();	
-		
-		} else if (pricingApproach.equals(PricingApproach.DecongestionPID)) {
-			log.info(">>> Decongestion PID Controller");
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-			decongestionSettings.setKp(1.0);
-			decongestionSettings.setKi(1.0);
-			decongestionSettings.setKd(1.0);
-			
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();	
-			
-		} else if (pricingApproach.equals(PricingApproach.DecongestionPIDwithParameters)) {
-			log.info(">>> Decongestion PID Controller (with parameters)");
-			
-			final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(10);
-			decongestionSettings.setTOLLING_APPROACH(TollingApproach.PID);
-			decongestionSettings.setKp(parameterKp);
-			decongestionSettings.setKi(parameterKi);
-			decongestionSettings.setKd(parameterKd);
-			
-			final DecongestionInfo info = new DecongestionInfo(scenario, decongestionSettings);
-			Decongestion decongestion = new Decongestion(new Controler(scenario), info);
-			controler = decongestion.getControler();	
 			
 		} else {
 			throw new RuntimeException("Unknown pricing approach: " + pricingApproach + ". Aborting...");
@@ -367,7 +240,7 @@ public class PricingRunner {
 		controler.run();
 		
 		log.info("Analyzing the final iteration...");
-		PersonTripBasicAnalysisMain analysis = new PersonTripBasicAnalysisMain(scenario.getConfig().controler().getOutputDirectory());
+		PersonTripBasicAnalysisRun analysis = new PersonTripBasicAnalysisRun(scenario.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
 		try {

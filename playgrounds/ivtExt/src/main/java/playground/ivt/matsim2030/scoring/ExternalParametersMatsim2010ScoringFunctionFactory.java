@@ -23,12 +23,12 @@ import playground.ivt.scoring.LineChangeScoringFunction;
  */
 public class ExternalParametersMatsim2010ScoringFunctionFactory implements ScoringFunctionFactory {
 	private final Scenario scenario;
-	private final CharyparNagelScoringParametersForPerson parametersForPerson;
+	private final ScoringParametersForPerson parametersForPerson;
 	// TODO modularize
 	private final StageActivityTypes typesNotToScore = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
 
 	@Inject
-	public ExternalParametersMatsim2010ScoringFunctionFactory(Scenario scenario, CharyparNagelScoringParametersForPerson parametersForPerson) {
+	public ExternalParametersMatsim2010ScoringFunctionFactory(Scenario scenario, ScoringParametersForPerson parametersForPerson) {
 		this.scenario = scenario;
 		this.parametersForPerson = parametersForPerson;
 	}
@@ -42,7 +42,7 @@ public class ExternalParametersMatsim2010ScoringFunctionFactory implements Scori
 			scenario.getScenarioElement( DestinationChoiceBestResponseContext.ELEMENT_NAME );
 
 		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-		final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
+		final ScoringParameters params = parametersForPerson.getScoringParameters( person );
 
 		// XXX THIS is the difference with default scoring function. Incorporate in the core and get rid of home-brewed
 		// scoring function factories. Home-brewed parametersPerPerson should be enough

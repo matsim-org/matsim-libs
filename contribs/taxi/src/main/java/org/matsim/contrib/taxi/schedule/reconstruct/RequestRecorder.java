@@ -29,58 +29,46 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 
+public class RequestRecorder implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
+	private final Map<Id<Person>, TaxiRequest> ongoingRequests = new HashMap<>();
+	private final ScheduleReconstructor reconstructor;
+	private final String legMode;
+	private long requestCounter = 0;// TODO necessary until RequestSubmittedEvent is introduced
 
-public class RequestRecorder
-    implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler
-{
-    private final Map<Id<Person>, TaxiRequest> ongoingRequests = new HashMap<>();
-    private final ScheduleReconstructor reconstructor;
-    private final String legMode;
-    private long requestCounter = 0;//TODO necessary until RequestSubmittedEvent is introduced
+	public RequestRecorder(ScheduleReconstructor reconstructor, String legMode) {
+		this.reconstructor = reconstructor;
+		this.legMode = legMode;
+	}
 
+	boolean hasAwaitingRequests() {
+		return !ongoingRequests.isEmpty();
+	}
 
-    public RequestRecorder(ScheduleReconstructor reconstructor, String legMode)
-    {
-        this.reconstructor = reconstructor;
-        this.legMode = legMode;
-    }
+	@Override
+	public void handleEvent(PersonDepartureEvent event) {
+		if (event.getLegMode().equals(legMode)) {
+			Id<Request> id = Id.create(requestCounter++, Request.class);
+			Link fromLink = reconstructor.links.get(event.getLinkId());
+			double time = event.getTime();
+			TaxiRequest request = new TaxiRequest(id, null, fromLink, time, time);
+			TaxiRequest oldRequest = ongoingRequests.put(event.getPersonId(), request);
+			if (oldRequest != null) {
+				throw new IllegalStateException("Currently only one request per passenger");
+			}
+			reconstructor.taxiRequests.put(request.getId(), request);
+		}
+	}
 
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		TaxiRequest request = ongoingRequests.remove(event.getPersonId());
+		if (request != null) {
+			Id<Person> driverId = reconstructor.getDriver(event.getVehicleId());
+			reconstructor.scheduleBuilders.get(driverId).addRequest(request);
+		}
+	}
 
-    boolean hasAwaitingRequests()
-    {
-        return !ongoingRequests.isEmpty();
-    }
-
-
-    @Override
-    public void handleEvent(PersonDepartureEvent event)
-    {
-        if (event.getLegMode().equals(legMode)) {
-            Id<Request> id = Id.create(requestCounter++, Request.class);
-            Link fromLink = reconstructor.links.get(event.getLinkId());
-            double time = event.getTime();
-            TaxiRequest request = new TaxiRequest(id, null, fromLink, time, time);
-            TaxiRequest oldRequest = ongoingRequests.put(event.getPersonId(), request);
-            if (oldRequest != null) {
-                throw new IllegalStateException("Currently only one request per passenger");
-            }
-            reconstructor.taxiData.addRequest(request);
-        }
-    }
-
-
-    @Override
-    public void handleEvent(PersonEntersVehicleEvent event)
-    {
-        TaxiRequest request = ongoingRequests.remove(event.getPersonId());
-        if (request != null) {
-            Id<Person> driverId = reconstructor.getDriver(event.getVehicleId());
-            reconstructor.scheduleBuilders.get(driverId).addRequest(request);
-        }
-    }
-
-
-    @Override
-    public void reset(int iteration)
-    {}
+	@Override
+	public void reset(int iteration) {
+	}
 }

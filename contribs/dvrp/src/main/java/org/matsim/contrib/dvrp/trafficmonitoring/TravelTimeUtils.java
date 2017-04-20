@@ -25,23 +25,17 @@ import org.matsim.core.events.*;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+public class TravelTimeUtils {
+	public static TravelTime createTravelTimesFromEvents(Scenario scenario, String eventsFile) {
+		TravelTimeCalculator ttCalculator = TravelTimeCalculator.create(scenario.getNetwork(),
+				scenario.getConfig().travelTimeCalculator());
+		initTravelTimeCalculatorFromEvents(ttCalculator, eventsFile);
+		return ttCalculator.getLinkTravelTimes();
+	}
 
-public class TravelTimeUtils
-{
-    public static TravelTime createTravelTimesFromEvents(Scenario scenario, String eventsFile)
-    {
-        TravelTimeCalculator ttCalculator = TravelTimeCalculator.create(scenario.getNetwork(),
-                scenario.getConfig().travelTimeCalculator());
-        initTravelTimeCalculatorFromEvents(ttCalculator, eventsFile);
-        return ttCalculator.getLinkTravelTimes();
-    }
-
-
-    public static void initTravelTimeCalculatorFromEvents(TravelTimeCalculator ttCalculator,
-            String eventsFile)
-    {
-        EventsManager events = EventsUtils.createEventsManager();
-        events.addHandler(ttCalculator);
-        new MatsimEventsReader(events).readFile(eventsFile);
-    }
+	public static void initTravelTimeCalculatorFromEvents(TravelTimeCalculator ttCalculator, String eventsFile) {
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(ttCalculator);
+		new MatsimEventsReader(events).readFile(eventsFile);
+	}
 }

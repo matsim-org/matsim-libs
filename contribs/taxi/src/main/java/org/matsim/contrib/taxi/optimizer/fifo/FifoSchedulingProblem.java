@@ -24,37 +24,31 @@ import java.util.Queue;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 
+public class FifoSchedulingProblem {
+	private final TaxiOptimizerContext optimContext;
+	private final BestDispatchFinder dispatchFinder;
 
-public class FifoSchedulingProblem
-{
-    private final TaxiOptimizerContext optimContext;
-    private final BestDispatchFinder dispatchFinder;
+	public FifoSchedulingProblem(TaxiOptimizerContext optimContext, BestDispatchFinder vrpFinder) {
+		this.optimContext = optimContext;
+		this.dispatchFinder = vrpFinder;
+	}
 
+	public void scheduleUnplannedRequests(Queue<TaxiRequest> unplannedRequests) {
+		while (!unplannedRequests.isEmpty()) {
+			TaxiRequest req = unplannedRequests.peek();
 
-    public FifoSchedulingProblem(TaxiOptimizerContext optimContext, BestDispatchFinder vrpFinder)
-    {
-        this.optimContext = optimContext;
-        this.dispatchFinder = vrpFinder;
-    }
+			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req,
+					optimContext.fleet.getVehicles().values());
 
+			// TODO search only through available vehicles
+			// TODO what about k-nearstvehicle filtering?
 
-    public void scheduleUnplannedRequests(Queue<TaxiRequest> unplannedRequests)
-    {
-        while (!unplannedRequests.isEmpty()) {
-            TaxiRequest req = unplannedRequests.peek();
+			if (best == null) {// TODO won't work with req filtering; use VehicleData to find out when to exit???
+				return;
+			}
 
-            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
-                    .findBestVehicleForRequest(req, optimContext.taxiData.getVehicles().values());
-
-            //TODO search only through available vehicles
-            //TODO what about k-nearstvehicle filtering?
-
-            if (best == null) {//TODO won't work with req filtering; use VehicleData to find out when to exit???
-                return;
-            }
-
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
-            unplannedRequests.poll();
-        }
-    }
+			optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+			unplannedRequests.poll();
+		}
+	}
 }

@@ -1,16 +1,16 @@
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.Module;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import com.google.inject.Module;
 
 public class PopulationPlugin extends AbstractQSimPlugin {
 

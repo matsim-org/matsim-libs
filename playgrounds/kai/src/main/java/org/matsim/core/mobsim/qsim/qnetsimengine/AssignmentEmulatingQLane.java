@@ -115,7 +115,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		qLink.getToNode().activateNode();
 	}
 	@Override
-	public final boolean isAcceptingFromWait() {
+	public final boolean isAcceptingFromWait(QVehicle veh) {
 		return true ; // we always accept
 	}
 
@@ -509,4 +509,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	@Override
+	void initBeforeSimStep() {
+	}
 }

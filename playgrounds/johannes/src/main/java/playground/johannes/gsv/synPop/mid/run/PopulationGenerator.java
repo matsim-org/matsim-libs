@@ -71,7 +71,7 @@ public class PopulationGenerator {
 		reader.addPersonAttributeHandler(new PersonCarAvailHandler());
 		
 		reader.addLegAttributeHandler(new LegIndexHandler());
-		reader.addLegAttributeHandler(new LegPurposeHandler());
+		reader.addLegAttributeHandler(new LegPurposeHandlerOld());
 		reader.addLegAttributeHandler(new LegOriginHandler());
 		reader.addLegAttributeHandler(new LegRoundTrip());
 		reader.addLegAttributeHandler(new LegStartTimeHandler());

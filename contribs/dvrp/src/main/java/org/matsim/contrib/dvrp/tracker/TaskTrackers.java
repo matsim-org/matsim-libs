@@ -19,72 +19,61 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
-import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-
 
 /**
  * General assumptions:
- * <p></p>
- * An offline tracker knows/uses only the corresponding task and the schedule
- * <p></p>
- * An online tracker knows/uses also the corresponding DynAction
+ * <ul>
+ * <li>An offline tracker knows/uses only the corresponding task and the schedule (i.e. plan)</li>
+ * <li>An online tracker knows/uses also the corresponding {@link DynAction} (i.e. execution)</li>
+ * </ul>
+ * 
+ * @author michalm
  */
-public class TaskTrackers
-{
-    public static void initOnlineDriveTaskTracking(DriveTask driveTask, VrpLeg vrpDynLeg,
-            VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
-    {
-        OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(driveTask, vrpDynLeg,
-                optimizer, timer);
+public class TaskTrackers {
+	public static void initOnlineDriveTaskTracking(Vehicle vehicle, VrpLeg vrpDynLeg,
+			VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer) {
+		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(vehicle, vrpDynLeg, optimizer, timer);
+		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
+		driveTask.initTaskTracker(onlineTracker);
+		vrpDynLeg.initOnlineTracking(onlineTracker);
+	}
 
-        driveTask.initTaskTracker(onlineTracker);
-        vrpDynLeg.initOnlineTracking(onlineTracker);
-    }
+	public static void initOnlineStayTaskTracking(StayTask stayTask, final DynActivity dynActivity) {
+		stayTask.initTaskTracker(new TaskTracker() {
+			@Override
+			public double predictEndTime() {
+				return dynActivity.getEndTime();
+			}
+		});
+	}
 
+	public static void initOfflineTaskTracking(final Task task, final MobsimTimer timer) {
+		task.initTaskTracker(new TaskTracker() {
+			@Override
+			public double predictEndTime() {
+				return TaskTrackers.predictEndTimeOffline(task, timer.getTimeOfDay());
+			}
+		});
+	}
 
-    public static void initOnlineStayTaskTracking(StayTask stayTask, final DynActivity dynActivity)
-    {
-        stayTask.initTaskTracker(new TaskTracker() {
-            @Override
-            public double predictEndTime()
-            {
-                return dynActivity.getEndTime();
-            }
-        });
-    }
+	public static double predictEndTime(Task task, double currentTime) {
+		if (task.getStatus() != TaskStatus.STARTED) {
+			throw new IllegalStateException();
+		}
 
+		TaskTracker tracker = task.getTaskTracker();
+		return tracker != null ? //
+				tracker.predictEndTime() : predictEndTimeOffline(task, currentTime);
+	}
 
-    public static void initOfflineTaskTracking(final Task task, final MobsimTimer timer)
-    {
-        task.initTaskTracker(new TaskTracker() {
-            @Override
-            public double predictEndTime()
-            {
-                return TaskTrackers.predictEndTimeOffline(task, timer.getTimeOfDay());
-            }
-        });
-    }
-
-
-    public static double predictEndTime(Task task, double currentTime)
-    {
-        if (task.getStatus() != TaskStatus.STARTED) {
-            throw new IllegalStateException();
-        }
-
-        TaskTracker tracker = task.getTaskTracker();
-        return tracker != null ? //
-                tracker.predictEndTime() : predictEndTimeOffline(task, currentTime);
-    }
-
-
-    private static double predictEndTimeOffline(Task task, double currentTime)
-    {
-        return Math.max(task.getEndTime(), currentTime);
-    }
+	private static double predictEndTimeOffline(Task task, double currentTime) {
+		return Math.max(task.getEndTime(), currentTime);
+	}
 }

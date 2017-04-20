@@ -5,7 +5,7 @@ import com.google.inject.Module;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 
-public class ExplodedConfigModule implements Module {
+public final class ExplodedConfigModule implements Module {
 	private final Config config;
 
 	public ExplodedConfigModule(Config config) {

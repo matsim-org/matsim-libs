@@ -22,24 +22,16 @@ package org.matsim.contrib.dvrp.extensions.vrppd;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 
+public interface PickupDeliveryRequest extends Request {
+	Link getFromLink();
 
-public interface PickupDeliveryRequest
-    extends Request
-{
-    Link getFromLink();
+	Link getToLink();
 
+	PickupDeliveryTask getPickupTask();
 
-    Link getToLink();
+	void setPickupTask(PickupDeliveryTask pickupTask);
 
+	PickupDeliveryTask getDeliveryTask();
 
-    PickupDeliveryTask getPickupTask();
-
-
-    void setPickupTask(PickupDeliveryTask pickupTask);
-
-
-    PickupDeliveryTask getDeliveryTask();
-
-
-    void setDeliveryTask(PickupDeliveryTask deliveryTask);
+	void setDeliveryTask(PickupDeliveryTask deliveryTask);
 }

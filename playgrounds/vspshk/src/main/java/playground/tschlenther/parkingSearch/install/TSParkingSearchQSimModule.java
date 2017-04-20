@@ -24,6 +24,7 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 
 import playground.tschlenther.parkingSearch.Benenson.BenensonParkingAgentFactory;
+import playground.tschlenther.parkingSearch.memoryBased.MemoryBasedParkingAgentFactory;
 
 
 class TSParkingSearchQSimModule extends com.google.inject.AbstractModule {
@@ -61,6 +62,7 @@ class TSParkingSearchQSimModule extends com.google.inject.AbstractModule {
 						throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
 					} else {
 						bind(AgentFactory.class).to(BenensonParkingAgentFactory.class).asEagerSingleton(); // (**)
+//						bind(AgentFactory.class).to(MemoryBasedParkingAgentFactory.class).asEagerSingleton(); // (**)
 					}
 					bind(ParkingPopulationAgentSource.class).asEagerSingleton();
 

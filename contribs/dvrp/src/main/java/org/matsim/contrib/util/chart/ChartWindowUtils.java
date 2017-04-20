@@ -25,48 +25,36 @@ import javax.swing.*;
 
 import org.jfree.chart.*;
 
+public class ChartWindowUtils {
+	public static void showFrame(JFreeChart chart) {
+		ChartFrame frame = new ChartFrame(chart.getTitle().getText(), chart);
+		SwingUtils.showWindow(frame, false);
+	}
 
-public class ChartWindowUtils
-{
-    public static void showFrame(JFreeChart chart)
-    {
-        ChartFrame frame = new ChartFrame(chart.getTitle().getText(), chart);
-        SwingUtils.showWindow(frame, false);
-    }
+	public static void showFrame(JFreeChart chart, String title, int width, int height) {
+		ChartFrame frame = new ChartFrame(title, chart);
+		frame.setPreferredSize(new Dimension(width, height));
+		SwingUtils.showWindow(frame, false);
+	}
 
+	public static void showDialog(JFreeChart chart, boolean modal) {
+		JDialog dialog = newChartDialog(chart, chart.getTitle().getText(), modal);
+		SwingUtils.showWindow(dialog, modal);
+	}
 
-    public static void showFrame(JFreeChart chart, String title, int width, int height)
-    {
-        ChartFrame frame = new ChartFrame(title, chart);
-        frame.setPreferredSize(new Dimension(width, height));
-        SwingUtils.showWindow(frame, false);
-    }
+	public static void showDialog(JFreeChart chart, String title, int width, int height, boolean modal) {
+		JDialog dialog = newChartDialog(chart, title, modal);
+		dialog.setPreferredSize(new Dimension(width, height));
+		SwingUtils.showWindow(dialog, modal);
+	}
 
-
-    public static void showDialog(JFreeChart chart, boolean modal)
-    {
-        JDialog dialog = newChartDialog(chart, chart.getTitle().getText(), modal);
-        SwingUtils.showWindow(dialog, modal);
-    }
-
-
-    public static void showDialog(JFreeChart chart, String title, int width, int height,
-            boolean modal)
-    {
-        JDialog dialog = newChartDialog(chart, title, modal);
-        dialog.setPreferredSize(new Dimension(width, height));
-        SwingUtils.showWindow(dialog, modal);
-    }
-
-
-    private static JDialog newChartDialog(JFreeChart chart, String title, boolean modal)
-    {
-        chart.setTitle(title);
-        JDialog dialog = new JDialog();
-        dialog.setTitle(title);
-        dialog.setContentPane(new ChartPanel(chart));
-        dialog.setModal(modal);
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        return dialog;
-    }
+	private static JDialog newChartDialog(JFreeChart chart, String title, boolean modal) {
+		chart.setTitle(title);
+		JDialog dialog = new JDialog();
+		dialog.setTitle(title);
+		dialog.setContentPane(new ChartPanel(chart));
+		dialog.setModal(modal);
+		dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		return dialog;
+	}
 }

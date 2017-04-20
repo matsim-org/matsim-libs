@@ -20,6 +20,7 @@
 package playground.vsp.airPollution.exposure;
 
 import java.util.Set;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -37,19 +38,13 @@ public class EmissionResponsibilityTravelDisutilityCalculatorFactory implements 
 
     private double sigma = 0. ;
     private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
-    private final EmissionModule emissionModule;
-    private final EmissionResponsibilityCostModule emissionCostModule;
-    private final PlanCalcScoreConfigGroup cnScoringGroup;
+    @Inject private EmissionModule emissionModule;
+    @Inject private EmissionResponsibilityCostModule emissionCostModule;
+    @Inject private PlanCalcScoreConfigGroup cnScoringGroup;
     private Set<Id<Link>> hotspotLinks = null;
 
-    public EmissionResponsibilityTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory,
-                                                                   EmissionModule emissionModule,
-                                                                   EmissionResponsibilityCostModule emissionCostModule,
-                                                                   PlanCalcScoreConfigGroup cnScoringGroup) {
+    public EmissionResponsibilityTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory) {
         this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-        this.emissionModule = emissionModule;
-        this.emissionCostModule = emissionCostModule;
-        this.cnScoringGroup = cnScoringGroup;
     }
 
     @Override

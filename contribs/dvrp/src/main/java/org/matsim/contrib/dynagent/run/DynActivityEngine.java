@@ -32,128 +32,107 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.*;
 
-
 /**
- * It might be nicer to have ActivityEngine as a delegate, not as the superclass. But there is a
- * hardcoded "instanceof ActivityEngine" check in QSim :-( TODO introduce an ActivityEngine
- * interface?
+ * It might be nicer to have ActivityEngine as a delegate, not as the superclass. But there is a hardcoded
+ * "instanceof ActivityEngine" check in QSim :-( TODO introduce an ActivityEngine interface?
  * 
- * DynActivityEngine and ActivityEngine could be decoupled
- * (if we can ensure DynActivityEngine's handleActivity() is called before that of ActivityEngine)
+ * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
+ * called before that of ActivityEngine)
  */
-public class DynActivityEngine
-    extends ActivityEngine
-{
-    private InternalInterface internalInterface;
+public class DynActivityEngine extends ActivityEngine {
+	private InternalInterface internalInterface;
 
-    private final List<DynAgent> dynAgents = new LinkedList<>();
-    private final List<DynAgent> newDynAgents = new ArrayList<>();//will to be handled in the next timeStep
+	private final List<DynAgent> dynAgents = new LinkedList<>();
+	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
 
+	@Inject
+	public DynActivityEngine(EventsManager eventsManager) {
+		super(eventsManager);
+	}
 
-    @Inject
-    public DynActivityEngine(EventsManager eventsManager)
-    {
-        super(eventsManager);
-    }
+	// See handleActivity for the reason for this.
+	private boolean beforeFirstSimStep = true;
 
+	@Override
+	public void doSimStep(double time) {
+		beforeFirstSimStep = false;
+		dynAgents.addAll(newDynAgents);
+		newDynAgents.clear();
 
-    // See handleActivity for the reason for this.
-    private boolean beforeFirstSimStep = true;
+		Iterator<DynAgent> dynAgentIter = dynAgents.iterator();
+		while (dynAgentIter.hasNext()) {
+			DynAgent agent = dynAgentIter.next();
+			if (agent.getState() == State.ACTIVITY) {
+				agent.doSimStep(time);
+				// ask agents about the current activity end time;
+				double currentEndTime = agent.getActivityEndTime();
 
+				if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
+					unregisterAgentAtActivityLocation(agent);
+					internalInterface.getMobsim().getAgentCounter().decLiving();
+					dynAgentIter.remove();
+				} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
+					unregisterAgentAtActivityLocation(agent);
+					agent.endActivityAndComputeNextState(time);
+					internalInterface.arrangeNextAgentState(agent);
+					dynAgentIter.remove();
+				}
+			}
+			// TODO what if not activity?
+		}
 
-    @Override
-    public void doSimStep(double time)
-    {
-        beforeFirstSimStep = false;
-        dynAgents.addAll(newDynAgents);
-        newDynAgents.clear();
+		super.doSimStep(time);
+	}
 
-        Iterator<DynAgent> dynAgentIter = dynAgents.iterator();
-        while (dynAgentIter.hasNext()) {
-            DynAgent agent = dynAgentIter.next();
-            if (agent.getState() == State.ACTIVITY) {
-                agent.doSimStep(time);
-                //ask agents about the current activity end time;
-                double currentEndTime = agent.getActivityEndTime();
+	@Override
+	public boolean handleActivity(MobsimAgent agent) {
+		if (!(agent instanceof DynAgent)) {
+			return super.handleActivity(agent);
+		}
 
-                if (currentEndTime == Double.POSITIVE_INFINITY) { //agent says: stop simulating me
-                    unregisterAgentAtActivityLocation(agent);
-                    internalInterface.getMobsim().getAgentCounter().decLiving();
-                    dynAgentIter.remove();
-                }
-                else if (currentEndTime <= time) { //the agent wants to end the activity NOW
-                    unregisterAgentAtActivityLocation(agent);
-                    agent.endActivityAndComputeNextState(time);
-                    internalInterface.arrangeNextAgentState(agent);
-                    dynAgentIter.remove();
-                }
-            }
-            //TODO what if not activity?
-        }
+		double endTime = agent.getActivityEndTime();
+		double currentTime = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 
-        super.doSimStep(time);
-    }
+		if (endTime == Double.POSITIVE_INFINITY) {
+			// This is the last planned activity.
+			// So the agent goes to sleep.
+			internalInterface.getMobsim().getAgentCounter().decLiving();
+		} else if (endTime <= currentTime && !beforeFirstSimStep) {
+			// This activity is already over (planned for 0 duration)
+			// So we proceed immediately.
+			agent.endActivityAndComputeNextState(currentTime);
+			internalInterface.arrangeNextAgentState(agent);
+		} else {
+			// The agent commences an activity on this link.
+			if (beforeFirstSimStep) {
+				dynAgents.add((DynAgent)agent);
+			} else {
+				newDynAgents.add((DynAgent)agent);
+			}
 
+			internalInterface.registerAdditionalAgentOnLink(agent);
+		}
 
-    @Override
-    public boolean handleActivity(MobsimAgent agent)
-    {
-        if (! (agent instanceof DynAgent)) {
-            return super.handleActivity(agent);
-        }
+		return true;
+	}
 
-        double endTime = agent.getActivityEndTime();
-        double currentTime = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+	@Override
+	public void afterSim() {
+		super.afterSim();
+		dynAgents.clear();
+	}
 
-        if (endTime == Double.POSITIVE_INFINITY) {
-            // This is the last planned activity.
-            // So the agent goes to sleep.
-            internalInterface.getMobsim().getAgentCounter().decLiving();
-        }
-        else if (endTime <= currentTime && !beforeFirstSimStep) {
-            // This activity is already over (planned for 0 duration)
-            // So we proceed immediately.
-            agent.endActivityAndComputeNextState(currentTime);
-            internalInterface.arrangeNextAgentState(agent);
-        }
-        else {
-            // The agent commences an activity on this link.
-            if (beforeFirstSimStep) {
-                dynAgents.add((DynAgent)agent);
-            }
-            else {
-                newDynAgents.add((DynAgent)agent);
-            }
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
+		super.setInternalInterface(internalInterface);
+	}
 
-            internalInterface.registerAdditionalAgentOnLink(agent);
-        }
-
-        return true;
-    }
-
-
-    @Override
-    public void afterSim()
-    {
-        super.afterSim();
-        dynAgents.clear();
-    }
-
-
-    @Override
-    public void setInternalInterface(InternalInterface internalInterface)
-    {
-        this.internalInterface = internalInterface;
-        super.setInternalInterface(internalInterface);
-    }
-
-
-    private void unregisterAgentAtActivityLocation(final MobsimAgent agent)
-    {
-        Id<Person> agentId = agent.getId();
-        Id<Link> linkId = agent.getCurrentLinkId();
-        if (linkId != null) { // may be bushwacking
-            internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
-        }
-    }
+	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
+		Id<Person> agentId = agent.getId();
+		Id<Link> linkId = agent.getCurrentLinkId();
+		if (linkId != null) { // may be bushwacking
+			internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
+		}
+	}
 }

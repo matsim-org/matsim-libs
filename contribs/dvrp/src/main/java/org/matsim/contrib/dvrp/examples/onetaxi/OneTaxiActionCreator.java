@@ -19,53 +19,46 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSim;
 
+import com.google.inject.Inject;
 
-public class OneTaxiActionCreator
-    implements VrpAgentLogic.DynActionCreator
-{
-    private final PassengerEngine passengerEngine;
-    private final MobsimTimer timer;
+/**
+ * @author michalm
+ */
+public class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
+	private final PassengerEngine passengerEngine;
+	private final MobsimTimer timer;
 
+	@Inject
+	public OneTaxiActionCreator(PassengerEngine passengerEngine, QSim qSim) {
+		this.passengerEngine = passengerEngine;
+		this.timer = qSim.getSimTimer();
+	}
 
-    public OneTaxiActionCreator(PassengerEngine passengerEngine, MobsimTimer timer)
-    {
-        this.passengerEngine = passengerEngine;
-        this.timer = timer;
-    }
+	@Override
+	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
+		Task task = vehicle.getSchedule().getCurrentTask(); 
+		if (task instanceof DriveTask) {
+			return VrpLegs.createLegWithOfflineTracker(vehicle, timer);
+		} else if (task instanceof OneTaxiServeTask) { // PICKUP or DROPOFF
+			final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
 
-
-    @Override
-    public DynAction createAction(final Task task, double now)
-    {
-        switch (task.getType()) {
-            case DRIVE:
-                return VrpLegs.createLegWithOfflineTracker((DriveTask)task, timer);
-
-            case STAY:
-                if (task instanceof OneTaxiServeTask) { //PICKUP or DROPOFF
-                    final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
-                    final OneTaxiRequest request = serveTask.getRequest();
-
-                    if (serveTask.isPickup()) {
-                        return new SinglePassengerPickupActivity(passengerEngine, serveTask,
-                                request, OneTaxiOptimizer.PICKUP_DURATION, "OneTaxiPickup");
-                    }
-                    else {
-                        return new SinglePassengerDropoffActivity(passengerEngine, serveTask,
-                                request, "OneTaxiDropoff");
-                    }
-                }
-                else { //WAIT
-                    return new VrpActivity("OneTaxiStay", (StayTask)task);
-                }
-        }
-
-        throw new RuntimeException();
-    }
+			if (serveTask.isPickup()) {
+				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
+						OneTaxiOptimizer.PICKUP_DURATION, "OneTaxiPickup");
+			} else {
+				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
+						"OneTaxiDropoff");
+			}
+		} else { // WAIT
+			return new VrpActivity("OneTaxiStay", (StayTask)task);
+		}
+	}
 }

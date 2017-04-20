@@ -40,9 +40,9 @@ public class SimpleJointPlanCreator<P extends Proposition> implements CoalitionC
 		final Map<Id<Person>,Plan> plans = new HashMap<>();
 
 		for ( Person person : proposition.getGroup() ) {
-			final Plan plan = person.getSelectedPlan().getCustomAttributes().containsKey( "proposition" ) ?
-					PlanUtils.createCopy( person.getSelectedPlan() ) :
-					person.getSelectedPlan();
+			final Plan plan = getPlan( person ).getCustomAttributes().containsKey( "proposition" ) ?
+					PlanUtils.createCopy( getPlan( person ) ) :
+					getPlan( person );
 			if ( !person.getPlans().contains( plan ) ) person.addPlan( plan );
 			plans.put( person.getId() , plan );
 
@@ -50,5 +50,9 @@ public class SimpleJointPlanCreator<P extends Proposition> implements CoalitionC
 		}
 
 		return factory.createJointPlan( plans );
+	}
+
+	private Plan getPlan( final Person person ) {
+		return person.getPlans().get( 0 );
 	}
 }

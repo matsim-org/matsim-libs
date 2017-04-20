@@ -20,7 +20,6 @@
 package playground.benjamin.scenarios.munich.exposure;
 
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
@@ -59,8 +58,8 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
 		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-		this.emissionModule = emissionModule;
 		this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;
+		this.emissionModule = emissionModule;
 	}
 
 	@Override
@@ -102,7 +101,7 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionAnalysisModule();
 		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 				vehicle,
 				Integer.parseInt(NetworkUtils.getType(((Link) link))),

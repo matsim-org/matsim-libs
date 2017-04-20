@@ -35,62 +35,57 @@ import playground.michalm.demand.taxi.ServedRequests;
 import playground.michalm.poznan.zone.PoznanZones;
 import playground.michalm.util.matrices.*;
 
+public class PoznanServedRequestsAggregator {
+	public static void main(String[] args) {
+		// Map<Id, Zone> zones = PoznanZones.readTaxiZones();
+		Map<Id<Zone>, Zone> zones = PoznanZones.readVisumZones();
 
-public class PoznanServedRequestsAggregator
-{
-    public static void main(String[] args)
-    {
-        //Map<Id, Zone> zones = PoznanZones.readTaxiZones();
-        Map<Id<Zone>, Zone> zones = PoznanZones.readVisumZones();
+		Iterable<PoznanServedRequest> requests = PoznanServedRequests.readRequests(2, 3, 4);
+		requests = PoznanServedRequests.filterNormalPeriods(requests);
+		requests = ServedRequests.filterWorkDaysPeriods(requests, PoznanServedRequests.ZERO_HOUR);
+		requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);
 
-        Iterable<PoznanServedRequest> requests = PoznanServedRequests.readRequests(2, 3, 4);
-        requests = PoznanServedRequests.filterNormalPeriods(requests);
-        requests = ServedRequests.filterWorkDaysPeriods(requests, PoznanServedRequests.ZERO_HOUR);
-        requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);
+		// aggregateRequests
+		ZoneFinder zoneFinder = new ZoneFinderImpl(zones, 200);
+		final FormatBasedDateDiscretizer hourlyDateDiscretizer = new FormatBasedDateDiscretizer(
+				FormatBasedDateDiscretizer.YMDH);
+		DemandAggregator demandAggregator = new DemandAggregator(zoneFinder, hourlyDateDiscretizer);
 
-        //aggregateRequests
-        ZoneFinder zoneFinder = new ZoneFinderImpl(zones, 200);
-        final FormatBasedDateDiscretizer hourlyDateDiscretizer = new FormatBasedDateDiscretizer(
-                FormatBasedDateDiscretizer.YMDH);
-        DemandAggregator demandAggregator = new DemandAggregator(zoneFinder, hourlyDateDiscretizer);
+		for (PoznanServedRequest r : requests) {
+			demandAggregator.addTrip(r.assigned, r.from, r.to);
+		}
 
-        for (PoznanServedRequest r : requests) {
-            demandAggregator.addTrip(r.assigned, r.from, r.to);
-        }
+		demandAggregator.printCounters();
 
-        demandAggregator.printCounters();
+		// write ODs to file
+		String matricesFile = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/matrices_workdays.txt";
+		String header = "year\tmonth\tm_day\tw_day\thour";
+		final DateFormat tabDateFormat = new SimpleDateFormat("yy\tMM\tdd\tu\tHH");
 
-        //write ODs to file
-        String matricesFile = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/matrices_workdays.txt";
-        String header = "year\tmonth\tm_day\tw_day\thour";
-        final DateFormat tabDateFormat = new SimpleDateFormat("yy\tMM\tdd\tu\tHH");
+		MatricesTxtWriter w1 = new MatricesTxtWriter(demandAggregator.getMatrices().getMatrices());
+		w1.setKeyHeader(header);
+		w1.setKeyFormatter(new Function<String, String>() {
+			@Override
+			public String apply(String key) {
+				Date date = hourlyDateDiscretizer.parseDiscretizedDate(key);
+				return tabDateFormat.format(date);
+			}
+		});
+		w1.write(matricesFile);
 
-        MatricesTxtWriter w1 = new MatricesTxtWriter(demandAggregator.getMatrices().getMatrices());
-        w1.setKeyHeader(header);
-        w1.setKeyFormatter(new Function<String, String>() {
-            @Override
-            public String apply(String key)
-            {
-                Date date = hourlyDateDiscretizer.parseDiscretizedDate(key);
-                return tabDateFormat.format(date);
-            }
-        });
-        w1.write(matricesFile);
+		Matrices aggregatedMatrices = MatrixUtils.aggregateMatrices(demandAggregator.getMatrices(),
+				new Function<String, String>() {
+					@SuppressWarnings("deprecation")
+					@Override
+					public String apply(String key) {
+						return StringUtils.leftPad(hourlyDateDiscretizer.parseDiscretizedDate(key).getHours() + "", 2);
+					};
+				});
 
-        Matrices aggregatedMatrices = MatrixUtils.aggregateMatrices(demandAggregator.getMatrices(),
-                new Function<String, String>() {
-                    @Override
-                    public String apply(String key)
-                    {
-                        return StringUtils.leftPad(
-                                hourlyDateDiscretizer.parseDiscretizedDate(key).getHours() + "", 2);
-                    };
-                });
-
-        String aggregatedMatricesFile = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/matrices_workdays_aggregated.txt";
-        MatricesTxtWriter w2 = new MatricesTxtWriter(aggregatedMatrices.getMatrices());
-        w2.setKeyHeader("hour");
-        w2.write(aggregatedMatricesFile);
-    }
+		String aggregatedMatricesFile = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/matrices_workdays_aggregated.txt";
+		MatricesTxtWriter w2 = new MatricesTxtWriter(aggregatedMatrices.getMatrices());
+		w2.setKeyHeader("hour");
+		w2.write(aggregatedMatricesFile);
+	}
 
 }

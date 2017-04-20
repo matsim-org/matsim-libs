@@ -23,51 +23,30 @@
 package playground.jbischoff.pt.scenario;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.av.intermodal.router.VariableAccessTransit;
-import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterImplFactory;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
-import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
+import org.matsim.contrib.av.intermodal.router.config.*;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
+import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl.Builder;
-import org.matsim.core.replanning.modules.TripsToLegsModule;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
+import com.google.inject.AbstractModule;
 
-import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModes;
 import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromModesModule;
 
 /**
  * @author  jbischoff
- *
- */
-/**
  *
  */
 public class RunRWPTComboBerlincaseWithLegModeChange {
@@ -78,10 +57,11 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 //		 }
 		String configfile = "C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/modechoice/config_modechoice.xml";
 
-		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new TaxiFareConfigGroup());
+		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new DvrpConfigGroup(), new TaxiFareConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
+
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 
@@ -104,15 +84,9 @@ public class RunRWPTComboBerlincaseWithLegModeChange {
 		config.addModule(vacfg);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		TaxiData taxiData = new TaxiData();
-		new VehicleReader(scenario.getNetwork(), taxiData)
-				.readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new TaxiModule(taxiData));
-		double expAveragingAlpha = 0.05;// from the AV flow paper
-
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-		controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+		controler.addOverridingModule(new TaxiOutputModule());
+        controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
 		controler.run();
 

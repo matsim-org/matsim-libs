@@ -27,50 +27,39 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
+public class DistanceCalculators {
+	public static final DistanceCalculator BEELINE_DISTANCE_CALCULATOR = new DistanceCalculator() {
+		@Override
+		public double calcDistance(Coord from, Coord to) {
+			return DistanceUtils.calculateDistance(from, to);
+		}
+	};
 
-public class DistanceCalculators
-{
-    public static final DistanceCalculator BEELINE_DISTANCE_CALCULATOR = new DistanceCalculator() {
-        @Override
-        public double calcDistance(Coord from, Coord to)
-        {
-            return DistanceUtils.calculateDistance(from, to);
-        }
-    };
+	public static DistanceCalculator crateFreespeedDistanceCalculator(final Network network) {
+		return crateFreespeedBasedCalculator(network, false);
+	}
 
+	public static DistanceCalculator crateFreespeedTimeCalculator(final Network network) {
+		return crateFreespeedBasedCalculator(network, true);
+	}
 
-    public static DistanceCalculator crateFreespeedDistanceCalculator(final Network network)
-    {
-        return crateFreespeedBasedCalculator(network, false);
-    }
+	private static DistanceCalculator crateFreespeedBasedCalculator(final Network network, final boolean timeBased) {
+		TravelTime ttimeCalc = new FreeSpeedTravelTime();
+		TravelDisutility tcostCalc = timeBased ? new TimeAsTravelDisutility(ttimeCalc)
+				: new DistanceAsTravelDisutility();
+		final DijkstraWithDijkstraTreeCache dijkstraTree = new DijkstraWithDijkstraTreeCache(network, tcostCalc,
+				ttimeCalc, TimeDiscretizer.CYCLIC_24_HOURS);
 
-
-    public static DistanceCalculator crateFreespeedTimeCalculator(final Network network)
-    {
-        return crateFreespeedBasedCalculator(network, true);
-    }
-
-
-    private static DistanceCalculator crateFreespeedBasedCalculator(final Network network,
-            final boolean timeBased)
-    {
-        TravelTime ttimeCalc = new FreeSpeedTravelTime();
-        TravelDisutility tcostCalc = timeBased ? new TimeAsTravelDisutility(ttimeCalc)
-                : new DistanceAsTravelDisutility();
-        final DijkstraWithDijkstraTreeCache dijkstraTree = new DijkstraWithDijkstraTreeCache(
-                network, tcostCalc, ttimeCalc, TimeDiscretizer.CYCLIC_24_HOURS);
-
-        return new DistanceCalculator() {
-            @Override
-            public double calcDistance(Coord from, Coord to)
-            {
-                Network networkImpl = (Network)network;
-		final Coord coord = from;
-                Node fromNode = NetworkUtils.getNearestNode(networkImpl,coord);
-		final Coord coord1 = to;
-                Node toNode = NetworkUtils.getNearestNode(networkImpl,coord1);
-                return dijkstraTree.calcLeastCostPath(fromNode, toNode, 0, null, null).travelCost;
-            }
-        };
-    }
+		return new DistanceCalculator() {
+			@Override
+			public double calcDistance(Coord from, Coord to) {
+				Network networkImpl = (Network)network;
+				final Coord coord = from;
+				Node fromNode = NetworkUtils.getNearestNode(networkImpl, coord);
+				final Coord coord1 = to;
+				Node toNode = NetworkUtils.getNearestNode(networkImpl, coord1);
+				return dijkstraTree.calcLeastCostPath(fromNode, toNode, 0, null, null).travelCost;
+			}
+		};
+	}
 }

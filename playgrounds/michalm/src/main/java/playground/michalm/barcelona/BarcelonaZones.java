@@ -26,18 +26,15 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+public class BarcelonaZones {
+	public static MultiPolygon readAgglomerationArea() {
+		String agglomerationShpFile = "d:/PP-rad/Barcelona/data/GIS/BCN_polygon_UMT31N.shp";
 
-public class BarcelonaZones
-{
-    public static MultiPolygon readAgglomerationArea()
-    {
-        String agglomerationShpFile = "d:/PP-rad/Barcelona/data/GIS/BCN_polygon_UMT31N.shp";
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(agglomerationShpFile);
+		if (features.size() != 1) {
+			throw new RuntimeException();
+		}
 
-        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(agglomerationShpFile);
-        if (features.size() != 1) {
-            throw new RuntimeException();
-        }
-
-        return (MultiPolygon)features.iterator().next().getDefaultGeometry();
-    }
+		return (MultiPolygon)features.iterator().next().getDefaultGeometry();
+	}
 }

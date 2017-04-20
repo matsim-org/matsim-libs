@@ -24,56 +24,38 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 
+public class EvDataImpl implements EvData {
+	private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
 
-public class EvDataImpl
-    implements EvData
-{
-    private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
-    private final Map<Id<Vehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
+	@Override
+	public Map<Id<Charger>, Charger> getChargers() {
+		return Collections.unmodifiableMap(chargers);
+	}
 
-    private final Map<Id<Charger>, Charger> unmodifiableChargers = Collections
-            .unmodifiableMap(chargers);
-    private final Map<Id<Vehicle>, ElectricVehicle> unmodifiableEVehicles = Collections
-            .unmodifiableMap(eVehicles);
+	@Override
+	public void addCharger(Charger charger) {
+		chargers.put(charger.getId(), charger);
+	}
 
+	@Override
+	public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles() {
+		return Collections.unmodifiableMap(eVehicles);
+	}
 
-    @Override
-    public Map<Id<Charger>, Charger> getChargers()
-    {
-        return unmodifiableChargers;
-    }
+	@Override
+	public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev) {
+		eVehicles.put(vehicleId, ev);
+	}
 
+	@Override
+	public void clearQueuesAndResetBatteries() {
+		for (ElectricVehicle ev : eVehicles.values()) {
+			ev.getBattery().resetSoc();
+		}
 
-    @Override
-    public void addCharger(Charger charger)
-    {
-        chargers.put(charger.getId(), charger);
-    }
-
-
-    @Override
-    public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles()
-    {
-        return unmodifiableEVehicles;
-    }
-
-
-    @Override
-    public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev)
-    {
-        eVehicles.put(vehicleId, ev);
-    }
-
-
-    @Override
-    public void clearQueuesAndResetBatteries()
-    {
-        for (ElectricVehicle ev : eVehicles.values()) {
-            ev.getBattery().resetSoc();
-        }
-
-        for (Charger c : chargers.values()) {
-            c.resetLogic();
-        }
-    }
+		for (Charger c : chargers.values()) {
+			c.resetLogic();
+		}
+	}
 }

@@ -27,41 +27,31 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.*;
 
+public class RandomDynAgentSource implements AgentSource {
+	private final QSim qSim;
+	private final int agentCount;
 
-public class RandomDynAgentSource
-    implements AgentSource
-{
-    private final QSim qSim;
-    private final int agentCount;
+	public RandomDynAgentSource(QSim qSim, int agentCount) {
+		this.qSim = qSim;
+		this.agentCount = agentCount;
+	}
 
+	@Override
+	public void insertAgentsIntoMobsim() {
+		Scenario scenario = qSim.getScenario();
+		Network network = scenario.getNetwork();
+		VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
 
-    public RandomDynAgentSource(QSim qSim, int agentCount)
-    {
-        this.qSim = qSim;
-        this.agentCount = agentCount;
-    }
+		for (int i = 0; i < agentCount; i++) {
+			RandomDynAgentLogic agentLogic = new RandomDynAgentLogic(network);
 
+			Id<Person> id = Id.createPersonId(i);
+			Id<Link> startLinkId = RandomDynAgentLogic.chooseRandomElement(network.getLinks().keySet());
+			DynAgent agent = new DynAgent(id, startLinkId, qSim.getEventsManager(), agentLogic);
 
-    @Override
-    public void insertAgentsIntoMobsim()
-    {
-        Scenario scenario = qSim.getScenario();
-        Network network = scenario.getNetwork();
-        VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
-
-        for (int i = 0; i < agentCount; i++) {
-            RandomDynAgentLogic agentLogic = new RandomDynAgentLogic(network);
-
-            Id<Person> id = Id.createPersonId(i);
-            Id<Link> startLinkId = RandomDynAgentLogic
-                    .chooseRandomElement(network.getLinks().keySet());
-            DynAgent agent = new DynAgent(id, startLinkId, qSim.getEventsManager(), agentLogic);
-
-            qSim.createAndParkVehicleOnLink(
-                    qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class),
-                            VehicleUtils.getDefaultVehicleType()),
-                    startLinkId);
-            qSim.insertAgentIntoMobsim(agent);
-        }
-    }
+			qSim.createAndParkVehicleOnLink(qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class),
+					VehicleUtils.getDefaultVehicleType()), startLinkId);
+			qSim.insertAgentIntoMobsim(agent);
+		}
+	}
 }

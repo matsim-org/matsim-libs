@@ -23,165 +23,108 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.taxi.schedule.*;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+/**
+ * @author michalm
+ */
+public class TaxiRequest extends RequestImpl implements PassengerRequest {
+	public enum TaxiRequestStatus {
+		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
+		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
+		PLANNED, // planned - included into one of the routes
 
-public class TaxiRequest
-    extends RequestImpl
-    implements PassengerRequest
-{
-    public enum TaxiRequestStatus
-    {
-        //INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
-        UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
-        PLANNED, // planned - included into one of the routes
+		// we have to carry out the request
+		PICKUP, RIDE, DROPOFF,
 
-        //we have started serving the request but we may still divert the cab
-        TAXI_DISPATCHED,
+		PERFORMED, //
+		// REJECTED, // rejected by the DISPATCHER
+		// CANCELLED, // canceled by the CUSTOMER
+		;
+	}
 
-        //we have to carry out the request
-        PICKUP, RIDE, DROPOFF,
+	private final MobsimPassengerAgent passenger;
+	private final Link fromLink;
+	private Link toLink;// toLink may be provided during the pickup
 
-        PERFORMED, //
-        //REJECTED, // rejected by the DISPATCHER
-        //CANCELLED, // canceled by the CUSTOMER
-        ;
-    };
+	private TaxiPickupTask pickupTask;
+	private TaxiDropoffTask dropoffTask;
 
+	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, double startTime,
+			double submissionTime) {
+		this(id, passenger, fromLink, null, startTime, submissionTime);
+	}
 
-    private final MobsimPassengerAgent passenger;
-    private final Link fromLink;
-    private Link toLink;//toLink may be provided during the pickup
+	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double startTime,
+			double submissionTime) {
+		super(id, 1, startTime, startTime, submissionTime);
+		this.passenger = passenger;
+		this.fromLink = fromLink;
+		this.toLink = toLink;
+	}
 
-    private TaxiPickupTask pickupTask;
-    private TaxiOccupiedDriveTask occupiedDriveTask;
-    private TaxiDropoffTask dropoffTask;
+	@Override
+	public Link getFromLink() {
+		return fromLink;
+	}
 
+	@Override
+	public Link getToLink() {
+		return toLink;
+	}
 
-    public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, double t0,
-            double submissionTime)
-    {
-        this(id, passenger, fromLink, null, t0, submissionTime);
-    }
+	public void setToLink(Link toLink) {
+		this.toLink = toLink;
+	}
 
+	@Override
+	public MobsimPassengerAgent getPassenger() {
+		return passenger;
+	}
 
-    public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-            double t0, double submissionTime)
-    {
-        super(id, 1, t0, t0, submissionTime);
-        this.passenger = passenger;
-        this.fromLink = fromLink;
-        this.toLink = toLink;
-    }
+	public TaxiPickupTask getPickupTask() {
+		return pickupTask;
+	}
 
+	public void setPickupTask(TaxiPickupTask pickupTask) {
+		this.pickupTask = pickupTask;
+	}
 
-    @Override
-    public Link getFromLink()
-    {
-        return fromLink;
-    }
+	public TaxiDropoffTask getDropoffTask() {
+		return dropoffTask;
+	}
 
+	public void setDropoffTask(TaxiDropoffTask dropoffTask) {
+		this.dropoffTask = dropoffTask;
+	}
 
-    @Override
-    public Link getToLink()
-    {
-        return toLink;
-    }
+	public TaxiRequestStatus getStatus() {
+		if (pickupTask == null) {
+			return TaxiRequestStatus.UNPLANNED;
+		}
 
+		switch (pickupTask.getStatus()) {
+			case PLANNED:
+				return TaxiRequestStatus.PLANNED;
 
-    public void setToLink(Link toLink)
-    {
-        this.toLink = toLink;
-    }
+			case STARTED:
+				return TaxiRequestStatus.PICKUP;
 
+			case PERFORMED:// continue
+		}
 
-    @Override
-    public MobsimPassengerAgent getPassenger()
-    {
-        return passenger;
-    }
+		switch (dropoffTask.getStatus()) {
+			case PLANNED:
+				return TaxiRequestStatus.RIDE;
 
+			case STARTED:
+				return TaxiRequestStatus.DROPOFF;
 
-    public TaxiPickupTask getPickupTask()
-    {
-        return pickupTask;
-    }
+			case PERFORMED:
+				return TaxiRequestStatus.PERFORMED;
+		}
 
-
-    public void setPickupTask(TaxiPickupTask pickupTask)
-    {
-        this.pickupTask = pickupTask;
-    }
-
-
-    public TaxiOccupiedDriveTask getDriveWithPassengerTask()
-    {
-        return occupiedDriveTask;
-    }
-
-
-    public void setOccupiedDriveTask(TaxiOccupiedDriveTask occupiedDriveTask)
-    {
-        this.occupiedDriveTask = occupiedDriveTask;
-    }
-
-
-    public TaxiDropoffTask getDropoffTask()
-    {
-        return dropoffTask;
-    }
-
-
-    public void setDropoffTask(TaxiDropoffTask dropoffTask)
-    {
-        this.dropoffTask = dropoffTask;
-    }
-
-
-    public TaxiRequestStatus getStatus()
-    {
-        if (pickupTask == null) {
-            return TaxiRequestStatus.UNPLANNED;
-        }
-
-        switch (pickupTask.getStatus()) {
-            case PLANNED:
-                if (pickupTask.getSchedule().getStatus() == ScheduleStatus.PLANNED) {
-                    return TaxiRequestStatus.PLANNED;
-                }
-
-                TaxiTask currentTask = (TaxiTask)pickupTask.getSchedule().getCurrentTask();
-                if (currentTask.getTaxiTaskType() == TaxiTaskType.EMPTY_DRIVE && //
-                        pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
-                    return TaxiRequestStatus.TAXI_DISPATCHED;
-                }
-
-                return TaxiRequestStatus.PLANNED;
-
-            case STARTED:
-                return TaxiRequestStatus.PICKUP;
-
-            case PERFORMED://continue
-        }
-
-        if (occupiedDriveTask.getStatus() == TaskStatus.STARTED) {
-            return TaxiRequestStatus.RIDE;
-        }
-
-        switch (dropoffTask.getStatus()) {
-            case STARTED:
-                return TaxiRequestStatus.DROPOFF;
-
-            case PERFORMED:
-                return TaxiRequestStatus.PERFORMED;
-
-            case PLANNED://illegal
-        }
-
-        throw new IllegalStateException("Unreachable code");
-    }
+		throw new IllegalStateException("Unreachable code");
+	}
 }

@@ -179,8 +179,8 @@ public class TripAnalyzerSrVV1 {
 	    	// reliant on variable "V_ANDPKW_MF": 0/1
 	    	int useOtherCarPool = trip.getUseOtherCarPool();
 
-	    	String activityEndActType = trip.getActivityEndActType();
-	    	String activityStartActType = trip.getActivityStartActType();
+	    	String activityEndActType = trip.getActivityTypeBeforeTrip();
+	    	String activityStartActType = trip.getActivityTypeAfterTrip();
 
 	    	if (onlyHomeAndWork == true) {
 	    		if ((activityEndActType.equals("home") && activityStartActType.equals("work")) || 
@@ -296,7 +296,7 @@ public class TripAnalyzerSrVV1 {
 	    		// store activities in a map
 	    		// reliant on variable "V_ZWECK": -9 = no data
 	    		// "V_ZWECK" - end of trip = start of activity
-	    		String activityType = trip.getActivityStartActType();
+	    		String activityType = trip.getActivityTypeAfterTrip();
 	    		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, weight);
 	    		aggregateWeightActivityTypes = aggregateWeightActivityTypes + weight;
 	    		

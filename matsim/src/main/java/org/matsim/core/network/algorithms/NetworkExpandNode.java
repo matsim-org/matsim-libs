@@ -37,7 +37,7 @@ import java.util.*;
  * @author balmermi
  * @author mrieser / senozon
  */
-public class NetworkExpandNode {
+public final class NetworkExpandNode {
 
 	private final Network network;
 	private double expRadius = 1.0;

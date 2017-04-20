@@ -50,7 +50,8 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.southafrica.freight.digicore.algorithms.concaveHull.ConcaveHull;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.ClusterActivity;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.DigicoreCluster;
-import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
+import playground.southafrica.freight.digicore.algorithms.postclustering.ClusteredChainGenerator;
+import playground.southafrica.freight.digicore.algorithms.postclustering.FacilityToActivityAssigner;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 import playground.southafrica.freight.digicore.io.DigicoreVehiclesReader;
@@ -71,7 +72,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Class to cluster the activities of Digicore vehicles' activity chains using
  * the {@link DJCluster} approach. Once clustered, the activity chains are <i>not</i>
  * adjusted. Rather, the clustering outputs can be used as inputs to a class 
- * such as {@link ClusteredChainGenerator}. 
+ * such as {@link ClusteredChainGenerator} (now deprecated) or {@link FacilityToActivityAssigner}. 
  *
  * @author jwjoubert
  */
@@ -128,8 +129,8 @@ public class DigicoreClusterRunner {
 		LOG.info(" Clustering the points...");
 		
 		/* These values should be set following Meintjes and Joubert, City Logistics paper? */
-		double[] radii = {20}; ////, 10, 15, 20, 25, 30, 35, 40};
-		int[] pmins = {20}; //, 10, 15, 20, 25};
+		double[] radii = {10}; ////, 10, 15, 20, 25, 30, 35, 40};
+		int[] pmins = {10}; //, 10, 15, 20, 25};
 
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
@@ -143,7 +144,7 @@ public class DigicoreClusterRunner {
 				String outputFolder = String.format("%s%.0f_%d/", outputFolderName, thisRadius, thisPmin);
 				String theFacilityFile = outputFolder + String.format("%.0f_%d_facilities.xml.gz", thisRadius, thisPmin);
 				String theFacilityAttributeFile = outputFolder + String.format("%.0f_%d_facilityAttributes.xml.gz", thisRadius, thisPmin);
-				String theFacilityCsvFile = outputFolder + String.format("%.0f_%d_facilityCsv.csv", thisRadius, thisPmin);
+				String theFacilityCsvFile = outputFolder + String.format("%.0f_%d_facilityCsv.csv.gz", thisRadius, thisPmin);
 				String facilityPointFolder = String.format("%sfacilityPoints/", outputFolder);
 				
 				/* Create the output folders. If it exists... first delete it. */
@@ -319,7 +320,7 @@ public class DigicoreClusterRunner {
 					 * Update (20130627): Or, rather write out the concave hull. */
 					/* FIXME Consider 'not' writing the facilities to file, as 
 					 * this takes up a HUGE amount of disk space (JWJ Nov '13) */
-					String clusterFile = String.format("%s%.0f_%d_points_%s.csv", outputFolder, radius, minimumPoints, facilityId.toString());
+					String clusterFile = String.format("%s%.0f_%d_points_%s.csv.gz", outputFolder, radius, minimumPoints, facilityId.toString());
 					BufferedWriter bw = IOUtils.getBufferedWriter(clusterFile);
 					try{
 						bw.write("Long,Lat");

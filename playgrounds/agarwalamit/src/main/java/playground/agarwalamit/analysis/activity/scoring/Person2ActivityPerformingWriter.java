@@ -38,7 +38,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -136,7 +136,7 @@ public class Person2ActivityPerformingWriter {
 
 	private void storeUtilOfPerforming(final Scenario sc, final Person p, final Activity activity) {
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
-			final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(sc, p.getId()).build();
+			final ScoringParameters params = new ScoringParameters.Builder(sc, p.getId()).build();
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {

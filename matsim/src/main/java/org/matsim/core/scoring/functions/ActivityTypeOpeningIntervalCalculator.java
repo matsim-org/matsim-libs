@@ -3,9 +3,9 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.population.Activity;
 
 public class ActivityTypeOpeningIntervalCalculator implements OpeningIntervalCalculator {
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 
-	public ActivityTypeOpeningIntervalCalculator(CharyparNagelScoringParameters params) {
+	public ActivityTypeOpeningIntervalCalculator(ScoringParameters params) {
 		this.params = params;
 	}
 

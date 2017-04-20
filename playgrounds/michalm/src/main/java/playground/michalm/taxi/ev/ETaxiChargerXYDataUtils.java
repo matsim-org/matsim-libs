@@ -24,47 +24,36 @@ import org.matsim.api.core.v01.Coord;
 import playground.michalm.ev.data.*;
 import playground.michalm.util.XYDataCollector.XYDataCalculator;
 
+public class ETaxiChargerXYDataUtils {
+	public static XYDataCalculator<Charger> createChargerOccupancyCalculator(final EvData evData, boolean relative) {
+		String[] header = relative ? //
+				new String[] { "plugs", "plugged_rel", "queued_rel", "assigned_rel" } //
+				: new String[] { "plugs", "plugged", "queued", "assigned" };
 
-public class ETaxiChargerXYDataUtils
-{
-    public static XYDataCalculator<Charger> createChargerOccupancyCalculator(final EvData evData,
-            boolean relative)
-    {
-        String[] header = relative ? //
-                new String[] { "plugs", "plugged_rel", "queued_rel", "assigned_rel" } //
-                : new String[] { "plugs", "plugged", "queued", "assigned" };
+		return new XYDataCalculator<Charger>() {
+			@Override
+			public String[] getHeader() {
+				return header;
+			}
 
-        return new XYDataCalculator<Charger>() {
-            @Override
-            public String[] getHeader()
-            {
-                return header;
-            }
+			@Override
+			public Coord getCoord(Charger charger) {
+				return charger.getCoord();
+			}
 
+			@Override
+			public String[] calculate(Charger charger) {
+				ETaxiChargingLogic logic = (ETaxiChargingLogic)charger.getLogic();
+				int plugs = charger.getPlugs();
+				return new String[] { charger.getPlugs() + "", //
+						getValue(logic.getPluggedCount(), plugs, relative), //
+						getValue(logic.getQueuedCount(), plugs, relative), //
+						getValue(logic.getAssignedCount(), plugs, relative) };
+			}
 
-            @Override
-            public Coord getCoord(Charger charger)
-            {
-                return charger.getCoord();
-            }
-
-
-            @Override
-            public String[] calculate(Charger charger)
-            {
-                ETaxiChargingLogic logic = (ETaxiChargingLogic)charger.getLogic();
-                int plugs = charger.getPlugs();
-                return new String[] { charger.getPlugs() + "", //
-                        getValue(logic.getPluggedCount(), plugs, relative), //
-                        getValue(logic.getQueuedCount(), plugs, relative), //
-                        getValue(logic.getAssignedCount(), plugs, relative) };
-            }
-
-
-            private String getValue(int count, int plugs, boolean relative)
-            {
-                return relative ? ((double)count / plugs) + "" : count + "";
-            }
-        };
-    }
+			private String getValue(int count, int plugs, boolean relative) {
+				return relative ? ((double)count / plugs) + "" : count + "";
+			}
+		};
+	}
 }

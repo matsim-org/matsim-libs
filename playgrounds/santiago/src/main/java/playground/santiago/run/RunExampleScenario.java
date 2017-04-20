@@ -21,8 +21,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingModule;
 
@@ -66,10 +66,10 @@ public class RunExampleScenario {
 			controler.addOverridingModule(new CadytsCarModule());
 			controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 				@Inject CadytsContext cadytsContext;
-				@Inject CharyparNagelScoringParametersForPerson parameters;
+				@Inject ScoringParametersForPerson parameters;
 				@Override
 				public ScoringFunction createNewScoringFunction(Person person) {
-					final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+					final ScoringParameters params = parameters.getScoringParameters(person);
 					
 					SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
@@ -113,10 +113,10 @@ public class RunExampleScenario {
 			controler.addOverridingModule(new CadytsCarModule());
 			controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 				@Inject CadytsContext cadytsContext;
-				@Inject CharyparNagelScoringParametersForPerson parameters;
+				@Inject ScoringParametersForPerson parameters;
 				@Override
 				public ScoringFunction createNewScoringFunction(Person person) {
-					final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+					final ScoringParameters params = parameters.getScoringParameters(person);
 					
 					SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));

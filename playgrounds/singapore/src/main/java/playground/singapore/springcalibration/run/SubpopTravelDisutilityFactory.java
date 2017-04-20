@@ -4,14 +4,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
 public class SubpopTravelDisutilityFactory implements TravelDisutilityFactory {
 	
-	private CharyparNagelScoringParametersForPerson params;
+	private ScoringParametersForPerson params;
 	private String mode = TransportMode.car;
 	
-	public SubpopTravelDisutilityFactory(CharyparNagelScoringParametersForPerson params, String mode) {
+	public SubpopTravelDisutilityFactory(ScoringParametersForPerson params, String mode) {
 		this.params = params;
 		this.mode = mode;
 	}

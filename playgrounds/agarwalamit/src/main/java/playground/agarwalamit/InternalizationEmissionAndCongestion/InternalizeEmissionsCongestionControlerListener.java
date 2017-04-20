@@ -20,6 +20,7 @@ package playground.agarwalamit.InternalizationEmissionAndCongestion;
 
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,8 +51,8 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	private final Logger logger = Logger.getLogger(InternalizeEmissionsCongestionControlerListener.class);
 
 	private MatsimServices controler;
-	private final EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
+	@Inject private EmissionModule emissionModule;
+	@Inject private EmissionCostModule emissionCostModule;
 	private String emissionEventOutputFile;
 	private EventWriterXML emissionEventWriter;
 	private EmissionInternalizationHandler emissionInternalizationHandler;
@@ -61,15 +62,11 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	int firstIt;
 	int lastIt;
 
-	private final MutableScenario scenario;
+	@Inject private MutableScenario scenario;
 	private final TollHandler tollHandler;
 	private CongestionHandlerImplV3 congestionHandler;
 
-
-	public InternalizeEmissionsCongestionControlerListener(EmissionModule emissionModule, EmissionCostModule emissionCostModule,MutableScenario scenario, TollHandler tollHandler) {
-		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
-		this.scenario = scenario;
+	public InternalizeEmissionsCongestionControlerListener(TollHandler tollHandler) {
 		this.tollHandler = tollHandler;
 	}
 
@@ -79,9 +76,6 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 
 		EventsManager eventsManager = this.controler.getEvents();
 		this.congestionHandler = new CongestionHandlerImplV3(eventsManager, this.scenario);
-
-		eventsManager.addHandler(this.emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(this.emissionModule.getColdEmissionHandler());
 
 		eventsManager.addHandler(this.congestionHandler);
 		eventsManager.addHandler(new MarginalCongestionPricingHandler(eventsManager, scenario));
@@ -134,7 +128,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		this.emissionModule.writeEmissionInformation(this.emissionEventOutputFile);
+		this.emissionModule.writeEmissionInformation();
 	}
 
 	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {

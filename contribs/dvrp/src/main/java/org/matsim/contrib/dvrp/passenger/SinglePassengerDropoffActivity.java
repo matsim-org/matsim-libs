@@ -23,30 +23,22 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dynagent.DynAgent;
 
+public class SinglePassengerDropoffActivity extends VrpActivity {
+	private final PassengerEngine passengerEngine;
+	private final DynAgent driver;
+	private final PassengerRequest request;
 
-public class SinglePassengerDropoffActivity
-    extends VrpActivity
-{
-    private final PassengerEngine passengerEngine;
-    private final StayTask dropoffTask;
-    private final PassengerRequest request;
+	public SinglePassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask dropoffTask,
+			PassengerRequest request, String activityType) {
+		super(activityType, dropoffTask);
 
+		this.passengerEngine = passengerEngine;
+		this.driver = driver;
+		this.request = request;
+	}
 
-    public SinglePassengerDropoffActivity(PassengerEngine passengerEngine, StayTask dropoffTask,
-            PassengerRequest request, String activityType)
-    {
-        super(activityType, dropoffTask);
-
-        this.passengerEngine = passengerEngine;
-        this.dropoffTask = dropoffTask;
-        this.request = request;
-    }
-
-
-    @Override
-    public void finalizeAction(double now)
-    {
-        DynAgent driver = dropoffTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-        passengerEngine.dropOffPassenger(driver, request, now);
-    }
+	@Override
+	public void finalizeAction(double now) {
+		passengerEngine.dropOffPassenger(driver, request, now);
+	}
 }

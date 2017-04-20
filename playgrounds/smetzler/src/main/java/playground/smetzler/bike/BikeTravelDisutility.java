@@ -26,17 +26,17 @@ public class BikeTravelDisutility implements TravelDisutility {
 
 	int linkCount=0;
 	double individualDis;
-	
+
 	private final static Logger log = Logger.getLogger(BikeTravelTime.class);
 
 	ObjectAttributes bikeAttributes;
 	double marginalUtilityOfTime;
 	double marginalUtilityOfDistance;
-//	double marginalUtilityOfComfort;
+	//	double marginalUtilityOfComfort;
 	double marginalUtilityOfStreettype;
 	double marginalUtilityOfSurfacetype;
 
-	
+
 
 	BikeTravelDisutility(BikeConfigGroup bikeConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup) {
 		//get infos from ObjectAttributes
@@ -48,7 +48,7 @@ public class BikeTravelDisutility implements TravelDisutility {
 
 		marginalUtilityOfStreettype = 	Double.valueOf(bikeConfigGroup.getMarginalUtilityOfStreettype()).doubleValue();
 		marginalUtilityOfSurfacetype = 	Double.valueOf(bikeConfigGroup.getMarginalUtilityOfSurfacetype()).doubleValue();
-		
+
 		//deprectated
 		//referenceBikeSpeed = Double.valueOf(bikeConfigGroup.getReferenceBikeSpeed()).doubleValue();
 		//marginalUtilityOfComfort = 	Double.valueOf(bikeConfigGroup.getMarginalUtilityOfComfort()).doubleValue();
@@ -123,7 +123,7 @@ public class BikeTravelDisutility implements TravelDisutility {
 			case "asphalt;paving_stones:35":surfaceFactor=  60; break;
 			case "paving_stones:3": 		surfaceFactor=  40; break;
 
-		//	default: 						surfaceFactor=  70; //log.info(surface + " surface not recognized");
+			//	default: 						surfaceFactor=  70; //log.info(surface + " surface not recognized");
 			default: 						surfaceFactor=  85; //log.info(surface + " surface not recognized");
 			}
 		}
@@ -206,72 +206,74 @@ public class BikeTravelDisutility implements TravelDisutility {
 
 		// SLOPE
 		//add disutility for slope here, makes sense for hilly cities, but left aside for berlin
-		
-		
+
+
 
 		// adding a randomfactor to disutility calculation
 		Random r = new Random();
 		double standardDeviation = 0.2;
 		int mean = 1;
 		double randomfactor = r.nextGaussian() * standardDeviation + mean;
+		// yyyyyy in the randomized toll disutility this is LOGnormal.  Should be made consistent, or an argument provided why in the different cases different
+		// mathematical forms make sense.  kai, feb'17
 
 		double travelTimeDisutility        = -(marginalUtilityOfTime/3600 * travelTime);
 		double distanceDisutility	       = -(marginalUtilityOfDistance  *   distance);
-		
+
 		double surfaceDisutility_util_m    = -(marginalUtilityOfSurfacetype * (100-surfaceFactor)/100);   //     (Math.pow((1/surfaceFactor), 2) + Math.pow((1/streetFactor), 2)); //TODO vielleicht quadratisch?
 		double streettypeDisutility_util_m = -(marginalUtilityOfStreettype  * (100- streetFactor)/100);        //     (Math.pow((1/surfaceFactor), 2) + Math.pow((1/streetFactor), 2)); //TODO vielleicht quadratisch?
 		double surfaceDisutility 	    = surfaceDisutility_util_m    * distance;
 		double streettypeDisutility 	= streettypeDisutility_util_m * distance;
-		
+
 
 		double disutility = (travelTimeDisutility + distanceDisutility + streettypeDisutility + surfaceDisutility) * randomfactor;
 
-		
+
 		//String person123 = person.getId().toString();
-//		if (person.getId().toString().equals("bike_home1_work1_0")) {
-//			individualDis = individualDis+ disutility;
-//			linkCount++;
-//			log.info(linkCount + "   "+disutility + "  " + individualDis);
-//			log.info("current link: " + "length: " + distance + "traveltime:  " + travelTime);
-//			log.info("further attributes: " + highway + "   " + cyclewaytype + "   " + surface);
-//			log.info(" ");
-//
-//		}
-//				
+		//		if (person.getId().toString().equals("bike_home1_work1_0")) {
+		//			individualDis = individualDis+ disutility;
+		//			linkCount++;
+		//			log.info(linkCount + "   "+disutility + "  " + individualDis);
+		//			log.info("current link: " + "length: " + distance + "traveltime:  " + travelTime);
+		//			log.info("further attributes: " + highway + "   " + cyclewaytype + "   " + surface);
+		//			log.info(" ");
+		//
+		//		}
+		//				
 		//// example from RandomizingTimeDistanceTravelDisutility
 		//	double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		//	return this.marginalCostOfTime * travelTime + logNormalRnd * this.marginalCostOfDistance * link.getLength();
 
 
-//		//for calibration:	
-//			System.out.println("Link "+ link.getId());
-//			System.out.println("marginalUtilityOfTime     " + marginalUtilityOfTime);
-//			System.out.println("marginalUtilityOfDistance " + marginalUtilityOfDistance);
-//			System.out.println("marginalUtilityOfComfort  " + marginalUtilityOfComfort);
-//			
-//			System.out.println("travelTime    " + travelTime);
-//			System.out.println("distance      " + distance);
-//			System.out.println("surface " + surface);
-//			System.out.println("surfaceFactor " + surfaceFactor);
-//			System.out.println("cyclewaytype " + cyclewaytype);
-//			System.out.println("highway " + highway);
-//			System.out.println("streetFactor  " + streetFactor);
-//		
-//			System.out.println("travelTimeDisutility      " + travelTimeDisutility);
-//			System.out.println("distanceDisutility        " + distanceDisutility);
-////			System.out.println("comfortDisutility_util_m  " + comfortDisutility_util_m);
-////			System.out.println("comfortDisutility         " + comfortDisutility);
-//			
-//			System.out.println("surfaceDisutility_util_m     " + surfaceDisutility_util_m);
-//			System.out.println("surfaceDisutility            " + surfaceDisutility);
-//			System.out.println("streettypeDisutility_util_m  " + streettypeDisutility_util_m);
-//			System.out.println("streettypeDisutility         " + streettypeDisutility);
-//			double sum = streettypeDisutility+surfaceDisutility;
-//			System.out.println("sum         " + sum);
-//
-//			
-//			System.out.println("disutility           " + disutility);
-//			System.out.println(" ");
+		//		//for calibration:	
+		//			System.out.println("Link "+ link.getId());
+		//			System.out.println("marginalUtilityOfTime     " + marginalUtilityOfTime);
+		//			System.out.println("marginalUtilityOfDistance " + marginalUtilityOfDistance);
+		//			System.out.println("marginalUtilityOfComfort  " + marginalUtilityOfComfort);
+		//			
+		//			System.out.println("travelTime    " + travelTime);
+		//			System.out.println("distance      " + distance);
+		//			System.out.println("surface " + surface);
+		//			System.out.println("surfaceFactor " + surfaceFactor);
+		//			System.out.println("cyclewaytype " + cyclewaytype);
+		//			System.out.println("highway " + highway);
+		//			System.out.println("streetFactor  " + streetFactor);
+		//		
+		//			System.out.println("travelTimeDisutility      " + travelTimeDisutility);
+		//			System.out.println("distanceDisutility        " + distanceDisutility);
+		////			System.out.println("comfortDisutility_util_m  " + comfortDisutility_util_m);
+		////			System.out.println("comfortDisutility         " + comfortDisutility);
+		//			
+		//			System.out.println("surfaceDisutility_util_m     " + surfaceDisutility_util_m);
+		//			System.out.println("surfaceDisutility            " + surfaceDisutility);
+		//			System.out.println("streettypeDisutility_util_m  " + streettypeDisutility_util_m);
+		//			System.out.println("streettypeDisutility         " + streettypeDisutility);
+		//			double sum = streettypeDisutility+surfaceDisutility;
+		//			System.out.println("sum         " + sum);
+		//
+		//			
+		//			System.out.println("disutility           " + disutility);
+		//			System.out.println(" ");
 
 		return disutility;
 

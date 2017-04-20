@@ -27,80 +27,66 @@ import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.zone.*;
 
+public class UnplannedRequestZonalRegistry {
+	private final ZonalSystem zonalSystem;
+	private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
+	private final Map<Id<Zone>, Map<Id<Request>, TaxiRequest>> requestsInZones;
 
-public class UnplannedRequestZonalRegistry
-{
-    private final ZonalSystem zonalSystem;
-    private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
-    private final Map<Id<Zone>, Map<Id<Request>, TaxiRequest>> requestsInZones;
+	private int requestCount = 0;
 
-    private int requestCount = 0;
+	public UnplannedRequestZonalRegistry(ZonalSystem zonalSystem) {
+		this.zonalSystem = zonalSystem;
+		zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
 
+		requestsInZones = new HashMap<>(zonalSystem.getZones().size());
+		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
+			requestsInZones.put(id, new HashMap<Id<Request>, TaxiRequest>());
+		}
+	}
 
-    public UnplannedRequestZonalRegistry(ZonalSystem zonalSystem)
-    {
-        this.zonalSystem = zonalSystem;
-        zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
+	// after submitted
+	public void addRequest(TaxiRequest request) {
+		Id<Zone> zoneId = getZoneId(request);
 
-        requestsInZones = new HashMap<>(zonalSystem.getZones().size());
-        for (Id<Zone> id : zonalSystem.getZones().keySet()) {
-            requestsInZones.put(id, new HashMap<Id<Request>, TaxiRequest>());
-        }
-    }
+		if (requestsInZones.get(zoneId).put(request.getId(), request) != null) {
+			throw new IllegalStateException(request + " is already in the registry");
+		}
 
+		requestCount++;
+	}
 
-    //after submitted
-    public void addRequest(TaxiRequest request)
-    {
-        Id<Zone> zoneId = getZoneId(request);
+	// after scheduled
+	public void removeRequest(TaxiRequest request) {
+		Id<Zone> zoneId = getZoneId(request);
 
-        if (requestsInZones.get(zoneId).put(request.getId(), request) != null) {
-            throw new IllegalStateException(request + " is already in the registry");
-        }
+		if (requestsInZones.get(zoneId).remove(request.getId()) == null) {
+			throw new IllegalStateException(request + " is not in the registry");
+		}
 
-        requestCount++;
-    }
+		requestCount--;
+	}
 
+	public List<TaxiRequest> findNearestRequests(Node node, int minCount) {
+		Zone zone = zonalSystem.getZone(node);
+		Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
+		List<TaxiRequest> nearestReqs = new ArrayList<>();
 
-    //after scheduled
-    public void removeRequest(TaxiRequest request)
-    {
-        Id<Zone> zoneId = getZoneId(request);
+		for (Zone z : zonesByDistance) {
+			nearestReqs.addAll(requestsInZones.get(z.getId()).values());
 
-        if (requestsInZones.get(zoneId).remove(request.getId()) == null) {
-            throw new IllegalStateException(request + " is not in the registry");
-        }
+			if (nearestReqs.size() >= minCount) {
+				return nearestReqs;
+			}
+		}
 
-        requestCount--;
-    }
+		return nearestReqs;
+	}
 
+	private Id<Zone> getZoneId(TaxiRequest request) {
+		return zonalSystem.getZone(request.getFromLink().getFromNode()).getId();
+	}
 
-    public Iterable<TaxiRequest> findNearestRequests(Node node, int minCount)
-    {
-        Zone zone = zonalSystem.getZone(node);
-        Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
-        List<TaxiRequest> nearestReqs = new ArrayList<>();
-
-        for (Zone z : zonesByDistance) {
-            nearestReqs.addAll(requestsInZones.get(z.getId()).values());
-
-            if (nearestReqs.size() >= minCount) {
-                return nearestReqs;
-            }
-        }
-
-        return nearestReqs;
-    }
-
-
-    private Id<Zone> getZoneId(TaxiRequest request)
-    {
-        return zonalSystem.getZone(request.getFromLink().getFromNode()).getId();
-    }
-
-
-    public int getRequestCount()
-    {
-        return requestCount;
-    }
+	public int getRequestCount() {
+		return requestCount;
+	}
 }

@@ -20,7 +20,7 @@
 
 package org.matsim.deprecated.scoring.functions;
 
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.MoneyScoring;
 
@@ -38,7 +38,7 @@ public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring, or
 
 	private final double marginalUtilityOfMoney;
 
-	public CharyparNagelMoneyScoring(final CharyparNagelScoringParameters params) {
+	public CharyparNagelMoneyScoring(final ScoringParameters params) {
 		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
 		this.reset();
 	}

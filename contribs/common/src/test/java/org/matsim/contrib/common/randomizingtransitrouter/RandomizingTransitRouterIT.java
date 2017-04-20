@@ -120,7 +120,7 @@ public class RandomizingTransitRouterIT {
 		}
 		{
 			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config)) ;
-			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.name() );
+			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
 			stratSets.setWeight(0.9);
 			config.strategy().addStrategySettings(stratSets);
 		}

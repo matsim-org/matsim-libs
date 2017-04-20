@@ -24,8 +24,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
+import com.google.inject.Inject;
+
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.IntegralApproach;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.data.LinkInfo;
 
@@ -36,29 +41,39 @@ import playground.ikaddoura.decongestion.data.LinkInfo;
  * @author ikaddoura
  */
 
-public class DecongestionTollingPID implements DecongestionTollSetting {
+public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeaveEventHandler {
 	private static final Logger log = Logger.getLogger(DecongestionTollingPID.class);
 	
-	private final DecongestionInfo congestionInfo;
-	private Map<Id<Link>, LinkInfo> linkId2infoPreviousTollComputation = new HashMap<>();
+	@Inject
+	private DecongestionInfo congestionInfo;
 	
-	private double K_p = Double.NaN;
-	private double K_i = Double.NaN;
-	private double K_d = Double.NaN;
-	
+	private Map<Id<Link>, LinkInfo> linkId2infoPreviousTollComputation = new HashMap<>();	
 	private int tollUpdateCounter = 0;
+	private final Map<Id<Link>, Map<Integer, Double>> linkId2time2totalDelayAllIterations = new HashMap<>();	
 	
-	public DecongestionTollingPID(DecongestionInfo congestionInfo) {
-		this.congestionInfo = congestionInfo;
-		K_p = congestionInfo.getDecongestionConfigGroup().getKp();
-		K_i = congestionInfo.getDecongestionConfigGroup().getKi();
-		K_d = congestionInfo.getDecongestionConfigGroup().getKd();
-	}
+	private final Map<Id<Link>, Map<Integer, Double>> linkId2time2avgDelayAllIterations = new HashMap<>();	
+	private final Map<Id<Link>, Map<Integer, Integer>> linkId2time2leavingAgents = new HashMap<>();
 
 	@Override
 	public void updateTolls() {
-	
+		
+		final double K_p = congestionInfo.getDecongestionConfigGroup().getKp();
+		final double K_i = congestionInfo.getDecongestionConfigGroup().getKi();
+		final double K_d = congestionInfo.getDecongestionConfigGroup().getKd();
+		
+		final String integralApproach = congestionInfo.getDecongestionConfigGroup().getIntegralApproach().toString();
+		
+		final double timeBinSize = (double) this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
+		final double capacityPeriod = this.congestionInfo.getScenario().getNetwork().getCapacityPeriod();
+		final double flowCapacityFactor = this.congestionInfo.getScenario().getConfig().qsim().getFlowCapFactor();
+		
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
+			
+			double flowCapacityHeadwaySec = Double.NEGATIVE_INFINITY;
+			if (K_i != 0. && integralApproach.equals(IntegralApproach.UnusedHeadway.toString())) {
+				flowCapacityHeadwaySec = capacityPeriod / ( this.congestionInfo.getScenario().getNetwork().getLinks().get(linkId).getCapacity() * flowCapacityFactor);
+			}
+
 			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
 				
 				// 0) compute e(t) = average delay
@@ -70,32 +85,97 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				double toll = 0.;
 				
 				// 1) proportional term
-				toll += this.K_p * averageDelay;
+				
+				if (K_p != 0.) {
+					toll += K_p * averageDelay;
+				}
 		
 				// 2) integral term
-				double totalDelay = 0.;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2value().containsKey(intervalNr)) {
-					// artificial reset to zero if congestion is eliminated
-					if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
-						totalDelay = 0.0;
-					} else {
-						totalDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2value().get(intervalNr) + averageDelay;
-					}
-					this.congestionInfo.getlinkInfos().get(linkId).getTime2value().put(intervalNr, totalDelay);
-				} else {
-					totalDelay = averageDelay;
-					this.congestionInfo.getlinkInfos().get(linkId).getTime2value().put(intervalNr, totalDelay);
-				}
-				toll += this.K_i * totalDelay;
+				
+//				// Ideen:
+				// --> letzten positiven averageDelay merken, und dann totalDelay -= lastAverageDelay ; --> DONE (alpha = 1.0)
+				// --> Mittel über die letzten positven averageDelays (exponential smoothing probably ok: lastAverageDelay = (1-alpha)*lastAvDelay + alpha*averageDelay ; ) --> DONE
+				// --> \propto * (1/flow - 1/cap, so etwas wie die "headway reserve" oder "unused time headway") --> DONE
 
-				// 3) derivative term
-				double previousDelay = 0.;
-				if (this.linkId2infoPreviousTollComputation.containsKey(linkId) && this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().containsKey(intervalNr)) {
-					previousDelay = this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);
+				if (K_i != 0.) {
+					double avgDelayAllIterations = 0.;
+					double unusedHeadway = 0.;
+
+					if (integralApproach.equals(IntegralApproach.Average.toString())) {
+						if (averageDelay > congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+							if (this.linkId2time2avgDelayAllIterations.get(linkId) == null) {
+								avgDelayAllIterations = averageDelay;
+								this.linkId2time2avgDelayAllIterations.put(linkId, new HashMap<>());
+							} else {
+								if (this.linkId2time2avgDelayAllIterations.get(linkId).get(intervalNr) == null) {
+									avgDelayAllIterations = averageDelay;
+								} else {
+									avgDelayAllIterations =  (1 - congestionInfo.getDecongestionConfigGroup().getIntegralApproachAverageAlpha()) * this.linkId2time2avgDelayAllIterations.get(linkId).get(intervalNr)
+											+ congestionInfo.getDecongestionConfigGroup().getIntegralApproachAverageAlpha() * averageDelay;
+								}
+							}
+							this.linkId2time2avgDelayAllIterations.get(linkId).put(intervalNr, avgDelayAllIterations);
+						}	
+					}
+					
+					if (integralApproach.equals(IntegralApproach.UnusedHeadway.toString())) {
+						double flowHeadwaySec = timeBinSize;
+						if (this.linkId2time2leavingAgents.get(linkId) != null && this.linkId2time2leavingAgents.get(linkId).get(intervalNr) != null) {
+							flowHeadwaySec = timeBinSize / this.linkId2time2leavingAgents.get(linkId).get(intervalNr);
+						}
+						unusedHeadway = flowHeadwaySec - flowCapacityHeadwaySec;
+						if (unusedHeadway < 0.) unusedHeadway = 0.; // there is no unused Headway
+					}
+
+					// update the total delay over all iterations
+					double totalDelayAllIterations = 0.;
+					if (linkId2time2totalDelayAllIterations.get(linkId) == null) {	
+						totalDelayAllIterations = averageDelay;
+						this.linkId2time2totalDelayAllIterations.put(linkId, new HashMap<>());
+					
+					} else {
+						
+						if (this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr) == null) {
+							totalDelayAllIterations = averageDelay;
+						
+						} else {	
+													
+							if (averageDelay <= congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+								
+								if (integralApproach.equals(IntegralApproach.Average.toString())) {
+									totalDelayAllIterations = this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr)
+											- avgDelayAllIterations;
+								} else if (integralApproach.equals(IntegralApproach.UnusedHeadway.toString())) {
+									totalDelayAllIterations = this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr)
+											- (congestionInfo.getDecongestionConfigGroup().getIntegralApproachUnusedHeadwayFactor() * unusedHeadway);
+								} else if (integralApproach.equals(IntegralApproach.Zero.toString())) {
+									totalDelayAllIterations = 0.;
+								} else {
+									throw new RuntimeException("Unknown integral approach. Aborting...");
+								}
+									
+							} else {
+								totalDelayAllIterations = this.linkId2time2totalDelayAllIterations.get(linkId).get(intervalNr) 
+										+ averageDelay;
+							}
+						}
+					}
+					this.linkId2time2totalDelayAllIterations.get(linkId).put(intervalNr, totalDelayAllIterations);				
+					toll += K_i * totalDelayAllIterations;
 				}
-			
-				double deltaDelay = averageDelay - previousDelay;
-				toll += this.K_d * deltaDelay;
+				
+				// 3) derivative term
+				
+				if (K_d != 0.) {
+					double previousDelay = 0.;
+					if (this.linkId2infoPreviousTollComputation.get(linkId) != null 
+							&& this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr) != null) {
+						previousDelay = this.linkId2infoPreviousTollComputation.get(linkId).getTime2avgDelay().get(intervalNr);
+					}
+				
+					double deltaDelay = averageDelay - previousDelay;
+					toll += K_d * deltaDelay;
+				}
 				
 				// 4) prevent negative tolls
 				if (toll < 0) {
@@ -105,7 +185,7 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				// 5) smoothen the tolls
 				
 				double previousToll = Double.NEGATIVE_INFINITY;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().containsKey(intervalNr)) {
+				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
 					previousToll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr);
 				}
 
@@ -128,16 +208,18 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 				}
 								
 				// 6) store the updated toll
-				Map<Integer, Double> time2toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll();
-				time2toll.put(intervalNr, smoothedToll);
+				if (smoothedToll > 0.) this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, smoothedToll);
 				
-//				if (intervalNr == 117) {
+				
+//				if (averageDelay == 0. && avgDelayAllIterations > 0.) {
 //					log.warn("link: " + linkId + " / time interval: " + intervalNr);
 //					log.warn("average delay: " + averageDelay);
-//					log.warn("total delay: " + totalDelay);
+//					log.warn("total delay: " + totalDelayAllIterations);
+//					log.warn("avgDelayAllIterations: " + avgDelayAllIterations);
 //					log.warn("previous delay: " + previousDelay);			
 //					log.warn("delta delay: " + deltaDelay);		
 //					log.warn("toll: " + smoothedToll);
+//					log.warn("------------------------");
 //				}
 			}	
 		}
@@ -160,5 +242,40 @@ public class DecongestionTollingPID implements DecongestionTollSetting {
 			linkId2infoPreviousTollComputation.put(linkId, linkInfoPreviousTollComputation);
 		}
 	}
+
+	@Override
+	public void reset(int iteration) {
+		this.linkId2time2leavingAgents.clear();
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		int timeBinNr = getIntervalNr(event.getTime());
+
+		Id<Link> linkId = event.getLinkId();
+		
+		if (linkId2time2leavingAgents.get(linkId) != null) {
+			
+			if (linkId2time2leavingAgents.get(linkId).get(timeBinNr) != null) {
+				int leavingAgents = linkId2time2leavingAgents.get(linkId).get(timeBinNr) + 1;
+				linkId2time2leavingAgents.get(linkId).put(timeBinNr, leavingAgents);
+				
+			} else {
+				linkId2time2leavingAgents.get(linkId).put(timeBinNr, 1);
+			}
+			
+		} else {
+			Map<Integer, Integer> time2leavingAgents = new HashMap<>();
+			time2leavingAgents.put(timeBinNr, 1);
+			linkId2time2leavingAgents.put(linkId, time2leavingAgents);
+			
+		}
+	}
+	
+	private int getIntervalNr(double time) {
+		double timeBinSize = congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();		
+		return (int) (time / timeBinSize);
+	}
+
 }
 

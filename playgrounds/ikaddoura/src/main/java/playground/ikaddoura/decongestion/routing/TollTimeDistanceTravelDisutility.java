@@ -20,6 +20,7 @@
 
 package playground.ikaddoura.decongestion.routing;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +38,8 @@ import playground.ikaddoura.decongestion.data.DecongestionInfo;
  * @author ikaddoura
  */
 public final class TollTimeDistanceTravelDisutility implements TravelDisutility {
-		
+	private static final Logger log = Logger.getLogger(TollTimeDistanceTravelDisutility.class);
+
 	private final TravelDisutility delegate;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private final DecongestionInfo info;
@@ -51,6 +53,8 @@ public final class TollTimeDistanceTravelDisutility implements TravelDisutility 
 		final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, cnScoringGroup );
 		builder.setSigma(sigma);
 		this.delegate = builder.createTravelDisutility(timeCalculator);
+
+		log.info("Using the toll-adjusted travel disutility in the decongestion package.");
 	}
 
 	@Override

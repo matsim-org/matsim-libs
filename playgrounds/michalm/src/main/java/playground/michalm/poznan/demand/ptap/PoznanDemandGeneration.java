@@ -32,75 +32,67 @@ import org.matsim.matrices.Matrix;
 
 import playground.michalm.demand.ODDemandGenerator;
 
+public class PoznanDemandGeneration {
+	public void generate(String inputDir, String plansFile, String transportMode) {
+		String networkFile = inputDir + "Matsim_2015_02/only_A/pt_network.xml";
+		// String networkFile = inputDir + "Matsim_2015_02/Poznan_2015_02_05_all.xml";
 
-public class PoznanDemandGeneration
-{
-    public void generate(String inputDir, String plansFile, String transportMode)
-    {
-        String networkFile = inputDir + "Matsim_2015_02/only_A/pt_network.xml";
-        //        String networkFile = inputDir + "Matsim_2015_02/Poznan_2015_02_05_all.xml";
+		String zonesXmlFile = inputDir + "Matsim_2015_02/zones.xml";
+		String zonesShpFile = inputDir + "Osm_2015_02/zones.SHP";
 
-        String zonesXmlFile = inputDir + "Matsim_2015_02/zones.xml";
-        String zonesShpFile = inputDir + "Osm_2015_02/zones.SHP";
+		String demandDir = inputDir + "Visum_2014/demand/";
+		// String hourlySharesFile = demandDir + "hourly_shares_KI.txt";
+		// String bindingsFile = demandDir + "bindings_KI-poj.txt";
+		String hourlySharesFile = demandDir + "hourly_shares_KZ.txt";
+		String activityPairsFile = demandDir + "activity_pairs_KZ.txt";
+		String bindingsFile = demandDir + "bindings_KZ.txt";
 
-        String demandDir = inputDir + "Visum_2014/demand/";
-        //        String hourlySharesFile = demandDir + "hourly_shares_KI.txt";
-        //        String bindingsFile = demandDir + "bindings_KI-poj.txt";
-        String hourlySharesFile = demandDir + "hourly_shares_KZ.txt";
-        String activityPairsFile = demandDir + "activity_pairs_KZ.txt";
-        String bindingsFile = demandDir + "bindings_KZ.txt";
+		int randomSeed = RandomUtils.DEFAULT_SEED;
+		RandomUtils.reset(randomSeed);
 
-        int randomSeed = RandomUtils.DEFAULT_SEED;
-        RandomUtils.reset(randomSeed);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		Map<Id<Zone>, Zone> zones = Zones.readZones(zonesXmlFile, zonesShpFile);
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-        Map<Id<Zone>, Zone> zones = Zones.readZones(zonesXmlFile, zonesShpFile);
+		ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, false);
 
-        ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, false);
+		Map<String, double[]> hourlyShares = VisumDemandDataReader.readHourlyShares(hourlySharesFile);
 
-        Map<String, double[]> hourlyShares = VisumDemandDataReader
-                .readHourlyShares(hourlySharesFile);
+		Map<String, Tuple<String, String>> activityPairs = VisumDemandDataReader.readActivityPairs(activityPairsFile);
 
-        Map<String, Tuple<String, String>> activityPairs = VisumDemandDataReader
-                .readActivityPairs(activityPairsFile);
+		Map<String, Matrix> odMatrices = VisumDemandDataReader.readODMatrices(bindingsFile, demandDir, zones);
 
-        Map<String, Matrix> odMatrices = VisumDemandDataReader.readODMatrices(bindingsFile,
-                demandDir, zones);
+		if (hourlyShares.size() != odMatrices.size()) {
+			throw new RuntimeException();
+		}
 
-        if (hourlyShares.size() != odMatrices.size()) {
-            throw new RuntimeException();
-        }
+		for (String key : hourlyShares.keySet()) {
+			double[] shares = hourlyShares.get(key);
+			Tuple<String, String> activityPair = activityPairs.get(key);
+			Matrix odMatrix = odMatrices.get(key);
+			int countBefore = scenario.getPopulation().getPersons().size();
 
-        for (String key : hourlyShares.keySet()) {
-            double[] shares = hourlyShares.get(key);
-            Tuple<String, String> activityPair = activityPairs.get(key);
-            Matrix odMatrix = odMatrices.get(key);
-            int countBefore = scenario.getPopulation().getPersons().size();
+			for (int i = 0; i < shares.length; i++) {
+				dg.generateSinglePeriod(odMatrix, activityPair.getFirst(), activityPair.getSecond(), transportMode,
+						i * 3600, 3600, shares[i]);
+			}
 
-            for (int i = 0; i < shares.length; i++) {
-                dg.generateSinglePeriod(odMatrix, activityPair.getFirst(), activityPair.getSecond(),
-                        transportMode, i * 3600, 3600, shares[i]);
-            }
+			int countAfter = scenario.getPopulation().getPersons().size();
+			int delta = countAfter - countBefore;
+			System.out.println("#trips generated for " + key + ": " + delta);
+		}
 
-            int countAfter = scenario.getPopulation().getPersons().size();
-            int delta = countAfter - countBefore;
-            System.out.println("#trips generated for " + key + ": " + delta);
-        }
+		dg.write(plansFile);
+	}
 
-        dg.write(plansFile);
-    }
+	public static void main(String[] args) {
+		String inputDir = "d:/GoogleDrive/Poznan/";
+		// String plansFile = "d:/PP-rad/poznan/test/pt_plans.xml.gz";
+		// String transportMode = TransportMode.pt;
 
+		String plansFile = "d:/PP-rad/poznan/test/KI-poj_plans.xml.gz";
+		String transportMode = TransportMode.car;
 
-    public static void main(String[] args)
-    {
-        String inputDir = "d:/GoogleDrive/Poznan/";
-        //        String plansFile = "d:/PP-rad/poznan/test/pt_plans.xml.gz";
-        //        String transportMode = TransportMode.pt;
-
-        String plansFile = "d:/PP-rad/poznan/test/KI-poj_plans.xml.gz";
-        String transportMode = TransportMode.car;
-
-        new PoznanDemandGeneration().generate(inputDir, plansFile, transportMode);
-    }
+		new PoznanDemandGeneration().generate(inputDir, plansFile, transportMode);
+	}
 }

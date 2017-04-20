@@ -22,6 +22,7 @@
  */
 package playground.jbischoff.csberlin.scenario;
 
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,7 +38,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
  */
 public class RunCSBerlinBasecaseWithParking {
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking_increase_poster.xml");
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/bmw_carsharing/data/scenario/configBCParking_increase_poster.xml", new DvrpConfigGroup());
 		String runId = "bc09_park_poster";
 		config.controler().setOutputDirectory("D:/runs-svn/bmw_carsharing/basecase/"+runId);
 		config.controler().setRunId(runId);

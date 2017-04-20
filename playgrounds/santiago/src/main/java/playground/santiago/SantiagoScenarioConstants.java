@@ -21,6 +21,8 @@ package playground.santiago;
 
 public final class SantiagoScenarioConstants {
 
+	public static final String COLECTIVOMODE = "colectivo";
+	
 	// additional modes
 	public enum Modes{
 							bus,

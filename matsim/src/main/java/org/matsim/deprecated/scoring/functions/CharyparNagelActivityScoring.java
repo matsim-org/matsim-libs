@@ -23,7 +23,7 @@ package org.matsim.deprecated.scoring.functions;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 
@@ -47,7 +47,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 	private static int firstLastActWarning = 0;
 	private static short firstLastActOpeningTimesWarning = 0;
 
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	private Activity currentActivity;
 	private boolean firstAct = true;
 
@@ -55,7 +55,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 
 	private static final Logger log = Logger.getLogger(CharyparNagelActivityScoring.class);
 
-	public CharyparNagelActivityScoring(final CharyparNagelScoringParameters params) {
+	public CharyparNagelActivityScoring(final ScoringParameters params) {
 		this.params = params;
 		this.reset();
 	}

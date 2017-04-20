@@ -208,14 +208,14 @@ public class ControlerTest {
 		controler.run();
 
 		// test if we got the right result
-		if ( this.isUsingFastCapacityUpdate ) {
+//		if ( this.isUsingFastCapacityUpdate ) {
 			// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
 			assertEquals("TravelTimeCalculator has wrong result",
 					150.5, controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
-		} else {
-			assertEquals("TravelTimeCalculator has wrong result",
-					151.0, controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
-		}
+//		} else {
+//			assertEquals("TravelTimeCalculator has wrong result",
+//					151.0, controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
+//		}
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controler().setLastIteration(1);
@@ -231,13 +231,13 @@ public class ControlerTest {
 		controler.run();
 
 		// test that the plans have the correct times
-		if ( this.isUsingFastCapacityUpdate ) {
+//		if ( this.isUsingFastCapacityUpdate ) {
 			assertEquals("ReRoute seems to have wrong travel times.",
 					150.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
-		} else {
-			assertEquals("ReRoute seems to have wrong travel times.",
-					151.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
-		}
+//		} else {
+//			assertEquals("ReRoute seems to have wrong travel times.",
+//					151.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
+//		}
 	}
 
 	/**

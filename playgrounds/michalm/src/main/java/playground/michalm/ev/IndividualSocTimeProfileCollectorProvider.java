@@ -19,7 +19,7 @@
 
 package playground.michalm.ev;
 
-import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -28,27 +28,19 @@ import com.google.inject.*;
 
 import playground.michalm.ev.data.EvData;
 
+public class IndividualSocTimeProfileCollectorProvider implements Provider<MobsimListener> {
+	private final EvData evData;
+	private final MatsimServices matsimServices;
 
-public class IndividualSocTimeProfileCollectorProvider
-    implements Provider<MobsimListener>
-{
-    private final EvData evData;
-    private final MatsimServices matsimServices;
+	@Inject
+	public IndividualSocTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices) {
+		this.evData = evData;
+		this.matsimServices = matsimServices;
+	}
 
-
-    @Inject
-    public IndividualSocTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
-    {
-        this.evData = evData;
-        this.matsimServices = matsimServices;
-    }
-
-
-    @Override
-    public MobsimListener get()
-    {
-        ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
-                EvTimeProfiles.createIndividualSocCalculator(evData));
-        return new TimeProfileCollector(calc, 300, "individual_soc_time_profiles", matsimServices);
-    }
+	@Override
+	public MobsimListener get() {
+		ProfileCalculator calc = EvTimeProfiles.createIndividualSocCalculator(evData);
+		return new TimeProfileCollector(calc, 300, "individual_soc_time_profiles", matsimServices);
+	}
 }

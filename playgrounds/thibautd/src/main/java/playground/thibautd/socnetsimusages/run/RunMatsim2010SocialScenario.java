@@ -102,8 +102,8 @@ public class RunMatsim2010SocialScenario {
 				} );
 
 
-					controller.run();
-				}
+		controller.run();
+	}
 
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );

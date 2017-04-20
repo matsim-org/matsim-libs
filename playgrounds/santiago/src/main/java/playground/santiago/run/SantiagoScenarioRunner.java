@@ -60,8 +60,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingModule;
@@ -90,7 +90,7 @@ public class SantiagoScenarioRunner {
 	private static boolean cadyts;
 	/***/
 
-	private static String simulationStep = "Step2b";
+	private static String simulationStep = "Step0_3";
 	private static String caseName = "baseCase1pct";
 	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/";
 
@@ -115,9 +115,9 @@ public class SantiagoScenarioRunner {
 			gantriesFile = inputPath + "inputFor" + simulationStep + "/gantries.xml";
 			policy=0;    
 			sigma=3 ;    
-			doModeChoice=true; 
+			doModeChoice=true; //TODO:BE AWARE OF THIS!
 			mapActs2Links=false;
-			cadyts=true;
+			cadyts=false; //TODO:BE AWARE OF THIS!
 		
 		}	
 			
@@ -161,10 +161,10 @@ public class SantiagoScenarioRunner {
 				// include cadyts into the plan scoring (this will add the cadyts corrections to the scores)
 				controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 					@Inject CadytsContext cadytsContext;
-					@Inject CharyparNagelScoringParametersForPerson parameters;
+					@Inject ScoringParametersForPerson parameters;
 					@Override
 					public ScoringFunction createNewScoringFunction(Person person) {
-						final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+						final ScoringParameters params = parameters.getScoringParameters(person);
 						
 						SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
@@ -261,7 +261,8 @@ public class SantiagoScenarioRunner {
 		StrategySettings changeExpSettings = new StrategySettings();
 		changeExpSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpSettings.setSubpopulation(subpopName);
-		changeExpSettings.setWeight(0.7);
+//		changeExpSettings.setWeight(0.85);
+		changeExpSettings.setWeight(0.7); //TODO: BE AWARE OF THIS!!!
 		controler.getConfig().strategy().addStrategySettings(changeExpSettings);
 	}
 

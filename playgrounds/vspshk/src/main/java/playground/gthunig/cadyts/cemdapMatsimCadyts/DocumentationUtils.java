@@ -15,17 +15,52 @@ public class DocumentationUtils {
 
 	public static final Logger log = Logger.getLogger(DocumentationUtils.class);
 
+	private static final String SEPERATOR = "\t-\t";
+
 	public static void main(String[] args) {
-		String rootRunDirectory = "../../../runs-svn/berlin_scenario_2016/be_100_1pct";
+		String rootRunDirectory = "../../../runs-svn/berlin_scenario_2016/be_109";
 		List<String> tripAnalyzerExtendedAnalysisDirectories = new ArrayList<>();
-		tripAnalyzerExtendedAnalysisDirectories.add("analysis_300_2");
-		tripAnalyzerExtendedAnalysisDirectories.add("analysis_300car_ber_dist_2");
+		tripAnalyzerExtendedAnalysisDirectories.add("analysis_300");
+		tripAnalyzerExtendedAnalysisDirectories.add("analysis_300_ber_dist");
+
+		String rootRunDirectory2 = "../../../runs-svn/berlin_scenario_2016/be_109a";
+		List<String> tripAnalyzerExtendedAnalysisDirectories2 = new ArrayList<>();
+		tripAnalyzerExtendedAnalysisDirectories2.add("analysis_300");
+		tripAnalyzerExtendedAnalysisDirectories2.add("analysis_300_ber_dist");
 		try {
 			List<String> output = searchDocumentationValues(rootRunDirectory, tripAnalyzerExtendedAnalysisDirectories);
-			output.forEach(System.out::println);
+			List<String> output2 = searchDocumentationValues(rootRunDirectory2, tripAnalyzerExtendedAnalysisDirectories2);
+
+			writeOutput(output2);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@SafeVarargs
+	private static void writeOutput(List<String>... outputLists) {
+		List<String> output = new ArrayList<>();
+
+		boolean instantiated = false;
+		for (List<String> outputList : outputLists) {
+			if (!instantiated) {
+				for (String outputLine : outputList) {
+					output.add(outputLine);
+				}
+				instantiated = true;
+			} else {
+				for (int i = 0; i < outputList.size(); i++) {
+					output.set(i, output.get(i) + SEPERATOR + outputList.get(i));
+				}
+			}
+		}
+
+		output.forEach(System.out::println);
+	}
+
+	private static void compare(List<String> output1, List<String> output2) {
+
 	}
 
 	private static List<String> searchDocumentationValues(String rootRunDirectory, List<String> tripAnalyzerExtendedAnalysisDirectories) throws IOException {

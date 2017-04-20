@@ -24,79 +24,58 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.michalm.ev.charging.ChargingLogic;
 
+public class ChargerImpl implements Charger {
+	private final Id<Charger> id;
+	private final double power;
+	private final int plugs;
+	private final Link link;
 
-public class ChargerImpl
-    implements Charger
-{
-    private final Id<Charger> id;
-    private final double power;
-    private final int plugs;
-    private final Link link;
+	private ChargingLogic logic;
 
-    private ChargingLogic logic;
+	public ChargerImpl(Id<Charger> id, double power, int plugs, Link link) {
+		this.id = id;
+		this.power = power;
+		this.plugs = plugs;
+		this.link = link;
+	}
 
+	@Override
+	public ChargingLogic getLogic() {
+		return logic;
+	}
 
-    public ChargerImpl(Id<Charger> id, double power, int plugs, Link link)
-    {
-        this.id = id;
-        this.power = power;
-        this.plugs = plugs;
-        this.link = link;
-    }
+	@Override
+	public void setLogic(ChargingLogic logic) {
+		this.logic = logic;
+	}
 
+	@Override
+	public Id<Charger> getId() {
+		return id;
+	}
 
-    @Override
-    public ChargingLogic getLogic()
-    {
-        return logic;
-    }
+	@Override
+	public double getPower() {
+		return power;
+	}
 
+	@Override
+	public int getPlugs() {
+		return plugs;
+	}
 
-    @Override
-    public void setLogic(ChargingLogic logic)
-    {
-        this.logic = logic;
-    }
+	@Override
+	public Link getLink() {
+		return link;
+	}
 
+	@Override
+	public Coord getCoord() {
+		return link.getCoord();
+	}
 
-    @Override
-    public Id<Charger> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public double getPower()
-    {
-        return power;
-    }
-
-
-    @Override
-    public int getPlugs()
-    {
-        return plugs;
-    }
-
-
-    @Override
-    public Link getLink()
-    {
-        return link;
-    }
-
-
-    @Override
-    public Coord getCoord()
-    {
-        return link.getCoord();
-    }
-
-
-    @Override
-    public void resetLogic()
-    {
-        logic.reset();
-    }
+	@Override
+	public void resetLogic() {
+		logic.reset();
+	}
 }

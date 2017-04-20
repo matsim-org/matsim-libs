@@ -27,6 +27,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
@@ -55,7 +56,9 @@ public class EmissionCostsByGroupsAndTimeBinsHandler implements WarmEmissionEven
 		for(int i=0; i<numberOfTimeBins; i++){
 			timeBin2group2link2flatEmissionCost.put(i, new GroupLinkFlatEmissions());
 		}
-		this.ecm = new EmissionCostModule(1.0);		
+		EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
+		emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.);
+		this.ecm = new EmissionCostModule(emissionsConfigGroup);
 	}
 	@Override
 	public void reset(int iteration) {	

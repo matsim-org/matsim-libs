@@ -22,16 +22,14 @@
  */
 package playground.southafrica.projects.complexNetworks.pathDependence;
 
-import java.io.File;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
+import playground.southafrica.freight.digicore.io.DigicoreVehiclesReader;
 import playground.southafrica.freight.digicore.utils.DigicoreChainCleaner;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
-import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 /** Class to build a path dependent complex network by reading all 
@@ -58,15 +56,17 @@ public class PathDependentNetworkBuilder {
 	public static void main(String[] args) {
 		Header.printHeader(PathDependentNetworkBuilder.class.toString(), args);
 		
-		String vehicleFolder = args[0];
+		String vehicleFile = args[0];
 		String outputFile = args[1];
-		
+		String description = args[2];
 		
 		PathDependentNetworkBuilder builder = new PathDependentNetworkBuilder(MatsimRandom.getRandom().nextLong());
-		builder.setNetworkDescription(args[2]);
+		builder.setNetworkDescription(description);
 		
-		List<File> vehicleFiles = FileUtils.sampleFiles(new File(vehicleFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
-		builder.network.buildNetwork(vehicleFiles);
+		/* Read the vehicle container. */
+		DigicoreVehicles vehicles = new DigicoreVehicles();
+		new DigicoreVehiclesReader(vehicles).readFile(vehicleFile);
+		builder.network.buildNetwork(vehicles);
 		
 		new DigicorePathDependentNetworkWriter(builder.network).write(outputFile);
 		

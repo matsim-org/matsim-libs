@@ -214,4 +214,11 @@ public class CompactUnmodifiablePlanMap implements Map<Id<Person>,Plan> {
 			return o1.getPerson().getId().compareTo( o2.getPerson().getId() );
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "CompactUnmodifiablePlanMap{" +
+					"size="+array.length+", " +
+					"plans="+Arrays.asList( array )+"}";
+	}
 }

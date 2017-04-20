@@ -5,7 +5,7 @@ import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
@@ -19,6 +19,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.analysis.AnalysisCrowdingControlerListener;
@@ -168,11 +169,21 @@ public class ControlerWithHeteroTollCrowdingComfort {
 
 		log.warn("About to init TransitRouterEventsHeteroWSFactory...");
 		if(simulationType.equals("homo")){
-			controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+				}
+			});
 		}else
 		{
 //			controler.addOverridingModule(new TransitRouterEventsAndHeterogeneityBasedWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
-			controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+				}
+			});
 		}
 
 		//Sun's Dwell Time model

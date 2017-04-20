@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -46,7 +46,7 @@ public class HerbieTravelTimeDistanceCostCalculator implements TravelDisutility 
 	public HerbieTravelTimeDistanceCostCalculator(
 			TravelTime timeCalculator,
 			PlanCalcScoreConfigGroup cnScoringGroup, // NOT delete, will be used for transit parameter...
-			CharyparNagelScoringParameters params, 
+			ScoringParameters params, 
 			HerbieConfigGroup herbieConfigGroup) {
 		super();
 		this.timeCalculator = timeCalculator;

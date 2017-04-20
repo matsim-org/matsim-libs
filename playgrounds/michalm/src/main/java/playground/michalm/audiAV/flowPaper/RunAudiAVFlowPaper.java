@@ -19,44 +19,38 @@
 
 package playground.michalm.audiAV.flowPaper;
 
+import org.matsim.contrib.av.flow.AvIncreasedCapacityModule;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.*;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.inject.name.Names;
 
-public class RunAudiAVFlowPaper
-{
-    public static void run(String configFile, String inputEvents)
-    {
-        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup());
-        final Controler controler = RunTaxiScenario.createControler(config, false);
+public class RunAudiAVFlowPaper {
+	public static void run(String configFile, double flowEfficiencyFactor, String inputEvents) {
+		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup());
+		final Controler controler = RunTaxiScenario.createControler(config, false);
 
-        final TravelTime initialTT = TravelTimeUtils
-                .createTravelTimesFromEvents(controler.getScenario(), inputEvents);
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install()
-            {
-//XXX this line is used in the 'flowpaper' (branch 'increasedFlowCapForAVs')
-//                bind(VehicleType.class).annotatedWith(Names.named(TaxiModule.TAXI_MODE))
-//                        .toInstance(VehicleUtils.AUTONOMOUS_VEHICLE_TYPE);
+		// to speed up computations
+		final TravelTime initialTT = TravelTimeUtils.createTravelTimesFromEvents(controler.getScenario(), inputEvents);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TravelTime.class).annotatedWith(Names.named(VrpTravelTimeModules.DVRP_INITIAL))
+						.toInstance(initialTT);
+			}
+		});
 
-                bind(VrpTravelTimeEstimator.Params.class).toInstance(
-                        new VrpTravelTimeEstimator.Params(initialTT, 0.05));
-            }
-        });
+		controler.addOverridingModule(new AvIncreasedCapacityModule(flowEfficiencyFactor));
 
-        controler.run();
-    }
+		controler.run();
+	}
 
-
-    public static void main(String[] args)
-    {
-//XXX this line is used in the 'flowpaper' (branch 'increasedFlowCapForAVs')
-//        VehicleUtils.avFlowFactor = Double.parseDouble(args[1]);
-//        System.out.println("VehicleUtils.avFlowFactor = " + VehicleUtils.avFlowFactor);
-        run(args[0], args[2]);
-    }
+	public static void main(String[] args) {
+		double flowEfficiencyFactor = Double.parseDouble(args[1]);
+		run(args[0], flowEfficiencyFactor, args[2]);
+	}
 }

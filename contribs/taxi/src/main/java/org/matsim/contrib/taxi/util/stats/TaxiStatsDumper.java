@@ -19,9 +19,9 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.*;
+import java.util.List;
 
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -31,82 +31,67 @@ import org.matsim.core.utils.io.IOUtils;
 
 import com.google.inject.Inject;
 
+public class TaxiStatsDumper implements AfterMobsimListener, ShutdownListener {
+	private static final String[] HEADER = { "iter", null, //
+			"PassWaitTime_avg", "PassWaitTime_sd", "PassWaitTime_95%ile", "PassWaitTime_max", null, //
+			"EmptyDriveRatio_fleetAvg", "EmptyDriveRatio_avg", "EmptyDriveRatio_sd", null, //
+			"StayRatio_fleetAvg", "StayRatio_avg", "StayRatio_sd", null, //
+			"OccupDriveRatio_fleetAvg" };
 
-public class TaxiStatsDumper
-    implements AfterMobsimListener, ShutdownListener
-{
-    private static final String[] HEADER = { "iter", null, //
-            "PassWaitTime_avg", "PassWaitTime_sd", "PassWaitTime_95%ile", "PassWaitTime_max", null, //
-            "EmptyDriveRatio_fleetAvg", "EmptyDriveRatio_avg", "EmptyDriveRatio_sd", null, //
-            "StayRatio_fleetAvg", "StayRatio_avg", "StayRatio_sd", null, //
-            "OccupDriveRatio_fleetAvg" };
+	private final Fleet fleet;
+	private final TaxiConfigGroup taxiCfg;
+	private final OutputDirectoryHierarchy controlerIO;
+	private final CompactCSVWriter multiDayWriter;
 
-    private final TaxiData taxiData;
-    private final TaxiConfigGroup taxiCfg;
-    private final OutputDirectoryHierarchy controlerIO;
-    private final CompactCSVWriter multiDayWriter;
+	@Inject
+	public TaxiStatsDumper(Fleet fleet, TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO) {
+		this.fleet = fleet;
+		this.taxiCfg = taxiCfg;
+		this.controlerIO = controlerIO;
+		multiDayWriter = new CompactCSVWriter(
+				IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_daily_stats.txt")));
+		multiDayWriter.writeNext(HEADER);
+	}
 
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		TaxiStatsCalculator calculator = new TaxiStatsCalculator(fleet.getVehicles().values());
 
-    @Inject
-    public TaxiStatsDumper(TaxiData taxiData, TaxiConfigGroup taxiCfg,
-            OutputDirectoryHierarchy controlerIO)
-    {
-        this.taxiData = taxiData;
-        this.taxiCfg = taxiCfg;
-        this.controlerIO = controlerIO;
-        multiDayWriter = new CompactCSVWriter(
-                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_daily_stats.txt")));
-        multiDayWriter.writeNext(HEADER);
-    }
+		appendToMultiDayStats(calculator.getDailyStats(), event);
 
+		if (taxiCfg.getDetailedStats()) {
+			writeDetailedStats(calculator.getTaxiStats(), event);
+		}
+	}
 
-    @Override
-    public void notifyAfterMobsim(AfterMobsimEvent event)
-    {
-        TaxiStatsCalculator calculator = new TaxiStatsCalculator(taxiData.getVehicles().values());
+	private void appendToMultiDayStats(TaxiStats s, AfterMobsimEvent event) {
+		multiDayWriter.writeNext(new CSVLineBuilder().add(event.getIteration() + "") //
+				.addEmpty() //
+				.addf("%.1f", s.passengerWaitTime.getMean()).addf("%.1f", s.passengerWaitTime.getStandardDeviation()) //
+				.addf("%.0f", s.passengerWaitTime.getPercentile(95)) //
+				.addf("%.0f", s.passengerWaitTime.getMax()) //
+				.addEmpty() //
+				.addf("%.4f", s.getFleetEmptyDriveRatio()) //
+				.addf("%.4f", s.vehicleEmptyDriveRatio.getMean()) //
+				.addf("%.4f", s.vehicleEmptyDriveRatio.getStandardDeviation()) //
+				.addEmpty() //
+				.addf("%.4f", s.getFleetStayRatio()) //
+				.addf("%.4f", s.vehicleStayRatio.getMean()) //
+				.addf("%.4f", s.vehicleStayRatio.getStandardDeviation()) //
+				.addEmpty() //
+				.addf("%.4f", s.getOccupiedDriveRatio()));
+		multiDayWriter.flush();
+	}
 
-        appendToMultiDayStats(calculator.getDailyStats(), event);
+	private void writeDetailedStats(List<TaxiStats> taxiStats, AfterMobsimEvent event) {
+		String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
 
-        if (taxiCfg.getDetailedStats()) {
-            writeDetailedStats(calculator.getTaxiStats(), event);
-        }
-    }
+		new TaxiStatsWriter(taxiStats).write(prefix + "stats.txt");
+		new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms.txt");
+	}
 
-
-    private void appendToMultiDayStats(TaxiStats s, AfterMobsimEvent event)
-    {
-        multiDayWriter.writeNext(new CSVLineBuilder().add(event.getIteration() + "") //
-                .addEmpty() //
-                .addf("%.1f", s.passengerWaitTime.getMean())
-                .addf("%.1f", s.passengerWaitTime.getStandardDeviation()) //
-                .addf("%.0f", s.passengerWaitTime.getPercentile(95)) //
-                .addf("%.0f", s.passengerWaitTime.getMax()) //
-                .addEmpty() //
-                .addf("%.4f", s.getFleetEmptyDriveRatio()) //
-                .addf("%.4f", s.vehicleEmptyDriveRatio.getMean()) //
-                .addf("%.4f", s.vehicleEmptyDriveRatio.getStandardDeviation()) //
-                .addEmpty() //
-                .addf("%.4f", s.getFleetStayRatio()) //
-                .addf("%.4f", s.vehicleStayRatio.getMean()) //
-                .addf("%.4f", s.vehicleStayRatio.getStandardDeviation()) //
-                .addEmpty() //
-                .addf("%.4f", s.getOccupiedDriveRatio()));
-        multiDayWriter.flush();
-    }
-
-
-    private void writeDetailedStats(List<TaxiStats> taxiStats, AfterMobsimEvent event)
-    {
-        String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
-
-        new TaxiStatsWriter(taxiStats).write(prefix + "stats.txt");
-        new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms.txt");
-    }
-
-
-    @Override
-    public void notifyShutdown(ShutdownEvent event)
-    {
-        multiDayWriter.close();
-    }
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		multiDayWriter.close();
+	}
 }

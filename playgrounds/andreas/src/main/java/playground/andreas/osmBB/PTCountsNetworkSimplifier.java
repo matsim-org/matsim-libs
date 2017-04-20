@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -218,7 +219,7 @@ public class PTCountsNetworkSimplifier {
 				nextMessageAt = 2 * nodesProcessed;
 			}
 
-			if(this.nodeTypesToMerge.contains(Integer.valueOf(nodeTopo.run(node)))){
+			if(this.nodeTypesToMerge.contains(Integer.valueOf(NetworkCalcTopoTypeAN.run(node)))){
 
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 
@@ -492,8 +493,8 @@ public class PTCountsNetworkSimplifier {
 	/**
 	 * Specify the types of node which should be merged.
 	 *
-	 * @param nodeTypesToMerge A Set of integer indicating the node types as specified by {@link NetworkCalcTopoType}
-	 * @see NetworkCalcTopoType NetworkCalcTopoType for a list of available classifications.
+	 * @param nodeTypesToMerge A Set of integer indicating the node types as specified by {@link NetworkCalcTopoTypeAN}
+	 * @see NetworkCalcTopoTypeAN NetworkCalcTopoType for a list of available classifications.
 	 */
 	public void setNodesToMerge(Set<Integer> nodeTypesToMerge){
 		this.nodeTypesToMerge.addAll(nodeTypesToMerge);

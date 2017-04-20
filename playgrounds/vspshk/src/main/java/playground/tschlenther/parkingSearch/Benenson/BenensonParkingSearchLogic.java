@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
@@ -25,22 +27,54 @@ import playground.tschlenther.parkingSearch.utils.TSParkingUtils;
  */
 public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	private static final Logger logger = Logger.getLogger(BenensonDynLeg.class);
+	private static final boolean logForDebug = false;
+	
 	private Network network;
-	private static final double MIN_THRESHOLD_PROB_FUNCTION = 10;
-	private static final double MAX_THRESHOLD_PROB_FUNCTION = 30;
-	private static final double THRESHOLD_EXPECTED_FREE_PARKINGSPACES = 5;
-	private static final double THRESHOLD_ALL_EXPECTED_PARKINGSPACES_TO_DEST = 290/TSParkingUtils.AVGPARKINGSLOTLENGTH;
+	private static final double MIN_THRESHOLD_PROB_FUNCTION = 1;
+	private static final double MAX_THRESHOLD_PROB_FUNCTION = 3;
 	private static final double ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN = 30;
-	private static final double ACCEPTED_DISTANCE_MAX = 600;
+	private static final double ACCEPTED_DISTANCE_MAX = 400;
 	private final Random random = MatsimRandom.getLocalInstance();
+	
+	//Grenzen für Übergang von Phase 1 -> 2 bzw. 2->3
+	private static final double THRESHOLD_OBSERVING_METER = 250;
+	private static final double THRESHOLD_PARKING_METER = 100;	
 
 	public BenensonParkingSearchLogic(Network network) {
 		this.network = network;
 	}
 	
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> destinationLinkId, Id<Vehicle> vehicleId, boolean hasTriedDestLinkBefore) {
+	@Override
+	public void reset() {
+
+	}
+	//----------------------------------------------------Phasenübergänge----------------------------------------------------------------------------
+	
+	boolean goIntoObserving (Id<Link> currLinkId, Id<Link> endLinkId){
+		double distToDest = NetworkUtils.getEuclideanDistance(
+				network.getLinks().get(currLinkId).getCoord(), network.getLinks().get(endLinkId).getCoord());
+		return distToDest < THRESHOLD_OBSERVING_METER ;
+	}
+	
+	boolean goIntoParking (Id<Link> currLinkId, Id<Link> endLinkId){
+		double distToDest = NetworkUtils.getEuclideanDistance(
+				network.getLinks().get(currLinkId).getCoord(), network.getLinks().get(endLinkId).getCoord());
+		return distToDest < THRESHOLD_PARKING_METER ;
+	}
+	
+	//-------------------------------------------------------Routing---------------------------------------------------------------------------
+	
+	/**
+	 * 
+	 * @param currentLinkId
+	 * @param destinationLinkId
+	 * @param vehicleId
+	 * @param hasTriedDestLinkBefore
+	 * @return
+	 */
+	public Id<Link> getNextLinkBenensonRouting(Id<Link> currentLinkId, Id<Link> destinationLinkId, Id<Vehicle> vehicleId) {
 		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Id<Link>> nextNodes = new ArrayList<>();
+		//List<Id<Link>> nextNodes = new ArrayList<>();
 		
 		//es wird nicht die Distanz zur Aktivität, sondern zum fromNode des Aktivitätenlinks berechnet
 		Node destination = network.getLinks().get(destinationLinkId).getFromNode();
@@ -48,22 +82,16 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		double distanceToDest = Double.MAX_VALUE;
 		Node nextNode;
 		Id<Link> nextLinkId = null;
-		
-		
-		/*
-		 * TODO: Problem (beim grid-Net):
-		 * wenn agent auf destLink fährt wird er immer umkehren und immer "auf der selben Seite" der aktivität suchen. => generelles Benenson-Problem.
-		 * 
-		 */
+
 		for (Id<Link> outlinkId : currentLink.getToNode().getOutLinks().keySet()){
 			if(outlinkId.equals(destinationLinkId)){
-				if(!hasTriedDestLinkBefore) return outlinkId;
+				return outlinkId;
 			}
 			nextNode = network.getLinks().get(outlinkId).getToNode();
 			double dd = NetworkUtils.getEuclideanDistance(destination.getCoord(),nextNode.getCoord());
 			if( dd < distanceToDest){
 				nextLinkId = outlinkId;
-				distanceToDest = NetworkUtils.getEuclideanDistance(destination.getCoord(),nextNode.getCoord());
+				distanceToDest = dd;
 			}
 			else if(dd == distanceToDest){
 				if (Math.random() > 0.5){
@@ -74,23 +102,28 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 		return nextLinkId;
 	}
 
-	@Override
-	public void reset() {
+	public Id<Link> getNextLinkRandomInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay) {
 
-	}
-
-	@Override
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
-		// TODO Auto-generated method stub
-		//throw new RuntimeException("i don't want this to happen");
-		
+		Id<Link> nextLink = null;
 		Link currentLink = network.getLinks().get(currentLinkId);
 		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
-		Id<Link> randomKey = keys.get(random.nextInt(keys.size()));
-		return randomKey;
+		do{
+			if(!(nextLink == null)) keys.remove(keys.indexOf(nextLink));
+			
+			if(keys.size() == 0){	//kein outlink in acceptaple Distance
+				keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
+				logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a random next link");
+				return keys.get(random.nextInt(keys.size()));
+			}
+			nextLink= keys.get(random.nextInt(keys.size()));	
+		}
+		while(!isDriverInAcceptableDistance(nextLink, endLinkId, firstDestLinkEnterTime, timeOfDay));
+		//logger.error("vehicle " + vehicleId  + " turns on link " + nextLink + " after " + (firstDestLinkEnterTime - timeOfDay) + " secs of searching");
+		return nextLink;
 	}
 
-	
+	//---------------------------------------------------Parkentscheidung-----------------------------------------------------------------------
+
 	/**
 	 * 
 	 * estimate amount of free parking spaces on the way to destination Link and decide whether to park on currentLink
@@ -100,56 +133,18 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * @param endLinkId
 	 * @return
 	 */
-	public boolean wantToParkHere (double pUnoccupied, Id<Link> currentLinkId, Id<Link> endLinkId) {		
-		double distToDest = NetworkUtils.getEuclideanDistance(
-				network.getLinks().get(currentLinkId).getToNode().getCoord(), network.getLinks().get(endLinkId).getFromNode().getCoord());
-		//TODO: falls der agent schon auf dem endLink ist, dann auf jeden Fall ja?
-		//
-		if(currentLinkId.equals(endLinkId)) return true;
-		//TODO: problem wenn distToDest = 0, dann will auf jeden Fall geparkt werden (z.B. auf dem Link gegenüber)
-		//=> man sollte eigentlich auf jeden Fall auf den Ziellink.
-		//=> was wenn man schon weiß dass der voll ist.
-		/*
-		 * wenn man fromNode vom EndLink zur Berechnung der Distanz verwendet hat man obiges Problem (umgehbar)
-		 * wenn man toNode verwendet hat man anderes Problem:
-		 * agenten müssen über den fromNode zur Aktivität laufen -> u.U. längere Distanz
-		 * 
-		 */
-		//TODO: Problem wenn pUnoccupied gleich 0
-		//=> dann gab es bisher noch keinen freien Slot, also ist es realistisch, den nächsten zu akzeptieren   
-		if( (pUnoccupied*distToDest/TSParkingUtils.AVGPARKINGSLOTLENGTH) <= THRESHOLD_EXPECTED_FREE_PARKINGSPACES ) return true;
-		return false;
-	}
-	
-	public boolean wantToParkHereV2 (double pUnoccupied, Id<Link> currentLinkId, Id<Link> endLinkId) {
-		//TODO: problem wenn distToDest = 0, dann will auf jeden Fall geparkt werden (z.B. auf dem Link gegenüber)
-		//=> man sollte eigentlich auf jeden Fall auf den Ziellink.
-		//=> was wenn man schon weiß dass der voll ist.
-		/*
-		 * wenn man fromNode vom EndLink zur Berechnung der Distanz verwendet hat man obiges Problem (umgehbar)
-		 * wenn man toNode verwendet hat man anderes Problem:
-		 * agenten müssen über den fromNode zur Aktivität laufen -> u.U. längere Distanz
-		 * 
-		 */
+	public boolean wantToParkHere (double pUnoccupied, Id<Link> currentLinkId, Id<Link> endLinkId) {
 		//TODO: Problem wenn pUnoccupied gleich 0
 		//=> dann gab es bisher noch keinen freien Slot, also ist es realistisch, den nächsten zu akzeptieren   
 		double distToDest = NetworkUtils.getEuclideanDistance(
-				network.getLinks().get(currentLinkId).getToNode().getCoord(), network.getLinks().get(endLinkId).getFromNode().getCoord());
+				network.getLinks().get(currentLinkId).getToNode().getCoord(), network.getLinks().get(endLinkId).getToNode().getCoord());
 		double expectedFreeSlots = (pUnoccupied*distToDest/TSParkingUtils.AVGPARKINGSLOTLENGTH);
 		double rnd = Math.random();
-		logger.error("\n current link: "+ currentLinkId + "\n expected slots: " + expectedFreeSlots + "\n probabilty to continue driving: " + getProbabilityOfContinueDriving(expectedFreeSlots) + "\n rnd: " + rnd);
+		if(logForDebug)logger.error("\n current link: "+ currentLinkId + "\n expected slots: " + expectedFreeSlots + "\n probabilty to continue driving: " + getProbabilityOfContinueDriving(expectedFreeSlots) + "\n rnd: " + rnd);
 		if (rnd < getProbabilityOfContinueDriving(expectedFreeSlots)) return false;
 		else return true;
 	}
 	
-	
-	public boolean becomeActive (Id<Link> currentLinkId, Id<Link> destinationLinkId){
-		double distToDest = NetworkUtils.getEuclideanDistance(
-				network.getLinks().get(currentLinkId).getToNode().getCoord(), network.getLinks().get(destinationLinkId).getFromNode().getCoord());
-		if( (distToDest/TSParkingUtils.AVGPARKINGSLOTLENGTH) <= THRESHOLD_ALL_EXPECTED_PARKINGSPACES_TO_DEST ) return true;
-		return false;
-	}
-
 	/**
 	 * linear probability function, depending on maximum and minimium threshold 
 	 */
@@ -169,31 +164,35 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * @param timeOfDay
 	 * @return
 	 */
-	public boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId,	double firstDestLinkEnterTimer, double timeOfDay) {
-		/*
-		 * PROBLEM: am Anfang von PHASE3 wird selbst der DestLink nicht akzeptiert, da Distanz zwischen fromNode und toNode zu groß
-		 * (wenn LinkLength > 100m)
-		 *
-		 *
-		 *PROBLEM: die Distanzen werden aufgrund der Koordinaten berechnet und haben erstmal nicht mit den Linklenghts zu tun!!!
-		 */
+	private boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId,	double firstDestLinkEnterTime, double timeOfDay) {
 
 		// if we're on the destinationLink, we always want to park
 		if(currentLinkId.equals(endLinkId)) return true;
 		
-		double distToDest = NetworkUtils.getEuclideanDistance(
-				network.getLinks().get(currentLinkId).getToNode().getCoord(), network.getLinks().get(endLinkId).getFromNode().getCoord());
-		
-		double timeSpent = timeOfDay - firstDestLinkEnterTimer;
+		double distToDest = NetworkUtils.getEuclideanDistance(network.getLinks().get(currentLinkId).getCoord(), network.getLinks().get(endLinkId).getCoord());
+
+		double timeSpent = timeOfDay - firstDestLinkEnterTime;
 		double acceptedDistance = 100 + ACCEPTED_DISTANCE_INCREASING_RATE_PER_MIN * (timeSpent / 60);
 		
 		if (acceptedDistance > ACCEPTED_DISTANCE_MAX) acceptedDistance = ACCEPTED_DISTANCE_MAX;
 		
 		//logger.error("\n Distanz zum Ziel: " + distToDest + "\n Anfang Phase 3 : " + firstDestLinkEnterTimer + "\n Jetzt: " + timeOfDay +  "\n Zeit (s) in Phase3: " + timeSpent + "\n akzeptierte Distanz: " + acceptedDistance);
 		
-		if (distToDest <= acceptedDistance) return true;		
+		if (distToDest <= acceptedDistance){
+			if(logForDebug){
+				logger.error(" distance between link " + currentLinkId + " and destLink " + endLinkId + ": " + distToDest);
+				logger.error("accepted : " + acceptedDistance);
+				logger.error("time spent: " + timeSpent);
+			}
+			return true;		
+		}
 		
 		return false;
+	}
+
+	@Override
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
+		throw new RuntimeException("this should not happen!");
 	}
 	
 }

@@ -67,6 +67,7 @@ public class VehicleEntersTrafficEvent extends Event implements HasPersonId, Has
 		return vehicleId;
 	}
 	
+	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}

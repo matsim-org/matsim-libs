@@ -56,6 +56,7 @@ public final class BoundingBox {
 	////////////////////////////////
 	
 	public BoundingBox(Envelope env) {
+		boundingBox = new double[4];
 		boundingBox[0] = env.getMinX() ;
 		boundingBox[1] = env.getMinY() ;
 		boundingBox[2] = env.getMaxX() ;

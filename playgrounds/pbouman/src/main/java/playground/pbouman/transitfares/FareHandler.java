@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -56,7 +57,7 @@ public class FareHandler implements
 	private HashMap<Id, DiscountInterval> agentDiscount;
 	private HashMap<Id, Double> lastCheckinTime;
 	private HashMap<Id, Double> lastCheckoutTime;
-	private HashMap<Id, Double> agentTotalFare;
+	private HashMap<Id<Person>, Double> agentTotalFare;
 	private HashMap<Id, Double> agentCurrentDistance;
 	private HashMap<Id, Double> agentTotalDistance;
 	
@@ -78,7 +79,7 @@ public class FareHandler implements
 	public void handleEvent(PersonLeavesVehicleEvent event)
 	{
 		
-		Id pid = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		Id vid = event.getVehicleId();
 		Id lid = vehicleToLine.get(vid);
 		Id rid = vehicleToRoute.get(vid);
@@ -100,15 +101,15 @@ public class FareHandler implements
 		//}
 		
 		// Remove this passenger from the vehicle
-		vehicleToPassengers.get(vid).remove(pid);
+		vehicleToPassengers.get(vid).remove(personId);
 		
 		double price = 0;
 		// Add the distance based pricing
-		price += agentCurrentDistance.get(pid) / 1000 * distPrice;
+		price += agentCurrentDistance.get(personId) / 1000 * distPrice;
 		// If there is no transfer period, or if it is too large, add the fixed price
 		double transferTime = Double.POSITIVE_INFINITY;
-		if (lastCheckoutTime.containsKey(pid))
-			transferTime = lastCheckoutTime.get(pid) - lastCheckinTime.get(pid);
+		if (lastCheckoutTime.containsKey(personId))
+			transferTime = lastCheckoutTime.get(personId) - lastCheckinTime.get(personId);
 		if (transferTime > policies.getTransferGracePeriod())
 			price += fixedPrice;
 		// If a discount applies, apply it
@@ -116,14 +117,14 @@ public class FareHandler implements
 		if (discount != null )
 			price = price * (1-discount.discount);
 		// Add the price to the total fare for the agent 
-		if (!agentTotalFare.containsKey(pid))
-			agentTotalFare.put(pid, price);
+		if (!agentTotalFare.containsKey(personId))
+			agentTotalFare.put(personId, price);
 		else
-			agentTotalFare.put(pid, price + agentTotalFare.get(pid));
+			agentTotalFare.put(personId, price + agentTotalFare.get(personId));
 
 		// Store the new checkout time for this passenger
 		// During the next checkout, this time is relevant to determine the transfer-gap
-		lastCheckoutTime.put(pid, event.getTime());
+		lastCheckoutTime.put(personId, event.getTime());
 		
 	}
 
@@ -220,17 +221,17 @@ public class FareHandler implements
 	{
 		double rev = 0;
 		
-		for (Id p : agentTotalFare.keySet())
+		for (Id<Person> personId : agentTotalFare.keySet())
 		{
-			double fare = agentTotalFare.get(p);
+			double fare = agentTotalFare.get(personId);
 			double factor = 1;
 			AgentSensitivities as = (AgentSensitivities) scenario.getScenarioElement(AgentSensitivities.ELEMENT_NAME);
 			if (as != null)
 			{
-				factor = as.getSensitivity(p);
+				factor = as.getSensitivity(personId);
 			}
 			
-			PersonMoneyEvent ame =  new PersonMoneyEvent(24*3600, p, -(fare*factor));
+			PersonMoneyEvent ame =  new PersonMoneyEvent(24*3600, personId, -(fare*factor));
 			rev += fare;
 			event.getServices().getEvents().processEvent(ame);
 		}
@@ -252,17 +253,17 @@ public class FareHandler implements
 	
 	public void reset(int iteration)
 	{
-		agentDiscount = new HashMap<Id, DiscountInterval>();
-		lastCheckinTime = new HashMap<Id, Double>();
-		lastCheckoutTime = new HashMap<Id, Double>();
-		agentTotalFare = new HashMap<Id, Double>();
-		agentCurrentDistance = new HashMap<Id, Double>();
-		agentTotalDistance = new HashMap<Id, Double>();
-		driverToVehicle = new HashMap<Id, Id>();
-		vehicleToDriver = new HashMap<Id, Id>();
-		vehicleToPassengers = new HashMap<Id, HashSet<Id>>();
-		vehicleToLine = new HashMap<Id,Id>();
-		vehicleToRoute = new HashMap<Id,Id>();
+		agentDiscount = new HashMap<>();
+		lastCheckinTime = new HashMap<>();
+		lastCheckoutTime = new HashMap<>();
+		agentTotalFare = new HashMap<>();
+		agentCurrentDistance = new HashMap<>();
+		agentTotalDistance = new HashMap<>();
+		driverToVehicle = new HashMap<>();
+		vehicleToDriver = new HashMap<>();
+		vehicleToPassengers = new HashMap<>();
+		vehicleToLine = new HashMap<>();
+		vehicleToRoute = new HashMap<>();
 	}
 	
 /*	private String getVehicleType(Id vehicleId)

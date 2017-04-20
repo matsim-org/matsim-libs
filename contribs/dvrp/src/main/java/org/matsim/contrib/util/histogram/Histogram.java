@@ -24,16 +24,12 @@ package org.matsim.contrib.util.histogram;
  * 
  * @param <T>
  */
-public interface Histogram<T>
-{
-    int getBinCount();
+public interface Histogram<T> {
+	int getBinCount();
 
+	T getBin(int idx);
 
-    T getBin(int idx);
+	long getCount(int idx);
 
-
-    long getCount(int idx);
-
-
-    long getTotalCount();
+	long getTotalCount();
 }

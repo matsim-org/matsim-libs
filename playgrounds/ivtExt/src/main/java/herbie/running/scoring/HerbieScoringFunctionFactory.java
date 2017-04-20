@@ -29,7 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.facilities.ActivityFacilities;
 
 import java.util.TreeMap;
@@ -65,18 +65,18 @@ public class HerbieScoringFunctionFactory implements ScoringFunctionFactory {
 
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 				person.getSelectedPlan(),
-				new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build(),
+				new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build(),
 				this.facilityPenalties,
 				this.facilities,
 				this.config));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
 				person.getSelectedPlan(),
-				new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build(),
+				new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build(),
 				config,
 				this.network,
 				this.ktiConfigGroup));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring(new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build()));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring(new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring(new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build()));
 		
 		return scoringFunctionAccumulator;
 	}

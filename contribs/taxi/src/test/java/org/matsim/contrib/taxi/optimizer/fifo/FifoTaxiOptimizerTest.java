@@ -24,19 +24,16 @@ import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
 import java.util.*;
 
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerFactory.OptimizerType;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 
+public class FifoTaxiOptimizerTest {
+	@Test
+	public void testFifo() {
+		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 
-public class FifoTaxiOptimizerTest
-{
-    @Test
-    public void testFifo()
-    {
-        BenchmarkWithConfig benchmark = new BenchmarkWithConfig("3.0", "25");
+		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
+		Map<String, String> params = createAbstractOptimParams(OptimizerType.FIFO);
 
-        List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
-        Map<String, String> params = createAbstractOptimParams(OptimizerType.FIFO);
-
-        runBenchmark(variants, params, benchmark);
-    }
+		runBenchmark(variants, params, benchmark);
+	}
 }

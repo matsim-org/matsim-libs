@@ -5,68 +5,60 @@ import java.util.Collection;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.*;
 import org.matsim.contrib.taxi.schedule.*;
 
+public class TaxiScheduleCharts {
+	public static JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles) {
+		return ScheduleCharts.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR, TAXI_PAINT_SELECTOR);
+	}
 
-public class TaxiScheduleCharts
-{
-    public static JFreeChart chartSchedule(Collection<? extends Vehicle> vehicles)
-    {
-        return ScheduleCharts.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR,
-                TAXI_PAINT_SELECTOR);
-    }
+	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = new DescriptionCreator() {
+		@Override
+		public String create(Task task) {
+			return ((TaxiTask)task).getTaxiTaskType().name();
+		}
+	};
 
+	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = new DescriptionCreator() {
+		@Override
+		public String create(Task task) {
+			if (task instanceof TaxiTaskWithRequest) {
+				TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
+				return taskWithReq.getTaxiTaskType().name() + "_" + taskWithReq.getRequest().getPassenger().getId();
+			}
 
-    public static final DescriptionCreator<TaxiTask> TAXI_DESCRIPTION_CREATOR = new DescriptionCreator<TaxiTask>() {
-        @Override
-        public String create(TaxiTask task)
-        {
-            return task.getTaxiTaskType().name();
-        }
-    };
+			return ((TaxiTask)task).getTaxiTaskType().name();
+		}
+	};
 
-    public static final DescriptionCreator<TaxiTask> TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = new DescriptionCreator<TaxiTask>() {
-        @Override
-        public String create(TaxiTask task)
-        {
-            if (task instanceof TaxiTaskWithRequest) {
-                TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-                return task.getTaxiTaskType().name() + "_"
-                        + taskWithReq.getRequest().getPassenger().getId();
-            }
+	private static final Color OCCUPIED_DRIVE_COLOR = new Color(200, 0, 0);
+	private static final Color PICKUP_DROPOFF_COLOR = new Color(0, 0, 200);
 
-            return task.getTaxiTaskType().name();
-        }
-    };
+	private static final Color EMPTY_DRIVE_COLOR = new Color(100, 0, 0);
+	private static final Color STAY_COLOR = new Color(0, 0, 100);
 
-    private static final Color OCCUPIED_DRIVE_COLOR = new Color(200, 0, 0);
-    private static final Color PICKUP_DROPOFF_COLOR = new Color(0, 0, 200);
+	public static final PaintSelector TAXI_PAINT_SELECTOR = new PaintSelector() {
+		public Paint select(Task task) {
+			switch (((TaxiTask)task).getTaxiTaskType()) {
+				case PICKUP:
+				case DROPOFF:
+					return PICKUP_DROPOFF_COLOR;
 
-    private static final Color EMPTY_DRIVE_COLOR = new Color(100, 0, 0);
-    private static final Color STAY_COLOR = new Color(0, 0, 100);
+				case OCCUPIED_DRIVE:
+					return OCCUPIED_DRIVE_COLOR;
 
-    public static final PaintSelector<TaxiTask> TAXI_PAINT_SELECTOR = new PaintSelector<TaxiTask>() {
-        public Paint select(TaxiTask task)
-        {
-            switch (task.getTaxiTaskType()) {
-                case PICKUP:
-                case DROPOFF:
-                    return PICKUP_DROPOFF_COLOR;
+				case EMPTY_DRIVE:
+					return EMPTY_DRIVE_COLOR;
 
-                case OCCUPIED_DRIVE:
-                    return OCCUPIED_DRIVE_COLOR;
+				case STAY:
+					return STAY_COLOR;
 
-                case EMPTY_DRIVE:
-                    return EMPTY_DRIVE_COLOR;
-
-                case STAY:
-                    return STAY_COLOR;
-
-                default:
-                    throw new IllegalStateException();
-            }
-        }
-    };
+				default:
+					throw new IllegalStateException();
+			}
+		}
+	};
 }

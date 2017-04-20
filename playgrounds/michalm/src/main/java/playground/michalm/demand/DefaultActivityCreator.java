@@ -29,77 +29,58 @@ import org.matsim.core.network.NetworkUtils;
 
 import com.vividsolutions.jts.geom.*;
 
+public class DefaultActivityCreator implements ActivityCreator {
+	protected final UniformRandom uniform = RandomUtils.getGlobalUniform();
+	protected final Network network;
+	protected final PopulationFactory pf;
 
-public class DefaultActivityCreator
-    implements ActivityCreator
-{
-    protected final UniformRandom uniform = RandomUtils.getGlobalUniform();
-    protected final Network network;
-    protected final PopulationFactory pf;
+	protected final GeometryProvider geometryProvider;
+	protected final PointAcceptor pointAcceptor;
 
-    protected final GeometryProvider geometryProvider;
-    protected final PointAcceptor pointAcceptor;
+	public DefaultActivityCreator(Scenario scenario) {
+		this(scenario, DEFAULT_GEOMETRY_PROVIDER, DEFAULT_POINT_ACCEPTOR);
+	}
 
+	public DefaultActivityCreator(Scenario scenario, GeometryProvider geometryProvider, PointAcceptor pointAcceptor) {
+		this.network = scenario.getNetwork();
+		this.pf = scenario.getPopulation().getFactory();
+		this.geometryProvider = geometryProvider;
+		this.pointAcceptor = pointAcceptor;
+	}
 
-    public DefaultActivityCreator(Scenario scenario)
-    {
-        this(scenario, DEFAULT_GEOMETRY_PROVIDER, DEFAULT_POINT_ACCEPTOR);
-    }
+	@Override
+	public Activity createActivity(Zone zone, String actType) {
+		Geometry geometry = geometryProvider.getGeometry(zone, actType);
+		Point p = null;
+		do {
+			p = RandomPointUtils.getRandomPointInGeometry(geometry);
+		} while (!pointAcceptor.acceptPoint(zone, actType, p));
 
+		Coord coord = new Coord(p.getX(), p.getY());
+		Link link = NetworkUtils.getNearestLink(network, coord);
 
-    public DefaultActivityCreator(Scenario scenario, GeometryProvider geometryProvider,
-            PointAcceptor pointAcceptor)
-    {
-        this.network = scenario.getNetwork();
-        this.pf = scenario.getPopulation().getFactory();
-        this.geometryProvider = geometryProvider;
-        this.pointAcceptor = pointAcceptor;
-    }
+		Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
+		activity.setLinkId(link.getId());
+		return activity;
+	}
 
+	public static final GeometryProvider DEFAULT_GEOMETRY_PROVIDER = new GeometryProvider() {
+		public Geometry getGeometry(Zone zone, String actType) {
+			return zone.getMultiPolygon();
+		}
+	};
 
-    @Override
-    public Activity createActivity(Zone zone, String actType)
-    {
-        Geometry geometry = geometryProvider.getGeometry(zone, actType);
-        Point p = null;
-        do {
-            p = RandomPointUtils.getRandomPointInGeometry(geometry);
-        }
-        while (!pointAcceptor.acceptPoint(zone, actType, p));
+	public interface GeometryProvider {
+		Geometry getGeometry(Zone zone, String actType);
+	}
 
-        Coord coord = new Coord(p.getX(), p.getY());
-        Link link = NetworkUtils.getNearestLink(network, coord);
+	public static final PointAcceptor DEFAULT_POINT_ACCEPTOR = new PointAcceptor() {
+		public boolean acceptPoint(Zone zone, String actType, Point point) {
+			return true;
+		}
+	};
 
-        Activity activity = (Activity)pf.createActivityFromCoord(actType, coord);
-        activity.setLinkId(link.getId());
-        return activity;
-    }
-
-
-    public static final GeometryProvider DEFAULT_GEOMETRY_PROVIDER = new GeometryProvider() {
-        public Geometry getGeometry(Zone zone, String actType)
-        {
-            return zone.getMultiPolygon();
-        }
-    };
-
-
-    public interface GeometryProvider
-    {
-        Geometry getGeometry(Zone zone, String actType);
-    }
-
-
-    public static final PointAcceptor DEFAULT_POINT_ACCEPTOR = new PointAcceptor() {
-        public boolean acceptPoint(Zone zone, String actType, Point point)
-        {
-            return true;
-        }
-    };
-
-
-    public interface PointAcceptor
-    {
-        boolean acceptPoint(Zone zone, String actType, Point point);
-    }
+	public interface PointAcceptor {
+		boolean acceptPoint(Zone zone, String actType, Point point);
+	}
 }

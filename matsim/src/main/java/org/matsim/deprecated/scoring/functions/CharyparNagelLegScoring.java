@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
@@ -53,7 +53,7 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	private static final double INITIAL_SCORE = 0.0;
 
 	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
+	protected final ScoringParameters params;
 	private Leg currentLeg;
 	protected Network network;
 	private TransitSchedule transitSchedule;
@@ -62,13 +62,13 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
 	
-	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network) {
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network) {
 		this.params = params;
 		this.network = network;
 		this.reset();
 	}
 	
-	public CharyparNagelLegScoring(final CharyparNagelScoringParameters params, Network network, TransitSchedule transitSchedule) {
+	public CharyparNagelLegScoring(final ScoringParameters params, Network network, TransitSchedule transitSchedule) {
 		this(params, network);
 		this.transitSchedule = transitSchedule;
 	}

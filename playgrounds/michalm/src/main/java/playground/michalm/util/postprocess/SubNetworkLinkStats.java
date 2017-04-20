@@ -34,45 +34,41 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import playground.michalm.util.gis.PolygonBasedFilter;
 
+public class SubNetworkLinkStats {
+	public static void main(String[] args) {
+		String dir = "d:\\PP-rad\\poznan\\";
+		String networkFile = dir + "network.xml";
+		String linkStats = dir + "40.linkstats.txt.gz";
+		String polygonFile = dir + "poznan_polygon\\poznan_city_polygon.shp";
+		boolean includeBorderLinks = false;
+		String filteredLinkStats = dir + "40.linkstats-filtered.txt.gz";
 
-public class SubNetworkLinkStats
-{
-    public static void main(String[] args)
-    {
-        String dir = "d:\\PP-rad\\poznan\\";
-        String networkFile = dir + "network.xml";
-        String linkStats = dir + "40.linkstats.txt.gz";
-        String polygonFile = dir + "poznan_polygon\\poznan_city_polygon.shp";
-        boolean includeBorderLinks = false;
-        String filteredLinkStats = dir + "40.linkstats-filtered.txt.gz";
+		Geometry polygonGeometry = PolygonBasedFilter.readPolygonGeometry(polygonFile);
+		Predicate<Link> linkInsidePolygonPredicate = PolygonBasedFilter
+				.createLinkInsidePolygonPredicate(polygonGeometry, includeBorderLinks);
 
-        Geometry polygonGeometry = PolygonBasedFilter.readPolygonGeometry(polygonFile);
-        Predicate<Link> linkInsidePolygonPredicate = PolygonBasedFilter
-                .createLinkInsidePolygonPredicate(polygonGeometry, includeBorderLinks);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
+		nr.readFile(networkFile);
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
-        nr.readFile(networkFile);
+		Map<Id<Link>, ? extends Link> linkMap = scenario.getNetwork().getLinks();
 
-        Map<Id<Link>, ? extends Link> linkMap = scenario.getNetwork().getLinks();
+		try (BufferedReader br = IOUtils.getBufferedReader(linkStats);
+				PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(filteredLinkStats))) {
+			String header = br.readLine();
+			pw.println(header);
 
-        try (BufferedReader br = IOUtils.getBufferedReader(linkStats);
-                PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(filteredLinkStats))) {
-            String header = br.readLine();
-            pw.println(header);
+			String line;
+			while ((line = br.readLine()) != null) {
+				String linkId = new StringTokenizer(line).nextToken();// linkId - first column
+				Link link = linkMap.get(Id.create(linkId, Link.class));
 
-            String line;
-            while ( (line = br.readLine()) != null) {
-                String linkId = new StringTokenizer(line).nextToken();// linkId - first column
-                Link link = linkMap.get(Id.create(linkId, Link.class));
-
-                if (linkInsidePolygonPredicate.apply(link)) {
-                    pw.println(line);
-                }
-            }
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+				if (linkInsidePolygonPredicate.apply(link)) {
+					pw.println(line);
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

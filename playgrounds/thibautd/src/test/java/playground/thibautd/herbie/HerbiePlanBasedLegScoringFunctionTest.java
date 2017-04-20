@@ -51,7 +51,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -78,7 +78,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	private final Plan plan;
 	private Network network;
 	private Config config;
-	private CharyparNagelScoringParameters params;
+	private ScoringParameters params;
 	private HerbieConfigGroup ktiConfigGroup;
 	private ActivityFacilitiesImpl facilities;
 
@@ -278,7 +278,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 		double monetaryDistanceRatePt = -2;
 		config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
-		params = new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build();
+		params = new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build();
 	}
 
 	//private void initPlans() {

@@ -25,94 +25,78 @@ import playground.michalm.taxi.data.EvrpVehicle.Ev;
 import playground.michalm.taxi.ev.ETaxiChargingLogic;
 import playground.michalm.taxi.schedule.ETaxiChargingTask;
 
+public class ETaxiAtChargerActivity extends AbstractDynActivity {
+	public static final String STAY_AT_CHARGER_ACTIVITY_TYPE = "ETaxiStayAtCharger";
 
-public class ETaxiAtChargerActivity
-    extends AbstractDynActivity
-{
-    public static final String STAY_AT_CHARGER_ACTIVITY_TYPE = "ETaxiStayAtCharger";
+	private final ETaxiChargingTask chargingTask;
 
-    private final ETaxiChargingTask chargingTask;
+	private double endTime = END_ACTIVITY_LATER;
 
-    private double endTime = END_ACTIVITY_LATER;
+	private enum State {
+		init, queued, plugged, unplugged
+	};
 
+	private State state = State.init;
 
-    private enum State
-    {
-        init, queued, plugged, unplugged
-    };
+	public ETaxiAtChargerActivity(ETaxiChargingTask chargingTask) {
+		super(STAY_AT_CHARGER_ACTIVITY_TYPE);
+		this.chargingTask = chargingTask;
+	}
 
+	@Override
+	public void doSimStep(double now) {
+		switch (state) {
+			case queued:
+			case plugged:
+				if (endTime <= now) {
+					endTime = now + 1;
+				}
+				return;
 
-    private State state = State.init;
+			case init:
+				initialize(now);
+				return;
 
+			default:
+				return;
+		}
+	}
 
-    public ETaxiAtChargerActivity(ETaxiChargingTask chargingTask)
-    {
-        super(STAY_AT_CHARGER_ACTIVITY_TYPE);
-        this.chargingTask = chargingTask;
-    }
+	private void initialize(double now) {
+		ETaxiChargingLogic logic = chargingTask.getLogic();
+		Ev ev = chargingTask.getEv();
 
+		logic.removeAssignedVehicle(ev);
+		ev.setAtChargerActivity(this);
+		logic.addVehicle(ev, now);
+	}
 
-    @Override
-    public void doSimStep(double now)
-    {
-        switch (state) {
-            case queued:
-            case plugged:
-                if (endTime <= now) {
-                    endTime = now + 1;
-                }
-                return;
+	@Override
+	public double getEndTime() {
+		return endTime;
+	}
 
-            case init:
-                initialize(now);
-                return;
+	public void vehicleQueued(double now) {
+		ETaxiChargingLogic logic = chargingTask.getLogic();
+		endTime = now + logic.estimateMaxWaitTimeOnArrival() + logic.estimateChargeTime(chargingTask.getEv());
+		state = State.queued;
+	}
 
-            default:
-                return;
-        }
-    }
+	public void chargingStarted(double now) {
+		// if veh is fully charged we must add at least 1 second to make sure that there is
+		// at least 1 time step (1 second) between chargingStarted() and chargingEnded()
+		endTime = now + Math.max(1, chargingTask.getLogic().estimateChargeTime(chargingTask.getEv()));
+		state = State.plugged;
+		chargingTask.setChargingStartedTime(now);
+	}
 
+	public void chargingEnded(double now) {
+		endTime = now;
+		state = State.unplugged;
+	}
 
-    private void initialize(double now)
-    {
-        ETaxiChargingLogic logic = chargingTask.getLogic();
-        Ev ev = chargingTask.getEv();
-
-        logic.removeAssignedVehicle(ev);
-        logic.addVehicle(ev, now);
-    }
-
-
-    @Override
-    public double getEndTime()
-    {
-        return endTime;
-    }
-
-
-    public void vehicleQueued(double now)
-    {
-        ETaxiChargingLogic logic = chargingTask.getLogic();
-        endTime = now + logic.estimateMaxWaitTimeOnArrival()
-                + logic.estimateChargeTime(chargingTask.getEv());
-        state = State.queued;
-    }
-
-
-    public void chargingStarted(double now)
-    {
-        //if veh is fully charged we must add at least 1 second to make sure that there is
-        //at least 1 time step (1 second) between chargingStarted() and chargingEnded()
-        endTime = now
-                + Math.max(1, chargingTask.getLogic().estimateChargeTime(chargingTask.getEv()));
-        state = State.plugged;
-        chargingTask.setChargingStartedTime(now);
-    }
-
-
-    public void chargingEnded(double now)
-    {
-        endTime = now;
-        state = State.unplugged;
-    }
+	@Override
+	public void finalizeAction(double now) {
+		chargingTask.getEv().setAtChargerActivity(null);
+	}
 }

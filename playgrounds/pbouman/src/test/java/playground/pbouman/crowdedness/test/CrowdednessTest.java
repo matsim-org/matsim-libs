@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -86,15 +87,15 @@ import javax.inject.Provider;
 
 public class CrowdednessTest
 {
-
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	
+	
 	/**
 	 * This test currently checks the following things:
 	 * 1) Do we get the correct crowdedness ratio's for a 4 person vehicle?
 	 * 2) Do we receive the expected number of penalty events?
 	 * 3) Are the penalties nonnegative? (In the future, this test should be made more exact)
 	 */
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	@Test
 	public final void testCrowdednessEvents()
 	{
@@ -193,7 +194,7 @@ public class CrowdednessTest
 	}
 
 	
-	private MutableScenario generateScenario()
+	private static MutableScenario generateScenario()
 	{
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);

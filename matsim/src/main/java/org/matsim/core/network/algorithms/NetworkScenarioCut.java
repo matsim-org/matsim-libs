@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class NetworkScenarioCut implements NetworkRunnable {
+public final class NetworkScenarioCut implements NetworkRunnable {
 
 	private enum CutType {RECTANGLE, CIRCLE}
 

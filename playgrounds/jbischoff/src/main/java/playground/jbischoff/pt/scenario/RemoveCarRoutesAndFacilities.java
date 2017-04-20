@@ -46,10 +46,10 @@ import org.matsim.pt.router.TransitActsRemover;
  */
 public class RemoveCarRoutesAndFacilities {
 public static void main(String[] args) {
-	String inputFile ="C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/bvg.run189.10pct.100.plans.filtered.selected.xml.gz";
-	String networkFile ="C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/network.final10pct.xml.gz";
+	String inputFile ="C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/25pct/bvg.run191.25pct.100.plans.filtered.selected.xml.gz";
+	String networkFile ="C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/25pct/network.final25pct.xml.gz";
 	
-	String outputFile ="C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/bvg.run189.10pct.100.plans.filtered.selected.noRoutes.xml.gz";
+	String outputFile ="C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/25pct/bvg.run191.25pct.100.plans.filtered.selected.noRoutes.xml.gz";
 	TransitActsRemover tar = new TransitActsRemover();
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);

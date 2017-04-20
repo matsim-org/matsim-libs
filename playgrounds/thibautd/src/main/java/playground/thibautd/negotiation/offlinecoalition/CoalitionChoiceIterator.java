@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
@@ -57,6 +58,7 @@ public class CoalitionChoiceIterator<P extends Proposition> {
 			final PropositionUtility<P> utility,
 			final Population population,
 			final CoalitionSelector selector,
+			final ExtraPlanRemover extraPlanRemover,
 			final OfflineCoalitionConfigGroup configGroup ) {
 		this.agents = agents;
 		this.population = population;
@@ -65,11 +67,25 @@ public class CoalitionChoiceIterator<P extends Proposition> {
 
 		log.info( "Initialize joint plans" );
 		final Counter counter = new Counter( "Initialize joint plan # " );
+		final Counter agentCounter = new Counter( "Look at agent # " , " / "+agents.getAllAgents().size() );
+		final ReplanningGroup group = new ReplanningGroup();
+		agents.getAllAgents().stream()
+				.map( NegotiationAgent::getId )
+				.map( population.getPersons()::get )
+				.forEach( group::addPerson );
+
+		int i = 0;
 		for ( NegotiationAgent<P> agent : agents.getAllAgents() ) {
+			agentCounter.incCounter();
 			for ( P proposition : alternativesGenerator.generateAlternatives( agent ) ) {
 				counter.incCounter();
 				final JointPlan jp = jointPlanCreator.apply( proposition );
-				jointPlans.addJointPlan( jp );
+				if ( jp.getIndividualPlans().size() > 1 ) {
+					jointPlans.addJointPlan( jp );
+				}
+				else if ( jointPlans.contains( jp ) ){
+					jointPlans.removeJointPlan( jp );
+				}
 
 				for ( Plan p : jp.getIndividualPlans().values() ) {
 					p.setScore(
@@ -79,8 +95,17 @@ public class CoalitionChoiceIterator<P extends Proposition> {
 									proposition ) );
 				}
 			}
+			if ( ++i % configGroup.getRemovalPeriod() == 0 ) {
+				log.info( "Run plan remover..." );
+				extraPlanRemover.removePlansInGroup( jointPlans , group );
+				log.info( "Run plan remover... DONE" );
+			}
 		}
+		agentCounter.printCounter();
 		counter.printCounter();
+		log.info( "Run plan remover..." );
+		extraPlanRemover.removePlansInGroup( jointPlans , group );
+		log.info( "Run plan remover... DONE" );
 	}
 
 	public GroupPlans doIteration() {

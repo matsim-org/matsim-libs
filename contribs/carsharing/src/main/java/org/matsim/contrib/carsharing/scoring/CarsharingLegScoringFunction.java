@@ -16,7 +16,7 @@ import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContain
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -28,7 +28,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	
 	private CostsCalculatorContainer costsCalculatorContainer;
 	private DemandHandler demandHandler;
-	private Id<Person> personId;
+	private Person person;
 	private CarsharingSupplyInterface carsharingSupplyContainer;
 	
 	private static final  Set<String> walkingLegs = ImmutableSet.of("egress_walk_ow", "access_walk_ow",
@@ -37,17 +37,17 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	private static final  Set<String> carsharingLegs = ImmutableSet.of("oneway_vehicle", "twoway_vehicle",
 			"freefloating_vehicle");
 	
-	public CarsharingLegScoringFunction(CharyparNagelScoringParameters params, 
+	public CarsharingLegScoringFunction(ScoringParameters params, 
 			Config config,  Network network, DemandHandler demandHandler,
 			CostsCalculatorContainer costsCalculatorContainer, CarsharingSupplyInterface carsharingSupplyContainer,
-			Id<Person> personId)
+			Person person)
 	{
 		super(params, network);
 		this.config = config;
 		this.demandHandler = demandHandler;
 		this.carsharingSupplyContainer = carsharingSupplyContainer;
 		this.costsCalculatorContainer = costsCalculatorContainer;
-		this.personId = personId;		
+		this.person = person;		
 	}
 
 	@Override
@@ -59,8 +59,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	public void finish() {		
 		super.finish();		
 		
-		AgentRentals agentRentals = this.demandHandler.getAgentRentalsMap().get(personId);
-		
+		AgentRentals agentRentals = this.demandHandler.getAgentRentalsMap().get(person.getId());
 		if (agentRentals != null) {
 			double marginalUtilityOfMoney = ((PlanCalcScoreConfigGroup)this.config.getModule("planCalcScore")).getMarginalUtilityOfMoney();
 			for(RentalInfo rentalInfo : agentRentals.getArr()) {

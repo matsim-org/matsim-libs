@@ -85,6 +85,10 @@ public class SylviaSignalsModule extends AbstractModule {
                 //michalm, jan'17
                 bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
             }
+            
+            if (getConfig().qsim().isUsingFastCapacityUpdate()) {
+                throw new RuntimeException("Fast flow capacity update does not support signals");
+            }
         }
 	}
 	

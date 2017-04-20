@@ -25,56 +25,43 @@ import org.matsim.api.core.v01.*;
 
 import playground.michalm.demand.taxi.ServedRequest;
 
+public class BarcelonaServedRequest implements ServedRequest {
+	public final Id<ServedRequest> id;
+	public final Coord from;
+	public final Coord to;
+	public final Date startTime;
+	public final Date endTime;
+	public final int travelTime;
+	public final double distance;
 
-public class BarcelonaServedRequest
-    implements ServedRequest
-{
-    public final Id<ServedRequest> id;
-    public final Coord from;
-    public final Coord to;
-    public final Date startTime;
-    public final Date endTime;
-    public final int travelTime;
-    public final double distance;
+	public BarcelonaServedRequest(Id<ServedRequest> id, Coord from, Coord to, Date start, Date end, int travelTime,
+			double distance) {
+		this.id = id;
+		this.from = from;
+		this.to = to;
+		this.startTime = start;
+		this.endTime = end;
+		this.travelTime = travelTime;
+		this.distance = distance;
+	}
 
+	@Override
+	public Id<ServedRequest> getId() {
+		return id;
+	}
 
-    public BarcelonaServedRequest(Id<ServedRequest> id, Coord from, Coord to, Date start, Date end,
-            int travelTime, double distance)
-    {
-        this.id = id;
-        this.from = from;
-        this.to = to;
-        this.startTime = start;
-        this.endTime = end;
-        this.travelTime = travelTime;
-        this.distance = distance;
-    }
+	@Override
+	public Coord getFrom() {
+		return from;
+	}
 
+	@Override
+	public Coord getTo() {
+		return to;
+	}
 
-    @Override
-    public Id<ServedRequest> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public Coord getFrom()
-    {
-        return from;
-    }
-
-
-    @Override
-    public Coord getTo()
-    {
-        return to;
-    }
-
-
-    @Override
-    public Date getStartTime()
-    {
-        return startTime;
-    }
+	@Override
+	public Date getStartTime() {
+		return startTime;
+	}
 }

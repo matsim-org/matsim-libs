@@ -54,9 +54,10 @@ public class MergeCSVFiles {
 	
 	private static final Logger log = Logger.getLogger(MergeCSVFiles.class);
 	
-	private static final String directory = "/Users/ihab/Desktop/ils4a/kaddoura/bln-dz-time/output_0.1sample_run_194c.150.plans_selected/output_route_time/";
-	private static final String fileName = "aggregated_info_car";
+	private static final String directory = "/Users/ihab/Desktop/ils4/kaddoura/bln-dz-time/output_0.1sample_run_194c.150.plans.selected-1000it.route.time.output.plans.selected/output_route/";
+	private static final String fileName = "aggregated_info_all_transport_modes";
 	private static final String separator = ";";
+	private static final int finalIteration = 300;
 	
 	private static TreeMap<String, LinkedHashMap<String, String>> path2key2Value = new TreeMap<>();
 	
@@ -108,7 +109,7 @@ public class MergeCSVFiles {
 			
 		if (path2key2Value.size() > 0) {
 			
-			String outputFile = directory + "merged_" + fileName + ".csv";
+			String outputFile = directory + "merged_it." + finalIteration + "_" + fileName + ".csv";
 
 			try ( BufferedWriter bw = IOUtils.getBufferedWriter(outputFile) ) {
 
@@ -150,7 +151,16 @@ public class MergeCSVFiles {
 		if (files != null) {
 			for (File f : files) {
 				if (f.isDirectory()) {
-					collectAllFilesInDirectory(f, fileList);
+					if(f.getName().toString().startsWith("it")) {
+						if (f.getName().toString().equals("it." + finalIteration)) {
+							collectAllFilesInDirectory(f, fileList);
+						} else {
+							// skip other iterations
+							log.info("... skipping " + f.getName().toString());
+						}
+					} else {
+						collectAllFilesInDirectory(f, fileList);
+					}
 				} else {
 					fileList.add(f);
 				}

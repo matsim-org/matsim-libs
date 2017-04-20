@@ -26,7 +26,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 
@@ -38,17 +41,12 @@ import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 
 public class DecongestionInfo {
 		
-	private final Scenario scenario;
-	private final DecongestionConfigGroup decongestionConfigGroup;
+	@Inject
+	private Scenario scenario;
 	
 	private final Map<Id<Link>, LinkInfo> linkId2info = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 
-	public DecongestionInfo(Scenario scenario, DecongestionConfigGroup decongestionConfigGroup) {
-		this.scenario = scenario;
-		this.decongestionConfigGroup = decongestionConfigGroup;
-	}
-	
 	public Scenario getScenario() {
 		return scenario;
 	}
@@ -62,7 +60,7 @@ public class DecongestionInfo {
 	}
 
 	public DecongestionConfigGroup getDecongestionConfigGroup() {
-		return decongestionConfigGroup;
+		return ConfigUtils.addOrGetModule(scenario.getConfig(), DecongestionConfigGroup.class);
 	}
 
 }

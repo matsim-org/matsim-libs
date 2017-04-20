@@ -168,7 +168,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	 * @param linkId
 	 * @param time
 	 */
-	private boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
+	protected boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			this.parkingLocationsOutsideFacilities.put(vehicleId, linkId);
@@ -227,9 +227,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	public double getNrOfAllParkingSpacesOnLink (Id<Link> linkId){
 		double allSpaces = 0;
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
-		if (parkingFacilitiesAtLink == null) {
-			return 0;
-		} else {
+		if (!(parkingFacilitiesAtLink == null)) {
 			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink){
 				allSpaces += this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
 			}

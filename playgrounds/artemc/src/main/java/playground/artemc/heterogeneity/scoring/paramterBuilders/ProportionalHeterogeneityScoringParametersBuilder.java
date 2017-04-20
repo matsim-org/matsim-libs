@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.pt.PtConstants;
 
 import java.util.Map;
@@ -20,9 +20,9 @@ public class ProportionalHeterogeneityScoringParametersBuilder {
 		this.scenario = scenario;
 	}
 
-	public CharyparNagelScoringParameters buildIncomeBasedScoringParameters(Person person){
+	public ScoringParameters buildIncomeBasedScoringParameters(Person person){
 
-		final CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(scenario, person.getId());
+		final ScoringParameters.Builder builder = new ScoringParameters.Builder(scenario, person.getId());
 
 		final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet = scenario.getConfig().planCalcScore().getScoringParameters((String) scenario.getPopulation().getPersonAttributes().getAttribute(person.toString(), scenario.getConfig().plans().getSubpopulationAttributeName()));
 
@@ -76,7 +76,7 @@ public class ProportionalHeterogeneityScoringParametersBuilder {
 		modeParamsBuilder.setScoreAtAll(false);
 		builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder);
 
-		final CharyparNagelScoringParameters individualParameters = builder.build();
+		final ScoringParameters individualParameters = builder.build();
 		return individualParameters;
 	}
 }

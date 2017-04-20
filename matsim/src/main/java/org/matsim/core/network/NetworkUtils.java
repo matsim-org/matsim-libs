@@ -621,8 +621,7 @@ public class NetworkUtils {
 		return link.getLength() / link.getFreespeed(time) ;
 	}
 
-	static final String TYPE="type" ;
-	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
+	public static final String TYPE="type" ;
 	public static void setType( Link link , String type ) {
 //		if ( link instanceof LinkImpl ) {
 //			((LinkImpl)link).setType2( type ) ;
@@ -633,8 +632,6 @@ public class NetworkUtils {
 			link.getAttributes().putAttribute(TYPE, type) ;
 		}
 	}
-
-	@Deprecated // use link.getAttributes()... directly.  kai, dec'16
 	public static String getType(Link link) {
 //		if ( link instanceof LinkImpl ) {
 //			return ((LinkImpl)link).getType2() ;	
@@ -644,21 +641,23 @@ public class NetworkUtils {
 		return (String) link.getAttributes().getAttribute(TYPE);
 	}
 
-
 	public static String getOrigId( Link link ) {
-		if ( link instanceof LinkImpl ) {
-			return ((LinkImpl)link).getOrigId2() ;
-		} else {
-			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
-		}
+//		if ( link instanceof LinkImpl ) {
+//			return ((LinkImpl)link).getOrigId2() ;
+//		} else {
+//			throw new RuntimeException("wrong implementation of Link interface do getOrigId" ) ;
+//		}
+		return (String) link.getAttributes().getAttribute(ORIGID);
 	}
 
-
 	public static void setOrigId( Link link, String id ) {
-		if ( link instanceof LinkImpl ) {
-			((LinkImpl) link).setOrigId2(id);
-		} else {
-			throw new RuntimeException("wrong implementation of interface Link to do setOrigId") ;
+//		if ( link instanceof LinkImpl ) {
+//			((LinkImpl) link).setOrigId2(id);
+//		} else {
+//			throw new RuntimeException("wrong implementation of interface Link to do setOrigId") ;
+//		}
+		if ( id != null ) {
+			link.getAttributes().putAttribute(ORIGID, id) ;
 		}
 	}
 
@@ -771,4 +770,6 @@ public class NetworkUtils {
 		// yyyyyy Make LinkFactoryImpl invisible outside package.  Does the LinkFactory interface have to be public at all?  kai, aug'16
 		return new LinkFactoryImpl();
 	}
+
+	public static final String ORIGID = "origid";
 }

@@ -21,22 +21,16 @@ package org.matsim.contrib.taxi.optimizer;
 
 import org.apache.commons.configuration.Configuration;
 
+/**
+ * @author michalm
+ */
+public class AbstractTaxiOptimizerParams {
+	public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
 
-public class AbstractTaxiOptimizerParams
-    implements TaxiOptimizerParams
-{
-    public static final String ID = "id";
-    public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
+	// usually 1 s; however, the assignment strategy for TaxiBerlin used 10 s (IEEE IS paper)
+	public final int reoptimizationTimeStep;
 
-    public final String id;//TODO is it used anywhere?
-
-    //usually 1 s; however, the assignment strategy for TaxiBerlin used 10 s (IEEE IS paper)
-    public final int reoptimizationTimeStep;
-
-
-    protected AbstractTaxiOptimizerParams(Configuration optimizerConfig)
-    {
-        id = optimizerConfig.getString(ID);
-        reoptimizationTimeStep = optimizerConfig.getInt(REOPTIMIZATION_TIME_STEP, 1);
-    }
+	protected AbstractTaxiOptimizerParams(Configuration optimizerConfig) {
+		reoptimizationTimeStep = optimizerConfig.getInt(REOPTIMIZATION_TIME_STEP, 1);
+	}
 }

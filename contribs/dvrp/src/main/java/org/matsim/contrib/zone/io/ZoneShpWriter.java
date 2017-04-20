@@ -28,35 +28,29 @@ import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+public class ZoneShpWriter {
+	public static final String ID_HEADER = "ID";
 
-public class ZoneShpWriter
-{
-    public static final String ID_HEADER = "ID";
+	private final Map<Id<Zone>, Zone> zones;
+	private final String coordinateSystem;
 
-    private final Map<Id<Zone>, Zone> zones;
-    private final String coordinateSystem;
+	public ZoneShpWriter(Map<Id<Zone>, Zone> zones, String coordinateSystem) {
+		this.zones = zones;
+		this.coordinateSystem = coordinateSystem;
+	}
 
+	public void write(String shpFile) {
+		CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
 
-    public ZoneShpWriter(Map<Id<Zone>, Zone> zones, String coordinateSystem)
-    {
-        this.zones = zones;
-        this.coordinateSystem = coordinateSystem;
-    }
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().addAttribute(ID_HEADER, String.class)
+				.setCrs(crs).setName("zone").create();
 
+		List<SimpleFeature> features = new ArrayList<>();
+		for (Zone z : zones.values()) {
+			String id = z.getId() + "";
+			features.add(factory.createPolygon(z.getMultiPolygon(), new Object[] { id }, id));
+		}
 
-    public void write(String shpFile)
-    {
-        CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
-
-        PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder()
-                .addAttribute(ID_HEADER, String.class).setCrs(crs).setName("zone").create();
-
-        List<SimpleFeature> features = new ArrayList<>();
-        for (Zone z : zones.values()) {
-            String id = z.getId() + "";
-            features.add(factory.createPolygon(z.getMultiPolygon(), new Object[] { id }, id));
-        }
-
-        ShapeFileWriter.writeGeometries(features, shpFile);
-    }
+		ShapeFileWriter.writeGeometries(features, shpFile);
+	}
 }

@@ -21,48 +21,36 @@ package org.matsim.contrib.util.random;
 
 import org.apache.commons.math3.random.*;
 
-
 /**
  * Based on org.matsim.core.gbl.MatsimRandom
  */
-public class RandomUtils
-{
-    public static final int DEFAULT_SEED = 4357;
+public class RandomUtils {
+	public static final int DEFAULT_SEED = 4357;
 
-    private static final RandomGenerator rg = new MersenneTwister(DEFAULT_SEED);
+	private static final RandomGenerator rg = new MersenneTwister(DEFAULT_SEED);
 
-    private static final UniformRandom uniform = new UniformRandom(rg);
+	private static final UniformRandom uniform = new UniformRandom(rg);
 
+	public static void reset() {
+		reset(DEFAULT_SEED);
+	}
 
-    public static void reset()
-    {
-        reset(DEFAULT_SEED);
-    }
+	public static void reset(final int seed) {
+		rg.setSeed(seed);
+	}
 
+	public static RandomGenerator getGlobalGenerator() {
+		return rg;
+	}
 
-    public static void reset(final int seed)
-    {
-        rg.setSeed(seed);
-    }
+	public static UniformRandom getGlobalUniform() {
+		return uniform;
+	}
 
-
-    public static RandomGenerator getGlobalGenerator()
-    {
-        return rg;
-    }
-
-
-    public static UniformRandom getGlobalUniform()
-    {
-        return uniform;
-    }
-
-
-    /**
-     * Returns an instance of a random number generator, which can be used locally, e.g. in threads.
-     */
-    public static RandomGenerator getLocalGenerator()
-    {
-        return new MersenneTwister(rg.nextInt());
-    }
+	/**
+	 * Returns an instance of a random number generator, which can be used locally, e.g. in threads.
+	 */
+	public static RandomGenerator getLocalGenerator() {
+		return new MersenneTwister(rg.nextInt());
+	}
 }

@@ -2,14 +2,13 @@ package playground.dhosse.prt.scheduler;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.taxi.data.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.schedule.*;
@@ -25,10 +24,10 @@ public class PrtScheduler
     private final TaxiSchedulerParams params;
 
 
-    public PrtScheduler(Scenario scenario, TaxiData taxiData, MobsimTimer timer,
+    public PrtScheduler(Network network, Fleet taxiData, MobsimTimer timer,
             TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility)
     {
-        super(scenario, taxiData, timer, params, travelTime, travelDisutility);
+        super(null, network, taxiData, timer, params, travelTime, travelDisutility);
         this.params = params;
     }
 
@@ -41,10 +40,10 @@ public class PrtScheduler
             throw new IllegalStateException();
         }
 
-        Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
+        Schedule bestSched = best.vehicle.getSchedule();
 
         if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
-            TaxiTask lastTask = Schedules.getLastTask(bestSched);// only WAIT
+            TaxiTask lastTask = (TaxiTask)Schedules.getLastTask(bestSched);// only WAIT
 
             if (lastTask.getTaxiTaskType().equals(TaxiTask.TaxiTaskType.PICKUP)) {
                 appendRequestToExistingScheduleTasks(best, requests);
@@ -81,13 +80,13 @@ public class PrtScheduler
 
         bestSched.addTask(new NPersonsPickupDriveTask(best.path, req));
 
-        double t3 = Math.max(best.path.getArrivalTime(), best.destination.getT0())
+        double t3 = Math.max(best.path.getArrivalTime(), best.destination.getEarliestStartTime())
                 + params.pickupDuration;
         bestSched.addTask(new NPersonsPickupStayTask(best.path.getArrivalTime(), t3, req));
 
         if (params.destinationKnown) {
             appendOccupiedDriveAndDropoff(bestSched);
-            appendTasksAfterDropoff(bestSched);
+            appendTasksAfterDropoff(best.vehicle);
         }
 
     }
@@ -97,9 +96,9 @@ public class PrtScheduler
             List<BestDispatchFinder.Dispatch<TaxiRequest>> requests)
     {
 
-        Schedule<TaxiTask> sched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
+        Schedule sched = best.vehicle.getSchedule();
 
-        for (TaxiTask task : sched.getTasks()) {
+        for (Task task : sched.getTasks()) {
 
             if (task instanceof NPersonsPickupStayTask) {
                 for (BestDispatchFinder.Dispatch<TaxiRequest> vrp : requests) {
@@ -117,7 +116,7 @@ public class PrtScheduler
 
 
     @Override
-    protected void appendOccupiedDriveAndDropoff(Schedule<TaxiTask> schedule)
+    protected void appendOccupiedDriveAndDropoff(Schedule schedule)
     {
         NPersonsPickupStayTask pickupStayTask = (NPersonsPickupStayTask)Schedules
                 .getLastTask(schedule);
@@ -139,24 +138,23 @@ public class PrtScheduler
 
 
     @Override
-    protected void appendTasksAfterDropoff(Schedule<TaxiTask> schedule)
+    protected void appendTasksAfterDropoff(Vehicle vehicle)
     {
         NPersonsDropoffStayTask dropoffStayTask = (NPersonsDropoffStayTask)Schedules
-                .getLastTask(schedule);
+                .getLastTask(vehicle.getSchedule());
 
         // addWaitTime at the end (even 0-second WAIT)
         double t5 = dropoffStayTask.getEndTime();
-        double tEnd = Math.max(t5, schedule.getVehicle().getT1());
+        double tEnd = Math.max(t5, vehicle.getServiceEndTime());
         Link link = dropoffStayTask.getLink();
 
-        schedule.addTask(new TaxiStayTask(t5, tEnd, link));
+        vehicle.getSchedule().addTask(new TaxiStayTask(t5, tEnd, link));
     }
 
 
     protected void scheduleRankReturn(Vehicle veh, double time, boolean charge, boolean home)
     {
-        @SuppressWarnings("unchecked")
-        Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
+        Schedule sched = (Schedule)veh.getSchedule();
         TaxiStayTask last = (TaxiStayTask)Schedules.getLastTask(veh.getSchedule());
         if (last.getStatus() != TaskStatus.STARTED)
             throw new IllegalStateException();
@@ -166,10 +164,10 @@ public class PrtScheduler
         Link nearestRank = veh.getStartLink();
 
         VrpPathWithTravelData path = calcPath(currentLink, nearestRank, time);
-        if (path.getArrivalTime() > veh.getT1())
+        if (path.getArrivalTime() > veh.getServiceEndTime())
             return; // no rank return if vehicle is going out of service anyway
         sched.addTask(new TaxiEmptyDriveTask(path));
-        sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
+        sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getServiceEndTime(), nearestRank));
 
     }
 }

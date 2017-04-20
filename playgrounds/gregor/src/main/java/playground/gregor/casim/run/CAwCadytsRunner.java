@@ -45,7 +45,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import playground.gregor.casim.proto.CALinkInfos.CALinInfos;
 import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
@@ -168,7 +168,7 @@ public class CAwCadytsRunner implements IterationStartsListener {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-				final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(controller.getScenario(), person.getId()).build();
+				final ScoringParameters params = new ScoringParameters.Builder(controller.getScenario(), person.getId()).build();
 				
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controller.getScenario().getNetwork()));

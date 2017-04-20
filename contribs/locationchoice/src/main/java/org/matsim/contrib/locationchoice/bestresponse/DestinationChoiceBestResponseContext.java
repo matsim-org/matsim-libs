@@ -44,7 +44,7 @@ import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.router.priorityqueue.HasIndex;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
@@ -69,7 +69,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
-	private CharyparNagelScoringParameters params;
+	private ScoringParameters params;
 	private DestinationChoiceConfigGroup dccg;
 	private int arekValsRead = 1;
 	private ObjectAttributes personsBetas = new ObjectAttributes();
@@ -103,7 +103,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	}
 	
 	public void init() {
-		this.params = new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
+		this.params = new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
 	this.dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 	ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
@@ -260,7 +260,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		return flexibleTypes;
 	}
 
-	public CharyparNagelScoringParameters getParams() {
+	public ScoringParameters getParams() {
 		return params;
 	}
 

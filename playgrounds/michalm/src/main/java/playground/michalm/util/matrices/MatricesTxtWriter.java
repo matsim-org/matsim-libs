@@ -26,70 +26,55 @@ import org.matsim.matrices.*;
 
 import com.google.common.base.*;
 
+public class MatricesTxtWriter {
+	private final Map<String, Matrix> matrices;
+	private String keyHeader = "key";
+	private Function<String, String> formatter = Functions.identity();
 
-public class MatricesTxtWriter
-{
-    private final Map<String, Matrix> matrices;
-    private String keyHeader = "key";
-    private Function<String, String> formatter = Functions.identity();
+	public static MatricesTxtWriter createForSingleMatrix(Matrix matrix) {
+		MatricesTxtWriter writer = new MatricesTxtWriter(Collections.singletonMap("", matrix));
+		writer.setKeyHeader(null);
+		return writer;
+	}
 
+	public MatricesTxtWriter(Map<String, Matrix> matrices) {
+		this.matrices = matrices;
+	}
 
-    public static MatricesTxtWriter createForSingleMatrix(Matrix matrix)
-    {
-        MatricesTxtWriter writer = new MatricesTxtWriter(Collections.singletonMap("", matrix));
-        writer.setKeyHeader(null);
-        return writer;
-    }
+	/**
+	 * to skip displaying the key column, set keyHeader to null
+	 * 
+	 * @param keyHeader
+	 */
+	public void setKeyHeader(String keyHeader) {
+		this.keyHeader = keyHeader;
+	}
 
+	public void setKeyFormatter(Function<String, String> formatter) {
+		this.formatter = formatter;
+	}
 
-    public MatricesTxtWriter(Map<String, Matrix> matrices)
-    {
-        this.matrices = matrices;
-    }
+	public void write(String file) {
+		try (PrintWriter pw = new PrintWriter(file)) {
+			writeKey(pw, keyHeader);
+			pw.println("from\tto\tvalue");
 
+			for (Map.Entry<String, Matrix> mapEntry : matrices.entrySet()) {
+				String key = keyHeader == null ? null : formatter.apply(mapEntry.getKey());
 
-    /**
-     * to skip displaying the key column, set keyHeader to null
-     * 
-     * @param keyHeader
-     */
-    public void setKeyHeader(String keyHeader)
-    {
-        this.keyHeader = keyHeader;
-    }
+				for (Entry e : MatrixUtils.createEntryIterable(mapEntry.getValue())) {
+					writeKey(pw, key);
+					pw.printf("%s\t%s\t%f\n", e.getFromLocation(), e.getToLocation(), e.getValue());
+				}
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-
-    public void setKeyFormatter(Function<String, String> formatter)
-    {
-        this.formatter = formatter;
-    }
-
-
-    public void write(String file)
-    {
-        try (PrintWriter pw = new PrintWriter(file)) {
-            writeKey(pw, keyHeader);
-            pw.println("from\tto\tvalue");
-
-            for (Map.Entry<String, Matrix> mapEntry : matrices.entrySet()) {
-                String key = keyHeader == null ? null : formatter.apply(mapEntry.getKey());
-
-                for (Entry e : MatrixUtils.createEntryIterable(mapEntry.getValue())) {
-                    writeKey(pw, key);
-                    pw.printf("%s\t%s\t%f\n", e.getFromLocation(), e.getToLocation(), e.getValue());
-                }
-            }
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    private void writeKey(PrintWriter pw, String key)
-    {
-        if (keyHeader != null) {
-            pw.print(key + "\t");
-        }
-    }
+	private void writeKey(PrintWriter pw, String key) {
+		if (keyHeader != null) {
+			pw.print(key + "\t");
+		}
+	}
 }

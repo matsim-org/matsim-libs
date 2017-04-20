@@ -29,7 +29,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -43,27 +42,28 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunParkingSearchExample {
 
 	public static void main(String[] args) {
-		// set to false, if you don't require visualisation, the the example will run for 10 iterations
-		new RunParkingSearchExample().run(false);
-
-	}
-
-	/**
-	 * 
-	 * @param otfvis
-	 *            turns otfvis visualisation on or off
-	 */
-	public void run(boolean otfvis) {
-		Config config = ConfigUtils.loadConfig("src/main/ressources/parkingsearch/config.xml");
-		config.plans().setInputFile("population100.xml");
-		config.facilities().setInputFile("parkingFacilities.xml");
-		config.controler().setOutputDirectory("output");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml");
+		//all further input files are set in the config.
+		
+		// set to false, if you don't require visualisation, then the example will run for 11 iterations, with OTFVis, only one iteration is performed. 
+		boolean otfvis = false;
 		if (otfvis) {
 			config.controler().setLastIteration(0);
 		} else {
 			config.controler().setLastIteration(10);
 		}
+		new RunParkingSearchExample().run(config,otfvis);
+
+	}
+
+	/**
+	 * @param config
+	 * 			a standard MATSim config
+	 * @param otfvis
+	 *            turns otfvis visualisation on or off
+	 */
+	public void run(Config config, boolean otfvis) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);

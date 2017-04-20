@@ -21,12 +21,9 @@ package org.matsim.contrib.dynagent.examples.random;
 
 import org.junit.Test;
 
-
-public class RunRandomDynAgentExampleTest
-{
-    @Test
-    public void testRun()
-    {
-        RunRandomDynAgentExample.run(false);
-    }
+public class RunRandomDynAgentExampleTest {
+	@Test
+	public void testRun() {
+		RunRandomDynAgentExample.run(false);
+	}
 }

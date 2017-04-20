@@ -45,7 +45,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
@@ -56,15 +55,9 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
- * Calculates at the end of each iteration the following statistics:
- * <ul>
- * <li>average score of the selected plan</li>
- * <li>average of the score of the worst plan of each agent</li>
- * <li>average of the score of the best plan of each agent</li>
- * <li>average of the average score of all plans of each agent</li>
- * </ul>
- * Plans with undefined scores
- * are not included in the statistics. The calculated values are written to a file, each iteration on
+ * Calculates at the end of each iteration mode statistics, based on the main mode identifier of a trip chain.
+ * For multi-modal trips, this is only as accurate as your main mode identifier.
+ * The calculated values are written to a file, each iteration on
  * a separate line.
  *
  * @author mrieser
@@ -176,16 +169,17 @@ ShutdownListener {
 
 
 		// yyyy the following does not work!!
+		// Why? The charts seem to be useful (JB, April 2017)
 		if (this.createPNG && event.getIteration() > this.minIteration) {
 			// create chart when data of more than one iteration is available.
 			XYLineChart chart = new XYLineChart("Mode Statistics", "iteration", "mode");
 			for ( Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet() ) {
 				String mode = entry.getKey() ;
 				Map<Integer, Double> history = entry.getValue() ;
-				log.warn( "about to add the following series:" ) ;
-				for ( Entry<Integer, Double> item : history.entrySet() ) {
-					log.warn( item.getKey() + " -- " + item.getValue() );
-				}
+//				log.warn( "about to add the following series:" ) ;
+//				for ( Entry<Integer, Double> item : history.entrySet() ) {
+//					log.warn( item.getKey() + " -- " + item.getValue() );
+//				}
 				chart.addSeries(mode, history ) ;
 			}
 			chart.addMatsimLogo();

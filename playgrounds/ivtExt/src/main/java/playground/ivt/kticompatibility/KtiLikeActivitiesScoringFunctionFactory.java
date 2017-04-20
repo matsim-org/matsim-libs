@@ -51,7 +51,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 
 	private final StageActivityTypes blackList;
 	private final KtiLikeScoringConfigGroup ktiConfig;
-	private final CharyparNagelScoringParametersForPerson parameters;
+	private final ScoringParametersForPerson parameters;
     private final Scenario scenario;
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final Scenario scenario) {
 		this.ktiConfig = ktiConfig;
-		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.parameters = new SubpopulationScoringParameters( scenario );
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 	}
@@ -70,7 +70,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
 		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-		final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+		final ScoringParameters params = parameters.getScoringParameters( person );
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(

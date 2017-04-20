@@ -93,7 +93,7 @@ public class RndPtRouterLauncherV2 {
 
 		{
 			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-			stratSets.setStrategyName(DefaultSelector.ChangeExpBeta.name());
+			stratSets.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
 			stratSets.setWeight(0.9);
 			config.strategy().addStrategySettings(stratSets);
 		}
@@ -156,9 +156,9 @@ public class RndPtRouterLauncherV2 {
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Inject private CadytsPtContext2 cadytsContext;
-			@Inject CharyparNagelScoringParametersForPerson parameters;
+			@Inject ScoringParametersForPerson parameters;
 			@Override public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
+				final ScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));

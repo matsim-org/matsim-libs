@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,19 +52,16 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 	private Map<Id<Person>, Double> pId2CongestionCosts= new HashMap<>();
 	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 	private MutableScenario scenario;
-	private final EmissionCostModule emissionCostModule;
+
+	@Inject private EmissionCostModule emissionCostModule;
+	@Inject private EmissionModule emissionModule;
 
 	private MoneyEventHandler moneyHandler;
 	private ExperiencedDelayHandler congestionCostHandler;
-	private final EmissionModule emissionModule;
+
 	private CausedEmissionCostHandler emissCostHandler;
 	private double vttsCar;
 	
-	public MyEmissionCongestionMoneyEventControlerListener(final EmissionCostModule emissionCostModule, final EmissionModule emissionModule) {
-		this.emissionCostModule = emissionCostModule;
-		this.emissionModule = emissionModule;
-	}
-
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.scenario = (MutableScenario) event.getServices().getScenario();
@@ -75,9 +73,7 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 
 		event.getServices().getEvents().addHandler(congestionCostHandler);
 		event.getServices().getEvents().addHandler(moneyHandler);
-		event.getServices().getEvents().addHandler(emissionModule.getWarmEmissionHandler());
-		event.getServices().getEvents().addHandler(emissionModule.getColdEmissionHandler());
-		
+
 		emissionModule.getEmissionEventsManager().addHandler(emissCostHandler);
 	}
 

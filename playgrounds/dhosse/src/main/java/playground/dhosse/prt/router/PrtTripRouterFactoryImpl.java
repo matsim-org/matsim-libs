@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.network.NetworkUtils;
@@ -22,13 +22,13 @@ import playground.dhosse.prt.passenger.PrtRequestCreator;
 
 public class PrtTripRouterFactoryImpl implements Provider<TripRouter> {
 	
-    private VrpData vrpData;
+    private Fleet vrpData;
     private Scenario scenario;
 	private final TravelTime travelTime;
 	private final TravelDisutility travelDisutility;
 	private final PrtData data;
 	
-	public PrtTripRouterFactoryImpl(VrpData vrpData, Scenario scenario, final TravelTime ttime, final TravelDisutility tdis, PrtData data){
+	public PrtTripRouterFactoryImpl(Fleet vrpData, Scenario scenario, final TravelTime ttime, final TravelDisutility tdis, PrtData data){
 
         this.vrpData = vrpData;
         this.scenario = scenario;

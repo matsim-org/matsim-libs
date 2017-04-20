@@ -19,70 +19,57 @@
 
 package playground.michalm.barcelona;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEvent.ChangeType;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkChangeEvent.*;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+public class BarcelonaNetworkChangeEventsGenerator {
+	// reduced speed between 7:00 and 22:59:59
+	private final static double[] SCALING_FACTORS = { 1, 1, 1, 1, 1, 1, 1, .8, .5, .5, .65, .8, .85, .8, .65, .6, .5,
+			.5, .5, .65, .7, .8, .95, 1 };
 
-public class BarcelonaNetworkChangeEventsGenerator
-{
-    //reduced speed between 7:00 and 22:59:59
-    private final static double[] SCALING_FACTORS = { 1, 1, 1, 1, 1, 1, 1, .8, .5, .5, .65, .8, .85,
-            .8, .65, .6, .5, .5, .5, .65, .7, .8, .95, 1 };
+	private final List<NetworkChangeEvent> networkChangeEvents = new ArrayList<NetworkChangeEvent>();
+	private final Network network;
 
-    private final List<NetworkChangeEvent> networkChangeEvents = new ArrayList<NetworkChangeEvent>();
-    private final Network network;
+	public BarcelonaNetworkChangeEventsGenerator(Network network) {
+		this.network = network;
+	}
 
+	public void generateChangeEvents() {
+		double prevFactor = 1;
+		for (int i = 0; i < 24; i++) {
+			double relativeFactor = SCALING_FACTORS[i] / prevFactor;
+			prevFactor = SCALING_FACTORS[i];
 
-    public BarcelonaNetworkChangeEventsGenerator(Network network)
-    {
-        this.network = network;
-    }
+			if (relativeFactor != 1) {
+				NetworkChangeEvent e = new NetworkChangeEvent((double)(i * 3600));
+				e.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, relativeFactor));
+				e.addLinks(network.getLinks().values());
+				this.networkChangeEvents.add(e);
+			}
+		}
+	}
 
+	public List<NetworkChangeEvent> getNetworkChangeEvents() {
+		return networkChangeEvents;
+	}
 
-    public void generateChangeEvents()
-    {
-        double prevFactor = 1;
-        for (int i = 0; i < 24; i++) {
-            double relativeFactor = SCALING_FACTORS[i] / prevFactor;
-            prevFactor = SCALING_FACTORS[i];
+	public static void main(String[] args) {
+		String dir = "d:/PP-rad/Barcelona/data/";
+		String networkFile = dir + "network/barcelona_network.xml";
+		String changeEventsFile = dir + "network/barcelona_change_events.xml";
 
-            if (relativeFactor != 1) {
-                NetworkChangeEvent e = new NetworkChangeEvent((double) (i * 3600));
-                e.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, relativeFactor));
-                e.addLinks(network.getLinks().values());
-                this.networkChangeEvents.add(e);
-            }
-        }
-    }
-
-
-    public List<NetworkChangeEvent> getNetworkChangeEvents()
-    {
-        return networkChangeEvents;
-    }
-
-
-    public static void main(String[] args)
-    {
-        String dir = "d:/PP-rad/Barcelona/data/";
-        String networkFile = dir + "network/barcelona_network.xml";
-        String changeEventsFile = dir + "network/barcelona_change_events.xml";
-
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-        BarcelonaNetworkChangeEventsGenerator gen = new BarcelonaNetworkChangeEventsGenerator(
-                scenario.getNetwork());
-        gen.generateChangeEvents();
-        new NetworkChangeEventsWriter().write(changeEventsFile, gen.getNetworkChangeEvents());
-    }
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		BarcelonaNetworkChangeEventsGenerator gen = new BarcelonaNetworkChangeEventsGenerator(scenario.getNetwork());
+		gen.generateChangeEvents();
+		new NetworkChangeEventsWriter().write(changeEventsFile, gen.getNetworkChangeEvents());
+	}
 }

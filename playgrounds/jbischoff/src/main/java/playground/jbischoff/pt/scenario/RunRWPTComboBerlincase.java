@@ -25,17 +25,11 @@ package playground.jbischoff.pt.scenario;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.contrib.av.robotaxi.scoring.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -45,39 +39,35 @@ import playground.jbischoff.pt.strategy.ChangeSingleLegModeWithPredefinedFromMod
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class RunRWPTComboBerlincase {
-public static void main(String[] args) {
 	
+	public static void main(String[] args) {
 		if (args.length!=1){
 			throw new RuntimeException("Wrong arguments");
 		}
 		String configfile = args[0];
 		
-		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new VariableAccessConfigGroup());
+		Config config = ConfigUtils.loadConfig(configfile, new TaxiConfigGroup(), new DvrpConfigGroup(), new  VariableAccessConfigGroup(), new TaxiFareConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-			
-	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
+
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
 
-       Scenario scenario = ScenarioUtils.loadScenario(config);
-       TaxiData taxiData = new TaxiData();
-       new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
-       Controler controler = new Controler(scenario);
-       controler.addOverridingModule(new TaxiModule(taxiData));
-       double expAveragingAlpha = 0.05;//from the AV flow paper 
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new TaxiOutputModule());
+		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new VariableAccessTransitRouterModule());
+		controler.addOverridingModule(new ChangeSingleLegModeWithPredefinedFromModesModule());
 
-       controler.addOverridingModule(
-               VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-       controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
-       controler.addOverridingModule(new VariableAccessTransitRouterModule());
-
-       controler.run();
-
-
-}
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().to(TaxiFareHandler.class).asEagerSingleton();
+			}
+		});
+		controler.run();
+	}
 }

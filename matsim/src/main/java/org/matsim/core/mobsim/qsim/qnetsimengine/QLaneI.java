@@ -42,7 +42,7 @@ abstract class QLaneI implements Identifiable<Lane> {
 	
 	abstract void addFromWait( final QVehicle veh);
 
-	abstract boolean isAcceptingFromWait();
+	abstract boolean isAcceptingFromWait(QVehicle veh);
 
 	abstract boolean isActive();
 
@@ -98,5 +98,7 @@ abstract class QLaneI implements Identifiable<Lane> {
 	 * the one with the smallest load.
 	 */
 	abstract double getLoadIndicator() ;
+	
+	abstract void initBeforeSimStep();
 
 }

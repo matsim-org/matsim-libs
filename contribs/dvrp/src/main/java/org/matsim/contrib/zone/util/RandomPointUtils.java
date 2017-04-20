@@ -26,48 +26,38 @@ import com.google.common.base.Predicate;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 
+public class RandomPointUtils {
+	public static Point getRandomPointInGeometry(final Geometry geometry) {
+		return getRandomPointInEnvelope(new Predicate<Point>() {
+			public boolean apply(Point p) {
+				return geometry.contains(p);
+			}
+		}, geometry.getEnvelopeInternal());
+	}
 
-public class RandomPointUtils
-{
-    public static Point getRandomPointInGeometry(final Geometry geometry)
-    {
-        return getRandomPointInEnvelope(new Predicate<Point>() {
-            public boolean apply(Point p)
-            {
-                return geometry.contains(p);
-            }
-        }, geometry.getEnvelopeInternal());
-    }
+	public static Point getRandomPointInGeometry(final PreparedGeometry geometry) {
+		return getRandomPointInEnvelope(new Predicate<Point>() {
+			public boolean apply(Point p) {
+				return geometry.contains(p);
+			}
+		}, geometry.getGeometry().getEnvelopeInternal());
+	}
 
+	private static Point getRandomPointInEnvelope(Predicate<Point> contains, Envelope envelope) {
+		UniformRandom uniform = RandomUtils.getGlobalUniform();
+		double minX = envelope.getMinX();
+		double maxX = envelope.getMaxX();
+		double minY = envelope.getMinY();
+		double maxY = envelope.getMaxY();
 
-    public static Point getRandomPointInGeometry(final PreparedGeometry geometry)
-    {
-        return getRandomPointInEnvelope(new Predicate<Point>() {
-            public boolean apply(Point p)
-            {
-                return geometry.contains(p);
-            }
-        }, geometry.getGeometry().getEnvelopeInternal());
-    }
+		Point p = null;
+		do {
+			double x = uniform.nextDouble(minX, maxX);
+			double y = uniform.nextDouble(minY, maxY);
+			p = MGC.xy2Point(x, y);
+		} while (!contains.apply(p));
 
-
-    private static Point getRandomPointInEnvelope(Predicate<Point> contains, Envelope envelope)
-    {
-        UniformRandom uniform = RandomUtils.getGlobalUniform();
-        double minX = envelope.getMinX();
-        double maxX = envelope.getMaxX();
-        double minY = envelope.getMinY();
-        double maxY = envelope.getMaxY();
-
-        Point p = null;
-        do {
-            double x = uniform.nextDouble(minX, maxX);
-            double y = uniform.nextDouble(minY, maxY);
-            p = MGC.xy2Point(x, y);
-        }
-        while (!contains.apply(p));
-
-        return p;
-    }
+		return p;
+	}
 
 }

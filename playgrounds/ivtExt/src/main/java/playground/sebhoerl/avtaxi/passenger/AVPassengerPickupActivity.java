@@ -2,6 +2,7 @@ package playground.sebhoerl.avtaxi.passenger;
 
 import java.util.Set;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
@@ -12,7 +13,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 public class AVPassengerPickupActivity extends AbstractDynActivity implements PassengerPickupActivity {
     private final PassengerEngine passengerEngine;
-    private final StayTask pickupTask;
+    private final DynAgent driver;
     private final Set<? extends PassengerRequest> requests;
     private final double pickupDuration;
     
@@ -21,16 +22,16 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
     private double endTime = 0.0;
     private int passengersAboard = 0;
     
-	public AVPassengerPickupActivity(PassengerEngine passengerEngine, StayTask pickupTask, Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
+	public AVPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, Vehicle vehicle, StayTask pickupTask, Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
         super(activityType);
         
-        if (requests.size() > pickupTask.getSchedule().getVehicle().getCapacity()) {
+        if (requests.size() > vehicle.getCapacity()) {
         	// Number of requests exceeds number of seats
         	throw new IllegalStateException();
         }
         
         this.passengerEngine = passengerEngine;
-        this.pickupTask = pickupTask;
+        this.driver = driver;
         this.pickupDuration = pickupDuration;
         this.requests = requests;
         
@@ -38,15 +39,14 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
         passengersAboard = 0;
         
         double now = pickupTask.getBeginTime();
-        DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
         
         for (PassengerRequest request : requests) {
     		if (passengerEngine.pickUpPassenger(this, driver, request, pickupTask.getBeginTime())) {
     			passengersAboard++;
     		}
     		
-    		if (request.getT0() > maximumRequestT0) {
-    			maximumRequestT0 = request.getT0();
+    		if (request.getEarliestStartTime() > maximumRequestT0) {
+    			maximumRequestT0 = request.getEarliestStartTime();
     		}
         }
         
@@ -94,7 +94,6 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
 			throw new IllegalArgumentException("I am waiting for different passengers!");
 		}
 		
-		DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
 		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
 			passengersAboard++;
 		} else {

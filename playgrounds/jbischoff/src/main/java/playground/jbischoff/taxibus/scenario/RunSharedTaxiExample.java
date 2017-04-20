@@ -21,25 +21,16 @@ package playground.jbischoff.taxibus.scenario;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.taxibus.run.configuration.*;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.*;
+import org.matsim.core.scoring.functions.*;
 
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
-import playground.jbischoff.taxibus.sharedtaxi.analysis.SharedTaxiContolerListener;
-import playground.jbischoff.taxibus.sharedtaxi.analysis.SharedTaxiTripAnalyzer;
+import playground.jbischoff.sharedTaxi.*;
 
 /**
  * @author jbischoff
@@ -49,7 +40,7 @@ public class RunSharedTaxiExample {
 
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig(args[0], new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig(args[0], new TaxibusConfigGroup(), new DvrpConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 	
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -68,8 +59,8 @@ public class RunSharedTaxiExample {
 				@Override
 				public ScoringFunction createNewScoringFunction(Person person) {
 					SumScoringFunction sumScoringFunction = new SumScoringFunction();
-					final CharyparNagelScoringParameters params =
-							new CharyparNagelScoringParameters.Builder(scenario, person.getId()).build();
+					final ScoringParameters params =
+							new ScoringParameters.Builder(scenario, person.getId()).build();
 					sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 					sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 					sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));

@@ -22,46 +22,27 @@ package org.matsim.contrib.taxi.schedule;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 
+public class TaxiDropoffTask extends StayTaskImpl implements TaxiTaskWithRequest {
+	private final TaxiRequest request;
 
-public class TaxiDropoffTask
-    extends StayTaskImpl
-    implements TaxiTaskWithRequest
-{
-    private final TaxiRequest request;
+	public TaxiDropoffTask(double beginTime, double endTime, TaxiRequest request) {
+		super(beginTime, endTime, request.getToLink());
 
+		this.request = request;
+		request.setDropoffTask(this);
+	}
 
-    public TaxiDropoffTask(double beginTime, double endTime, TaxiRequest request)
-    {
-        super(beginTime, endTime, request.getToLink());
+	@Override
+	public TaxiTaskType getTaxiTaskType() {
+		return TaxiTaskType.DROPOFF;
+	}
 
-        this.request = request;
-        request.setDropoffTask(this);
-    }
+	public TaxiRequest getRequest() {
+		return request;
+	}
 
-
-    @Override
-    public void disconnectFromRequest()
-    {
-        request.setDropoffTask(null);
-    }
-
-
-    @Override
-    public TaxiTaskType getTaxiTaskType()
-    {
-        return TaxiTaskType.DROPOFF;
-    }
-
-
-    public TaxiRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
-    }
+	@Override
+	protected String commonToString() {
+		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+	}
 }

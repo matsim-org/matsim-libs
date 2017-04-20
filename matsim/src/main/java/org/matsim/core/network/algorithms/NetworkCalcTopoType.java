@@ -36,7 +36,7 @@ import org.matsim.core.utils.misc.Counter;
  *
  * @author balmermi
  **/
-public class NetworkCalcTopoType implements NetworkRunnable {
+public final class NetworkCalcTopoType implements NetworkRunnable {
 
 	public final static Integer EMPTY        = 0;
 	public final static Integer SOURCE       = 1;

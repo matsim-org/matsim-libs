@@ -28,25 +28,17 @@ import org.xml.sax.Attributes;
 import playground.michalm.ev.EvUnitConversions;
 import playground.michalm.taxi.data.EvrpVehicle;
 
+public class EvrpVehicleReader extends VehicleReader {
+	public EvrpVehicleReader(Network network, FleetImpl fleet) {
+		super(network, fleet);
+	}
 
-public class EvrpVehicleReader
-    extends VehicleReader
-{
-    public EvrpVehicleReader(Network network, VrpData data)
-    {
-        super(network, data);
-    }
-
-
-    @Override
-    protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0,
-            double t1, Attributes atts)
-    {
-        double batteryCapacity_kWh = ReaderUtils.getDouble(atts, "battery_capacity", 20);
-        double initialSoc_kWh = ReaderUtils.getDouble(atts, "initial_soc",
-                0.8 * batteryCapacity_kWh);
-        return new EvrpVehicle(id, startLink, capacity, t0, t1,
-                batteryCapacity_kWh * EvUnitConversions.J_PER_kWh,
-                initialSoc_kWh * EvUnitConversions.J_PER_kWh);
-    }
+	@Override
+	protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1,
+			Attributes atts) {
+		double batteryCapacity_kWh = ReaderUtils.getDouble(atts, "battery_capacity", 20);
+		double initialSoc_kWh = ReaderUtils.getDouble(atts, "initial_soc", 0.8 * batteryCapacity_kWh);
+		return new EvrpVehicle(id, startLink, capacity, t0, t1, batteryCapacity_kWh * EvUnitConversions.J_PER_kWh,
+				initialSoc_kWh * EvUnitConversions.J_PER_kWh);
+	}
 }

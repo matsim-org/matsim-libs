@@ -22,27 +22,18 @@ package org.matsim.contrib.taxi.schedule;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
+public class TaxiEmptyDriveTask extends DriveTaskImpl implements TaxiTask {
+	public TaxiEmptyDriveTask(VrpPathWithTravelData path) {
+		super(path);
+	}
 
-public class TaxiEmptyDriveTask
-    extends DriveTaskImpl
-    implements TaxiTask
-{
-    public TaxiEmptyDriveTask(VrpPathWithTravelData path)
-    {
-        super(path);
-    }
+	@Override
+	public TaxiTaskType getTaxiTaskType() {
+		return TaxiTaskType.EMPTY_DRIVE;
+	}
 
-
-    @Override
-    public TaxiTaskType getTaxiTaskType()
-    {
-        return TaxiTaskType.EMPTY_DRIVE;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
-    }
+	@Override
+	protected String commonToString() {
+		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+	}
 }

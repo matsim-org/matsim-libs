@@ -56,7 +56,7 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 	private final StageActivityTypes blackList;
 
 	// very expensive to initialize:only do once!
-	private final Map<Id, CharyparNagelScoringParameters> individualParameters = new HashMap<>();
+	private final Map<Id, ScoringParameters> individualParameters = new HashMap<>();
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -76,7 +76,7 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 		final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
 
 		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-		final CharyparNagelScoringParameters params =
+		final ScoringParameters params =
 				createParams( person , config , scenario.getConfig().scenario(), personAttributes );
 
 		// activities
@@ -106,7 +106,7 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 		return scoringFunctionAccumulator;
 	}
 
-	private CharyparNagelScoringParameters createParams(
+	private ScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
 			final ScenarioConfigGroup scenarioConfig,
@@ -115,8 +115,8 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 			return individualParameters.get( person.getId() );
 		}
 
-		final CharyparNagelScoringParameters.Builder builder =
-				new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
+		final ScoringParameters.Builder builder =
+				new ScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			// XXX works only if no variation of type of activities between plans
@@ -175,7 +175,7 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 					typeBuilder );
 		}
 
-		final CharyparNagelScoringParameters params =
+		final ScoringParameters params =
 				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;

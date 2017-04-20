@@ -245,9 +245,17 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	@Override
 	boolean doSimStep() {
 		double now = context.getSimTimer().getTimeOfDay() ;
+		
 		boolean lanesActive = false;
 		boolean movedWaitToRoad = false;
 		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
+		    //TODO
+		    //Because moveBufferToNextLane() (called from moveLanes()) is kind of "moveInternalNodes()",
+		    //it should be executed before moveWaitToRoad() to keep the sequence fully consistent.
+		    //The sequence is broken only if isInsertingWaitingVehiclesBeforeDrivingVehicles==true.
+		    //Currently, the buffer of the accepting lane gets emptied after moveWaitToRoad(),
+		    //which gives preference to already driving vehicles 
+		    //michalm, jan'17
 			this.moveWaitToRoad(now);
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
 			lanesActive = this.moveLanes();
@@ -266,8 +274,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		for (QLaneI lane : this.laneQueues.values()) {
 			// (go through all lanes)
 			
-//			((QueueWithBuffer) lane).updateRemainingFlowCapacity();
-			
 			/* part A */
 			if (!this.toNodeLaneQueues.contains(lane)) {
 				// (so it HAS a link-internal next lane)
@@ -283,6 +289,11 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			}
 			/* end of part A */
 		}
+		
+        for (QLaneI lane : this.laneQueues.values()) {
+            lane.initBeforeSimStep();
+        }
+        
 		for (QLaneI lane : this.laneQueues.values()) {
 			// (go through all lanes)
 		
@@ -369,11 +380,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 */
 	private boolean moveWaitToRoad(final double now) {
 		boolean movedWaitToRoad = false;
-		while (this.firstLaneQueue.isAcceptingFromWait()) {
-			QVehicle veh = this.getWaitingList().poll();
-			if (veh == null) {
-				return movedWaitToRoad;
-			}
+		while (!getWaitingList().isEmpty()) {
+		    if (!firstLaneQueue.isAcceptingFromWait(this.getWaitingList().peek())) {
+		        return movedWaitToRoad;
+		    }
+		    QVehicle veh = this.getWaitingList().poll();
+
 			movedWaitToRoad = true;
 			context .getEventsManager() .processEvent(
 							new VehicleEntersTrafficEvent(now, veh.getDriver().getId(),

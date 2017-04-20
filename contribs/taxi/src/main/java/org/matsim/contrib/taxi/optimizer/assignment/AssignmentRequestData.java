@@ -22,36 +22,29 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 
+class AssignmentRequestData extends AssignmentDestinationData<TaxiRequest> {
+	private int urgentReqCount = 0;
 
-class AssignmentRequestData
-    extends AssignmentDestinationData<TaxiRequest>
-{
-    private int urgentReqCount = 0;
+	AssignmentRequestData(TaxiOptimizerContext optimContext, double planningHorizon,
+			Iterable<TaxiRequest> unplannedRequests) {
+		double currTime = optimContext.timer.getTimeOfDay();
+		double maxT0 = currTime + planningHorizon;
 
+		int idx = 0;
+		for (TaxiRequest r : unplannedRequests) {
+			double t0 = r.getEarliestStartTime();
+			if (t0 > maxT0) {// beyond the planning horizon
+				continue;
+			}
 
-    AssignmentRequestData(TaxiOptimizerContext optimContext, double planningHorizon,
-            Iterable<TaxiRequest> unplannedRequests)
-    {
-        double currTime = optimContext.timer.getTimeOfDay();
-        double maxT0 = currTime + planningHorizon;
+			if (t0 <= currTime) {
+				urgentReqCount++;
+			}
+			entries.add(new DestEntry<TaxiRequest>(idx++, r, r.getFromLink(), t0));
+		}
+	}
 
-        int idx = 0;
-        for (TaxiRequest r : unplannedRequests) {
-            double t0 = r.getT0();
-            if (t0 > maxT0) {//beyond the planning horizon
-                continue;
-            }
-
-            if (t0 <= currTime) {
-                urgentReqCount++;
-            }
-            entries.add(new DestEntry<TaxiRequest>(idx++, r, r.getFromLink(), t0));
-        }
-    }
-
-
-    public int getUrgentReqCount()
-    {
-        return urgentReqCount;
-    }
+	public int getUrgentReqCount() {
+		return urgentReqCount;
+	}
 }

@@ -21,44 +21,31 @@ package org.matsim.contrib.util.histogram;
 
 import org.matsim.contrib.util.EnumAdder;
 
+public class EnumAdderHistogram<T extends Enum<T>, N extends Number> implements Histogram<T> {
+	private final EnumAdder<T, N> adder;
 
-public class EnumAdderHistogram<T extends Enum<T>, N extends Number>
-    implements Histogram<T>
-{
-    private final EnumAdder<T, N> adder;
+	public EnumAdderHistogram(EnumAdder<T, N> adder) {
+		this.adder = adder;
+	}
 
+	@Override
+	public int getBinCount() {
+		return adder.getKeys().length;
+	}
 
-    public EnumAdderHistogram(EnumAdder<T, N> adder)
-    {
-        this.adder = adder;
-    }
+	@Override
+	public T getBin(int idx) {
+		return adder.getKeys()[idx];
+	}
 
+	@Override
+	public long getCount(int idx) {
+		T key = getBin(idx);
+		return adder.get(key).longValue();
+	}
 
-    @Override
-    public int getBinCount()
-    {
-        return adder.getKeys().length;
-    }
-
-
-    @Override
-    public T getBin(int idx)
-    {
-        return adder.getKeys()[idx];
-    }
-
-
-    @Override
-    public long getCount(int idx)
-    {
-        T key = getBin(idx);
-        return adder.get(key).longValue();
-    }
-
-
-    @Override
-    public long getTotalCount()
-    {
-        return adder.getTotal().longValue();
-    }
+	@Override
+	public long getTotalCount() {
+		return adder.getTotal().longValue();
+	}
 }

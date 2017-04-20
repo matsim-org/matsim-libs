@@ -31,99 +31,86 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.zone.*;
 import org.matsim.contrib.zone.util.*;
 
+public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
+	private static final Comparator<Vehicle> LONGEST_WAITING_FIRST = new Comparator<Vehicle>() {
+		public int compare(Vehicle v1, Vehicle v2) {
+			double beginTime1 = v1.getSchedule().getCurrentTask().getBeginTime();
+			double beginTime2 = v2.getSchedule().getCurrentTask().getBeginTime();
+			return Double.compare(beginTime1, beginTime2);
+		}
+	};
 
-public class ZonalTaxiOptimizer
-    extends RuleBasedTaxiOptimizer
-{
-    private static final Comparator<Vehicle> LONGEST_WAITING_FIRST = new Comparator<Vehicle>() {
-        public int compare(Vehicle v1, Vehicle v2)
-        {
-            double beginTime1 = v1.getSchedule().getCurrentTask().getBeginTime();
-            double beginTime2 = v2.getSchedule().getCurrentTask().getBeginTime();
-            return Double.compare(beginTime1, beginTime2);
-        }
-    };
+	private final Map<Id<Zone>, Zone> zones;
+	private Map<Id<Zone>, PriorityQueue<Vehicle>> zoneToIdleVehicleQueue;
+	private final Map<Id<Link>, Zone> linkToZone;
 
-    private final Map<Id<Zone>, Zone> zones;
-    private Map<Id<Zone>, PriorityQueue<Vehicle>> zoneToIdleVehicleQueue;
-    private final Map<Id<Link>, Zone> linkToZone;
+	public ZonalTaxiOptimizer(TaxiOptimizerContext optimContext, ZonalTaxiOptimizerParams params) {
+		super(optimContext, params);
 
+		zones = Zones.readZones(params.zonesXmlFile, params.zonesShpFile);
+		System.err.println("No conversion of SRS is done");
 
-    public ZonalTaxiOptimizer(TaxiOptimizerContext optimContext, ZonalTaxiOptimizerParams params)
-    {
-        super(optimContext, params);
+		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(optimContext.network,
+				new ZoneFinderImpl(zones, params.expansionDistance));
 
-        zones = Zones.readZones(params.zonesXmlFile, params.zonesShpFile);
-        System.err.println("No conversion of SRS is done");
+		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
+		// the zones used in ZonalTaxiOptim (for dispatching)
+	}
 
-        this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(optimContext.network,
-                new ZoneFinderImpl(zones, params.expansionDistance));
+	@Override
+	protected void scheduleUnplannedRequests() {
+		initIdleVehiclesInZones();
+		scheduleUnplannedRequestsWithinZones();
 
-        //FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
-        //the zones used in ZonalTaxiOptim (for dispatching)
-    }
+		if (!getUnplannedRequests().isEmpty()) {
+			super.scheduleUnplannedRequests();
+		}
+	}
 
+	private void initIdleVehiclesInZones() {
+		// TODO use idle vehicle register instead...
 
-    @Override
-    protected void scheduleUnplannedRequests()
-    {
-        initIdleVehiclesInZones();
-        scheduleUnplannedRequestsWithinZones();
+		zoneToIdleVehicleQueue = new HashMap<>();
+		for (Id<Zone> zoneId : zones.keySet()) {
+			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<Vehicle>(10, LONGEST_WAITING_FIRST));
+		}
 
-        if (!unplannedRequests.isEmpty()) {
-            super.scheduleUnplannedRequests();
-        }
-    }
+		for (Vehicle veh : getOptimContext().fleet.getVehicles().values()) {
+			if (getOptimContext().scheduler.isIdle(veh)) {
+				Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
+				Zone zone = linkToZone.get(link.getId());
+				if (zone != null) {
+					PriorityQueue<Vehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
+					queue.add(veh);
+				}
+			}
+		}
+	}
 
+	private void scheduleUnplannedRequestsWithinZones() {
+		Iterator<TaxiRequest> reqIter = getUnplannedRequests().iterator();
+		while (reqIter.hasNext()) {
+			TaxiRequest req = reqIter.next();
 
-    private void initIdleVehiclesInZones()
-    {
-        //TODO use idle vehicle register instead...
+			Zone zone = linkToZone.get(req.getFromLink().getId());
+			if (zone == null) {
+				continue;
+			}
 
-        zoneToIdleVehicleQueue = new HashMap<>();
-        for (Id<Zone> zoneId : zones.keySet()) {
-            zoneToIdleVehicleQueue.put(zoneId,
-                    new PriorityQueue<Vehicle>(10, LONGEST_WAITING_FIRST));
-        }
+			PriorityQueue<Vehicle> idleVehsInZone = zoneToIdleVehicleQueue.get(zone.getId());
+			if (idleVehsInZone.isEmpty()) {
+				continue;
+			}
 
-        for (Vehicle veh : optimContext.taxiData.getVehicles().values()) {
-            if (optimContext.scheduler.isIdle(veh)) {
-                Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
-                Zone zone = linkToZone.get(link.getId());
-                if (zone != null) {
-                    PriorityQueue<Vehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
-                    queue.add(veh);
-                }
-            }
-        }
-    }
+			Iterable<Vehicle> filteredVehs = Collections.singleton(idleVehsInZone.peek());
+			BestDispatchFinder.Dispatch<TaxiRequest> best = getDispatchFinder().findBestVehicleForRequest(req,
+					filteredVehs);
 
-
-    private void scheduleUnplannedRequestsWithinZones()
-    {
-        Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
-        while (reqIter.hasNext()) {
-            TaxiRequest req = reqIter.next();
-
-            Zone zone = linkToZone.get(req.getFromLink().getId());
-            if (zone == null) {
-                continue;
-            }
-
-            PriorityQueue<Vehicle> idleVehsInZone = zoneToIdleVehicleQueue.get(zone.getId());
-            if (idleVehsInZone.isEmpty()) {
-                continue;
-            }
-
-            Iterable<Vehicle> filteredVehs = Collections.singleton(idleVehsInZone.peek());
-            BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder
-                    .findBestVehicleForRequest(req, filteredVehs);
-
-            if (best != null) {
-                optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
-                reqIter.remove();
-                idleVehsInZone.remove(best.vehicle);
-            }
-        }
-    }
+			if (best != null) {
+				getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+				reqIter.remove();
+				idleVehsInZone.remove(best.vehicle);
+			}
+		}
+	}
 }

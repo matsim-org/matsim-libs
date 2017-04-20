@@ -35,51 +35,47 @@ import org.matsim.core.utils.io.IOUtils;
 
 import com.google.common.collect.Maps;
 
+public class CountDropoffsPerLink {
 
-public class CountDropoffsPerLink
-{
+	public static void main(String[] args) {
+		String dir = "../../../shared-svn/projects/audi_av/scenario/";
+		String networkFile = dir + "networkc.xml.gz";
+		String plansFile = dir + "plans.xml.gz";
+		String dropoffCountsFile = dir + "JAIHC_paper/dropoffs_per_link.txt";
 
-    public static void main(String[] args)
-    {
-        String dir = "../../../shared-svn/projects/audi_av/scenario/";
-        String networkFile = dir + "networkc.xml.gz";
-        String plansFile = dir + "plans.xml.gz";
-        String dropoffCountsFile = dir + "JAIHC_paper/dropoffs_per_link.txt";
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		new PopulationReader(scenario).readFile(plansFile);
 
-        Config config = ConfigUtils.createConfig();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-        new PopulationReader(scenario).readFile(plansFile);
+		// for each leg, get the destination link
+		Map<Id<Link>, ? extends Link> links = scenario.getNetwork().getLinks();
+		Map<Id<Link>, MutableInt> counts = Maps.newHashMapWithExpectedSize(links.size());
+		for (Id<Link> id : links.keySet()) {
+			counts.put(id, new MutableInt());
+		}
 
-        //for each leg, get the destination link
-        Map<Id<Link>, ? extends Link> links = scenario.getNetwork().getLinks();
-        Map<Id<Link>, MutableInt> counts = Maps.newHashMapWithExpectedSize(links.size());
-        for (Id<Link> id : links.keySet()) {
-            counts.put(id, new MutableInt());
-        }
+		int allLegs = 0;
+		int taxiLegs = 0;
+		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
+		for (Person p : persons.values()) {
+			List<PlanElement> planElements = p.getSelectedPlan().getPlanElements();
+			if (planElements.size() != 3) {
+				throw new RuntimeException();
+			}
+			if (((Leg)planElements.get(1)).getMode().equals("taxi")) {
+				counts.get(((Activity)planElements.get(2)).getLinkId()).increment();
+				taxiLegs++;
+			}
+			allLegs++;
+		}
 
-        int allLegs = 0;
-        int taxiLegs = 0;
-        Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
-        for (Person p : persons.values()) {
-            List<PlanElement> planElements = p.getSelectedPlan().getPlanElements();
-            if (planElements.size() != 3) {
-                throw new RuntimeException();
-            }
-            if ( ((Leg)planElements.get(1)).getMode().equals("taxi")) {
-                counts.get( ((Activity)planElements.get(2)).getLinkId()).increment();
-                taxiLegs++;
-            }
-            allLegs++;
-        }
+		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(dropoffCountsFile))) {
+			for (Entry<Id<Link>, MutableInt> e : counts.entrySet()) {
+				writer.writeNext(e.getKey() + "", e.getValue() + "");
+			}
+		}
 
-        try (CompactCSVWriter writer = new CompactCSVWriter(
-                IOUtils.getBufferedWriter(dropoffCountsFile))) {
-            for (Entry<Id<Link>, MutableInt> e : counts.entrySet()) {
-                writer.writeNext(e.getKey() + "", e.getValue() + "");
-            }
-        }
-
-        System.out.println("#taxi legs = " + taxiLegs + "; #all legs = " + allLegs);
-    }
+		System.out.println("#taxi legs = " + taxiLegs + "; #all legs = " + allLegs);
+	}
 }

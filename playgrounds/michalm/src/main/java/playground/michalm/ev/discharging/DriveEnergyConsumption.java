@@ -21,12 +21,10 @@ package playground.michalm.ev.discharging;
 
 import org.matsim.api.core.v01.network.Link;
 
-
 /**
- * Net energy taken from the battery to propel the vehicle, i.e. consumed by the motor minus
- * effectively regenerated (returned back to the battery).
+ * Net energy taken from the battery to propel the vehicle, i.e. consumed by the motor minus effectively regenerated
+ * (returned back to the battery).
  */
-public interface DriveEnergyConsumption
-{
-    double calcEnergyConsumption(Link link, double travelTime);
+public interface DriveEnergyConsumption {
+	double calcEnergyConsumption(Link link, double travelTime);
 }

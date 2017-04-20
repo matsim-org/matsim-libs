@@ -19,59 +19,45 @@
 
 package org.matsim.contrib.taxi.data;
 
+import java.util.Collection;
+
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
+public class TaxiRequests {
+	public static final Predicate<TaxiRequest> IS_UNPLANNED = new TaxiRequestStatusPredicate(
+			TaxiRequestStatus.UNPLANNED);
 
-public class TaxiRequests
-{
-    public static final Predicate<TaxiRequest> IS_UNPLANNED = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.UNPLANNED);
+	public static final Predicate<TaxiRequest> IS_PLANNED = new TaxiRequestStatusPredicate(TaxiRequestStatus.PLANNED);
 
-    public static final Predicate<TaxiRequest> IS_PLANNED = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.PLANNED);
+	public static final Predicate<TaxiRequest> IS_PICKUP = new TaxiRequestStatusPredicate(TaxiRequestStatus.PICKUP);
 
-    public static final Predicate<TaxiRequest> IS_TAXI_DISPATCHED = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.TAXI_DISPATCHED);
+	public static final Predicate<TaxiRequest> IS_RIDE = new TaxiRequestStatusPredicate(TaxiRequestStatus.RIDE);
 
-    public static final Predicate<TaxiRequest> IS_PICKUP = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.PICKUP);
+	public static final Predicate<TaxiRequest> IS_DROPOFF = new TaxiRequestStatusPredicate(TaxiRequestStatus.DROPOFF);
 
-    public static final Predicate<TaxiRequest> IS_RIDE = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.RIDE);
+	public static final Predicate<TaxiRequest> IS_PERFORMED = new TaxiRequestStatusPredicate(
+			TaxiRequestStatus.PERFORMED);
 
-    public static final Predicate<TaxiRequest> IS_DROPOFF = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.DROPOFF);
+	public static class TaxiRequestStatusPredicate implements Predicate<TaxiRequest> {
+		private final TaxiRequestStatus status;
 
-    public static final Predicate<TaxiRequest> IS_PERFORMED = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.PERFORMED);
+		public TaxiRequestStatusPredicate(TaxiRequestStatus status) {
+			this.status = status;
+		}
 
+		@Override
+		public boolean apply(TaxiRequest r) {
+			return r.getStatus() == status;
+		}
+	}
 
-    public static class TaxiRequestStatusPredicate
-        implements Predicate<TaxiRequest>
-    {
-        private final TaxiRequestStatus status;
-
-
-        public TaxiRequestStatusPredicate(TaxiRequestStatus status)
-        {
-            this.status = status;
-        }
-
-
-        @Override
-        public boolean apply(TaxiRequest r)
-        {
-            return r.getStatus() == status;
-        }
-    }
-
-
-    public static int countRequestsWithStatus(Iterable<TaxiRequest> requests,
-            TaxiRequestStatus status)
-    {
-        return Iterables.size(Iterables.filter(requests, new TaxiRequestStatusPredicate(status)));
-    }
+	@SuppressWarnings("unchecked")
+	public static int countRequestsWithStatus(Iterable<? extends Request> requests, TaxiRequestStatus status) {
+		return Iterables
+				.size(Iterables.filter((Collection<TaxiRequest>)requests, new TaxiRequestStatusPredicate(status)));
+	}
 }

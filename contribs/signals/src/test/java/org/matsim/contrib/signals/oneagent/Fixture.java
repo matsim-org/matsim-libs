@@ -73,6 +73,7 @@ public class Fixture {
 		conf.qsim().setUseLanes(true);
 		conf.qsim().setStuckTime(1000);
 		conf.qsim().setStartTime(0.0);
+		conf.qsim().setUsingFastCapacityUpdate(false);
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setUseSignalSystems(true);
 		

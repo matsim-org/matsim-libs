@@ -115,7 +115,7 @@ public class SubPopInputs4Munich {
 			config.strategy().addStrategySettings(reroute);
 
 			StrategySettings expBeta = new StrategySettings();
-			expBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+			expBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			expBeta.setSubpopulation(ug);
 			expBeta.setWeight(0.7);
 			config.strategy().addStrategySettings(expBeta);
@@ -146,7 +146,7 @@ public class SubPopInputs4Munich {
 			config.strategy().addStrategySettings(reroute);
 
 			StrategySettings expBeta = new StrategySettings();
-			expBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+			expBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			expBeta.setSubpopulation(ug);
 			expBeta.setWeight(0.70);
 			config.strategy().addStrategySettings(expBeta);

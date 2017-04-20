@@ -19,25 +19,21 @@
 
 package org.matsim.contrib.dynagent;
 
-public interface DynActivity
-    extends DynAction
-{
-    //Double.POSITIVE_INFINITY == stop simulating the agent (permanent sleep)
-    public static final double END_ACTIVITY_LATER = Double.MAX_VALUE;
+public interface DynActivity extends DynAction {
+	// Double.POSITIVE_INFINITY == stop simulating the agent (permanent sleep)
+	public static final double END_ACTIVITY_LATER = Double.MAX_VALUE;
 
+	String getActivityType();
 
-    String getActivityType();
+	double getEndTime();
 
-
-    double getEndTime();
-
-
-    /**
-     * DynActivity is performed at steps: now == beginTime + 1, ..., endTime
-     * 
-     * @param now current time
-     */
-    //TODO this method may possibly be pulled up to DynAction since even when travelling (either by
-    //PuT or PrT) an agent may think, talk (also on the phone), collaborate etc.
-    void doSimStep(double now);
+	/**
+	 * DynActivity is performed at steps: now == beginTime + 1, ..., endTime
+	 * 
+	 * @param now
+	 *            current time
+	 */
+	// TODO this method may possibly be pulled up to DynAction since even when travelling (either by
+	// PuT or PrT) an agent may think, talk (also on the phone), collaborate etc.
+	void doSimStep(double now);
 }

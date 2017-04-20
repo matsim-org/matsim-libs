@@ -27,41 +27,33 @@ import playground.michalm.ev.charging.ChargingHandler;
 import playground.michalm.ev.data.EvData;
 import playground.michalm.ev.discharging.*;
 
+public class EvModule extends AbstractModule {
+	private final EvData evData;
 
-public class EvModule
-    extends AbstractModule
-{
-    private final EvData evData;
+	public EvModule(EvData evData) {
+		this.evData = evData;
+	}
 
+	@Override
+	public void install() {
+		bind(EvData.class).toInstance(evData);
+		bind(DriveDischargingHandler.class).asEagerSingleton();
+		addEventHandlerBinding().to(DriveDischargingHandler.class);
+		bind(AuxDischargingHandler.class).asEagerSingleton();
+		addMobsimListenerBinding().to(AuxDischargingHandler.class);
+		bind(ChargingHandler.class).asEagerSingleton();
+		addMobsimListenerBinding().to(ChargingHandler.class);
 
-    public EvModule(EvData evData)
-    {
-        this.evData = evData;
-    }
+		if (EvConfigGroup.get(getConfig()).getTimeProfiles()) {
+			addMobsimListenerBinding().toProvider(SocHistogramTimeProfileCollectorProvider.class);
+			addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
+			// add more time profiles if necessary
+		}
 
-
-    @Override
-    public void install()
-    {
-        bind(EvData.class).toInstance(evData);
-        bind(DriveDischargingHandler.class).asEagerSingleton();
-        addEventHandlerBinding().to(DriveDischargingHandler.class);
-        bind(AuxDischargingHandler.class).asEagerSingleton();
-        addMobsimListenerBinding().to(AuxDischargingHandler.class);
-        bind(ChargingHandler.class).asEagerSingleton();
-        addMobsimListenerBinding().to(ChargingHandler.class);
-
-        if (EvConfigGroup.get(getConfig()).getTimeProfiles()) {
-            addMobsimListenerBinding().toProvider(SocHistogramTimeProfileCollectorProvider.class);
-            addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
-            //add more time profiles if necessary
-        }
-
-        addControlerListenerBinding().toInstance(new IterationEndsListener() {
-            public void notifyIterationEnds(IterationEndsEvent event)
-            {
-                evData.clearQueuesAndResetBatteries();
-            }
-        });
-    }
+		addControlerListenerBinding().toInstance(new IterationEndsListener() {
+			public void notifyIterationEnds(IterationEndsEvent event) {
+				evData.clearQueuesAndResetBatteries();
+			}
+		});
+	}
 }

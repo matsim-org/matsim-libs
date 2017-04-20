@@ -58,8 +58,7 @@ final class FileUtils {
 				}
 
 				// create id for pt stop
-				Long id = Long.parseLong( parts[idIDX] );
-				Id<PtStop> stopId = Id.create(id, PtStop.class);
+				Id<PtStop> stopId = Id.create(parts[idIDX], PtStop.class);
 				// create pt stop coordinate
 				Coord ptStopCoord = new Coord(Double.parseDouble(parts[xCoordIDX]), Double.parseDouble(parts[yCoordIDX]));
 
@@ -69,7 +68,7 @@ final class FileUtils {
 						qTree.getMinNorthing() <= ptStopCoord.getY();
 						if(!isInBoundary){
 							if(wrnCntSkip < 20)
-								log.warn("Pt stop " + id + " lies outside the network boundary and will be skipped!");
+								log.warn("Pt stop " + stopId + " lies outside the network boundary and will be skipped!");
 							else if(wrnCntSkip == 20)
 								log.error("Found " + wrnCntParse + " warnings of type 'pt stop lies outside the network boundary'. Reasons for this error is that the network defines the boundary for the quad tree that determines the nearest pt station for a given origin/destination location.");
 							wrnCntSkip++;
@@ -121,10 +120,8 @@ final class FileUtils {
 					continue;
 				}
 
-				try{
+//				try{
 					// trying to convert items into integers
-					Long originPtStopAsLong 	= Long.parseLong(parts[originPtStopIDX]);
-					Long destinationPtStopAsLong= Long.parseLong(parts[destinationPtStopIDX]);
 					double value 				= Double.parseDouble(parts[valueIDX]);
 					if(isTravelTimes)
 						value = value * 60.; 	// convert value from minutes into seconds
@@ -139,8 +136,8 @@ final class FileUtils {
 					}
 
 					// create Id's
-					Id<PtStop> originPtStopID 			= Id.create(originPtStopAsLong, PtStop.class);
-					Id<PtStop> destinationPtStopID 		= Id.create(destinationPtStopAsLong, PtStop.class);
+					Id<PtStop> originPtStopID 			= Id.create(parts[originPtStopIDX], PtStop.class);
+					Id<PtStop> destinationPtStopID 		= Id.create(parts[destinationPtStopIDX], PtStop.class);
 
 					// check if a pt stop with the given id exists
 					if( ptStopHashMap.containsKey(originPtStopID) && 
@@ -163,14 +160,14 @@ final class FileUtils {
 						wrnCntId++;
 						continue;
 					}
-				} catch(NumberFormatException nfe){
-					if(wrnCntFormat < 20)
-						log.warn("Could not convert values into integer: " + line);
-					else if(wrnCntFormat == 20)
-						log.error("Found " + wrnCntFormat + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check if id's are provided as 'long' type and travel values (times, distances) as 'double' type.");
-					wrnCntFormat++;
-					continue;
-				}
+//				} catch(NumberFormatException nfe){
+//					if(wrnCntFormat < 20)
+//						log.warn("Could not convert values into integer: " + line);
+//					else if(wrnCntFormat == 20)
+//						log.error("Found " + wrnCntFormat + " warnings of type 'pt stop id not found'. There is probably something seriously wrong. Please check if id's are provided as 'long' type and travel values (times, distances) as 'double' type.");
+//					wrnCntFormat++;
+//					continue;
+//				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

@@ -22,21 +22,23 @@ package playground.southafrica.freight.digicore.algorithms.complexNetwork;
 
 import java.util.Map;
 
-import org.apache.commons.collections15.Transformer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
 
+import com.google.common.base.Function;
+
 import edu.uci.ics.jung.graph.util.Pair;
 
-public class DigicoreEdgeWeightTransformer implements Transformer<Pair<Id<ActivityFacility>>, String> {
+public class DigicoreEdgeWeightTransformer implements Function<Pair<Id<ActivityFacility>>, String> {
 	private final Map<Pair<Id<ActivityFacility>>, Integer> map;
 	
 	public DigicoreEdgeWeightTransformer(Map<Pair<Id<ActivityFacility>>, Integer> map) {
 		this.map = map;
 	}
 
+
 	@Override
-	public String transform(Pair<Id<ActivityFacility>> pair) {
+	public String apply(Pair<Id<ActivityFacility>> pair) {
 		return map.get(pair).toString();
 	}
 

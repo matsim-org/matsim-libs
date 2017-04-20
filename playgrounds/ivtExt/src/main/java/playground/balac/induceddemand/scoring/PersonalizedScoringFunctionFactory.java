@@ -60,7 +60,7 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 	private final StageActivityTypes blackList;
 
 	// very expensive to initialize:only do once!
-	private final Map<Id, CharyparNagelScoringParameters> individualParameters = new HashMap< >();
+	private final Map<Id, ScoringParameters> individualParameters = new HashMap< >();
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -87,7 +87,7 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 
 		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		//final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		final CharyparNagelScoringParameters params = createParams( person , config , scenario.getConfig().scenario(), personAttributes );
+		final ScoringParameters params = createParams( person , config , scenario.getConfig().scenario(), personAttributes );
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
@@ -157,7 +157,7 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 		return scoringFunctionAccumulator;
 	}
 
-	private CharyparNagelScoringParameters createParams(
+	private ScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
 			final ScenarioConfigGroup scenarioConfig,
@@ -166,8 +166,8 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 			return individualParameters.get( person.getId() );
 		}
 
-		final CharyparNagelScoringParameters.Builder builder =
-				new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
+		final ScoringParameters.Builder builder =
+				new ScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			
@@ -246,7 +246,7 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 					typeBuilder );
 		}
 
-		final CharyparNagelScoringParameters params =
+		final ScoringParameters params =
 				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;

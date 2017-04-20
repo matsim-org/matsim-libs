@@ -5,54 +5,43 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 
+public class PopulationUtils {
+	public static void convertLegModes(List<String> passengerIds, String mode, Scenario scenario) {
+		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
 
-public class PopulationUtils
-{
-	private PopulationUtils(){} // do not instantiate
+		for (String id : passengerIds) {
+			Person person = persons.get(Id.create(id, Person.class));
 
-	
-	
-    public static void convertLegModes(List<String> passengerIds, String mode, Scenario scenario)
-    {
-        Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
+			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Leg) {
+					((Leg)pe).setMode(mode);
+				}
+			}
+		}
+	}
 
-        for (String id : passengerIds) {
-            Person person = persons.get(Id.create(id, Person.class));
+	public static void removePersonsNotUsingMode(String mode, Scenario scenario) {
+		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
+		Iterator<? extends Person> personIter = persons.values().iterator();
 
-            for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-                if (pe instanceof Leg) {
-                    ((Leg)pe).setMode(mode);
-                }
-            }
-        }
-    }
+		while (personIter.hasNext()) {
+			Plan selectedPlan = personIter.next().getSelectedPlan();
 
+			if (!hasLegOfMode(selectedPlan, mode)) {
+				personIter.remove();
+			}
+		}
+	}
 
-    public static void removePersonsNotUsingMode(String mode, Scenario scenario)
-    {
-        Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
-        Iterator<? extends Person> personIter = persons.values().iterator();
+	private static boolean hasLegOfMode(Plan plan, String mode) {
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				if (((Leg)pe).getMode().equals(mode)) {
+					return true;
+				}
+			}
+		}
 
-        while (personIter.hasNext()) {
-            Plan selectedPlan = personIter.next().getSelectedPlan();
-
-            if (!hasLegOfMode(selectedPlan, mode)) {
-                personIter.remove();
-            }
-        }
-    }
-
-
-    private static boolean hasLegOfMode(Plan plan, String mode)
-    {
-        for (PlanElement pe : plan.getPlanElements()) {
-            if (pe instanceof Leg) {
-                if ( ((Leg)pe).getMode().equals(mode)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
+		return false;
+	}
 }

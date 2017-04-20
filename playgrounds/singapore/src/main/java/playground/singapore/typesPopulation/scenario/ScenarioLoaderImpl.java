@@ -34,10 +34,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -64,9 +64,9 @@ import playground.singapore.typesPopulation.population.PopulationReader;
  * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
  * </ul> 
  *
- * @see org.matsim.core.scenario.ScenarioImplPops
+ * @see playground.singapore.typesPopulation.scenario.ScenarioImplPops
  *
- * @author dgrether
+ * @author sergioo
  */
 public class ScenarioLoaderImpl {
 

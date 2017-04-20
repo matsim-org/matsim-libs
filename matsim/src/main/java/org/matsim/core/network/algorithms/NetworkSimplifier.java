@@ -53,7 +53,7 @@ import java.util.TreeSet;
  * @author aneumann, jwjoubert
  *
  */
-public class NetworkSimplifier {
+public final class NetworkSimplifier {
 
 	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
 	private boolean mergeLinkStats = false;

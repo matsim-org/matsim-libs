@@ -23,33 +23,27 @@ import java.util.Arrays;
 
 import org.matsim.contrib.otfvis.OTFVis;
 
+public class OTFVisSim {
 
-public class OTFVisSim
-{
+	public static void main(String[] args) {
+		String dir;
+		String mviFile;
 
-    public static void main(String[] args)
-    {
-        String dir;
-        String mviFile;
+		if (args.length == 1 && args[0].equals("test")) {// for testing
+			// dir = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
+			dir = "d:\\PP-rad\\taxi\\mielec-2-peaks\\";
 
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            //dir = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
-            dir = "d:\\PP-rad\\taxi\\mielec-2-peaks\\";
+			// mviFile = "output\\config-verB\\ITERS\\it.10\\10.otfvis.mvi";
+			// mviFile = "output\\config-verB\\ITERS\\it.50\\50.otfvis.mvi";
 
-            // mviFile = "output\\config-verB\\ITERS\\it.10\\10.otfvis.mvi";
-            //mviFile = "output\\config-verB\\ITERS\\it.50\\50.otfvis.mvi";
+			mviFile = "20.otfvis.mvi";
+		} else if (args.length == 2) {
+			dir = args[0];
+			mviFile = args[1];
+		} else {
+			throw new IllegalArgumentException("Incorrect program arguments: " + Arrays.toString(args));
+		}
 
-            mviFile = "20.otfvis.mvi";
-        }
-        else if (args.length == 2) {
-            dir = args[0];
-            mviFile = args[1];
-        }
-        else {
-            throw new IllegalArgumentException(
-                    "Incorrect program arguments: " + Arrays.toString(args));
-        }
-
-        OTFVis.playMVI(dir + mviFile);
-    }
+		OTFVis.playMVI(dir + mviFile);
+	}
 }

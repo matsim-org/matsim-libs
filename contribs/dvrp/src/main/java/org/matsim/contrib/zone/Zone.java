@@ -24,77 +24,56 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+public class Zone implements BasicLocation<Zone> {
+	private final Id<Zone> id;
+	private final String type;
 
-public class Zone
-    implements BasicLocation<Zone>
-{
-    private final Id<Zone> id;
-    private final String type;
+	private MultiPolygon multiPolygon;
+	private Coord centroid;
 
-    private MultiPolygon multiPolygon;
-    private Coord centroid;
+	public Zone(Id<Zone> id, String type) {
+		this.id = id;
+		this.type = type;
+	}
 
+	public Zone(Id<Zone> id, String type, Coord centroid) {
+		this.id = id;
+		this.type = type;
+		this.centroid = centroid;
+	}
 
-    public Zone(Id<Zone> id, String type)
-    {
-        this.id = id;
-        this.type = type;
-    }
+	public Zone(Id<Zone> id, String type, MultiPolygon multiPolygon) {
+		this.id = id;
+		this.type = type;
 
+		this.multiPolygon = multiPolygon;
+		centroid = MGC.point2Coord(multiPolygon.getCentroid());
+	}
 
-    public Zone(Id<Zone> id, String type, Coord centroid)
-    {
-        this.id = id;
-        this.type = type;
-        this.centroid = centroid;
-    }
+	@Override
+	public Id<Zone> getId() {
+		return id;
+	}
 
+	@Override
+	public Coord getCoord() {
+		return centroid;
+	}
 
-    public Zone(Id<Zone> id, String type, MultiPolygon multiPolygon)
-    {
-        this.id = id;
-        this.type = type;
+	public void setCoord(Coord coord) {
+		this.centroid = coord;
+	}
 
-        this.multiPolygon = multiPolygon;
-        centroid = MGC.point2Coord(multiPolygon.getCentroid());
-    }
+	public String getType() {
+		return type;
+	}
 
+	public MultiPolygon getMultiPolygon() {
+		return multiPolygon;
+	}
 
-    @Override
-    public Id<Zone> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public Coord getCoord()
-    {
-        return centroid;
-    }
-
-
-    public void setCoord(Coord coord)
-    {
-        this.centroid = coord;
-    }
-
-
-    public String getType()
-    {
-        return type;
-    }
-
-
-    public MultiPolygon getMultiPolygon()
-    {
-        return multiPolygon;
-    }
-
-
-    public void setMultiPolygon(MultiPolygon multiPolygon)
-    {
-        this.multiPolygon = multiPolygon;
-        centroid = MGC.point2Coord(multiPolygon.getCentroid());
-    }
+	public void setMultiPolygon(MultiPolygon multiPolygon) {
+		this.multiPolygon = multiPolygon;
+		centroid = MGC.point2Coord(multiPolygon.getCentroid());
+	}
 }

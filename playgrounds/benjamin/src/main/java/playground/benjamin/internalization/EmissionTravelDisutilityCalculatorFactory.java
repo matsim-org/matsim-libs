@@ -21,6 +21,7 @@ package playground.benjamin.internalization;
 
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -37,17 +38,11 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
  */
 public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
-	private final EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
-	private Set<Id<Link>> hotspotLinks;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
+	@Inject private EmissionModule emissionModule;
+	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public EmissionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule,
-			PlanCalcScoreConfigGroup cnScoringGroup) {
-		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
-		this.cnScoringGroup = cnScoringGroup;
-	}
+	@Inject private EmissionCostModule emissionCostModule;
+	private Set<Id<Link>> hotspotLinks;
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){

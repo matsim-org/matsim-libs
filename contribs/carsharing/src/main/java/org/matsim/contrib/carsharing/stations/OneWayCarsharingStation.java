@@ -55,10 +55,19 @@ public class OneWayCarsharingStation implements CarsharingStation{
 	public void addCar(String type, CSVehicle vehicle){
 		
 		ArrayList<CSVehicle> currentVehicles = this.vehiclesPerType.get(type);		
+		
+		if (currentVehicles == null)
+			currentVehicles = new ArrayList<CSVehicle>();
+		
 		currentVehicles.add(vehicle);
-		int currentNumberOfVehicles = this.numberOfvehiclesPerType.get(type);
-		currentNumberOfVehicles++;
-		this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);	
+		this.vehiclesPerType.put(type, currentVehicles);
+		if (this.numberOfvehiclesPerType.get(type) == null)
+			this.numberOfvehiclesPerType.put(type, 1);	
+		else {
+			int currentNumberOfVehicles = this.numberOfvehiclesPerType.get(type);
+			currentNumberOfVehicles++;
+			this.numberOfvehiclesPerType.put(type, currentNumberOfVehicles);
+		}
 	}
 
 	@Override

@@ -27,25 +27,22 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
+public class TaxiDemandUtils {
+	public static void preprocessPlansBasedOnCoordsOnly(Scenario scenario) {
+		Network network = scenario.getNetwork();
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			List<PlanElement> planElements = p.getSelectedPlan().getPlanElements();
 
-public class TaxiDemandUtils
-{
-    public static void preprocessPlansBasedOnCoordsOnly(Scenario scenario)
-    {
-        Network network = scenario.getNetwork();
-        for (Person p : scenario.getPopulation().getPersons().values()) {
-            List<PlanElement> planElements = p.getSelectedPlan().getPlanElements();
+			Activity fromActivity = (Activity)planElements.get(0);
+			Link fromLink = NetworkUtils.getNearestLink(network, fromActivity.getCoord());
+			fromActivity.setLinkId(fromLink.getId());
 
-            Activity fromActivity = (Activity)planElements.get(0);
-            Link fromLink = NetworkUtils.getNearestLink(network, fromActivity.getCoord());
-            fromActivity.setLinkId(fromLink.getId());
+			Activity toActivity = (Activity)planElements.get(2);
+			Link toLink = NetworkUtils.getNearestLink(network, toActivity.getCoord());
+			toActivity.setLinkId(toLink.getId());
 
-            Activity toActivity = (Activity)planElements.get(2);
-            Link toLink = NetworkUtils.getNearestLink(network, toActivity.getCoord());
-            toActivity.setLinkId(toLink.getId());
-
-            Leg leg = (Leg)p.getSelectedPlan().getPlanElements().get(1);
-            leg.setRoute(new GenericRouteImpl(fromLink.getId(), toLink.getId()));
-        }
-    }
+			Leg leg = (Leg)p.getSelectedPlan().getPlanElements().get(1);
+			leg.setRoute(new GenericRouteImpl(fromLink.getId(), toLink.getId()));
+		}
+	}
 }

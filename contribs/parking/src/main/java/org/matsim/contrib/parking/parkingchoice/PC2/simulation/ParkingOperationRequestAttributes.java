@@ -25,12 +25,12 @@ import org.matsim.facilities.ActivityFacility;
 
 public class ParkingOperationRequestAttributes {
 
-	Coord destCoordinate;
-	double arrivalTime;
-	double parkingDurationInSeconds;
-	Id<Person> personId;
-	Id<ActivityFacility> facilityId;
-	String actType;
-	int legIndex;
+	public Coord destCoordinate;
+	public double arrivalTime;
+	public double parkingDurationInSeconds;
+	public Id<Person> personId;
+	public Id<ActivityFacility> facilityId;
+	public String actType;
+	public int legIndex;
 
 }

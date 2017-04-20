@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,7 +19,10 @@
 
 package org.matsim.contrib.accessibility;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -49,7 +52,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     private double boundingBoxRight;
     private double boundingBoxBottom;
 	
-	private Integer cellSizeCellBasedAccessibility;
+	private Long cellSizeCellBasedAccessibility;
 	private String shapeFileCellBasedAccessibility;
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
@@ -137,11 +140,11 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	// keeping the code compact
 	
 	@StringGetter("cellSizeForCellBasedAccessibility") 
-    public Integer getCellSizeCellBasedAccessibility() {
+    public Long getCellSizeCellBasedAccessibility() {
 		return this.cellSizeCellBasedAccessibility;
     }
 	@StringSetter("cellSizeForCellBasedAccessibility")  // size in meters (whatever that is since the coord system does not know about meters)
-    public void setCellSizeCellBasedAccessibility(int value) {
+    public void setCellSizeCellBasedAccessibility(long value) {
 		if (value <= 0) {
 			throw new IllegalArgumentException("Cell size must be greater than zero.");
 		}
@@ -240,22 +243,23 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     }
 
     @StringGetter(AREA_OF_ACC_COMP)
-	public String getAreaOfAccessibilityComputation() {
-		return areaOfAccessibilityComputation.toString();
+	public AreaOfAccesssibilityComputation getAreaOfAccessibilityComputation() {
+		return areaOfAccessibilityComputation;
 	}
 
     @StringSetter(AREA_OF_ACC_COMP)
-	public void setAreaOfAccessibilityComputation( String areaOfAccessibilityComputation) {
-    	boolean problem = true ;
-    	for ( AreaOfAccesssibilityComputation var : AreaOfAccesssibilityComputation.values() ) {
-    		if ( var.toString().equals(areaOfAccessibilityComputation) ) {
-    			this.areaOfAccessibilityComputation = var ;
-    			problem = false ;
-    		}
-    	}
-    	if ( problem ){
-    		throw new RuntimeException("string typo error") ;
-    	}
+	public void setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation areaOfAccessibilityComputation) {
+	    this.areaOfAccessibilityComputation = areaOfAccessibilityComputation ;
+//    	boolean problem = true ;
+//    	for ( AreaOfAccesssibilityComputation var : AreaOfAccesssibilityComputation.values() ) {
+//    		if ( var.toString().equals(areaOfAccessibilityComputation) ) {
+//    			this.areaOfAccessibilityComputation = var ;
+//    			problem = false ;
+//    		}
+//    	}
+//    	if ( problem ){
+//    		throw new RuntimeException("string typo error") ;
+//    	}
 	}
     
 }

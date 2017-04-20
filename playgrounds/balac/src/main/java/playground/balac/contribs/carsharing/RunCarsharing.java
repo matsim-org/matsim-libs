@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
@@ -33,6 +34,7 @@ import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
+import org.matsim.contrib.carsharing.runExample.ComputationTime;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -74,7 +76,14 @@ public class RunCarsharing {
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 
 		final Controler controler = new Controler( sc );
-		
+		int i = 0;
+		for (Person person : sc.getPopulation().getPersons().values()) {
+			Boolean b = false;
+			if (i % 150 == 0)
+				b = true;
+			person.getAttributes().putAttribute("bulky", b);
+			i++;
+		}
 		installCarSharing(controler);
 		
 		controler.run();
@@ -129,6 +138,8 @@ public class RunCarsharing {
 			    bind(CarsharingSupplyInterface.class).toInstance(carsharingSupplyContainer);
 			    bind(CarsharingManagerInterface.class).toInstance(carsharingManager);
 			    bind(DemandHandler.class).asEagerSingleton();
+			    bind(ComputationTime.class).asEagerSingleton();
+
 			}			
 		});		
 		
@@ -182,7 +193,7 @@ public class RunCarsharing {
 			if (s.equals("Mobility"))
 				costCalculations.put("freefloating", new CostStructure1());		
 			else {
-				costCalculations.put("freefloating", new CostStructure2());
+				costCalculations.put("freefloating", new CostStructure1());
 				costCalculations.put("twoway", new CostStructureTwoWay());
 
 			}

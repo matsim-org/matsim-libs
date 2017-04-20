@@ -217,8 +217,7 @@ public class QNode implements NetsimNode {
 		for (QLaneI lane : link.getOfferingQLanes()) {
 			while (! lane.isNotOfferingVehicle()) {
 				QVehicle veh = lane.getFirstVehicle();
-				Id<Link> nextLink = veh.getDriver().chooseNextLinkId();
-				if (! (lane.hasGreenForToLink(nextLink) && moveVehicleOverNode(veh, lane, now))) {
+                if (! moveVehicleOverNode(veh, lane, now)) {
 					break;
 				}
 			}
@@ -259,8 +258,6 @@ public class QNode implements NetsimNode {
 	 */
 	private boolean moveVehicleOverNode(final QVehicle veh, final QLaneI fromLaneBuffer, final double now) {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
-		Link currentLink = veh.getCurrentLink();
-
 		if ((! fromLaneBuffer.hasGreenForToLink(nextLinkId))) {
 			//there is no longer a stuck check for red links. This means that
 			//in case of an infinite red time the simulation will not stop automatically because
@@ -268,6 +265,7 @@ public class QNode implements NetsimNode {
 				return false;
 		}
 
+        Link currentLink = veh.getCurrentLink();
 		if (nextLinkId == null) {
 			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
 					+ " currentLink=" + currentLink.getId().toString()

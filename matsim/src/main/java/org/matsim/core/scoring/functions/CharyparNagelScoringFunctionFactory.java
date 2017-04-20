@@ -44,14 +44,14 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 
 	protected Network network;
 
-	private final CharyparNagelScoringParametersForPerson params;
+	private final ScoringParametersForPerson params;
 
 	public CharyparNagelScoringFunctionFactory( final Scenario sc ) {
-		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() );
+		this( new SubpopulationScoringParameters( sc ) , sc.getNetwork() );
 	}
 
 	@Inject
-	CharyparNagelScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network) {
+	CharyparNagelScoringFunctionFactory(final ScoringParametersForPerson params, Network network) {
 		this.params = params;
 		this.network = network;
 	}
@@ -77,7 +77,7 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 
-		final CharyparNagelScoringParameters parameters = params.getScoringParameters( person );
+		final ScoringParameters parameters = params.getScoringParameters( person );
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring( parameters ));

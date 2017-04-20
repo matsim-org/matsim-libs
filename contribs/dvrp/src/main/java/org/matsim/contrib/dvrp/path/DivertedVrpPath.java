@@ -25,115 +25,90 @@ import org.matsim.api.core.v01.network.Link;
 
 import com.google.common.collect.Iterators;
 
+/**
+ * A DivertedVrpPath is a VrpPath which additionally keeps information about the original path, where the new path
+ * deviates from the original one, and at which link index they diverted.
+ * 
+ * @author (of documentation) nagel
+ */
+public class DivertedVrpPath implements VrpPath {
+	private final VrpPath originalPath;
+	private final VrpPath newSubPath;
+	private final int diversionLinkIdx;// originalPath.getLink(diversionLinkIdx) == newSubPath.getLink(0)
 
-public class DivertedVrpPath
-    implements VrpPath
-{
-    private final VrpPath originalPath;
-    private final VrpPath newSubPath;
-    private final int diversionLinkIdx;// originalPath.getLink(diversionLinkIdx) == newSubPath.getLink(0)
+	public DivertedVrpPath(VrpPath originalPath, VrpPath newSubPath, int diversionLinkIdx) {
+		if (originalPath.getLink(diversionLinkIdx) != newSubPath.getLink(0)) {
+			throw new IllegalArgumentException();
+		}
 
+		this.originalPath = originalPath;
+		this.newSubPath = newSubPath;
+		this.diversionLinkIdx = diversionLinkIdx;
+	}
 
-    public DivertedVrpPath(VrpPath originalPath, VrpPath newSubPath, int diversionLinkIdx)
-    {
-        if (originalPath.getLink(diversionLinkIdx) != newSubPath.getLink(0)) {
-            throw new IllegalArgumentException();
-        }
+	@Override
+	public int getLinkCount() {
+		return diversionLinkIdx + newSubPath.getLinkCount();
+	}
 
-        this.originalPath = originalPath;
-        this.newSubPath = newSubPath;
-        this.diversionLinkIdx = diversionLinkIdx;
-    }
+	@Override
+	public Link getLink(int idx) {
+		if (isInOriginalPath(idx)) {
+			return originalPath.getLink(idx);
+		} else {
+			return newSubPath.getLink(idx - diversionLinkIdx);
+		}
+	}
 
+	@Override
+	public double getLinkTravelTime(int idx) {
+		if (isInOriginalPath(idx)) {
+			return originalPath.getLinkTravelTime(idx);
+		} else {
+			return newSubPath.getLinkTravelTime(idx - diversionLinkIdx);
+		}
+	}
 
-    @Override
-    public int getLinkCount()
-    {
-        return diversionLinkIdx + newSubPath.getLinkCount();
-    }
+	private boolean isInOriginalPath(int idx) {
+		// for getLink() both idx < diversionLinkIdx and idx <= diversionLinkIdx are OK
+		// for getLinkTT() diversionLinkIdx must be taken from originalPath since TT for the first link
+		// in newSubPath is 1 second (a vehicle enters the link at its end)
+		return idx <= diversionLinkIdx;
+	}
 
+	@Override
+	public void setLinkTravelTime(int idx, double linkTT) {
+		if (isInOriginalPath(idx)) {
+			originalPath.setLinkTravelTime(idx, linkTT);
+		} else {
+			newSubPath.setLinkTravelTime(idx - diversionLinkIdx, linkTT);
+		}
+	}
 
-    @Override
-    public Link getLink(int idx)
-    {
-        if (isInOriginalPath(idx)) {
-            return originalPath.getLink(idx);
-        }
-        else {
-            return newSubPath.getLink(idx - diversionLinkIdx);
-        }
-    }
+	@Override
+	public Link getFromLink() {
+		return originalPath.getFromLink();
+	}
 
+	@Override
+	public Link getToLink() {
+		return newSubPath.getToLink();
+	}
 
-    @Override
-    public double getLinkTravelTime(int idx)
-    {
-        if (isInOriginalPath(idx)) {
-            return originalPath.getLinkTravelTime(idx);
-        }
-        else {
-            return newSubPath.getLinkTravelTime(idx - diversionLinkIdx);
-        }
-    }
+	@Override
+	public Iterator<Link> iterator() {
+		return Iterators.concat(Iterators.limit(originalPath.iterator(), diversionLinkIdx), newSubPath.iterator());
+	}
 
+	public VrpPath getOriginalPath() {
+		return originalPath;
+	}
 
-    private boolean isInOriginalPath(int idx)
-    {
-        //for getLink() both idx < diversionLinkIdx and idx <= diversionLinkIdx are OK
-        //for getLinkTT() diversionLinkIdx must be taken from originalPath since TT for the first link
-        //in newSubPath is 1 second (a vehicle enters the link at its end) 
-        return idx <= diversionLinkIdx;
-    }
+	public VrpPath getNewSubPath() {
+		return newSubPath;
+	}
 
-
-    @Override
-    public void setLinkTravelTime(int idx, double linkTT)
-    {
-        if (isInOriginalPath(idx)) {
-            originalPath.setLinkTravelTime(idx, linkTT);
-        }
-        else {
-            newSubPath.setLinkTravelTime(idx - diversionLinkIdx, linkTT);
-        }
-    }
-
-
-    @Override
-    public Link getFromLink()
-    {
-        return originalPath.getFromLink();
-    }
-
-
-    @Override
-    public Link getToLink()
-    {
-        return newSubPath.getToLink();
-    }
-
-
-    @Override
-    public Iterator<Link> iterator()
-    {
-        return Iterators.concat(Iterators.limit(originalPath.iterator(), diversionLinkIdx),
-                newSubPath.iterator());
-    }
-
-
-    public VrpPath getOriginalPath()
-    {
-        return originalPath;
-    }
-
-
-    public VrpPath getNewSubPath()
-    {
-        return newSubPath;
-    }
-
-
-    public int getDiversionLinkIdx()
-    {
-        return diversionLinkIdx;
-    }
+	public int getDiversionLinkIdx() {
+		return diversionLinkIdx;
+	}
 }

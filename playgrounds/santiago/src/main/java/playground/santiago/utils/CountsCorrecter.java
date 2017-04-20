@@ -63,7 +63,7 @@ public class CountsCorrecter {
 			
 				Count badCount = badCounts.getCount(goodCountId);
 
-			for (int h = 7 ; h<23 ; ++h){
+			for (int h = 7 ; h<=23 ; ++h){
 				
 				
 				

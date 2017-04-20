@@ -32,47 +32,36 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
 
 import com.google.inject.Provides;
 
+public class DynQSimModule<T extends Mobsim> extends AbstractModule {
+	private final Class<? extends javax.inject.Provider<? extends T>> providerClass;
 
-public class DynQSimModule<T extends Mobsim>
-    extends AbstractModule
-{
-    private Class<? extends javax.inject.Provider<? extends T>> providerClass;
+	public DynQSimModule(Class<? extends javax.inject.Provider<? extends T>> providerClass) {
+		this.providerClass = providerClass;
+	}
 
+	@Override
+	public void install() {
+		bindMobsim().toProvider(providerClass);
+	}
 
-    public DynQSimModule(Class<? extends javax.inject.Provider<? extends T>> providerClass)
-    {
-        this.providerClass = providerClass;
-    }
+	@Provides
+	private Collection<AbstractQSimPlugin> provideQSimPlugins(Config config) {
+		return createQSimPlugins(config);
+	}
 
-
-    @Override
-    public void install()
-    {
-        bindMobsim().toProvider(providerClass);
-    }
-
-
-    @Provides
-    private Collection<AbstractQSimPlugin> provideQSimPlugins(Config config)
-    {
-        return createQSimPlugins(config);
-    }
-
-    
-    public static Collection<AbstractQSimPlugin> createQSimPlugins(Config config)
-    {
-        final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-        plugins.add(new MessageQueuePlugin(config));
-        plugins.add(new DynActivityEnginePlugin(config));
-        plugins.add(new QNetsimEnginePlugin(config));
-        if (config.network().isTimeVariantNetwork()) {
-            plugins.add(new NetworkChangeEventsPlugin(config));
-        }
-        if (config.transit().isUseTransit()) {
-            plugins.add(new TransitEnginePlugin(config));
-        }
-        plugins.add(new TeleportationPlugin(config));
-        plugins.add(new PopulationPlugin(config));
-        return plugins;
-    }
+	public static Collection<AbstractQSimPlugin> createQSimPlugins(Config config) {
+		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
+		plugins.add(new MessageQueuePlugin(config));
+		plugins.add(new DynActivityEnginePlugin(config));
+		plugins.add(new QNetsimEnginePlugin(config));
+		if (config.network().isTimeVariantNetwork()) {
+			plugins.add(new NetworkChangeEventsPlugin(config));
+		}
+		if (config.transit().isUseTransit()) {
+			plugins.add(new TransitEnginePlugin(config));
+		}
+		plugins.add(new TeleportationPlugin(config));
+		plugins.add(new PopulationPlugin(config));
+		return plugins;
+	}
 }

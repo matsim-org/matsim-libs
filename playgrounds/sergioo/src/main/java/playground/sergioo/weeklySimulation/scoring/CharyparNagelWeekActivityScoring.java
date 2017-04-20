@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -54,12 +54,12 @@ public class CharyparNagelWeekActivityScoring implements ActivityScoring, org.ma
 	protected double score;
 	private double currentActivityStartTime;
 	private double firstActivityEndTime;
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	private Activity currentActivity;
 	private boolean firstAct = true;
 	private Activity firstActivity;
 	
-	public CharyparNagelWeekActivityScoring(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+	public CharyparNagelWeekActivityScoring(final ScoringParameters params, final ActivityFacilities facilities) {
 		this.params = params;
 		this.reset();
 		this.facilities = facilities;

@@ -25,54 +25,41 @@ import org.matsim.api.core.v01.*;
 
 import playground.michalm.demand.taxi.ServedRequest;
 
+public class PoznanServedRequest implements ServedRequest {
+	final Id<ServedRequest> id;
+	final Date accepted;
+	final Date assigned;
+	final Coord from;
+	final Coord to;
+	final Id<String> taxiId;
 
-public class PoznanServedRequest
-    implements ServedRequest
-{
-    final Id<ServedRequest> id;
-    final Date accepted;
-    final Date assigned;
-    final Coord from;
-    final Coord to;
-    final Id<String> taxiId;
+	public PoznanServedRequest(Id<ServedRequest> id, Date accepted, Date assigned, Coord from, Coord to,
+			Id<String> taxiId) {
+		this.id = id;
+		this.accepted = accepted;
+		this.assigned = assigned;
+		this.from = from;
+		this.to = to;
+		this.taxiId = taxiId;
+	}
 
+	@Override
+	public Id<ServedRequest> getId() {
+		return id;
+	}
 
-    public PoznanServedRequest(Id<ServedRequest> id, Date accepted, Date assigned, Coord from,
-            Coord to, Id<String> taxiId)
-    {
-        this.id = id;
-        this.accepted = accepted;
-        this.assigned = assigned;
-        this.from = from;
-        this.to = to;
-        this.taxiId = taxiId;
-    }
+	@Override
+	public Coord getFrom() {
+		return from;
+	}
 
+	@Override
+	public Coord getTo() {
+		return to;
+	}
 
-    @Override
-    public Id<ServedRequest> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public Coord getFrom()
-    {
-        return from;
-    }
-
-
-    @Override
-    public Coord getTo()
-    {
-        return to;
-    }
-
-
-    @Override
-    public Date getStartTime()
-    {
-        return assigned;
-    }
+	@Override
+	public Date getStartTime() {
+		return assigned;
+	}
 }

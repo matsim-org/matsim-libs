@@ -25,6 +25,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 import org.matsim.contrib.socnetsim.utils.CollectionUtils;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
+import org.matsim.core.router.priorityqueue.HasIndex;
+import org.matsim.core.router.priorityqueue.MinHeap;
 import org.matsim.core.utils.misc.Counter;
 
 import java.util.ArrayDeque;
@@ -32,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -204,20 +208,20 @@ public class SnaUtils {
 		return ((double) sum) / count;
 	}
 
-	public static Collection<Set<Id>> identifyConnectedComponents(
+	public static Collection<Set<Id<Person>>> identifyConnectedComponents(
 			final SocialNetwork sn) {
 		if ( !sn.isReflective() ) {
 			throw new IllegalArgumentException( "the algorithm is valid only with reflective networks" );
 		}
 		final Map<Id<Person>, Set<Id<Person>>> altersMap = new LinkedHashMap<>( sn.getMapRepresentation() );
-		final Collection< Set<Id> > components = new ArrayList< Set<Id> >();
+		final Collection< Set<Id<Person>> > components = new ArrayList<>();
 	
 		while ( !altersMap.isEmpty() ) {
 			// DFS implemented as a loop (recursion results in a stackoverflow on
 			// big networks)
 			final Id<Person> seed = CollectionUtils.getElement( 0 , altersMap.keySet() );
 	
-			final Set<Id> component = new HashSet<Id>();
+			final Set<Id<Person>> component = new HashSet<>();
 			components.add( component );
 			component.add( seed );
 	
@@ -225,7 +229,7 @@ public class SnaUtils {
 			stack.add( seed );
 	
 			while ( !stack.isEmpty() ) {
-				final Id current = stack.remove();
+				final Id<Person> current = stack.remove();
 				final Set<Id<Person>> alters = altersMap.remove( current );
 	
 				for ( Id<Person> alter : alters ) {
@@ -238,6 +242,137 @@ public class SnaUtils {
 		}
 	
 		return components;
+	}
+
+	public static void sampleSocialDistances(
+			final SocialNetwork socialNetwork,
+			final Random random,
+			final int nPairs,
+			final DistanceCallback callback  ) {
+
+		log.info( "searching for the biggest connected component..." );
+		PairRandomizer biggestComponent = null;
+		for ( Set<Id<Person>> component : SnaUtils.identifyConnectedComponents( socialNetwork ) ) {
+			if ( biggestComponent == null || biggestComponent.ids.size() < component.size() ) {
+				biggestComponent = new PairRandomizer( random , component );
+			}
+		}
+
+		log.info( "considering only biggest component with size "+ biggestComponent.ids.size() );
+		log.info( "ignoring "+( socialNetwork.getEgos().size() - biggestComponent.ids.size() )+" agents ("+
+				( ( socialNetwork.getEgos().size() - biggestComponent.ids.size() ) * 100d / socialNetwork.getEgos().size() )+"%)" );
+
+
+		final Counter counter = new Counter( "sampling pair # " );
+		for ( int i = 0; i < nPairs; i++ ) {
+			counter.incCounter();
+			final Id<Person> ego = biggestComponent.next();
+			final Id<Person> alter = biggestComponent.next();
+
+			callback.notifyDistance(
+					ego, alter ,
+					calcNHops( socialNetwork , ego , alter ) );
+		}
+		counter.printCounter();
+	}
+
+	// "two way dijkstra" directly on the social network.
+	// given the small world property, this should be much faster than standard dijkstra.
+	// this also avoids creating a matsim network to run the standard dijkstra, saving precious memory
+	// it is, in practice, roughly 50 times faster than using MATSim's dijkstra on an equivalent matsim network.
+	// No idea if this comes from the 2-way (it might be, given the small-world property) or simply the implementation...
+	private static int calcNHops( final SocialNetwork network , final Id<Person> ego, final Id<Person> alter ) {
+		// does this implementation really speeds things up? It takes quite a lot of space, as it does not resizes...
+		final MinHeap<TaggedId> queue = new BinaryMinHeap<>( network.getEgos().size() );
+		final TaggedIdPool pool = new TaggedIdPool();
+
+		queue.add( pool.getTaggedId( ego , true , 0 ) , 0 );
+		queue.add( pool.getTaggedId( alter , false , 0 ) , 0 );
+
+		while ( !queue.isEmpty() ) {
+			final TaggedId current = queue.poll();
+
+			final int newDist = current.dist + 1;
+
+			final Set<Id<Person>> currentAlters = network.getAlters( current.id );
+			for ( Id<Person> currentAlter : currentAlters ) {
+				final TaggedId taggedId = pool.getTaggedId( currentAlter , current.fromEgo , newDist );
+
+				// we joined the two trees
+				if ( taggedId.fromEgo == !current.fromEgo ) return newDist + taggedId.dist;
+				if ( taggedId.dist == newDist ) {
+					// it was newly created
+					queue.add( taggedId , taggedId.dist );
+				}
+			}
+		}
+
+		throw new RuntimeException();
+	}
+
+	private static class TaggedIdPool {
+		private int index = 0;
+
+		private final Map<Id<Person>, TaggedId> ids = new HashMap<>();
+
+		public TaggedId getTaggedId( final Id<Person> id , final boolean fromEgo , final int dist ) {
+			TaggedId taggedId = ids.get( id );
+			if ( taggedId == null ) {
+				taggedId = new TaggedId( id , index++, fromEgo, dist );
+				ids.put( id , taggedId );
+			}
+
+			return taggedId;
+		}
+	}
+	private static class TaggedId implements HasIndex {
+		final Id<Person> id;
+		final int index;
+
+		final boolean fromEgo;
+		final int dist;
+
+		private TaggedId( final Id<Person> id, final int index, final boolean fromEgo, final int dist ) {
+			this.id = id;
+			this.index = index;
+			this.fromEgo = fromEgo;
+			this.dist = dist;
+		}
+
+		@Override
+		public int getArrayIndex() {
+			return index;
+		}
+	}
+
+	@FunctionalInterface
+	public interface DistanceCallback {
+		void notifyDistance( final Id<Person> ego , final Id<Person> alter , final double distance );
+	}
+
+	private static class PairRandomizer {
+		private final List<Id<Person>> ids;
+		private int index = 0;
+		private int step = 1;
+
+		private PairRandomizer(
+				final Random random,
+				final Collection<Id<Person>> ids ) {
+			this.ids = new ArrayList<>( ids );
+			Collections.shuffle( this.ids , random );
+		}
+
+		public Id<Person> next() {
+			final Id<Person> id = ids.get( index );
+
+			index += step;
+			if ( index >= ids.size() ) {
+				index = 0;
+				step++;
+			}
+
+			return id;
+		}
 	}
 }
 

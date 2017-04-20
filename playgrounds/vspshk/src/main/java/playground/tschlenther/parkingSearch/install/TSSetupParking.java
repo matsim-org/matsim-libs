@@ -23,6 +23,8 @@
 package playground.tschlenther.parkingSearch.install;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
@@ -38,12 +40,13 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.StageActivityTypes;
 
-import playground.tschlenther.parkingSearch.Benenson.FacilityBasedBenensonParkingManager;
+import com.google.inject.name.Names;
+
 
 
 /**
  * @author  jbischoff
- *
+ * @author  tschlenther
  */
 /**
  *
@@ -63,18 +66,19 @@ public class TSSetupParking {
 			}
 		};
 		routingModuleCar.setStageActivityTypes(stageActivityTypesCar);
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addRoutingModuleBinding(TransportMode.car).toInstance(routingModuleCar);
-				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
+				//bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
 				//bind(ParkingSearchManager.class).to(FacilityBasedBenensonParkingManager.class).asEagerSingleton();
 				bind(WalkLegFactory.class).asEagerSingleton();
 				this.install(new TSParkingSearchQSimModule());
 				addControlerListenerBinding().to(ParkingListener.class);
 				bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
 				bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);
+				bind(Network.class).annotatedWith(Names.named(DvrpModule.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
 			}
 		});
 

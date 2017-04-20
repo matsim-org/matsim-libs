@@ -541,7 +541,7 @@ public class BeingTogetherScoring {
 		}
 	}
 
-	public static interface Filter {
+	public interface Filter {
 		public boolean consider(final String typeOrMode);
 	}
 
@@ -576,7 +576,7 @@ public class BeingTogetherScoring {
 		}
 	}
 
-	public static interface PersonOverlapScorer {
+	public interface PersonOverlapScorer {
 		public double getScore(
 				Id alter,
 				double totalTimePassedTogether);
@@ -611,6 +611,7 @@ public class BeingTogetherScoring {
 
 		@Override
 		public double getScore(final Id alter, final double totalTimePassedTogether) {
+			if ( typicalDuration < 0 ) throw new IllegalStateException(  );
 			final double log = marginalUtility * typicalDuration
 						* Math.log( totalTimePassedTogether / zeroDuration );
 			// penalizing being a short time with social contacts would make no sense,

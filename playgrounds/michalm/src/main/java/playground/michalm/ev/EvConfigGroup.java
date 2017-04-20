@@ -19,97 +19,80 @@
 
 package playground.michalm.ev;
 
+import java.net.URL;
+
 import org.matsim.core.config.*;
 
+public class EvConfigGroup extends ReflectiveConfigGroup {
+	public static final String GROUP_NAME = "ev";
 
-public class EvConfigGroup
-    extends ReflectiveConfigGroup
-{
-    public static final String GROUP_NAME = "ev";
+	@SuppressWarnings("deprecation")
+	public static EvConfigGroup get(Config config) {
+		return (EvConfigGroup)config.getModule(GROUP_NAME);
+	}
 
+	public static final String CHARGE_TIME_STEP = "chargeTimeStep";
+	public static final String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
 
-    public static EvConfigGroup get(Config config)
-    {
-        return (EvConfigGroup)config.getModule(GROUP_NAME);
-    }
+	// input
+	public static final String CHARGERS_FILE = "chargersFile";
 
+	// output
+	public static final String TIME_PROFILES = "timeProfiles";
 
-    public static final String CHARGE_TIME_STEP = "chargeTimeStep";
-    public static final String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
+	// no need to simulate with 1-second time step
+	private int chargeTimeStep = 5; // 5 s ==> 0.35% SOC (fast charging, 50 kW)
+	private int auxDischargeTimeStep = 60; // 1 min ==> 0.25% SOC (3 kW aux power)
 
-    //input
-    public static final String CHARGERS_FILE = "chargersFile";
+	private String chargersFile = null;
 
-    //output
-    public static final String TIME_PROFILES = "timeProfiles";
+	private boolean timeProfiles = false;
 
-    //no need to simulate with 1-second time step
-    private int chargeTimeStep = 5; //5 s ==> 0.35% SOC (fast charging, 50 kW)
-    private int auxDischargeTimeStep = 60; //1 min ==> 0.25% SOC (3 kW aux power)
+	public EvConfigGroup() {
+		super(GROUP_NAME);
+	}
 
-    private String chargersFile = null;
+	@StringGetter(CHARGE_TIME_STEP)
+	public int getChargeTimeStep() {
+		return chargeTimeStep;
+	}
 
-    private boolean timeProfiles = false;
+	@StringSetter(CHARGE_TIME_STEP)
+	public void setChargeTimeStep(int chargeTimeStep) {
+		this.chargeTimeStep = chargeTimeStep;
+	}
 
+	@StringGetter(AUX_DISCHARGE_TIME_STEP)
+	public int getAuxDischargeTimeStep() {
+		return auxDischargeTimeStep;
+	}
 
-    public EvConfigGroup()
-    {
-        super(GROUP_NAME);
-    }
+	@StringSetter(AUX_DISCHARGE_TIME_STEP)
+	public void setAuxDischargeTimeStep(int auxDischargeTimeStep) {
+		this.auxDischargeTimeStep = auxDischargeTimeStep;
+	}
 
+	@StringGetter(CHARGERS_FILE)
+	public String getChargersFile() {
+		return chargersFile;
+	}
 
-    @StringGetter(CHARGE_TIME_STEP)
-    public int getChargeTimeStep()
-    {
-        return chargeTimeStep;
-    }
+	@StringSetter(CHARGERS_FILE)
+	public void setChargersFile(String chargersFile) {
+		this.chargersFile = chargersFile;
+	}
 
+	@StringGetter(TIME_PROFILES)
+	public boolean getTimeProfiles() {
+		return timeProfiles;
+	}
 
-    @StringSetter(CHARGE_TIME_STEP)
-    public void setChargeTimeStep(int chargeTimeStep)
-    {
-        this.chargeTimeStep = chargeTimeStep;
-    }
+	@StringSetter(TIME_PROFILES)
+	public void setTimeProfiles(boolean timeProfiles) {
+		this.timeProfiles = timeProfiles;
+	}
 
-
-    @StringGetter(AUX_DISCHARGE_TIME_STEP)
-    public int getAuxDischargeTimeStep()
-    {
-        return auxDischargeTimeStep;
-    }
-
-
-    @StringSetter(AUX_DISCHARGE_TIME_STEP)
-    public void setAuxDischargeTimeStep(int auxDischargeTimeStep)
-    {
-        this.auxDischargeTimeStep = auxDischargeTimeStep;
-    }
-
-
-    @StringGetter(CHARGERS_FILE)
-    public String getChargerFile()
-    {
-        return chargersFile;
-    }
-
-
-    @StringSetter(CHARGERS_FILE)
-    public void setChargerFile(String chargersFile)
-    {
-        this.chargersFile = chargersFile;
-    }
-
-
-    @StringGetter(TIME_PROFILES)
-    public boolean getTimeProfiles()
-    {
-        return timeProfiles;
-    }
-
-
-    @StringSetter(TIME_PROFILES)
-    public void setTimeProfiles(boolean timeProfiles)
-    {
-        this.timeProfiles = timeProfiles;
-    }
+	public URL getChargersFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.chargersFile);
+	}
 }

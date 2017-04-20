@@ -19,11 +19,16 @@
 
 package org.matsim.contrib.dvrp.optimizer;
 
-import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
-
-public interface VrpOptimizerWithOnlineTracking
-    extends VrpOptimizer
-{
-    void nextLinkEntered(DriveTask driveTask);
+/**
+ * @author michalm
+ * @author (of documentation) nagel
+ */
+public interface VrpOptimizerWithOnlineTracking extends VrpOptimizer {
+	/**
+	 * Notifies the optimizer that the next link was entered.
+	 */
+	void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink);
 }

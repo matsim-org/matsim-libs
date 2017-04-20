@@ -22,12 +22,16 @@ package others.sergioo.visUtils;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Toolkit;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import others.sergioo.util.geometry.Line2D;
@@ -40,6 +44,8 @@ public class PanelPointLines extends JPanel implements Observer {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	private static final int FRAMESIZE = 10;
 	
 	//Attributes
 	private Point2D upLeftCorner;
@@ -52,6 +58,8 @@ public class PanelPointLines extends JPanel implements Observer {
 	private Stroke linesStroke = new BasicStroke(1);
 	private PointLines pointsLines;
 	private String title;
+	private JFrame window;
+	
 	//Methods
 	public PanelPointLines(PointLines pointsLines) {
 		this.setBackground(backgroundColor);
@@ -64,6 +72,21 @@ public class PanelPointLines extends JPanel implements Observer {
 		this.pointsLines = pointsLines;
 		this.title = title;
 		calculateBoundaries();
+		((Observable) pointsLines).addObserver(this);
+	}
+	public PanelPointLines(PointLines pointsLines, JFrame window) {
+		this.setBackground(backgroundColor);
+		this.pointsLines = pointsLines;
+		calculateBoundaries(window);
+		this.window = window;
+		((Observable) pointsLines).addObserver(this);
+	}
+	public PanelPointLines(PointLines pointsLines, String title, JFrame window) {
+		this.setBackground(backgroundColor);
+		this.pointsLines = pointsLines;
+		this.title = title;
+		calculateBoundaries(window);
+		this.window = window;
 		((Observable) pointsLines).addObserver(this);
 	}
 	@Override
@@ -90,20 +113,59 @@ public class PanelPointLines extends JPanel implements Observer {
 		g2.setColor(linesColor);
 		g2.setStroke(linesStroke);
 		for(Line2D line:pointsLines.getLines()) {
-			if(line.getThickness()!=-1) {
-				g2.setColor(new Color(1,1-(float)line.getThickness()/10,0));
+			if(line.getThickness()!=-1)
 				g2.setStroke(new BasicStroke((float)line.getThickness()));
-			}
+			else
+				g2.setStroke(linesStroke);
 			g2.drawLine(getIntX(line.getPI().getX()), getIntY(line.getPI().getY()), getIntX(line.getPF().getX()), getIntY(line.getPF().getY()));
 		}
 		/*for(Line2D line:((SimpleMapMatcher)pointsLines).getLines2())
 			g2.drawLine(getIntX(line.getPI().getX()), getIntY(line.getPI().getY()), getIntX(line.getPF().getX()), getIntY(line.getPF().getY()));*/
 	}
 	public int getIntX(double x) {
-		return (int) ((x-upLeftCorner.getX())*(Window.width-2*Window.FRAMESIZE)/this.size.getX())+Window.FRAMESIZE;
+		return (int) ((x-upLeftCorner.getX())*(window.getWidth()-2*FRAMESIZE)/this.size.getX())+FRAMESIZE;
 	}
 	public int getIntY(double y) {
-		return (int) ((upLeftCorner.getY()-y)*(Window.height-2*Window.FRAMESIZE)/this.size.getY())+Window.FRAMESIZE;
+		return (int) ((upLeftCorner.getY()-y)*(window.getHeight()-2*FRAMESIZE)/this.size.getY())+FRAMESIZE;
+	}
+	private void calculateBoundaries(JFrame window) {
+		double xMin=Double.POSITIVE_INFINITY, yMin=Double.POSITIVE_INFINITY, xMax=Double.NEGATIVE_INFINITY, yMax=Double.NEGATIVE_INFINITY;
+		for(Point2D point:pointsLines.getPoints()) {
+			if(point.getX()<xMin)
+				xMin = point.getX();
+			if(point.getX()>xMax)
+				xMax = point.getX();
+			if(point.getY()<yMin)
+				yMin = point.getY();
+			if(point.getY()>yMax)
+				yMax = point.getY();
+		}
+		for(Line2D line:pointsLines.getLines()) {
+			Point2D point = line.getPI();
+			if(point.getX()<xMin)
+				xMin = point.getX();
+			if(point.getX()>xMax)
+				xMax = point.getX();
+			if(point.getY()<yMin)
+				yMin = point.getY();
+			if(point.getY()>yMax)
+				yMax = point.getY();
+			point = line.getPF();
+			if(point.getX()<xMin)
+				xMin = point.getX();
+			if(point.getX()>xMax)
+				xMax = point.getX();
+			if(point.getY()<yMin)
+				yMin = point.getY();
+			if(point.getY()>yMax)
+				yMax = point.getY();
+		}
+		upLeftCorner = new Point2D(xMin, yMax);
+		size = new Vector2D(new Point2D(xMin, yMin), new Point2D(xMax, yMax));
+		Dimension scSize = Toolkit.getDefaultToolkit().getScreenSize();		
+		int width=(int) (size.getX()/size.getY()>(double)scSize.getWidth()/(double)scSize.getHeight()?scSize.getWidth():scSize.getHeight()*size.getX()/size.getY());
+		int height=(int) (size.getY()/size.getX()>(double)scSize.getHeight()/(double)scSize.getWidth()?scSize.getHeight():scSize.getWidth()*size.getY()/size.getX());
+		window.setSize(width, height);
 	}
 	private void calculateBoundaries() {
 		double xMin=Double.POSITIVE_INFINITY, yMin=Double.POSITIVE_INFINITY, xMax=Double.NEGATIVE_INFINITY, yMax=Double.NEGATIVE_INFINITY;
@@ -139,8 +201,6 @@ public class PanelPointLines extends JPanel implements Observer {
 		}
 		upLeftCorner = new Point2D(xMin, yMax);
 		size = new Vector2D(new Point2D(xMin, yMin), new Point2D(xMax, yMax));
-		Window.width=(int) (size.getX()/size.getY()>(double)Window.MAX_WIDTH/(double)Window.MAX_HEIGHT?Window.MAX_WIDTH:Window.MAX_HEIGHT*size.getX()/size.getY());
-		Window.height=(int) (size.getY()/size.getX()>(double)Window.MAX_HEIGHT/(double)Window.MAX_WIDTH?Window.MAX_HEIGHT:Window.MAX_WIDTH*size.getY()/size.getX());
 	}
 	@Override
 	public void update(Observable o, Object arg) {

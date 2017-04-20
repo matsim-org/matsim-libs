@@ -24,9 +24,8 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.zone.*;
 
 import com.google.common.base.Predicate;
@@ -46,14 +45,15 @@ public class InclusionIdleTaxiZonalRegistry
     private final String barrierFreeTaxiDesignator;
 
 
-    public InclusionIdleTaxiZonalRegistry(ZonalSystem zonalSystem, TaxiScheduleInquiry scheduleInquiry,String barrierFreeTaxiDesignator)
+    public InclusionIdleTaxiZonalRegistry(ZonalSystem zonalSystem, ScheduleInquiry scheduleInquiry,String barrierFreeTaxiDesignator)
     {
     	this.barrierFreeTaxiDesignator = barrierFreeTaxiDesignator;
         this.zonalSystem = zonalSystem;
         zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
 
-        isIdle = TaxiSchedulerUtils.createIsIdle(scheduleInquiry);
+        isIdle = ScheduleInquiries.createIsIdle(scheduleInquiry);
         isIdleAndBarrierFree = createIsIdleAndBarrierFreePredicate(scheduleInquiry);
+        
         vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
         for (Id<Zone> id : zonalSystem.getZones().keySet()) {
             vehiclesInZones.put(id, new HashMap<Id<Vehicle>, Vehicle>());
@@ -91,23 +91,24 @@ public class InclusionIdleTaxiZonalRegistry
     }
 
 
-    public Iterable<Vehicle> findNearestVehicles(Node node, int minCount, boolean needsSpecialVehicle)
+    public Iterable<Vehicle> findNearestVehicles(Node node, boolean needsSpecialVehicle)
     {
-        if (minCount >= vehicles.size()) {
-            return getVehicles();
-        }
+        
 
         Zone zone = zonalSystem.getZone(node);
         Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
         List<Vehicle> nearestVehs = new ArrayList<>();
-
         for (Zone z : zonesByDistance) {
-            Iterables.addAll(nearestVehs,
-                    Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdle));
+        	if (needsSpecialVehicle){
+        		
+        		Iterables.addAll(nearestVehs,Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdleAndBarrierFree));
+        		
+        	}
+        	else{
+        		Iterables.addAll(nearestVehs,Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdle));
+        	}
 
-            if (nearestVehs.size() >= minCount) {
-                return nearestVehs;
-            }
+           
         }
 
         return nearestVehs;
@@ -131,12 +132,16 @@ public class InclusionIdleTaxiZonalRegistry
         return vehicles.size();
     }
     
-    private Predicate<Vehicle> createIsIdleAndBarrierFreePredicate(final TaxiScheduleInquiry scheduleInquiry)
+    private Predicate<Vehicle> createIsIdleAndBarrierFreePredicate(final ScheduleInquiry scheduleInquiry)
     {
         return new Predicate<Vehicle>() {
             public boolean apply(Vehicle vehicle)
             {
-                return (scheduleInquiry.isIdle(vehicle)&&vehicle.getId().toString().startsWith(barrierFreeTaxiDesignator));
+            	if (vehicle.getId().toString().startsWith(barrierFreeTaxiDesignator)){
+            		
+            		return (scheduleInquiry.isIdle(vehicle));
+                   	} 
+            	else return false;
             }
         };
     }

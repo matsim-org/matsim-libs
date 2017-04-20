@@ -188,7 +188,7 @@ public class TransitQueueSimulationTest {
 
         QSim sim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
         sim.run();
-        List<MobsimAgent> agents = new ArrayList<>(sim.getAgents());
+        List<MobsimAgent> agents = new ArrayList<>(sim.getAgents().values());
         Collections.sort(agents, new Comparator<MobsimAgent>() {
             @Override
             public int compare(MobsimAgent mobsimAgent, MobsimAgent mobsimAgent1) {

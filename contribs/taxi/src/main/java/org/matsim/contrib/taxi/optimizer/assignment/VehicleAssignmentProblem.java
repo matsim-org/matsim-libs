@@ -25,186 +25,166 @@ import java.util.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
+import org.matsim.contrib.util.*;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Lists;
 
+/**
+ * @author michalm
+ */
+public class VehicleAssignmentProblem<D> {
+	public static interface AssignmentCost<D> {
+		double calc(VehicleData.Entry departure, DestEntry<D> dest, PathData pathData);
+	}
 
-public class VehicleAssignmentProblem<D>
-{
-    public static interface AssignmentCost<D>
-    {
-        double calc(VehicleData.Entry departure, DestEntry<D> dest, PathData pathData);
-    }
+	private final TravelTime travelTime;
+	private final FastAStarEuclidean euclideanRouter;
 
+	private final OneToManyPathSearch forwardPathSearch;
+	private final OneToManyPathSearch backwardPathSearch;
 
-    private final TravelTime travelTime;
-    private final FastAStarEuclidean euclideanRouter;
+	private final LinkProvider<DestEntry<D>> destLinkProvider = LinkProviders.createDestEntryToLink();
 
-    private final OneToManyPathSearch forwardPathSearch;
-    private final OneToManyPathSearch backwardPathSearch;
+	private final StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> destinationFinder;
+	private final StraightLineKnnFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder;
 
-    private final LinkProvider<DestEntry<D>> destLinkProvider = LinkProviders
-            .createDestEntryToLink();
+	private AssignmentCost<D> assignmentCost;
+	private VehicleData vData;
+	private AssignmentDestinationData<D> dData;
 
-    private final StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> destinationFinder;
-    private final StraightLineKnnFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder;
+	public VehicleAssignmentProblem(TravelTime travelTime, MultiNodePathCalculator router,
+			BackwardMultiNodePathCalculator backwardRouter) {
+		// we do not need Euclidean router when there is not kNN filtering
+		this(travelTime, router, backwardRouter, null, -1, -1);
+	}
 
-    private AssignmentCost<D> assignmentCost;
-    private VehicleData vData;
-    private AssignmentDestinationData<D> dData;
+	public VehicleAssignmentProblem(TravelTime travelTime, MultiNodePathCalculator router,
+			BackwardMultiNodePathCalculator backwardRouter, FastAStarEuclidean euclideanRouter,
+			int nearestDestinationLimit, int nearestVehicleLimit) {
+		this.travelTime = travelTime;
+		this.euclideanRouter = euclideanRouter;
 
+		forwardPathSearch = OneToManyPathSearch.createForwardSearch(router);
+		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
 
-    public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
-            BackwardFastMultiNodeDijkstra backwardRouter)
-    {
-        //we do not need Euclidean router when there is not kNN filtering
-        this(travelTime, router, backwardRouter, null, -1, -1);
-    }
+		// TODO this kNN is slow
+		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
+		destinationFinder = nearestDestinationLimit < 0 ? null : new StraightLineKnnFinder<>(nearestDestinationLimit,
+				LinkProviders.VEHICLE_ENTRY_TO_LINK, linkProvider);
+		vehicleFinder = nearestVehicleLimit < 0 ? null
+				: new StraightLineKnnFinder<>(nearestVehicleLimit, linkProvider, LinkProviders.VEHICLE_ENTRY_TO_LINK);
+	}
 
+	public List<Dispatch<D>> findAssignments(VehicleData vData, AssignmentDestinationData<D> dData,
+			AssignmentCost<D> assignmentCost) {
+		this.vData = vData;
+		this.dData = dData;
+		this.assignmentCost = assignmentCost;
 
-    public VehicleAssignmentProblem(TravelTime travelTime, FastMultiNodeDijkstra router,
-            BackwardFastMultiNodeDijkstra backwardRouter, FastAStarEuclidean euclideanRouter,
-            int nearestDestinationLimit, int nearestVehicleLimit)
-    {
-        this.travelTime = travelTime;
-        this.euclideanRouter = euclideanRouter;
+		PathData[][] pathDataMatrix = createPathDataMatrix();
+		double[][] costMatrix = createCostMatrix(pathDataMatrix);
+		int[] assignments = new HungarianAlgorithm(costMatrix).execute();
+		return createDispatches(assignments, pathDataMatrix, travelTime);
+	}
 
-        forwardPathSearch = OneToManyPathSearch.createForwardSearch(router);
-        backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
+	// private static int calcPathsForVehiclesCount = 0;
+	// private static int calcPathsForDestinationsCount = 0;
 
-        //TODO this kNN is slow
-        destinationFinder = StraightLineKnnFinders.createDestEntryFinder(nearestDestinationLimit);
-        vehicleFinder = StraightLineKnnFinders.createVehicleDepartureFinder(nearestVehicleLimit);
-    }
+	private PathData[][] createPathDataMatrix() {
+		PathData[][] pathDataMatrix = (PathData[][])Array.newInstance(PathData.class, vData.getSize(), dData.getSize());
 
+		if (dData.getSize() > vData.getSize()) {
+			calcPathsForVehicles(pathDataMatrix);
+			// calcPathsForVehiclesCount++;
+		} else {
+			calcPathsForDestinations(pathDataMatrix);
+			// calcPathsForDestinationsCount++;
+		}
 
-    public List<Dispatch<D>> findAssignments(VehicleData vData, AssignmentDestinationData<D> dData,
-            AssignmentCost<D> assignmentCost)
-    {
-        this.vData = vData;
-        this.dData = dData;
-        this.assignmentCost = assignmentCost;
+		// if ( (calcPathsForDestinationsCount + calcPathsForVehiclesCount) % 100 == 0) {
+		// System.err.println("PathsForDestinations = " + calcPathsForDestinationsCount
+		// + " PathsForVehicles = " + calcPathsForVehiclesCount);
+		// System.err.println("dests = " + dData.getSize() + " vehs = " + vData.getSize()
+		// + " idleVehs = " + vData.getIdleCount());
+		// }
 
-        PathData[][] pathDataMatrix = createPathDataMatrix();
-        double[][] costMatrix = createCostMatrix(pathDataMatrix);
-        int[] assignments = new HungarianAlgorithm(costMatrix).execute();
-        return createDispatches(assignments, pathDataMatrix, travelTime);
-    }
+		return pathDataMatrix;
+	}
 
+	private void calcPathsForVehicles(PathData[][] pathDataMatrix) {
+		for (int v = 0; v < vData.getSize(); v++) {
+			VehicleData.Entry departure = vData.getEntry(v);
 
-    //private static int calcPathsForVehiclesCount = 0;
-    //private static int calcPathsForDestinationsCount = 0;
+			List<DestEntry<D>> filteredDests = destinationFinder == null ? dData.getEntries()
+					: destinationFinder.findNearest(departure, dData.getEntries());
+			List<Link> toLinks = Lists.transform(filteredDests, destLinkProvider);
+			PathData[] paths = forwardPathSearch.calcPaths(departure.link, toLinks, departure.time);
 
-    private PathData[][] createPathDataMatrix()
-    {
-        PathData[][] pathDataMatrix = (PathData[][])Array.newInstance(PathData.class,
-                vData.getSize(), dData.getSize());
+			for (int i = 0; i < filteredDests.size(); i++) {
+				int d = filteredDests.get(i).idx;
+				pathDataMatrix[v][d] = paths[i];
+			}
+		}
+	}
 
-        if (dData.getSize() > vData.getSize()) {
-            calcPathsForVehicles(pathDataMatrix);
-            //calcPathsForVehiclesCount++;
-        }
-        else {
-            calcPathsForDestinations(pathDataMatrix);
-            //calcPathsForDestinationsCount++;
-        }
+	// TODO does not support adv reqs
+	private void calcPathsForDestinations(PathData[][] pathDataMatrix) {
+		for (int d = 0; d < dData.getSize(); d++) {
+			DestEntry<D> dest = dData.getEntry(d);
 
-        //if ( (calcPathsForDestinationsCount + calcPathsForVehiclesCount) % 100 == 0) {
-        //    System.err.println("PathsForDestinations = " + calcPathsForDestinationsCount
-        //        + " PathsForVehicles = " + calcPathsForVehiclesCount);
-        //    System.err.println("dests = " + dData.getSize() + " vehs = " + vData.getSize()
-        //        + " idleVehs = " + vData.getIdleCount());
-        //}
+			List<VehicleData.Entry> filteredVehs = vehicleFinder == null ? vData.getEntries()
+					: vehicleFinder.findNearest(dest, vData.getEntries());
+			List<Link> toLinks = Lists.transform(filteredVehs, LinkProviders.VEHICLE_ENTRY_TO_LINK);
+			PathData[] paths = backwardPathSearch.calcPaths(dest.link, toLinks, dest.time);
 
-        return pathDataMatrix;
-    }
+			for (int i = 0; i < filteredVehs.size(); i++) {
+				int v = filteredVehs.get(i).idx;
+				pathDataMatrix[v][d] = paths[i];
+			}
+		}
+	}
 
+	private double[][] createCostMatrix(PathData[][] pathDataMatrix) {
 
-    private void calcPathsForVehicles(PathData[][] pathDataMatrix)
-    {
-        for (int v = 0; v < vData.getSize(); v++) {
-            VehicleData.Entry departure = vData.getEntry(v);
+		double[][] costMatrix = new double[vData.getSize()][dData.getSize()];
 
-            List<DestEntry<D>> filteredDests = destinationFinder == null ? dData.getEntries()
-                    : destinationFinder.findNearest(departure, dData.getEntries());
-            List<Link> toLinks = Lists.transform(filteredDests, destLinkProvider);
-            PathData[] paths = forwardPathSearch.calcPaths(departure.link, toLinks, departure.time);
+		for (int v = 0; v < vData.getSize(); v++) {
+			VehicleData.Entry departure = vData.getEntry(v);
+			for (int r = 0; r < dData.getSize(); r++) {
+				costMatrix[v][r] = assignmentCost.calc(departure, dData.getEntry(r), pathDataMatrix[v][r]);
+			}
+		}
 
-            for (int i = 0; i < filteredDests.size(); i++) {
-                int d = filteredDests.get(i).idx;
-                pathDataMatrix[v][d] = paths[i];
-            }
-        }
-    }
+		return costMatrix;
+	}
 
+	private List<Dispatch<D>> createDispatches(int[] assignments, PathData[][] pathDataMatrix, TravelTime travelTime) {
+		List<Dispatch<D>> dispatches = new ArrayList<>(Math.min(vData.getSize(), dData.getSize()));
+		for (int v = 0; v < assignments.length; v++) {
+			int d = assignments[v];
+			if (d == -1 || // no request assigned
+					d >= dData.getSize()) {// non-existing (dummy) request assigned
+				continue;
+			}
 
-    //TODO does not support adv reqs
-    private void calcPathsForDestinations(PathData[][] pathDataMatrix)
-    {
-        for (int d = 0; d < dData.getSize(); d++) {
-            DestEntry<D> dest = dData.getEntry(d);
+			VehicleData.Entry departure = vData.getEntry(v);
+			DestEntry<D> dest = dData.getEntry(d);
+			PathData pathData = pathDataMatrix[v][d];
 
-            List<VehicleData.Entry> filteredVehs = vehicleFinder == null ? vData.getEntries()
-                    : vehicleFinder.findNearest(dest, vData.getEntries());
-            List<Link> toLinks = Lists.transform(filteredVehs, LinkProviders.VEHICLE_ENTRY_TO_LINK);
-            PathData[] paths = backwardPathSearch.calcPaths(dest.link, toLinks, dest.time);
+			// TODO if null is frequent we may be more efficient by increasing the neighbourhood
+			VrpPathWithTravelData vrpPath = pathData == null ? //
+					VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time, euclideanRouter, travelTime)
+					: VrpPaths.createPath(departure.link, dest.link, departure.time, pathData.path, travelTime);
 
-            for (int i = 0; i < filteredVehs.size(); i++) {
-                int v = filteredVehs.get(i).idx;
-                pathDataMatrix[v][d] = paths[i];
-            }
-        }
-    }
+			dispatches.add(new Dispatch<>(departure.vehicle, dest.destination, vrpPath));
+		}
 
-
-    private double[][] createCostMatrix(PathData[][] pathDataMatrix)
-    {
-
-        double[][] costMatrix = new double[vData.getSize()][dData.getSize()];
-
-        for (int v = 0; v < vData.getSize(); v++) {
-            VehicleData.Entry departure = vData.getEntry(v);
-            for (int r = 0; r < dData.getSize(); r++) {
-                costMatrix[v][r] = assignmentCost.calc(departure, dData.getEntry(r),
-                        pathDataMatrix[v][r]);
-            }
-        }
-
-        return costMatrix;
-    }
-
-
-    private List<Dispatch<D>> createDispatches(int[] assignments, PathData[][] pathDataMatrix,
-            TravelTime travelTime)
-    {
-        List<Dispatch<D>> dispatches = new ArrayList<>(Math.min(vData.getSize(), dData.getSize()));
-        for (int v = 0; v < assignments.length; v++) {
-            int d = assignments[v];
-            if (d == -1 || //no request assigned
-                    d >= dData.getSize()) {// non-existing (dummy) request assigned
-                continue;
-            }
-
-            VehicleData.Entry departure = vData.getEntry(v);
-            DestEntry<D> dest = dData.getEntry(d);
-            PathData pathData = pathDataMatrix[v][d];
-
-            //TODO if null is frequent we may be more efficient by increasing the neighbourhood
-            VrpPathWithTravelData vrpPath = pathData == null ? //
-                    VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time,
-                            euclideanRouter, travelTime)
-                    : VrpPaths.createPath(departure.link, dest.link, departure.time, pathData.path,
-                            travelTime);
-
-            dispatches.add(new Dispatch<>(departure.vehicle, dest.destination, vrpPath));
-        }
-
-        return dispatches;
-    }
+		return dispatches;
+	}
 }

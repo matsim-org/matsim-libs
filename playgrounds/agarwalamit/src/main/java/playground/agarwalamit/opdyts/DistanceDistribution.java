@@ -24,7 +24,6 @@ import java.util.Map;
 /**
  * Created by amit on 13/01/2017.
  */
-@SuppressWarnings("DefaultFileTemplate")
 public interface DistanceDistribution {
 
     double [] getDistClasses();

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.network.io.NetworkReaderTeleatlas;
@@ -51,7 +50,7 @@ import org.opengis.feature.simple.SimpleFeature;
  *
  * @author balmermi
  */
-public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable {
+public final class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

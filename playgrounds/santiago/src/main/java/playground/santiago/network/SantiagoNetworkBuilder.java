@@ -65,11 +65,13 @@ public class SantiagoNetworkBuilder {
 	final boolean prepareForModeChoice = false;
 //	final boolean prepareForModeChoice = true;
 	
-	private final String svnWorkingDir = "/Users/michaelzilske/svn/santiago/scenario/";
+//	private final String svnWorkingDir = "/Users/michaelzilske/svn/santiago/scenario/";
+	private final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
 	private final String workingDirInputFiles = svnWorkingDir + "inputFromElsewhere/";
-	private final String outputDir = svnWorkingDir + "inputFromElsewhere/network/";
-
-	private final String transitNetworkFile = svnWorkingDir + "inputForMATSim/transit/transitnetwork.xml.gz";
+//	private final String outputDir = svnWorkingDir + "inputFromElsewhere/network/";
+	private final String outputDir = svnWorkingDir + "inputFromElsewhere/TMP_networkOSM/";
+	
+	private final String transitNetworkFile = svnWorkingDir + "inputForMATSim/TMP_Transit/transitnetwork.xml.gz";
 	
 	public static void main(String[] args) {
 		SantiagoNetworkBuilder snb = new SantiagoNetworkBuilder();

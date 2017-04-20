@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -94,8 +95,10 @@ public class TransitRouterImpl implements TransitRouter {
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
-			double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
-			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.trConfig.getExtensionRadius());
+			if ( nearestNode != null ) { // transit schedule might be completely empty!
+				double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
+				nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.trConfig.getExtensionRadius());
+			}
 		}
 		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
 		for (TransitRouterNetworkNode node : nearestNodes) {
@@ -125,24 +128,31 @@ public class TransitRouterImpl implements TransitRouter {
 		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
 		// find possible end stops
 		Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toFacility.getCoord(), departureTime);
+		
+		double pathCost = Double.POSITIVE_INFINITY ;
+		Path p = null ;
 
-		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(transitNetwork, travelDisutility, travelTime,
-				wrappedFromNodes, wrappedToNodes, person);
-		// This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
+		if ( wrappedFromNodes != null && wrappedToNodes != null ) {
 
-		// find routes between start and end stop
-		Path p = tree.getPath(wrappedToNodes);
+			TransitLeastCostPathTree tree = new TransitLeastCostPathTree(transitNetwork, travelDisutility, travelTime,
+					wrappedFromNodes, wrappedToNodes, person);
+			// yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
 
-		if (p == null) {
-			return null;
+			// find routes between start and end stop
+			p = tree.getPath(wrappedToNodes);
+
+			if (p == null) {
+				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
+			}
+			pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		}
 
 		double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
-		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 
 		if (directWalkCost * trConfig.getDirectWalkFactor() < pathCost ) {
 			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
 		}
+		Gbl.assertNotNull(p); // this is now a bit confused since I do not understand the logic, see above.  kai, mar'17
 		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
 	}
 
@@ -187,7 +197,7 @@ public class TransitRouterImpl implements TransitRouter {
 //					ptRoute.setDistance( currentDistance );
 					ptRoute.setDistance( link.getLength() );
 					// (see MATSIM-556)
-
+					
 					leg.setRoute(ptRoute);
 					leg.setTravelTime(arrivalTime - time);
 					time = arrivalTime;

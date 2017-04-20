@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.juliakern.distribution.withScoringFast;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -32,9 +34,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author benjamin
@@ -160,19 +159,26 @@ public class RunEmissionPricing {
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 		vcg.setWritingOutputEvents(false) ;
-		
-		EmissionControlerListener ecl = new EmissionControlerListener(controler);
-		controler.addControlerListener(ecl);
-        controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(ecl, controler.getScenario()));
-		
-		
-		EmissionModule emissionModule = ecl.emissionModule;
-		EmissionCostModule emissionCostModule = new EmissionCostModule(1.0);
-		// add travel disutility
-		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionModule, emissionCostModule, config.planCalcScore());
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+			}
+		});
+
+		EmissionControlerListener ecl = new EmissionControlerListener(controler);
+		controler.addControlerListener(ecl);
+        controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(ecl, controler.getScenario()));
+
+        ecg.setEmissionCostMultiplicationFactor(1.);
+
+		// add travel disutility
+		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionCostModule.class).asEagerSingleton();
 				bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
 			}
 		});

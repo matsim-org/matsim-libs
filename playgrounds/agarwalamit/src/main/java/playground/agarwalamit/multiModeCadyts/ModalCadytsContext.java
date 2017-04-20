@@ -70,7 +70,7 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 	private final Map<String,ModalLink> modalLinkContainer;
 
 	@Inject
-	ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<ModalLink> calibrationCounts, EventsManager eventsManager, 
+	private ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<ModalLink> calibrationCounts, EventsManager eventsManager,
 			VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO, Map<String,ModalLink> modalLinkContainer) {
 		this.scenario = scenario;
 		this.calibrationCounts = calibrationCounts;

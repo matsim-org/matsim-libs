@@ -25,71 +25,51 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
+public class DijkstraTree extends DijkstraWithThinPath {
+	private Node fromNode;
+	private double startTime;
 
-public class DijkstraTree
-    extends DijkstraWithThinPath
-{
-    private Node fromNode;
-    private double startTime;
+	public DijkstraTree(Network network, TravelDisutility costFunction, final TravelTime timeFunction) {
+		super(network, costFunction, timeFunction);
+	}
 
+	public void calcLeastCostPathTree(Node fromNode, double startTime) {
+		this.fromNode = fromNode;
+		this.startTime = startTime;
 
-    public DijkstraTree(Network network, TravelDisutility costFunction,
-            final TravelTime timeFunction)
-    {
-        super(network, costFunction, timeFunction);
-    }
+		augmentIterationId();
+		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);// TODO other options??
+		initFromNode(fromNode, null, startTime, pendingNodes);
 
+		while (!pendingNodes.isEmpty()) {
+			relaxNode(pendingNodes.poll(), null, pendingNodes);
+		}
+	}
 
-    public void calcLeastCostPathTree(Node fromNode, double startTime)
-    {
-        this.fromNode = fromNode;
-        this.startTime = startTime;
+	private void initFromNode(final Node fromNode, final Node toNode, final double startTime,
+			final PseudoRemovePriorityQueue<Node> pendingNodes) {
+		DijkstraNodeData data = getData(fromNode);
+		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
+	}
 
-        augmentIterationId();
-        PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);//TODO other options??
-        initFromNode(fromNode, null, startTime, pendingNodes);
+	@Override
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, Person person, Vehicle vehicle) {
+		if (fromNode != this.fromNode || startTime != this.startTime || person != null || vehicle != null) {
+			throw new IllegalArgumentException();
+		}
 
-        while (!pendingNodes.isEmpty()) {
-            relaxNode(pendingNodes.poll(), null, pendingNodes);
-        }
-    }
+		return getLeastCostPath(toNode);
+	}
 
+	public Path getLeastCostPath(Node toNode) {
+		return constructPath(fromNode, toNode, startTime, getData(toNode).getTime());
+	}
 
-    private void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-            final PseudoRemovePriorityQueue<Node> pendingNodes)
-    {
-        DijkstraNodeData data = getData(fromNode);
-        visitNode(fromNode, data, pendingNodes, startTime, 0, null);
-    }
+	public double getTime(Node toNode) {
+		return getData(toNode).getTime();
+	}
 
-
-    @Override
-    public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, Person person,
-            Vehicle vehicle)
-    {
-        if (fromNode != this.fromNode || startTime != this.startTime || person != null
-                || vehicle != null) {
-            throw new IllegalArgumentException();
-        }
-
-        return getLeastCostPath(toNode);
-    }
-
-
-    public Path getLeastCostPath(Node toNode)
-    {
-        return constructPath(fromNode, toNode, startTime, getData(toNode).getTime());
-    }
-
-
-    public double getTime(Node toNode)
-    {
-        return getData(toNode).getTime();
-    }
-
-
-    public double getCost(Node toNode)
-    {
-        return getData(toNode).getCost();
-    }
+	public double getCost(Node toNode) {
+		return getData(toNode).getCost();
+	}
 }

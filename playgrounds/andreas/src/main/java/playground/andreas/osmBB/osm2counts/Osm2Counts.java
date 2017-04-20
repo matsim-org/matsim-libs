@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 
 import playground.andreas.mzilske.osm.JOSMTolerantFastXMLReader;
 

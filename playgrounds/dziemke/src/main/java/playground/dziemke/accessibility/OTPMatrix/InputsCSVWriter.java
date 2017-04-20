@@ -1,18 +1,17 @@
 package playground.dziemke.accessibility.OTPMatrix;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author dziemke
  */
 public final class InputsCSVWriter {
-	private static final Logger log = LoggerFactory.getLogger(InputsCSVWriter.class);
+	private static final Logger LOG = Logger.getLogger(InputsCSVWriter.class);
 
 //	private static final String SEPARATOR = ",";
 	private String separator;
@@ -23,7 +22,7 @@ public final class InputsCSVWriter {
 	 * writes the header
 	 */
 	public InputsCSVWriter(String path, String separator){
-		log.info("Initializing  ...");
+		LOG.info("Initializing  ...");
 		
 		this.separator = separator;
 		
@@ -34,7 +33,7 @@ public final class InputsCSVWriter {
 			throw new RuntimeException("writer could not be instantiated") ;
 		}
 
-		log.info("... done!");
+		LOG.info("... done!");
 	}
 
 	
@@ -96,11 +95,11 @@ public final class InputsCSVWriter {
 	 */
 	public final void close(){
 		try {
-			log.info("Closing ...");
+			LOG.info("Closing ...");
 			assert(writer != null);
 			writer.flush();
 			writer.close();
-			log.info("... done!");
+			LOG.info("... done!");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	

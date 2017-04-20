@@ -231,7 +231,7 @@ public class Matrix2Episodes {
         if(!zonesNotFound.isEmpty()) logger.warn(String.format("%s zones not found.", zonesNotFound.size()));
         if(!zonesNoFacilities.isEmpty()) logger.warn(String.format("%s zone with no facilities.", zonesNoFacilities.size()));
         if(lowVolumeCnt > 0)
-            logger.warn(String.format("%s zone with volume below threshold. Lost %s trips.", lowVolumeCnt, lowVolumeSum));
+            logger.warn(String.format("%s relations with volume below threshold. Lost %s trips.", lowVolumeCnt, lowVolumeSum));
 
         return persons;
     }

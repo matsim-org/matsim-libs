@@ -23,34 +23,29 @@ import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 
+public class RuleBasedTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
+	public static final String GOAL = "goal";
 
-public class RuleBasedTaxiOptimizerParams
-    extends AbstractTaxiOptimizerParams
-{
-    public static final String GOAL = "goal";
+	public static final String NEAREST_REQUESTS_LIMIT = "nearestRequestsLimit";
+	public static final String NEAREST_VEHICLES_LIMIT = "nearestVehiclesLimit";
 
-    public static final String NEAREST_REQUESTS_LIMIT = "nearestRequestsLimit";
-    public static final String NEAREST_VEHICLES_LIMIT = "nearestVehiclesLimit";
+	public static final String CELL_SIZE = "cellSize";
 
-    public static final String CELL_SIZE = "cellSize";
+	public final Goal goal;
 
-    public final Goal goal;
+	public final int nearestRequestsLimit;
+	public final int nearestVehiclesLimit;
 
-    public final int nearestRequestsLimit;
-    public final int nearestVehiclesLimit;
+	public final double cellSize;
 
-    public final double cellSize;
+	public RuleBasedTaxiOptimizerParams(Configuration optimizerConfig) {
+		super(optimizerConfig);
 
+		goal = Goal.valueOf(optimizerConfig.getString(GOAL));
 
-    public RuleBasedTaxiOptimizerParams(Configuration optimizerConfig)
-    {
-        super(optimizerConfig);
+		nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
+		nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
 
-        goal = Goal.valueOf(optimizerConfig.getString(GOAL));
-
-        nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
-        nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
-
-        cellSize = optimizerConfig.getDouble(CELL_SIZE);//1000 m tested for Berlin
-    }
+		cellSize = optimizerConfig.getDouble(CELL_SIZE);// 1000 m tested for Berlin
+	}
 }

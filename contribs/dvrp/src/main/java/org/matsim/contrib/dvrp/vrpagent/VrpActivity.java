@@ -22,23 +22,16 @@ package org.matsim.contrib.dvrp.vrpagent;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.AbstractDynActivity;
 
+public class VrpActivity extends AbstractDynActivity {
+	private final StayTask stayTask;
 
-public class VrpActivity
-    extends AbstractDynActivity
-{
-    private final StayTask stayTask;
+	public VrpActivity(String activityType, StayTask stayTask) {
+		super(activityType);
+		this.stayTask = stayTask;
+	}
 
-
-    public VrpActivity(String activityType, StayTask stayTask)
-    {
-        super(activityType);
-        this.stayTask = stayTask;
-    }
-
-
-    @Override
-    public double getEndTime()
-    {
-        return stayTask.getEndTime();
-    }
+	@Override
+	public double getEndTime() {
+		return stayTask.getEndTime();
+	}
 }

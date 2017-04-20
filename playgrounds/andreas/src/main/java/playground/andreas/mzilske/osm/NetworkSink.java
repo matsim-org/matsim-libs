@@ -203,6 +203,11 @@ public class NetworkSink implements SinkSource {
 		way.getTags().add(new Tag("matsim:forward:link-id:" + l.getId().toString(), l.getId().toString()));
 	}
 
+	@Override
+	public void initialize(Map<String, Object> map) {
+
+	}
+
 	private static class OsmHighwayDefaults {
 		public final double lanes;
 		public final double freespeed;

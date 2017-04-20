@@ -41,7 +41,7 @@ public class RunTaxiEvaluation {
 
 	public static void main(String[] args) {
 
-		String networkFile = "D:/runs-svn/barrierFreeTaxi/run_50/taxis_50.output_network.xml.gz";
+		String networkFile = "D:/runs-svn/barrierFreeTaxi/v2/veh_300/veh_300.output_network.xml.gz";
 
 		// Berlin
 		String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
@@ -64,10 +64,13 @@ public class RunTaxiEvaluation {
 		// List<String> list =
 		// Collections.singletonList("00.0k_AV1.0_flowCap100");
 
-		for (int i = 50; i <= 1000; i = i + 50) {
-			String runId = "taxis_" + i;
-			String dir = "D:/runs-svn/barrierFreeTaxi/1500_run_" + i + "/";
-			System.out.println("run " + runId);
+		List<String> normalWaitTimes = new ArrayList<>();
+		List<String> barrierfreeWaitTimes = new ArrayList<>();
+		
+		for (int i = 300; i <= 500; i = i + 50) {
+			String runId = "veh_" + i;
+			String dir = "D:/runs-svn/barrierFreeTaxi/v2/veh_"+ i + "/";
+			System.out.println("pop " + runId);
 			ZoneBasedBarrierFreeTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandlerBF = new ZoneBasedBarrierFreeTaxiCustomerWaitHandler(
 					network, geo, true);
 			ZoneBasedBarrierFreeTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandlerNonBF = new ZoneBasedBarrierFreeTaxiCustomerWaitHandler(
@@ -81,9 +84,21 @@ public class RunTaxiEvaluation {
 			String eventsFile = dir + runId + ".output_events.xml.gz";
 
 			new MatsimEventsReader(events).readFile(eventsFile);
-			zoneBasedTaxiCustomerWaitHandlerBF.writeCustomerStats(dir);
-			zoneBasedTaxiCustomerWaitHandlerNonBF.writeCustomerStats(dir);
-			travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(dir);
+			String outDir = dir+runId;
+			zoneBasedTaxiCustomerWaitHandlerBF.writeCustomerStats(outDir);
+			zoneBasedTaxiCustomerWaitHandlerNonBF.writeCustomerStats(outDir);
+			travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(outDir);
+			normalWaitTimes.add(i + "\t" + zoneBasedTaxiCustomerWaitHandlerNonBF.getOverallAverageWaitTime());
+			barrierfreeWaitTimes.add(i + "\t" + zoneBasedTaxiCustomerWaitHandlerBF.getOverallAverageWaitTime());
+			
+		}
+		System.out.println("Barrierfree Taxi waittimes (Fleet, average Wait)");
+		for (String s : barrierfreeWaitTimes){
+			System.out.println(s);
+		}
+		System.out.println("Ordinary Taxi waittimes (Fleet, average Wait)");
+		for (String s : normalWaitTimes){
+			System.out.println(s);
 		}
 
 	}

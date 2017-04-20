@@ -23,6 +23,7 @@
 package playground.jbischoff.ffcs;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -41,7 +42,7 @@ import playground.jbischoff.ffcs.sim.SetupFreefloatingParking;
  */
 public class RunFreefloatingParkingExample {
 public static void main(String[] args) {
-	Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/example/config_ffcs.xml", new FFCSConfigGroup());
+	Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/bmw_carsharing/example/config_ffcs.xml", new FFCSConfigGroup(), new DvrpConfigGroup());
 	config.plans().setInputFile("populationffcs100.xml");
 	config.facilities().setInputFile("parkingFacilities.xml");
 	config.controler().setOutputDirectory("../../../shared-svn/projects/bmw_carsharing/example/ffcs_output");

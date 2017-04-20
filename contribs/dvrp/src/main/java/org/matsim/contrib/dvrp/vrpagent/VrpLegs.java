@@ -19,58 +19,53 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+public class VrpLegs {
+	public static VrpLeg createLegWithOfflineTracker(Vehicle vehicle, MobsimTimer timer) {
+		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
+		VrpLeg leg = new VrpLeg(driveTask.getPath());
+		TaskTrackers.initOfflineTaskTracking(driveTask, timer);
+		return leg;
+	}
 
-public class VrpLegs
-{
-    public static VrpLeg createLegWithOfflineTracker(DriveTask driveTask, MobsimTimer timer)
-    {
-        VrpLeg leg = new VrpLeg(driveTask.getPath());
-        TaskTrackers.initOfflineTaskTracking(driveTask, timer);
-        return leg;
-    }
+	public static VrpLeg createLegWithOnlineTracker(Vehicle vehicle, VrpOptimizerWithOnlineTracking optimizer,
+			MobsimTimer timer) {
+		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
+		VrpLeg leg = new VrpLeg(driveTask.getPath());
+		TaskTrackers.initOnlineDriveTaskTracking(vehicle, leg, optimizer, timer);
+		return leg;
+	}
 
+	public static interface LegCreator {
+		/**
+		 * @param vehicle
+		 *            for which the leg is created
+		 * @return fully initialised vrp leg (e.g. with online tracking, etc.)
+		 */
+		VrpLeg createLeg(Vehicle vehicle);
+	}
 
-    public static VrpLeg createLegWithOnlineTracker(DriveTask driveTask,
-            VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
-    {
-        VrpLeg leg = new VrpLeg(driveTask.getPath());
-        TaskTrackers.initOnlineDriveTaskTracking(driveTask, leg, optimizer, timer);
-        return leg;
-    }
+	public static LegCreator createLegWithOfflineTrackerCreator(final MobsimTimer timer) {
+		return new LegCreator() {
+			@Override
+			public VrpLeg createLeg(Vehicle vehicle) {
+				return createLegWithOfflineTracker(vehicle, timer);
+			}
+		};
+	}
 
-
-    public static interface LegCreator
-    {
-        VrpLeg createLeg(DriveTask driveTask);
-    }
-
-
-    public static LegCreator createLegWithOfflineTrackerCreator(final MobsimTimer timer)
-    {
-        return new LegCreator() {
-            @Override
-            public VrpLeg createLeg(DriveTask driveTask)
-            {
-                return createLegWithOfflineTracker(driveTask, timer);
-            }
-        };
-    }
-
-
-    public static LegCreator createLegWithOnlineTrackerCreator(
-            final VrpOptimizerWithOnlineTracking optimizer, final MobsimTimer timer)
-    {
-        return new LegCreator() {
-            @Override
-            public VrpLeg createLeg(DriveTask driveTask)
-            {
-                return createLegWithOnlineTracker(driveTask, optimizer, timer);
-            }
-        };
-    }
+	public static LegCreator createLegWithOnlineTrackerCreator(final VrpOptimizerWithOnlineTracking optimizer,
+			final MobsimTimer timer) {
+		return new LegCreator() {
+			@Override
+			public VrpLeg createLeg(Vehicle vehicle) {
+				return createLegWithOnlineTracker(vehicle, optimizer, timer);
+			}
+		};
+	}
 }

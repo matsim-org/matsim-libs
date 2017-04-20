@@ -27,7 +27,7 @@ import org.matsim.core.router.priorityqueue.MinHeap;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.WeightCalculator;
 
-final class PointingAgent {
+public final class PointingAgent {
 	private final Id id;
 	private final PlanRecord[] records;
 	private boolean off = false;

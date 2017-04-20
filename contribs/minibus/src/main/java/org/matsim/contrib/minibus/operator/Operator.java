@@ -40,7 +40,7 @@ public interface Operator {
 	
 	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget);
 	
-	public void score(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap);
+	public void score(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, SubsidyI subsidy);
 	
 	public void replan(PStrategyManager pStrategyManager, int iteration);
 

@@ -1,6 +1,7 @@
 package playground.andreas.osmBB.osm2counts;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
@@ -101,4 +102,8 @@ public class NodeSink implements Sink{
 		return this.unitNameMap;
 	}
 
+	@Override
+	public void initialize(Map<String, Object> map) {
+
+	}
 }

@@ -27,31 +27,23 @@ import com.google.inject.Inject;
 import playground.michalm.ev.EvConfigGroup;
 import playground.michalm.ev.data.*;
 
+public class AuxDischargingHandler implements MobsimAfterSimStepListener {
+	private final Iterable<? extends ElectricVehicle> eVehicles;
+	private final int auxDischargeTimeStep;
 
-public class AuxDischargingHandler
-    implements MobsimAfterSimStepListener
-{
-    private final Iterable<? extends ElectricVehicle> eVehicles;
-    private final int auxDischargeTimeStep;
+	@Inject
+	public AuxDischargingHandler(EvData evData, EvConfigGroup evConfig) {
+		this.eVehicles = evData.getElectricVehicles().values();
+		this.auxDischargeTimeStep = evConfig.getAuxDischargeTimeStep();
+	}
 
-
-    @Inject
-    public AuxDischargingHandler(EvData evData, EvConfigGroup evConfig)
-    {
-        this.eVehicles = evData.getElectricVehicles().values();
-        this.auxDischargeTimeStep = evConfig.getAuxDischargeTimeStep();
-    }
-
-
-    @Override
-    public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e)
-    {
-        if ( (e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
-            for (ElectricVehicle ev : eVehicles) {
-                double energy = ev.getAuxEnergyConsumption()
-                        .calcEnergyConsumption(auxDischargeTimeStep);
-                ev.getBattery().discharge(energy);
-            }
-        }
-    }
+	@Override
+	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
+		if ((e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
+			for (ElectricVehicle ev : eVehicles) {
+				double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep);
+				ev.getBattery().discharge(energy);
+			}
+		}
+	}
 }

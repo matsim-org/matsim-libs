@@ -160,94 +160,32 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 
 		@Override
 		public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-//			System.out.println(travelTime.getLinkTravelTime(link, e.getSimulationTime()));
-			if (e.getSimulationTime() == t1) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1, null, null));
-			} else if (e.getSimulationTime() == t2) {
-				assertEquals(360.0, travelTime.getLinkTravelTime(link, t2, null, null));
-			} else if (e.getSimulationTime() == t3) {
-				if(this.isUsingFastCapacityUpdate) {
-					assertEquals(467.97297297297297, travelTime.getLinkTravelTime(link, t3, null, null));
-				} else {
-					assertEquals(468.2162162162162, travelTime.getLinkTravelTime(link, t3, null, null));
-				}
-			} else if (e.getSimulationTime() == t4) {
-//				assertEquals(616.4935064935065, travelTime.getLinkTravelTime(link, t4));
-				if(this.isUsingFastCapacityUpdate) {
-					assertEquals(612.9358974358975, travelTime.getLinkTravelTime(link, t4, null, null));
-				} else {
-					assertEquals(613.2051282051282, travelTime.getLinkTravelTime(link, t4, null, null));
-				}
-			} else if (e.getSimulationTime() == t5) {
-//				assertEquals(822.1428571428571, travelTime.getLinkTravelTime(link, t5));
-				if(this.isUsingFastCapacityUpdate) {
-					assertEquals(690.92, travelTime.getLinkTravelTime(link, t5, null, null));
-				} else {
-					assertEquals(691.19, travelTime.getLinkTravelTime(link, t5, null, null));
-				}
-			} else if (e.getSimulationTime() == t6) {
-//				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t6));
-				if(this.isUsingFastCapacityUpdate) {
-					assertEquals(690.92, travelTime.getLinkTravelTime(link, t6, null, null));
-				} else {
-					assertEquals(691.19, travelTime.getLinkTravelTime(link, t6, null, null));
-				}
-			} else if (e.getSimulationTime() == t7) {
-//				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t7));
-				if (this.isUsingFastCapacityUpdate) {
-					assertEquals(967.4090909090909, travelTime.getLinkTravelTime(link, t7, null, null));
-				} else {
-					assertEquals(967.6818181818181, travelTime.getLinkTravelTime(link, t7, null, null));
-				}
-			} else if (e.getSimulationTime() == t8) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8, null, null));
-			}
+		    checkLinkTravelTimes(e.getSimulationTime());
 		}
 
 		@Override
 		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
-			if (e.getSimulationTime() == t1) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1, null, null));
-			} else if (e.getSimulationTime() == t2) {
-				assertEquals(360.0, travelTime.getLinkTravelTime(link, t2, null, null));
-			} else if (e.getSimulationTime() == t3) {
-				if(this.isUsingFastCapacityUpdate) {
-					assertEquals(467.97297297297297, travelTime.getLinkTravelTime(link, t3, null, null));
-				} else {
-					assertEquals(468.2162162162162, travelTime.getLinkTravelTime(link, t3, null, null));
-				}
-			} else if (e.getSimulationTime() == t4) {
-//				assertEquals(616.4935064935065, travelTime.getLinkTravelTime(link, t4));
-				if(this.isUsingFastCapacityUpdate) {
-					assertEquals(612.9358974358975, travelTime.getLinkTravelTime(link, t4, null, null));
-				} else {
-					assertEquals(613.2051282051282, travelTime.getLinkTravelTime(link, t4, null, null));
-				}
-			} else if (e.getSimulationTime() == t5) {
-//				assertEquals(822.1428571428571, travelTime.getLinkTravelTime(link, t5));
-				if(this.isUsingFastCapacityUpdate) {
-					assertEquals(690.92, travelTime.getLinkTravelTime(link, t5, null, null));
-				} else { 
-					assertEquals(691.19, travelTime.getLinkTravelTime(link, t5, null, null));
-				}
-			} else if (e.getSimulationTime() == t6) {
-//				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t6));
-				if(this.isUsingFastCapacityUpdate) {
-					assertEquals(690.92, travelTime.getLinkTravelTime(link, t6, null, null));
-				} else { 
-					assertEquals(691.19, travelTime.getLinkTravelTime(link, t6, null, null));
-				}
-			} else if (e.getSimulationTime() == t7) {
-//				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t7));
-				if(this.isUsingFastCapacityUpdate){
-					assertEquals(967.4090909090909, travelTime.getLinkTravelTime(link, t7, null, null));
-				} else {
-					assertEquals(967.6818181818181, travelTime.getLinkTravelTime(link, t7, null, null));
-				}
-			} else if (e.getSimulationTime() == t8) {
-				assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8, null, null));
-			}
+            checkLinkTravelTimes(e.getSimulationTime());
 		}
-	}
-	
+		
+		private void checkLinkTravelTimes(double time) {
+	        if (time == t1) {
+	            assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t1, null, null));
+	        } else if (time == t2) {
+	            assertEquals(360.0, travelTime.getLinkTravelTime(link, t2, null, null));
+	        } else if (time == t3) {
+	            assertEquals(467.6756756756757, travelTime.getLinkTravelTime(link, t3, null, null));
+	        } else if (time == t4) {
+	            assertEquals(612.6282051282051, travelTime.getLinkTravelTime(link, t4, null, null));
+	        } else if (time == t5) {
+	            assertEquals(690.62, travelTime.getLinkTravelTime(link, t5, null, null));
+	        } else if (time == t6) {
+	            assertEquals(690.62, travelTime.getLinkTravelTime(link, t6, null, null));
+	        } else if (time == t7) {
+	            assertEquals(967.1363636363636, travelTime.getLinkTravelTime(link, t7, null, null));
+	        } else if (time == t8) {
+	            assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8, null, null));
+	        }
+	    }
+	}	
 }

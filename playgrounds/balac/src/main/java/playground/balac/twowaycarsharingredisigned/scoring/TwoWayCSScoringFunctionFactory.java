@@ -11,7 +11,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 
 public class TwoWayCSScoringFunctionFactory implements ScoringFunctionFactory { //extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {

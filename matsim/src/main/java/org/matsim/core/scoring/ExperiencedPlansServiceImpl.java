@@ -63,16 +63,11 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 
 	@Override
 	public void writeExperiencedPlans(String iterationFilename) {
+//		finishIteration(); // already called somewhere else in pgm flow.
 		Population tmpPop = PopulationUtils.createPopulation(config);
 		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.getFactory().createPerson(entry.getKey());
 			Plan plan = entry.getValue();
-			if (scoringFunctionsForPopulation != null) {
-				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId()).getScore());
-				if (plan.getScore().isNaN()) {
-					log.warn("score is NaN; plan:" + plan.toString());
-				}
-			}
 			person.addPlan(plan);
 			tmpPop.addPerson(person);
 		}
@@ -80,6 +75,20 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 		// I removed the "V5" here in the assumption that it is better to move along with future format changes.  If this is
 		// undesired, please change back but could you then please also add a comment why you prefer this.  Thanks.
 		// kai, jan'16
+	}
+	@Override
+	public final void finishIteration() {
+		// I separated this from "writeExperiencedPlans" so that it can be called separately even when nothing is written.  Can't say
+		// if the design might be better served by an iteration ends listener.  kai, feb'17
+		for (Map.Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
+			Plan plan = entry.getValue();
+			if (scoringFunctionsForPopulation != null) {
+				plan.setScore(scoringFunctionsForPopulation.getScoringFunctionForAgent(entry.getKey()).getScore());
+				if (plan.getScore().isNaN()) {
+					log.warn("score is NaN; plan:" + plan.toString());
+				}
+			}
+		}
 	}
 
 	@Override

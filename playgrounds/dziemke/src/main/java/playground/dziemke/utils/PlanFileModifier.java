@@ -47,8 +47,10 @@ public class PlanFileModifier {
 	// In case using input plans that have not yet been iterated
 //	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans.xml.gz";
 //	static final String OUTPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans_no_links_routes.xml.gz";
-	static String inputPlansFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/100/plans.xml.gz";
-	static String outputPlansFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/100/plans_no_links_routes.xml.gz";
+//	static String inputPlansFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/100/plans.xml.gz";
+//	static String outputPlansFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/100/plans_no_links_routes.xml.gz";
+	static String inputPlansFile = "../../../runs-svn/berlin_scenario_2016/be_118/be_118.output_plans.xml.gz";
+	static String outputPlansFile = "../../../runs-svn/berlin_scenario_2016/be_118/be_118.output_plans_no_links_routes.xml.gz";
 	
 	
 //	if (onlyTransferSelectedPlan == true) {

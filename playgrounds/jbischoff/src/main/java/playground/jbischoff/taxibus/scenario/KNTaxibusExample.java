@@ -20,20 +20,15 @@
 package playground.jbischoff.taxibus.scenario;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.taxibus.run.configuration.TaxibusConfigGroup;
+import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
-import playground.jbischoff.taxibus.scenario.analysis.quick.TaxiBusTravelTimesAnalyzer;
-import playground.jbischoff.taxibus.scenario.analysis.quick.TraveltimeAndDistanceEventHandler;
 
 /**
  * @author jbischoff
@@ -48,15 +43,16 @@ public class KNTaxibusExample {
 		// all vehicles start at same place; all passengers start at same place:
 
 		//TODO: Kai, in case you use this, please update your SVN first, Joschka // Dec 2016
-		// passengers live in larger area and want to go to railway station (now with nicer routes):
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configClustered.xml", new TaxibusConfigGroup());
-//		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configJsprit.xml", new TaxibusConfigGroup());
+		// passengers live in larger area and want to go to railway station (now with nicer routes), two different algorithms:
+		
+//		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configClustered.xml", new TaxibusConfigGroup());
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configJsprit.xml", new TaxibusConfigGroup(), new DvrpConfigGroup());
 		
 		// passengers live in larger area and have distributed destinations, shared taxi for 2 persons:
 //		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/braunschweig/scenario/taxibus-example/input/configShared.xml", new TaxibusConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
-		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
+		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 		
 		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
 //		visConfig.setMapOverlayMode(true);
@@ -68,22 +64,12 @@ public class KNTaxibusExample {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-
-		final TaxiBusTravelTimesAnalyzer taxibusTravelTimesAnalyzer = new TaxiBusTravelTimesAnalyzer();
-		final TraveltimeAndDistanceEventHandler ttEventHandler = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override public void install() {
-				addEventHandlerBinding().toInstance(taxibusTravelTimesAnalyzer);
-				addEventHandlerBinding().toInstance(ttEventHandler);
-			}
-		});
+		new org.matsim.contrib.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 		controler.addOverridingModule( new OTFVisLiveModule() );
 		
 		controler.run();
 
-		taxibusTravelTimesAnalyzer.printOutput();
-		ttEventHandler.printOutput();
+	
 	}
 
 	

@@ -57,8 +57,6 @@ import scenarios.illustrative.braess.run.RunBraessSimulation.PricingType;
  * Test to fix the route distribution and travel times in Braess's scenario.
  * If it fails something has changed to previous MATSim behavior.
  * 
- * Currently, congestion version V4 throws a runtime exception and is therefore set to ignore (see comment below).
- * 
  * @author tthunig
  *
  */
@@ -70,42 +68,28 @@ public final class FixBraessBehaviorIT{
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	@Test
+//	@Ignore("due to bugfixes in fast capacity update (by michalm) this tests give different results on jenkins and travis")
+    @Test
 	public void testBraessWoPricing() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 24, 1920, 21, 3805298);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 26, 1920, 14, 3785111);
 	}
 
-	@Test
+//	@Ignore("due to bugfixes in fast capacity update (by michalm) this tests give different results on jenkins and travis")
+    @Test
 	public void testV3() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 457, 1135, 408, 3113939);
-	}
-	
-	/* V4 throws a runtime exception: 
-	 * "time=28915.0; 13.799999999999999 sec delay is not internalized. Aborting..."
-	 * Amit, please fix this and remove the @Ignore. 
-	 * Theresa & Ihab oct'2015 */
-	@Test
-	@Ignore
-	public void testV4() {
-		Assert.fail("Not yet tested.");
-//		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V4, , , , );
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 456, 1091, 453, 2995253);
 	}
 
+//	@Ignore("due to bugfixes in fast capacity update (by michalm) this tests give different results on jenkins and travis")
 	@Test
 	public void testV8() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V8, 572, 974, 454, 2992020);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V8, 538, 1026, 436, 2965792);
 	}
-	
+
+//	@Ignore("due to bugfixes in fast capacity update (by michalm) this tests give different results on jenkins and travis")
 	@Test
 	public void testV9() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 603, 863, 534, 2825507);
-	}
-	
-	@Test
-	@Ignore
-	public void testFlowbased() {
-		Assert.fail("Not yet implemented.");
-//		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.FLOWBASED, , , , );
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 605, 850, 545, 2814891);
 	}
 	
 	private void fixRouteDistributionAndTT(RunBraessSimulation.PricingType pricingType, int expectedNOAgentsOnUpperRoute,
@@ -160,17 +144,20 @@ public final class FixBraessBehaviorIT{
 			
 		controler.run();		
 		
-		// test route distribution
+		// get route distribution
 		int agentsOnUpperRoute = handler.getRouteUsers()[0];
 		int agentsOnMiddleRoute = handler.getRouteUsers()[1];
 		int agentsOnLowerRoute = handler.getRouteUsers()[2];
 		log.info("Route distribution: " + agentsOnUpperRoute + ", " + agentsOnMiddleRoute + ", " + agentsOnLowerRoute);
+		
+		// get total travel time
+		double totalTT = handler.getTotalTT();
+		log.info("Total travel time: " + totalTT);
+		
+		// test both
 		Assert.assertEquals("The number of agents on the upper route has changed to previous MATSim behavior.", expectedNOAgentsOnUpperRoute, agentsOnUpperRoute);
 		Assert.assertEquals("The number of agents on the middle route has changed to previous MATSim behavior.", expectedNOAgentsOnMiddleRoute, agentsOnMiddleRoute);
 		Assert.assertEquals("The number of agents on the lower route has changed to previous MATSim behavior.", expectedNOAgentsOnLowerRoute, agentsOnLowerRoute);
-		
-		// test total travel time
-		double totalTT = handler.getTotalTT();
 		Assert.assertEquals("The total travel time has changed to previous MATSim behavior.", expectedTotalTT, totalTT, MatsimTestUtils.EPSILON);
 	}
 	
@@ -197,7 +184,7 @@ public final class FixBraessBehaviorIT{
 		config.strategy().setMaxAgentPlanMemorySize(3);
 
 		config.qsim().setStuckTime(3600 * 0.5);
-
+		
 		// set end time to 12 am (4 hours after simulation start) to
 		// shorten simulation run time
 		config.qsim().setEndTime(3600 * 10);

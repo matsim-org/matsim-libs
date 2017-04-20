@@ -39,7 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
  *
  * @author balmermi
  */
-public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
+public final class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

@@ -20,9 +20,11 @@
 package org.matsim.contrib.emissions.example;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -31,7 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * After creating a config file with 
  * {@link CreateEmissionConfig CreateEmissionConfig}
  * this class runs a simulation and calculates emissions online.
- * Results are written into distinct xml-files including emission event files for some iterations (as specified by the config).
+ * Results are written into events file (including emission events) for some iterations (as specified by the config).
  * <p></p>
  * See <a href="{@docRoot}/src-html/org/matsim/contrib/emissions/example/RunEmissionToolOnlineExample.html#line.39">here</a> for the listing.
 
@@ -56,7 +58,12 @@ public class RunEmissionToolOnlineExampleV2 {
 	public final void run() {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.addControlerListener(new EmissionControlerListener());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+			}
+		});
 		controler.run();
 	}
 	public static void main(String[] args) {

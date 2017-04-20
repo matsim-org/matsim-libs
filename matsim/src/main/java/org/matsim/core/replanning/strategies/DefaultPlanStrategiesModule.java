@@ -126,7 +126,15 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         }
     }
 
-    public static enum DefaultSelector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }
+    public static interface DefaultSelector { 
+	    final String KeepLastSelected="KeepLastSelected" ;
+	    final String BestScore="BestScore";
+	    final String ChangeExpBeta="ChangeExpBeta"; 
+	    final String SelectExpBeta="SelectExpBeta";
+	    final String SelectRandom="SelectRandom";
+	    final String SelectPathSizeLogit="SelectPathSizeLogit" ; 
+    }
+    
 
     public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, @Deprecated ChangeLegMode, TimeAllocationMutator_ReRoute, 
     	@Deprecated ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, @Deprecated TripSubtourModeChoice }

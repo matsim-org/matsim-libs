@@ -23,23 +23,19 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
-import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.ProportionBasedConflictSolver;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
-import playground.ivt.utils.ConcurrentStopWatch;
 import playground.ivt.utils.MonitoringUtils;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.negotiation.framework.NegotiationScenarioFromFileModule;
-import playground.thibautd.negotiation.framework.Negotiator;
 import playground.thibautd.negotiation.framework.NegotiatorConfigGroup;
-import playground.thibautd.negotiation.framework.StopWatchMeasurement;
 import playground.thibautd.negotiation.offlinecoalition.CoalitionChoiceIterator;
 import playground.thibautd.negotiation.offlinecoalition.OfflineCoalitionConfigGroup;
 import playground.thibautd.negotiation.offlinecoalition.OfflineCoalitionModule;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author thibautd
@@ -53,10 +49,13 @@ public class RunOfflineLocationCoalition {
 						new SocialNetworkConfigGroup(),
 						new LocationAlternativesConfigGroup(),
 						new NegotiatorConfigGroup(),
-						new OfflineCoalitionConfigGroup() );
+						new OfflineCoalitionConfigGroup(),
+						new GroupReplanningConfigGroup() );
 
 		Logger.getLogger( CoalitionSelector.class ).setLevel( Level.TRACE );
 		//Logger.getLogger( ProportionBasedConflictSolver.class ).setLevel( Level.TRACE );
+		//Logger.getLogger( LocationAlternativesGenerator.class ).setLevel( Level.TRACE );
+		// Logger.getLogger( LexicographicForCompositionExtraPlanRemover.class ).setLevel( Level.TRACE );
 
 		try ( AutoCloseable out = MoreIOUtils.initOut( config ) ;
 			  AutoCloseable monitor = MonitoringUtils.monitorAndLogOnClose();

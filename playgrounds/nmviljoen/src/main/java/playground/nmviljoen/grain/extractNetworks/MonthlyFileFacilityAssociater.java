@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import playground.nmviljoen.grain.GrainUtils;
-import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
+import playground.southafrica.freight.digicore.algorithms.postclustering.ClusteredChainGenerator;
 import playground.southafrica.utilities.Header;
 
 /**

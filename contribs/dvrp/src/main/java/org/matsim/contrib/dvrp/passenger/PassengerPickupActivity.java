@@ -22,9 +22,6 @@ package org.matsim.contrib.dvrp.passenger;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-
-public interface PassengerPickupActivity
-    extends DynActivity
-{
-    void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now);
+public interface PassengerPickupActivity extends DynActivity {
+	void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now);
 }

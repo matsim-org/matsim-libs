@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
@@ -55,26 +56,28 @@ public class SocialNetworkAsMatsimNetworkUtils {
 		final Network net = NetworkUtils.createNetwork();
 
 		final Coord dummyCoord = new Coord((double) 0, (double) 0);
-		for ( Id ego : sn.getEgos() ) {
+		for ( Id<Person> ego : sn.getEgos() ) {
 			final Coord coord = agentCoords == null ? dummyCoord : agentCoords.get( ego );
 			net.addNode(
 					net.getFactory().createNode(
-						ego,
+						Id.create( ego , Node.class ),
 						coord ) );
 
 		}
-	
-		for ( Id ego : sn.getEgos() ) {
+
+		for ( Id<Person> ego : sn.getEgos() ) {
 			final Iterable<Id<Person>> alters = sn.getAlters( ego );
 			for ( Id<Person> alter : alters ) {
+				final Id<Node> egoId = Id.create( ego , Node.class );
+				final Id<Node> alterId = Id.create( alter , Node.class );
 				net.addLink(
 						net.getFactory().createLink(
 							Id.create( ego+"---"+alter, Link.class ),
-							net.getNodes().get( ego ),
-							net.getNodes().get( alter ) ) );
+							net.getNodes().get( egoId ),
+							net.getNodes().get( alterId ) ) );
 			}
 		}
-	
+
 		return net;
 	}
 }

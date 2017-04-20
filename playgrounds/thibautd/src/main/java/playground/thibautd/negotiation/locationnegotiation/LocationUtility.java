@@ -67,15 +67,34 @@ public class LocationUtility implements PropositionUtility<LocationProposition> 
 		final double sumOfAlterUtils =
 				alters.stream()
 						.filter( a -> !a.getId().equals( agent.getId() ) )
-						.mapToDouble( a -> configGroup.getFixedUtilContact() + seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact() )
+						.mapToDouble( a -> configGroup.getFixedUtilContact() + contactErrorTerm( ego, a ) )
 						.sum();
 
-		final double utilLocation =
-				seeds.getGaussianErrorTerm( ego, asAttr( location ) ) * configGroup.getSigmaFacility();
+		final double utilLocation = locationErrorTerm( ego, location );
 
 		final double utilTravelTime = getTravelDistance( ego, location ) * configGroup.getBetaDistance();
 
 		return sumOfAlterUtils + utilLocation + utilTravelTime;
+	}
+
+	private double locationErrorTerm( final Person ego, final ActivityFacility location ) {
+		switch ( configGroup.getFacilityErrorTermDistribution() ) {
+			case normal:
+				return seeds.getGaussianErrorTerm( ego, asAttr( location ) ) * configGroup.getSigmaFacility();
+			case uniform:
+				return seeds.getUniformErrorTerm( ego, asAttr( location ) ) * configGroup.getSigmaFacility();
+		}
+		throw new RuntimeException();
+	}
+
+	private double contactErrorTerm( final Person ego, final Person a ) {
+		switch ( configGroup.getContactErrorTermDistribution() ) {
+			case normal:
+				return seeds.getGaussianErrorTerm( a, ego ) * configGroup.getMuContact();
+			case uniform:
+				return seeds.getUniformErrorTerm( a, ego ) * configGroup.getMuContact();
+		}
+		throw new RuntimeException();
 	}
 
 	// TODO: make facilities actually implement attributable!

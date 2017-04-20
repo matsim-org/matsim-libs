@@ -27,39 +27,31 @@ import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
 
 import com.google.common.collect.Lists;
 
+public class ScheduleCoordSources {
+	// n DriveTasks -> n+1 Links
+	public static CoordSource createCoordSource(final List<DriveTask> tasks) {
+		return new CoordSource() {
 
-public class ScheduleCoordSources
-{
-    // n DriveTasks -> n+1 Links
-    public static CoordSource createCoordSource(final List<DriveTask> tasks)
-    {
-        return new CoordSource() {
+			@Override
+			public Coord getCoord(int item) {
+				if (item == 0) {
+					return tasks.get(0).getPath().getFromLink().getCoord();
+				}
 
-            @Override
-            public Coord getCoord(int item)
-            {
-                if (item == 0) {
-                    return tasks.get(0).getPath().getFromLink().getCoord();
-                }
+				return tasks.get(item - 1).getPath().getToLink().getCoord();
+			}
 
-                return tasks.get(item - 1).getPath().getToLink().getCoord();
-            }
+			@Override
+			public int getCount() {
+				int size = tasks.size();
+				return size == 0 ? 0 : size + 1;
+			}
+		};
+	}
 
-
-            @Override
-            public int getCount()
-            {
-                int size = tasks.size();
-                return size == 0 ? 0 : size + 1;
-            }
-        };
-    }
-
-
-    // Schedule -> n DriveTasks -> n+1 Links
-    public static CoordSource createCoordSource(Schedule<?> schedule)
-    {
-        List<DriveTask> driveTasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
-        return ScheduleCoordSources.createCoordSource(driveTasks);
-    }
+	// Schedule -> n DriveTasks -> n+1 Links
+	public static CoordSource createCoordSource(Schedule schedule) {
+		List<DriveTask> driveTasks = Lists.newArrayList(Schedules.createDriveTaskIter(schedule));
+		return ScheduleCoordSources.createCoordSource(driveTasks);
+	}
 }

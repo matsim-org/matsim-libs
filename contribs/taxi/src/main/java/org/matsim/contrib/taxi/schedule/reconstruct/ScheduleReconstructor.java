@@ -25,86 +25,76 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
+public class ScheduleReconstructor {
+	final FleetImpl fleet = new FleetImpl();
+	final Map<Id<Request>, TaxiRequest> taxiRequests = new LinkedHashMap<>();
+	final Map<Id<Link>, ? extends Link> links;
 
-public class ScheduleReconstructor
-{
-    final TaxiData taxiData = new TaxiData();
-    final Map<Id<Link>, ? extends Link> links;
+	final Map<Id<Person>, ScheduleBuilder> scheduleBuilders = new LinkedHashMap<>();
+	private boolean schedulesValidated = false;
 
-    final Map<Id<Person>, ScheduleBuilder> scheduleBuilders = new LinkedHashMap<>();
-    private boolean schedulesValidated = false;
+	private final DriveRecorder driveRecorder;
+	private final StayRecorder stayRecorder;
+	private final RequestRecorder requestRecorder;
 
-    private final DriveRecorder driveRecorder;
-    private final StayRecorder stayRecorder;
-    private final RequestRecorder requestRecorder;
+	@Inject
+	public ScheduleReconstructor(@Named(DvrpModule.DVRP_ROUTING) Network network, EventsManager eventsManager) {
+		links = network.getLinks();
 
+		driveRecorder = new DriveRecorder(this);
+		eventsManager.addHandler(driveRecorder);
 
-    @Inject
-    public ScheduleReconstructor(Network network, EventsManager eventsManager)
-    {
-        links = network.getLinks();
+		stayRecorder = new StayRecorder(this);
+		eventsManager.addHandler(stayRecorder);
 
-        driveRecorder = new DriveRecorder(this);
-        eventsManager.addHandler(driveRecorder);
+		requestRecorder = new RequestRecorder(this, TaxiModule.TAXI_MODE);
+		eventsManager.addHandler(requestRecorder);
+	}
 
-        stayRecorder = new StayRecorder(this);
-        eventsManager.addHandler(stayRecorder);
+	Id<Person> getDriver(Id<Vehicle> vehicleId) {
+		return Id.createPersonId(vehicleId);
+	}
 
-        requestRecorder = new RequestRecorder(this, TaxiModule.TAXI_MODE);
-        eventsManager.addHandler(requestRecorder);
-    }
+	ScheduleBuilder getBuilder(Id<Person> personId) {
+		return scheduleBuilders.get(personId);
+	}
 
+	private void validateSchedules() {
+		if (driveRecorder.hasOngoingDrives() || stayRecorder.hasOngoingStays()
+				|| requestRecorder.hasAwaitingRequests()) {
+			throw new IllegalStateException();
+		}
 
-    Id<Person> getDriver(Id<Vehicle> vehicleId)
-    {
-        return Id.createPersonId(vehicleId);
-    }
+		for (ScheduleBuilder sb : scheduleBuilders.values()) {
+			if (!sb.isScheduleBuilt()) {
+				throw new IllegalSelectorException();
+			}
+		}
+	}
 
+	public Fleet getFleet() {
+		if (!schedulesValidated) {
+			validateSchedules();
+		}
 
-    ScheduleBuilder getBuilder(Id<Person> personId)
-    {
-        return scheduleBuilders.get(personId);
-    }
+		return fleet;
+	}
 
-
-    private void validateSchedules()
-    {
-        if (driveRecorder.hasOngoingDrives() || stayRecorder.hasOngoingStays()
-                || requestRecorder.hasAwaitingRequests()) {
-            throw new IllegalStateException();
-        }
-
-        for (ScheduleBuilder sb : scheduleBuilders.values()) {
-            if (!sb.isScheduleBuilt()) {
-                throw new IllegalSelectorException();
-            }
-        }
-    }
-
-
-    public TaxiData getTaxiData()
-    {
-        if (!schedulesValidated) {
-            validateSchedules();
-        }
-
-        return taxiData;
-    }
-
-
-    public static TaxiData reconstructFromFile(Network network, String eventsFile)
-    {
-        EventsManager eventsManager = EventsUtils.createEventsManager();
-        ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager);
-        new MatsimEventsReader(eventsManager).readFile(eventsFile);
-        return reconstructor.getTaxiData();
-    }
+	public static Fleet reconstructFromFile(Network network, String eventsFile) {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		ScheduleReconstructor reconstructor = new ScheduleReconstructor(network, eventsManager);
+		new MatsimEventsReader(eventsManager).readFile(eventsFile);
+		return reconstructor.getFleet();
+	}
 }

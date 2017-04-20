@@ -24,30 +24,22 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.michalm.ev.charging.ChargingLogic;
 
+public interface Charger extends BasicLocation<Charger> {
+	ChargingLogic getLogic();
 
-public interface Charger
-    extends BasicLocation<Charger>
-{
-    ChargingLogic getLogic();
+	void setLogic(ChargingLogic logic);
 
+	Link getLink();
 
-    void setLogic(ChargingLogic logic);
+	/**
+	 * @return max power at a single plug, in [W]
+	 */
+	double getPower();
 
+	/**
+	 * @return number of plugs
+	 */
+	int getPlugs();
 
-    Link getLink();
-
-
-    /**
-     * @return max power at a single plug, in [W]
-     */
-    double getPower();
-
-
-    /**
-     * @return number of plugs
-     */
-    int getPlugs();
-
-
-    void resetLogic();
+	void resetLogic();
 }

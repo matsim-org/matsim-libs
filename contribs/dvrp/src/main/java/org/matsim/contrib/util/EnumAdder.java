@@ -19,22 +19,16 @@
 
 package org.matsim.contrib.util;
 
-public interface EnumAdder<K extends Enum<K>, N extends Number>
-{
-    K[] getKeys();
+public interface EnumAdder<K extends Enum<K>, N extends Number> {
+	K[] getKeys();
 
+	N get(K e);
 
-    N get(K e);
+	N getTotal();
 
+	void increment(K e);
 
-    N getTotal();
+	void add(K e, Number value);
 
-
-    void increment(K e);
-
-
-    void add(K e, Number value);
-
-
-    void addAll(EnumAdder<K, ?> enumAdder);
+	void addAll(EnumAdder<K, ?> enumAdder);
 }

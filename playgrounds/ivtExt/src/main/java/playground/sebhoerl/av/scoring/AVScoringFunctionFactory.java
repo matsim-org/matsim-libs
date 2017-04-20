@@ -6,19 +6,19 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 import playground.sebhoerl.av.framework.AVConfigGroup;
 import playground.sebhoerl.av.framework.AVModule;
 
 public class AVScoringFunctionFactory implements ScoringFunctionFactory {
     private ScoringFunctionFactory standardFactory;
-    private CharyparNagelScoringParametersForPerson params;
+    private ScoringParametersForPerson params;
     private AVConfigGroup config;
     
     public AVScoringFunctionFactory(Scenario scenario, AVConfigGroup config) {
-        params = new SubpopulationCharyparNagelScoringParameters(scenario);
+        params = new SubpopulationScoringParameters(scenario);
         standardFactory = new CharyparNagelScoringFunctionFactory(scenario);
         this.config = config;
     }

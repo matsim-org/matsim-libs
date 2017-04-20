@@ -65,6 +65,7 @@ public class RunSignalSystemsExample {
 		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 		config.qsim().setNodeOffset(5.);
+        config.qsim().setUsingFastCapacityUpdate(false);
 		
 		// add the signal config group to the config file
 		SignalSystemsConfigGroup signalConfig = 

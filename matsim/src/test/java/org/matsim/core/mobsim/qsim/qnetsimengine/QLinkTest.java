@@ -40,11 +40,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -68,7 +66,15 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
+
 /**
+ * NOTE for writing tests - in order to keep compliance with QSim the right sequence must be
+ * followed: 1. increase time, 2. move nodes, 3. links sequence.
+ * Since QLinkI.getOfferingQLanes().get(0).popFirstVehicle() is a shortcut for moving nodes, it must
+ * be executed !!BEFORE!! (not after) QLinkI.doSimStep() (within a sim step)
+ * Otherwise QueueWithBuffer for fastCapacityUpdate=true may give wrong results.
+ * 
+ * 
  * @author dgrether
  * @author mrieser
  */
@@ -113,8 +119,6 @@ public final class QLinkTest extends MatsimTestCase {
 		p.addPlan(PopulationUtils.createPlan());
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 		
-		double now = 0. ;
-
 		f.qlink1.getAcceptingQLane().addFromUpstream(v);
 		assertEquals(1, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		assertFalse(f.qlink1.getAcceptingQLane().isAcceptingFromUpstream());
@@ -181,9 +185,11 @@ public final class QLinkTest extends MatsimTestCase {
 		
 		now = 2. ;
 		f.sim.getSimTimer().setTime(now);
-
-		// time step 2, vehicle leaves link
 		f.qlink1.doSimStep();
+
+        // time step 3, vehicle leaves link
+        now = 3. ;
+        f.sim.getSimTimer().setTime(now);
 		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 //		assertEquals(0, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
@@ -280,7 +286,10 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1)); // somewhere on link
 		assertEquals(1, f.qlink1.getAllVehicles().size()); // somewhere on link
 
-		// vehicle leaves link
+        now = 2. ;
+        f.sim.getSimTimer().setTime(now);
+
+        // vehicle leaves link
 		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
@@ -362,27 +371,31 @@ public final class QLinkTest extends MatsimTestCase {
 		qlink.doSimStep( );
 		assertEquals(2, ((QueueWithBuffer) qlink.getAcceptingQLane()).getAllVehicles().size());
 		assertFalse(qlink.isNotOfferingVehicle());
+
+		//time step 3
+        now = 3. ;
+        qsim.getSimTimer().setTime(3.);
+
 		// v1 leaves buffer
 		assertEquals(v1, qlink.getOfferingQLanes().get(0).popFirstVehicle());
 		assertEquals(1, ((QueueWithBuffer) qlink.getAcceptingQLane()).getAllVehicles().size());
 		assertTrue(qlink.isNotOfferingVehicle());
 		
-		now = 3. ;
-		qsim.getSimTimer().setTime(3.);
-
-		// time step 3, v2 moves to buffer
+		//v2 moves to buffer
 		qlink.doSimStep();
 		assertEquals(1, ((QueueWithBuffer) qlink.getAcceptingQLane()).getAllVehicles().size());
 		assertFalse(qlink.isNotOfferingVehicle());
-		// v2 leaves buffer
+		
+        // time step 4
+        now = 4. ;
+        qsim.getSimTimer().setTime(4.);
+
+        // v2 leaves buffer
 		assertEquals(v2, qlink.getOfferingQLanes().get(0).popFirstVehicle());
 		assertEquals(0, ((QueueWithBuffer) qlink.getAcceptingQLane()).getAllVehicles().size());
 		assertTrue(qlink.isNotOfferingVehicle());
 		
-		now = 4. ;
-		qsim.getSimTimer().setTime(4.);
-		
-		// time step 4, empty link
+		//empty link
 		qlink.doSimStep();
 		assertEquals(0, ((QueueWithBuffer) qlink.getAcceptingQLane()).getAllVehicles().size());
 		assertTrue(qlink.isNotOfferingVehicle());
@@ -405,10 +418,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 	@Test
 	public void testStorageSpaceDifferentVehicleSizes() {
-		
-		// the test will fail if using fast capacity update (See ticket MATSIM-507)
-		if(isUsingFastCapacityUpdate) return;
-		
+	
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		VehicleType defaultVehType = new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class));
@@ -444,18 +454,28 @@ public final class QLinkTest extends MatsimTestCase {
 		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh5);  // used vehicle equivalents: 10
 		assertFalse(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
-
 		assertTrue(f.qlink2.isNotOfferingVehicle());
-		
+
+		for (int t = 0; t < 5; t++) {
+	      now = t;
+	      f.sim.getSimTimer().setTime(now);
+          f.qlink2.doSimStep();
+		}
+
 		now = 5.0 ;
 		f.sim.getSimTimer().setTime(now);
-
-		f.qlink2.doSimStep( ); // first veh moves to buffer, used vehicle equivalents: 5
+		f.qlink2.doSimStep(); // first veh moves to buffer, used vehicle equivalents: 5
 		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		assertFalse(f.qlink2.isNotOfferingVehicle());
-		f.qlink2.getOfferingQLanes().get(0).popFirstVehicle();  // first veh leaves buffer
-		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
+		
+        now = 6.0 ;
+        f.sim.getSimTimer().setTime(now);
+        // popFirstVehicle() is a shortcut for moveNodes(), and therefore must be executed
+        //!!BEFORE!! qlink.doSimStep() (within a sim step)
+        f.qlink2.getOfferingQLanes().get(0).popFirstVehicle();  // first veh leaves buffer
+        f.qlink2.doSimStep(); // used vehicle equivalents: 5.0
 
+        assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh25); // used vehicle equivalents: 7.5
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh1);  // used vehicle equivalents: 8.5
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh1);  // used vehicle equivalents: 9.5
@@ -463,11 +483,18 @@ public final class QLinkTest extends MatsimTestCase {
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh1);  // used vehicle equivalents: 10.5
 		assertFalse(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		
-		now = 6.0 ;
-		f.sim.getSimTimer().setTime(now);
-
-		f.qlink2.doSimStep(); // first veh moves to buffer, used vehicle equivalents: 5.5
-		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
+        for (int i = 7; i < 10 ; i++) {
+            now = i;
+            f.sim.getSimTimer().setTime(now);
+            f.qlink2.doSimStep();
+            assertFalse(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
+          }
+        
+        now = 10.0 ;
+        f.sim.getSimTimer().setTime(now);
+        f.qlink2.doSimStep(); // "2nd first" veh moves to buffer, used vehicle equivalents: 5.5
+        
+        assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh1);  // used vehicle equivalents: 6.5
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh25); // used vehicle equivalents: 9.0
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh1);  // used vehicle equivalents: 10.0

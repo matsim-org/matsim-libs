@@ -3,16 +3,14 @@ package playground.wrashid.parkingChoice.priceoptimization.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoreManager;
-import org.matsim.contrib.parking.parkingchoice.PC2.scoring.ParkingScoringFunction;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 import com.google.inject.Inject;
 
@@ -21,7 +19,7 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 
 	private ParkingScoreManager parkingScoreManager;
 	private Scenario scenario;
-	private CharyparNagelScoringParametersForPerson parameters;
+	private ScoringParametersForPerson parameters;
 
 	//@Inject
 	//private ScoreTrackingListener tracker;
@@ -31,7 +29,7 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 			Scenario scenario, ParkingScoreManager parkingScoreManager) {
 		this.scenario = scenario;
 		this.parkingScoreManager = parkingScoreManager;
-		this.parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.parameters = new SubpopulationScoringParameters( scenario );
 	}
 
 	@Override

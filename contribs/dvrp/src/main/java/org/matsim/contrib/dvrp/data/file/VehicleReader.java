@@ -21,60 +21,52 @@ package org.matsim.contrib.dvrp.data.file;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+/**
+ * @author michalm
+ */
+public class VehicleReader extends MatsimXmlParser {
+	private static final String VEHICLE = "vehicle";
 
-public class VehicleReader
-    extends MatsimXmlParser
-{
-    private static final String VEHICLE = "vehicle";
+	private static final double DEFAULT_CAPACITY = 1;
+	private static final double DEFAULT_T_0 = 0;
+	private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
-    private static final double DEFAULT_CAPACITY = 1;
-    private static final double DEFAULT_T_0 = 0;
-    private static final double DEFAULT_T_1 = 24 * 60 * 60;
+	private FleetImpl fleet;
+	private Map<Id<Link>, ? extends Link> links;
 
-    private VrpData data;
-    private Map<Id<Link>, ? extends Link> links;
+	public VehicleReader(Network network, FleetImpl fleet) {
+		this.fleet = fleet;
+		links = network.getLinks();
+	}
 
+	@Override
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		if (VEHICLE.equals(name)) {
+			fleet.addVehicle(createVehicle(atts));
+		}
+	}
 
-    public VehicleReader(Network network, VrpData data)
-    {
-        this.data = data;
-        links = network.getLinks();
-    }
+	@Override
+	public void endTag(String name, String content, Stack<String> context) {
+	}
 
+	private Vehicle createVehicle(Attributes atts) {
+		Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
+		Link startLink = links.get(Id.createLinkId(atts.getValue("start_link")));
+		double capacity = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
+		double t0 = ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0);
+		double t1 = ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1);
+		return createVehicle(id, startLink, capacity, t0, t1, atts);
+	}
 
-    @Override
-    public void startTag(String name, Attributes atts, Stack<String> context)
-    {
-        if (VEHICLE.equals(name)) {
-            data.addVehicle(createVehicle(atts));
-        }
-    }
-
-
-    @Override
-    public void endTag(String name, String content, Stack<String> context)
-    {}
-
-
-    private Vehicle createVehicle(Attributes atts)
-    {
-        Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
-        Link startLink = links.get(Id.createLinkId(atts.getValue("start_link")));
-        double capacity = ReaderUtils.getDouble(atts, "capacity", DEFAULT_CAPACITY);
-        double t0 = ReaderUtils.getDouble(atts, "t_0", DEFAULT_T_0);
-        double t1 = ReaderUtils.getDouble(atts, "t_1", DEFAULT_T_1);
-        return createVehicle(id, startLink, capacity, t0, t1, atts);
-    }
-    
-    
-    protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1, Attributes atts)
-    {
-        return new VehicleImpl(id, startLink, capacity, t0, t1);
-    }
+	protected Vehicle createVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1,
+			Attributes atts) {
+		return new VehicleImpl(id, startLink, capacity, t0, t1);
+	}
 }

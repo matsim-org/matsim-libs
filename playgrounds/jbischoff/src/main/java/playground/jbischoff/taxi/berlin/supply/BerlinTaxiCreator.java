@@ -39,8 +39,7 @@ import playground.michalm.TaxiBerlin.TaxiBerlinZoneUtils;
 import com.vividsolutions.jts.geom.Point;
 
 
-public class BerlinTaxiCreator
-    implements VehicleCreator
+public class BerlinTaxiCreator implements VehicleGenerator.VehicleCreator
 {
     private static final Logger log = Logger.getLogger(BerlinTaxiCreator.class);
     private static final Random RND = new Random(42);
@@ -66,7 +65,7 @@ public class BerlinTaxiCreator
 
 
     @Override
-    public Vehicle createVehicle(double t0, double t1)
+    public VehicleImpl createVehicle(double t0, double t1)
     {
         Id<Zone> lorId = lorSelection.select();
         String vehIdString = "t_" + lorId + "_" + (t0 / 3600) + "_" + currentVehicleId;
@@ -76,7 +75,7 @@ public class BerlinTaxiCreator
         Id<Vehicle> vehId = Id.create(vehIdString, Vehicle.class);
 
         Link link = getRandomLinkInLor(lorId);
-        Vehicle v = new VehicleImpl(vehId, link, PAXPERCAR, Math.round(t0), Math.round(t1));
+        VehicleImpl v = new VehicleImpl(vehId, link, PAXPERCAR, Math.round(t0), Math.round(t1));
         currentVehicleId++;
         return v;
     }

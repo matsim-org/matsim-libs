@@ -30,7 +30,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
 
 import javax.inject.Inject;
@@ -107,8 +107,8 @@ public class BikeSharingTripRouterModule extends AbstractModule {
 		@Override
 		public RoutingModule get() {
 			// XXX should be person-dependent
-			final CharyparNagelScoringParameters scoringParams =
-					new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
+			final ScoringParameters scoringParams =
+					new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
 			final Collection<InitialNodeRouter> initialNodeRouters = new ArrayList<InitialNodeRouter>( 2 );
 			initialNodeRouters.add(
 					new InitialNodeRouter(

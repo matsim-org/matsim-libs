@@ -55,6 +55,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 import playground.santiago.SantiagoScenarioConstants;
+import playground.santiago.colectivos.router.ColectivoModule;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -76,8 +77,8 @@ public class SantiagoScenarioRunnerFelix {
 	private static boolean mapActs2Links;
 	private static String gantriesFile;
 
-	private static String caseName = "baseCase1pct";
-	private static String inputPath = "C:/Users/Felix/Documents/Uni/Santiago de Chile/1_pct_Leo/";
+	private static String caseName = "v3";
+	private static String inputPath = "C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v3/input/";
 	
 	
 	
@@ -94,7 +95,7 @@ public class SantiagoScenarioRunnerFelix {
 			
 		} else {
 		
-			configFile=inputPath + "randomized_sampled_config.xml" ; 
+			configFile=inputPath + "randomized_sampled_config_fares_eingebunden.xml" ; 
 			gantriesFile = inputPath + "gantries.xml";
 			policy=0;    
 			sigma=3 ;    
@@ -109,14 +110,17 @@ public class SantiagoScenarioRunnerFelix {
 			
 			Config config = ConfigUtils.loadConfig(configFile);
 			Scenario scenario = ScenarioUtils.loadScenario(config);
-			config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			Controler controler = new Controler(scenario);
 			
 			// adding other network modes than car requires some router; here, the same values as for car are used
 			setNetworkModeRouting(controler);
 			
+			//adding colectivo integration
+			controler.addOverridingModule(new ColectivoModule());
+			
 			// adding pt fare
-			controler.getEvents().addHandler(new PTFareHandler(controler, doModeChoice, scenario.getPopulation()));
+			controler.getEvents().addHandler(new PTFareHandlerFelix(controler, doModeChoice, scenario.getPopulation()));
 			
 			// adding basic strategies for car and non-car users
 			setBasicStrategiesForSubpopulations(controler);
@@ -193,8 +197,6 @@ public class SantiagoScenarioRunnerFelix {
 				addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding(SantiagoScenarioConstants.Modes.taxi.toString()).to(networkTravelTime());
 				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.taxi.toString()).to(carTravelDisutilityFactoryKey());
-				addTravelTimeBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(networkTravelTime());
-				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding(SantiagoScenarioConstants.Modes.other.toString()).to(networkTravelTime());
 				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.other.toString()).to(carTravelDisutilityFactoryKey());
 			}

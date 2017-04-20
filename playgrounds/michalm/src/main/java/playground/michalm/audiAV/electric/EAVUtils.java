@@ -20,11 +20,10 @@
 package playground.michalm.audiAV.electric;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.discharging.*;
@@ -33,46 +32,40 @@ import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.data.EvrpVehicle.Ev;
 import playground.michalm.taxi.ev.ETaxiChargingLogic;
 
+public class EAVUtils {
+	public static void initEvData(Fleet fleet, EvData evData) {
+		TemperatureProvider tempProvider = () -> 20;// aux power about 1 kW at 20oC
+		double chargingSpeedFactor = 1.; // full speed
 
-public class EAVUtils
-{
-    public static void initEvData(TaxiData taxiData, EvData evData)
-    {
-        TemperatureProvider tempProvider = () -> 20;// aux power about 1 kW at 20oC
-        double chargingSpeedFactor = 1.; //full speed
+		for (Charger c : evData.getChargers().values()) {
+			new ETaxiChargingLogic(c, chargingSpeedFactor);
+		}
 
-        for (Charger c : evData.getChargers().values()) {
-            new ETaxiChargingLogic(c, chargingSpeedFactor);
-        }
+		for (Vehicle v : fleet.getVehicles().values()) {
+			Ev ev = ((EvrpVehicle)v).getEv();
+			ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
+			ev.setAuxEnergyConsumption(
+					new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider, EAVUtils::isServingCustomer));
+			evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);
+		}
+	}
 
-        for (Vehicle v : taxiData.getVehicles().values()) {
-            Ev ev = ((EvrpVehicle)v).getEv();
-            ev.setDriveEnergyConsumption(new OhdeSlaskiDriveEnergyConsumption());
-            ev.setAuxEnergyConsumption(new OhdeSlaskiAuxEnergyConsumption(ev, tempProvider,
-                    EAVUtils::isServingCustomer));
-            evData.addElectricVehicle(Id.createVehicleId(v.getId()), ev);
-        }
-    }
+	private static boolean isServingCustomer(ElectricVehicle ev) {
+		Schedule schedule = ((Ev)ev).getEvrpVehicle().getSchedule();
+		if (schedule.getStatus() != ScheduleStatus.STARTED) {
+			return false;
+		}
 
+		switch (((TaxiTask)schedule.getCurrentTask()).getTaxiTaskType()) {
+			case PICKUP:
+			case OCCUPIED_DRIVE:
+			case DROPOFF:
+				return true;
 
-    private static boolean isServingCustomer(ElectricVehicle ev)
-    {
-        Schedule<TaxiTask> schedule = TaxiSchedules
-                .asTaxiSchedule( ((Ev)ev).getEvrpVehicle().getSchedule());
-        if (schedule.getStatus() != ScheduleStatus.STARTED) {
-            return false;
-        }
+			// TODO driving empty to cusomer is not handled yet (will be?)
 
-        switch (schedule.getCurrentTask().getTaxiTaskType()) {
-            case PICKUP:
-            case OCCUPIED_DRIVE:
-            case DROPOFF:
-                return true;
-
-            //TODO driving empty to cusomer is not handled yet (will be?)
-
-            default:
-                return false;
-        }
-    }
+			default:
+				return false;
+		}
+	}
 }

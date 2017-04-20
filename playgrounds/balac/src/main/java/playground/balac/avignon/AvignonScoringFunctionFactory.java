@@ -14,9 +14,9 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 /**
  * @author balacm
  */
@@ -27,13 +27,13 @@ public class AvignonScoringFunctionFactory implements ScoringFunctionFactory {
 	private Config config;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
-	private final CharyparNagelScoringParametersForPerson parametersForPerson;
+	private final ScoringParametersForPerson parametersForPerson;
 
 	public AvignonScoringFunctionFactory(Config config, MatsimServices controler, DestinationChoiceBestResponseContext lcContext) {
 		this.controler = controler;
 		this.lcContext = lcContext;
 		this.config = config;
-		this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+		this.parametersForPerson = new SubpopulationScoringParameters( controler.getScenario() );
 		log.info("creating DCScoringFunctionFactory");
 	}
 		
@@ -76,7 +76,7 @@ public class AvignonScoringFunctionFactory implements ScoringFunctionFactory {
                     lcContext);
 		}
 
-		final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
+		final ScoringParameters params = parametersForPerson.getScoringParameters( person );
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring( params ));

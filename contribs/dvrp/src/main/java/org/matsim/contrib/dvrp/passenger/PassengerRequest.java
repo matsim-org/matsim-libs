@@ -23,15 +23,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+public interface PassengerRequest extends Request {
+	Link getFromLink();
 
-public interface PassengerRequest
-    extends Request
-{
-    Link getFromLink();
+	Link getToLink();
 
-
-    Link getToLink();
-
-
-    MobsimPassengerAgent getPassenger();
+	MobsimPassengerAgent getPassenger();
 }

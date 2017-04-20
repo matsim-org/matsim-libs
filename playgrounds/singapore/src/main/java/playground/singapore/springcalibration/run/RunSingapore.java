@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
@@ -21,11 +21,11 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.singapore.scoring.CharyparNagelOpenTimesActivityScoring;
 import playground.singapore.springcalibration.run.roadpricing.SubpopRoadPricingModule;
@@ -46,7 +46,7 @@ public class RunSingapore {
 		final SingaporeConfigGroup singaporeConfigGroup = ConfigUtils.addOrGetModule(
 				scenario.getConfig(), SingaporeConfigGroup.GROUP_NAME, SingaporeConfigGroup.class);
 		
-		CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+		ScoringParametersForPerson parameters = new SubpopulationScoringParameters( controler.getScenario() );
 										
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
@@ -54,7 +54,7 @@ public class RunSingapore {
 			@Inject Network network;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final ScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));			
@@ -136,9 +136,13 @@ public class RunSingapore {
 				(int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
         log.info("About to init TransitRouterWSImplFactory...");
-        
-        controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
-        
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+			}
+		});
         // TODO: also take into account waiting times and stop times in scoring?!
 		// -----------------------------------------------------------------------------
 		

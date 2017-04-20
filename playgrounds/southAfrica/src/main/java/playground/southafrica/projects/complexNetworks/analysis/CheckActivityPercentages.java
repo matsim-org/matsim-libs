@@ -33,6 +33,7 @@ import playground.southafrica.utilities.Header;
  *  
  * @author jwjoubert
  */
+@Deprecated
 public class CheckActivityPercentages {
 	final private static Logger LOG = Logger.getLogger(CheckActivityPercentages.class); 
 

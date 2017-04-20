@@ -24,42 +24,29 @@ import java.util.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
+public abstract class AssignmentDestinationData<D> {
+	public static class DestEntry<D> extends LinkTimePair {
+		public final int idx;
+		public final D destination;
 
-public abstract class AssignmentDestinationData<D>
-{
-    public static class DestEntry<D>
-        extends LinkTimePair
-    {
-        public final int idx;
-        public final D destination;
+		public DestEntry(int idx, D destination, Link link, double time) {
+			super(link, time);
+			this.idx = idx;
+			this.destination = destination;
+		}
+	}
 
+	protected final List<DestEntry<D>> entries = new ArrayList<>();
 
-        public DestEntry(int idx, D destination, Link link, double time)
-        {
-            super(link, time);
-            this.idx = idx;
-            this.destination = destination;
-        }
-    }
+	public int getSize() {
+		return entries.size();
+	}
 
+	public DestEntry<D> getEntry(int idx) {
+		return entries.get(idx);
+	}
 
-    protected final List<DestEntry<D>> entries = new ArrayList<>();
-
-
-    public int getSize()
-    {
-        return entries.size();
-    }
-
-
-    public DestEntry<D> getEntry(int idx)
-    {
-        return entries.get(idx);
-    }
-
-
-    public List<DestEntry<D>> getEntries()
-    {
-        return entries;
-    }
+	public List<DestEntry<D>> getEntries() {
+		return entries;
+	}
 }

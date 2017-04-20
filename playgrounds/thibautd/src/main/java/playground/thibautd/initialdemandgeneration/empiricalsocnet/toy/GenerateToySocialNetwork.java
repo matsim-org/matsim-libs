@@ -25,7 +25,6 @@ import org.matsim.core.config.ConfigWriter;
 import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.AutocloserModule;
 import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplerUtils;
-import playground.thibautd.initialdemandgeneration.empiricalsocnet.framework.SocialNetworkSamplingConfigGroup;
 
 import java.util.Random;
 
@@ -35,7 +34,7 @@ import java.util.Random;
 public class GenerateToySocialNetwork {
 	public static void main( final String... args ) {
 		final ToySocialNetworkConfigGroup configGroup = new ToySocialNetworkConfigGroup();
-		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup , new SocialNetworkSamplingConfigGroup() );
+		final Config config = ConfigUtils.loadConfig( args[ 0 ] , configGroup );
 
 		MoreIOUtils.initOut( config.controler().getOutputDirectory() , config );
 

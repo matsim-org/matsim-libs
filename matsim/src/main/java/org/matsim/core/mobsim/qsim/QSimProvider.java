@@ -50,8 +50,8 @@ public class QSimProvider implements Provider<QSim> {
 			@Override
 			protected void configure() {
 				for (AbstractQSimPlugin plugin : plugins) {
-					for (Module module : plugin.modules()) {
-						install(module);
+					for (Module module1 : plugin.modules()) {
+						install(module1);
 					}
 				}
 				bind(QSim.class).asEagerSingleton();

@@ -15,10 +15,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.dziemke.utils.LogToOutputSaver;
 
@@ -37,25 +35,29 @@ public class CreateMatrixBasedPtInputs {
 		// ... for local use
 		// Input and Output
 //		String networkFile = "../../../shared-svn/projects/maxess/data/nmb/transit/NMBM_PT_V1.xml.gz";
-//		String networkFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz";
 		String networkFile = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/jtlu14b.output_network.xml.gz";
+//		String networkFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz";
 //		String networkFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/network/2015-05-26/network.xml";
+//		String networkFile = "../../../matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
 		
 //		String transitScheduleFile = "../../../shared-svn/projects/maxess/data/nmb/transit/Transitschedule_PT_V1_WithVehicles.xml.gz";
-//		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
 		String transitScheduleFile = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/ITERS/it.300/jtlu14b.300.transitScheduleScored.xml.gz";
+//		String transitScheduleFile = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16/schedule.xml";
+//		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/gtfs/2015-07-03/transitschedule.xml";
 		
 //		String outputRoot = "../../../shared-svn/projects/maxess/data/nmb/transit/matrix/07/";
-		String outputRoot = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/";
+//		String outputRoot = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_1000/";
+		String outputRoot = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_station/";
+//		String outputRoot = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/matsim_2015-06-16/matrix/";
 //		String outputRoot = "../../../../Workspace/shared-svn/projects/accessibility_berlin/travel_matrix/2016-01-05/";
 //		String outputFileRoot = "../../data/accessibility/be_002/";
 		LogToOutputSaver.setOutputDirectory(outputRoot);
 		
 		// Parameters
 		Boolean measuringPointsAsPTStops = true; // if "true" -> use regular, user-defined locations instead of stops from schedule
-//		Double cellSize = 1000.; // only relevant if "meauringPointsAsPTStops = true"
-		Double cellSize = 500.; // only relevant if "meauringPointsAsPTStops = true"
+		Double cellSize = 1000.; // only relevant if "meauringPointsAsPTStops = true"
+//		Double cellSize = 500.; // only relevant if "meauringPointsAsPTStops = true"
 		Double departureTime = 8. * 60 * 60;
 		Integer numberOfThreads = 1;
 //		Integer numberOfThreads = 20;

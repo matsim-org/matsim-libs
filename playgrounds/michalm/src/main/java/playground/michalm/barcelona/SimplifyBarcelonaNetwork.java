@@ -29,22 +29,20 @@ import com.google.common.collect.Sets;
 
 import playground.andreas.utils.net.NetworkSimplifier;
 
-public class SimplifyBarcelonaNetwork
-{
-    public static void main(String[] args)
-    {
-        String dir = "d:/PP-rad/Barcelona/data/network/";
-        String networkFile = dir + "barcelona_network.xml";
-        String simplifiedNetworkFile = dir + "barcelona_simplified_network.xml";
+public class SimplifyBarcelonaNetwork {
+	public static void main(String[] args) {
+		String dir = "d:/PP-rad/Barcelona/data/network/";
+		String networkFile = dir + "barcelona_network.xml";
+		String simplifiedNetworkFile = dir + "barcelona_simplified_network.xml";
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
-        NetworkSimplifier simplifier = new NetworkSimplifier();
-        simplifier.setNodesToMerge(Sets.newHashSet(4, 5));
-        simplifier.run(scenario.getNetwork());
-        simplifier.run(scenario.getNetwork());//2nd run
+		NetworkSimplifier simplifier = new NetworkSimplifier();
+		simplifier.setNodesToMerge(Sets.newHashSet(4, 5));
+		simplifier.run(scenario.getNetwork());
+		simplifier.run(scenario.getNetwork());// 2nd run
 
-        new NetworkWriter(scenario.getNetwork()).write(simplifiedNetworkFile);
-    }
+		new NetworkWriter(scenario.getNetwork()).write(simplifiedNetworkFile);
+	}
 }

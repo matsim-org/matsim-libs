@@ -22,52 +22,42 @@ package playground.michalm.taxi.data.file;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import playground.michalm.taxi.data.*;
 
+public class TaxiRankReader extends MatsimXmlParser {
+	private final static String RANK = "rank";
 
-public class TaxiRankReader
-    extends MatsimXmlParser
-{
-    private final static String RANK = "rank";
+	private final static int DEFAULT_RANK_CAPACITY = Integer.MAX_VALUE;
 
-    private final static int DEFAULT_RANK_CAPACITY = Integer.MAX_VALUE;
+	private final TaxiRankDataImpl data;
+	private Map<Id<Link>, ? extends Link> links;
 
-    private final TaxiDataWithRanks data;
-    private Map<Id<Link>, ? extends Link> links;
+	public TaxiRankReader(Network network, TaxiRankDataImpl data) {
+		this.data = data;
+		links = network.getLinks();
+	}
 
+	@Override
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		if (RANK.equals(name)) {
+			data.addTaxiRank(createRank(atts));
+		}
+	}
 
-    public TaxiRankReader(Scenario scenario, TaxiDataWithRanks data)
-    {
-        this.data = data;
-        links = scenario.getNetwork().getLinks();
-    }
+	@Override
+	public void endTag(String name, String content, Stack<String> context) {
+	}
 
-
-    @Override
-    public void startTag(String name, Attributes atts, Stack<String> context)
-    {
-        if (RANK.equals(name)) {
-            data.addTaxiRank(createRank(atts));
-        }
-    }
-
-
-    @Override
-    public void endTag(String name, String content, Stack<String> context)
-    {}
-
-
-    private TaxiRank createRank(Attributes atts)
-    {
-        Id<TaxiRank> id = Id.create(atts.getValue("id"), TaxiRank.class);
-        String name = ReaderUtils.getString(atts, "name", id + "");
-        Link link = links.get(Id.createLinkId(atts.getValue("link")));
-        int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_RANK_CAPACITY);
-        return new TaxiRank(id, name, link, capacity);
-    }
+	private TaxiRank createRank(Attributes atts) {
+		Id<TaxiRank> id = Id.create(atts.getValue("id"), TaxiRank.class);
+		String name = ReaderUtils.getString(atts, "name", id + "");
+		Link link = links.get(Id.createLinkId(atts.getValue("link")));
+		int capacity = ReaderUtils.getInt(atts, "capacity", DEFAULT_RANK_CAPACITY);
+		return new TaxiRank(id, name, link, capacity);
+	}
 }

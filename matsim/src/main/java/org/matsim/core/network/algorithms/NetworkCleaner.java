@@ -44,7 +44,7 @@ import org.matsim.core.api.internal.NetworkRunnable;
  * @author mrieser
  * @author balmermi
  */
-public class NetworkCleaner implements NetworkRunnable {
+public final class NetworkCleaner implements NetworkRunnable {
 
 	private static final Logger log = Logger.getLogger(NetworkCleaner.class);
 

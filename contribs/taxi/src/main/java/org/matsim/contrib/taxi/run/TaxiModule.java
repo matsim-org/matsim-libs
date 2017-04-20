@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,53 +19,54 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.*;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.vehicles.*;
+import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
+import org.matsim.core.config.Config;
 
-import com.google.inject.name.Names;
+import com.google.inject.*;
+import com.google.inject.name.Named;
 
+/**
+ * @author michalm
+ */
+public class TaxiModule extends DvrpModule {
+	public static final String TAXI_MODE = "taxi";
 
-public class TaxiModule
-    extends AbstractModule
-{
-    public static final String TAXI_MODE = "taxi";
+	public TaxiModule() {
+		this(DefaultTaxiOptimizerProvider.class);
+	}
 
-    private final TaxiData taxiData;
-    private final VehicleType vehicleType;
+	public TaxiModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
+		super(createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class), TaxiOptimizer.class);
+	}
 
+	@Provides
+	@Singleton
+	private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
+			TaxiConfigGroup taxiCfg) {
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(network, fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+		return fleet;
+	}
 
-    public TaxiModule(TaxiData taxiData)
-    {
-        this(taxiData, VehicleUtils.getDefaultVehicleType());
-    }
-
-
-    public TaxiModule(TaxiData taxiData, VehicleType vehicleType)
-    {
-        this.taxiData = taxiData;
-        this.vehicleType = vehicleType;
-    }
-
-
-    @Override
-    public void install()
-    {
-        addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
-        bind(TaxiData.class).toInstance(taxiData);
-        bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
-        bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
-
-        addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-        addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-        if (TaxiConfigGroup.get(getConfig()).getTimeProfiles()) {
-            addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-            //add more time profiles if necessary
-        }
-    }
+	private static com.google.inject.AbstractModule createModuleForQSimPlugin(
+			final Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
+		return new com.google.inject.AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
+				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
+				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
+				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+			}
+		};
+	}
 }

@@ -79,6 +79,7 @@ public class CourtesyEvent extends Event implements HasPersonId {
 	public Map<String, String> getAttributes() {
 		final Map<String, String> map = super.getAttributes();
 
+		map.put( "actType" , actType );
 		map.put( "egoId" , ego.toString() );
 		map.put( "alterId" , alter.toString() );
 

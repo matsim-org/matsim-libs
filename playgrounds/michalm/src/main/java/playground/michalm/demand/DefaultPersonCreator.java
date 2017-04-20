@@ -23,35 +23,25 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.zone.Zone;
 
+public class DefaultPersonCreator implements PersonCreator {
+	private final PopulationFactory pf;
+	private final String idFormat;
+	private int currentAgentId = 0;
 
-public class DefaultPersonCreator
-    implements PersonCreator
-{
-    private final PopulationFactory pf;
-    private final String idFormat;
-    private int currentAgentId = 0;
+	public DefaultPersonCreator(Scenario scenario) {
+		this(scenario, "%07d");
+	}
 
+	// idFormat: e.g. "%07d", "taxi_customer_%04d"...
+	public DefaultPersonCreator(Scenario scenario, String idFormat) {
+		this.pf = scenario.getPopulation().getFactory();
+		this.idFormat = idFormat;
+	}
 
-    public DefaultPersonCreator(Scenario scenario)
-    {
-        this(scenario, "%07d");
-    }
-
-
-    //idFormat: e.g. "%07d", "taxi_customer_%04d"... 
-    public DefaultPersonCreator(Scenario scenario, String idFormat)
-    {
-        this.pf = scenario.getPopulation().getFactory();
-        this.idFormat = idFormat;
-    }
-
-
-    @Override
-    public Person createPerson(Plan plan, Zone fromZone, Zone toZone)
-    {
-        String strId = String.format(idFormat + "_%s_%s", currentAgentId++, fromZone.getId(),
-                toZone.getId());
-        Person person = pf.createPerson(Id.create(strId, Person.class));
-        return person;
-    }
+	@Override
+	public Person createPerson(Plan plan, Zone fromZone, Zone toZone) {
+		String strId = String.format(idFormat + "_%s_%s", currentAgentId++, fromZone.getId(), toZone.getId());
+		Person person = pf.createPerson(Id.create(strId, Person.class));
+		return person;
+	}
 }

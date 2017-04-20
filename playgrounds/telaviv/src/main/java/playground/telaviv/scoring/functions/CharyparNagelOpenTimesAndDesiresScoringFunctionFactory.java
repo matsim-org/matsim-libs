@@ -28,7 +28,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.FacilityOpeningIntervalCalculator;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,14 +48,14 @@ import java.util.Map;
 public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final Map<String, Double> originalTypicalDurations;
-	private final Map<Id, CharyparNagelScoringParameters> paramsMap;
+	private final Map<Id, ScoringParameters> paramsMap;
     private Scenario scenario;
 	private PlanCalcScoreConfigGroup config;
 
     public CharyparNagelOpenTimesAndDesiresScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
     	this.config = config;
 		this.scenario = scenario;
-		this.paramsMap = new HashMap<Id, CharyparNagelScoringParameters>();
+		this.paramsMap = new HashMap<Id, ScoringParameters>();
 		
 		/*
 		 * backup configs original typical durations

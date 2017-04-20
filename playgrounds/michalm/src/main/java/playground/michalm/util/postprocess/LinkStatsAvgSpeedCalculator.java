@@ -24,35 +24,31 @@ import java.util.List;
 
 import playground.michalm.util.postprocess.LinkStatsReader.LinkStats;
 
+public class LinkStatsAvgSpeedCalculator {
+	public static void main(String[] args) {
+		String dir = "d:\\PP-rad\\poznan\\";
+		String linkStatsFile = dir + "40.linkstats-filtered.txt.gz";
+		String avgSpeedFile = dir + "40.avg_speed-filtered.txt";
 
-public class LinkStatsAvgSpeedCalculator
-{
-    public static void main(String[] args)
-    {
-        String dir = "d:\\PP-rad\\poznan\\";
-        String linkStatsFile = dir + "40.linkstats-filtered.txt.gz";
-        String avgSpeedFile = dir + "40.avg_speed-filtered.txt";
+		List<? extends LinkStats> lsl = LinkStatsReader.readLinkStats(linkStatsFile);
 
-        List<? extends LinkStats> lsl = LinkStatsReader.readLinkStats(linkStatsFile);
+		double[] hrsLengthSum = new double[24];
+		double[] hrsTTSum = new double[24];
 
-        double[] hrsLengthSum = new double[24];
-        double[] hrsTTSum = new double[24];
+		for (LinkStats ls : lsl) {
+			for (int i = 0; i < 24; i++) {
+				hrsLengthSum[i] += ls.hrs[i] * ls.length;
+				hrsTTSum[i] += ls.hrs[i] * ls.tt[i];
+			}
+		}
 
-        for (LinkStats ls : lsl) {
-            for (int i = 0; i < 24; i++) {
-                hrsLengthSum[i] += ls.hrs[i] * ls.length;
-                hrsTTSum[i] += ls.hrs[i] * ls.tt[i];
-            }
-        }
-
-        try (PrintWriter pw = new PrintWriter(new File(avgSpeedFile))) {
-            for (int i = 0; i < 24; i++) {
-                double avgSpeed = 3.6 * hrsLengthSum[i] / hrsTTSum[i];
-                pw.println(i + "\t" + avgSpeed);
-            }
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		try (PrintWriter pw = new PrintWriter(new File(avgSpeedFile))) {
+			for (int i = 0; i < 24; i++) {
+				double avgSpeed = 3.6 * hrsLengthSum[i] / hrsTTSum[i];
+				pw.println(i + "\t" + avgSpeed);
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

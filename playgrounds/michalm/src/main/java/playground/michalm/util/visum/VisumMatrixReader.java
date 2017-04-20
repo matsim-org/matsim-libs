@@ -26,133 +26,100 @@ import java.util.*;
 
 import org.matsim.core.utils.io.IOUtils;
 
+public class VisumMatrixReader {
+	public static double[][] readMatrix(String file) {
+		VisumMatrixReader reader = new VisumMatrixReader();
+		reader.readFile(file);
+		return reader.getMatrix();
+	}
 
-public class VisumMatrixReader
-{
-    public static double[][] readMatrix(String file)
-    {
-        VisumMatrixReader reader = new VisumMatrixReader();
-        reader.readFile(file);
-        return reader.getMatrix();
-    }
+	public static int[] readIds(String file) {
+		VisumMatrixReader reader = new VisumMatrixReader();
+		reader.readFile(file);
+		return reader.getIds();
+	}
 
+	private int[] ids;
+	private double[][] matrix;
 
-    public static int[] readIds(String file)
-    {
-        VisumMatrixReader reader = new VisumMatrixReader();
-        reader.readFile(file);
-        return reader.getIds();
-    }
+	public void readFile(String file) {
+		try (BufferedReader reader = IOUtils.getBufferedReader(file)) {
+			NumberReader nr = new NumberReader(reader);
 
+			nr.nextDouble();// time interval - from
+			nr.nextDouble();// time interval - to
+			nr.nextDouble();// factor
 
-    private int[] ids;
-    private double[][] matrix;
+			int count = nr.nextInt(); // number of objects
 
+			// object ids
+			ids = new int[count];
+			for (int i = 0; i < count; i++) {
+				ids[i] = nr.nextInt();
+			}
 
-    public void readFile(String file)
-    {
-        try (BufferedReader reader = IOUtils.getBufferedReader(file)) {
-            NumberReader nr = new NumberReader(reader);
+			// values
+			matrix = (double[][])Array.newInstance(double.class, count, count);
+			for (int i = 0; i < count; i++) {
+				for (int j = 0; j < count; j++) {
+					matrix[i][j] = nr.nextDouble();
+				}
+			}
+		} catch (IOException | ParseException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-            nr.nextDouble();// time interval - from
-            nr.nextDouble();// time interval - to
-            nr.nextDouble();// factor
+	public int[] getIds() {
+		return ids;
+	}
 
-            int count = nr.nextInt(); // number of objects
+	public double[][] getMatrix() {
+		return matrix;
+	}
 
-            // object ids
-            ids = new int[count];
-            for (int i = 0; i < count; i++) {
-                ids[i] = nr.nextInt();
-            }
+	private static class NumberReader {
+		private final BufferedReader reader;
+		private final NumberFormat nf = NumberFormat.getInstance(Locale.US);
+		private StringTokenizer st;
 
-            // values
-            matrix = (double[][])Array.newInstance(double.class, count, count);
-            for (int i = 0; i < count; i++) {
-                for (int j = 0; j < count; j++) {
-                    matrix[i][j] = nr.nextDouble();
-                }
-            }
-        }
-        catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		private NumberReader(BufferedReader reader) throws IOException {
+			this.reader = reader;
+			moveToNextValidLine();
+		}
 
+		public double nextDouble() throws IOException, ParseException {
+			return nextNumber().doubleValue();
+		}
 
-    public int[] getIds()
-    {
-        return ids;
-    }
+		public int nextInt() throws IOException, ParseException {
+			return nextNumber().intValue();
+		}
 
+		public Number nextNumber() throws IOException, ParseException {
+			if (!st.hasMoreTokens()) {
+				moveToNextValidLine();
+			}
 
-    public double[][] getMatrix()
-    {
-        return matrix;
-    }
+			return nf.parse(st.nextToken());
+		}
 
+		private void moveToNextValidLine() throws IOException {
+			String line;
+			do {
+				line = reader.readLine();
+			} while (!isValidLine(line));
 
-    private static class NumberReader
-    {
-        private final BufferedReader reader;
-        private final NumberFormat nf = NumberFormat.getInstance(Locale.US);
-        private StringTokenizer st;
+			st = new StringTokenizer(line);
+		}
 
+		private boolean isValidLine(String line) {
+			if (line.trim().isEmpty()) {
+				return false;
+			}
 
-        private NumberReader(BufferedReader reader)
-            throws IOException
-        {
-            this.reader = reader;
-            moveToNextValidLine();
-        }
-
-
-        public double nextDouble()
-            throws IOException, ParseException
-        {
-            return nextNumber().doubleValue();
-        }
-
-
-        public int nextInt()
-            throws IOException, ParseException
-        {
-            return nextNumber().intValue();
-        }
-
-
-        public Number nextNumber()
-            throws IOException, ParseException
-        {
-            if (!st.hasMoreTokens()) {
-                moveToNextValidLine();
-            }
-
-            return nf.parse(st.nextToken());
-        }
-
-
-        private void moveToNextValidLine()
-            throws IOException
-        {
-            String line;
-            do {
-                line = reader.readLine();
-            }
-            while (!isValidLine(line));
-
-            st = new StringTokenizer(line);
-        }
-
-
-        private boolean isValidLine(String line)
-        {
-            if (line.trim().isEmpty()) {
-                return false;
-            }
-
-            char firstChar = line.charAt(0);
-            return firstChar != '*' && firstChar != '$';
-        }
-    }
+			char firstChar = line.charAt(0);
+			return firstChar != '*' && firstChar != '$';
+		}
+	}
 }

@@ -24,84 +24,63 @@ import java.util.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
+public class PickupDeliveryTaskImpl extends StayTaskImpl implements PickupDeliveryTask {
+	private final boolean pickup;
 
-public class PickupDeliveryTaskImpl
-    extends StayTaskImpl
-    implements PickupDeliveryTask
-{
-    private final boolean pickup;
+	private final List<PickupDeliveryRequest> requests = new ArrayList<>();
+	private final List<PickupDeliveryRequest> unmodifiableRequests = Collections.unmodifiableList(requests);
 
-    private final List<PickupDeliveryRequest> requests = new ArrayList<>();
-    private final List<PickupDeliveryRequest> unmodifiableRequests = Collections
-            .unmodifiableList(requests);
+	public PickupDeliveryTaskImpl(double beginTime, double endTime, Link link, boolean pickup) {
+		super(beginTime, endTime, link);
+		this.pickup = pickup;
+	}
 
+	@Override
+	public boolean isPickup() {
+		return pickup;
+	}
 
-    public PickupDeliveryTaskImpl(double beginTime, double endTime, Link link, boolean pickup)
-    {
-        super(beginTime, endTime, link);
-        this.pickup = pickup;
-    }
+	@Override
+	public List<PickupDeliveryRequest> getRequests() {
+		return unmodifiableRequests;
+	}
 
+	@Override
+	public void addRequest(PickupDeliveryRequest request) {
+		if ((pickup && request.getFromLink() != getLink()) //
+				|| (!pickup && request.getToLink() != getLink())) {
+			throw new RuntimeException();
+		}
 
-    @Override
-    public boolean isPickup()
-    {
-        return pickup;
-    }
+		requests.add(request);
 
+		if (pickup) {
+			request.setPickupTask(this);
+		} else {
+			request.setDeliveryTask(this);
+		}
+	}
 
-    @Override
-    public List<PickupDeliveryRequest> getRequests()
-    {
-        return unmodifiableRequests;
-    }
+	@Override
+	public void removeRequest(PickupDeliveryRequest request) {
+		removeFromRequest(request);
+		requests.remove(request);
+	}
 
+	@Override
+	public void removeAllRequests() {
+		for (PickupDeliveryRequest r : requests) {
+			removeFromRequest(r);
+		}
 
-    @Override
-    public void addRequest(PickupDeliveryRequest request)
-    {
-        if ( (pickup && request.getFromLink() != getLink()) //
-                || (!pickup && request.getToLink() != getLink())) {
-            throw new RuntimeException();
-        }
+		requests.clear();
+	}
 
-        requests.add(request);
-
-        if (pickup) {
-            request.setPickupTask(this);
-        }
-        else {
-            request.setDeliveryTask(this);
-        }
-    }
-
-
-    @Override
-    public void removeRequest(PickupDeliveryRequest request)
-    {
-        removeFromRequest(request);
-        requests.remove(request);
-    }
-
-
-    @Override
-    public void removeAllRequests()
-    {
-        for (PickupDeliveryRequest r : requests) {
-            removeFromRequest(r);
-        }
-
-        requests.clear();
-    }
-
-
-    private void removeFromRequest(PickupDeliveryRequest request)
-    {
-        if (pickup) {
-            request.setPickupTask(null);
-        }
-        else {
-            request.setDeliveryTask(null);
-        }
-    }
+	private void removeFromRequest(PickupDeliveryRequest request) {
+		if (pickup) {
+			request.setPickupTask(null);
+		} else {
+			request.setDeliveryTask(null);
+		}
+	}
 }

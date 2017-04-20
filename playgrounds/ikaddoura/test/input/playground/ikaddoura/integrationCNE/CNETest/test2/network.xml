@@ -77,8 +77,8 @@
 	<link id="link_6_9" from="6" to="9" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
 	<link id="link_9_6" from="9" to="6" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
 	
-	<link id="link_10_7" from="10" to="7" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43" />
-	<link id="link_7_10" from="7" to="10" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="43"/>
+	<link id="link_10_7" from="10" to="7" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="86" />
+	<link id="link_7_10" from="7" to="10" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" type="86"/>
 
 
 </links>

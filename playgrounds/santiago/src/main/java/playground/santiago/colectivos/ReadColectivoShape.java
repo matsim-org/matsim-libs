@@ -89,13 +89,14 @@ public class ReadColectivoShape {
 		double longestDistance=0.0;
 		double shortestDistance=100000.0;
 		double totalDistance = 0.0;
+		double intervall = 0.0;
 		String shortestLine= "";
 		String longestLine="";
 		
 		List<String> shortLinks = new ArrayList<>();
 		Map<String,Double> distanceOfLines = new HashMap <String,Double>();
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/santiago/scenario/inputForMATSim/network/network_merged_cl.xml.gz");
+		new MatsimNetworkReader(network).readFile("C:/Users/Felix/Documents/Bachelor/Santiago de Chile/santiago/scenario/inputForMATSim/network/network_merged_cl.xml.gz");
 
 //		Filtering car network
 		NetworkFilterManager m = new NetworkFilterManager(network);
@@ -109,7 +110,7 @@ public class ReadColectivoShape {
 		});
 		
 		Network network2 = m.applyFilters();
-		new NetworkWriter(network2).write("C:/Users/Felix/Documents/Uni/Santiago de Chile/network_car.xml.gz");
+//		new NetworkWriter(network2).write("C:/Users/Felix/Documents/Bachelor/Santiago de Chile/network_car.xml.gz");
 		
 		//creating scenario		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -122,23 +123,32 @@ public class ReadColectivoShape {
 		
 
 //		reading Files
-		Map<String,Geometry> lines = readShapeFileAndExtractGeometry("C:/Users/Felix/Documents/Uni/Santiago de Chile/Shape-Files/Rutas_Licitadas.shp");
-//		Map<String,String> lineas = readShapeFileAndExtractFare("C:/Users/Felix/Documents/Uni/Santiago de Chile/Shape-Files/Rutas_Licitadas.shp");
-		Map<String,String> fleet = readExcelFileAndExtractFleet("C:/Users/Felix/Documents/Uni/Santiago de Chile/Shape-Files/Resumen_Geocodificacion.csv");
-//		createVehicleType(scenario.getTransitSchedule(),scenario.getTransitVehicles());
-		 	
-		
+		Map<String,Geometry> lines = readShapeFileAndExtractGeometry("C:/Users/Felix/Documents/Bachelor/Santiago de Chile/Shape-Files/Rutas_Licitadas.shp");
+//		Map<String,String> fleet = readExcelFileAndExtractFleet("C:/Users/Felix/Documents/Bachelor/Santiago de Chile/Shape-Files/Resumen_Geocodificacion.csv");
+		Map<String,String> interval = readCSVFileAndExtractInterval("C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v1/santiago/outputWithCollectivo(FC_SC1)/Traveltimes3(AddedEmptyLines).csv");
+			System.out.println(interval);
+		List xLinks = new ArrayList<>();
 	
 		
 		
 		for (Entry<String,Geometry> entry : lines.entrySet())
 		{
+			
 			numberLines++;
 			String linienName = entry.getKey();
-			if (linienName.equals("20") || linienName.equals("294")){
-				continue;
-			}
+//			if (linienName.equals("20") || linienName.equals("294")){
+//				continue;
+//			}
 			
+			for (Entry<String,String> entries : interval.entrySet()){
+				
+				if (linienName.equals(entries.getKey())){
+					System.out.println(entries.getKey());
+					System.out.println(entries.getValue());
+					intervall = Double.parseDouble(entries.getValue());
+				}
+			}
+			System.out.println(intervall);
 			MultiLineString mls = (MultiLineString) entry.getValue();
 			
 			Coord start = new Coord (mls.getCoordinates()[0].x,mls.getCoordinates()[0].y);
@@ -150,14 +160,23 @@ public class ReadColectivoShape {
 			double midCoordinatefinderA = 0;
 			double midCoordinatefinderB = 0;
 			int counter=0;
-			int everyXlinks=5;
+			int everyXlinks=8;
 			double distance = 0;
 			boolean containsDouble=true;
 			List<Link> route = new ArrayList<>();
 			List<Link> test = new ArrayList<>();
 			
-			Node lastNode = startNode;
 			
+			Node lastNode = startNode;
+			if (linienName.equals("179")|| linienName.equals("197")){
+			everyXlinks=4;
+			}
+			if (linienName.equals("198")|| linienName.equals("218")){
+				everyXlinks=9;
+			}
+			if (linienName.equals("20")|| linienName.equals("232")||linienName.equals("294")){
+				everyXlinks=1;
+			}
 			
 			
 			while (containsDouble==true)//avoids that links are used more than once (loops)
@@ -188,7 +207,7 @@ public class ReadColectivoShape {
 							route.addAll(routeToClosestLink);
 							int n = route.size()-1;
 							if (n>0){
-							lastNode = route.get(n).getToNode();
+								lastNode = route.get(n).getToNode();
 							}
 						}
 				
@@ -197,8 +216,8 @@ public class ReadColectivoShape {
 						
 					}		
 				}
-			// adds route to end node
-			List<Link> closestLinks = getNearestNLinks(network2, end, 5);
+			// adds route to last link
+			List<Link> closestLinks = getNearestNLinks(network2, end, 2);
 			List<Link> routeToClosestLink = findRouteToNextLink(end, lastNode, closestLinks, network2);
 			
 		
@@ -232,13 +251,13 @@ public class ReadColectivoShape {
 			
 			totalDistance= totalDistance + distance;
 			//if distance < 1km line is not added
-			if (distance<1000.0){
-				shortLinks.add(linienName);
-				countLow++;
-				continue;
-			}
+//			if (distance<1000.0){
+//				shortLinks.add(linienName);
+//				countLow++;
+//				continue;
+//			}
 			countHigh++;
-			addTransitRoute(linienName, route, distance);
+			addTransitRoute(linienName, route, intervall);
 			
 			//get longest and shortest distance
 			if (distance > longestDistance){
@@ -250,18 +269,48 @@ public class ReadColectivoShape {
 				shortestLine = entry.getKey();
 			}
 			distanceOfLines.put(linienName, distance);
+			xLinks.add(everyXlinks);
 		}
-//		setFaresAndWriteFile(distanceOfLines, shortestDistance, longestDistance);
+		setFaresAndWriteFile(distanceOfLines, shortestDistance, longestDistance);
 		
 		//create vehicles, get the old vehicles- and schedule-file and add new colectivo vehicles and schedule
 		createVehicles(scenario.getTransitSchedule(),scenario.getTransitVehicles());
 					
-		new VehicleReaderV1(scenario.getTransitVehicles()).readFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/santiago/scenario/inputForMATSim/transit/old/transitvehicles.xml"); 
- 		new TransitScheduleReader(scenario).readFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/santiago/scenario/inputForMATSim/transit/old/transitschedule_simplified.xml");
+		new VehicleReaderV1(scenario.getTransitVehicles()).readFile("C:/Users/Felix/Documents/Bachelor/Santiago de Chile/santiago/scenario/inputForMATSim/transit/old/transitvehicles.xml"); 
+ 		new TransitScheduleReader(scenario).readFile(				"C:/Users/Felix/Documents/Bachelor/Santiago de Chile/santiago/scenario/inputForMATSim/transit/old/transitschedule_simplified.xml");
  				
- 		new TransitScheduleWriter(transitSchedule).writeFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/schedule_simplified_all2.xml");
- 		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile("C:/Users/Felix/Documents/Uni/Santiago de Chile/vehicles_simplified_all2.xml");
-		System.out.println("shortest distance:        "+shortestDistance);
+ 		new TransitScheduleWriter(transitSchedule).writeFile(		 "C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v3/scheduleFinal/schedule_all.xml");
+ 		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile("C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v3/scheduleFinal/vehicles_all.xml");
+// 		try{
+// 		File file = new File(										 "C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v3/scheduleTest/colectivo_statistics.xml");
+// 		BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+//		bw.write("shortest distance:        "+shortestDistance);
+//		bw.newLine();
+//		bw.write("shortest line:            "+shortestLine);
+//		bw.newLine();
+//		bw.write("longest distance :        "+longestDistance);
+//		bw.newLine();
+//		bw.write("longest line:             "+longestLine);
+//		bw.newLine();
+//		bw.write("#valid lines (over 1km):  "+countHigh);
+//		bw.newLine();
+//		bw.write("#invalid lines (under 1km):"+countLow);
+//		bw.newLine();
+//		bw.write("total number of lines:     "+numberLines);
+//		bw.newLine();
+//		bw.write("total distance:            "+totalDistance);
+//		bw.newLine();
+//		
+//		
+//		for (int a=1; a<374; a++){
+//			bw.write("|| Line:"+a+" everyXLink:"+xLinks.get(a));
+//			}
+//		bw.close();
+// 		}
+// 		catch (IOException e) {
+//			e.printStackTrace();
+//		}
+ 		System.out.println("shortest distance:        "+shortestDistance);
 		System.out.println("shortest line:            "+shortestLine);
 		System.out.println("longest distance :        "+longestDistance);
 		System.out.println("longest line:             "+longestLine);
@@ -272,6 +321,7 @@ public class ReadColectivoShape {
 		for (String a : shortLinks){
 			System.out.println("short link:"+a);
 		}
+		
 		
 	}			
 	
@@ -289,9 +339,9 @@ public class ReadColectivoShape {
 		try {
 
 			
-			fare= 250.0 + 2250.0 * (distance-shortestDistance) / (longestDistance-shortestDistance);
+			fare= 200.0 + 2800.0 * (distance-shortestDistance) / (longestDistance-shortestDistance);
 			fare = (int) Math.round(fare);
-			File file = new File("C:/Users/Felix/Documents/Uni/Santiago de Chile/Fares.txt");
+			File file = new File("C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v3/scheduleTest/Fares.txt");
 			
 			// if file doesnt exists, then create it
 //			if (!file.exists()) {
@@ -326,7 +376,7 @@ private Map<String, String> readShapeFileAndExtractFare(String filename) {
 	
 	}
 
-private void addTransitRoute(String routeName, List<Link> route, Double distance) {
+private void addTransitRoute(String routeName, List<Link> route, Double intervall) {
 	
 	NetworkRoute nr = new LinkNetworkRouteImpl(route.get(0).getId(),route.get(route.size()-1).getId());
 	List<Id<Link>> linkIds = new ArrayList<>();
@@ -337,11 +387,11 @@ private void addTransitRoute(String routeName, List<Link> route, Double distance
 	List<TransitRouteStop> stops = new ArrayList<>();
 	
 	for (int j=0; j< route.size();j++){
-	TransitStopFacility stopf1 = transitSchedule.getFactory().createTransitStopFacility(Id.create(routeName+ "co_parada" +j, TransitStopFacility.class), route.get(j).getCoord(), false); 
-	TransitRouteStop stop1 = transitSchedule.getFactory().createTransitRouteStop(stopf1, j*30, j*30);
-	stops.add(stop1);
-	this.transitSchedule.addStopFacility(stopf1);
-	stopf1.setLinkId(route.get(j).getId());
+		TransitStopFacility stopf1 = transitSchedule.getFactory().createTransitStopFacility(Id.create(routeName+ "co_parada" +j, TransitStopFacility.class), route.get(j).getCoord(), false); 
+		TransitRouteStop stop1 = transitSchedule.getFactory().createTransitRouteStop(stopf1, j*30, j*30);
+		stops.add(stop1);
+		this.transitSchedule.addStopFacility(stopf1);
+		stopf1.setLinkId(route.get(j).getId());
 	}
 	
 	nr.setLinkIds(route.get(0).getId(), linkIds, route.get(route.size()-1).getId());
@@ -351,11 +401,45 @@ private void addTransitRoute(String routeName, List<Link> route, Double distance
 	transitLine.addRoute(transitRoute);
 
 	this.transitSchedule.addTransitLine(transitLine);
-	
-		for (int k = 0; 18000.0+k*120+0.0001*distance*k*60 < 79200.0 ; k++) {
+		if (intervall > 3.0){
+		for (int k = 0; 18000.0+k*60*intervall < 79200.0 ; k++) {
 		
-		Departure dep = transitSchedule.getFactory().createDeparture(Id.create("dep"+k, Departure.class), 18000.0+k*120+0.0001*distance*k*60);
-		transitRoute.addDeparture(dep);
+			Departure dep = transitSchedule.getFactory().createDeparture(Id.create("dep"+k, Departure.class), 18000.0+k*60*intervall);
+			transitRoute.addDeparture(dep);
+		}
+		}
+		//generating different schedule for peak times
+		else{
+			int count=0;
+			for (int k = 0; 18000.0+k*1.24*60*intervall < 25140.0 ; k++) {
+				count++;
+				Departure dep = transitSchedule.getFactory().createDeparture(Id.create("dep"+count, Departure.class), 18000.0+k*1.24*60*intervall);
+				transitRoute.addDeparture(dep);
+				
+			}
+			for (int k = 0; 25200.0+k*60*intervall < 32340.0 ; k++) {
+				count++;
+				Departure dep = transitSchedule.getFactory().createDeparture(Id.create("dep"+count, Departure.class), 25200.0+k*60*intervall);
+				transitRoute.addDeparture(dep);
+				
+			}
+			for (int k = 0; 32400.0+k*1.24*60*intervall < 64740.0 ; k++) {
+				count++;
+				Departure dep = transitSchedule.getFactory().createDeparture(Id.create("dep"+count, Departure.class), 32400.0+k*1.24*60*intervall);
+				transitRoute.addDeparture(dep);
+			}
+			for (int k = 0; 64800.0+k*60*intervall < 71940.0 ; k++) {
+				count++;
+				Departure dep = transitSchedule.getFactory().createDeparture(Id.create("dep"+count, Departure.class), 64800.0+k*60*intervall);
+				transitRoute.addDeparture(dep);
+			}
+			for (int k = 0; 72000.0+k*1.24*60*intervall < 79140.0 ; k++) {
+				count++;
+				Departure dep = transitSchedule.getFactory().createDeparture(Id.create("dep"+count, Departure.class), 72000.0+k*1.24*60*intervall);
+				transitRoute.addDeparture(dep);
+			}
+			
+			
 		}
 	}
 
@@ -432,6 +516,29 @@ private void createVehicles (TransitSchedule schedule, Vehicles vehicles) {
             e.printStackTrace();
         }
         return fleet;
+	
+	}
+	
+	private Map<String,String> readCSVFileAndExtractInterval(String filename){
+		Map<String,String> interval = new TreeMap<>();
+		
+        String line;
+        String cvsSplitBy = ";";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+
+            while ((line = br.readLine()) != null) {
+
+                
+                String [] interv = line.split(cvsSplitBy);
+                interval.put(interv[0], interv[7]);
+                
+            }
+//            fleet.put(lineNo, flotte);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return interval;
 	
 	}
 	

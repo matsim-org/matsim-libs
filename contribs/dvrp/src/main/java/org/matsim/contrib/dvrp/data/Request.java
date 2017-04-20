@@ -21,24 +21,33 @@ package org.matsim.contrib.dvrp.data;
 
 import org.matsim.api.core.v01.Identifiable;
 
-
 /**
  * @author michalm
  */
-public interface Request
-    extends Identifiable<Request>
-{
-    double getQuantity();
+public interface Request extends Identifiable<Request> {
 
+	/**
+	 * @return the amount of people/goods to serve/transport (see: {@link Vehicle#getCapacity()})
+	 */
+	double getQuantity();
 
-    double getT0();// earliest start time
+	/**
+	 * @return begining of the time window (inclusive) - earliest time when the request can be served
+	 */
+	double getEarliestStartTime();
 
+	/**
+	 * @return end of the time window (exclusive) - time by which the request should be served
+	 */
+	double getLatestStartTime();
 
-    double getT1();// latest start time
+	/**
+	 * @return time at which the request was submitted
+	 */
+	double getSubmissionTime();
 
-
-    double getSubmissionTime();
-
-
-    boolean isRejected();
+	/**
+	 * @return indicates whether the request has been rejected by the service provider (optimizer/dispatcher)
+	 */
+	boolean isRejected();
 }

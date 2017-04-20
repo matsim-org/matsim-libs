@@ -28,107 +28,86 @@ import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.prep.PreparedPolygon;
 
+public class ServedRequests {
+	public enum WeekDay {
+		SUN, MON, TUE, WED, THU, FRI, SAT;// weird ordering imposed by Date
 
-public class ServedRequests
-{
-    public enum WeekDay
-    {
-        SUN, MON, TUE, WED, THU, FRI, SAT;//weird ordering imposed by Date
+		@SuppressWarnings("deprecation")
+		public static WeekDay getWeekDay(Date date) {
+			return WeekDay.values()[date.getDay()];
+		}
+	}
 
-        public static WeekDay getWeekDay(Date date)
-        {
-            return WeekDay.values()[date.getDay()];
-        }
-    }
+	public static boolean isWithinArea(ServedRequest request, PreparedPolygon preparedPolygon) {
+		Point from = MGC.coord2Point(request.getFrom());
+		Point to = MGC.coord2Point(request.getTo());
+		return preparedPolygon.contains(from) && preparedPolygon.contains(to);
+	}
 
+	public static boolean isBetweenDates(ServedRequest request, Date fromDate, Date toDate) {
+		long assignedTime = request.getStartTime().getTime();
+		return assignedTime >= fromDate.getTime() && assignedTime < toDate.getTime();
+	}
 
-    public static boolean isWithinArea(ServedRequest request, PreparedPolygon preparedPolygon)
-    {
-        Point from = MGC.coord2Point(request.getFrom());
-        Point to = MGC.coord2Point(request.getTo());
-        return preparedPolygon.contains(from) && preparedPolygon.contains(to);
-    }
+	public static boolean isOnWeekDays(ServedRequest request, WeekDay... weekDays) {
+		WeekDay wd = WeekDay.getWeekDay(request.getStartTime());
+		return Arrays.asList(weekDays).contains(wd);
+	}
 
+	public static Predicate<ServedRequest> createWithinAreaPredicate(MultiPolygon area) {
+		final PreparedPolygon preparedPolygon = new PreparedPolygon(area);
+		return new Predicate<ServedRequest>() {
+			public boolean apply(ServedRequest request) {
+				return isWithinArea(request, preparedPolygon);
+			}
+		};
+	}
 
-    public static boolean isBetweenDates(ServedRequest request, Date fromDate, Date toDate)
-    {
-        long assignedTime = request.getStartTime().getTime();
-        return assignedTime >= fromDate.getTime() && assignedTime < toDate.getTime();
-    }
+	public static Predicate<ServedRequest> createBetweenDatesPredicate(final Date fromDate, final Date toDate) {
+		return new Predicate<ServedRequest>() {
+			public boolean apply(ServedRequest request) {
+				return ServedRequests.isBetweenDates(request, fromDate, toDate);
+			}
+		};
+	}
 
+	public static Predicate<ServedRequest> createOnWeekDaysPredicate(final WeekDay... weekDays) {
+		return new Predicate<ServedRequest>() {
+			public boolean apply(ServedRequest request) {
+				return ServedRequests.isOnWeekDays(request, weekDays);
+			}
+		};
+	}
 
-    public static boolean isOnWeekDays(ServedRequest request, WeekDay... weekDays)
-    {
-        WeekDay wd = WeekDay.getWeekDay(request.getStartTime());
-        return Arrays.asList(weekDays).contains(wd);
-    }
+	public static <T extends ServedRequest> Iterable<T> filterWorkDaysPeriods(Iterable<T> requests,
+			final int zeroHour) {
+		Predicate<ServedRequest> predicate = new Predicate<ServedRequest>() {
+			@SuppressWarnings("deprecation")
+			public boolean apply(ServedRequest request) {
+				WeekDay wd = WeekDay.getWeekDay(request.getStartTime());
 
+				switch (wd) {
+					case MON:
+						return request.getStartTime().getHours() >= zeroHour;
 
-    public static Predicate<ServedRequest> createWithinAreaPredicate(MultiPolygon area)
-    {
-        final PreparedPolygon preparedPolygon = new PreparedPolygon(area);
-        return new Predicate<ServedRequest>() {
-            public boolean apply(ServedRequest request)
-            {
-                return isWithinArea(request, preparedPolygon);
-            }
-        };
-    }
+					case TUE:
+					case WED:
+					case THU:
+						return true;
 
+					case SAT:
+					case SUN:
+						return false;
 
-    public static Predicate<ServedRequest> createBetweenDatesPredicate(final Date fromDate,
-            final Date toDate)
-    {
-        return new Predicate<ServedRequest>() {
-            public boolean apply(ServedRequest request)
-            {
-                return ServedRequests.isBetweenDates(request, fromDate, toDate);
-            }
-        };
-    }
+					case FRI:
+						return request.getStartTime().getHours() < zeroHour;
 
+					default:
+						throw new IllegalArgumentException();
+				}
+			}
+		};
 
-    public static Predicate<ServedRequest> createOnWeekDaysPredicate(final WeekDay... weekDays)
-    {
-        return new Predicate<ServedRequest>() {
-            public boolean apply(ServedRequest request)
-            {
-                return ServedRequests.isOnWeekDays(request, weekDays);
-            }
-        };
-    }
-
-
-    public static <T extends ServedRequest> Iterable<T> filterWorkDaysPeriods(Iterable<T> requests,
-            final int zeroHour)
-    {
-        Predicate<ServedRequest> predicate = new Predicate<ServedRequest>() {
-            public boolean apply(ServedRequest request)
-            {
-                WeekDay wd = WeekDay.getWeekDay(request.getStartTime());
-
-                switch (wd) {
-                    case MON:
-                        return request.getStartTime().getHours() >= zeroHour;
-
-                    case TUE:
-                    case WED:
-                    case THU:
-                        return true;
-
-                    case SAT:
-                    case SUN:
-                        return false;
-
-                    case FRI:
-                        return request.getStartTime().getHours() < zeroHour;
-
-                    default:
-                        throw new IllegalArgumentException();
-                }
-            }
-        };
-
-        return Iterables.filter(requests, predicate);
-    }
+		return Iterables.filter(requests, predicate);
+	}
 }

@@ -167,7 +167,7 @@ public class TripAnalyzerV2Basic {
 	public static Map<String, Double> createActivityTypeMap(List<Trip> trips) {
     	Map<String, Double> activityTypeMap = new TreeMap<>();
     	for (Trip trip : trips) {
-    		String activityType = trip.getActivityStartActType();
+    		String activityType = trip.getActivityTypeAfterTrip();
     		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, trip.getWeight());
     	}
     	return activityTypeMap;

@@ -22,7 +22,7 @@ package herbie.running.scoring;
 
 import herbie.running.config.HerbieConfigGroup;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 
 /**
@@ -39,10 +39,10 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  */
 public class TravelScoringFunction {
 	
-	private CharyparNagelScoringParameters params;
+	private ScoringParameters params;
 	private HerbieConfigGroup herbieConfigGroup;
 
-	public TravelScoringFunction(CharyparNagelScoringParameters params, HerbieConfigGroup ktiConfigGroup) {
+	public TravelScoringFunction(ScoringParameters params, HerbieConfigGroup ktiConfigGroup) {
 		this.params = params;
 		this.herbieConfigGroup = ktiConfigGroup;
 	}

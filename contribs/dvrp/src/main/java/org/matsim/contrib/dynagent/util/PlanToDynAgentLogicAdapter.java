@@ -25,63 +25,51 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.core.population.routes.NetworkRoute;
 
-
 /**
- * This class could be useful for jUnit testing of compatibility of DynAgent with
- * PersonDriverAgentImpl (i.e. comparing events thrown during 2 different QSims, one with
- * {@code PlanToDynAgentLogicAdapter} while the other with {@code PersonDriverAgentImpl}).
+ * This class could be useful for jUnit testing of compatibility of DynAgent with PersonDriverAgentImpl (i.e. comparing
+ * events thrown during 2 different QSims, one with {@code PlanToDynAgentLogicAdapter} while the other with
+ * {@code PersonDriverAgentImpl}).
  * 
  * @author michalm
  */
-public class PlanToDynAgentLogicAdapter
-    implements DynAgentLogic
-{
-    private DynAgent agent;
-    private Iterator<PlanElement> planElemIter;
+public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
+	private DynAgent agent;
+	private Iterator<PlanElement> planElemIter;
 
+	/**
+	 * @param plan
+	 *            (always starts with Activity)
+	 */
+	public PlanToDynAgentLogicAdapter(Plan plan) {
+		planElemIter = plan.getPlanElements().iterator();
+	}
 
-    /**
-     * @param plan (always starts with Activity)
-     */
-    public PlanToDynAgentLogicAdapter(Plan plan)
-    {
-        planElemIter = plan.getPlanElements().iterator();
-    }
+	@Override
+	public DynActivity computeInitialActivity(DynAgent adapterAgent) {
+		this.agent = adapterAgent;
 
+		Activity act = (Activity)planElemIter.next();
+		return new StaticDynActivity(act.getType(), act.getEndTime());
+	}
 
-    @Override
-    public DynActivity computeInitialActivity(DynAgent adapterAgent)
-    {
-        this.agent = adapterAgent;
+	@Override
+	public DynAgent getDynAgent() {
+		return agent;
+	}
 
-        Activity act = (Activity)planElemIter.next();
-        return new StaticDynActivity(act.getType(), act.getEndTime());
-    }
+	@Override
+	public DynAction computeNextAction(DynAction oldAction, double now) {
+		PlanElement planElem = planElemIter.next();
 
-
-    @Override
-    public DynAgent getDynAgent()
-    {
-        return agent;
-    }
-
-
-    @Override
-    public DynAction computeNextAction(DynAction oldAction, double now)
-    {
-        PlanElement planElem = planElemIter.next();
-
-        if (planElem instanceof Activity) {
-            Activity act = (Activity)planElem;
-            return new StaticDynActivity(act.getType(), act.getEndTime());
-        }
-        else if (planElem instanceof Leg) {
-            //only the 'car' mode supported right now 
-            Leg leg = (Leg)planElem;
-            return new StaticDriverDynLeg(leg.getMode(), (NetworkRoute)leg.getRoute());
-        }
-        else {
-            throw new IllegalStateException();
-        }
-    }
+		if (planElem instanceof Activity) {
+			Activity act = (Activity)planElem;
+			return new StaticDynActivity(act.getType(), act.getEndTime());
+		} else if (planElem instanceof Leg) {
+			// only the 'car' mode supported right now
+			Leg leg = (Leg)planElem;
+			return new StaticDriverDynLeg(leg.getMode(), (NetworkRoute)leg.getRoute());
+		} else {
+			throw new IllegalStateException();
+		}
+	}
 }

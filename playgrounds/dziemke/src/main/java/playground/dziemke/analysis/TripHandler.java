@@ -3,6 +3,7 @@ package playground.dziemke.analysis;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -21,7 +22,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 public class TripHandler implements ActivityEndEventHandler, ActivityStartEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
-	private Map<Id<Trip>, Trip> trips = new HashMap<>();
+    public static final Logger log = Logger.getLogger(TripHandler.class);
+    private static boolean tripmodeWarn = true;
+
+    private Map<Id<Trip>, Trip> trips = new HashMap<>();
 	
 	private Map<Id<Person>, Integer> activityEndCount = new HashMap <Id<Person>, Integer>();
 	private Map<Id<Person>, Integer> activityStartCount = new HashMap <Id<Person>, Integer>();
@@ -63,7 +67,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		trip.setDepartureLinkId(linkId);
 		trip.setDepartureTime_s(time_s);
 		//trip.setDepartureLegMode(legMode);
-		trip.setActivityEndActType(actType);
+		trip.setActivityTypeBeforeTrip(actType);
 		trip.setWeight(1.);
 		trips.put(tripId, trip);
 		
@@ -83,7 +87,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		if (activityEndCount.get(personId) >= 2) {
 			int numberOfLastArrival = activityStartCount.get(personId);
 			Id<Trip> lastTripId = Id.create(personId + "_" + numberOfLastArrival, Trip.class);
-			if (!trips.get(tripId).getActivityEndActType().equals(trips.get(lastTripId).getActivityStartActType())) {
+			if (!trips.get(tripId).getActivityTypeBeforeTrip().equals(trips.get(lastTripId).getActivityTypeAfterTrip())) {
 				//System.err.println("Type of ending activity is not the same as type of previously started activity.");
 				throw new RuntimeException("Type of ending activity is not the same as type of previously started activity.");
 			} 
@@ -121,7 +125,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 			trips.get(tripId).setArrivalLinkId(linkId);
 			trips.get(tripId).setArrivalTime_s(time_s);
 			//trips.get(tripId).setArrivalLegMode(legMode);
-			trips.get(tripId).setActivityStartActType(actType);
+			trips.get(tripId).setActivityTypeAfterTrip(actType);
 			trips.get(tripId).setTripComplete(true);
 		} else {
 			this.noPreviousEndOfActivityCounter++;
@@ -174,14 +178,17 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		// store information from event to variable
 		String legMode = event.getLegMode();
 		//System.out.println("Mode of current trip is " + legModeString);
-		Id<Person> personId = event.getPersonId();
-		// other information not needed
-		
-		// add information concerning leg mode to the object "Trip"
-		Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
-		trips.get(tripId).setMode(legMode);
-		
-		
+        Id<Person> personId = event.getPersonId();
+        // other information not needed
+
+        // add information concerning leg mode to the object "Trip"
+        Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
+        trips.get(tripId).setMode(legMode);
+        if (tripmodeWarn) {
+            log.warn("Trip mode = Arrival leg mode; assumed that every leg has the same legMode");
+            tripmodeWarn = false;
+        }
+
 	}
 // --------------------------------------------------------------------------------------------------
 	

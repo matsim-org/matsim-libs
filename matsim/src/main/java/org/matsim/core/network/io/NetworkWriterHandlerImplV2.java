@@ -100,7 +100,7 @@ import java.util.Set;
 		}
 
 		if (network instanceof Network) {
-			out.write(" effectivecellsize=\"" + ((Network) network).getEffectiveCellSize() + "\"");
+			out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
 			out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
 		}
 
@@ -177,16 +177,16 @@ import java.util.Set;
 			out.write(" modes=\"" + this.lastModes + "\"");
 		}
 
-		if (link instanceof Link) {
-			Link li = (Link) link;
-			if (NetworkUtils.getOrigId( li ) != null) {
-				out.write(" origid=\"" + NetworkUtils.getOrigId( li ) + "\"");
-			}
+//		if (link instanceof Link) {
+//			Link link = link;
+//			if (NetworkUtils.getOrigId( link ) != null) {
+//				out.write(" origid=\"" + NetworkUtils.getOrigId( link ) + "\"");
+//			}
 //			if (NetworkUtils.getType(li) != null) {
 //				out.write(" type=\"" + NetworkUtils.getType(li) + "\"");
 //			}
 			// is now in the attributes, no special treatment. kai, dec'16
-		}
+//		}
 		out.write(" >\n");
 
 		attributesWriter.writeAttributes( "\t\t\t" , out , link.getAttributes() );

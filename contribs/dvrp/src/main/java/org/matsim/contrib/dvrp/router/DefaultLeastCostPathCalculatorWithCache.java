@@ -28,55 +28,44 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.*;
 
+public class DefaultLeastCostPathCalculatorWithCache implements LeastCostPathCalculatorWithCache {
+	private final LeastCostPathCalculator calculator;
+	private final TimeDiscretizer timeDiscretizer;
+	private final Table<Id<Node>, Id<Node>, Path>[] pathCache;
 
-public class DefaultLeastCostPathCalculatorWithCache
-    implements LeastCostPathCalculatorWithCache
-{
-    private final LeastCostPathCalculator calculator;
-    private final TimeDiscretizer timeDiscretizer;
-    private final Table<Id<Node>, Id<Node>, Path>[] pathCache;
+	private CacheStats cacheStats = new CacheStats();
 
-    private CacheStats cacheStats = new CacheStats();
+	@SuppressWarnings("unchecked")
+	public DefaultLeastCostPathCalculatorWithCache(LeastCostPathCalculator calculator,
+			TimeDiscretizer timeDiscretizer) {
+		this.calculator = calculator;
+		this.timeDiscretizer = timeDiscretizer;
 
+		pathCache = new Table[timeDiscretizer.getIntervalCount()];
+		for (int i = 0; i < pathCache.length; i++) {
+			pathCache[i] = HashBasedTable.create();
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    public DefaultLeastCostPathCalculatorWithCache(LeastCostPathCalculator calculator,
-            TimeDiscretizer timeDiscretizer)
-    {
-        this.calculator = calculator;
-        this.timeDiscretizer = timeDiscretizer;
+	@Override
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, Person person, Vehicle vehicle) {
+		Table<Id<Node>, Id<Node>, Path> spCacheSlice = pathCache[timeDiscretizer.getIdx(startTime)];
+		Path path = spCacheSlice.get(fromNode.getId(), toNode.getId());
 
-        pathCache = new Table[timeDiscretizer.getIntervalCount()];
-        for (int i = 0; i < pathCache.length; i++) {
-            pathCache[i] = HashBasedTable.create();
-        }
-    }
+		if (path == null) {
+			cacheStats.incMisses();
+			path = calculator.calcLeastCostPath(fromNode, toNode, timeDiscretizer.discretize(startTime), person,
+					vehicle);
+			spCacheSlice.put(fromNode.getId(), toNode.getId(), path);
+		} else {
+			cacheStats.incHits();
+		}
 
+		return path;
+	}
 
-    @Override
-    public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, Person person,
-            Vehicle vehicle)
-    {
-        Table<Id<Node>, Id<Node>, Path> spCacheSlice = pathCache[timeDiscretizer.getIdx(startTime)];
-        Path path = spCacheSlice.get(fromNode.getId(), toNode.getId());
-
-        if (path == null) {
-            cacheStats.incMisses();
-            path = calculator.calcLeastCostPath(fromNode, toNode,
-                    timeDiscretizer.discretize(startTime), person, vehicle);
-            spCacheSlice.put(fromNode.getId(), toNode.getId(), path);
-        }
-        else {
-            cacheStats.incHits();
-        }
-
-        return path;
-    }
-
-
-    @Override
-    public CacheStats getCacheStats()
-    {
-        return cacheStats;
-    }
+	@Override
+	public CacheStats getCacheStats() {
+		return cacheStats;
+	}
 }
