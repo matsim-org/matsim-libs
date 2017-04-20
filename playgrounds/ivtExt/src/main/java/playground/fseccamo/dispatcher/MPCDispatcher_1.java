@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -35,6 +37,7 @@ import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkLoader;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.netdata.vLinkDataReader;
+import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -57,7 +60,9 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
     final int numberOfAVs;
     private int total_rebalanceCount = 0;
     Tensor printVals = Tensors.empty();
-    LPVehicleRebalancing lpVehicleRebalancing;
+    @Deprecated
+    LPVehicleRebalancing lpVehicleRebalancing; // TODO is this needed?
+    final InstantPathFactory instantPathFactory;
 
     JavaContainerSocket javaContainerSocket;
 
@@ -65,15 +70,15 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
             AVDispatcherConfig config, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
-            ParallelLeastCostPathCalculator router, //
+            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager, //
             VirtualNetwork virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
             Map<VirtualLink, Double> travelTimesIn) {
-        super(config, travelTime, router, eventsManager, virtualNetwork);
+        super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
         this.virtualNodeDest = abstractVirtualNodeDest;
-
+        this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
@@ -180,6 +185,22 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
                         // getAVRequests()
                         // virtualNetwork.getVirtualNode(link)
                         // virtualNetwork.
+                        AVRequest r = null;
+
+                        VirtualNode fromIn = null;
+                        VrpPathWithTravelData vrp = instantPathFactory.getVrpPathWithTravelData(r.getFromLink(), r.getToLink(), now);
+                        for (int index = 0; index < vrp.getLinkCount(); ++index) {
+                            Link link = vrp.getLink(index);
+                            final VirtualNode next = virtualNetwork.getVirtualNode(link);
+                            if (fromIn == null)
+                                fromIn = next;
+                            else //
+                            if (fromIn != next) {
+                                final VirtualNode toIn = next;
+                                // FOUND adjacent node
+                                virtualNetwork.getVirtualLink(fromIn, toIn);
+                            }
+                        }
                         double[] array = new double[m]; // TODO
                         DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { m }, array);
                         container.add(doubleArray);
