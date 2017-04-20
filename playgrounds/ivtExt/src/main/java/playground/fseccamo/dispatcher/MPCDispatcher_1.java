@@ -4,15 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.path.VrpPath;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -28,15 +31,13 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
 import ch.ethz.idsc.tensor.sca.Plus;
-import jogamp.opengl.glu.mipmap.ExtractPrimitive;
-import playground.clruch.dispatcher.core.PartitionedDispatcher;
+import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
-import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkLoader;
@@ -46,11 +47,9 @@ import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
@@ -58,7 +57,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * “Load Balancing for Mobility-on-Demand Systems.” In Robotics: Science and Systems VII. doi:10.15607/rss.2011.vii.034.
  * Implemented by Claudio Ruch on 2017, 02, 25
  */
-public class MPCDispatcher_1 extends PartitionedDispatcher {
+public class MPCDispatcher_1 extends BaseMpcDispatcher {
     public final int samplingPeriod;
     // public final int redispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
@@ -67,8 +66,6 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
     final int numberOfAVs;
     private int total_rebalanceCount = 0;
     Tensor printVals = Tensors.empty();
-    @Deprecated
-    LPVehicleRebalancing lpVehicleRebalancing; // TODO is this needed?
     final InstantPathFactory instantPathFactory;
 
     JavaContainerSocket javaContainerSocket;
@@ -91,8 +88,6 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
         // redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
-        // setup linear program
-        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork, travelTimes);
 
         try {
             final int m = virtualNetwork.getvLinksCount();
@@ -160,6 +155,9 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
 
     }
 
+    // TODO remove served requests from map to save memory (but will not influence functionality)
+    final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
+
     @Override
     public void redispatch(double now) {
 
@@ -185,37 +183,39 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
                   // 4) <VirtualLink, Integer> numberofRebalancingVehicles --> new function needs to implemented
 
                     Container container = new Container("problem");
-                    {
+                    { // done
                         /**
                          * number of waiting customers that begin their journey on link_k = (node_i, node_j)
                          */
-                        // getAVRequests()
-                        // virtualNetwork.getVirtualNode(link)
-                        // virtualNetwork.
-                        AVRequest r = null;
-
-                        VirtualNode fromIn = null;
-                        VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData(r.getFromLink(), r.getToLink(), now);
-                        for (int index = 0; index < vrpPath.getLinkCount(); ++index) {
-                            Link link = vrpPath.getLink(index);
-                            final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
-                            if (fromIn == null)
-                                fromIn = toIn;
-                            else //
-                            if (fromIn != toIn) { // found adjacent node
-                                VirtualLink vl = virtualNetwork.getVirtualLink(fromIn, toIn);
-                                if (vl != null) {
-                                    // TODO
-                                } else {
-                                    // give up?
+                        Tensor vector = Array.zeros(m);
+                        for (AVRequest avRequest : getAVRequests()) { // all current requests
+                            if (mpcRequestsMap.containsKey(avRequest)) { // if request has been seen/computed before
+                                VirtualLink virtualLink = mpcRequestsMap.get(avRequest).virtualLink;
+                                vector.set(Plus.ONE, virtualLink.index);
+                            } else {
+                                VirtualNode fromIn = null;
+                                VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
+                                        avRequest.getFromLink(), avRequest.getToLink(), now); // TODO perhaps add expected waitTime
+                                for (Link link : vrpPath) {
+                                    final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
+                                    if (fromIn == null)
+                                        fromIn = toIn;
+                                    else //
+                                    if (fromIn != toIn) { // found adjacent node
+                                        VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
+                                        mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, virtualLink));
+                                        // I assume virtualLink != null
+                                        vector.set(Plus.ONE, virtualLink.index);
+                                        break;
+                                    }
                                 }
                             }
                         }
-                        double[] array = new double[m]; // TODO
+                        double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { m }, array);
                         container.add(doubleArray);
                     }
-                    {
+                    { // done
                         /**
                          * STAY vehicles + vehicles without task inside VirtualNode
                          */
@@ -223,57 +223,26 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
                         Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
                         double[] array = new double[n];
                         for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet())
-                            array[entry.getKey().index] = entry.getValue().size();
+                            array[entry.getKey().index] = entry.getValue().size(); // TODO use tensor notation
 
                         DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { n }, array);
                         container.add(doubleArray);
                     }
-                    {
+                    { // done
                         /**
                          * Vehicles with customers still within node_i traveling on link_k = (node_i, node_j)
                          */
-                        final Tensor vector = Array.zeros(m);
-                        Map<AVVehicle, Link> map = getVehiclesWithCustomer();
-                        // Map<VirtualNode, List<AVVehicle>> map = getVirtualNodeVehiclesWithCustomer();
-                        for (Entry<AVVehicle, Link> entry : map.entrySet()) {
-                            final AVVehicle avVehicle = entry.getKey();
-                            final Link current = entry.getValue();
-                            Task task = avVehicle.getSchedule().getCurrentTask();
-                            AVDriveTask driveTask = (AVDriveTask) task;
-                            VrpPath vrpPath = driveTask.getPath();
-                            boolean fused = false;
-                            VirtualNode fromIn = null;
-                            VirtualNode toIn = null;
-
-                            for (Link link : vrpPath) {
-                                fused |= link == current;
-                                if (fused) {
-                                    if (fromIn == null)
-                                        fromIn = virtualNetwork.getVirtualNode(link);
-                                    else {
-                                        VirtualNode candidate = virtualNetwork.getVirtualNode(link);
-                                        if (fromIn != candidate) {
-                                            toIn = candidate;
-                                            VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
-                                            vector.set(Plus.ONE, virtualLink.index);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            if (toIn == null) {
-                                System.out.println("failed to find dest.");
-                            }
-                        }
+                        final Tensor vector = countVehiclesPerVLink(getVehiclesWithCustomer());
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingVehiclesWithCustomersPerVLink", new int[] { m }, array);
                         container.add(doubleArray);
                     }
-                    {
+                    { // done
                         /**
                          * rebalancing vehicles still within node_i traveling on link_k = (node_i, node_j)
                          */
-                        double[] array = new double[m]; // TODO
+                        final Tensor vector = countVehiclesPerVLink(getRebalancingVehicles());
+                        double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { m }, array);
                         container.add(doubleArray);
                     }
@@ -283,31 +252,78 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
 
                 { // recv
                   // USE THE RETURN VALUE TO MAKE COMMANDS IN MATSIM:
-                  // 1) <VirtualLink, Integer> numberOfCustomerCarryingVehicles: the number of vehicles at VirtualLink ij which should take a request and
-                  // transport
-                  // it to a virtualNode
+                  // 1) <VirtualLink, Integer> pickupPerVLink: the number of vehicles at VirtualLink ij which should take a request and
+                  // transport the person to a virtualNode
                   // for all these u_ij select u_ij customers in vNode i which have any shortest path that with sequence (vN1i, vNj, whatever, ... )
-                  // 2) <VirtualLink, Integer> numberofRebalancingVehicles : for every VirtualLink select this number of vehicles vehicle in the fromVNode and
-                  // send it
-                  // to the to VNode
-                  // use existing commands
+
+                    // 2) <VirtualLink, Integer> rebalancingPerVLink : for every VirtualLink select this number of vehicles vehicle in the fromVNode and
+                    // send it to the to VNode / use existing commands
 
                     // this waits until a reply has been received:
                     Container container = javaContainerSocket.blocking_getContainer();
                     System.out.println("received: " + container);
 
                     // container.id == 'solution'
+                    // TODO perhaps consider requests and rebalancing simultaneously instead of consecutively
+                    Tensor requestVector = null;
+                    Tensor rebalanceVector = null;
                     {
                         DoubleArray doubleArray = container.get("pickupPerVLink");
+                        requestVector = Round.of(Tensors.vectorDouble(doubleArray.value)); // integer values = # person
                         /**
                          * find closest available cars to customers and pickup
                          */
                     }
                     {
                         DoubleArray doubleArray = container.get("rebalancingPerVLink");
+                        rebalanceVector = Round.of(Tensors.vectorDouble(doubleArray.value));
                         /**
                          * find remaining available cars and do rebalance
                          */
+                    }
+
+                    {
+                        final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                        final Map<VirtualLink, List<MpcRequest>> virtualLinkRequestsMap = mpcRequestsMap.values().stream() //
+                                .collect(Collectors.groupingBy(mpcRequest -> mpcRequest.virtualLink));
+
+                        for (Entry<VirtualLink, List<MpcRequest>> entry : virtualLinkRequestsMap.entrySet()) {
+                            VirtualLink virtualLink = entry.getKey();
+                            VirtualNode fromIn = virtualLink.getFrom();
+                            if (availableVehicles.containsKey(fromIn)) {
+                                // find cars!
+                                List<VehicleLinkPair> cars = availableVehicles.get(fromIn);
+                                List<MpcRequest> requests = entry.getValue();
+                                final int desiredPickup = requestVector.Get(virtualLink.index).number().intValue();
+                                final int desiredRebalance = rebalanceVector.Get(virtualLink.index).number().intValue();
+                                {
+                                    // TODO perhaps ensure that requests are served according to waiting
+                                    // GlobalAssert.that(desiredPickup <= list.size()); // a bit strong
+                                    int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
+                                    for (int count = 0; count < min; ++count) {
+                                        VehicleLinkPair vehicleLinkPair = cars.get(0);
+                                        cars.remove(0);
+                                        MpcRequest mpcRequest = requests.get(count);
+                                        Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
+                                        setVehicleDiversion(vehicleLinkPair, pickupLocation); // send car to customer
+                                    }
+                                }
+                                {
+                                    Random random = new Random();
+                                    int min = Math.min(desiredRebalance, cars.size());
+                                    for (int count = 0; count < min; ++count) {
+                                        VehicleLinkPair vehicleLinkPair = cars.get(0);
+                                        cars.remove(0);
+                                        VirtualNode destNode = virtualLink.getTo();
+                                        // TODO choose better link
+                                        Link rebalanceDest = new ArrayList<>(destNode.getLinks()).get(random.nextInt(destNode.getLinks().size()));
+                                        setVehicleDiversion(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
+                                    }
+                                }
+
+                            }
+                        }
+
                     }
 
                 }
