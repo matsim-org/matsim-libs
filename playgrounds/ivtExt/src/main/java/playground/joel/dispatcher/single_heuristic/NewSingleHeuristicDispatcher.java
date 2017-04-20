@@ -69,13 +69,13 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
             // add unassigned vehicles to search tree
             addUnassignedVehicles(getavailableUnassignedVehicleLinkPairs());
             
-            if(getavailableUnassignedVehicleLinkPairs().size()>0)
-                if(getUnassignedAVRequests().size()>0) {
+            if(getavailableUnassignedVehicleLinkPairs().size()>0 && getUnassignedAVRequests().size()>0)
+                while (!(getavailableUnassignedVehicleLinkPairs().size()==0 || getUnassignedAVRequests().size()==0)) {
 
                     // oversupply case
                     if (getavailableUnassignedVehicleLinkPairs().size() >= getUnassignedAVRequests().size()) {
-                        System.out.println("oversupply: more unassigned vehicles than unassigned requests; " +
-                                "("+getavailableUnassignedVehicleLinkPairs().size()+":"+getUnassignedAVRequests().size()+")");
+                    //    System.out.println("oversupply: more unassigned vehicles than unassigned requests; " +
+                    //            "(" + getavailableUnassignedVehicleLinkPairs().size() + ":" + getUnassignedAVRequests().size() + ")");
                         AVRequest request = getUnassignedAVRequests().iterator().next();
                         AVVehicle closestVehicle = findClosestVehicle(request, getavailableUnassignedVehicleLinkPairs());
                         if (closestVehicle != null)
@@ -84,8 +84,8 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
 
                     // undersupply case
                     else {
-                        System.out.println("undersupply: more unassigned requests than unassigned vehicles; " +
-                                "("+getavailableUnassignedVehicleLinkPairs().size()+":"+getUnassignedAVRequests().size()+")");
+                    //    System.out.println("undersupply: more unassigned requests than unassigned vehicles; " +
+                    //            "(" + getavailableUnassignedVehicleLinkPairs().size() + ":" + getUnassignedAVRequests().size() + ")");
                         VehicleLinkPair vehicleLinkPair = getavailableUnassignedVehicleLinkPairs().get(0);
                         AVRequest closestRequest = findClosestRequest(vehicleLinkPair, getUnassignedAVRequests());
                         if (closestRequest != null)
