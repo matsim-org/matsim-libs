@@ -1,9 +1,3 @@
-/**
- * Dispatcher implementing the linear program from Pavone, Marco, Stephen Smith, Emilio Frazzoli, and Daniela Rus. 2011.
- * “Load Balancing for Mobility-on-Demand Systems.” In Robotics: Science and Systems VII. doi:10.15607/rss.2011.vii.034.
- * Implemented by Claudio Ruch on 2017, 02, 25
- */
-
 package playground.fseccamo.dispatcher;
 
 import java.io.File;
@@ -49,6 +43,11 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+/**
+ * Dispatcher implementing the linear program from Pavone, Marco, Stephen Smith, Emilio Frazzoli, and Daniela Rus. 2011.
+ * “Load Balancing for Mobility-on-Demand Systems.” In Robotics: Science and Systems VII. doi:10.15607/rss.2011.vii.034.
+ * Implemented by Claudio Ruch on 2017, 02, 25
+ */
 public class MPCDispatcher_1 extends PartitionedDispatcher {
     public final int samplingPeriod;
     // public final int redispatchPeriod;
@@ -178,6 +177,9 @@ public class MPCDispatcher_1 extends PartitionedDispatcher {
                         /**
                          * number of waiting customers that begin their journey on link_k = (node_i, node_j)
                          */
+                        // getAVRequests()
+                        // virtualNetwork.getVirtualNode(link)
+                        // virtualNetwork.
                         double[] array = new double[m]; // TODO
                         DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { m }, array);
                         container.add(doubleArray);

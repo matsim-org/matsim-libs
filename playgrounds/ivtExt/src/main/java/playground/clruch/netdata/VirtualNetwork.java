@@ -53,7 +53,8 @@ public class VirtualNetwork {
     }
 
     /**
-     * Gets the virtual node belonging to a link of the network
+     * Gets the virtual node belonging to a link of the network.
+     * The lookup is fast.
      *
      * @param link of the network
      * @return virtual node belonging to link
