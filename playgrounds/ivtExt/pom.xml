@@ -91,12 +91,60 @@
 	  	<artifactId>taxi</artifactId>
 	  	<version>0.9.0-SNAPSHOT</version>
 	  </dependency>
+	  <dependency>
+		  <groupId>org.jdom</groupId>
+		  <artifactId>jdom2</artifactId>
+		  <version>2.0.6</version>
+	  </dependency>
+	  <!-- https://mvnrepository.com/artifact/de.lmu.ifi.dbs.elki/elki -->
+	  <dependency>
+		  <groupId>de.lmu.ifi.dbs.elki</groupId>
+		  <artifactId>elki</artifactId>
+		  <version>0.7.1</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>org.gnu.glpk</groupId>
+		  <artifactId>glpk-java</artifactId>
+		  <version>1.5.0</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>ch.ethz.idsc</groupId>
+		  <artifactId>tensor</artifactId>
+		  <version>0.1.5</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>ch.ethz.idsc</groupId>
+		  <artifactId>jmex</artifactId>
+		  <version>0.0.2</version>
+	  </dependency>
   </dependencies>
 
 	<repositories>
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
+		</repository>
+		<repository>
+			<id>XypronRelease</id>
+			<name>Xypron Release</name>
+			<url>https://www.xypron.de/repository</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>tensor-mvn-repo</id>
+			<url>https://raw.github.com/idsc-frazzoli/tensor/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jmex-mvn-repo</id>
+			<url>https://raw.github.com/idsc-frazzoli/jmex/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
 		</repository>
 	</repositories>
 

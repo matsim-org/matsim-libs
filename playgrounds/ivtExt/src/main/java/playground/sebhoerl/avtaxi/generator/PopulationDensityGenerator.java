@@ -1,6 +1,11 @@
 package playground.sebhoerl.avtaxi.generator;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -9,28 +14,28 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+
+import com.google.inject.Inject;
+
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
-import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
+/**
+ * class generates {@link AVVehicle}s and places them according to the density of the {@link Population}.
+ * 
+ * all vehicles are created in this iteration. after that, no more AVVehiles are added to the system.
+ */
 public class PopulationDensityGenerator implements AVGenerator {
+    private static final Logger log = Logger.getLogger(PopulationDensityGenerator.class);
     final long numberOfVehicles;
     long generatedNumberOfVehicles = 0;
 
     final String prefix;
 
-    private List<Link> linkList = new LinkedList<>();
-    private Map<Link, Double> cumulativeDensity = new HashMap<>();
+    private NavigableMap<Double, Link> cumulativeDensity = new TreeMap<>();
 
-    public PopulationDensityGenerator(AVGeneratorConfig config, Network network, Population population) {
+    PopulationDensityGenerator(AVGeneratorConfig config, Network network, Population population) {
         this.numberOfVehicles = config.getNumberOfVehicles();
 
         String prefix = config.getPrefix();
@@ -40,6 +45,7 @@ public class PopulationDensityGenerator implements AVGenerator {
         double sum = 0.0;
         Map<Link, Double> density = new HashMap<>();
 
+        int personCount = 0;
         for (Person person : population.getPersons().values()) {
             for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
                 if (planElement instanceof Activity) {
@@ -50,21 +56,26 @@ public class PopulationDensityGenerator implements AVGenerator {
                     } else {
                         density.put(link, 1.0);
                     }
+<<<<<<< HEAD
 
                     if (!linkList.contains(link)) linkList.add(link);
+=======
+>>>>>>> master
                     sum += 1.0;
                 }
-
-                break;
             }
+            ++personCount;
         }
+        log.info("personCount " + personCount);
 
         // Compute relative frequencies and cumulative
         double cumsum = 0.0;
 
-        for (Link link : linkList) {
-            cumsum += density.get(link) / sum;
-            cumulativeDensity.put(link, cumsum);
+        for (Map.Entry<Link, Double> entry : density.entrySet()) {
+            cumulativeDensity.put(cumsum, entry.getKey());
+            cumsum += entry.getValue() / sum;
+
+            log.debug("link " + entry.getKey() + "cumsum " + cumsum);
         }
     }
 
@@ -81,20 +92,18 @@ public class PopulationDensityGenerator implements AVGenerator {
         double r = MatsimRandom.getRandom().nextDouble();
         Link selectedLink = linkList.get(0);
 
-        for (Link link : linkList) {
-            if (r <= cumulativeDensity.get(link)) {
-                selectedLink = link;
-                break;
-            }
-        }
+        selectedLink = cumulativeDensity.lowerEntry(r).getValue();
+        log.info("car placed at link " + selectedLink + " r=" + r);
 
         Id<Vehicle> id = Id.create("av_" + prefix + String.valueOf(generatedNumberOfVehicles), Vehicle.class);
         return new AVVehicle(id, selectedLink, 4.0, 0.0, 108000.0);
     }
 
     static public class Factory implements AVGenerator.AVGeneratorFactory {
-        @Inject private Population population;
-        @Inject private Network network;
+        @Inject
+        private Population population;
+        @Inject
+        private Network network;
 
         @Override
         public AVGenerator createGenerator(AVGeneratorConfig generatorConfig) {

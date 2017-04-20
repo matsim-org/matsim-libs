@@ -1,8 +1,13 @@
 package playground.sebhoerl.avtaxi.vrpagent;
 
+<<<<<<< HEAD
 import com.google.inject.Inject;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
+=======
+import javax.inject.Named;
+
+>>>>>>> master
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.StayTask;
@@ -12,14 +17,14 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.*;
 
+import com.google.inject.Inject;
+
 import playground.sebhoerl.avtaxi.passenger.AVPassengerDropoffActivity;
 import playground.sebhoerl.avtaxi.passenger.AVPassengerPickupActivity;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
-
-import javax.inject.Named;
 
 public class AVActionCreator implements VrpAgentLogic.DynActionCreator {
     public static final String PICKUP_ACTIVITY_TYPE = "AVPickup";
@@ -32,7 +37,8 @@ public class AVActionCreator implements VrpAgentLogic.DynActionCreator {
     @Inject
     private VrpLegs.LegCreator legCreator;
 
-    @Inject @Named("pickupDuration")
+    @Inject
+    @Named("pickupDuration")
     private Double pickupDuration;
 
     @Override

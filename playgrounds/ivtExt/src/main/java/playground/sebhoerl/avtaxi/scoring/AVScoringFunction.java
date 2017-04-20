@@ -1,24 +1,22 @@
 package playground.sebhoerl.avtaxi.scoring;
 
-import org.apache.commons.lang3.SystemUtils;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.scoring.PersonExperiencedLeg;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.opengis.filter.capability.Operator;
+
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 import playground.sebhoerl.avtaxi.config.AVPriceStructureConfig;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.routing.AVRoute;
-import playground.sebhoerl.avtaxi.routing.AVRouteFactory;
 import playground.sebhoerl.avtaxi.schedule.AVTransitEvent;
-
-import java.util.*;
 
 public class AVScoringFunction implements SumScoringFunction.ArbitraryEventScoring {
     final static Logger log = Logger.getLogger(AVScoringFunction.class);
@@ -33,14 +31,14 @@ public class AVScoringFunction implements SumScoringFunction.ArbitraryEventScori
     private AVScoringTrip scoringTrip = null;
     private double score = 0.0;
 
-    final private Person person;
+//    final private Person person; // TODO jan: not used
 
     public AVScoringFunction(AVConfig config, Person person, double marginalUtilityOfMoney, double marginalUtilityOfTraveling) {
         this.marginalUtilityOfWaiting = config.getMarginalUtilityOfWaitingTime() / 3600.0;
         this.marginalUtilityOfTraveling = marginalUtilityOfTraveling;
         this.marginalUtilityOfMoney = marginalUtilityOfMoney;
         this.config = config;
-        this.person = person;
+//        this.person = person;
     }
     
     @Override

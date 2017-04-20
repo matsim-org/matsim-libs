@@ -13,8 +13,13 @@ public class AVPassengerDropoffActivity extends VrpActivity {
     private final PassengerEngine passengerEngine;
     private final DynAgent driver;
     private final Set<? extends PassengerRequest> requests;
+<<<<<<< HEAD
     
     public AVPassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, Vehicle vehicle, StayTask dropoffTask,
+=======
+
+    public AVPassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask dropoffTask,
+>>>>>>> master
                                       Set<? extends PassengerRequest> requests, String activityType)
     {
         super(activityType, dropoffTask);
@@ -28,7 +33,6 @@ public class AVPassengerDropoffActivity extends VrpActivity {
         	throw new IllegalStateException();
         }
     }
-
 
     @Override
     public void finalizeAction(double now)

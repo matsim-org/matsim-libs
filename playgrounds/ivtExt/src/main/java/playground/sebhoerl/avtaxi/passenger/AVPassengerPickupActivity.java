@@ -16,13 +16,18 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
     private final DynAgent driver;
     private final Set<? extends PassengerRequest> requests;
     private final double pickupDuration;
-    
+
     private double maximumRequestT0 = 0;
-    
+
     private double endTime = 0.0;
     private int passengersAboard = 0;
+<<<<<<< HEAD
     
 	public AVPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, Vehicle vehicle, StayTask pickupTask, Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
+=======
+
+	public AVPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask, Set<? extends PassengerRequest> requests, double pickupDuration, String activityType) {
+>>>>>>> master
         super(activityType);
         
         if (requests.size() > vehicle.getCapacity()) {
@@ -56,34 +61,34 @@ public class AVPassengerPickupActivity extends AbstractDynActivity implements Pa
         	setEndTimeIfWaitingForPassengers(now);
         }
 	}
-	
-	private void setEndTimeIfWaitingForPassengers(double now) {
-		endTime = Math.max(now, maximumRequestT0) + pickupDuration;
-		
-        if (endTime == now) {
-            endTime += 1;
-        }
-	}
 
-	@Override
-	public double getEndTime() {
-		return endTime;
-	}
-	
-    @Override
-    public void doSimStep(double now)
-    {
-        if (passengersAboard < requests.size()) {
-            setEndTimeIfWaitingForPassengers(now);
-        }
+    private void setEndTimeIfWaitingForPassengers(double now) {
+		endTime = Math.max(now, maximumRequestT0) + pickupDuration;
+
+		if (endTime == now) {
+			endTime += 1;
+		}
     }
-    
+
+    @Override
+    public double getEndTime() {
+	return endTime;
+    }
+
+    @Override
+    public void doSimStep(double now) {
+		if (passengersAboard < requests.size()) {
+			setEndTimeIfWaitingForPassengers(now);
+		}
+    }
+
     private PassengerRequest getRequestForPassenger(MobsimPassengerAgent passenger) {
-    	for (PassengerRequest request : requests) {
-    		if (passenger == request.getPassenger()) return request;
-    	}
-    	
-    	return null;
+		for (PassengerRequest request : requests) {
+			if (passenger == request.getPassenger())
+			return request;
+		}
+
+		return null;
     }
 
 	@Override

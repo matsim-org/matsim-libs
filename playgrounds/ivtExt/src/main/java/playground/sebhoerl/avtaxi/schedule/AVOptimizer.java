@@ -1,29 +1,37 @@
 package playground.sebhoerl.avtaxi.schedule;
 
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.contrib.dvrp.tracker.TaskTracker;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import playground.sebhoerl.avtaxi.data.AVOperator;
+
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-import java.util.*;
-
 @Singleton
-public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
+public class AVOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener {
     private double now;
     final private List<AVRequest> submittedRequestsBuffer = Collections.synchronizedList(new LinkedList<>());
 
-    @Inject private Map<Id<AVOperator>, AVDispatcher> dispatchers;
+//    @Inject private Map<Id<AVOperator>, AVDispatcher> dispatchers; // jan: yet unused
     @Inject private EventsManager eventsManager;
 
     @Override
@@ -97,5 +105,16 @@ public class AVOptimizer implements VrpOptimizer, MobsimBeforeSimStepListener {
         for (AVRequest request : task.getRequests()) {
             eventsManager.processEvent(new AVTransitEvent(request, now));
         }
+    }
+
+    @Override
+    public void nextLinkEntered(DriveTask driveTask) {
+        TaskTracker taskTracker = driveTask.getTaskTracker();
+        OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+        LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
+        AVVehicle avVehicle = (AVVehicle) driveTask.getSchedule().getVehicle();
+        AVDispatcher avDispatcher = avVehicle.getDispatcher();
+        avDispatcher.onNextLinkEntered(avVehicle, driveTask, linkTimePair);
+
     }
 }

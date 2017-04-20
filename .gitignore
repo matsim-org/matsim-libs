@@ -13,4 +13,12 @@ playgrounds/jjoubert/data
 /playgrounds/southAfrica/src/main/java/playground/southafrica/tmp/CheckAccessibilityConfig.java
 /playgrounds/southAfrica/test/input/playground/southafrica/freight/digicore/extract/TurnkeyExtractorTest/test.csv
 /playgrounds/jjoubert/src/main/java/playground/jjoubert/TemporaryCode/NetworkV2toV1.java
+<<<<<<< HEAD
 /playgrounds/southAfrica/data
+=======
+
+# jan added:
+tutorial/output/
+tutorial/pop.xml.gz
+
+>>>>>>> master

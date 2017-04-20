@@ -3,8 +3,8 @@ package playground.sebhoerl.avtaxi.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+
 import playground.sebhoerl.avtaxi.data.AVOperator;
-import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.schedule.AVTransitEvent;
 
 public class AVScoringTrip {
