@@ -9,23 +9,22 @@ import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.io.File;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import javax.swing.JCheckBox;
 
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Dimensions;
+import ch.ethz.idsc.tensor.alg.Subdivide;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
-import playground.clruch.export.AVStatus;
+import ch.ethz.idsc.tensor.red.Total;
 import playground.clruch.gheat.graphics.Hue;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.net.VehicleContainer;
+import playground.clruch.utils.LruCache;
 import playground.clruch.utils.gui.GraphicsUtil;
 import playground.clruch.utils.gui.RowPanel;
 
@@ -35,6 +34,8 @@ public class LinkLayer extends ViewerLayer {
     private volatile boolean drawLinks = false;
     private volatile boolean drawMaxCars = false;
     private static final Color LINKCOLOR = new Color(153, 153, 102, 64);
+
+    Map<Long, SimulationObject> lruCache = LruCache.create(10);
 
     Tensor matrix = null; //
 
@@ -55,6 +56,8 @@ public class LinkLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
+        lruCache.put(ref.now, ref);
+
         if (drawLinks) {
             graphics.setColor(LINKCOLOR);
             for (OsmLink osmLink : matsimMapComponent.db.getOsmLinks()) {
@@ -67,41 +70,35 @@ public class LinkLayer extends ViewerLayer {
         }
 
         if (drawLoad) {
+            final int width = 4;
+            LinkStats linkStats = new LinkStats(width);
+            linkStats.feed(ref, 0);
+            for (int ofs = 1; ofs < width; ++ofs)
+                if (lruCache.containsKey(ref.now - 10 * ofs))
+                    linkStats.feed(lruCache.get(ref.now - 10 * ofs), ofs);
 
-            AVStatus[] INTERP = new AVStatus[] { //
-                    AVStatus.DRIVEWITHCUSTOMER, AVStatus.DRIVETOCUSTMER, AVStatus.REBALANCEDRIVE };
+            final Tensor table = linkStats.count;
+            Tensor weight = Subdivide.of(RealScalar.of(1), RealScalar.of(.1), width - 1);
+            weight = weight.multiply(Total.of(weight).Get().invert());
 
-            Map<Integer, List<VehicleContainer>> map = ref.vehicles.stream() //
-                    .collect(Collectors.groupingBy(VehicleContainer::getLinkId));
-            // TODO better gfx
-            // Tensor colors = Tensors.empty();
-            // for (AVStatus avStatus : INTERP)
-            // colors.append(ColorFormat.toVector(AvStatusColor.Claudios.of(avStatus)));
             GraphicsUtil.setQualityHigh(graphics);
-            for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
-                OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
+            // System.out.println(linkStats.linkIndex.size());
+            for (int index : linkStats.linkIndex) {
+                OsmLink osmLink = matsimMapComponent.db.getOsmLink(index);
                 final double factor = osmLink.getLength() * matsimMapComponent.getMeterPerPixel();
                 Point p1 = matsimMapComponent.getMapPosition(osmLink.getCoordFrom());
                 if (p1 != null) {
                     Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getCoordTo());
-                    List<VehicleContainer> list = entry.getValue();
-                    final long total = list.stream().filter(vc -> !vc.avStatus.equals(AVStatus.STAY)).count();
-                    if (0 < total) {
-                        Map<AVStatus, List<VehicleContainer>> classify = //
-                                list.stream().collect(Collectors.groupingBy(vc -> vc.avStatus));
-                        int[] counts = new int[3];
-                        for (AVStatus avStatus : INTERP)
-                            counts[avStatus.ordinal()] = classify.containsKey(avStatus) ? classify.get(avStatus).size() : 0;
-                        final int customers = counts[0];
-                        final int carsEmpty = counts[1] + counts[2];
-                        double h = (carsEmpty / (double) total + 1.0) / 3;
-                        Color blend = new Hue(h, 1, .5, .75).rgba;
-                        graphics.setColor(blend);
-                        Stroke stroke = new BasicStroke((float) Math.sqrt(3000 * total / factor));
-                        graphics.setStroke(stroke);
-                        Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
-                        graphics.draw(shape);
-                    }
+                    Tensor linkTable = weight.dot(table.get(index));
+                    final double total = Total.of(linkTable).Get().number().doubleValue();
+                    final double carsEmpty = linkTable.Get(1).number().doubleValue();
+                    // System.out.println(total + " " + carsEmpty);
+                    double h = (carsEmpty / (double) total + 0.8) / 3;
+                    graphics.setColor(new Hue(h, 1, .85, .75).rgba);
+                    Stroke stroke = new BasicStroke((float) Math.sqrt(3000 * total / factor));
+                    graphics.setStroke(stroke);
+                    Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
+                    graphics.draw(shape);
                 }
             }
             GraphicsUtil.setQualityDefault(graphics);
