@@ -45,8 +45,8 @@ import playground.jbischoff.analysis.modalsplit.ModalSplitAnalyser;
 public class TripsPerModeAnalysis {
 public static void main(String[] args) {
 	
-	String plansF = "D:/runs-svn/vw_rufbus/runPM122.10-comp2/runPM122.10-comp2.output_plans.xml.gz";
-	String eventsF = "D:/runs-svn/vw_rufbus/runPM122.10-comp2/runPM122.10-comp2.output_events.xml.gz";
+	String plansF = "D:/runs-svn/vw_rufbus/runPM122.10-comp-375-250-cheapwalk/runPM122.10-comp-375-250-cheapwalk.output_plans.xml.gz";
+	String eventsF = "D:/runs-svn/vw_rufbus/runPM122.10-comp-375-250-cheapwalk/runPM122.10-comp-375-250-cheapwalk.output_events.xml.gz";
 	
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	new PopulationReader(scenario).readFile(plansF);

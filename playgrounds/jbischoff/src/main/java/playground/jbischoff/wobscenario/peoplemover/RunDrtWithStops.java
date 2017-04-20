@@ -35,7 +35,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 public class RunDrtWithStops {
 
 	public static void main(String[] args) {
-		String configFile = "../../../shared-svn/projects/vw_rufbus/projekt2/input/configPM122.10.xml";
+		String configFile = "../../../shared-svn/projects/vw_rufbus/projekt2/input/configPM122.10c.xml";
 		RunDrtWithStops.run(configFile, false);
 	}
 
