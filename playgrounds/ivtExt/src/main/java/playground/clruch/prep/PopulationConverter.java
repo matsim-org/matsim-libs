@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -24,8 +25,8 @@ public class PopulationConverter {
             System.exit(-1);
         }
         final File fileImport = new File(dir, "population.xml");
-        final File fileExportGz = new File(dir, "populationupdated.xml.gz");
-        final File fileExport = new File(dir, "populationupdated.xml");
+        final File fileExportGz = new File(dir, "populationZurichOnlyAV.xml.gz");
+        final File fileExport = new File(dir, "populationZurichOnlyAV.xml");
 
         // load the existing population file
         Config config = ConfigUtils.createConfig();
@@ -34,11 +35,15 @@ public class PopulationConverter {
 
         final Population population = scenario.getPopulation();
         //TheApocalypse.decimatesThe(population).toNoMoreThan(5000).people();
-        System.out.println("Population size:" + population.getPersons().values().size());
+        //System.out.println("Population size:" + population.getPersons().values().size());
 
         // edit the configuration file - change all modes of transport to "av"
+        //Coord center = new Coord(2704366.0,1236061.0);
+        Coord center = new Coord(2684648.0,1251492.0);
+        double radius = 25000;
+        PopulationTools.elminateOutsideRadius(population, center, radius);
+        System.out.println("Population size after radius cut: " + population.getPersons().values().size());
         PopulationTools.changeModesOfTransportToAV(population);
-
         System.out.println("Population size after conversion:" + population.getPersons().values().size());
 
         {
