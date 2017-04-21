@@ -24,8 +24,7 @@ public class TilesLayer extends ViewerLayer {
             rowPanel.add(sl.getLabelComponent());
         }
         {
-            // JToolBar jToolBar = new JToolBar();
-            JPanel jPanel = new JPanel(new FlowLayout(1,2,2));
+            JPanel jPanel = new JPanel(new FlowLayout(1, 2, 2));
             {
                 SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
                 spinnerLabel.setArray(0, 128, 255);
@@ -51,7 +50,6 @@ public class TilesLayer extends ViewerLayer {
             }
             rowPanel.add(jPanel);
         }
-
     }
 
     @Override

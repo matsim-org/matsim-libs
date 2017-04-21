@@ -40,7 +40,7 @@ import playground.clruch.utils.gui.SpinnerLabel;
  * adapted from code by Jan Peter Stotz
  */
 public class MatsimViewerFrame implements Runnable {
-    public int STEPSIZE_SECONDS = 10; // TODO this should be derived from storage files
+    public static int STEPSIZE_SECONDS = 10; // TODO this should be derived from storage files
     // ---
     private final MatsimMapComponent matsimMapComponent;
     private boolean isLaunched = true;
