@@ -12,6 +12,7 @@ import java.awt.geom.Line2D;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -39,8 +40,9 @@ public class LinkLayer extends ViewerLayer {
     private volatile boolean drawLinks = false;
     private volatile boolean drawMaxCars = false;
     private static final Color LINKCOLOR = new Color(153, 153, 102, 64);
+    private static final int MAXHISTORY = 10;
 
-    Map<Long, SimulationObject> lruCache = LruCache.create(10);
+    Map<Long, SimulationObject> lruCache = LruCache.create(MAXHISTORY);
 
     int historyLength = 4;
     int loadScale = 3;
@@ -77,7 +79,7 @@ public class LinkLayer extends ViewerLayer {
         }
 
         if (drawLoad) {
-            int width = historyLength;
+            final int width = historyLength;
             LinkStats linkStats = new LinkStats(width);
             linkStats.feed(ref, 0);
             int DT = MatsimViewerFrame.STEPSIZE_SECONDS;
@@ -85,7 +87,6 @@ public class LinkLayer extends ViewerLayer {
                 if (lruCache.containsKey(ref.now - DT * ofs))
                     linkStats.feed(lruCache.get(ref.now - DT * ofs), ofs);
 
-            final Tensor table = linkStats.count;
             Tensor weight;
             if (1 < width) {
                 weight = Subdivide.of(RealScalar.of(1), RealScalar.of(.1), width - 1);
@@ -97,13 +98,14 @@ public class LinkLayer extends ViewerLayer {
             GraphicsUtil.setQualityHigh(graphics);
             // System.out.println(linkStats.linkIndex.size());
             double scaling = loadScale * 1000;
-            for (int index : linkStats.linkIndex) {
-                OsmLink osmLink = matsimMapComponent.db.getOsmLink(index);
+            for (Entry<Integer,Tensor> entry : linkStats.linkTensor.entrySet()) {
+                final int index = entry.getKey();
+                final OsmLink osmLink = matsimMapComponent.db.getOsmLink(index);
                 final double factor = osmLink.getLength() * matsimMapComponent.getMeterPerPixel();
                 Point p1 = matsimMapComponent.getMapPosition(osmLink.getCoordFrom());
                 if (p1 != null) {
                     Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getCoordTo());
-                    Tensor linkTable = weight.dot(table.get(index));
+                    Tensor linkTable = weight.dot(entry.getValue());
                     final double total = Total.of(linkTable).Get().number().doubleValue();
                     final double carsEmpty = linkTable.Get(1).number().doubleValue();
                     // System.out.println(total + " " + carsEmpty);
