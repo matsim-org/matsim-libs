@@ -7,14 +7,14 @@ import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
 import playground.clruch.jmapviewer.tilesources.BlackWhiteTileSource;
 import playground.clruch.jmapviewer.tilesources.CycleTileSource;
-import playground.clruch.jmapviewer.tilesources.DarkCartocdnTileSource;
+import playground.clruch.jmapviewer.tilesources.DarkCartoTileSource;
 import playground.clruch.jmapviewer.tilesources.FrenchTileSource;
 import playground.clruch.jmapviewer.tilesources.GrayMapnikTileSource;
 import playground.clruch.jmapviewer.tilesources.HikebikeTileSource;
 import playground.clruch.jmapviewer.tilesources.HillshadingTileSource;
 import playground.clruch.jmapviewer.tilesources.HotTileSource;
 import playground.clruch.jmapviewer.tilesources.LandscapeTileSource;
-import playground.clruch.jmapviewer.tilesources.LightCartocdnTileSource;
+import playground.clruch.jmapviewer.tilesources.LightCartoTileSource;
 import playground.clruch.jmapviewer.tilesources.MapnikTileSource;
 import playground.clruch.jmapviewer.tilesources.OpenCycleTileSource;
 import playground.clruch.jmapviewer.tilesources.WatercolorTileSource;
@@ -27,8 +27,8 @@ public class JMapTileSelector {
                 new MapnikTileSource(), //
                 new GrayMapnikTileSource(), //
                 new WikimediaTileSource(), //
-                new LightCartocdnTileSource(), //
-                new DarkCartocdnTileSource(), //
+                new LightCartoTileSource(), //
+                new DarkCartoTileSource(), //
                 new FrenchTileSource(), //
                 new BlackWhiteTileSource(), //
                 new WatercolorTileSource(), //
