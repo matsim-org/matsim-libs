@@ -10,7 +10,7 @@ abstract class CartoTileSource extends CyclicTileSource {
 
     @Override
     public final String getTermsOfUseText() {
-        return "carto.com";
+        return "CARTO";
     }
 
     @Override

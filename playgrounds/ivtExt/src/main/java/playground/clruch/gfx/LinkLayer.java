@@ -98,10 +98,10 @@ public class LinkLayer extends ViewerLayer {
             GraphicsUtil.setQualityHigh(graphics);
             // System.out.println(linkStats.linkIndex.size());
             double scaling = loadScale * 1000;
-            for (Entry<Integer,Tensor> entry : linkStats.linkTensor.entrySet()) {
+            for (Entry<Integer, Tensor> entry : linkStats.linkTensor.entrySet()) {
                 final int index = entry.getKey();
                 final OsmLink osmLink = matsimMapComponent.db.getOsmLink(index);
-                final double factor = osmLink.getLength() * matsimMapComponent.getMeterPerPixel();
+                final double factor = Math.max(osmLink.getLength(), 1) * matsimMapComponent.getMeterPerPixel();
                 Point p1 = matsimMapComponent.getMapPosition(osmLink.getCoordFrom());
                 if (p1 != null) {
                     Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getCoordTo());
