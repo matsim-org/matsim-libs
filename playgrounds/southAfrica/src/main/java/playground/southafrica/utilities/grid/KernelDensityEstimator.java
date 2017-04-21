@@ -52,8 +52,8 @@ public class KernelDensityEstimator {
 	private double radius;
 	private Map<Point, Double> weight;
 
-	private final Counter pointCounter = new Counter("  points #");
-	private final Counter lineCounter = new Counter("  lines #");
+	private final Counter pointCounter = new Counter("  points # ");
+	private final Counter lineCounter = new Counter("  lines # ");
 
 	public KernelDensityEstimator(GeneralGrid grid, KdeType type, double radius) {
 		if(radius <= grid.getCellWidth() & type != KdeType.CELL){
@@ -77,74 +77,82 @@ public class KernelDensityEstimator {
 		return this.weight.get(p);
 	}
 
-
 	public void processPoint(Point p, double weight){
-		/* For a line, we use different search radii for different KDE-types. */
-		double usedRadius;
-		switch (this.kdeType) {
-		case CELL:
-			/* The larger of the given radius, or half the cell width. This is 
-			 * to ensure that if a point is on the shared boundary of two 
-			 * geometries, they share the weight evenly, even though the given
-			 * radius might have been 0.0. */
-			usedRadius = Math.max(this.radius, this.grid.getCellWidth()/2.0);
-			break;
-		case GAUSSIAN:
-			/* Three times the given radius is used. */
-			usedRadius = 3.0*this.radius;
-			break;
-		default:
-			usedRadius = this.radius;
-			break;
-		}
-		
-		/* Find all (possible) cells around the point. */
-		double sum = 0.0;
-		Collection<Point> neighbours = this.grid.getGrid().getDisk(p.getX(), p.getY(), usedRadius);
-		Map<Point, Double> interimMap = new HashMap<Point, Double>(neighbours.size());
+		processPoint(p, weight, false);
+	}
 
-		/* Determine the interim weights. */
-		Iterator<Point>	iterator = neighbours.iterator();
-		while(iterator.hasNext()){
-			Point centroid = iterator.next();
-			Geometry cell = this.grid.getCellGeometry(centroid);
-
+	public void processPoint(Point p, double weight, boolean silent){
+		/* Only distribute the weight if it is greater than zero. */
+		if(weight > 0){
+			/* For a line, we use different search radii for different KDE-types. */
+			double usedRadius;
 			switch (this.kdeType) {
 			case CELL:
-				/* Only consider the cell in which the point occurs. */
-				if(cell.covers(p)){
-					double w = weight;
-					interimMap.put(centroid, w);
-					sum += w;
-				}
+				/* The larger of the given radius, or half the cell width. This is 
+				 * to ensure that if a point is on the shared boundary of two 
+				 * geometries, they share the weight evenly, even though the given
+				 * radius might have been 0.0. */
+				usedRadius = Math.max(this.radius, this.grid.getCellWidth()/2.0);
 				break;
-				
-			case EPANECHNIKOV:
 			case GAUSSIAN:
-			case TRIANGULAR:
-			case TRIWEIGHT:
-			case UNIFORM:
-				/* Calculate the weight for a cell proportional to the distance 
-				 * from the cell's centroid to the point. */
-				double distance = centroid.distance(p);
-				double w = getFunctionFromDistance(distance)*weight;
-				interimMap.put(centroid, w);
-				sum += w;
+				/* Three times the given radius is used. */
+				usedRadius = 3.0*this.radius;
 				break;
 			default:
+				usedRadius = this.radius;
 				break;
 			}
-		}
-
-		/* Normalise the weights. */
-		for(Point cell : interimMap.keySet()){
-			if(!this.weight.containsKey(cell)){
-				this.weight.put(cell, interimMap.get(cell)/sum*weight);
-			} else{
-				this.weight.put(cell, this.weight.get(cell) + interimMap.get(cell)/sum*weight);
+			
+			/* Find all (possible) cells around the point. */
+			double sum = 0.0;
+			Collection<Point> neighbours = this.grid.getGrid().getDisk(p.getX(), p.getY(), usedRadius);
+			Map<Point, Double> interimMap = new HashMap<Point, Double>(neighbours.size());
+			
+			/* Determine the interim weights. */
+			Iterator<Point>	iterator = neighbours.iterator();
+			while(iterator.hasNext()){
+				Point centroid = iterator.next();
+				Geometry cell = this.grid.getCellGeometry(centroid);
+				
+				switch (this.kdeType) {
+				case CELL:
+					/* Only consider the cell in which the point occurs. */
+					if(cell.covers(p)){
+						double w = weight;
+						interimMap.put(centroid, w);
+						sum += w;
+					}
+					break;
+					
+				case EPANECHNIKOV:
+				case GAUSSIAN:
+				case TRIANGULAR:
+				case TRIWEIGHT:
+				case UNIFORM:
+					/* Calculate the weight for a cell proportional to the distance 
+					 * from the cell's centroid to the point. */
+					double distance = centroid.distance(p);
+					double w = getFunctionFromDistance(distance)*weight;
+					interimMap.put(centroid, w);
+					sum += w;
+					break;
+				default:
+					break;
+				}
+			}
+			
+			/* Normalise the weights. */
+			for(Point cell : interimMap.keySet()){
+				if(!this.weight.containsKey(cell)){
+					this.weight.put(cell, interimMap.get(cell)/sum*weight);
+				} else{
+					this.weight.put(cell, this.weight.get(cell) + interimMap.get(cell)/sum*weight);
+				}
+			}
+			if(!silent){
+				pointCounter.incCounter();
 			}
 		}
-		pointCounter.incCounter();
 	}
 
 
