@@ -105,10 +105,10 @@
 <!-- ====================================================================== -->
 
 	<module name="evacuation" >
-		<param name="evacuationAreaFile" value="./test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/evacuation_area.shp" />
-		<param name="networkFile" value="./test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/lenzen.osm" />
-		<param name="outputDir" value="./test/output/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/" />
-		<param name="populationFile" value="./test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/population.shp" />
+		<param name="evacuationAreaFile" value="./test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorIT/testScenarioGenerator/evacuation_area.shp" />
+		<param name="networkFile" value="./test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorIT/testScenarioGenerator/lenzen.osm" />
+		<param name="outputDir" value="./test/output/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorIT/testScenarioGenerator/" />
+		<param name="populationFile" value="./test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorIT/testScenarioGenerator/population.shp" />
 		<param name="sampleSize" value="0.787" />
 	</module>
 
