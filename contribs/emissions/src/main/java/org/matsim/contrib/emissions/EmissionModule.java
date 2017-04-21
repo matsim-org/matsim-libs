@@ -63,7 +63,7 @@ public class EmissionModule {
 	
 	//===
     private Map<Integer, String> roadTypeMapping;
-	private Vehicles emissionVehicles;
+	private Vehicles vehicles;
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
@@ -98,8 +98,8 @@ public class EmissionModule {
 		getInputFiles();
 		
 		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
-		if(this.emissionVehicles == null){
-			emissionVehicles = scenario.getVehicles();
+		if(this.vehicles == null){
+			vehicles = scenario.getVehicles();
 		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
@@ -137,8 +137,8 @@ public class EmissionModule {
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
 		
-		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
+		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
+		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
 	}
 
