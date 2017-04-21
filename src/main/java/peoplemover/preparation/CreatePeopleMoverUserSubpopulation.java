@@ -20,7 +20,7 @@
 /**
  * 
  */
-package robotaxi.preparation;
+package peoplemover.preparation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -36,13 +36,13 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 /**
  *
  */
-public class CreateTaxiUserSubpopulation {
+public class CreatePeopleMoverUserSubpopulation {
 
 	public static void main(String[] args) {
 		String inputPlansFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/population/initial_plans1.0.xml.gz";
-		String outputPersonAttributes = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/population/drtCustomers.xml";
+		String outputPersonAttributes = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/population/drtCustomers1.0.xml";
 		String identifier = "WB_WB";
-		String subpopulation = "drtCustomer";
+		String subpopulation = "taxiCustomer";
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new PopulationReader(scenario).readFile(inputPlansFile);
 		for (Person p : scenario.getPopulation().getPersons().values()){
