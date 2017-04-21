@@ -32,6 +32,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
 
@@ -43,6 +44,7 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 	@Inject private EmissionModule emissionModule;
 	@Inject private EmissionCostModule emissionCostModule;
 	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
+	@Inject private Vehicles vehicles;
 
 	private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
 	private Set<Id<Link>> hotspotLinks;
@@ -57,7 +59,7 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
-		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(this.randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator), timeCalculator, cnScoringGroup, this.emissionModule, this.emissionCostModule, this.sigma, this.hotspotLinks, this.tollHandler);
+		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(this.randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator), timeCalculator, cnScoringGroup, this.emissionModule, this.emissionCostModule, this.sigma, this.hotspotLinks, this.tollHandler, vehicles);
 
 		return new TravelDisutility(){
 

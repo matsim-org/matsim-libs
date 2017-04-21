@@ -50,7 +50,7 @@ public class ResDisFactory implements TravelDisutilityFactory {
 	@Override
 	public TravelDisutility createTravelDisutility( TravelTime timeCalculator) {
 		double marginalutilityOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		final ResDisCalculator resdiscal = new ResDisCalculator(tdf.createTravelDisutility(timeCalculator), ecl, marginalutilityOfMoney, this.emissionModule, this.emissionCostModule);
+		final ResDisCalculator resdiscal = new ResDisCalculator(tdf.createTravelDisutility(timeCalculator), ecl, marginalutilityOfMoney, this.emissionModule, this.emissionCostModule, );
 		
 		return resdiscal;
 

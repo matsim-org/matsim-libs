@@ -33,6 +33,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * benjamin, ihab, amit
@@ -48,13 +49,15 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
     private final Set<Id<Link>> hotspotLinks;
     private final double sigma ;
 
+    private final Vehicles emissionVehicles;
+
     public EmissionTollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
-                                              TravelTime timeCalculator,
-                                              double marginalUtilOfMoney,
-                                              EmissionModule emissionModule,
-                                              EmissionCostModule emissionCostModule,
-                                              double sigma,
-                                              Set<Id<Link>> hotspotLinks) {
+                                                    TravelTime timeCalculator,
+                                                    double marginalUtilOfMoney,
+                                                    EmissionModule emissionModule,
+                                                    EmissionCostModule emissionCostModule,
+                                                    double sigma,
+                                                    Set<Id<Link>> hotspotLinks, Vehicles vehicles) {
         this.randomizedTimeDistanceTravelDisutility = randomizedTimeDistanceTravelDisutility;
         this.timeCalculator = timeCalculator;
         this.marginalUtlOfMoney = marginalUtilOfMoney;
@@ -62,6 +65,8 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
         this.emissionCostModule = emissionCostModule;
         this.sigma = sigma;
         this.hotspotLinks = hotspotLinks;
+        this.emissionVehicles= vehicles;
+
     }
 
     @Override
@@ -71,7 +76,6 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
 
         Vehicle emissionVehicle = v;
         if (emissionVehicle == null){
-            // TODO [AA] : This looks ugly, is there any better way to get vehicle here, amit Nov 2016.
             // the link travel disutility is asked without information about the vehicle
             if (person == null){
                 // additionally, no person is given -> a default vehicle type is used
@@ -79,7 +83,7 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
                 emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
             } else {
                 // a person is given -> use the vehicle for that person given in emissionModule
-                emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
+                emissionVehicle = this.emissionVehicles.getVehicles().get(Id.createVehicleId(person.getId()));
             }
         }
 

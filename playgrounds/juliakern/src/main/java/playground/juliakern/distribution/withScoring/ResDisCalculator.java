@@ -35,6 +35,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.juliakern.distribution.EmActivity;
 
@@ -57,13 +58,16 @@ public class ResDisCalculator implements TravelDisutility{
 
 	private double sumOfDelegateValues = 0.0;
 
-	public ResDisCalculator(TravelDisutility travelDisutility, EmissionControlerListener ecl, double marginalutilityOfMoney, EmissionModule emissionModule, EmissionCostModule emissionCostModule){
+	private final Vehicles emissionVehicles ;
+
+	public ResDisCalculator(TravelDisutility travelDisutility, EmissionControlerListener ecl, double marginalutilityOfMoney, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Vehicles vehicles){
 		this.delegate = travelDisutility;
 		this.ecl = ecl;
 		this.timeBinSize = ecl.timeBinSize;
 		this.marginalUtilityOfMoney = marginalutilityOfMoney;
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
+		this.emissionVehicles = vehicles;
 	}
 
 	@Override
@@ -77,7 +81,7 @@ public class ResDisCalculator implements TravelDisutility{
 				emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
 			} else {
 				// a person is given -> use the vehicle for that person given in emissionModule
-				emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+				emissionVehicle = this.emissionVehicles.getVehicles().get(person.getId());
 			}
 		}
 		

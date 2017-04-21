@@ -33,6 +33,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * benjamin, ihab, amit
@@ -48,13 +49,15 @@ public class EmissionResponsibilityTollTimeDistanceTravelDisutility implements T
     private final Set<Id<Link>> hotspotLinks;
     private final double sigma ;
 
+    private final Vehicles emissionVehicles;
+
     public EmissionResponsibilityTollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
                                                                   TravelTime timeCalculator,
                                                                   double marginalUtilOfMoney,
                                                                   EmissionModule emissionModule,
                                                                   EmissionResponsibilityCostModule emissionResponsibilityCostModule,
                                                                   double sigma,
-                                                                  Set<Id<Link>> hotspotLinks) {
+                                                                  Set<Id<Link>> hotspotLinks, Vehicles vehicles) {
         this.randomizedTimeDistanceTravelDisutility = randomizedTimeDistanceTravelDisutility;
         this.timeCalculator = timeCalculator;
         this.marginalUtlOfMoney = marginalUtilOfMoney;
@@ -62,6 +65,8 @@ public class EmissionResponsibilityTollTimeDistanceTravelDisutility implements T
         this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;
         this.sigma = sigma;
         this.hotspotLinks = hotspotLinks;
+
+        this.emissionVehicles = vehicles;
     }
 
     @Override
@@ -79,7 +84,7 @@ public class EmissionResponsibilityTollTimeDistanceTravelDisutility implements T
                 emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
             } else {
                 // a person is given -> use the vehicle for that person given in emissionModule
-                emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
+                emissionVehicle = this.emissionVehicles.getVehicles().get(Id.createVehicleId(person.getId()));
             }
         }
 

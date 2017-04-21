@@ -21,7 +21,6 @@ package playground.benjamin.internalization;
 
 import java.util.Map;
 import java.util.Set;
-
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,6 +35,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
@@ -53,8 +53,10 @@ public class EmissionTravelDisutilityCalculator implements TravelDisutility {
 	EmissionCostModule emissionCostModule;
 	private final Set<Id<Link>> hotspotLinks;
 
+	private final Vehicles emissionVehicles;
 
-	public EmissionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
+
+	public EmissionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks, Vehicles vehicles) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
@@ -62,6 +64,7 @@ public class EmissionTravelDisutilityCalculator implements TravelDisutility {
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
 		this.hotspotLinks = hotspotLinks;
+		this.emissionVehicles = vehicles;
 	}
 
 	@Override
@@ -75,7 +78,7 @@ public class EmissionTravelDisutilityCalculator implements TravelDisutility {
 				emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
 			} else {
 				// a person is given -> use the vehicle for that person given in emissionModule
-				emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+				emissionVehicle = this.emissionVehicles.getVehicles().get(person.getId());
 			}
 		}
 		

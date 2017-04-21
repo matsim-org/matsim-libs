@@ -396,11 +396,6 @@ public class EmissionModule {
 		return eventsManager;
 	}
 
-	@Deprecated // use scenario.getVehicles() instead.
-	public Vehicles getEmissionVehicles() {
-		return emissionVehicles;
-	}
-
 	public void writeEmissionInformation() {
 		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
 				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
