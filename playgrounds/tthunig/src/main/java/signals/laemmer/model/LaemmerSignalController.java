@@ -285,7 +285,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private void initializeSensoring() {
         for (SignalGroup group : this.system.getSignalGroups().values()) {
             for (Signal signal : group.getSignals().values()) {
-                if (signal.getLaneIds() != null || !(signal.getLaneIds().isEmpty())) {
+                if (signal.getLaneIds() != null && !(signal.getLaneIds().isEmpty())) {
                     for (Id<Lane> laneId : signal.getLaneIds()) {
                         this.sensorManager.registerNumberOfCarsOnLaneInDistanceMonitoring(signal.getLinkId(), laneId, 0.);
                     }

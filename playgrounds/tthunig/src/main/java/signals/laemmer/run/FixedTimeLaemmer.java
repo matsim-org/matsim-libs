@@ -34,12 +34,16 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.LanesUtils;
+import org.matsim.lanes.data.Lane;
+import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesFactory;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import signals.CombinedSignalsModule;
 import signals.advancedPlanbased.AdvancedPlanBasedSignalSystemController;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by nkuehnel on 03.04.2017.
@@ -48,6 +52,7 @@ public class FixedTimeLaemmer {
     private static final Logger log = Logger.getLogger(LaemmerMain.class);
     private static final double T_CYC = 120;
     private static final double TAU_SUM = 20;
+    private static final int LANE_CAPACITY = 1800;
 
 
     /**
@@ -56,41 +61,64 @@ public class FixedTimeLaemmer {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-        final Config config = defineConfig();
+//        for (int i = 0; i <= 1200; i += 60) {
+            run(180, 600, true, false, true);
+//        }
+    }
 
-        // simulate traffic dynamics with holes (default would be without)
-//        config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
-//        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
-//        config.qsim().setNodeOffset(5.);
+    private static void run(double flowNS, double flowWE, boolean vis, boolean stochastic, boolean lanes) {
 
-        // add the OTFVis config group
-//        OTFVisConfigGroup otfvisConfig =
-//                ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-        // make links visible beyond screen edge
-//        otfvisConfig.setScaleQuadTreeRect(true);
-//        otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
-//        otfvisConfig.setAgentSize(240);
+        String outputPath;
+        if (stochastic) {
+            if(lanes) {
+                outputPath = "output/fixedTimeBasic" + "_ew" + flowWE + "_ns" + flowNS + "_stochastic_lanes";
+            } else {
+                outputPath = "output/fixedTimeBasic" + "_ew" + flowWE + "_ns" + flowNS + "_stochastic_noLanes";
+            }
+        } else {
+            if(lanes) {
+                outputPath = "output/fixedTimeBasic" + "_ew" + flowWE + "_ns" + flowNS + "_constant_lanes";
+            } else {
+                outputPath = "output/fixedTimeBasic" + "_ew" + flowWE + "_ns" + flowNS + "_constant_noLanes";
+            }
+        }
+        final Config config = defineConfig(outputPath, lanes);
 
-        final Scenario scenario = defineScenario(config, 180, 900);
+        CombinedSignalsModule module = new CombinedSignalsModule();
+
+        final Scenario scenario = defineScenario(config, flowNS, flowWE, stochastic, lanes);
         Controler controler = new Controler(scenario);
 
-//        controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
-        controler.addOverridingModule(new CombinedSignalsModule());
 
+        controler.addOverridingModule(module);
+
+        if (vis) {
+            config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
+            config.qsim().setNodeOffset(5.);
+            OTFVisConfigGroup otfvisConfig =
+                    ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+            otfvisConfig.setScaleQuadTreeRect(true);
+            otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
+            otfvisConfig.setAgentSize(240);
+            controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
+        }
 
         controler.run();
     }
 
-
-    private static Config defineConfig() {
+    private static Config defineConfig(String outputPath, boolean lanes) {
         Config config = ConfigUtils.createConfig();
-        config.controler().setOutputDirectory("output/laemmerexampleFixedTime_900_e_w/");
+        config.controler().setOutputDirectory(outputPath);
 
         config.controler().setLastIteration(0);
-        config.travelTimeCalculator().setMaxTime(60 * 840);
+        config.travelTimeCalculator().setMaxTime(60 * 120);
         config.qsim().setStartTime(0);
         config.qsim().setEndTime(60 * 120);
         config.qsim().setUsingFastCapacityUpdate(true);
+
+        if(lanes) {
+            config.qsim().setUseLanes(true);
+        }
 
         SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
         signalConfigGroup.setUseSignalSystems(true);
@@ -109,22 +137,20 @@ public class FixedTimeLaemmer {
         return config;
     }
 
-    private static Scenario defineScenario(Config config, double flowNS, double flowWE) {
+
+
+
+    private static Scenario defineScenario(Config config, double flowNS, double flowWE, boolean stochastic, boolean lanes) {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         // add missing scenario elements
         SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
         scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-
         createNetwork(scenario);
-        createPopulation(scenario, flowNS, flowWE);
-
-        double lambda1 = flowNS / (scenario.getNetwork().getLinks().get(Id.createLinkId("7_3")).getCapacity());
-        double lambda2 = flowWE / (scenario.getNetwork().getLinks().get(Id.createLinkId("4_3")).getCapacity());
-        double lambda3 = flowNS / (scenario.getNetwork().getLinks().get(Id.createLinkId("8_3")).getCapacity());
-        double lambda4 = flowWE / (scenario.getNetwork().getLinks().get(Id.createLinkId("2_3")).getCapacity());
-
-
-        createSignals(scenario, lambda1, lambda2, lambda3, lambda4);
+        if(lanes) {
+            createLanes(scenario);
+        }
+        createPopulation(scenario, flowNS, flowWE, stochastic);
+        createSignals(scenario, flowNS, flowWE, lanes);
         return scenario;
     }
 
@@ -139,7 +165,7 @@ public class FixedTimeLaemmer {
      * ^
      * |
      * v
-     * 1 <----> 2 <----> 3 <----> 4 <----> 5
+     * 1 <===> 2 <===> 3 <===> 4 <===> 5
      * ^
      * |
      * v
@@ -204,49 +230,147 @@ public class FixedTimeLaemmer {
 
     }
 
-    private static void createPopulation(Scenario scenario, double flowNS, double flowWE) {
+    private static void createLanes(Scenario scenario) {
+        Lanes lanes = scenario.getLanes();
+        LanesFactory factory = lanes.getFactory();
+
+
+        // create lanes for link 2_3
+        LanesToLinkAssignment lanesForLink2_3 = factory
+                .createLanesToLinkAssignment(Id.createLinkId("2_3"));
+        lanes.addLanesToLinkAssignment(lanesForLink2_3);
+
+        // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
+        LanesUtils.createAndAddLane(lanesForLink2_3, factory,
+                Id.create("2_3.ol", Lane.class), LANE_CAPACITY, 1000, 0, 1,
+                null, Arrays.asList(Id.create("2_3.l", Lane.class), Id.create("2_3.r", Lane.class)));
+
+
+        // straight and left turning lane (alignment 1)
+        LanesUtils.createAndAddLane(lanesForLink2_3, factory,
+                Id.create("2_3.l", Lane.class), LANE_CAPACITY, 500, 1, 1,
+                Arrays.asList(Id.create("3_4", Link.class), Id.create("3_7", Link.class)), null);
+
+        // right turning lane (alignment -1)
+        LanesUtils.createAndAddLane(lanesForLink2_3, factory,
+                Id.create("2_3.r", Lane.class), LANE_CAPACITY, 500, -1, 1,
+                Arrays.asList(Id.create("3_4", Link.class), Id.create("3_8", Link.class)), null);
+
+
+        // create lanes for link 4_3
+        LanesToLinkAssignment lanesForLink4_3 = factory
+                .createLanesToLinkAssignment(Id.create("4_3", Link.class));
+        lanes.addLanesToLinkAssignment(lanesForLink4_3);
+
+        // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
+        LanesUtils.createAndAddLane(lanesForLink4_3, factory,
+                Id.create("4_3.ol", Lane.class), LANE_CAPACITY, 1000, 0, 1,
+                null, Arrays.asList(Id.create("4_3.l", Lane.class), Id.create("4_3.r", Lane.class)));
+
+        // straight and left turning lane (alignment 1)
+        LanesUtils.createAndAddLane(lanesForLink4_3, factory,
+                Id.create("4_3.l", Lane.class), LANE_CAPACITY, 500, 1, 1,
+                Arrays.asList(Id.create("3_2", Link.class), Id.create("3_8", Link.class)), null);
+
+        // right turning lane (alignment -1)
+        LanesUtils.createAndAddLane(lanesForLink4_3, factory,
+                Id.create("4_3.r", Lane.class), LANE_CAPACITY, 500, -1, 1,
+                Arrays.asList(Id.create("3_2", Link.class), Id.create("3_7", Link.class)), null);
+
+
+        // create lanes for link 7_3
+        LanesToLinkAssignment lanesForLink7_3 = factory
+                .createLanesToLinkAssignment(Id.create("7_3", Link.class));
+        lanes.addLanesToLinkAssignment(lanesForLink7_3);
+
+        // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
+        LanesUtils.createAndAddLane(lanesForLink7_3, factory,
+                Id.create("7_3.ol", Lane.class), LANE_CAPACITY, 1000, 0, 1,
+                Arrays.asList(Id.create("3_4", Link.class), Id.create("3_2", Link.class), Id.create("3_8", Link.class)), null);
+
+        // create lanes for link 8_3
+        LanesToLinkAssignment lanesForLink8_3 = factory
+                .createLanesToLinkAssignment(Id.create("8_3", Link.class));
+        lanes.addLanesToLinkAssignment(lanesForLink8_3);
+
+        // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
+        LanesUtils.createAndAddLane(lanesForLink8_3, factory,
+                Id.create("8_3.ol", Lane.class), LANE_CAPACITY, 1000, 0, 1,
+                Arrays.asList(Id.create("3_2", Link.class), Id.create("3_7", Link.class), Id.create("3_4", Link.class)), null);
+
+    }
+
+    private static void createPopulation(Scenario scenario, double flowNS, double flowWE, boolean stochastic) {
         Population population = scenario.getPopulation();
 
         String[] linksNS = {"6_7-8_9", "9_8-7_6"};
         String[] linksWE = {"5_4-2_1", "1_2-4_5"};
 
-        createPopulationForRelation(flowNS, population, linksNS);
-        createPopulationForRelation(flowWE, population, linksWE);
+        Random rnd = new Random(14);
+        createPopulationForRelation(flowNS, population, linksNS, stochastic, rnd);
+        createPopulationForRelation(flowWE, population, linksWE, stochastic, rnd);
     }
 
-    private static void createPopulationForRelation(double flow, Population population, String[] links) {
-        if (flow > 0) {
-            for (String od : links) {
-                String fromLinkId = od.split("-")[0];
-                String toLinkId = od.split("-")[1];
+    private static void createPopulationForRelation(double flow, Population population, String[] links, boolean stochastic, Random rnd) {
 
+        double lambdaT = (flow / 3600 ) / 5;
+        double lambdaN = 1./5.;
+
+        if(flow == 0) {
+            return;
+        }
+
+
+        for (String od : links) {
+            String fromLinkId = od.split("-")[0];
+            String toLinkId = od.split("-")[1];
+            Map<Double, Integer> insertNAtSecond = new HashMap<>();
+            if (stochastic) {
+                for (double i = 0; i < 5400; i++) {
+
+                    double expT = 1 - Math.exp(-lambdaT);
+                    double p1 = rnd.nextDouble();
+                    if (p1 < expT) {
+                        double p2 = rnd.nextDouble();
+                        for(int n = 0; ; n++) {
+                            double expN = Math.exp(-lambdaN * n);
+                            if((p2 > expN)) {
+                                insertNAtSecond.put(i, n);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
                 double nthSecond = (3600 / flow);
+                for (double i = 0; i < 5400; i += nthSecond) {
+                    insertNAtSecond.put(i, 1);
+                }
+            }
 
-                for (double i = 0; i < 5400; i+=nthSecond) {
+            for (Map.Entry<Double, Integer> entry : insertNAtSecond.entrySet()) {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    // create a person
+                    Person person = population.getFactory().createPerson(Id.createPersonId(od + "-" + entry.getKey()+"("+i+")"));
+                    population.addPerson(person);
 
+                    // create a plan for the person that contains all this
+                    // information
+                    Plan plan = population.getFactory().createPlan();
+                    person.addPlan(plan);
 
-                        // create a person
-                        Person person = population.getFactory().createPerson(Id.createPersonId(od + "-" + i));
-                        population.addPerson(person);
+                    // create a start activity at the from link
+                    Activity startAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(fromLinkId));
+                    // distribute agents uniformly during one hour.
+                    startAct.setEndTime(entry.getKey());
+                    plan.addActivity(startAct);
 
-                        // create a plan for the person that contains all this
-                        // information
-                        Plan plan = population.getFactory().createPlan();
-                        person.addPlan(plan);
+                    // create a dummy leg
+                    plan.addLeg(population.getFactory().createLeg(TransportMode.car));
 
-                        // create a start activity at the from link
-                        Activity startAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(fromLinkId));
-                        // distribute agents uniformly during one hour.
-                        startAct.setEndTime(i);
-                        plan.addActivity(startAct);
-
-                        // create a dummy leg
-                        plan.addLeg(population.getFactory().createLeg(TransportMode.car));
-
-                        // create a drain activity at the to link
-                        Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(toLinkId));
-                        plan.addActivity(drainAct);
-
+                    // create a drain activity at the to link
+                    Activity drainAct = population.getFactory().createActivityFromLinkId("dummy", Id.createLinkId(toLinkId));
+                    plan.addActivity(drainAct);
                 }
             }
         }
@@ -320,4 +444,96 @@ public class FixedTimeLaemmer {
         signalPlan.setOffset(0);
     }
 
+    private static void createSignals(Scenario scenario, double flowNS, double flowWE, boolean useLanes) {
+
+        SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+        SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
+        SignalSystemsDataFactory sysFac = signalSystems.getFactory();
+        SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
+        SignalControlData signalControl = signalsData.getSignalControlData();
+        SignalControlDataFactory conFac = signalControl.getFactory();
+
+        // create signal system
+        Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
+        SignalSystemData signalSystem1 = sysFac.createSignalSystemData(signalSystemId);
+        signalSystems.addSignalSystemData(signalSystem1);
+
+
+        Lanes lanes = null;
+
+        if(useLanes) {
+            lanes = scenario.getLanes();
+        }
+
+        // create a signal for every inLink
+        for (Link inLink : scenario.getNetwork().getNodes().get(Id.createNodeId(3)).getInLinks().values()) {
+            SignalData signal = sysFac.createSignalData(Id.create("Signal" + inLink.getId(), Signal.class));
+            if(lanes != null) {
+                for (Lane lane : lanes.getLanesToLinkAssignments().get(inLink.getId()).getLanes().values()) {
+                    if(lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty()) {
+                        signal.addLaneId(lane.getId());
+                    }
+                }
+            }
+            signal.setLinkId(inLink.getId());
+            signalSystem1.addSignalData(signal);
+        }
+
+        // group signals with non conflicting streams
+        Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
+        SignalGroupData signalGroup1 = signalGroups.getFactory()
+                .createSignalGroupData(signalSystemId, signalGroupId1);
+        Id<Signal> id2_3 = Id.create("Signal2_3", Signal.class);
+        signalGroup1.addSignalId(id2_3);
+        signalGroups.addSignalGroupData(signalGroup1);
+
+        Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
+        SignalGroupData signalGroup2 = signalGroups.getFactory()
+                .createSignalGroupData(signalSystemId, signalGroupId2);
+        Id<Signal> id7_3 = Id.create("Signal7_3", Signal.class);
+        signalGroup2.addSignalId(id7_3);
+        signalGroups.addSignalGroupData(signalGroup2);
+
+        Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
+        SignalGroupData signalGroup3 = signalGroups.getFactory()
+                .createSignalGroupData(signalSystemId, signalGroupId3);
+        Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
+        signalGroup3.addSignalId(id4_3);
+        signalGroups.addSignalGroupData(signalGroup3);
+
+        Id<SignalGroup> signalGroupId4 = Id.create("SignalGroup4", SignalGroup.class);
+        SignalGroupData signalGroup4 = signalGroups.getFactory()
+                .createSignalGroupData(signalSystemId, signalGroupId4);
+        Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
+        signalGroup4.addSignalId(id8_3);
+
+        signalGroups.addSignalGroupData(signalGroup4);
+
+        // create the signal control
+        SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
+        signalSystemControl.setControllerIdentifier(AdvancedPlanBasedSignalSystemController.IDENTIFIER);
+        signalControl.addSignalSystemControllerData(signalSystemControl);
+
+        // create a plan for the signal system (with defined cycle time and offset 0)
+        SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 120, 0, Id.create("SignalPlan1", SignalPlan.class));
+        signalSystemControl.addSignalPlanData(signalPlan);
+
+        double lambda1 = flowWE / 3600;
+        double lambda2 = flowNS / 1800;
+        double lambda3 = flowWE / 3600;
+        double lambda4 = flowNS / 1800;
+
+        double lambdaSum = lambda1 + lambda2 + lambda3 + lambda4;
+        int g1 = (int) Math.rint((lambda1 / lambdaSum) * ((T_CYC) - TAU_SUM));
+        int g2 = (int) Math.rint((lambda2 / lambdaSum) * ((T_CYC) - TAU_SUM));
+        int g3 = (int) Math.rint((lambda3 / lambdaSum) * ((T_CYC) - TAU_SUM));
+        int g4 = (int) Math.rint((lambda4 / lambdaSum) * ((T_CYC) - TAU_SUM));
+
+        // specify signal group settings for all signal groups
+        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, g1));
+        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, g1 + 5, g1 + 5 + g2));
+        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId3, g1 + g2 + 10, g1 + g2 + 10 + g3));
+        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId4, g1 + g2 + g3 + 15, g1 + g2 + g3 + 15 + g4));
+        signalPlan.setOffset(0);
+    }
 }

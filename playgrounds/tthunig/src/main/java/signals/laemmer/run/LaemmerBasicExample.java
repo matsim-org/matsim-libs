@@ -60,11 +60,11 @@ public class LaemmerBasicExample {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-//        for (int i = 0; i <= 1200; i += 60) {
-            run(180, 600, LaemmerConfig.Regime.COMBINED, true, false, true, true);
-//            run(180, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false);
-//            run(180, i, LaemmerConfig.Regime.STABILIZING, false, false, false);
-//        }
+        for (int i = 0; i <= 1200; i += 60) {
+            run(180, i, LaemmerConfig.Regime.COMBINED, false, false, false, false);
+            run(180, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, false);
+            run(180, i, LaemmerConfig.Regime.STABILIZING, false, false, false, false);
+        }
     }
 
     private static void run(double flowNS, double flowWE, LaemmerConfig.Regime regime, boolean vis, boolean log, boolean stochastic, boolean lanes) {
@@ -131,7 +131,7 @@ public class LaemmerBasicExample {
         config.travelTimeCalculator().setMaxTime(60 * 120);
         config.qsim().setStartTime(0);
         config.qsim().setEndTime(60 * 120);
-//        config.qsim().setUsingFastCapacityUpdate(true);
+        config.qsim().setUsingFastCapacityUpdate(true);
 
         if(lanes) {
             config.qsim().setUseLanes(true);
