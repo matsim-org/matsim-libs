@@ -22,7 +22,7 @@
  *  <li> Go to "CaseDefinition" > "New"</li>
  *  <li> Select the desired parameters:</li>
  *   <ul>
- *    <li> VEHICLE CATEGORIES: Currently, PC (passenger car) and HGV (heavy goods vehicle) are supported. A third type, ZEV (zero emission vehicle) is also added to the category (see {@link org.matsim.contrib.emissions.types.HbefaVehicleCategory HbefaVehicleCategory})</li>
+ *    <li> VEHICLE CATEGORIES: Currently, PC (passenger car), HGV (heavy goods vehicle), MOTORCYCLE and ZEV (zero emission vehicle) are supported (see {@link org.matsim.contrib.emissions.types.HbefaVehicleCategory HbefaVehicleCategory})</li>
  *    <li> COMPONENTS: Currently, all pollutants listed under {@link org.matsim.contrib.emissions.types.WarmPollutant WarmPollutant} are supported; please choose accordingly</li>
  *    <li> YEARS: Choose the year of your scenario (only when exporting the mandatory average emission factors files)</li>
  *    <li> FLEET COMPOSITION: Choose "EF weighted with fleet composition" for the mandatory average emission factors files, and "EF per subsegment (without weighting)" for the optional detailed emission factors files</li>
