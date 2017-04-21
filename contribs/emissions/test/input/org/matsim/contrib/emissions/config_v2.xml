@@ -52,8 +52,8 @@
 		<!-- REQUIRED: mapping from input road types to HBEFA 3.1 road type strings -->
 		<param name="emissionRoadTypeMappingFile" value="sample_roadTypeMapping.txt" />
 
-		<!-- if true, emission events will not appear in the events file. -->
-		<param name="isIgnoringEmissionsFromEventsFile" value="false" />
+		<!-- if false, emission events will not appear in the events file. -->
+		<param name="isWritingEmissionsEvents" value="true" />
 
 		<!-- The vehicle information (or vehicles file) should be passed to the scenario.The definition of emission specifications:
 		 - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'
