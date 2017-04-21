@@ -50,8 +50,8 @@ extends ReflectiveConfigGroup
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	private boolean isUsingVehicleIdAsVehicleDescription = false;
 
-	private static final String IGNORING_EMISSIONS_FROM_EVENTS_FILE = "isIgnoringEmissionsFromEventsFile";
-	private boolean isIgnoringEmissionsFromEventsFile = false;
+	private static final String IGNORING_EMISSIONS_FROM_EVENTS_FILE = "isWritingEmissionsEvents";
+	private boolean isWritingEmissionsEvents = true;
 
 	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
 	private double emissionEfficiencyFactor = 1.0;
@@ -227,8 +227,8 @@ extends ReflectiveConfigGroup
 	}
 
 	@StringGetter(IGNORING_EMISSIONS_FROM_EVENTS_FILE)
-	public boolean isIgnoringEmissionsFromEventsFile() {
-		return isIgnoringEmissionsFromEventsFile;
+	public boolean isWritingEmissionsEvents() {
+		return isWritingEmissionsEvents;
 	}
 
 	/**
@@ -236,7 +236,7 @@ extends ReflectiveConfigGroup
 	 */
 	@StringSetter(IGNORING_EMISSIONS_FROM_EVENTS_FILE)
 	public void setIgnoringEmissionsFromEventsFile(boolean ignoringEmissionsFromEventsFile) {
-		isIgnoringEmissionsFromEventsFile = ignoringEmissionsFromEventsFile;
+		isWritingEmissionsEvents = ignoringEmissionsFromEventsFile;
 	}
 
 	@StringGetter(EMISSION_EFFICIENCY_FACTOR)

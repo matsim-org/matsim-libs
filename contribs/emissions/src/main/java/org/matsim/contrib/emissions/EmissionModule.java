@@ -77,7 +77,7 @@ public class EmissionModule {
 
 		this.ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
 
-		if ( ecg.isIgnoringEmissionsFromEventsFile() ) {
+		if ( !ecg.isWritingEmissionsEvents() ) {
 			logger.warn("Emission events are excluded from events file. A new events manager is created.");
 			this.eventsManager = EventsUtils.createEventsManager();
 		} else {
