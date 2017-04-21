@@ -46,7 +46,7 @@ public class MatsimViewerFrame implements Runnable {
     private boolean isLaunched = true;
     private final JToggleButton jToggleButton = new JToggleButton("auto");
     private final JSlider jSlider = new JSlider(0, 1, 0);
-    private Scalar playbackSpeed = RealScalar.of(50);
+    private int playbackSpeed = 50;
     private final Thread thread;
 
     public final JFrame jFrame = new JFrame();
@@ -128,17 +128,10 @@ public class MatsimViewerFrame implements Runnable {
                 }
                 panelControls.add(jToggleButton);
                 {
-                    SpinnerLabel<Scalar> spinnerLabel = new SpinnerLabel<>();
+                    SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
                     spinnerLabel.setArray( //
-                            RealScalar.of(200), //
-                            RealScalar.of(100), //
-                            RealScalar.of(50), //
-                            RealScalar.of(25), //
-                            RealScalar.of(10), //
-                            RealScalar.of(5), //
-                            RealScalar.of(2), //
-                            RealScalar.of(1) //
-                    );
+                            800, 500, 400, 300, 200, 150, 125, 100, //
+                            75, 50, 25, 10, 5, 2, 1);
                     spinnerLabel.setValueSafe(playbackSpeed);
                     spinnerLabel.addSpinnerListener(i -> playbackSpeed = i);
                     spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "playback factor");
@@ -217,7 +210,7 @@ public class MatsimViewerFrame implements Runnable {
             int millis = 500;
             if (jSlider != null && jToggleButton.isSelected()) {
                 jSlider.setValue(jSlider.getValue() + 1);
-                millis = RealScalar.of(1000 * STEPSIZE_SECONDS).divide(playbackSpeed).number().intValue();
+                millis = RealScalar.of(1000 * STEPSIZE_SECONDS).divide(RealScalar.of(playbackSpeed)).number().intValue();
             }
             try {
                 Thread.sleep(millis);

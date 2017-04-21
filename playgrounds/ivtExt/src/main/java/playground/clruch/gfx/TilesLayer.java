@@ -40,7 +40,7 @@ public class TilesLayer extends ViewerLayer {
             }
             {
                 SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
-                spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 255);
+                spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 224, 255);
                 spinnerLabel.setValueSafe(matsimMapComponent.mapAlphaCover);
                 spinnerLabel.addSpinnerListener(i -> matsimMapComponent.setMapAlphaCover(i));
                 spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(55, DEFAULT_HEIGHT));
