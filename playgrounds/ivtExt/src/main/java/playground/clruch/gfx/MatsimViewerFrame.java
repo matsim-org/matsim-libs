@@ -40,7 +40,7 @@ import playground.clruch.utils.gui.SpinnerLabel;
  * adapted from code by Jan Peter Stotz
  */
 public class MatsimViewerFrame implements Runnable {
-    public int STEPSIZE_SECONDS = 10; // TODO this should be derived from storage files
+    public static int STEPSIZE_SECONDS = 10; // TODO this should be derived from storage files
     // ---
     private final MatsimMapComponent matsimMapComponent;
     private boolean isLaunched = true;
@@ -75,15 +75,17 @@ public class MatsimViewerFrame implements Runnable {
         JPanel panelNorth = new JPanel(new BorderLayout());
         JPanel panelControls = new JPanel(createFlowLayout());
         panelNorth.add(panelControls, BorderLayout.NORTH);
-
+        panelNorth.add(jSlider, BorderLayout.SOUTH);
         jFrame.add(panelNorth, BorderLayout.NORTH);
+
+        JScrollPane jScrollPane;
         {
             RowPanel rowPanel = new RowPanel();
             for (ViewerLayer viewerLayer : matsimMapComponent.viewerLayers)
                 rowPanel.add(viewerLayer.createPanel());
             JPanel jPanel = new JPanel(new BorderLayout());
             jPanel.add(rowPanel.jPanel, BorderLayout.NORTH);
-            JScrollPane jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            jScrollPane = new JScrollPane(jPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPane.setPreferredSize(new Dimension(150, 0));
             jFrame.add(jScrollPane, BorderLayout.EAST);
         }
@@ -94,7 +96,6 @@ public class MatsimViewerFrame implements Runnable {
         matsimToggleButton.addActionListener(l -> jSlider.setEnabled(!matsimToggleButton.isSelected()));
         panelControls.add(matsimToggleButton);
 
-        panelNorth.add(jSlider, BorderLayout.SOUTH);
         {
             List<IterationFolder> list = StorageUtils.getAvailableIterations();
             if (list.isEmpty()) {
@@ -143,6 +144,16 @@ public class MatsimViewerFrame implements Runnable {
                     spinnerLabel.addToComponentReduced(panelControls, new Dimension(50, 28), "playback factor");
                 }
             }
+        }
+
+        {
+            JToggleButton jToggleButton = new JToggleButton("config");
+            jToggleButton.setSelected(true);
+            jToggleButton.addActionListener(event -> {
+                jScrollPane.setVisible(jToggleButton.isSelected());
+                jFrame.validate();
+            });
+            panelControls.add(jToggleButton);
         }
 
         getJMapViewer().addMouseListener(new MouseAdapter() {
