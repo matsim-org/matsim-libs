@@ -22,7 +22,7 @@ public class ScenarioViewer {
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
 
-        ReferenceFrame referenceFrame = ReferenceFrame.SIOUXFALLS;
+        ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
 
         // set manually to display virtual network boundary (will be ignored if file doesn't exist)
         // this is optional and should not cause problems if file does not exist.

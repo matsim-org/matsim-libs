@@ -108,9 +108,9 @@ public class MatsimMapComponent extends JMapViewer {
             drawInfoStrings(graphics);
         }
         {
-            graphics.setFont(debugStringFont);
-            graphics.setColor(Color.LIGHT_GRAY);
-            graphics.drawString("" + repaint_count, 0, dimension.height - 40);
+            // graphics.setFont(debugStringFont);
+            // graphics.setColor(Color.LIGHT_GRAY);
+            // graphics.drawString("" + repaint_count, 0, dimension.height - 40);
         }
     }
 

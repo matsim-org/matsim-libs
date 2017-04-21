@@ -110,7 +110,7 @@ public class MatsimStaticDatabase {
 
     void setIteration(Integer iteration) {
         this.iteration = iteration;
-        System.out.println("set iteration=" + iteration);
+        // System.out.println("set iteration=" + iteration);
     }
 
     int getIteration() {
