@@ -89,6 +89,7 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
     protected int zoom;
 
     public int mapAlphaCover = 160;
+    public int mapGrayCover = 255;
 
     protected JSlider zoomSlider;
     protected JButton zoomInButton;
@@ -652,7 +653,8 @@ public class JMapViewer extends JComponent implements TileLoaderListener {
                             tile.paint(g, posx, posy); // , tilesize, tilesize
 
                             {
-                                g.setColor(new Color(255, 255, 255, mapAlphaCover));
+                                int rgb = mapGrayCover;
+                                g.setColor(new Color(rgb, rgb, rgb, mapAlphaCover));
                                 g.fillRect(posx, posy, 256, 256);
                             }
 
