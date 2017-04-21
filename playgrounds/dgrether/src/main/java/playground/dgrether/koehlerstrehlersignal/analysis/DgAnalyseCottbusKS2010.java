@@ -402,11 +402,6 @@ public class DgAnalyseCottbusKS2010 {
 					result.distanceMeter = avgTtSpeed.getDistanceMeter();
 					result.noTrips = avgTtSpeed.getNumberOfTrips();
 					result.noStuckedVeh = avgTtSpeed.getNumberOfStuckedVeh();
-					// TODO for debugging
-					LOG.warn("number of trips: " + avgTtSpeed.getNumberOfTrips());
-					LOG.warn("number of vehicles: " + avgTtSpeed.getNumberOfVehicles());
-					LOG.warn("number of agents: " + avgTtSpeed.getNumberOfPersons());
-					LOG.warn("number of stucked/aborted agents: " + avgTtSpeed.getNumberOfStuckedVeh());
 					result.seenPersonIds = avgTtSpeed.getSeenPersonIds();
 					LOG.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfVehicles());
 				}
@@ -677,57 +672,75 @@ public class DgAnalyseCottbusKS2010 {
 				l.add(ri);
 			}
 		} else { // args is empty
-			int cap = 5;
+			String cap = "10";
 			
 			RunInfo ri = null;
 			ri = new RunInfo();
-			ri.runId = "30"+cap+"1";
+			ri.runId = "3"+cap+"1";
 			ri.iteration = 200;
 			ri.baseCase = true;
 			ri.remark = "all green";
 			l.add(ri);
 			
-			ri = new RunInfo();
-			ri.runId = "30"+cap+"2";
-			ri.iteration = 200;
-			ri.remark = "fixed MS";
-			l.add(ri);
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"2";
+//			ri.iteration = 200;
+//			ri.remark = "fixed MS";
+//			l.add(ri);
+//			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"3";
+//			ri.iteration = 200;
+//			ri.remark = "sylvia MS";
+//			l.add(ri);
 			
 			ri = new RunInfo();
-			ri.runId = "30"+cap+"3";
+			ri.runId = "3"+cap+"3c";
 			ri.iteration = 200;
-			ri.remark = "sylvia MS";
+			ri.remark = "sylvia MS stab";
 			l.add(ri);
 			
-			ri = new RunInfo();
-			ri.runId = "30"+cap+"4";
-			ri.iteration = 200;
-			ri.remark = "bp MS";
-			l.add(ri);
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"4";
+//			ri.iteration = 200;
+//			ri.remark = "bp MS";
+//			l.add(ri);
+//			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"5";
+//			ri.iteration = 200;
+//			ri.remark = "bp MS+green";
+//			l.add(ri);
+//			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"6";
+//			ri.iteration = 200;
+//			ri.remark = "bp green";
+//			l.add(ri);
 			
-			ri = new RunInfo();
-			ri.runId = "30"+cap+"5";
-			ri.iteration = 200;
-			ri.remark = "bp MS+green";
-			l.add(ri);
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"6M";
+//			ri.iteration = 200;
+//			ri.remark = "bp green an MS";
+//			l.add(ri);
 			
-			ri = new RunInfo();
-			ri.runId = "30"+cap+"6";
-			ri.iteration = 200;
-			ri.remark = "bp green";
-			l.add(ri);
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"7";
+//			ri.iteration = 200;
+//			ri.remark = "toll ring";
+//			l.add(ri);
+//			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"8";
+//			ri.iteration = 200;
+//			ri.remark = "toll w/oRing";
+//			l.add(ri);
 			
-			ri = new RunInfo();
-			ri.runId = "30"+cap+"7";
-			ri.iteration = 200;
-			ri.remark = "toll ring";
-			l.add(ri);
-			
-			ri = new RunInfo();
-			ri.runId = "30"+cap+"8";
-			ri.iteration = 200;
-			ri.remark = "toll w/oRing";
-			l.add(ri);
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"9";
+//			ri.iteration = 200;
+//			ri.remark = "cp V9";
+//			l.add(ri);
 		}
 		return l;
 	}
@@ -748,8 +761,8 @@ public class DgAnalyseCottbusKS2010 {
 		String date = cal.get(Calendar.YEAR) + "-" + monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 
 		// TODO choose correct version
-		svnBaseDir = "/net/ils3/thunig/"; // cluster
-//		basePath = "../../../"; // local
+//		svnBaseDir = "/net/ils3/thunig/"; // cluster
+		svnBaseDir = "../../../"; // local
 		
 		List<RunInfo> runIds = createRunsIdList(args);
 		String runIdsString = createRunIdIterationString(runIds);
