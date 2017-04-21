@@ -66,6 +66,8 @@ public class RouteLegsGH {
 
     private static final String GH_DIR = "ghDirectory";
 
+    private static final String USE_CH = "useCH";
+
     public static void main(String args[]) throws FactoryException {
         Config config = ConfigUtils.createConfig();
         ConfigUtils.loadConfig(config, args[0]);
@@ -87,7 +89,7 @@ public class RouteLegsGH {
          */
         logger.info("Prerocess routing...");
 //        int nThreads = Executor.getFreePoolSize();
-        int nThreads = 1;
+        int nThreads = 4;
 
         FlagEncoder encoder = new CarFlagEncoder();
         EncodingManager em = new EncodingManager(encoder);
@@ -96,13 +98,15 @@ public class RouteLegsGH {
         hopper.setDataReaderFile(group.getParams().get(OSM_FILE));
         hopper.setGraphHopperLocation(group.getParams().get(GH_DIR));
         hopper.setEncodingManager(em);
+        boolean useCh = Boolean.parseBoolean(group.getParams().get(USE_CH));
+        hopper.setCHEnabled(useCh);
         hopper.importOrLoad();
         /*
         Run...
          */
         MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(31467), DefaultGeographicCRS.WGS84);
         logger.info("Route legs...");
-        RouteEpisode task = new RouteEpisode(new RouteLegGH(hopper, encoder, facilityData, transform));
+        RouteEpisode task = new RouteEpisode(new RouteLegGH(hopper, encoder, facilityData, transform, useCh));
         TaskRunner.run(task, persons, nThreads, true);
         /*
         Validate...

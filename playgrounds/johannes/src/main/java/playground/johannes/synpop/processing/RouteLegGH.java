@@ -25,12 +25,10 @@ import com.graphhopper.routing.Path;
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.RoutingAlgorithm;
 import com.graphhopper.routing.ch.PrepareContractionHierarchies;
-import com.graphhopper.routing.util.DefaultEdgeFilter;
-import com.graphhopper.routing.util.EdgeFilter;
-import com.graphhopper.routing.util.FlagEncoder;
-import com.graphhopper.routing.util.TraversalMode;
+import com.graphhopper.routing.util.*;
 import com.graphhopper.routing.weighting.FastestWeighting;
 import com.graphhopper.storage.CHGraphImpl;
+import com.graphhopper.storage.Graph;
 import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.storage.index.LocationIndex;
 import com.graphhopper.storage.index.QueryResult;
@@ -67,19 +65,27 @@ public class RouteLegGH implements SegmentTask {
 
     private final EdgeFilter edgeFilter;
 
-    public RouteLegGH(GraphHopper graphHopper, FlagEncoder encoder, FacilityData facilityData, MathTransform transform) {
+    private final GraphHopper graphHopper;
 
+    private final boolean useCh;
+
+    public RouteLegGH(GraphHopper graphHopper, FlagEncoder encoder, FacilityData facilityData, MathTransform transform, boolean useCh) {
+        this.graphHopper = graphHopper;
         this.facilityData = facilityData;
         this.index = graphHopper.getLocationIndex();
         this.transform = transform;
+        this.useCh = useCh;
 
         graph = graphHopper.getGraphHopperStorage();
-        pch = new PrepareContractionHierarchies(graph.getDirectory(),
-                graph,
-                graph.getGraph(CHGraphImpl.class),
-                new FastestWeighting(encoder),
-                TraversalMode.NODE_BASED);
-
+        if(useCh) {
+            pch = new PrepareContractionHierarchies(graph.getDirectory(),
+                    graph,
+                    graph.getGraph(CHGraphImpl.class),
+                    new FastestWeighting(encoder),
+                    TraversalMode.NODE_BASED);
+        } else {
+            pch = null;
+        }
         algoOpts = AlgorithmOptions.start().algorithm(Parameters.Algorithms.ASTAR_BI).
 //        algoOpts = AlgorithmOptions.start().algorithm(Parameters.Algorithms.DIJKSTRA_BI).
                 traversalMode(TraversalMode.NODE_BASED).
@@ -87,6 +93,7 @@ public class RouteLegGH implements SegmentTask {
                 build();
 
         edgeFilter = new DefaultEdgeFilter(encoder);
+
     }
 
     @Override
@@ -112,10 +119,23 @@ public class RouteLegGH implements SegmentTask {
                     return;
                 }
 
-                QueryGraph queryGraph = new QueryGraph(graph.getGraph(CHGraphImpl.class));
+                QueryGraph queryGraph;
+                if(useCh) {
+                    queryGraph = new QueryGraph(graph.getGraph(CHGraphImpl.class));
+                } else  {
+                    queryGraph = new QueryGraph(graph.getGraph(Graph.class));
+                }
                 queryGraph.lookup(fromQuery, toQuery);
 
-                RoutingAlgorithm algorithm = pch.createAlgo(queryGraph, algoOpts);
+                RoutingAlgorithm algorithm;
+                if(useCh) {
+                    algorithm = pch.createAlgo(queryGraph, algoOpts);
+                } else {
+                    HintsMap hintsMap = new HintsMap();
+                    hintsMap.setVehicle("car");
+                    hintsMap.setWeighting("fastest");
+                    algorithm = graphHopper.getAlgorithmFactory(hintsMap).createAlgo(queryGraph, algoOpts);
+                }
                 Path path = algorithm.calcPath(fromQuery.getClosestNode(), toQuery.getClosestNode());
                 TIntList nodes = path.calcNodes();
 
@@ -128,7 +148,7 @@ public class RouteLegGH implements SegmentTask {
                     }
                     segment.setAttribute(CommonKeys.LEG_ROUTE, builder.toString());
                 } else {
-                    System.err.println("Ooops");
+//                    System.err.println("Ooops");
                 }
             }
         }
