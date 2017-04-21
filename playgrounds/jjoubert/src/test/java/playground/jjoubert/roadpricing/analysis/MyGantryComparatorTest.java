@@ -22,10 +22,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
-public class MyGantryComparatorIT {
+public class MyGantryComparatorTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private final static Logger log = Logger.getLogger(MyGantryComparatorIT.class);
+	private final static Logger log = Logger.getLogger(MyGantryComparatorTest.class);
 	
 	@SuppressWarnings("unused")
 	@Test
