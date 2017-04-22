@@ -16,29 +16,44 @@
 
 <!-- ============================================================ -->
 
-<!ELEMENT instance					(logic,physical,associations,sets*)>
+<!ELEMENT instance					(physicalNetwork,logicalNetwork,associations,sets*)>
 <!ATTLIST instance
 		  archetype		CDATA		#REQUIRED
 		  number		CDATA		#REQUIRED>
 		  
-<!ELEMENT logic						(nodes, edges)>
+<!ELEMENT physicalNetwork			(physicalNodes, physicalEdges)>
 
-<!ELEMENT physical					(nodes, edges)>
+<!ELEMENT physicalNodes				(node)*>
 
-<!ELEMENT nodes						(node)*>
-
-<!ELEMENT node						EMPTY>
-<!ATTLIST node
+<!ELEMENT physicalNode				EMPTY>
+<!ATTLIST physicalNode
 		  id			CDATA		#REQUIRED
-		  x				CDATA		#IMPLIED
-		  y				CDATA		#IMPLIED>
+		  x				CDATA		#REQUIRED
+		  y				CDATA		#REQUIRED>
 
-<!ELEMENT edges						(edge)*>
+<!ELEMENT physicalEdges				(physicalEdge)*>
 
-<!ELEMENT edge						EMPTY>
-<!ATTLIST edge
-		  originId		CDATA		#REQUIRED
-		  destId		CDATA		#REQUIRED>
+<!ELEMENT physicalEdge				EMPTY>
+<!ATTLIST physicalEdge
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED>
+
+<!ELEMENT logicalNetwork			(logicalNodes, logicalEdges)>
+
+<!ELEMENT logicalNodes				(logicalNode)*>
+
+<!ELEMENT logicalNode				EMPTY>
+<!ATTLIST logicalNode
+		  id			CDATA		#REQUIRED
+		  name			CDATA		#IMPLIED
+		  capacity		CDATA		#IMPLIED>
+
+<!ELEMENT logicalEdges				(logicalEdge)*>
+
+<!ELEMENT logicalEdge				EMPTY>
+<!ATTLIST logicalEdge
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED>
 
 <!ELEMENT associations				(association)>
 
@@ -54,8 +69,8 @@
 
 <!ELEMENT set						(path)+>
 <!ATTLIST set
-		  originId		CDATA		#REQUIRED
-		  destId		CDATA		#REQUIRED>
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED>
 
 <!ELEMENT path						(node)*>
 
