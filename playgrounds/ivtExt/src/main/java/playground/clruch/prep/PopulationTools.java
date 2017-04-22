@@ -120,6 +120,34 @@ class PopulationTools {
         }
     }
 
+    /** removes all persons with activity Type "freight" from population
+     * @param population
+     */
+    public static void eliminateFreight(Population population) {
+        log.info("All population elements with activity freight are removed.");
+
+        Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
+
+        while (itPerson.hasNext()) {
+            Person person = itPerson.next();
+            boolean removePerson = false;
+            for (Plan plan : person.getPlans()) {
+                for (PlanElement planElement : plan.getPlanElements()) {
+                    if (planElement instanceof Activity) {
+                        Activity act = (Activity) planElement;
+                        if (act.getType() == "freight") {
+                            removePerson = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (removePerson)
+                itPerson.remove();
+        }
+
+    }
+
     // TODO: is there MATSim internal function?
     private static double coordDistance(Coord c1, Coord c2) {
         double dX = c1.getX() - c2.getX();
