@@ -13,7 +13,7 @@ import ch.ethz.idsc.tensor.alg.Array;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNetworkLoader;
+import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.vLinkDataReader;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
@@ -43,7 +43,7 @@ public class VirtualNetworkTest {
         }
 
         System.out.println("" + virtualnetworkXML.getAbsoluteFile());
-        VirtualNetwork virtualNetwork = VirtualNetworkLoader.fromXML(scenario.getNetwork(), virtualnetworkXML);
+        VirtualNetwork virtualNetwork = VirtualNetworkIO.fromXML(scenario.getNetwork(), virtualnetworkXML);
         Map<VirtualLink, Double> travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkXML, virtualNetwork, "Ttime");
 
         int iter = 10;
