@@ -20,48 +20,121 @@
 
 package playground.nmviljoen.io;
 
+
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.southafrica.freight.digicore.containers.DigicoreActivity;
-import playground.southafrica.freight.digicore.containers.DigicoreChain;
-import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
-import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
+import edu.uci.ics.jung.graph.DirectedGraph;
+import playground.nmviljoen.gridExperiments.GridExperiment;
+import playground.nmviljoen.gridExperiments.NmvLink;
+import playground.nmviljoen.gridExperiments.NmvNode;
 
 public class MultilayerInstanceWriter extends MatsimXmlWriter implements MatsimWriter{
 	private final Logger log = Logger.getLogger(MultilayerInstanceWriter.class);
 	private Counter counter = new Counter("  vehicle # ");
-	private DigicoreVehicles vehicles;
+	private GridExperiment experiment;
 
 		
-	public MultilayerInstanceWriter(DigicoreVehicles vehicles){
+	public MultilayerInstanceWriter(GridExperiment experiment){
 		super();
-		this.vehicles = vehicles;
+		this.experiment = experiment;
 	}
 
 	
 	@Override
 	public void write(final String filename){
-		log.info("Writing Digicore vehicles to file: " + filename);
+		log.info("Writing grid experiment to file: " + filename);
 		writeV1(filename);
 	}
 	
 	
 	public void writeV1(final String filename){
 		String dtd = "http://matsim.org/files/dtd/multilayerNetwork_v1.dtd";
-//		MultilayerInstanceWriterHandler handler = new MultilayerInstanceWriterHandlerImpl_v1();
+		MultilayerInstanceWriterHandler handler = new MultilayerInstanceWriterHandlerImpl_v1(experiment);
 		
-//		try {
-//			openFile(filename);
-//			writeXmlHead();
-//			writeDoctype("multilayerNetwork", dtd);
-//			
+		openFile(filename);
+		writeXmlHead();
+		writeDoctype("multilayerNetwork", dtd);
+			
+		try {
+			handler.startInstance(writer);
+			
+			/* Physical network */
+			DirectedGraph<NmvNode, NmvLink> physicalNetwork = experiment.getPhysicalNetwork();
+			handler.startPhysicalNetwork(writer);
+			handler.startPhysicalNodes(writer);
+			/*TODO Write all physical nodes. */
+				Map<Integer, NmvNode> sortedPhysicalNodes = sortNodes(physicalNetwork.getVertices());
+				for(Integer i : sortedPhysicalNodes.keySet()){
+					handler.startPhysicalNode(writer, sortedPhysicalNodes.get(i));
+					handler.endPhysicalNode(writer);
+				}
+			handler.endPhysicalNodes(writer);
+			handler.startPhysicalEdges(writer);
+			/*TODO Write all physical edges. */
+				Map<Integer, Map<Integer, NmvLink>> sortedPhysicalLinks = sortLinks(physicalNetwork.getEdges());
+				for(Integer i : sortedPhysicalLinks.keySet()){
+					Map<Integer, NmvLink> thisMap = sortedPhysicalLinks.get(i);
+					for(Integer j : thisMap.keySet()){
+						NmvLink link = sortedPhysicalLinks.get(i).get(j);
+						handler.startPhysicalEdge(writer, link);
+						handler.endPhysicalEdge(writer);
+					}
+				}
+			handler.endPhysicalEdges(writer);
+			handler.endPhysicalNetwork(writer);
+			
+			/* Logical network */
+			handler.startLogicalNetwork(writer);
+			handler.startLogicalNodes(writer);
+			/* TODO Write all logical nodes. */
+				handler.startLogicalNode(writer);
+				handler.endLogicalNode(writer);
+			handler.endLogicalNodes(writer);
+			handler.startLogicalEdges(writer);
+			/* TODO Write all logical egdes. */
+				handler.startLogicalEdge(writer);
+				handler.endLogicalEdge(writer);
+			handler.endLogicalEdges(writer);
+			handler.endLogicalNetwork(writer);
+			
+			/* Association lists */
+			handler.startAssociations(writer);
+			/* TODO Write all associations. */
+				handler.startAssociation(writer);
+				handler.endAssociation(writer);
+			handler.endAssociations(writer);
+			
+			/* Shortest path sets. */
+			handler.startSets(writer);
+			/* TODO Write all sets */
+				handler.startSet(writer);
+				/* TODO Write all paths */
+				handler.startPath(writer);
+				handler.endPath(writer);
+				handler.endSet(writer);
+			handler.endSets(writer);
+			
+			handler.endInstance(writer);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write XML for multilayered network.");
+		}finally{
+			try {
+				this.writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close XML writer.");
+			}
+		}
 //			handler.startVehicles(this.vehicles, this.writer);
 //			for(DigicoreVehicle vehicle : this.vehicles.getVehicles().values()){
 //				handler.startVehicle(vehicle, this.writer);
@@ -79,10 +152,37 @@ public class MultilayerInstanceWriter extends MatsimXmlWriter implements MatsimW
 //			}
 //			counter.printCounter();
 //			handler.endVehicles(this.writer);
-//			this.writer.close();
-//		} catch (IOException e) {
-//			throw new UncheckedIOException(e);
-//		}
 	}
+	
+	private Map<Integer, NmvNode> sortNodes(Collection<NmvNode> nodes){
+		Map<Integer, NmvNode> sortedMap = new TreeMap<Integer, NmvNode>();
+		Iterator<NmvNode> iterator = nodes.iterator();
+		while(iterator.hasNext()){
+			NmvNode node = iterator.next();
+			int id = Integer.parseInt(node.getId());
+			sortedMap.put(id, node);
+		}
+		return sortedMap;
+	}
+	
+	
+	private Map<Integer, Map<Integer, NmvLink>> sortLinks(Collection<NmvLink> links){
+		Map<Integer, Map<Integer, NmvLink>> sortedLinks = new TreeMap<>();
+		Iterator<NmvLink> iterator = links.iterator();
+		while(iterator.hasNext()){
+			NmvLink link = iterator.next();
+			String[] sa = link.getId().split("_");
+			Integer from = Integer.parseInt(sa[0]);
+			Integer to = Integer.parseInt(sa[1]);
+			if(!sortedLinks.containsKey(from)){
+				Map<Integer, NmvLink> newMap = new TreeMap<>();
+				sortedLinks.put(from, newMap);
+			}
+			sortedLinks.get(from).put(to, link);
+		}
+		return sortedLinks;
+	}
+	
+	
 }
 

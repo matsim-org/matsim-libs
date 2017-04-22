@@ -12,14 +12,18 @@ import edu.uci.ics.jung.graph.Graph;
 public class NmvNode implements Comparable<NmvNode>{
 	public String intID;
 	public String id;
-	public double X;
-	public double Y;
+	public Double X = null;
+	public Double Y = null;
 
 	public NmvNode(String intID, String id, double X, double Y) {
 		this.intID = intID;
 		this.id = id;
 		this.X = X;
 		this.Y = Y;
+	}
+	
+	public NmvNode(String id) {
+		this.id = id;
 	}
 	
 	public String toString() {
