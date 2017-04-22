@@ -157,11 +157,26 @@ public class GridExperiment {
 			this.shortName = shortName;
 			this.description = longName;
 			this.acronym = acronym;
+=======
+	
+	public enum Archetype{
+		MALIK("Malik", "Some longer description for Malik network"),
+		NAVABI("Navabi", "Some longer description for Navabi network"),
+		RESSLER("Ressler", "Some longer description for Ressler network");
+		
+		private String shortName;
+		private String longName;
+		
+		private Archetype(String shortName, String longName) {
+			this.shortName = shortName;
+			this.longName = longName;
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 		}
 		
 		public String getShortName(){
 			return this.shortName;
 		}
+<<<<<<< HEAD
 		
 		public String getDescription(){
 			return this.description;

@@ -33,7 +33,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.jgrapht.alg.DirectedNeighborIndex;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -57,6 +59,9 @@ import playground.southafrica.utilities.Header;
 public class ExperimentConverter {
 	final private static Logger LOG = Logger.getLogger(ExperimentConverter.class);
 	private static DirectedGraph<NmvNode, NmvLink> physicalNetwork;
+	private static DirectedGraph<NmvNode, NmvLink> shNetwork;
+	private static DirectedGraph<NmvNode, NmvLink> dhNetwork;
+	private static DirectedGraph<NmvNode, NmvLink> fcNetwork;
 	private static Map<String, Coord> nodeMap;
 
 	/**
@@ -75,8 +80,18 @@ public class ExperimentConverter {
 		new File(xmlFolder).mkdirs();
 		
 		/* Build the physical network only once. */
+
 		buildNodeMap(physicalNetworkNodes);
 		addPhysicalEdges(physicalNetworkLinks);
+		
+		GridExperiment experiment = new GridExperiment();
+		experiment.setArchetype(Archetype.MALIK);
+		experiment.setInstanceNumber(123);
+		experiment.setPhysicalNetwork(physicalNetwork);
+		
+		
+		new MultilayerInstanceWriter(experiment).write(xmlFile);
+		
 		
 		List<File> folders = FileUtils.sampleFiles(new File(pathToInstances), Integer.MAX_VALUE, null);
 		Counter counter = new Counter("  instance # ");
@@ -246,6 +261,8 @@ public class ExperimentConverter {
 				throw new RuntimeException(filename);
 			}
 		}
+		
+		
 		
 		return network;
 	}
