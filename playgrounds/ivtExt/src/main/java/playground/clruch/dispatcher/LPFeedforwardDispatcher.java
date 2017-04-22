@@ -44,7 +44,7 @@ import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNetworkLoader;
+import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.netdata.vLinkDataReader;
 import playground.clruch.utils.GlobalAssert;
@@ -268,7 +268,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             {
                 final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
                 GlobalAssert.that(virtualnetworkFile.isFile());
-                virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkFile);
+                virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
                 travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkFile, virtualNetwork, "Ttime");
             }
 

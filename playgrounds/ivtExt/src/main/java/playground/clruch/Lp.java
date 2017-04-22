@@ -14,7 +14,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNetworkLoader;
+import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.vLinkDataReader;
 import playground.sebhoerl.avtaxi.config.*;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
