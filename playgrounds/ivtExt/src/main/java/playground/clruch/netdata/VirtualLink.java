@@ -13,12 +13,14 @@ public class VirtualLink {
     private final String id;
     private final VirtualNode from;
     private final VirtualNode to;
+    private final double travelTime;
 
-    VirtualLink(int index, String idIn, VirtualNode fromIn, VirtualNode toIn) {
+    VirtualLink(int index, String idIn, VirtualNode fromIn, VirtualNode toIn, double travelTimeIn) {
         this.index = index;
         id = idIn;
         from = fromIn;
         to = toIn;
+        travelTime = travelTimeIn;
     }
 
     public String getId() {
@@ -31,6 +33,10 @@ public class VirtualLink {
 
     public VirtualNode getTo() {
         return to;
+    }
+    
+    public double getTtime(){
+        return travelTime;
     }
 
     public int getIndex() {return  index; }

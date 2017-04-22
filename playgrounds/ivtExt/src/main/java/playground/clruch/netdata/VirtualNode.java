@@ -3,6 +3,7 @@ package playground.clruch.netdata;
 import java.util.Collections;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
 /**
@@ -18,12 +19,14 @@ public class VirtualNode {
     private final String id;
     private final Set<Link> links;
     private final int neighCount;
+    private final Coord coord;
 
-    VirtualNode(int index, String idIn, Set<Link> linksIn, int neighCount) {
+    VirtualNode(int index, String idIn, Set<Link> linksIn, int neighCount, Coord coordIn) {
         this.index = index;
         this.id = idIn;
         this.links = linksIn;
         this.neighCount = neighCount;
+        this.coord = coordIn;
 
         //EVTL GET RID OF THIS -> LEFTOVER NODE or deal differently with it or test if last idx is not leftOver-> problem & fill last one in!!sth like this... TODO
         if (!idIn.contains("" + (index + 1)))
@@ -36,6 +39,10 @@ public class VirtualNode {
 
     public String getId() {
         return id;
+    }
+    
+    public Coord getCoord(){
+        return coord;
     }
 
     public int getIndex() {return  index; }

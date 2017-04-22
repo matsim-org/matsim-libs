@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
@@ -79,18 +80,18 @@ public class VirtualNetwork {
         return virtualNodes.get(index);
     }
 
-    /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn, int neighCount) {
-        VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount);
+    /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn, int neighCount, Coord coord) {
+        VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount, coord);
         virtualNodes.add(virtualNode);
         for (Link link : virtualNode.getLinks())
             linkVNodeMap.put(link, virtualNode);
         return virtualNode;
     }
 
-    /* package */ void addVirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn) {
+    /* package */ void addVirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn, double travelTime) {
         GlobalAssert.that(Objects.nonNull(fromIn));
         GlobalAssert.that(Objects.nonNull(toIn));
-        VirtualLink virtualLink = new VirtualLink(virtualLinks.size(), idIn, fromIn, toIn);
+        VirtualLink virtualLink = new VirtualLink(virtualLinks.size(), idIn, fromIn, toIn,travelTime);
         virtualLinks.add(virtualLink);
         virtualLinkPairs.put(nodePair_key(fromIn, toIn), virtualLink);
     }
