@@ -1,4 +1,4 @@
-package playground.gthunig.DistanceBins;
+package playground.dziemke.analysis.modalShare;
 
 import java.util.ArrayList;
 import java.util.List;
