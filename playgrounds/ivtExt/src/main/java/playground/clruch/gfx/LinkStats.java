@@ -1,10 +1,9 @@
 package playground.clruch.gfx;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import ch.ethz.idsc.tensor.RealScalar;
@@ -15,19 +14,21 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.VehicleContainer;
 
+// sioux falls has ~3k roads
+// zurich scenario has ~200k roads
 class LinkStats {
 
     static AVStatus[] INTERP = new AVStatus[] { //
             AVStatus.DRIVEWITHCUSTOMER, AVStatus.DRIVETOCUSTMER, AVStatus.REBALANCEDRIVE };
 
     final MatsimStaticDatabase db;
-    final Tensor count;
+    final int width;
 
-    final Set<Integer> linkIndex = new HashSet<>();
+    final Map<Integer, Tensor> linkTensor = new HashMap<>();
 
     public LinkStats(int width) {
         db = MatsimStaticDatabase.INSTANCE;
-        count = Array.zeros(db.getOsmLinksSize(), width, 2);
+        this.width = width;
     }
 
     public void feed(SimulationObject ref, int ofs) {
@@ -39,7 +40,13 @@ class LinkStats {
             List<VehicleContainer> list = entry.getValue();
             final long total = list.stream().filter(vc -> !vc.avStatus.equals(AVStatus.STAY)).count();
             if (0 < total) {
-                linkIndex.add(index);
+                final Tensor array;
+                if (linkTensor.containsKey(index))
+                    array = linkTensor.get(index);
+                else {
+                    array = Array.zeros(width, 2);
+                    linkTensor.put(index, array);
+                }
                 Map<AVStatus, List<VehicleContainer>> classify = //
                         list.stream().collect(Collectors.groupingBy(vc -> vc.avStatus));
                 int[] counts = new int[3];
@@ -47,8 +54,8 @@ class LinkStats {
                     counts[avStatus.ordinal()] = classify.containsKey(avStatus) ? classify.get(avStatus).size() : 0;
                 final int customers = counts[0];
                 final int carsEmpty = counts[1] + counts[2];
-                count.set(RealScalar.of(customers), index, ofs, 0);
-                count.set(RealScalar.of(carsEmpty), index, ofs, 1);
+                array.set(RealScalar.of(customers), ofs, 0);
+                array.set(RealScalar.of(carsEmpty), ofs, 1);
             }
         }
     }

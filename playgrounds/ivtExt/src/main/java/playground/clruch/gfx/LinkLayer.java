@@ -2,6 +2,8 @@ package playground.clruch.gfx;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
@@ -10,12 +12,15 @@ import java.awt.geom.Line2D;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Subdivide;
@@ -27,6 +32,7 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.LruCache;
 import playground.clruch.utils.gui.GraphicsUtil;
 import playground.clruch.utils.gui.RowPanel;
+import playground.clruch.utils.gui.SpinnerLabel;
 
 public class LinkLayer extends ViewerLayer {
 
@@ -34,9 +40,12 @@ public class LinkLayer extends ViewerLayer {
     private volatile boolean drawLinks = false;
     private volatile boolean drawMaxCars = false;
     private static final Color LINKCOLOR = new Color(153, 153, 102, 64);
+    private static final int MAXHISTORY = 10;
 
-    Map<Long, SimulationObject> lruCache = LruCache.create(10);
+    Map<Long, SimulationObject> lruCache = LruCache.create(MAXHISTORY);
 
+    int historyLength = 4;
+    int loadScale = 3;
     Tensor matrix = null; //
 
     public LinkLayer(MatsimMapComponent matsimMapComponent) {
@@ -70,32 +79,39 @@ public class LinkLayer extends ViewerLayer {
         }
 
         if (drawLoad) {
-            final int width = 4;
+            final int width = historyLength;
             LinkStats linkStats = new LinkStats(width);
             linkStats.feed(ref, 0);
+            int DT = MatsimViewerFrame.STEPSIZE_SECONDS;
             for (int ofs = 1; ofs < width; ++ofs)
-                if (lruCache.containsKey(ref.now - 10 * ofs))
-                    linkStats.feed(lruCache.get(ref.now - 10 * ofs), ofs);
+                if (lruCache.containsKey(ref.now - DT * ofs))
+                    linkStats.feed(lruCache.get(ref.now - DT * ofs), ofs);
 
-            final Tensor table = linkStats.count;
-            Tensor weight = Subdivide.of(RealScalar.of(1), RealScalar.of(.1), width - 1);
-            weight = weight.multiply(Total.of(weight).Get().invert());
+            Tensor weight;
+            if (1 < width) {
+                weight = Subdivide.of(RealScalar.of(1), RealScalar.of(.1), width - 1);
+                weight = weight.multiply(Total.of(weight).Get().invert());
+            } else {
+                weight = Tensors.of(RealScalar.ONE);
+            }
 
             GraphicsUtil.setQualityHigh(graphics);
             // System.out.println(linkStats.linkIndex.size());
-            for (int index : linkStats.linkIndex) {
-                OsmLink osmLink = matsimMapComponent.db.getOsmLink(index);
+            double scaling = loadScale * 1000;
+            for (Entry<Integer,Tensor> entry : linkStats.linkTensor.entrySet()) {
+                final int index = entry.getKey();
+                final OsmLink osmLink = matsimMapComponent.db.getOsmLink(index);
                 final double factor = osmLink.getLength() * matsimMapComponent.getMeterPerPixel();
                 Point p1 = matsimMapComponent.getMapPosition(osmLink.getCoordFrom());
                 if (p1 != null) {
                     Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getCoordTo());
-                    Tensor linkTable = weight.dot(table.get(index));
+                    Tensor linkTable = weight.dot(entry.getValue());
                     final double total = Total.of(linkTable).Get().number().doubleValue();
                     final double carsEmpty = linkTable.Get(1).number().doubleValue();
                     // System.out.println(total + " " + carsEmpty);
                     double h = (carsEmpty / (double) total + 0.8) / 3;
                     graphics.setColor(new Hue(h, 1, .85, .75).rgba);
-                    Stroke stroke = new BasicStroke((float) Math.sqrt(3000 * total / factor));
+                    Stroke stroke = new BasicStroke((float) Math.sqrt(scaling * total / factor));
                     graphics.setStroke(stroke);
                     Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
                     graphics.draw(shape);
@@ -150,6 +166,36 @@ public class LinkLayer extends ViewerLayer {
                 matsimMapComponent.repaint();
             });
             rowPanel.add(jCheckBox);
+        }
+        {
+            JPanel jPanel = new JPanel(new FlowLayout(1, 2, 2));
+            {
+                SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
+                spinnerLabel.setArray(1, 2, 3, 4, 5);
+                spinnerLabel.setValueSafe(historyLength);
+                spinnerLabel.addSpinnerListener(i -> {
+                    historyLength = i;
+                    matsimMapComponent.repaint();
+                });
+                spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(55, DEFAULT_HEIGHT));
+                spinnerLabel.getLabelComponent().setToolTipText("load history length");
+                jPanel.add(spinnerLabel.getLabelComponent());
+
+            }
+            {
+                SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
+                spinnerLabel.setArray(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+                spinnerLabel.setValueSafe(loadScale);
+                spinnerLabel.addSpinnerListener(i -> {
+                    loadScale = i;
+                    matsimMapComponent.repaint();
+                });
+                spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(55, DEFAULT_HEIGHT));
+                spinnerLabel.getLabelComponent().setToolTipText("load scaling");
+                jPanel.add(spinnerLabel.getLabelComponent());
+
+            }
+            rowPanel.add(jPanel);
         }
         {
             final JCheckBox jCheckBox = new JCheckBox("streets");

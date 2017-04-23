@@ -1,6 +1,7 @@
 package playground.clruch.gfx;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.util.BitSet;
@@ -119,6 +120,7 @@ public class VehiclesLayer extends ViewerLayer {
                 avStatusColors = cs;
                 matsimMapComponent.repaint();
             });
+            spinner.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));
             rowPanel.add(spinner.getLabelComponent());
         }
 
