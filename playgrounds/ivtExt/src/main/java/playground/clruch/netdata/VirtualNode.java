@@ -1,10 +1,13 @@
 package playground.clruch.netdata;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+
+import playground.clruch.utils.GlobalAssert;
 
 /**
  * Created by Claudio on 2/8/2017.
@@ -32,6 +35,26 @@ public class VirtualNode {
         if (!idIn.contains("" + (index + 1)))
             throw new RuntimeException("node index mismatch:" + idIn + " != " + (index + 1));
     }
+    
+    VirtualNode(int index, String idIn, int neighCount, Coord coordIn) {
+        this.index = index;
+        this.id = idIn;
+        this.links = new LinkedHashSet();
+        this.neighCount = neighCount;
+        this.coord = coordIn;
+
+        //EVTL GET RID OF THIS -> LEFTOVER NODE or deal differently with it or test if last idx is not leftOver-> problem & fill last one in!!sth like this... TODO
+        if (!idIn.contains("" + (index + 1)))
+            throw new RuntimeException("node index mismatch:" + idIn + " != " + (index + 1));
+    }
+    
+    public void setLinks(Set<Link> linksIn){
+        GlobalAssert.that(this.links.size()==0);
+        for(Link link : linksIn){
+            this.links.add(link);
+        }
+    }
+    
 
     public Set<Link> getLinks() {
         return Collections.unmodifiableSet(links);

@@ -87,6 +87,15 @@ public class VirtualNetwork {
             linkVNodeMap.put(link, virtualNode);
         return virtualNode;
     }
+    
+    /* package */ VirtualNode addVirtualNode(VirtualNode virtualNodeIn) {
+        virtualNodes.add(virtualNodeIn);
+        for (Link link : virtualNodeIn.getLinks())
+            linkVNodeMap.put(link, virtualNodeIn);
+        return virtualNodeIn;
+    }
+    
+    
 
     /* package */ void addVirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn, double travelTime) {
         GlobalAssert.that(Objects.nonNull(fromIn));

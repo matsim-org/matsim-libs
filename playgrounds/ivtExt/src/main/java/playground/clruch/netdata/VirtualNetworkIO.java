@@ -3,12 +3,14 @@ package playground.clruch.netdata;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -131,9 +133,13 @@ public class VirtualNetworkIO {
         rootElement.setAttribute(new Attribute("name", "VNName"));
 
 
-        // add virtualNodes to network
+        // add virtualNodes to network (sort according to name)
+        Comparator<VirtualNode> byString = (e1, e2) -> e1.getId().compareTo(e2.getId());
+        Comparator<VirtualNode> byIntID = (e1, e2) -> Integer.compare(e1.getIndex(), e2.getIndex());
+        List<VirtualNode> virtualNodesSorted = virtualNetwork.getVirtualNodes().stream().sorted(byIntID).collect(Collectors.toList());
+        
         Element virtualNodeselem = new Element(VIRTUALNODENAME+"s");
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+        for (VirtualNode virtualNode : virtualNodesSorted) {
             Element virtualNodeelem = new Element(VIRTUALNODENAME);
             // set attributes
             virtualNodeelem.setAttribute(new Attribute(IDNAME, virtualNode.getId()));
