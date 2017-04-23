@@ -61,9 +61,9 @@ public class FixedTimeLaemmer {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-//        for (int i = 0; i <= 1200; i += 60) {
-            run(180, 600, true, false, true);
-//        }
+        for (int i = 0; i <= 1200; i += 60) {
+            run(180, i, false, true, true);
+        }
     }
 
     private static void run(double flowNS, double flowWE, boolean vis, boolean stochastic, boolean lanes) {

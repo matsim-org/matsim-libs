@@ -61,9 +61,9 @@ public class LaemmerBasicExample {
         log.info("Running Laemmer main method...");
 
         for (int i = 0; i <= 1200; i += 60) {
-            run(180, i, LaemmerConfig.Regime.COMBINED, false, false, false, false);
-            run(180, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, false);
-            run(180, i, LaemmerConfig.Regime.STABILIZING, false, false, false, false);
+            run(180, i, LaemmerConfig.Regime.COMBINED, false, false, true, true);
+//            run(180, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, true);
+//            run(180, i, LaemmerConfig.Regime.STABILIZING, false, false, false, true);
         }
     }
 
@@ -131,7 +131,7 @@ public class LaemmerBasicExample {
         config.travelTimeCalculator().setMaxTime(60 * 120);
         config.qsim().setStartTime(0);
         config.qsim().setEndTime(60 * 120);
-        config.qsim().setUsingFastCapacityUpdate(true);
+//        config.qsim().setUsingFastCapacityUpdate(true);
 
         if(lanes) {
             config.qsim().setUseLanes(true);
@@ -339,7 +339,7 @@ public class LaemmerBasicExample {
             int totalN = 0;
             String fromLinkId = od.split("-")[0];
             String toLinkId = od.split("-")[1];
-            Map<Double, Integer> insertNAtSecond = new HashMap<>();
+            Map<Double, Integer> insertNAtSecond = new TreeMap<>();
             if (stochastic) {
                 for (double i = 0; i < 5400; i++) {
 
