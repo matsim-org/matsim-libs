@@ -24,6 +24,7 @@ public class MatsimMapComponent extends JMapViewer {
 
     final MatsimStaticDatabase db;
     private int repaint_count = 0;
+    public boolean displayHud = true;
 
     SimulationObject simulationObject = null;
 
@@ -45,8 +46,8 @@ public class MatsimMapComponent extends JMapViewer {
         addLayer(new RequestsLayer(this));
         addLayer(new LinkLayer(this));
         addLayer(virtualNetworkLayer);
-        addLayer(new ClockLayer(this));
-    
+        addLayer(new HudLayer(this));
+
     }
 
     public void addLayer(ViewerLayer viewerLayer) {
@@ -105,7 +106,8 @@ public class MatsimMapComponent extends JMapViewer {
 
             jLabel.setText(ref.infoLine);
 
-            drawInfoStrings(graphics);
+            if (displayHud)
+                drawInfoStrings(graphics);
         }
         {
             // graphics.setFont(debugStringFont);
@@ -154,6 +156,11 @@ public class MatsimMapComponent extends JMapViewer {
 
     public void setMapAlphaCover(int alpha) {
         mapAlphaCover = alpha;
+        repaint();
+    }
+
+    public void setHudShow(boolean selected) {
+        displayHud = selected;
         repaint();
     }
 

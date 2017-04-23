@@ -15,7 +15,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.red.Mean;
+import ch.ethz.idsc.tensor.alg.TensorMap;
+import ch.ethz.idsc.tensor.alg.Transpose;
+import ch.ethz.idsc.tensor.red.Median;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -90,10 +92,12 @@ public class MatsimStaticDatabase {
     }
 
     public Coord getCenter() {
-        return CoordUtil.toCoord( //
-                Mean.of(Tensor.of(getOsmLinks().stream() //
-                        .map(osmLink -> osmLink.getAt(.5)) //
-                        .map(CoordUtil::toTensor))));
+        Tensor points = Tensor.of(getOsmLinks().stream() //
+                .map(osmLink -> osmLink.getAt(.5)) //
+                .map(CoordUtil::toTensor));
+        // Tensor mean = Mean.of(points); // <- mean is fast but doesn't produce as good estimate as median
+        Tensor median = TensorMap.of(Median::of, Transpose.of(points), 1);
+        return CoordUtil.toCoord(median);
     }
 
     public int getOsmLinksSize() {

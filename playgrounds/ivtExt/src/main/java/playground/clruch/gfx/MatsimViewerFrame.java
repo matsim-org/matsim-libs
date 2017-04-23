@@ -143,7 +143,9 @@ public class MatsimViewerFrame implements Runnable {
             JToggleButton jToggleButton = new JToggleButton("config");
             jToggleButton.setSelected(true);
             jToggleButton.addActionListener(event -> {
-                jScrollPane.setVisible(jToggleButton.isSelected());
+                boolean show = jToggleButton.isSelected();
+                jScrollPane.setVisible(show);
+                matsimMapComponent.jLabel.setVisible(show);
                 jFrame.validate();
             });
             panelControls.add(jToggleButton);
