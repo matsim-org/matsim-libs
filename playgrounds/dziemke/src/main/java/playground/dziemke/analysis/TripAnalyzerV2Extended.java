@@ -281,10 +281,10 @@ public class TripAnalyzerV2Extended {
 					continue;
 				}
 			}
-			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
+			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) > maxDistance_km) {
 				continue;
 			}
-//			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) <= minDistance_km) {
+//			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) < minDistance_km) {
 //    			continue;
 //    		}
 			if (onlyAnalyzeTripsWithActivityTypeBeforeTrip && onlyAnalyzeTripsWithActivityTypeAfterTrip) {
