@@ -45,7 +45,7 @@ public class LinkLayer extends ViewerLayer {
     Map<Long, SimulationObject> lruCache = LruCache.create(MAXHISTORY);
 
     int historyLength = 4;
-    int loadScale = 3;
+    int loadScale = 5;
     Tensor matrix = null; //
 
     public LinkLayer(MatsimMapComponent matsimMapComponent) {
@@ -108,9 +108,10 @@ public class LinkLayer extends ViewerLayer {
                     Tensor linkTable = weight.dot(entry.getValue());
                     final double total = Total.of(linkTable).Get().number().doubleValue();
                     final double carsEmpty = linkTable.Get(1).number().doubleValue();
-                    // System.out.println(total + " " + carsEmpty);
-                    double h = (carsEmpty / (double) total + 0.8) / 3;
-                    graphics.setColor(new Hue(h, 1, .85, .75).rgba);
+                    double ratio = carsEmpty / (double) total;
+                    double h = (ratio + 0.8) / 3; // r=0->Green, r=1->Blue
+                    double v = 0.84 + ratio * .15; // r=0->, r=1->Brighter
+                    graphics.setColor(new Hue(h, 1, v, .75).rgba);
                     Stroke stroke = new BasicStroke((float) Math.sqrt(scaling * total / factor));
                     graphics.setStroke(stroke);
                     Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);

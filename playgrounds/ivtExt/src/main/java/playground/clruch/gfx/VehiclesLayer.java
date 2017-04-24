@@ -25,7 +25,7 @@ public class VehiclesLayer extends ViewerLayer {
             AVStatus.DRIVETOCUSTMER, AVStatus.DRIVEWITHCUSTOMER, AVStatus.REBALANCEDRIVE };
     private BitSet bits = new BitSet();
 
-    AvStatusColor avStatusColors = AvStatusColor.Standard;
+    AvStatusColor avStatusColors = AvStatusColor.Mild;
     boolean showLocation = true;
 
     public VehiclesLayer(MatsimMapComponent matsimMapComponent) {
