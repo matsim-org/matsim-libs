@@ -63,7 +63,7 @@ public class EmissionModule {
 	
 	//===
     private Map<Integer, String> roadTypeMapping;
-	private Vehicles emissionVehicles;
+	private Vehicles vehicles;
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
@@ -77,7 +77,7 @@ public class EmissionModule {
 
 		this.ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
 
-		if ( ecg.isIgnoringEmissionsFromEventsFile() ) {
+		if ( !ecg.isWritingEmissionsEvents() ) {
 			logger.warn("Emission events are excluded from events file. A new events manager is created.");
 			this.eventsManager = EventsUtils.createEventsManager();
 		} else {
@@ -86,6 +86,10 @@ public class EmissionModule {
 
 		createLookupTables();
 		createEmissionHandler();
+
+		// add event handlers here and restrict the access outside the emission Module.  Amit Apr'17.
+		this.eventsManager.addHandler(warmEmissionHandler);
+		this.eventsManager.addHandler(coldEmissionHandler);
 	}
 	
 	private void createLookupTables() {
@@ -94,8 +98,8 @@ public class EmissionModule {
 		getInputFiles();
 		
 		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
-		if(this.emissionVehicles == null){
-			emissionVehicles = scenario.getVehicles();
+		if(this.vehicles == null){
+			vehicles = scenario.getVehicles();
 		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
@@ -133,8 +137,8 @@ public class EmissionModule {
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
 		
-		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
+		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
+		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -382,23 +386,14 @@ public class EmissionModule {
 		return hbefaTrafficSituation;
 	}
 
-	public WarmEmissionHandler getWarmEmissionHandler() {
-		return warmEmissionHandler;	
-	}
-
-	public ColdEmissionHandler getColdEmissionHandler() {
-		return coldEmissionHandler;
+	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
+		return this. warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
 	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
 	// for the analysis purpose. Need a test. Amit Apr'17
 	public EventsManager getEmissionEventsManager() {
 		return eventsManager;
-	}
-
-	@Deprecated // use scenario.getVehicles() instead.
-	public Vehicles getEmissionVehicles() {
-		return emissionVehicles;
 	}
 
 	public void writeEmissionInformation() {

@@ -29,6 +29,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * benjamin, ihab, amit
@@ -42,6 +43,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
     @Inject  private EmissionCostModule emissionCostModule;
     @Inject  private PlanCalcScoreConfigGroup cnScoringGroup;
     private Set<Id<Link>> hotspotLinks = null;
+    @Inject private Vehicles vehicles;
 
     public EmissionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory) {
         this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
@@ -57,7 +59,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
                 this.emissionModule,
                 this.emissionCostModule,
                 this.sigma,
-                this.hotspotLinks);
+                this.hotspotLinks, vehicles);
     }
 
     public void setSigma ( double val ) {

@@ -141,7 +141,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 //		emissionModule.createLookupTables();
 //		emissionModule.createEmissionHandler();
 		
-		EventsManager eventsManager = controler.getEvents();
+		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
 		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
 		simulationEndTime = 60*60*30.0; // TODO
 		timeBinSize = simulationEndTime/noOfTimeBins;
@@ -160,8 +160,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		
 		}
 		logger.info("done parsing");
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		geh = new GeneratedEmissionsHandler(0.0, timeBinSize, links2xcells, links2ycells);
 		emissionModule.getEmissionEventsManager().addHandler(geh);
 		

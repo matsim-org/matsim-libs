@@ -21,7 +21,6 @@ package org.matsim.contrib.emissions.example.archive;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -68,7 +67,6 @@ public class RunEmissionToolOnlineExample {
 			@Override
 			public void install() {
 				bind(EmissionModule.class).asEagerSingleton();
-				addControlerListenerBinding().toInstance(new EmissionControlerListener());
 			}
 		});
 		controler.run();

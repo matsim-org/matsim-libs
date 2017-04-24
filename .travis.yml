@@ -4,17 +4,11 @@ addons:
   apt:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
-install: true                   # Do nothing
 script:
-  - cd ${TRAVIS_BUILD_DIR}/examples && mvn install
-  - cd ${TRAVIS_BUILD_DIR}/matsim && mvn install -DskipTests # Everything needs MATSim
-  - cd ${TRAVIS_BUILD_DIR}/tutorial && mvn install -DskipTests
-  - cd ${TRAVIS_BUILD_DIR}/contribs && mvn install -DskipTests # Many of the playgrounds need some of the contribs
-  - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test --fail-at-end -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+  - mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 env:
   global:
     - MAVEN_OPTS="-Xmx2g"
-  matrix:
-    - MODULE=matsim
-    - MODULE=contribs
-    - MODULE=playgrounds
+cache:
+  directories:
+  - $HOME/.m2

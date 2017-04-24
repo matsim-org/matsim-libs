@@ -28,6 +28,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
@@ -41,10 +42,12 @@ public class EmissionModalTravelDisutilityCalculatorFactory implements TravelDis
 	@Inject  private EmissionCostModule emissionCostModule;
 	private Set<Id<Link>> hotspotLinks;
 	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
+	@Inject
+	private Vehicles vehicles;
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
-		return new EmissionModalTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule, hotspotLinks);
+		return new EmissionModalTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule, hotspotLinks, vehicles);
 	}
 
 	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {

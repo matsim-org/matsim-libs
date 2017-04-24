@@ -82,9 +82,6 @@ public class ManteuffelEmissionToolOffline{
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
 
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventsOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 

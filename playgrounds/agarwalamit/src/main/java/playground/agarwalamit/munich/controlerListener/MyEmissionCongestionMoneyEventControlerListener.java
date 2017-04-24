@@ -73,9 +73,7 @@ public class MyEmissionCongestionMoneyEventControlerListener implements StartupL
 
 		event.getServices().getEvents().addHandler(congestionCostHandler);
 		event.getServices().getEvents().addHandler(moneyHandler);
-		event.getServices().getEvents().addHandler(emissionModule.getWarmEmissionHandler());
-		event.getServices().getEvents().addHandler(emissionModule.getColdEmissionHandler());
-		
+
 		emissionModule.getEmissionEventsManager().addHandler(emissCostHandler);
 	}
 

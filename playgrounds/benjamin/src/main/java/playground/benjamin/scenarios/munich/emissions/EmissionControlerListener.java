@@ -56,9 +56,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
-		EventsManager eventsManager = controler.getEvents();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
 	}
 
 	@Override

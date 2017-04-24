@@ -71,9 +71,6 @@ public class EmissionOfflineMaryland {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
 
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 

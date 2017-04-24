@@ -33,7 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * After creating a config file with 
  * {@link CreateEmissionConfig CreateEmissionConfig}
  * this class runs a simulation and calculates emissions online.
- * Results are written into distinct xml-files including emission event files for some iterations (as specified by the config).
+ * Results are written into events file (including emission events) for some iterations (as specified by the config).
  * <p></p>
  * See <a href="{@docRoot}/src-html/org/matsim/contrib/emissions/example/RunEmissionToolOnlineExample.html#line.39">here</a> for the listing.
 
@@ -62,7 +62,6 @@ public class RunEmissionToolOnlineExampleV2 {
 			@Override
 			public void install() {
 				bind(EmissionModule.class).asEagerSingleton();
-				addControlerListenerBinding().toInstance(new EmissionControlerListener());
 			}
 		});
 		controler.run();

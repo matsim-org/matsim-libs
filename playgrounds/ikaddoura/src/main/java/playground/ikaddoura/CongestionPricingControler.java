@@ -96,7 +96,7 @@ public class CongestionPricingControler {
 			log.info("Sigma: " + sigma);
 
 		} else {
-			outputDirectory = "../../../runs-svn/vickrey-decongestion/output-FINAL/V9/";
+			outputDirectory = "../../../runs-svn/vickrey-decongestion/output-FINAL/V9_different_rndSeed234/";
 			configFile = "../../../runs-svn/vickrey-decongestion/input/config.xml";
 			VTTSapproach = "different";
 			implementation = "V9";
@@ -111,6 +111,8 @@ public class CongestionPricingControler {
 	private void run() {
 
 		Config config = ConfigUtils.loadConfig(configFile);
+		config.global().setRandomSeed(234);
+		
 		if (outputDirectory == null) {
 			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
 				throw new RuntimeException("Either provide an output directory in the config file or the controler. Aborting...");

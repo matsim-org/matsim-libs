@@ -30,7 +30,7 @@
 	</build>
 
 	<repositories>
-		<repository>
+<!-- 		<repository>
 			<id>org.janusproject-maven</id>
 			<name>Janus Project Repository</name>
 			<url>http://www.janus-project.org/maven</url>
@@ -39,7 +39,7 @@
 			<id>sarl-repository</id>
 			<url>http://maven.sarl.io/</url>
 		</repository>
-		<repository>
+ -->		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
 		</repository>
@@ -70,7 +70,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
-			<version>3.4.1</version>
+			<version>3.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>org.processing</groupId>
 			<artifactId>core</artifactId>
-			<version>3.0</version>
+			<version>3.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>

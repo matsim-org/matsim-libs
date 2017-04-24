@@ -22,12 +22,13 @@ package playground.southafrica.freight.digicore.algorithms.complexNetwork;
 
 import java.util.Map;
 
-import org.apache.commons.collections15.Transformer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
 
-public class DigicoreNodeCoordinateTransformer implements Transformer<Id<ActivityFacility>, String> {
+import com.google.common.base.Function;
+
+public class DigicoreNodeCoordinateTransformer implements Function<Id<ActivityFacility>, String> {
 	private Map<Id<ActivityFacility>, Coord> map;
 	
 	public DigicoreNodeCoordinateTransformer(Map<Id<ActivityFacility>, Coord> coordinateMap) {
@@ -35,7 +36,7 @@ public class DigicoreNodeCoordinateTransformer implements Transformer<Id<Activit
 	}
 
 	@Override
-	public String transform(Id<ActivityFacility> facilityId) {
+	public String apply(Id<ActivityFacility> facilityId) {
 		return String.format("[%.2f ; %.2f]", map.get(facilityId).getX(), map.get(facilityId).getY());
 	}
 

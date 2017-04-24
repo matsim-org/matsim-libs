@@ -21,7 +21,9 @@ package org.matsim.contrib.drt.routing;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.Config;
@@ -36,17 +38,27 @@ import com.google.inject.Inject;
 public class DrtRoutingModule implements RoutingModule {
 	private final DrtConfigGroup drtconfig;
 	private StageActivityTypes stageActivityTypes;
-
+	private final Network network;
 	@Inject
-	public DrtRoutingModule(Config config) {
+	public DrtRoutingModule(Config config, Network network) {
 		this.drtconfig = DrtConfigGroup.get(config);
+		this.network = network;
 	}
 
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
 			Person person) {
 		Route route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		double distanceEstimate = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord())
+		Coord fromCoord = fromFacility.getCoord();
+		Coord toCoord = toFacility.getCoord();
+		
+		if (fromCoord==null){
+			fromCoord = network.getLinks().get(fromFacility.getLinkId()).getCoord();
+		}
+		if (toCoord==null){
+			toCoord = network.getLinks().get(toFacility.getLinkId()).getCoord();
+		}
+		double distanceEstimate = CoordUtils.calcEuclideanDistance(fromCoord, toCoord )
 				* drtconfig.getEstimatedBeelineDistanceFactor();
 		route.setDistance(distanceEstimate);
 		route.setTravelTime(distanceEstimate / drtconfig.getEstimatedDrtSpeed());

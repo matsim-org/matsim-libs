@@ -54,10 +54,10 @@ public class MergeCSVFiles {
 	
 	private static final Logger log = Logger.getLogger(MergeCSVFiles.class);
 	
-	private static final String directory = "/Users/ihab/Desktop/ils4/kaddoura/optAV/output_distanceCost-0.0002/";
+	private static final String directory = "/Users/ihab/Desktop/ils4/kaddoura/bln-dz-time/output_0.1sample_run_194c.150.plans.selected-1000it.route.time.output.plans.selected/output_route/";
 	private static final String fileName = "aggregated_info_all_transport_modes";
 	private static final String separator = ";";
-	private static final int finalIteration = 50;
+	private static final int finalIteration = 300;
 	
 	private static TreeMap<String, LinkedHashMap<String, String>> path2key2Value = new TreeMap<>();
 	

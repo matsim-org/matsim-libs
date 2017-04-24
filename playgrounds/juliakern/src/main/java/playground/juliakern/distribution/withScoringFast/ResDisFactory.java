@@ -27,6 +27,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
@@ -37,6 +38,7 @@ public class ResDisFactory implements TravelDisutilityFactory {
 	@Inject private EmissionModule emissionModule;
 	@Inject private EmissionCostModule emissionCostModule;
 	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
+	@Inject private Vehicles vehicles;
 	
 	public ResDisFactory(EmissionControlerListener ecl){
 		this.ecl = ecl;
@@ -45,7 +47,7 @@ public class ResDisFactory implements TravelDisutilityFactory {
 	@Override
 	public TravelDisutility createTravelDisutility( TravelTime timeCalculator) {
 		double marginalutilityOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		final ResDisCalculator resdiscal = new ResDisCalculator(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, cnScoringGroup ).createTravelDisutility(timeCalculator), ecl, marginalutilityOfMoney, this.emissionModule, this.emissionCostModule);
+		final ResDisCalculator resdiscal = new ResDisCalculator(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, cnScoringGroup ).createTravelDisutility(timeCalculator), ecl, marginalutilityOfMoney, this.emissionModule, this.emissionCostModule, vehicles);
 		
 		return resdiscal;
 

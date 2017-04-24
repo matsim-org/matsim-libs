@@ -30,16 +30,30 @@ public class ParseEleDataFromGeoTiff {
 		// SRTM1:  http://earthexplorer.usgs.gov/ (login in required)
 		// SRTM3:  http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
 		// EU-DEM: http://data.eox.at/eudem
+		// oslo DEM10: http://data.kartverket.no/download/content/digital-terrengmodell-10-m-utm-32
 		
+//		//oslo EUDEM
+//		File tiffFile = new File(
+//				"../../../../desktop/Oslo/OsloEle/EUDEM_Oslo.tif");
+		
+		//oslo DEM10
+//		File tiffFile = new File(
+//				"../../../../desktop/Oslo/OsloEle/EntireGreatOsloUTM.tif");
 		
 		//berlin SRTM3
 //		File tiffFile = new File(
 //				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/srtm3/srtm_39_02.tif");
 		
-	    //berlin EU-DEM
-		File tiffFile = new File(
-				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/BerlinEUDEM.tif");
 		
+		 //berlin EU-DEM testing
+		File tiffFile = new File(
+				"../../../../desktop/Oslo/countsAuslesen/OSM_counts/BerlinEleEUDEM.tif");
+		
+		
+//	    //berlin EU-DEM
+//		File tiffFile = new File(
+//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/BerlinEUDEM.tif");
+//		
 //		//stuttgart EUDEM
 //		File tiffFile = new File(
 //				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/stuttgartEUDEM.tif");		
@@ -64,11 +78,15 @@ public class ParseEleDataFromGeoTiff {
 
 		GridGeometry2D gg = grid.getGridGeometry();
 
+//		oslo
+//		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:32632", true); 
+//		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:32632", true); 
 		
 		//convert the the projection used in the MATSim Berlin scenario (DHDN / 3-degree Gauss-Kruger zone 4) to one used in the elevation data (Geotiff, WGS84) 
 		//new
-		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:31468", true); // DHDN / 3-degree Gauss-Kruger zone 4
-		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326", true);  //WGS84
+		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:31468", true); //desired MATSIMnet    // DHDN / 3-degree Gauss-Kruger zone 4
+		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326", true); //projection of input  //WGS84
+//		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4258", true); //projection of input  //ETRS89
 
 		MathTransform mathTransform = CRS.findMathTransform(sourceCRS, targetCRS, true);
 
