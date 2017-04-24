@@ -17,40 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package robotaxi.preparation;
+package peoplemover.run;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.Controler;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * @author  jbischoff
- *
+ * @author michalm
  */
-/**
- *
- */
-public class CreateTaxiUserSubpopulation {
+public class RunDrtScenario {
+	public static void run(String configFile, boolean otfvis) {
+		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		createControler(config, otfvis).run();
+	}
+
+	public static Controler createControler(Config config, boolean otfvis) {
+		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
+		config.checkConsistency();
+		return DrtControlerCreator.createControler(config, otfvis);
+	}
 
 	public static void main(String[] args) {
-		String inputPlansFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/population/initial_plans1.0.xml.gz";
-		String outputPersonAttributes = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/population/drtCustomers.xml";
-		String identifier = "WB_WB";
-		String subpopulation = "drtCustomer";
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenario).readFile(inputPlansFile);
-		for (Person p : scenario.getPopulation().getPersons().values()){
-			if (p.getId().toString().startsWith(identifier)){
-				scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", subpopulation);
-			}
+		if (args.length != 1) {
+			throw new IllegalArgumentException("RunDrtScenario needs one argument: path to the configuration file");
 		}
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outputPersonAttributes);
+		RunDrtScenario.run(args[0], false);
 	}
-	
 }

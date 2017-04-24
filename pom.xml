@@ -60,6 +60,11 @@
 			<artifactId>av</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
+			<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>drt</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
 
 		<!-- <dependency> <groupId>com.github.msmobility</groupId> <artifactId>silo</artifactId> 
 			<version>master-SNAPSHOT</version> </dependency> -->
