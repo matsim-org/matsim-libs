@@ -10,11 +10,14 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.GraphicsUtil;
 import playground.clruch.utils.gui.RowPanel;
 
-public class ClockLayer extends ViewerLayer {
+/**
+ * Head Up Display
+ */
+public class HudLayer extends ViewerLayer {
 
     boolean show = true;
 
-    protected ClockLayer(MatsimMapComponent matsimMapComponent) {
+    protected HudLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
     }
 
@@ -35,7 +38,14 @@ public class ClockLayer extends ViewerLayer {
     @Override
     protected void createPanel(RowPanel rowPanel) {
         {
-            JCheckBox jCheckBox = new JCheckBox("show");
+            JCheckBox jCheckBox = new JCheckBox("details");
+            jCheckBox.setToolTipText("head up display");
+            jCheckBox.setSelected(show);
+            jCheckBox.addActionListener(e -> matsimMapComponent.setHudShow(jCheckBox.isSelected()));
+            rowPanel.add(jCheckBox);
+        }
+        {
+            JCheckBox jCheckBox = new JCheckBox("clock");
             jCheckBox.setToolTipText("time on clock");
             jCheckBox.setSelected(show);
             jCheckBox.addActionListener(e -> setShow(jCheckBox.isSelected()));
