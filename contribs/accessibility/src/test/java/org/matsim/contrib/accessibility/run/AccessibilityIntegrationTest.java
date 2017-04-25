@@ -70,7 +70,6 @@ public class AccessibilityIntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@SuppressWarnings("static-method")
-	@Ignore
 	@Test
 	public void testMainMethod() {
 		Config config = ConfigUtils.createConfig();
@@ -150,7 +149,6 @@ public class AccessibilityIntegrationTest {
 	}
 
 
-	@Ignore
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = createTestConfig() ;
@@ -181,7 +179,6 @@ public class AccessibilityIntegrationTest {
 	}
 
 
-	@Ignore
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
 
@@ -278,46 +275,14 @@ public class AccessibilityIntegrationTest {
 		String networkFile = utils.getOutputDirectory() + "network.xml";
 		new NetworkWriter(network).write(networkFile);
 		config.network().setInputFile(networkFile);
-		
-		//
-//		List<String> mainModes = new ArrayList<>();
-//		mainModes.add("car");
-//		mainModes.add("bus");
-//		config.qsim().setMainModes(mainModes);
-		//
 
 		config.transit().setUseTransit(true);
 //		config.transit().setTransitScheduleFile(utils.getClassInputDirectory() + "schedule.xml");
-//		config.transit().setVehiclesFile(utils.getClassInputDirectory() + "vehicles.xml");
-		config.transit().setTransitScheduleFile(utils.getClassInputDirectory() + "schedule.xml");
+		config.transit().setTransitScheduleFile(utils.getClassInputDirectory() + "schedule2.xml");
 		config.transit().setVehiclesFile(utils.getClassInputDirectory() + "vehicles.xml");
-		
-		//
-		Set<String> transitModes = new HashSet<>();
-		transitModes.add(TransportMode.pt);
-		config.transit().setTransitModes(transitModes);
-		//
-		
-		//
-//		{
-//			ModeRoutingParams walkPars = new ModeRoutingParams(TransportMode.walk);
-//			walkPars.setBeelineDistanceFactor(1.3);
-//			walkPars.setTeleportedModeSpeed(4.);
-//			config.plansCalcRoute().addModeRoutingParams(walkPars);
-//		}
-		//
 
-//		{
-			ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
-			ptParams.setMarginalUtilityOfDistance(1.);
-			config.planCalcScore().addModeParams(ptParams);
-//		}
-		
-//		{
-//			ModeParams ptParams = new ModeParams(TransportMode.pt);
-//			ptParams.setMarginalUtilityOfDistance(1.);
-//			config.planCalcScore().addModeParams(ptParams);
-//		}
+		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
+		config.planCalcScore().addModeParams(ptParams);
 
 		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
 		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");
@@ -339,12 +304,10 @@ public class AccessibilityIntegrationTest {
 	private static Scenario createTestScenario(final Config config) {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// Creating test opportunities (facilities)
+		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
-			Coord coord = link.getCoord();
-			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
 			opportunities.addActivityFacility(facility);
 		}
 		return scenario;
@@ -403,33 +366,33 @@ public class AccessibilityIntegrationTest {
 
 					if (x == 50 && y == 50) {
 						expected.accessibilityFreespeed = 2.1486094237531126;
-						expected.accessibilityCar = 2.1429858043469507;
+						expected.accessibilityCar = 2.1482840466191093;
 						expected.accessibilityBike = 2.2257398663221;
 						expected.accessibilityWalk = 1.70054725728361;
-						expected.accessibilityPt = -568.357923512129;
+						expected.accessibilityPt = 2.1581641260040683;
 						expected.accessibilityMatrixBasedPt = 0.461863556339195;
 					} else if (x == 150 && y == 50) {
 						expected.accessibilityFreespeed = 2.1486094237531126;
-						expected.accessibilityCar = 2.1429858043469507;
+						expected.accessibilityCar = 2.1482840466191093;
 						expected.accessibilityBike = 2.2257398663221;
 						expected.accessibilityWalk = 1.70054725728361;
-						expected.accessibilityPt = -569.051070692689;
+						expected.accessibilityPt = 2.0032465393091434;
 						expected.accessibilityMatrixBasedPt = 0.461863556339195;
 					} else if (x == 50 && y == 150) {
 						expected.accessibilityFreespeed = 2.1766435716006005;
-						expected.accessibilityCar = 2.1716742650724403;
+						expected.accessibilityCar = 2.176238564675181;
 						expected.accessibilityBike = 2.2445468698643367;
 						// expected.accessibilityBike = 1.; // deliberately wrong for testing
 						expected.accessibilityWalk = 1.7719146868026079;
-						expected.accessibilityPt = -568.6456055845807;
+						expected.accessibilityPt = 2.057596373646452;
 						expected.accessibilityMatrixBasedPt = 0.461863556339195;
 						// expected.accessibilityMatrixBasedPt = 1.; // deliberately wrong for testing
 					} else if (x == 150 && y == 150) {
 						expected.accessibilityFreespeed = 2.2055702759681273;
-						expected.accessibilityCar = 2.202905560392762;
+						expected.accessibilityCar = 2.2052225231109226;
 						expected.accessibilityBike = 2.2637376515333636;
 						expected.accessibilityWalk = 1.851165291193725;
-						expected.accessibilityPt = -569.051070692689;
+						expected.accessibilityPt = 1.9202710265495115;
 						expected.accessibilityMatrixBasedPt = 0.624928280738513;
 					}
 

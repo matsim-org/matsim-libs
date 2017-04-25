@@ -6,6 +6,7 @@ package playground.tschlenther.parkingSearch.utils;
 import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.axis2.util.IOUtils;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -35,19 +37,25 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 	private final static String mierendorffLinks = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Zielzone.txt";
 	private final static String klausenerLinks = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Homezone.txt";
 	
+	private List<String> zones;
+	
 	/**
 	 * @param scenario
 	 */
 	@Inject
-	public ZoneParkingManager(Scenario scenario) {
+	public ZoneParkingManager(Scenario scenario, String[] pathToZoneTxtFiles) {
 		super(scenario);
 		
 		this.linksOfZone = new HashMap<String,HashSet<Id<Link>>>();
 		this.totalCapOfZone = new HashMap<String,Double>();
 		this.occupationOfZone = new HashMap<String,Double>();
 		
-		readZone(mierendorffLinks);
-		readZone(klausenerLinks);
+		for(String zone: pathToZoneTxtFiles){
+			readZone(zone);
+		}
+		
+//		readZone(mierendorffLinks);
+//		readZone(klausenerLinks);
 		
 		for(String zone: this.linksOfZone.keySet()){
 			calculateTotalZoneParkCapacity(zone);
@@ -95,13 +103,18 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 	public boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		if (parkVehicleAtLink(vehicleId, linkId, time)) {
 			for(String zone : this.linksOfZone.keySet()){
-				if(linksOfZone.get(zone).contains(linkId)){
+				if(linksOfZone.get(zone).contains(linkId) && this.facilitiesPerLink.containsKey(linkId)){
 					double newOcc = this.occupationOfZone.get(zone) + 1;
 					if(this.totalCapOfZone.get(zone)<newOcc){
-						throw new RuntimeException("occupancy of zone " + zone + " is higher than 100%. Capacity= " + this.totalCapOfZone.get(zone) + "  occupancy=" + newOcc);
+						String s = "FacilityID: " + this.parkingLocations.get(vehicleId);
+						String t = "Belegt: " + this.occupation.get(this.parkingLocations.get(vehicleId));
+						String u = "Kapazität: " + this.parkingFacilities.get(this.parkingLocations.get(vehicleId)).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
+						String v = "TotalCapacityOnLink: " + getNrOfAllParkingSpacesOnLink(linkId);
+						throw new RuntimeException("occupancy of zone " + zone + " is higher than 100%. Capacity= " + this.totalCapOfZone.get(zone) + "  occupancy=" + newOcc + "time = " + time
+								+ "\n" + s + "\n" + t + "\n" + u + "\n" + v);
 					}
 					this.occupationOfZone.put(zone,newOcc);
-					return true;
+					return true;								// assumes: link is only part of exactly 1 zone
 				}
 			}
 			return true;
@@ -111,19 +124,26 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 	
 	@Override
 	public boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
-		
-		for(String zone : this.linksOfZone.keySet()){
-			if(linksOfZone.get(zone).contains(linkId)){
-				double newOcc = this.occupationOfZone.get(zone) - 1;
-				if(newOcc < 0 ){
-					//throw new RuntimeException("occupancy of zone " + zone + " is negative. Capacity= " + this.totalCapOfZone.get(zone) + "  occupancy=" + newOcc);
-					newOcc = 0;
+		if (!this.parkingLocations.containsKey(vehicleId)) {
+			return true;
+			// we assume the person parks somewhere else
+		} else {
+			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
+			this.occupation.get(fac).decrement();
+	
+			Id<Link> parkingLink = this.parkingFacilities.get(fac).getLinkId();
+			for(String zone : this.linksOfZone.keySet()){
+				if(linksOfZone.get(zone).contains(parkingLink)){
+					double newOcc = this.occupationOfZone.get(zone) - 1;
+					if(newOcc < 0 ){
+						//throw new RuntimeException("occupancy of zone " + zone + " is negative. Capacity= " + this.totalCapOfZone.get(zone) + "  occupancy=" + newOcc);
+						newOcc = 0;
+					}
+					this.occupationOfZone.put(zone,newOcc);
 				}
-				this.occupationOfZone.put(zone,newOcc);
 			}
+				return true;
 		}
-		
-		return super.unParkVehicleHere(vehicleId, linkId, time);
 	}
 	
 	

@@ -173,19 +173,21 @@ public class KtiScoringFunctionFactoryWithJointModesAndEquity implements Scoring
 		final GroupSizePreferencesConfigGroup groupSizeGroup = (GroupSizePreferencesConfigGroup)
 			scenario.getConfig().getModule( GroupSizePreferencesConfigGroup.GROUP_NAME );
 
-		addScoringFunction( person.getId() , function ,
-				new GroupCompositionPenalizer(
-						groupSizeGroup.getActivityType(),
-						new GroupCompositionPenalizer.MinGroupSizeLinearUtilityOfTime(
-								groupSizeGroup.getPersonPreference(person, scenario.getConfig() ),
-								groupSizeGroup.getUtilityOfMissingContact_util_s())));
+		if ( groupSizeGroup.getMinPref() != 0 || groupSizeGroup.getMaxPref() != 0 ) {
+			addScoringFunction( person.getId(), function,
+					new GroupCompositionPenalizer(
+							groupSizeGroup.getActivityType(),
+							new GroupCompositionPenalizer.MinGroupSizeLinearUtilityOfTime(
+									groupSizeGroup.getPersonPreference( person, scenario.getConfig() ),
+									groupSizeGroup.getUtilityOfMissingContact_util_s() ) ) );
+		}
 
 
-		addScoringFunction( person.getId() , function ,
-				new StandardDeviationScorer(
-						travelTimesRecords,
-						group.getJoinableActivityTypes(),
-						betaStdDev ) );
+		//addScoringFunction( person.getId() , function ,
+		//		new StandardDeviationScorer(
+		//				travelTimesRecords,
+		//				group.getJoinableActivityTypes(),
+		//				betaStdDev ) );
 		return function;
 	}
 

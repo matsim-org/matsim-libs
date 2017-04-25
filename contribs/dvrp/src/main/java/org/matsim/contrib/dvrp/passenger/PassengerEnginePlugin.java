@@ -4,12 +4,14 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 
 import com.google.inject.*;
+import com.google.inject.name.Named;
 
 public class PassengerEnginePlugin extends AbstractQSimPlugin {
 	private final String mode;
@@ -55,6 +57,7 @@ public class PassengerEnginePlugin extends AbstractQSimPlugin {
 		@Inject
 		private VrpOptimizer optimizer;
 		@Inject
+		@Named(DvrpModule.DVRP_ROUTING)
 		private Network network;
 
 		public PassengerEngineProvider(String mode) {

@@ -20,7 +20,6 @@
 package playground.benjamin.scenarios.munich.exposure;
 
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +35,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 
 
@@ -53,14 +53,17 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 	EmissionModule emissionModule;
 	EmissionResponsibilityCostModule emissionResponsibilityCostModule;
 
+	private final Vehicles emissionVehicles;
 
-	public EmissionResponsibilityTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionResponsibilityCostModule emissionResponsibilityCostModule) {
+
+	public EmissionResponsibilityTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionResponsibilityCostModule emissionResponsibilityCostModule, Vehicles vehicles) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
 		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-		this.emissionModule = emissionModule;
 		this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;
+		this.emissionModule = emissionModule;
+		this.emissionVehicles = vehicles;
 	}
 
 	@Override
@@ -74,7 +77,7 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 				emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
 			} else {
 				// a person is given -> use the vehicle for that person given in emissionModule
-				emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+				emissionVehicle = this.emissionVehicles.getVehicles().get(person.getId());
 			}
 		}
 		
@@ -102,7 +105,7 @@ public class EmissionResponsibilityTravelDisutilityCalculator implements TravelD
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionAnalysisModule();
 		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 				vehicle,
 				Integer.parseInt(NetworkUtils.getType(((Link) link))),

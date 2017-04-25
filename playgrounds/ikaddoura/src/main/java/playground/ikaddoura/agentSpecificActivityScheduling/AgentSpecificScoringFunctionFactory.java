@@ -19,10 +19,7 @@
 
 package playground.ikaddoura.agentSpecificActivityScheduling;
 
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -32,8 +29,9 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+
+import com.google.inject.Inject;
 
 /**
 * The default {@link CharyparNagelScoringFunctionFactory} except that activities are scored for each agent individually.
@@ -43,31 +41,28 @@ import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 public class AgentSpecificScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	protected Network network;
-	private final ScoringParametersForPerson params;
-	private final CountActEventHandler actCount;
-	private double tolerance;
-		
-	public AgentSpecificScoringFunctionFactory( final Scenario sc, final CountActEventHandler actCount, double tolerance) {
-		this( new SubpopulationScoringParameters( sc ) , sc.getNetwork() , actCount , tolerance);
-	}
-	
 	@Inject
-	AgentSpecificScoringFunctionFactory(final ScoringParametersForPerson params, Network network, CountActEventHandler actCount, double tolerance) {
-		this.params = params;
-		this.network = network;
-		this.actCount = actCount;
-		this.tolerance = tolerance;
-	}
+	private Scenario scenario;
+		
+	@Inject
+	private CountActEventHandler actCount;
 	
+	public AgentSpecificScoringFunctionFactory() {} 
+		
+	protected AgentSpecificScoringFunctionFactory(Scenario scenario, CountActEventHandler actCounter) {
+		this.scenario = scenario;
+		this.actCount = actCounter;
+	}
+
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 				
-		final ScoringParameters parameters = params.getScoringParameters( person );
-				
+		final ScoringParameters parameters = new SubpopulationScoringParameters(scenario).getScoringParameters(person);
+		final AgentSpecificActivitySchedulingConfigGroup asasConfigGroup = (AgentSpecificActivitySchedulingConfigGroup) scenario.getConfig().getModules().get(AgentSpecificActivitySchedulingConfigGroup.GROUP_NAME);
+		
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-		sumScoringFunction.addScoringFunction(new AgentSpecificActivityScoring(parameters, person, actCount, tolerance));
-		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network));
+		sumScoringFunction.addScoringFunction(new AgentSpecificActivityScoring(parameters, person, actCount, asasConfigGroup.getTolerance()));
+		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring( parameters , this.scenario.getNetwork()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));
 		return sumScoringFunction;		

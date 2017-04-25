@@ -16,7 +16,7 @@ public final class LeastCostPathCalculatorAccessibilityContributionCalculator im
 	private Node fromNode;
 	private Double departureTime;
 
-	LeastCostPathCalculatorAccessibilityContributionCalculator(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, LeastCostPathCalculator leastCostPathCalculator) {
+	public LeastCostPathCalculatorAccessibilityContributionCalculator(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, LeastCostPathCalculator leastCostPathCalculator) {
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
 		this.leastCostPathCalculator = leastCostPathCalculator;
 	}

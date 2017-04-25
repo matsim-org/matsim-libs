@@ -26,7 +26,6 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -79,15 +78,10 @@ public class ManteuffelEmissionToolOffline{
 		ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-        
-		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
+		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
+
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventsOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
@@ -96,6 +90,6 @@ public class ManteuffelEmissionToolOffline{
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventsOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 }

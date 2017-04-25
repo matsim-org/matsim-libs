@@ -36,7 +36,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * 
  * Use the config file as created by the 
  * {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} to calculate 
- * emissions based on the link leave events of an events file. Results are written into an emission event file. 
+ * emissions based on the link leave events of an events file. Results are written into an emission event file.
+ * Archived: Nov'16
  *
  * @author benjamin, julia
  */
@@ -59,17 +60,12 @@ public class RunEmissionToolOfflineExample {
 
 		// following is only for backward compatibility in which vehicle description is null;
 		// for the new scenarios, setting vehicle description should be preferred.; Amit, sep 2016.
-		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
+		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
-		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
+		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
+
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
@@ -78,7 +74,7 @@ public class RunEmissionToolOfflineExample {
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 
 	private static int getLastIteration() {

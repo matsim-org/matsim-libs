@@ -21,8 +21,6 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
@@ -48,20 +46,16 @@ public class RunTaxiBenchmark {
 	}
 
 	public static Controler createControler(Config config, int runs) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		config.controler().setLastIteration(runs - 1);
 		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
 		config.checkConsistency();
 
 		Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
-		final FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
-
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
 		controler.addOverridingModule(new TaxiOutputModule());
-		controler.addOverridingModule(TaxiOptimizerModules.createBenchmarkModule(fleet));
+		controler.addOverridingModule(new TaxiBenchmarkModule());
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -76,7 +70,7 @@ public class RunTaxiBenchmark {
 	public static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime) {
 		Scenario scenario = new ScenarioBuilder(config).build();
 
-		if (config.network().isTimeVariantNetwork()) {// TODO use guice to choose between TimeVariantLinkFactories?
+		if (config.network().isTimeVariantNetwork()) {
 			((Network)scenario.getNetwork()).getFactory()
 					.setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
 		}

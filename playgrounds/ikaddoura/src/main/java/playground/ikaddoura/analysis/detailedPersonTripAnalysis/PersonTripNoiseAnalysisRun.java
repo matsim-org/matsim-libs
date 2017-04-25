@@ -181,18 +181,18 @@ public class PersonTripNoiseAnalysisRun {
 		PersonTripNoiseAnalysis analysis = new PersonTripNoiseAnalysis();
 		
 		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, TaxiOptimizerModules.TAXI_MODE, basicHandler, noiseHandler);
+		analysis.printTripInformation(outputPath, TaxiModule.TAXI_MODE, basicHandler, noiseHandler);
 		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler);
 		analysis.printTripInformation(outputPath, null, basicHandler, noiseHandler);
 		log.info("Print trip information... Done.");
 
 		log.info("Print person information...");
-		analysis.printPersonInformation(outputPath, TaxiOptimizerModules.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);	
+		analysis.printPersonInformation(outputPath, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);	
 		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);	
 		analysis.printPersonInformation(outputPath, null, personId2userBenefit, basicHandler, noiseHandler);	
 		log.info("Print person information... Done.");
 
-		analysis.printAggregatedResults(outputPath, TaxiOptimizerModules.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);
+		analysis.printAggregatedResults(outputPath, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);
 		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
 		analysis.printAggregatedResults(outputPath, null, personId2userBenefit, basicHandler, noiseHandler);
 	}

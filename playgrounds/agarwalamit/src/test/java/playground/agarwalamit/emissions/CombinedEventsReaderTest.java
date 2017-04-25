@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -84,7 +85,11 @@ public class CombinedEventsReaderTest {
             }
         });
 
-        CausedEmissionCostHandler emissionHandler = new CausedEmissionCostHandler(new EmissionCostModule(1.0,true));
+        EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
+        emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.0);
+        emissionsConfigGroup.setConsideringCO2Costs(true);
+
+        CausedEmissionCostHandler emissionHandler = new CausedEmissionCostHandler(new EmissionCostModule(emissionsConfigGroup));
         CombinedMatsimEventsReader reader = new CombinedMatsimEventsReader(events);
         events.addHandler(emissionHandler);
         reader.readFile(combinedEventsFile);
@@ -144,7 +149,11 @@ public class CombinedEventsReaderTest {
     public void readEmissionEventsFile() {
         String emissionEventsFile = helper.getClassInputDirectory() + "0.emission.events.xml.gz";
 
-        CausedEmissionCostHandler handler = new CausedEmissionCostHandler(new EmissionCostModule(1.0,true));
+        EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
+        emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.0);
+        emissionsConfigGroup.setConsideringCO2Costs(true);
+
+        CausedEmissionCostHandler handler = new CausedEmissionCostHandler(new EmissionCostModule(emissionsConfigGroup));
 
         EventsManager events = EventsUtils.createEventsManager();
         events.addHandler(handler);

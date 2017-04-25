@@ -20,6 +20,7 @@
 package playground.vsp.airPollution.flatEmissions;
 
 import java.util.Set;
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -28,6 +29,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * benjamin, ihab, amit
@@ -37,19 +39,14 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 
     private double sigma = 0. ;
     private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
-    private final EmissionModule emissionModule;
-    private final EmissionCostModule emissionCostModule;
-    private final PlanCalcScoreConfigGroup cnScoringGroup;
+    @Inject  private EmissionModule emissionModule;
+    @Inject  private EmissionCostModule emissionCostModule;
+    @Inject  private PlanCalcScoreConfigGroup cnScoringGroup;
     private Set<Id<Link>> hotspotLinks = null;
+    @Inject private Vehicles vehicles;
 
-    public EmissionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory,
-                                                     EmissionModule emissionModule,
-                                                     EmissionCostModule emissionCostModule,
-                                                     PlanCalcScoreConfigGroup cnScoringGroup) {
+    public EmissionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory) {
         this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-        this.emissionModule = emissionModule;
-        this.emissionCostModule = emissionCostModule;
-        this.cnScoringGroup = cnScoringGroup;
     }
 
     @Override
@@ -62,7 +59,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
                 this.emissionModule,
                 this.emissionCostModule,
                 this.sigma,
-                this.hotspotLinks);
+                this.hotspotLinks, vehicles);
     }
 
     public void setSigma ( double val ) {

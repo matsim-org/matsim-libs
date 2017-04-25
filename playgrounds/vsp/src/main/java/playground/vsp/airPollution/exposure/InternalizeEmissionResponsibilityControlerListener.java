@@ -74,10 +74,8 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		EventsManager eventsManager = controler.getEvents();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());			
-		
+		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
+
 		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
 		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gridTools);
 		eventsManager.addHandler(intervalHandler);
@@ -126,7 +124,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 
 		boolean isWritingOutputEvents = event.getServices().getConfig().vspExperimental().isWritingOutputEvents();
 		if( isWritingOutputEvents) {

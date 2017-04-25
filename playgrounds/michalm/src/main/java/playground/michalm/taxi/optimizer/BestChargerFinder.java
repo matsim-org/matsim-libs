@@ -22,9 +22,13 @@ package playground.michalm.taxi.optimizer;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
+import org.matsim.contrib.util.LinkProvider;
 
 import playground.michalm.ev.data.Charger;
 
+/**
+ * @author michalm
+ */
 public class BestChargerFinder {
 	private static final LinkProvider<Charger> CHARGER_TO_LINK = (charger) -> charger.getLink();
 

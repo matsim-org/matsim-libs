@@ -62,6 +62,7 @@ public class JointDecisionProcessModule extends AbstractModule {
 		// process as such
 		bind(PlansReplanning.class).to( GroupReplanningListenner.class );
 		bind(PlansScoring.class).to( InternalizingPlansScoring.class );
+		addControlerListenerBinding().to( InternalizingPlansScoring.class );
 		addControlerListenerBinding().to( DumpJointDataAtEnd.class );
 
 		bind( InternalizationSettings.class ).to( ConfigBasedInternalizationSettings.class );

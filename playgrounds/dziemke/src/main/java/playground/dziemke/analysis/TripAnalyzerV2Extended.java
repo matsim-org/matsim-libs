@@ -29,7 +29,7 @@ public class TripAnalyzerV2Extended {
 	public static final Logger LOG = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
 	// Parameters
-	private static String runId = "be_117j"; // <----------
+	private static String runId = "be_121a"; // <----------
 	private static String iterationForAnalysis = "300";
 	private static final String cemdapPersonsInputFileId = "21"; // Check if this number corresponds correctly to the runId
 
@@ -37,10 +37,10 @@ public class TripAnalyzerV2Extended {
 	private static final String mode = TransportMode.car;
 	
 	private static final boolean onlyAnalyzeTripInteriorOfArea = false; // formerly results labelled as "int"
-	private static boolean onlyAnalyzeTripsStartingOrEndingInArea = false; // formerly results labelled as "ber" (Berlin-based) <----------
+	private static boolean onlyAnalyzeTripsStartingOrEndingInArea = true; // formerly results labelled as "ber" (Berlin-based) <----------
 	private static final Integer areaId = 11000000; // 11000000 = Berlin; Set a shapefile that contains this area correctly!
 	
-	private static boolean onlyAnalyzeTripsInDistanceRange = false; // "dist"; usually varied for analysis // <----------
+	private static boolean onlyAnalyzeTripsInDistanceRange = true; // "dist"; usually varied for analysis // <----------
 	private static final double minDistance_km = 0;
 	private static final double maxDistance_km = 100;
 
@@ -223,6 +223,7 @@ public class TripAnalyzerV2Extended {
 			outputDirectory = outputDirectory + "_soe-in-" + areaId;
 		}
 		if (onlyAnalyzeTripsInDistanceRange) {
+//			outputDirectory = outputDirectory + "_dist-" + maxDistance_km;
 			outputDirectory = outputDirectory + "_dist-" + minDistance_km + "-" + maxDistance_km;
 		}
 		if (onlyAnalyzeTripsWithActivityTypeBeforeTrip) {
@@ -280,10 +281,10 @@ public class TripAnalyzerV2Extended {
 					continue;
 				}
 			}
-			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
+			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) > maxDistance_km) {
 				continue;
 			}
-			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) <= minDistance_km) {
+			if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) < minDistance_km) {
     			continue;
     		}
 			if (onlyAnalyzeTripsWithActivityTypeBeforeTrip && onlyAnalyzeTripsWithActivityTypeAfterTrip) {

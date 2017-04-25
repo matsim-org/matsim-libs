@@ -29,7 +29,7 @@ public class AVRequestCreator implements PassengerRequestCreator {
     Map<Id<AVOperator>, AVDispatcher> dispatchers;
 
     @Override
-    public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link pickupLink, Link dropoffLink, double t0, double t1, double now) {
+    public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link pickupLink, Link dropoffLink, double departureTime, double submissionTime) {
         if (!(passenger instanceof PlanAgent)) {
             throw new RuntimeException("Need PlanAgent in order to figure out the operator");
         }
@@ -46,6 +46,6 @@ public class AVRequestCreator implements PassengerRequestCreator {
             throw new IllegalStateException("Operator '" + route.getOperatorId().toString() + "' does not exist.");
         }
 
-        return new AVRequest(id, passenger, pickupLink, dropoffLink, t1, now, route, operator, dispatchers.get(route.getOperatorId()));
+        return new AVRequest(id, passenger, pickupLink, dropoffLink, departureTime, submissionTime, route, operator, dispatchers.get(route.getOperatorId()));
     }
 }

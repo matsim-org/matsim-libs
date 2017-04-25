@@ -19,17 +19,12 @@
 
 package playground.jbischoff.wobscenario.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.contrib.drt.taxibus.algorithm.utils.TaxibusUtils;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.contrib.taxibus.algorithm.utils.TaxibusUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 /**

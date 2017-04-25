@@ -23,7 +23,9 @@ public class CreateNetwork {
 	public static void main(String[] args) {
 		
 		String WGS84 = "EPSG:4326";
-		String DHDN_GK4 = "EPSG:31468";
+	//	String DHDN_GK4 = "EPSG:31468";
+		
+		String UTM_32N = "EPSG:32632";
 		
 		
 		
@@ -37,12 +39,20 @@ public class CreateNetwork {
 //		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/network/" + szenarioname + "_MATsim.xml.gz";
 //		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/network/" + szenarioname + "_bikeObjectAtt.xml.gz";
 		
-		
-		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/berlin/massnahmen/BerlinBikeNet_mod_falke.osm";
-		String szenarioname= "Berlin_falke";
-		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/network/massnahmen/" + szenarioname + "_MATsim.xml.gz";
-		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/network/massnahmen/" + szenarioname + "_bikeObjectAtt.xml.gz";
+//		String path = "../../../../workspace/shared-svn/studies/countries/de/berlin-bike";
+//		String inputOSM = path + "/networkRawData/berlin/BerlinBikeNet_mod.osm";
+//		String szenarioname= "Oslo_first";
+//		String outputXML =     path + "/input/szenarios/berlin/network/" + szenarioname + "_MATsim.xml.gz";
+//		String outputBikeXML = path + "/input/szenarios/berlin/network/" + szenarioname + "_bikeObjectAtt.xml.gz";
 
+		//String path = "../../../../desktop/Oslo/network/";
+
+		String path = "../../../../desktop/Oslo/countsAuslesen/OSM_counts/";
+		String inputOSM = path + "testMonitoring.osm";
+		String szenarioname= "testMonitoring";
+		String outputXML =     path + "/MATSimNet/" + szenarioname + "_MATsim.xml";
+		String outputBikeXML = path + "/MATSimNet/" + szenarioname + "_bikeObjectAtt.xml";
+		
 		
 		
 		Config config = ConfigUtils.createConfig();
@@ -52,7 +62,10 @@ public class CreateNetwork {
 		Network carNetwork = NetworkUtils.createNetwork();
 		
 		CoordinateTransformation ct = 
-				TransformationFactory.getCoordinateTransformation(WGS84, DHDN_GK4); //TransformationFactory.WGS84
+// Oslo
+//				TransformationFactory.getCoordinateTransformation(WGS84, UTM_32N); 
+				TransformationFactory.getCoordinateTransformation(WGS84, "EPSG:31468"); 
+
 
 		BikeCustomizedOsmNetworkReader bikeNetworkReader = new BikeCustomizedOsmNetworkReader(bikeNetwork,ct);
 		bikeNetworkReader.constructBikeNetwork(inputOSM); 
@@ -76,19 +89,19 @@ public class CreateNetwork {
 			bikeNetwork.removeNode(node.getId());
 			mergedNetwork.addNode(node);
 		}
-		for (Node node : new ArrayList<Node>(carNetwork.getNodes().values())) {
-			carNetwork.removeNode(node.getId());
-			if (!mergedNetwork.getNodes().containsKey(node.getId())) {
-				mergedNetwork.addNode(node);
-			}
-		}
+//		for (Node node : new ArrayList<Node>(carNetwork.getNodes().values())) {
+//			carNetwork.removeNode(node.getId());
+//			if (!mergedNetwork.getNodes().containsKey(node.getId())) {
+//				mergedNetwork.addNode(node);
+//			}
+//		}
 		
 		for (Link link : bikeLinks) {
 			mergedNetwork.addLink(link);
 		}
-		for (Link link : carLinks) {
-			mergedNetwork.addLink(link);
-		}
+//		for (Link link : carLinks) {
+//			mergedNetwork.addLink(link);
+//		}
 		
 		
 		

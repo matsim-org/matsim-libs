@@ -35,6 +35,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 /**
@@ -52,8 +53,10 @@ private final EmissionModule emissionModule;
     private final Set<Id<Link>> hotspotLinks;
     private final PlanCalcScoreConfigGroup cnScoringGroup;
 
+    private final Vehicles emissionVehicles;
 
-    public EmissionModalTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
+
+    public EmissionModalTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks, Vehicles vehicles) {
         this.timeCalculator = timeCalculator;
         this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 //        this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
@@ -62,6 +65,7 @@ private final EmissionModule emissionModule;
         this.emissionCostModule = emissionCostModule;
         this.hotspotLinks = hotspotLinks;
         this.cnScoringGroup = cnScoringGroup;
+        this.emissionVehicles = vehicles;
     }
 
     @Override
@@ -75,7 +79,7 @@ private final EmissionModule emissionModule;
                 emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
             } else {
                 // a person is given -> use the vehicle for that person given in emissionModule
-                emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
+                emissionVehicle = this.emissionVehicles.getVehicles().get(Id.createVehicleId(person.getId()));
             }
         }
 
@@ -122,7 +126,7 @@ private final EmissionModule emissionModule;
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 
-        WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
+        WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionAnalysisModule();
         Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
                 vehicle,
                 Integer.parseInt(NetworkUtils.getType(link)),

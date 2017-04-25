@@ -99,6 +99,12 @@ public class GroupStrategyManager {
 			final GroupPlanStrategy strategy = e.getKey();
 			final List<ReplanningGroup> toHandle = e.getValue();
 			log.info( "passing "+toHandle.size()+" groups to strategy "+strategy );
+
+			if ( log.isTraceEnabled() ) {
+				for ( ReplanningGroup group : toHandle ) {
+					log.trace( "Handling group "+group+" with strategy "+strategy );
+				}
+			}
 			if ( stopWatch != null ) stopWatch.beginOperation( "strategy "+strategy );
 			strategy.run(
 					context,

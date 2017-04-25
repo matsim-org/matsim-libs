@@ -121,7 +121,7 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(TaxiOptimizerModules.TAXI_MODE)){
+		if (event.getLegMode().equals(TaxiModule.TAXI_MODE)){
 			waitingPax.add(event.getPersonId());
 			if (!dailyFeeCharged.contains(event.getPersonId())){
 				dailyFeeCharged.add(event.getPersonId());

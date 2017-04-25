@@ -76,27 +76,32 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(DESTINATION_KNOWN, "If false, the drop-off location remains unknown to the optimizer and scheduler"
-				+ " until the end of pickup");
-		map.put(VEHICLE_DIVERSION, "If true, vehicles can be diverted during empty trips. Requires online tracking.");
+				+ " until the end of pickup. False by default.");
+		map.put(VEHICLE_DIVERSION, "If true, vehicles can be diverted during empty trips. Requires online tracking."
+				+ " False by default.");
 		map.put(PICKUP_DURATION, "Typically, 120 seconds");
 		map.put(DROPOFF_DURATION, "Typically, 60 seconds");
 		map.put(A_STAR_EUCLIDEAN_OVERDO_FACTOR,
-				"Used in AStarEuclidean for shortest path search for occupied drives. Values above 1.0"
-						+ " (typically, 1.5 to 3.0) speed up the search, but at the cost of obtaining longer paths");
+				"Used in AStarEuclidean for shortest path search for occupied drives. Default value is 1.0. "
+						+ "Values above 1.0 (typically, 1.5 to 3.0) speed up search, "
+						+ "but at the cost of obtaining longer paths");
 		map.put(ONLINE_VEHICLE_TRACKER,
-				"If true, vehicles are (GPS-like) monitored while moving. This helps in getting more accurate estimates"
-						+ " on the time of arrival. Online tracking is necessary for vehicle diversion.");
+				"If true, vehicles are (GPS-like) monitored while moving. This helps in getting more accurate "
+						+ "estimates on the time of arrival. Online tracking is necessary for vehicle diversion. "
+						+ "False by default.");
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE,
-				"If true, the startLink is changed to last link in the current schedule, so the taxi starts the next"
-						+ " day at the link where it stopped operating the day before");
+				"If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
+						+ "day at the link where it stopped operating the day before. False by default.");
 		map.put(TAXIS_FILE, "An XML file specifying the taxi fleet. The file format according to dvrp_vehicles_v1.dtd");
 		map.put(TIME_PROFILES,
-				"If true, writes time profiles of vehicle statuses (i.e. current task type) and the number of unplanned"
-						+ " requests are written to a text file (taxi_status_time_profiles) and saved as plots");
-		map.put(DETAILED_STATS, "If true, detailed hourly taxi stats are dumped after each iteration.");
+				"If true, writes time profiles of vehicle statuses (i.e. current task type) and the number of unplanned "
+						+ "requests are written to a text file (taxi_status_time_profiles) and saved as plots. "
+						+ "False by default.");
+		map.put(DETAILED_STATS,
+				"If true, detailed hourly taxi stats are dumped after each iteration. False by default.");
 		map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED,
-				"Specifies whether the simulation should interrupt if not all requests were performed  when"
-						+ " an interation ends. Otherwise, a warning is given. Default == true");
+				"Specifies whether the simulation should interrupt if not all requests were performed when"
+						+ " an interation ends. Otherwise, a warning is given. True by default.");
 		map.put(OPTIMIZER_PARAMETER_SET, // currently, comments for parameter sets are not printed
 				"Specifies the type and parameters of the TaxiOptimizer. See: TaxiOptimizerParams and classes"
 						+ " implementing it, e.g. AbstractTaxiOptimizerParams.");

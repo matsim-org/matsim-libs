@@ -21,9 +21,9 @@ package playground.juliakern.distribution.withScoring;
 
 import java.util.ArrayList;
 import java.util.Map;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -42,11 +42,11 @@ import playground.vsp.airPollution.exposure.GridTools;
 public class EmissionControlerListener implements StartupListener, IterationStartsListener, 
 ShutdownListener, ScoringListener, AfterMobsimListener{
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
-	
+
 	MatsimServices controler;
 	String emissionEventOutputFile;
 	Integer lastIteration;
-	EmissionModule emissionModule;
+	@Inject private EmissionModule emissionModule;
 	EventWriterXML emissionEventWriter;
 	IntervalHandler intervalHandler;
 	GeneratedEmissionsHandler geh;
@@ -78,11 +78,6 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 		this.intervalHandler = new IntervalHandler();
 
         logger.warn(controler.getScenario().getNetwork().getLinks().size() + " number of links");
-		
-		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 	}
 	
 	@Override
@@ -104,17 +99,19 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 //		emissionModule.createLookupTables();
 //		emissionModule.createEmissionHandler();
 		
-		EventsManager eventsManager = controler.getEvents();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
+		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
+		// commenting the following lines could cause a problem if emission events are skipped.
+		// In that case, just use the events manager which is passed to the emission module. Amit Apr'17
+//		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
+//		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+
 		eventsManager.addHandler(intervalHandler);
 		
 		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
 		timeBinSize = simulationEndTime/noOfTimeBins;
 		
 		geh = new GeneratedEmissionsHandler(0.0, timeBinSize, links2xcells, links2ycells);
-		emissionModule.emissionEventsManager.addHandler(geh);
+		emissionModule.getEmissionEventsManager().addHandler(geh);
 	}
 
 	@Override
@@ -140,7 +137,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 		} catch (NullPointerException e) {
 			logger.warn("No file to close. Is this intended?");
 		}
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 
 

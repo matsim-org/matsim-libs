@@ -48,7 +48,7 @@ import java.util.Map;
 /**
  * @author thibautd
  */
-public class InternalizingPlansScoring implements PlansScoring, ScoringListener {
+public class InternalizingPlansScoring implements PlansScoring, ScoringListener, IterationStartsListener {
 	private static final Logger log =
 		Logger.getLogger(InternalizingPlansScoring.class);
 
@@ -143,6 +143,11 @@ public class InternalizingPlansScoring implements PlansScoring, ScoringListener 
 		if ( score.isNaN() ) throw new RuntimeException( "got NaN score for person "+p );
 
 		return score.doubleValue();
+	}
+
+	@Override
+	public void notifyIterationStarts( final IterationStartsEvent event ) {
+		this.eventsToScore.beginIteration( event.getIteration() );
 	}
 
 	public interface InternalizationSettings {

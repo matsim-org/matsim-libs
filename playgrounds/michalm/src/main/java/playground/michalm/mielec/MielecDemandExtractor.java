@@ -21,7 +21,7 @@ package playground.michalm.mielec;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.config.*;
 import org.matsim.core.population.io.PopulationReader;
@@ -51,7 +51,7 @@ public class MielecDemandExtractor {
 			for (Person p : scenario.getPopulation().getPersons().values()) {
 				Leg leg = (Leg)p.getPlans().get(0).getPlanElements().get(1);
 
-				if (leg.getMode() == TaxiOptimizerModules.TAXI_MODE) {
+				if (leg.getMode() == TaxiModule.TAXI_MODE) {
 					csvWriter.writeNext(p.getId() + "", (int)leg.getDepartureTime() + "", //
 							leg.getRoute().getStartLinkId() + "", leg.getRoute().getEndLinkId() + "");
 				}

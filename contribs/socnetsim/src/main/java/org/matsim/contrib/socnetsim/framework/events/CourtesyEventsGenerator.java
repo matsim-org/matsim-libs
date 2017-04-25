@@ -41,6 +41,8 @@ import com.google.inject.Inject;
 /**
  * Creates "courtesy" events: agents say "hello" and "goodbye" to their
  * social contacts located in the same facility as them.
+ *
+ * This is needed for scoring, because scoring functions cannot listen to the events of social contacts.
  * @author thibautd
  */
 public class CourtesyEventsGenerator implements ActivityStartEventHandler, ActivityEndEventHandler {

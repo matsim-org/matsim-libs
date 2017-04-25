@@ -3,8 +3,8 @@
  * Execute {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} and {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExampleV2 RunEmissionToolOnlineExampleV2} or {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExampleV2 RunEmissionToolOfflineExampleV2} from the example package.
  * <ul>
  * <li> {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}: Creates a MATSim config file with links to emission related input files as {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}. </li>
- * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExampleV2 RunEmissionToolOnlineExampleV2}: Produces an emission events file during the simulation. </li>
- * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExampleV2 RunEmissionToolOfflineExampleV2}: Produces an emission events file based on a standard MATSim eventsfile. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExampleV2 RunEmissionToolOnlineExampleV2}: Writes emission events to the events file during the simulation. </li>
+ * <li> {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExampleV2 RunEmissionToolOfflineExampleV2}: Writes emission events to the events file based on a standard MATSim events file. </li>
  * </ul>
  * The online example as well as the offline example use a config file as created by {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig}. 
  * An example config and the associated files can be found at the test input directory.
@@ -22,7 +22,7 @@
  *  <li> Go to "CaseDefinition" > "New"</li>
  *  <li> Select the desired parameters:</li>
  *   <ul>
- *    <li> VEHICLE CATEGORIES: Currently, PC (passenger car) and HGV (heavy goods vehicle) are supported. A third type, ZEV (zero emission vehicle) is also added to the category (see {@link org.matsim.contrib.emissions.types.HbefaVehicleCategory HbefaVehicleCategory})</li>
+ *    <li> VEHICLE CATEGORIES: Currently, PC (passenger car), HGV (heavy goods vehicle), MOTORCYCLE and ZEV (zero emission vehicle) are supported (see {@link org.matsim.contrib.emissions.types.HbefaVehicleCategory HbefaVehicleCategory})</li>
  *    <li> COMPONENTS: Currently, all pollutants listed under {@link org.matsim.contrib.emissions.types.WarmPollutant WarmPollutant} are supported; please choose accordingly</li>
  *    <li> YEARS: Choose the year of your scenario (only when exporting the mandatory average emission factors files)</li>
  *    <li> FLEET COMPOSITION: Choose "EF weighted with fleet composition" for the mandatory average emission factors files, and "EF per subsegment (without weighting)" for the optional detailed emission factors files</li>

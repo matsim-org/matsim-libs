@@ -24,10 +24,12 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-import com.google.inject.name.Names;
+import com.google.inject.*;
+import com.google.inject.name.*;
 
 public class VrpTravelTimeModules {
 	public static final String DVRP_INITIAL = "dvrp_initial";
+	public static final String DVRP_OBSERVED = "dvrp_observed";
 	public static final String DVRP_ESTIMATED = "dvrp_estimated";
 
 	public static AbstractModule createTravelTimeEstimatorModule() {
@@ -46,6 +48,13 @@ public class VrpTravelTimeModules {
 				bind(VrpTravelTimeEstimator.class).asEagerSingleton();
 				addTravelTimeBinding(DVRP_ESTIMATED).to(VrpTravelTimeEstimator.class);
 				addMobsimListenerBinding().to(VrpTravelTimeEstimator.class);
+			}
+
+			@Provides
+			@Named(VrpTravelTimeModules.DVRP_OBSERVED)
+			@Singleton
+			TravelTime provideTravelTime(@Named(TransportMode.car) TravelTime observedTT) {
+				return observedTT;
 			}
 		};
 	}

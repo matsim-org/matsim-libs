@@ -94,7 +94,7 @@ public static void main(String[] args) throws IOException {
 					if (leg.getMode().equals(TransportMode.car)||leg.getMode().equals(TransportMode.pt))
 {
 						
-						leg.setMode(TaxiOptimizerModules.TAXI_MODE);
+						leg.setMode(TaxiModule.TAXI_MODE);
 						Id<Link> start = null;
 						Id<Link> end = null;
 						if (leg.getRoute()!=null){

@@ -69,4 +69,13 @@ public final class PlanRecord implements HasIndex {
 	public int getArrayIndex() {
 		return index;
 	}
+
+	@Override
+	public String toString() {
+		return "PlanRecord{" +
+				"weight=" + weight +
+				", plan=" + plan +
+				", isFeasible=" + isFeasible +
+				'}';
+	}
 }

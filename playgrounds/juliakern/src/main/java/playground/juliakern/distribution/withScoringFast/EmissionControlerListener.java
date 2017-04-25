@@ -21,9 +21,9 @@ package playground.juliakern.distribution.withScoringFast;
 
 import java.util.ArrayList;
 import java.util.Map;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -56,7 +56,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	MatsimServices controler;
 	String emissionEventOutputFile;
 	Integer lastIteration;
-	EmissionModule emissionModule;
+	@Inject
+	private EmissionModule emissionModule;
 	EventWriterXML emissionEventWriter;
 	IntervalHandler intervalHandler;
 	GeneratedEmissionsHandler geh;
@@ -96,10 +97,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
         setMinMax(controler.getScenario().getNetwork());
         this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		
-		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 		this.emissionFile1="./output/emissionFile.txt";
 	}
 	
@@ -110,11 +107,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		this.eventsFile = eventsFile;
 		this.network=network;
 		this.emissionFile1=emissionFile;
-		
-		Scenario scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
 	}
 	
 	private void setMinMax(Network network2) {
@@ -149,7 +141,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 //		emissionModule.createLookupTables();
 //		emissionModule.createEmissionHandler();
 		
-		EventsManager eventsManager = controler.getEvents();
+		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
 		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
 		simulationEndTime = 60*60*30.0; // TODO
 		timeBinSize = simulationEndTime/noOfTimeBins;
@@ -168,13 +160,11 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		
 		}
 		logger.info("done parsing");
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		geh = new GeneratedEmissionsHandler(0.0, timeBinSize, links2xcells, links2ycells);
-		emissionModule.emissionEventsManager.addHandler(geh);
+		emissionModule.getEmissionEventsManager().addHandler(geh);
 		
 	
-		EmissionEventsReader emissionReader = new EmissionEventsReader(emissionModule.emissionEventsManager);
+		EmissionEventsReader emissionReader = new EmissionEventsReader(emissionModule.getEmissionEventsManager());
 		
 //		SimpleWarmEmissionEventHandler weeh = new SimpleWarmEmissionEventHandler();
 //		eventsManager.addHandler(weeh);
@@ -222,7 +212,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		} catch (NullPointerException e) {
 			logger.warn("No file to close. Is this intended?");
 		}
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 		
 		
 	}

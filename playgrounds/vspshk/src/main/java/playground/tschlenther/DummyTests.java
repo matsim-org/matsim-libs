@@ -1,6 +1,9 @@
 package playground.tschlenther;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -11,7 +14,18 @@ import playground.tschlenther.processing.testapplet;
 public class DummyTests {
 	
 	public static void main(String[] argS){
-		testListIndex();
+//		testListIndex();
+//		testDecimalFormat();
+		testDateFormat();
+	}
+	
+	private static void testDateFormat(){
+		String now = new SimpleDateFormat("ddMM").format(new Date());
+		System.out.println(now);
+		now = new SimpleDateFormat("ddMMyy").format(new Date());
+		System.out.println(now);
+		now = new SimpleDateFormat("ddMMyy_HH.mm").format(new Date());
+		System.out.println(now);
 	}
 	
 	private static void testListIndex(){
@@ -46,9 +60,11 @@ public class DummyTests {
 		System.out.println("halbe stunde:" + (int) (39551/1800) );
 		System.out.println("Stunde:" + (int) (39551/3600) );
 		
+		
+		
+		
 	}
-	
-	
+
 
 	private static void testArray(){
 		double[] arr1 = new double[3];
@@ -71,6 +87,16 @@ public class DummyTests {
 		System.out.println("\n ARRAY \n" + printarray(arr2));
 		
 		
+	}
+	
+	private static  void testDecimalFormat(){
+		double x = 389;
+		double y = 0.8298;
+		double z = 23.61599;
+		
+		DecimalFormat df = new DecimalFormat("##.##");
+		
+		System.out.println("x = " + df.format(x) + "\t y= " + df.format(y) + "\t z= " + df.format(z) );
 	}
 	
 	private static void testTreeSet(){

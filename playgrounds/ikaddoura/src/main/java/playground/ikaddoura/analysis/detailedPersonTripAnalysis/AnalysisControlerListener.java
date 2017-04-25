@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.run.TaxiOptimizerModules;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -94,19 +94,19 @@ public class AnalysisControlerListener implements IterationEndsListener {
 		
 		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
 			log.info("Print trip information...");
-			analysis.printTripInformation(outputPathAnalysisIteration, TaxiOptimizerModules.TAXI_MODE, basicHandler, noiseHandler);
+			analysis.printTripInformation(outputPathAnalysisIteration, TaxiModule.TAXI_MODE, basicHandler, noiseHandler);
 			analysis.printTripInformation(outputPathAnalysisIteration, TransportMode.car, basicHandler, noiseHandler);
 			analysis.printTripInformation(outputPathAnalysisIteration, null, basicHandler, noiseHandler);
 			log.info("Print trip information... Done.");
 
 			log.info("Print person information...");
-			analysis.printPersonInformation(outputPathAnalysisIteration, TaxiOptimizerModules.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);	
+			analysis.printPersonInformation(outputPathAnalysisIteration, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);	
 			analysis.printPersonInformation(outputPathAnalysisIteration, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);	
 			analysis.printPersonInformation(outputPathAnalysisIteration, null, personId2userBenefit, basicHandler, noiseHandler);	
 			log.info("Print person information... Done.");
 		}
 
-		analysis.printAggregatedResults(outputPathAnalysisIteration, TaxiOptimizerModules.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);
+		analysis.printAggregatedResults(outputPathAnalysisIteration, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);
 		analysis.printAggregatedResults(outputPathAnalysisIteration, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
 		analysis.printAggregatedResults(outputPathAnalysisIteration, null, personId2userBenefit, basicHandler, noiseHandler);
 		

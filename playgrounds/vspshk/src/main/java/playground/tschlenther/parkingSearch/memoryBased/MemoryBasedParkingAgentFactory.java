@@ -62,7 +62,7 @@ public class MemoryBasedParkingAgentFactory implements AgentFactory {
 	 */
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		ParkingSearchLogic parkingLogic  = new DistanceMemoryBasedParkingSearchLogic(network);
+		ParkingSearchLogic parkingLogic  = new DistanceMemoryParkingSearchLogic(network);
 		ParkingAgentLogic agentLogic = new MemoryBasedParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
 				parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic );
 		Id<Link> startLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();

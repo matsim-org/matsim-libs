@@ -91,7 +91,6 @@ public class EquilMixedTrafficEmissionTest {
 
 	@Test
 	public void emissionTollTest() {
-		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		List<String> mainModes = Arrays.asList("car","bicycle");
 
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
@@ -152,22 +151,21 @@ public class EquilMixedTrafficEmissionTest {
 		String outputDirectory = classOutputDir + helper.getMethodName() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
-		EmissionModule emissionModule = new EmissionModule(sc);
-		emissionModule.setEmissionEfficiencyFactor( 1.0 );
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-
-		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
+		EmissionsConfigGroup emissionsConfigGroup = ( (EmissionsConfigGroup) sc.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME) );
+		emissionsConfigGroup.setEmissionEfficiencyFactor(1.0);
+		emissionsConfigGroup.setConsideringCO2Costs(isConsideringCO2Costs);
+		emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EmissionModule.class).toInstance(emissionModule);
-				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				bind(EmissionModule.class).asEagerSingleton();
+				bind(EmissionCostModule.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+
 				bindCarTravelDisutilityFactory().to(EmissionModalTravelDisutilityCalculatorFactory.class);
 			}
 		});
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 
 		MyPersonMoneyEventHandler personMoneyHandler = new MyPersonMoneyEventHandler();
 		VehicleLinkEnterLeaveTimeEventHandler enterLeaveTimeEventHandler = new VehicleLinkEnterLeaveTimeEventHandler(Id.createLinkId("23"));
@@ -194,7 +192,7 @@ public class EquilMixedTrafficEmissionTest {
 		MyEmissionEventHandler emissEventHandler = new MyEmissionEventHandler();
 		events.addHandler(emissEventHandler);
 		int lastIt = sc.getConfig().controler().getLastIteration();
-		reader.readFile(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz");
+		reader.readFile(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz");
 
 		// first check for cold emission, which are generated only on departure link.
 		for (ColdEmissionEvent e : emissEventHandler.coldEvents ) {

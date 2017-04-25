@@ -98,6 +98,10 @@
 		
 	</module>
 	
+	<module name="dvrp">
+		<param name="mode" value="taxi"/>
+	</module>
+	
 	<module name="taxi">
 
 		<!-- Used in AStarEuclidean for shortest path search for occupied drives. 

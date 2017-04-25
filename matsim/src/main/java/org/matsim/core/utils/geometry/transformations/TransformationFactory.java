@@ -43,6 +43,7 @@ public abstract class TransformationFactory {
 	public final static String WGS84_SA_Albers = "WGS84_SA_Albers"; // South Africa (Adapted version of Africa Albers Equal) 
 	public final static String HARTEBEESTHOEK94_LO19 = "SA_Lo19"; // South Africa adaption of Transverse Mercator.
 	public final static String HARTEBEESTHOEK94_LO29 = "SA_Lo29"; // South Africa adaption of Transverse Mercator.
+	public final static String HARTEBEESTHOEK94_LO31 = "SA_Lo31"; // South Africa adaption of Transverse Mercator.
 	public final static String WGS84_UTM33N = "WGS84_UTM33N"; // Berlin
 	public final static String DHDN_GK4 = "DHDN_GK4"; // berlin/germany, for GeoTools
 	public final static String WGS84_UTM29N = "WGS84_UTM29N"; // coimbra/portugal

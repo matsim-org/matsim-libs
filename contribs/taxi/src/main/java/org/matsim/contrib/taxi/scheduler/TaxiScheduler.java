@@ -21,8 +21,7 @@ package org.matsim.contrib.taxi.scheduler;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -47,28 +46,28 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 
-	public TaxiScheduler(Scenario scenario, Fleet fleet, MobsimTimer timer, TaxiSchedulerParams params,
-			TravelTime travelTime, TravelDisutility travelDisutility) {
+	public TaxiScheduler(TaxiConfigGroup taxiCfg, Network network, Fleet fleet, MobsimTimer timer,
+			TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility) {
 		this.fleet = fleet;
 		this.params = params;
 		this.timer = timer;
 		this.travelTime = travelTime;
 
 		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
-		preProcessEuclidean.run(scenario.getNetwork());
+		preProcessEuclidean.run(network);
 
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
-				.createRoutingNetwork(scenario.getNetwork());
+				.createRoutingNetwork(network);
 
 		router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility, travelTime,
 				params.AStarEuclideanOverdoFactor, fastRouterFactory);
 
-		initFleet(scenario);
+		initFleet(taxiCfg);
 	}
 
-	private void initFleet(Scenario scenario) {
-		if (TaxiConfigGroup.get(scenario.getConfig()).isChangeStartLinkToLastLinkInSchedule()) {
+	private void initFleet(TaxiConfigGroup taxiCfg) {
+		if (taxiCfg.isChangeStartLinkToLastLinkInSchedule()) {
 			for (Vehicle veh : fleet.getVehicles().values()) {
 				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
 			}

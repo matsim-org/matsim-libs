@@ -147,13 +147,9 @@ public class PatnaEmissionsWriter {
         PatnaEmissionVehicleCreator emissionVehicleCreatorHandler = new PatnaEmissionVehicleCreator(scenario);
 
         String emissionEventOutputFile = outputDir + "/output_emissions_events.xml.gz";
-        EmissionModule emissionModule = new EmissionModule(scenario);
-        emissionModule.createLookupTables();
-        emissionModule.createEmissionHandler();
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
-        eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-        eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+        EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
         eventsManager.addHandler(emissionVehicleCreatorHandler);
 
         EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
@@ -164,7 +160,7 @@ public class PatnaEmissionsWriter {
 
         emissionEventWriter.closeFile();
 
-        emissionModule.writeEmissionInformation(emissionEventOutputFile);
+        emissionModule.writeEmissionInformation();
     }
 
     class PatnaEmissionVehicleCreator implements PersonDepartureEventHandler {

@@ -19,37 +19,34 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonUtils;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.misc.Counter;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.misc.Counter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
  */
 public class RandomSelectorsTest {
-	private static interface SelectorFactory {
-		public GroupLevelPlanSelector create(Random r);
-	}
 
 	private final List<ReplanningGroup> testGroups = new ArrayList<ReplanningGroup>();
 	private JointPlans jointPlans = new JointPlans();
@@ -58,6 +55,11 @@ public class RandomSelectorsTest {
 	public void clear() {
 		testGroups.clear();
 		jointPlans = new JointPlans();
+	}
+
+	@Before
+	public void setTrace() {
+		if ( false ) Logger.getLogger( RandomGroupLevelSelector.class ).setLevel( Level.TRACE );
 	}
 
 	@Before
@@ -283,20 +285,108 @@ public class RandomSelectorsTest {
 				jointPlans.getFactory().createJointPlan( jp8 ) );
 	}
 
-	@Test
-	public void testRandomSelector() throws Exception {
-		testDeterminism( new SelectorFactory() {
-			@Override
-			public GroupLevelPlanSelector create(final Random r) {
-				return new RandomGroupLevelSelector(
-						r,
-						new EmptyIncompatiblePlansIdentifierFactory());
-			}
-		});
+	@Before
+	public void createPartiallyJointPlans() {
+		ReplanningGroup group = new ReplanningGroup();
+		testGroups.add( group );
+
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+
+		Id<Person> id = Id.createPersonId( "tintin" );
+		final Id<Person> id1 = id;
+		Person person = PopulationUtils.getFactory().createPerson(id1);
+		group.addPerson( person );
+		Plan plan = PersonUtils.createAndAddPlan(person, false);
+		plan.setScore( 145d );
+		plan = PersonUtils.createAndAddPlan(person, true);
+		plan.setScore( 142d );
+		jp1.put( id , plan );
+
+		id = Id.createPersonId( "milou" );
+		final Id<Person> id2 = id;
+		person = PopulationUtils.getFactory().createPerson(id2);
+		group.addPerson( person );
+		plan = PersonUtils.createAndAddPlan(person, false);
+		plan.setScore( 116d );
+		plan = PersonUtils.createAndAddPlan(person, true);
+		plan.setScore( 115d );
+		jp1.put( id , plan );
+
+		id = Id.createPersonId( "tim" );
+		final Id<Person> id3 = id;
+		person = PopulationUtils.getFactory().createPerson(id3);
+		group.addPerson( person );
+		plan = PersonUtils.createAndAddPlan(person, false);
+		plan.setScore( 150.6 );
+		plan = PersonUtils.createAndAddPlan(person, true);
+		plan.setScore( 150.8 );
+		jp2.put( id , plan );
+
+		id = Id.createPersonId( "struppy" );
+		final Id<Person> id4 = id;
+		person = PopulationUtils.getFactory().createPerson(id4);
+		group.addPerson( person );
+		plan = PersonUtils.createAndAddPlan(person, false);
+		plan.setScore( 171.7 );
+		plan = PersonUtils.createAndAddPlan(person, true);
+		plan.setScore( 171.5 );
+		jp2.put( id , plan );
+
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp1 ) );
+		jointPlans.addJointPlan(
+				jointPlans.getFactory().createJointPlan( jp2 ) );
 	}
 
-	private void testDeterminism(
-			final SelectorFactory factory) {
+	@Before
+	public void createRandomFixtures() {
+		final Random random = new Random( 42 );
+		for ( int i=0; i < 100; i++ ) {
+			ReplanningGroup group = new ReplanningGroup();
+			testGroups.add( group );
+
+			final List<List<Plan>> planLists = new ArrayList<>();
+			for ( int pNr=0; pNr < 5; pNr++ ) {
+				Person person = PopulationUtils.getFactory().createPerson( Id.create( pNr , Person.class ) );
+				group.addPerson( person );
+
+				final List<Plan> plans = new ArrayList<>();
+				planLists.add( plans );
+
+				for ( int planNr=0; planNr < 5; planNr++ ) {
+					final Plan plan = PopulationUtils.getFactory().createPlan();
+					plan.setScore( random.nextDouble() );
+					person.addPlan( plan );
+					// keep one individual plan
+					if ( planNr > 0 ) plans.add( plan );
+				}
+			}
+
+			// create random joint plans.
+			while ( !planLists.isEmpty() ) {
+				int n = 1 + random.nextInt( planLists.size() );
+				final Map<Id<Person>,Plan> jp = new HashMap<>();
+
+				Collections.shuffle( planLists , random );
+				final Iterator<List<Plan>> it = planLists.iterator();
+				while ( n-- > 0 ) {
+					final List<Plan> list = it.next();
+
+					final Plan plan = list.remove( 0 );
+					if ( list.isEmpty() ) it.remove();
+
+					jp.put( plan.getPerson().getId() , plan );
+				}
+
+				jointPlans.addJointPlan(
+						jointPlans.getFactory().createJointPlan( jp ) );
+			}
+		}
+	}
+
+	@Test
+	public void testDeterminism() throws Exception {
 		final int seed = 1264;
 
 		final Counter count = new Counter( "selection # " );
@@ -304,7 +394,10 @@ public class RandomSelectorsTest {
 			GroupPlans previous = null;
 			for (int i=0; i<100; i++) {
 				count.incCounter();
-				GroupLevelPlanSelector selector = factory.create( new Random( seed ) );
+				final GroupLevelPlanSelector selector =
+						new RandomGroupLevelSelector(
+								new Random( seed ),
+								new EmptyIncompatiblePlansIdentifierFactory() );
 
 				final GroupPlans selected = selector.selectPlans(
 						jointPlans , group );
@@ -321,5 +414,33 @@ public class RandomSelectorsTest {
 		}
 		count.printCounter();
 	}
+
+	@Test
+	public void testNoFailuresWithVariousSeeds() throws Exception {
+		final RandomGroupLevelSelector selector = new RandomGroupLevelSelector(
+				new Random( 123 ),
+				new EmptyIncompatiblePlansIdentifierFactory());
+
+		final Counter count = new Counter( "selection # " );
+		final Counter groupCount = new Counter( "group # " );
+		for (ReplanningGroup group : testGroups) {
+			groupCount.incCounter();
+			for (int i=0; i<500; i++) {
+				count.incCounter();
+
+				final GroupPlans selected = selector.selectPlans(
+						jointPlans , group );
+
+				if (selected == null) throw new NullPointerException( "test is useless if the selector returns null" );
+
+				Assert.assertEquals( "unexpected selected plan size" ,
+						selected.getAllIndividualPlans().size(),
+						group.getPersons().size() );
+			}
+		}
+		groupCount.printCounter();
+		count.printCounter();
+	}
+
 }
 

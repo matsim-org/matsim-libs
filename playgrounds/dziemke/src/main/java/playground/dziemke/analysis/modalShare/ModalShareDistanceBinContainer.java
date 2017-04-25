@@ -1,8 +1,6 @@
 package playground.dziemke.analysis.modalShare;
 
 import org.apache.log4j.Logger;
-import playground.gthunig.DistanceBins.DistanceBin;
-import playground.gthunig.DistanceBins.DistanceBinContainer;
 
 /**
  * @author gthunig on 23.03.2017.
