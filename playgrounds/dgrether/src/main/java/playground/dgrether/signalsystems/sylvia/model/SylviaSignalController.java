@@ -24,9 +24,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.CheckedOutputStream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
@@ -34,9 +39,11 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.AbstractSignalController;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
+import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.Lane;
 
@@ -63,17 +70,17 @@ public class SylviaSignalController extends AbstractSignalController implements 
 	public final static class SignalControlProvider implements Provider<SignalController>{
 		private DgSylviaConfig sylviaConfig;
 		private LinkSensorManager sensorManager;
-		private SignalsData signalsData;
+		private Scenario scenario;
 		
-		public SignalControlProvider(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData) {
+		public SignalControlProvider(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, Scenario scenario) {
 			this.sylviaConfig = sylviaConfig;
 			this.sensorManager = sensorManager;
-			this.signalsData = signalsData;
+			this.scenario = scenario;
 		}
 		
 		@Override
 		public SylviaSignalController get() {
-			return new SylviaSignalController(sylviaConfig, sensorManager, signalsData);
+			return new SylviaSignalController(sylviaConfig, sensorManager, scenario);
 		}
 	}
 	
@@ -88,14 +95,25 @@ public class SylviaSignalController extends AbstractSignalController implements 
 	private int secondInCycle = -1; //used for debug output
 	private DgExtensionPoint currentExtensionPoint;
 
-	private DgSylviaConfig sylviaConfig;
-	private LinkSensorManager sensorManager;
-	private SignalsData signalsData;
+	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
+	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
+	/* the controller will allow a delay of at most this factor times the free speed travel time */
+	private static final double DELAY_FACTOR = 1;
+	/* the controller will allow a link occupation of at most this factor times the maximum number of vehicles regarding to the storage capacity */
+	private static final double STORAGE_FACTOR = 0.75;
 
-	private SylviaSignalController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, SignalsData signalsData) {
+	private final DgSylviaConfig sylviaConfig;
+	private final LinkSensorManager sensorManager;
+	private final SignalsData signalsData;
+	private final Network network;
+	private final JDEQSimConfigGroup jdeQSim;
+
+	private SylviaSignalController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, Scenario scenario) {
 		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
-		this.signalsData = signalsData;
+		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		this.network = scenario.getNetwork();
+		this.jdeQSim = scenario.getConfig().jdeqSim();
 		this.init();
 	}
 	
@@ -108,6 +126,7 @@ public class SylviaSignalController extends AbstractSignalController implements 
 		this.extensionPointMap = new HashMap<>();
 		this.forcedExtensionPointMap = new HashMap<>();
 		this.initCycle();
+		if (sylviaConfig.isCheckDownstream()) initDownstream();
 	}
 
 
@@ -115,6 +134,19 @@ public class SylviaSignalController extends AbstractSignalController implements 
 		this.secondInSylviaCycle = -1; //as this is incremented before use
 		this.secondInCycle = -1;
 		this.extensionTime = 0;
+	}
+	
+	private void initDownstream() {
+		// determine different occupancy criterion for links, i.e. maximum number of vehicles
+		for (Link link : network.getLinks().values()) {
+			// maximum number = storage capacity * factor
+			linkMaxNoCarsForStorage.put(link.getId(), (int) ((link.getLength() / jdeQSim.getCarSize()) * STORAGE_FACTOR));
+
+			// maximum number such that (free speed travel time * factor) can be reached (when vehicles are distributed uniformly over time)
+			int maxNoCarsForFreeSpeedTT = (int) Math.ceil((link.getLength() / link.getFreespeed()) * DELAY_FACTOR * (link.getCapacity() / 3600));
+			linkMaxNoCarsForFreeSpeed.put(link.getId(), maxNoCarsForFreeSpeedTT);
+//			log.info("setting max number of cars for free speed travel time to " + maxNoCarsForFreeSpeedTT);
+		}		
 	}
 	
 	/**
@@ -155,6 +187,7 @@ public class SylviaSignalController extends AbstractSignalController implements 
 		else { // no extension is active
 			// increment the number of seconds that the basic plan is processed
 			this.secondInSylviaCycle++;
+			// TODO what happens when first sim sim event is not at second 0? it does not extend the phase then?! theresa apr'17
 			
 			//check for forced extension trigger (end of the last phase of the plan)
 			if (this.forcedExtensionPointMap.containsKey(this.secondInSylviaCycle)){
@@ -255,16 +288,13 @@ public class SylviaSignalController extends AbstractSignalController implements 
 	private boolean checkExtensionCondition(double currentTime, DgExtensionPoint extensionPoint){
 		if (this.isExtensionTimeLeft()) {
 			//check if there is some green time left or one of the groups is over its maximal green time
-			boolean greenTimeLeft = true;
 			for (Id<SignalGroup> signalGroupId : extensionPoint.getSignalGroupIds()){
 					if (! this.isGreenTimeLeft(currentTime, signalGroupId, extensionPoint.getMaxGreenTime(signalGroupId))){
-						greenTimeLeft = false;
+						return false;
 					}
 			}
-			//if there is green time left check traffic state
-			if (greenTimeLeft){
-				return this.checkTrafficConditions(currentTime, extensionPoint);
-			}
+			//if return was not reached yet, green time is left. check sensor data:
+			return this.checkTrafficConditions(currentTime, extensionPoint);
 		}
 		return false;
 	}
@@ -284,14 +314,16 @@ public class SylviaSignalController extends AbstractSignalController implements 
 			if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 				noCars = this.sensorManager.getNumberOfCarsInDistance(signal.getLinkId(), this.sylviaConfig.getSensorDistanceMeter(), currentTime);
 				if (noCars > 0){
-					return true;
+//					return true;
+					return checkDownstream(signal.getTurningMoveRestrictions());
 				}
 			}
 			else {
 				for (Id<Lane> laneId : signal.getLaneIds()){
 					noCars = this.sensorManager.getNumberOfCarsOnLane(signal.getLinkId(), laneId);
 					if (noCars > 0){
-						return true;
+//						return true;
+						return checkDownstream(signal.getTurningMoveRestrictions());
 					}
 				}
 			}
@@ -299,7 +331,22 @@ public class SylviaSignalController extends AbstractSignalController implements 
 		return false;
 	}
 	
-	
+	// Return true if downstream links are empty; false if at least one downstream link is occupied
+	private boolean checkDownstream(Set<Id<Link>> turningMoveRestrictions) {
+		if (sylviaConfig.isCheckDownstream()){
+			// TODO outsource downstream check to separate sensor (DownstreamSensor)
+			for (Id<Link> downstreamLinkId : turningMoveRestrictions){
+				int numberOfCarsOnLink = this.sensorManager.getNumberOfCarsOnLink(downstreamLinkId);
+				int maxNoCarsForStorage = linkMaxNoCarsForStorage.get(downstreamLinkId);
+				int maxNoCarsForFreespeed = linkMaxNoCarsForFreeSpeed.get(downstreamLinkId);
+				if (numberOfCarsOnLink > Math.min(maxNoCarsForStorage, maxNoCarsForFreespeed)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public void reset(Integer iterationNumber) {
 		this.init();
@@ -381,14 +428,12 @@ public class SylviaSignalController extends AbstractSignalController implements 
 			}
 			
 			// put all extension points in a map ordered by time
-			DgExtensionPoint extPoint = null;
 			if (! this.extensionPointMap.containsKey(extensionMoment)){
-				extPoint = new DgExtensionPoint(extensionMoment);
-				this.extensionPointMap.put(extensionMoment, extPoint);
+				this.extensionPointMap.put(extensionMoment, new DgExtensionPoint(extensionMoment));
 //				// comment this out because it is not needed and not used. tt, oct'16
 //				sylvia.addExtensionPoint(extPoint); 
 			}
-			extPoint = this.extensionPointMap.get(extensionMoment);
+			DgExtensionPoint extPoint = this.extensionPointMap.get(extensionMoment);
 			extPoint.addSignalGroupId(settings.getSignalGroupId());
 
 			//calculate max green time
@@ -428,6 +473,8 @@ public class SylviaSignalController extends AbstractSignalController implements 
 	/**
 	 * Collect all signals of the signal system and prepare sensors (event handlers) upstream of them
 	 * to count vehicles in a specific distance (when no lanes are used) or on the last lane (if lanes are used).
+	 * 
+	 * Prepare also downstream sensors if checkDownstream is enabled in sylviaConfig
 	 */
 	private void initializeSensoring(){
 		for (DgExtensionPoint extPoint : this.extensionPointMap.values()){
@@ -448,6 +495,17 @@ public class SylviaSignalController extends AbstractSignalController implements 
 						this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
 					}
 				}
+			}
+		}
+		
+		if (sylviaConfig.isCheckDownstream()){
+			// initialize downstream sensors
+			for (Signal signal : system.getSignals().values()){
+				Node systemNode = this.network.getLinks().get(signal.getLinkId()).getToNode();
+				for (Id<Link> outgoingLinkId : systemNode.getOutLinks().keySet()) {
+					this.sensorManager.registerNumberOfCarsMonitoring(outgoingLinkId);
+				}
+				break; // systemNode is the same for all signals of the system
 			}
 		}
 	}	
