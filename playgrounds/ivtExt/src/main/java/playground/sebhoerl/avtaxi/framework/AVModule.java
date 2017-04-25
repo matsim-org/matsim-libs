@@ -115,10 +115,6 @@ public class AVModule extends AbstractModule {
         bind(SelfishDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
 
-        bind(SelfishVoronoiDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), SelfishVoronoiDispatcher.class.getSimpleName()).to(SelfishVoronoiDispatcher.Factory.class);
-
-
         /** dispatchers for PartitionedDispatcher */
         //bind(ConsensusDispatcherDFR.Factory.class);
         bind(LPFeedbackLIPDispatcher.Factory.class);
