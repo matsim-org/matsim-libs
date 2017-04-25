@@ -53,9 +53,6 @@ public class SelfishDispatcher extends UniversalDispatcher {
     private final HashSet<AVRequest> openRequests = new HashSet<>();
     private final double[] networkBounds;
 
-    // data structure for storing requests closest to each vehicle
-    private final HashMap<AVVehicle, List<AVRequest>> voronoiSets = new HashMap<>();
-
     private SelfishDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             AVGeneratorConfig generatorConfig, //
@@ -78,7 +75,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
         network = networkIn;
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
-        networkLinksTree = buildNetworkQuadTree();
+        networkLinksTree = buildNetworkTree();
 
     }
 
@@ -106,23 +103,27 @@ public class SelfishDispatcher extends UniversalDispatcher {
                 }
                                
                 // if requests present ...
-                if (getAVRequests().size() > 0) {
-                    
+                if (!getAVRequests().isEmpty()) { 
                     if (useVoronoiSets) { // check whether to use the Voronoi sets in the selfish strategy
-                        updateVoronoiSets();
+           
+                        HashMap<AVVehicle, QuadTree<AVRequest>> voronoiSets = computeVoronoiSets();
+                                    
                         for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-                            List<AVRequest> voronoiSet = voronoiSets.get(vehicleLinkPair.avVehicle);
-                            if (!voronoiSet.isEmpty()) {
-                                setVehicleDiversion(vehicleLinkPair, findClosestRequest(vehicleLinkPair, voronoiSet));
+                            Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
+                            QuadTree<AVRequest> voronoiSet = voronoiSets.get(vehicleLinkPair.avVehicle);
+                            if (voronoiSet.size() > 0) {
+                                AVRequest closestRequest = voronoiSet.getClosest(vehicleCoord.getX(), vehicleCoord.getY());
+                                // AVRequest closestRequest findClosestRequest(vehicleLinkPair, voronoiSet.values());
+                                setVehicleDiversion(vehicleLinkPair, closestRequest.getFromLink());
                             }
                         }
                     } else { // send every vehicle to closest customer
-                        if (getAVRequests().size() > 0) {
-                            getDivertableVehicles().stream() //
-                                    .forEach(v -> setVehicleDiversion(v, findClosestRequest(v, getAVRequests())));
+                        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                            Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
+                            AVRequest closestRequest = pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());  
+                            setVehicleDiversion(vehicleLinkPair, closestRequest.getFromLink());
                         }
-                    }
-                    
+                    }                    
                 }
                 
                 // send remaining vehicles to their reference position
@@ -139,9 +140,8 @@ public class SelfishDispatcher extends UniversalDispatcher {
     /**
      * 
      */
-    private QuadTree<Link> buildNetworkQuadTree() {
-        QuadTree<Link> networkQuadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2],
-                networkBounds[3]);
+    private QuadTree<Link> buildNetworkTree() {
+        QuadTree<Link> networkQuadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
         Collection<? extends Link> networkLinks = network.getLinks().values();
         for (Link link : networkLinks) {
             GlobalAssert.that(link != null);
@@ -174,15 +174,26 @@ public class SelfishDispatcher extends UniversalDispatcher {
 
     /**
      * @param vehicleLinkPair
-     *            some vehicle link pair
+     *            some vehicleLinkPair
      * @param avRequests
-     *            list of currently open AVRequests
-     * @return the Link with fromNode closest to vehicleLinkPair
-     *         divertableLocation fromNode
+     *            list of AVRequests
+     * @return the closest request (with respect to its From node coord)
      */
-    private Link findClosestRequest(VehicleLinkPair vehicleLinkPair, Collection<AVRequest> avRequests) {
+    private static AVRequest findClosestRequest(VehicleLinkPair vehicleLinkPair, Collection<AVRequest> avRequests) {
+        
         Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
-        return pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY()).getFromLink();
+        AVRequest closestRequest = null;
+        double closestDistance = Double.POSITIVE_INFINITY;
+        for (AVRequest avRequest : avRequests) {
+            Coord requestCoord = avRequest.getFromLink().getFromNode().getCoord();
+            double distance = Math.hypot(requestCoord.getX() - vehicleCoord.getX(), requestCoord.getY() - vehicleCoord.getY());
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestRequest = avRequest;
+            }
+        }
+        GlobalAssert.that(closestRequest != null);
+        return closestRequest;
     }
 
     /**
@@ -200,37 +211,38 @@ public class SelfishDispatcher extends UniversalDispatcher {
     }
 
     /**
-     * update the Voronoi set for each AV
+     * compute the Voronoi set for each AV
      */
-    private void updateVoronoiSets() {
-        // clear the Voronoi set for each vehicle
+    private HashMap<AVVehicle, QuadTree<AVRequest>> computeVoronoiSets() {
+        
+        HashMap<AVVehicle, QuadTree<AVRequest>> voronoiSets = new HashMap<>();
         for (AVVehicle avVehicle : getMaintainedVehicles()) {
-            voronoiSets.get(avVehicle).clear();
-            GlobalAssert.that(voronoiSets.get(avVehicle).isEmpty());
+            voronoiSets.put(avVehicle, new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]));
         }
+        
         // for each outstanding request, assign it to the Voronoi set of the closest divertible AV
         for (AVRequest avRequest : getAVRequests()) {
-            Coord reqCoord = avRequest.getFromLink().getCoord();
+            Coord requestCoord = avRequest.getFromLink().getFromNode().getCoord();
             AVVehicle closestVehicle = null;
-            double closestDistance = Double.MAX_VALUE;
+            double closestDistance = Double.POSITIVE_INFINITY;
             for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
                 
                 Coord avCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                 // Coord avCoord = refPositions.get(vehicleLinkPair.avVehicle).getCoord();
                 
-                double distance = Math.hypot(reqCoord.getX() - avCoord.getX(), reqCoord.getY() - avCoord.getY());
+                double distance = Math.hypot(requestCoord.getX() - avCoord.getX(), requestCoord.getY() - avCoord.getY());
                 if (distance < closestDistance) {
                     closestDistance = distance;
                     closestVehicle = vehicleLinkPair.avVehicle; // TODO how to deal with equidistant vehicles?
                 }
             }
-            if (closestDistance < Double.MAX_VALUE) {
-                GlobalAssert.that(closestVehicle != null);
-                voronoiSets.get(closestVehicle).add(avRequest);
-            }
+            GlobalAssert.that(closestVehicle != null);    
+            boolean putSuccess = voronoiSets.get(closestVehicle).put(requestCoord.getX(), requestCoord.getY(), avRequest);
+            GlobalAssert.that(putSuccess);
         }
+        return voronoiSets;
     }
-
+    
     /**
      *
      * @param avRequests
@@ -327,9 +339,6 @@ public class SelfishDispatcher extends UniversalDispatcher {
 
             // assign a random link from the network to every AV
             refPositions.put(avVehicle, networkLinks.get(0));
-
-            // create an empty Voronoi set for every AV
-            voronoiSets.put(avVehicle, new ArrayList<>());
         }
         vehiclesInitialized = true;
     }
