@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -46,6 +47,99 @@ public class VirtualNetworkIO {
     
     
     /**
+     * Saves virtualNetwork as a bitmap file
+     * @param file
+     * @param virtualNetwork
+     * @throws IOException
+     */
+    public static void toByte(File file, VirtualNetwork virtualNetwork) throws IOException{
+        Files.write(file.toPath(), ObjectFormat.of(virtualNetwork));        
+    }
+    
+    
+    /**
+     * loads virtualNetwork from a bitmap file
+     * @param network
+     * @param file
+     * @return
+     * @throws ClassNotFoundException
+     * @throws DataFormatException
+     * @throws IOException
+     */
+    public static VirtualNetwork fromByte(Network network, File file) throws ClassNotFoundException, DataFormatException, IOException{
+        VirtualNetwork virtualNetwork = ObjectFormat.parse(Files.readAllBytes(file.toPath())); 
+        virtualNetwork.fillSerializationInfo(network);  
+        return virtualNetwork;
+    }
+    
+    
+    
+    /**
+     * Only for debugging purposes (printing)
+     * @param fileName
+     * @param virtualNetwork
+     * @throws IOException
+     */
+    public static void toXML(String fileName, VirtualNetwork virtualNetwork) throws IOException {
+
+        Element rootElement = new Element("virtualNetwork");
+        rootElement.setAttribute(new Attribute("name", "VNName"));
+
+
+        // add virtualNodes to network (sort according to name)
+        Comparator<VirtualNode> byString = (e1, e2) -> e1.getId().compareTo(e2.getId());
+        Comparator<VirtualNode> byIntID = (e1, e2) -> Integer.compare(e1.getIndex(), e2.getIndex());
+        List<VirtualNode> virtualNodesSorted = virtualNetwork.getVirtualNodes().stream().sorted(byIntID).collect(Collectors.toList());
+        
+        Element virtualNodeselem = new Element(VIRTUALNODENAME+"s");
+        for (VirtualNode virtualNode : virtualNodesSorted) {
+            Element virtualNodeelem = new Element(VIRTUALNODENAME);
+            // set attributes
+            virtualNodeelem.setAttribute(new Attribute(IDNAME, virtualNode.getId()));
+            virtualNodeelem.setAttribute(new Attribute(XNAME, Double.toString(virtualNode.getCoord().getX())));
+            virtualNodeelem.setAttribute(new Attribute(YNAME, Double.toString(virtualNode.getCoord().getY())));
+            virtualNodeelem.setAttribute(new Attribute(NUMBERNEIGHBORNAME, Integer.toString(virtualNode.getNeighCount())));
+            // add links
+            Element linksElement = new Element(LINKNAME+"s");
+            for(Link link : virtualNode.getLinks()){
+                Element linkElem = new Element(LINKNAME);
+                linkElem.setAttribute(IDNAME,link.getId().toString());
+                linksElement.addContent(linkElem);
+            }
+            virtualNodeelem.addContent(linksElement);
+            
+            
+            virtualNodeselem.addContent(virtualNodeelem);
+        }
+        rootElement.addContent(virtualNodeselem);
+        
+        // add virtualLinks to network
+        Element virtualLinkselem = new Element(VIRTUALLINKNAME+"s");
+        for (VirtualLink virtualLink : virtualNetwork.getVirtualLinks()) {
+            Element virtualLinkelem = new Element(VIRTUALLINKNAME);
+            virtualLinkelem.setAttribute(new Attribute(IDNAME, virtualLink.getId()));
+            virtualLinkelem.setAttribute(new Attribute(FROMNAME, virtualLink.getFrom().getId()));
+            virtualLinkelem.setAttribute(new Attribute(TONAME, virtualLink.getTo().getId()));
+            virtualLinkelem.setAttribute(new Attribute(LINKTRAVELTIMENAME, Double.toString(virtualLink.getTtime())));
+            virtualLinkselem.addContent(virtualLinkelem);
+        }
+        rootElement.addContent(virtualLinkselem);
+
+        
+        Document doc = new Document(rootElement);
+        XMLOutputter xmlOutput = new XMLOutputter();
+
+        // display ml
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        xmlOutput.output(doc, new FileWriter(fileName));
+
+    }
+    
+    
+    
+    
+    
+    /**
      * Function that loads a virtual network from a virtualNetwork.xml file
      *
      * @param network
@@ -54,6 +148,7 @@ public class VirtualNetworkIO {
      *            the file location of the virtualNetwork.xml file
      * @return
      */
+    @Deprecated // only bitmap storage will be supported
     public static VirtualNetwork fromXML(Network network, File file) {
         VirtualNetwork virtualNetwork = new VirtualNetwork();
 
@@ -130,70 +225,6 @@ public class VirtualNetworkIO {
         return null;
     }
 
-    public static void toXML(String fileName, VirtualNetwork virtualNetwork) throws IOException {
-
-        Element rootElement = new Element("virtualNetwork");
-        rootElement.setAttribute(new Attribute("name", "VNName"));
-
-
-        // add virtualNodes to network (sort according to name)
-        Comparator<VirtualNode> byString = (e1, e2) -> e1.getId().compareTo(e2.getId());
-        Comparator<VirtualNode> byIntID = (e1, e2) -> Integer.compare(e1.getIndex(), e2.getIndex());
-        List<VirtualNode> virtualNodesSorted = virtualNetwork.getVirtualNodes().stream().sorted(byIntID).collect(Collectors.toList());
-        
-        Element virtualNodeselem = new Element(VIRTUALNODENAME+"s");
-        for (VirtualNode virtualNode : virtualNodesSorted) {
-            Element virtualNodeelem = new Element(VIRTUALNODENAME);
-            // set attributes
-            virtualNodeelem.setAttribute(new Attribute(IDNAME, virtualNode.getId()));
-            virtualNodeelem.setAttribute(new Attribute(XNAME, Double.toString(virtualNode.getCoord().getX())));
-            virtualNodeelem.setAttribute(new Attribute(YNAME, Double.toString(virtualNode.getCoord().getY())));
-            virtualNodeelem.setAttribute(new Attribute(NUMBERNEIGHBORNAME, Integer.toString(virtualNode.getNeighCount())));
-            // add links
-            Element linksElement = new Element(LINKNAME+"s");
-            for(Link link : virtualNode.getLinks()){
-                Element linkElem = new Element(LINKNAME);
-                linkElem.setAttribute(IDNAME,link.getId().toString());
-                linksElement.addContent(linkElem);
-            }
-            virtualNodeelem.addContent(linksElement);
-            
-            
-            virtualNodeselem.addContent(virtualNodeelem);
-        }
-        rootElement.addContent(virtualNodeselem);
-        
-        // add virtualLinks to network
-        Element virtualLinkselem = new Element(VIRTUALLINKNAME+"s");
-        for (VirtualLink virtualLink : virtualNetwork.getVirtualLinks()) {
-            Element virtualLinkelem = new Element(VIRTUALLINKNAME);
-            virtualLinkelem.setAttribute(new Attribute(IDNAME, virtualLink.getId()));
-            virtualLinkelem.setAttribute(new Attribute(FROMNAME, virtualLink.getFrom().getId()));
-            virtualLinkelem.setAttribute(new Attribute(TONAME, virtualLink.getTo().getId()));
-            virtualLinkelem.setAttribute(new Attribute(LINKTRAVELTIMENAME, Double.toString(virtualLink.getTtime())));
-            virtualLinkselem.addContent(virtualLinkelem);
-        }
-        rootElement.addContent(virtualLinkselem);
-
-        
-        Document doc = new Document(rootElement);
-        XMLOutputter xmlOutput = new XMLOutputter();
-
-        // display ml
-        xmlOutput.setFormat(Format.getPrettyFormat());
-        xmlOutput.output(doc, new FileWriter(fileName));
-
-    }
-
-    public static void toByte(File file, VirtualNetwork virtualNetwork) throws IOException{
-        Files.write(file.toPath(), ObjectFormat.of(virtualNetwork));        
-    }
-    
-    public static VirtualNetwork fromByte(Network network, String fileName){
-    //    return ObjectFormat.parse(Files.readAllBytes(fileName);
-        return null; 
-    }
-    
     
 
 
