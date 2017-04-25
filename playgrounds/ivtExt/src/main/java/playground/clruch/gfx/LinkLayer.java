@@ -45,7 +45,7 @@ public class LinkLayer extends ViewerLayer {
     Map<Long, SimulationObject> lruCache = LruCache.create(MAXHISTORY);
 
     int historyLength = 4;
-    int loadScale = 3;
+    int loadScale = 5;
     Tensor matrix = null; //
 
     public LinkLayer(MatsimMapComponent matsimMapComponent) {
@@ -98,19 +98,20 @@ public class LinkLayer extends ViewerLayer {
             GraphicsUtil.setQualityHigh(graphics);
             // System.out.println(linkStats.linkIndex.size());
             double scaling = loadScale * 1000;
-            for (Entry<Integer,Tensor> entry : linkStats.linkTensor.entrySet()) {
+            for (Entry<Integer, Tensor> entry : linkStats.linkTensor.entrySet()) {
                 final int index = entry.getKey();
                 final OsmLink osmLink = matsimMapComponent.db.getOsmLink(index);
-                final double factor = osmLink.getLength() * matsimMapComponent.getMeterPerPixel();
+                final double factor = Math.max(osmLink.getLength(), 1) * matsimMapComponent.getMeterPerPixel();
                 Point p1 = matsimMapComponent.getMapPosition(osmLink.getCoordFrom());
                 if (p1 != null) {
                     Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getCoordTo());
                     Tensor linkTable = weight.dot(entry.getValue());
                     final double total = Total.of(linkTable).Get().number().doubleValue();
                     final double carsEmpty = linkTable.Get(1).number().doubleValue();
-                    // System.out.println(total + " " + carsEmpty);
-                    double h = (carsEmpty / (double) total + 0.8) / 3;
-                    graphics.setColor(new Hue(h, 1, .85, .75).rgba);
+                    double ratio = carsEmpty / (double) total;
+                    double h = (ratio + 0.8) / 3; // r=0->Green, r=1->Blue
+                    double v = 0.84 + ratio * .15; // r=0->, r=1->Brighter
+                    graphics.setColor(new Hue(h, 1, v, .75).rgba);
                     Stroke stroke = new BasicStroke((float) Math.sqrt(scaling * total / factor));
                     graphics.setStroke(stroke);
                     Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);

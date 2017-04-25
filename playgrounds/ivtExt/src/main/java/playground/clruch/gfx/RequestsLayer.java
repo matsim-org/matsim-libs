@@ -73,6 +73,7 @@ public class RequestsLayer extends ViewerLayer {
         maxWaitTime = 0;
         // draw requests
         graphics.setFont(requestsFont);
+        final boolean showNumbers = drawNumber && 13 < matsimMapComponent.getZoom();
         Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                 .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
         for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
@@ -110,7 +111,7 @@ public class RequestsLayer extends ViewerLayer {
                         graphics.drawLine(x, y, p2.x, p2.y);
                     }
                 }
-                if (drawNumber) {
+                if (showNumbers) {
                     graphics.setColor(Color.GRAY);
                     graphics.drawString("" + numRequests, x, y); // - numRequests
                 }
@@ -148,7 +149,7 @@ public class RequestsLayer extends ViewerLayer {
     protected void createPanel(RowPanel rowPanel) {
         {
             final JCheckBox jCheckBox = new JCheckBox("number");
-            jCheckBox.setToolTipText("exact number of people waiting");
+            jCheckBox.setToolTipText("exact number of people waiting (only for zoom > 13)");
             jCheckBox.setSelected(drawNumber);
             jCheckBox.addActionListener(event -> {
                 drawNumber = jCheckBox.isSelected();
