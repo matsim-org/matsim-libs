@@ -30,13 +30,13 @@ public class NetworkConverter {
         config.network().setInputFile(fileImport.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
-        
-        // increasing the second value goes north
+
         // increasing the first value goes right
+        // increasing the second value goes north
         //Coord center = new Coord(2704366.0,1236061.0);
         //Coord center = new Coord(2684648.0,1251492.0);
         //Coord center = new Coord(2684648.0,1251492.0); Center in Kloten
-        Coord center = new Coord(2683000.0,1250500.0);
+        Coord center = new Coord(2683600.0,1251400.0);
         double radius = 9000;
         Network filteredNetwork = NetworkTools.elminateOutsideRadius(network, center, radius);
         
