@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -17,11 +18,13 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
+import playground.clruch.dispatcher.core.UniversalDispatcher;
+
 /**
- * if a vehicle is in stay more and there is a request at the link of where the
- * car is the vehicle will pickup the customer. this is repeated for all
- * possible matches until either there are no more available cars at a link, or
- * no more requests. customers who have waited longer are picked up first.
+ * if a vehicle is in stay more and there is a request at the link of where the car is the vehicle
+ * will pickup the customer. this is repeated for all possible matches until either there are no
+ * more available cars at a link, or no more requests. customers who have waited longer are picked
+ * up first.
  */
 public class InOrderOfArrivalMatcher extends AbstractVehicleRequestMatcher {
     final BiConsumer<AVVehicle, AVRequest> biConsumer;

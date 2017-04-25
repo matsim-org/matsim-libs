@@ -41,7 +41,7 @@ public class ScenarioViewer {
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
-        matsimViewer.jFrame.setSize(800, 900);
+        matsimViewer.jFrame.setSize(900, 900);
         matsimViewer.jFrame.setVisible(true);
     }
 

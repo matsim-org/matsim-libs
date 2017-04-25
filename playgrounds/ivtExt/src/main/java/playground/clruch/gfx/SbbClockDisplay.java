@@ -4,9 +4,11 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.Line2D;
 
-public class SbbClockDisplay {
+class SbbClockDisplay {
 
     int wid = 52;
     int hourRad = 32;
@@ -20,7 +22,7 @@ public class SbbClockDisplay {
     int secCirc = 10;
 
     void drawClock(Graphics2D graphics, long now, Point c) {
-
+        // GraphicsUtil.setQualityHigh(graphics);
         SecondsToHMS hms = new SecondsToHMS(now);
         // code to draw the clock was stolen from https://processing.org/examples/clock.html
         // code adapted by jph
@@ -42,11 +44,8 @@ public class SbbClockDisplay {
             double dy = -Math.cos(h);
             double cx = c.x + dx * hourRad;
             double cy = c.y + dy * hourRad;
-            graphics.drawLine( //
-                    (int) (c.x - hourRadIn * dx), //
-                    (int) (c.y - hourRadIn * dy), //
-                    (int) cx, //
-                    (int) cy);
+            Shape shape = new Line2D.Double(c.x - hourRadIn * dx, c.y - hourRadIn * dy, cx, cy);
+            graphics.draw(shape);
         }
 
         graphics.setStroke(new BasicStroke(3));
@@ -55,11 +54,8 @@ public class SbbClockDisplay {
             double dy = -Math.cos(m);
             double cx = c.x + dx * minRad;
             double cy = c.y + dy * minRad;
-            graphics.drawLine( //
-                    (int) (c.x - minRadAl * dx), //
-                    (int) (c.y - minRadAl * dy), //
-                    (int) cx, //
-                    (int) cy);
+            Shape shape = new Line2D.Double(c.x - minRadAl * dx, c.y - minRadAl * dy, cx, cy);
+            graphics.draw(shape);
         }
 
         // Draw the minute ticks
@@ -77,11 +73,8 @@ public class SbbClockDisplay {
             double dy = -Math.cos(s);
             double cx = c.x + dx * secRadOut;
             double cy = c.y + dy * secRadOut;
-            graphics.drawLine( //
-                    (int) (c.x - secRadIn * dx), //
-                    (int) (c.y - secRadIn * dy), //
-                    (int) cx, //
-                    (int) cy);
+            Shape shape = new Line2D.Double(c.x - secRadIn * dx, c.y - secRadIn * dy, cx, cy);
+            graphics.draw(shape);
             graphics.fillArc((int) cx - secCirc / 2, (int) cy - secCirc / 2, secCirc, secCirc, 0, 360);
         }
 
@@ -94,7 +87,8 @@ public class SbbClockDisplay {
         double y1 = c.y + Math.sin(angle) * minRadOut;
         double x2 = c.x + Math.cos(angle) * minRadIn;
         double y2 = c.y + Math.sin(angle) * minRadIn;
-        graphics.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+        Shape shape = new Line2D.Double(x1, y1, x2, y2);
+        graphics.draw(shape);
     }
 
     void secAt(Graphics2D graphics, Point c, int a) {
@@ -103,7 +97,8 @@ public class SbbClockDisplay {
         double y1 = c.y + Math.sin(angle) * minRadOut;
         double x2 = c.x + Math.cos(angle) * (minRadOut - 1);
         double y2 = c.y + Math.sin(angle) * (minRadOut - 1);
-        graphics.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+        Shape shape = new Line2D.Double(x1, y1, x2, y2);
+        graphics.draw(shape);
     }
 
 }

@@ -4,10 +4,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
 
@@ -15,21 +18,23 @@ import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.utils.gui.RowPanel;
 
-public class RequestLayer extends ViewerLayer {
+public class RequestsLayer extends ViewerLayer {
 
     private static Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
     // ---
+    private volatile boolean drawNumber = true;
     private volatile boolean drawRequestDestinations = false;
 
-    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.ORANGE.colorScheme);
-    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GREEN.colorScheme);
-
-    public RequestLayer(MatsimMapComponent matsimMapComponent) {
-        super(matsimMapComponent);
-    }
-
+    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.Orange);
+    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GreenContour);
     double maxWaitTime;
+
+    public RequestsLayer(MatsimMapComponent matsimMapComponent) {
+        super(matsimMapComponent);
+        requestDestMap.show = false; // default: don't show distrib of request dest
+    }
 
     @Override
     public void prepareHeatmaps(SimulationObject ref) {
@@ -68,6 +73,7 @@ public class RequestLayer extends ViewerLayer {
         maxWaitTime = 0;
         // draw requests
         graphics.setFont(requestsFont);
+        final boolean showNumbers = drawNumber && 13 < matsimMapComponent.getZoom();
         Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                 .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
         for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
@@ -105,8 +111,10 @@ public class RequestLayer extends ViewerLayer {
                         graphics.drawLine(x, y, p2.x, p2.y);
                     }
                 }
-                graphics.setColor(Color.DARK_GRAY);
-                graphics.drawString("" + numRequests, x, y); // - numRequests
+                if (showNumbers) {
+                    graphics.setColor(Color.GRAY);
+                    graphics.drawString("" + numRequests, x, y); // - numRequests
+                }
             }
         }
 
@@ -135,6 +143,34 @@ public class RequestLayer extends ViewerLayer {
 
     public boolean getDrawDestinations() {
         return drawRequestDestinations;
+    }
+
+    @Override
+    protected void createPanel(RowPanel rowPanel) {
+        {
+            final JCheckBox jCheckBox = new JCheckBox("number");
+            jCheckBox.setToolTipText("exact number of people waiting (only for zoom > 13)");
+            jCheckBox.setSelected(drawNumber);
+            jCheckBox.addActionListener(event -> {
+                drawNumber = jCheckBox.isSelected();
+                matsimMapComponent.repaint();
+            });
+            rowPanel.add(jCheckBox);
+        }
+        {
+            final JCheckBox jCheckBox = new JCheckBox("destin.");
+            jCheckBox.setToolTipText("line of travel");
+            jCheckBox.setSelected(getDrawDestinations());
+            jCheckBox.addActionListener(event -> setDrawDestinations(jCheckBox.isSelected()));
+            rowPanel.add(jCheckBox);
+        }
+        createHeatmapPanel(rowPanel, "source", requestHeatMap);
+        createHeatmapPanel(rowPanel, "sink", requestDestMap);
+    }
+
+    @Override
+    public List<MatsimHeatMap> getHeatmaps() {
+        return Arrays.asList(requestHeatMap, requestDestMap);
     }
 
 }

@@ -109,6 +109,16 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
     }
 
     /**
+     * @return map
+     */
+    // possibly not needed but still keep around...
+    // protected Map<VirtualNode, List<AVVehicle>> getVirtualNodeVehiclesWithCustomer() {
+    // Map<AVVehicle, Link> map = getVehiclesWithCustomer();
+    // return map.keySet().stream() //
+    // .collect(Collectors.groupingBy(vehicle -> virtualNetwork.getVirtualNode(map.get(vehicle))));
+    // }
+
+    /**
      * same as getVirtualNodeAvailableVehicles() but returns only vehicles which are currently not in a rebalancing task
      *
      * @return

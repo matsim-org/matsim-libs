@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.Coord;
 import playground.clruch.gheat.DataManager;
 import playground.clruch.gheat.HeatMap;
 import playground.clruch.gheat.PointLatLng;
-import playground.clruch.gheat.graphics.ColorScheme;
+import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.jmapviewer.Tile;
 
 public class MatsimHeatMap {
@@ -19,11 +19,11 @@ public class MatsimHeatMap {
     final DataManager dataManager = new DataManager(matsimDataSource);
     final ImageObserver imageObserver = new JLabel();
 
-    ColorScheme colorScheme;
+    ColorSchemes colorSchemes;
     boolean show = true;
 
-    public MatsimHeatMap(ColorScheme colorScheme) {
-        this.colorScheme = colorScheme;
+    public MatsimHeatMap(ColorSchemes colorSchemes) {
+        this.colorSchemes = colorSchemes;
     }
 
     public void render(Graphics graphics, Tile tile, int zoom, int posx, int posy) {
@@ -31,7 +31,7 @@ public class MatsimHeatMap {
             try {
                 BufferedImage img = HeatMap.GetTile( //
                         dataManager, //
-                        colorScheme, //
+                        colorSchemes.colorScheme, //
                         zoom, //
                         tile.getXtile(), //
                         tile.getYtile());

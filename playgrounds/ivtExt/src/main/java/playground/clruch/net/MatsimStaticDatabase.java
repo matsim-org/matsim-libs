@@ -15,7 +15,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.red.Mean;
+import ch.ethz.idsc.tensor.alg.TensorMap;
+import ch.ethz.idsc.tensor.alg.Transpose;
+import ch.ethz.idsc.tensor.red.Median;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -31,11 +33,10 @@ public class MatsimStaticDatabase {
         CoordinateTransformation coords_toWGS84 = referenceFrame.coords_toWGS84;
 
         for (Link link : network.getLinks().values()) {
-            OsmLink osmLink = new OsmLink(link);
-
-            osmLink.coords[0] = coords_toWGS84.transform(link.getFromNode().getCoord());
-            osmLink.coords[1] = coords_toWGS84.transform(link.getToNode().getCoord());
-
+            OsmLink osmLink = new OsmLink(link, //
+                    coords_toWGS84.transform(link.getFromNode().getCoord()), //
+                    coords_toWGS84.transform(link.getToNode().getCoord()) //
+            );
             linkMap.put(link.getId().toString(), osmLink);
         }
 
@@ -78,7 +79,9 @@ public class MatsimStaticDatabase {
         return linkInteger.get(link);
     }
 
-    public  Map<Link, Integer> getLinkInteger() {return Collections.unmodifiableMap(linkInteger);}
+    public Map<Link, Integer> getLinkInteger() {
+        return Collections.unmodifiableMap(linkInteger);
+    }
 
     public OsmLink getOsmLink(int index) {
         return list.get(index);
@@ -89,10 +92,12 @@ public class MatsimStaticDatabase {
     }
 
     public Coord getCenter() {
-        return CoordUtil.toCoord( //
-                Mean.of(Tensor.of(getOsmLinks().stream() //
-                        .map(osmLink -> osmLink.getAt(.5)) //
-                        .map(CoordUtil::toTensor))));
+        Tensor points = Tensor.of(getOsmLinks().stream() //
+                .map(osmLink -> osmLink.getAt(.5)) //
+                .map(CoordUtil::toTensor));
+        // Tensor mean = Mean.of(points); // <- mean is fast but doesn't produce as good estimate as median
+        Tensor median = TensorMap.of(Median::of, Transpose.of(points), 1);
+        return CoordUtil.toCoord(median);
     }
 
     public int getOsmLinksSize() {
@@ -109,9 +114,9 @@ public class MatsimStaticDatabase {
 
     void setIteration(Integer iteration) {
         this.iteration = iteration;
-        System.out.println("set iteration=" + iteration);
+        // System.out.println("set iteration=" + iteration);
     }
-    
+
     int getIteration() {
         return iteration;
     }
