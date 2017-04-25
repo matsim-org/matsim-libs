@@ -2,8 +2,11 @@ package playground.clruch.netdata;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -21,7 +24,8 @@ public class VirtualNode implements Serializable {
     public final int index;
     /** id is only used for debugging */
     private final String id;
-    private final Set<Link> links;
+    private transient final Set<Link> links;
+    private final Set<String> linkIDsforSerialization;
     private final int neighCount;
     private final Coord coord;
 
@@ -31,6 +35,7 @@ public class VirtualNode implements Serializable {
         this.links = linksIn;
         this.neighCount = neighCount;
         this.coord = coordIn;
+        this.linkIDsforSerialization = linksIn.stream().map(v->v.getId().toString()).collect(Collectors.toCollection(HashSet::new));
 
         //TODO remove check 
         //EVTL GET RID OF THIS -> LEFTOVER NODE or deal differently with it or test if last idx is not leftOver-> problem & fill last one in!!sth like this... TODO

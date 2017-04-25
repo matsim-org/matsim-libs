@@ -3,6 +3,7 @@ package playground.clruch.netdata;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -23,6 +24,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+
+import ch.ethz.idsc.tensor.io.ObjectFormat;
 
 public class VirtualNetworkIO {
     
@@ -181,4 +184,17 @@ public class VirtualNetworkIO {
         xmlOutput.output(doc, new FileWriter(fileName));
 
     }
+
+    public static void toByte(File file, VirtualNetwork virtualNetwork) throws IOException{
+        Files.write(file.toPath(), ObjectFormat.of(virtualNetwork));        
+    }
+    
+    public static VirtualNetwork fromByte(Network network, String fileName){
+    //    return ObjectFormat.parse(Files.readAllBytes(fileName);
+        return null; 
+    }
+    
+    
+
+
 }

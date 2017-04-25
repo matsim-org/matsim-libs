@@ -22,12 +22,12 @@ import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.utils.GZHandler;
 
-// TODO rename this to ScenarioPrep and make properly
+
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
 
-        // BEGIN: CUSTOMIZE -----------------------------------------------
+        // BEGIN: CUSTOMIZE ----------------------------------------------- 
         // set manually depending on the scenario:
         final int maxPopulationSize = 142381;
         final int numVirtualNodes = 40;
@@ -108,6 +108,8 @@ public class ScenarioPreparer {
         KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
         VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes);
         VirtualNetworkIO.toXML(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME + ".xml", virtualNetwork);
-        System.out.println("saved virtual network to: " + dir + "virtualNetwork/" + VIRTUALNETWORKFILENAME + ".xml");
+        VirtualNetworkIO.toByte(new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME), virtualNetwork);
+        System.out.println("saved virtual network byte format to : "+ new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME));
+        System.out.println("saved virtual network to: " + dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME + ".xml");
     }
 }

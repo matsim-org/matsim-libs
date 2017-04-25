@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
@@ -25,7 +26,8 @@ public class VirtualNetwork implements Serializable {
     private final List<VirtualNode> virtualNodes = new ArrayList<>();
     private final List<VirtualLink> virtualLinks = new ArrayList<>();
     // the map is for checking that all links in the network are assigned to one vNode
-    private final Map<Link, VirtualNode> linkVNodeMap = new HashMap<>();
+    private transient final Map<Link, VirtualNode> linkVNodeMap = new HashMap<>();
+    private final Map<String, VirtualNode> linkVNodeMapRAWVERYPRIVATE = new HashMap<>(); // is stored but only used to create references LINK
     private final Map<Point, VirtualLink> virtualLinkPairs = new HashMap<>();
 
     /* package */ VirtualNetwork() {
