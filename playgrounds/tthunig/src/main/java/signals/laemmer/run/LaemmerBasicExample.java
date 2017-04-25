@@ -434,10 +434,10 @@ public class LaemmerBasicExample {
         Id<Signal> id2_3 = Id.create("Signal2_3", Signal.class);
         signalGroup1.addSignalId(id2_3);
         if(useLanes) {
-            laemmerConfig.addArrivalRateForSignalLane(id2_3, Id.create("2_3.l", Lane.class), (flowWE / 3600) / 2);
-            laemmerConfig.addArrivalRateForSignalLane(id2_3, Id.create("2_3.r", Lane.class), (flowWE / 3600) / 2);
+            laemmerConfig.addArrivalRateForLane(Id.createLinkId("2_3"), Id.create("2_3.l", Lane.class), (flowWE / 3600) / 2);
+            laemmerConfig.addArrivalRateForLane(Id.createLinkId("2_3"), Id.create("2_3.r", Lane.class), (flowWE / 3600) / 2);
         } else {
-            laemmerConfig.addArrivalRateForSignal(id2_3, flowWE / 3600);
+            laemmerConfig.addArrivalRateForLink(Id.createLinkId("2_3"), flowWE / 3600);
         }
         signalGroups.addSignalGroupData(signalGroup1);
 
@@ -447,22 +447,22 @@ public class LaemmerBasicExample {
         Id<Signal> id7_3 = Id.create("Signal7_3", Signal.class);
         signalGroup2.addSignalId(id7_3);
         if(useLanes) {
-            laemmerConfig.addArrivalRateForSignalLane(id7_3, Id.create("7_3.ol", Lane.class), (flowNS / 3600));
+            laemmerConfig.addArrivalRateForLane(Id.createLinkId("7_3"), Id.create("7_3.ol", Lane.class), (flowNS / 3600));
         } else {
-            laemmerConfig.addArrivalRateForSignal(id7_3, flowNS / 3600);
+            laemmerConfig.addArrivalRateForLink(Id.createLinkId("7_3"), flowNS / 3600);
         }
         signalGroups.addSignalGroupData(signalGroup2);
 
         Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
         SignalGroupData signalGroup3 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId3);
-        Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
+        Id<Signal> id4_3 = Id.create("4_3", Signal.class);
         signalGroup3.addSignalId(id4_3);
         if(useLanes) {
-            laemmerConfig.addArrivalRateForSignalLane(id4_3, Id.create("4_3.l", Lane.class), (flowWE / 3600) / 2);
-            laemmerConfig.addArrivalRateForSignalLane(id4_3, Id.create("4_3.r", Lane.class), (flowWE / 3600) / 2);
+            laemmerConfig.addArrivalRateForLane(Id.createLinkId("4_3"), Id.create("4_3.l", Lane.class), (flowWE / 3600) / 2);
+            laemmerConfig.addArrivalRateForLane(Id.createLinkId("4_3"), Id.create("4_3.r", Lane.class), (flowWE / 3600) / 2);
         } else {
-            laemmerConfig.addArrivalRateForSignal(id4_3, flowWE / 3600);
+            laemmerConfig.addArrivalRateForLink(Id.createLinkId("4_3"), flowWE / 3600);
         }
         signalGroups.addSignalGroupData(signalGroup3);
 
@@ -472,9 +472,9 @@ public class LaemmerBasicExample {
         Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
         signalGroup4.addSignalId(id8_3);
         if(useLanes) {
-            laemmerConfig.addArrivalRateForSignalLane(id8_3, Id.create("8_3.ol", Lane.class), (flowNS / 3600));
+            laemmerConfig.addArrivalRateForLane(Id.createLinkId("8_3"), Id.create("8_3.ol", Lane.class), (flowNS / 3600));
         } else {
-            laemmerConfig.addArrivalRateForSignal(id8_3, flowNS / 3600);
+            laemmerConfig.addArrivalRateForLink(Id.createLinkId("8_3"), flowNS / 3600);
         }
         signalGroups.addSignalGroupData(signalGroup4);
 
