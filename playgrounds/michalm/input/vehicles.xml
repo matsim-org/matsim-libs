@@ -16,8 +16,6 @@
 		<doorOperation mode="serial"/>
 		<passengerCarEquivalents pce="1.0"/>
 	</vehicleType>
-	<vehicle id="H13551R02P01" type="car"/>
-	<vehicle id="H06404R08P01" type="car"/>
 	<vehicle id="H01947R08P01" type="car"/>
 	<vehicle id="H09310R01P02" type="car"/>
 	<vehicle id="H14758R03P01" type="car"/>
