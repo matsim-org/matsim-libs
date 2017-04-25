@@ -10,12 +10,8 @@
 	<fileSets>
 		
 		<fileSet>
-			<directory>${project.basedir}</directory>
-			<includes>
-				<include>examples/equil/**</include>
-				<include>examples/tutorial/**</include>
-				<include>libs/**</include>
-			</includes>
+			<directory>../examples/scenarios</directory>
+			<outputDirectory>examples</outputDirectory>
 		</fileSet>
 		
 	</fileSets>
