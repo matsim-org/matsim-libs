@@ -76,7 +76,7 @@ public class ScenarioPreparer {
         // 2) adapt the population to new network
         {
             System.out.println("Original population size: " + population.getPersons().values().size());
-            PopulationTools.elminateOutsideRadius(population, center, radius);
+            PopulationTools.elminateOutsideNetwork(population, network);
             System.out.println("Population size after radius cut: " + population.getPersons().values().size());
             if(populationeliminateFreight) PopulationTools.eliminateFreight(population);
             System.out.println("Population size after removing freight: " + population.getPersons().values().size());

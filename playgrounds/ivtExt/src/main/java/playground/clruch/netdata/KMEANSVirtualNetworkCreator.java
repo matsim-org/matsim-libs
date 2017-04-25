@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans;
@@ -130,7 +131,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             for (VirtualNode vNto : virtualNetwork.getVirtualNodes()) {
                 if (!vNfrom.equals(vNto)) {
                     String indexStr = "vLink_" + Integer.toString(index + 1);
-                    virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, coordDist(vNfrom.getCoord(), vNto.getCoord()));
+                    virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, CoordUtils.calcEuclideanDistance(vNfrom.getCoord(), vNto.getCoord()));
                     index++;
                 }
             }
@@ -139,12 +140,4 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
         return virtualNetwork;
 
     }
-
-    // TODO remove this with MATSim implementation
-    double coordDist(Coord c1, Coord c2) {
-        double dx = c1.getX() - c2.getX();
-        double dy = c1.getY() - c2.getY();
-        return Math.hypot(dx, dy);
-    }
-
 }
