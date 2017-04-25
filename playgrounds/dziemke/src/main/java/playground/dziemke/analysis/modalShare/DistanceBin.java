@@ -1,4 +1,4 @@
-package playground.gthunig.DistanceBins;
+package playground.dziemke.analysis.modalShare;
 
 /**
  * @author gthunig on 21.03.2017.

@@ -55,7 +55,7 @@ import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerLi
  *
  * A test to check:
  * <li>
- *     online : based on the switch isIgnoringEmissionsFromEventsFile in {@link EmissionsConfigGroup},
+ *     online : based on the switch isWritingEmissionsEvents  in {@link EmissionsConfigGroup},
  *     include/exclude emission events in normal events
  * </li>
  *
@@ -73,23 +73,23 @@ public class EmissionEventsTest {
     @Rule
     public MatsimTestUtils helper = new MatsimTestUtils();
 
-    private final boolean isIgnoringEmissionsFromEventsFile ;
+    private final boolean isWritingEmissionsEvents;
 
-    @Parameterized.Parameters(name = "{index}: isIgnoringEmissionsFromEventsFile == {0}")
+    @Parameterized.Parameters(name = "{index}: isWritingEmissionsEvents == {0}")
     public static List<Object> considerCO2 () {
         Object[] isIgnoringEmissionsFromEventsFile = new Object [] { true , false };
         return Arrays.asList(isIgnoringEmissionsFromEventsFile);
     }
 
     public EmissionEventsTest (final boolean isIgnoringEmissionsFromEventsFile) {
-        this.isIgnoringEmissionsFromEventsFile = isIgnoringEmissionsFromEventsFile;
+        this.isWritingEmissionsEvents = isIgnoringEmissionsFromEventsFile;
     }
 
     @Test
     public void eventsOfflineTest(){
         String inputEventsFile = helper.getPackageInputDirectory()+"/CombinedEventsReaderTest/0.events.xml.gz";
-        new File(helper.getOutputDirectory()+"/ignoreingEmissionFromEventsFile="+this.isIgnoringEmissionsFromEventsFile).mkdir();
-        String outputEventsFile = helper.getOutputDirectory()+"/ignoreingEmissionFromEventsFile="+this.isIgnoringEmissionsFromEventsFile+"/outputEvents.xml.gz";
+        new File(helper.getOutputDirectory()+"/ignoreingEmissionFromEventsFile="+this.isWritingEmissionsEvents).mkdir();
+        String outputEventsFile = helper.getOutputDirectory()+"/ignoreingEmissionFromEventsFile="+this.isWritingEmissionsEvents +"/outputEvents.xml.gz";
 
         // generate emissions
 
@@ -132,14 +132,14 @@ public class EmissionEventsTest {
             vehs.addVehicle(bikeVeh);
         }
 
-        emissionSettings(sc, this.isIgnoringEmissionsFromEventsFile);
+        emissionSettings(sc, this.isWritingEmissionsEvents);
 
         EventsManager emissionEventsManager = EventsUtils.createEventsManager();
         EmissionModule emissionModule = new EmissionModule(sc, emissionEventsManager);
 
         EventWriterXML emissionEventWriter;
 
-        if (! this.isIgnoringEmissionsFromEventsFile ) { // if ignoring emission events,
+        if ( this.isWritingEmissionsEvents) { // i.e., ignoring emission events,
             emissionEventWriter = new EventWriterXML(outputEventsFile);
             emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
         } else {
@@ -149,7 +149,7 @@ public class EmissionEventsTest {
         MatsimEventsReader matsimEventsReader = new MatsimEventsReader(emissionEventsManager);
         matsimEventsReader.readFile(inputEventsFile);
 
-        if (! this.isIgnoringEmissionsFromEventsFile ) {
+        if ( this.isWritingEmissionsEvents) {
             emissionEventWriter.closeFile();
         }
 
@@ -168,8 +168,8 @@ public class EmissionEventsTest {
         });
         reader.readFile(outputEventsFile);
 
-        if ( isIgnoringEmissionsFromEventsFile && warmEvents.size()!=0 ) throw new RuntimeException("There should NOT be any warm emission events in "+ outputEventsFile + " file.");
-        else if (! isIgnoringEmissionsFromEventsFile && warmEvents.size()==0) throw new RuntimeException("There should be some warm emission events in "+ outputEventsFile + " file.");
+        if ( ! isWritingEmissionsEvents && warmEvents.size()!=0 ) throw new RuntimeException("There should NOT be any warm emission events in "+ outputEventsFile + " file.");
+        else if ( isWritingEmissionsEvents && warmEvents.size()==0) throw new RuntimeException("There should be some warm emission events in "+ outputEventsFile + " file.");
     }
 
     @Test
@@ -198,7 +198,7 @@ public class EmissionEventsTest {
         sc.getConfig().plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.pt).setTeleportedModeFreespeedFactor(1.5);
 
         equilTestSetUp.createActiveAgents(sc, carPersonId, TransportMode.car, 6.0 * 3600.);
-        emissionSettings(sc, this.isIgnoringEmissionsFromEventsFile);
+        emissionSettings(sc, this.isWritingEmissionsEvents);
 
         Controler controler = new Controler(sc);
 
@@ -235,8 +235,8 @@ public class EmissionEventsTest {
         });
         reader.readFile(eventsFile);
 
-        if ( isIgnoringEmissionsFromEventsFile && warmEvents.size()!=0 ) throw new RuntimeException("There should NOT be any warm emission events in "+ eventsFile + " file.");
-        else if (! isIgnoringEmissionsFromEventsFile && warmEvents.size()==0) throw new RuntimeException("There should be some warm emission events in "+ eventsFile + " file.");
+        if ( !isWritingEmissionsEvents && warmEvents.size()!=0 ) throw new RuntimeException("There should NOT be any warm emission events in "+ eventsFile + " file.");
+        else if (isWritingEmissionsEvents && warmEvents.size()==0) throw new RuntimeException("There should be some warm emission events in "+ eventsFile + " file.");
     }
 
     private void emissionSettings(final Scenario scenario, final boolean isIgnoringEmissionsFromEventsFile){
