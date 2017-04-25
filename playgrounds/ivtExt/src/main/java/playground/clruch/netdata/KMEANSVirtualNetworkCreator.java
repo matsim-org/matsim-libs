@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import playground.clruch.utils.GlobalAssert;
 
-public class KMEANSVirtualNetworkCreator extends AbstractVirtualNetworkCreator {
+public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreator {
 
     Random random = new Random();
     DatabaseConnection dbc;
@@ -47,10 +46,7 @@ public class KMEANSVirtualNetworkCreator extends AbstractVirtualNetworkCreator {
     Clustering<KMeansModel> c;
     Relation<NumberVector> rel;
 
-    public KMEANSVirtualNetworkCreator() {
-
-    }
-
+    @Override
     public VirtualNetwork createVirtualNetwork(Population population, Network network, int numVNodes) {
         // initialize new virtual network
         VirtualNetwork virtualNetwork = new VirtualNetwork();
@@ -92,8 +88,7 @@ public class KMEANSVirtualNetworkCreator extends AbstractVirtualNetworkCreator {
 
         // Relation containing the number vectors:
         rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-        // We know that the ids must be a continuous range:
-        DBIDRange ids = (DBIDRange) rel.getDBIDs();
+
 
         // CREATE MAP with all VirtualNodes
         Map<VirtualNode, Set<Link>> vNMap = new HashMap<>();
@@ -145,6 +140,7 @@ public class KMEANSVirtualNetworkCreator extends AbstractVirtualNetworkCreator {
 
     }
 
+    // TODO remove this with MATSim implementation
     double coordDist(Coord c1, Coord c2) {
         double dx = c1.getX() - c2.getX();
         double dy = c1.getY() - c2.getY();

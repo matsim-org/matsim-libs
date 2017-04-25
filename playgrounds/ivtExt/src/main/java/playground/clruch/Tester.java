@@ -14,14 +14,8 @@ import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 
-/**
- * main entry point
- * 
- * only one ScenarioServer can run at one time, since a fixed network port is reserved to serve the
- * simulation status
- * 
- * if you wish to run multiple simulations at the same time use for instance {@link RunAVScenario}
- */
+
+// TODO rename this to ScenarioPrep and make properly
 public class Tester {
 
     public static void main(String[] args) throws MalformedURLException, Exception {

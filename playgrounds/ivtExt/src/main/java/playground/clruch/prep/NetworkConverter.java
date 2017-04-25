@@ -18,8 +18,7 @@ public class NetworkConverter {
     public static void main(String[] args) throws MalformedURLException {
         final File dir = new File(args[0]);
         if (!dir.isDirectory()) {
-            new RuntimeException("not a directory: " + dir).printStackTrace();
-            System.exit(-1);
+            throw new RuntimeException("not a directory: " + dir);
         }
         final File fileImport = new File(dir, "network.xml");
         final File fileExportGz = new File(dir, "networkConverted.xml.gz");
@@ -38,12 +37,12 @@ public class NetworkConverter {
         //Coord center = new Coord(2684648.0,1251492.0); Center in Kloten
         Coord center = new Coord(2683600.0,1251400.0);
         double radius = 9000;
-        Network filteredNetwork = NetworkTools.elminateOutsideRadius(network, center, radius);
+        NetworkCutClean.elminateOutsideRadius(network, center, radius);
         
         
         {
             // write the modified population to file
-            NetworkWriter nw = new NetworkWriter(filteredNetwork);
+            NetworkWriter nw = new NetworkWriter(network);
             nw.write(fileExportGz.toString());
         }
 

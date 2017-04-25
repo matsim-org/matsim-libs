@@ -12,11 +12,12 @@ import org.matsim.core.network.algorithms.NetworkScenarioCut;
  *
  */
 
-public class NetworkTools {
 
-    private static final Logger log = Logger.getLogger(NetworkTools.class);
+public class NetworkCutClean {
 
-    public static Network elminateOutsideRadius(Network network, Coord center, double radius) {
+    private static final Logger log = Logger.getLogger(NetworkCutClean.class);
+
+    public static void elminateOutsideRadius(Network network, Coord center, double radius) {
 
         log.info("All network elements which are more than " + radius + " [m] away from Coord " + center.toString() + " removed.");
         
@@ -27,8 +28,6 @@ public class NetworkTools {
         NetworkCleaner networkCleaner = new NetworkCleaner();
         networkCleaner.run(network);
         System.out.println("network size after cleaning: " + network.getNodes().size());
-
-        return network;
 
     }
 }
