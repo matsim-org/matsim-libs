@@ -59,7 +59,8 @@ public class DownstreamSignalsModule extends AbstractModule{
 			// bindings for sensor based signals
 			bind(LinkSensorManager.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
-            
+            bind(DownstreamSensor.class);
+			
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
             addMobsimListenerBinding().to(QSimSignalEngine.class);

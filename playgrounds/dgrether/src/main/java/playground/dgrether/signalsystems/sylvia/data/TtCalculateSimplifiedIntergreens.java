@@ -30,50 +30,41 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesDataImpl;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesWriter10;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreensForSignalSystemDataImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
-import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.model.SignalGroup;
 
-import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.utils.DgSignalGroupSettingsDataOnsetComparator;
 
 /**
- * 
- * Class to calculate the intergreen times from a (fixed) signal control plan
- * and write them into a xml file.
- * 
- * Intergreens are necessary to create and check (adaptive) signal control
- * plans.
+ * Class to calculate the intergreen times from a (fixed) signal control plan and write them into a xml file.
+ * Intergreens are necessary to create and check (adaptive) signal control plans.
  * 
  * @author tthunig
- * 
  */
 public class TtCalculateSimplifiedIntergreens {
 
-	private static final Logger log = Logger
-			.getLogger(TtCalculateSimplifiedIntergreens.class);
+	private static final Logger log = Logger.getLogger(TtCalculateSimplifiedIntergreens.class);
 
 	int signalSystemCycleTime = 0;
-	List<SignalGroupSettingsData> groupSettingsList = new ArrayList<SignalGroupSettingsData>();
-	Map<Id, DgPhase> signalGroupIdToPhaseMapping = new HashMap<Id, DgPhase>();
-	List<DgPhase> sortedPhasesByOnset = new ArrayList<DgPhase>();
-	Map<Integer, List<SignalGroupSettingsData>> onsetSettingsMap = new HashMap<Integer, List<SignalGroupSettingsData>>();
+	List<SignalGroupSettingsData> groupSettingsList = new ArrayList<>();
+	Map<Id<SignalGroup>, DgPhase> signalGroupIdToPhaseMapping = new HashMap<>();
+	List<DgPhase> sortedPhasesByOnset = new ArrayList<>();
+	Map<Integer, List<SignalGroupSettingsData>> onsetSettingsMap = new HashMap<>();
 
-	public void calculateIntergreens(String signalControlInputFile,
-			String intergreensOutputFile, boolean simplifyPhases) {
-		log.info("Calculate intergreens of the signal control from file "
-				+ signalControlInputFile);
+	public void calculateIntergreens(String signalControlInputFile, String intergreensOutputFile, boolean simplifyPhases) {
+		log.info("Calculate intergreens of the signal control from file " + signalControlInputFile);
 		if (simplifyPhases)
-			log.info("Simplify signal phases: a phase ends with the last setting starting at the phase starting time, "
-					+ "i.e. these kind of phases may overlap. "
+			log.info("Simplify signal phases: a phase ends with the last setting starting at the phase starting time, " + "i.e. these kind of phases may overlap. "
 					+ "Intergreens of overlapping signals from different phases are defined as zero.");
 
 		// read fixed time control
@@ -85,12 +76,10 @@ public class TtCalculateSimplifiedIntergreens {
 		IntergreenTimesData intergreens = new IntergreenTimesDataImpl();
 
 		// loop through all signal systems; calculate their intergreens
-		for (SignalSystemControllerData signalSystemData : signalControl
-				.getSignalSystemControllerDataBySystemId().values()) {
+		for (SignalSystemControllerData signalSystemData : signalControl.getSignalSystemControllerDataBySystemId().values()) {
 
 			// create a container for the intergreens of this signal system
-			IntergreensForSignalSystemData systemIntergreens = new IntergreensForSignalSystemDataImpl(
-					signalSystemData.getSignalSystemId());
+			IntergreensForSignalSystemData systemIntergreens = new IntergreensForSignalSystemDataImpl(signalSystemData.getSignalSystemId());
 
 			this.preprocessSystemsSignalGroups(signalSystemData, simplifyPhases);
 
@@ -102,18 +91,15 @@ public class TtCalculateSimplifiedIntergreens {
 			}
 
 			intergreens.addIntergreensForSignalSystem(systemIntergreens);
-			log.info("intergreen calculation for signal system "
-					+ signalSystemData.getSignalSystemId() + " done");
+			log.info("intergreen calculation for signal system " + signalSystemData.getSignalSystemId() + " done");
 		}
 
 		// write the intergreens to file
-		IntergreenTimesWriter10 writer = new IntergreenTimesWriter10(
-				intergreens);
+		IntergreenTimesWriter10 writer = new IntergreenTimesWriter10(intergreens);
 		writer.write(intergreensOutputFile);
 	}
 
-	private void preprocessSystemsSignalGroups(
-			SignalSystemControllerData signalSystemData, boolean simplifyPhases) {
+	private void preprocessSystemsSignalGroups(SignalSystemControllerData signalSystemData, boolean simplifyPhases) {
 		log.info("preprocess signal groups data for intergreens calculation");
 
 		// reset system properties
@@ -122,45 +108,35 @@ public class TtCalculateSimplifiedIntergreens {
 		this.sortedPhasesByOnset.clear();
 		this.onsetSettingsMap.clear();
 
-		for (SignalPlanData signalPlan : signalSystemData.getSignalPlanData()
-				.values()) {
-			groupSettingsList.addAll(signalPlan
-					.getSignalGroupSettingsDataByGroupId().values());
+		for (SignalPlanData signalPlan : signalSystemData.getSignalPlanData().values()) {
+			groupSettingsList.addAll(signalPlan.getSignalGroupSettingsDataByGroupId().values());
 			// assumption: all signal plans of a signal system have the same
 			// cycle time
 			signalSystemCycleTime = signalPlan.getCycleTime();
 		}
 
 		// delete signal groups which are green all the time
-		Set<SignalGroupSettingsData> allGreenSignals = this
-				.removeAllGreenSignalGroupSettings(groupSettingsList,
-						signalSystemCycleTime);
+		this.removeAllGreenSignalGroupSettings(groupSettingsList, signalSystemCycleTime);
 
 		// make a copy and sort by signal group onsets
-		ArrayList<SignalGroupSettingsData> sortedGroupSettingsList = new ArrayList<SignalGroupSettingsData>();
+		ArrayList<SignalGroupSettingsData> sortedGroupSettingsList = new ArrayList<>();
 		sortedGroupSettingsList.addAll(groupSettingsList);
-		Collections.sort(sortedGroupSettingsList,
-				new DgSignalGroupSettingsDataOnsetComparator());
+		Collections.sort(sortedGroupSettingsList, new DgSignalGroupSettingsDataOnsetComparator());
 
 		// create structures to simplify the intergreens calculation
 		this.createSameOnsetMapping();
 		if (simplifyPhases) {
-			Map<Integer, List<SignalGroupSettingsData>> droppingSettingsMap = this
-					.createSameDroppingMapping();
-			this.createSimplifiedPhases(sortedGroupSettingsList,
-					droppingSettingsMap);
+			Map<Integer, List<SignalGroupSettingsData>> droppingSettingsMap = this.createSameDroppingMapping();
+			this.createSimplifiedPhases(sortedGroupSettingsList, droppingSettingsMap);
 		} else {
-			Map<Id, Set<SignalGroupSettingsData>> overlappingSettingsMap = this
-					.createOverlappingSettingsMap();
+			Map<Id<SignalGroup>, Set<SignalGroupSettingsData>> overlappingSettingsMap = this.createOverlappingSettingsMap();
 			this.createPhases(sortedGroupSettingsList, overlappingSettingsMap);
 		}
 	}
 
-	private Set<SignalGroupSettingsData> removeAllGreenSignalGroupSettings(
-			List<SignalGroupSettingsData> groupSettingsList, Integer cycleTime) {
-		Set<SignalGroupSettingsData> allGreenSettings = new HashSet<SignalGroupSettingsData>();
-		ListIterator<SignalGroupSettingsData> it = groupSettingsList
-				.listIterator();
+	private Set<SignalGroupSettingsData> removeAllGreenSignalGroupSettings(List<SignalGroupSettingsData> groupSettingsList, Integer cycleTime) {
+		Set<SignalGroupSettingsData> allGreenSettings = new HashSet<>();
+		ListIterator<SignalGroupSettingsData> it = groupSettingsList.listIterator();
 		while (it.hasNext()) {
 			SignalGroupSettingsData settings = it.next();
 			if (settings.getOnset() == 0 && settings.getDropping() == cycleTime) {
@@ -174,39 +150,31 @@ public class TtCalculateSimplifiedIntergreens {
 	private void createSameOnsetMapping() {
 		for (SignalGroupSettingsData settings : groupSettingsList) {
 			if (!onsetSettingsMap.containsKey(settings.getOnset())) {
-				onsetSettingsMap.put(settings.getOnset(),
-						new ArrayList<SignalGroupSettingsData>());
+				onsetSettingsMap.put(settings.getOnset(), new ArrayList<>());
 			}
 			onsetSettingsMap.get(settings.getOnset()).add(settings);
 		}
 	}
 
 	private Map<Integer, List<SignalGroupSettingsData>> createSameDroppingMapping() {
-		Map<Integer, List<SignalGroupSettingsData>> droppingSettingsMap = new HashMap<Integer, List<SignalGroupSettingsData>>();
+		Map<Integer, List<SignalGroupSettingsData>> droppingSettingsMap = new HashMap<>();
 		for (SignalGroupSettingsData settings : groupSettingsList) {
 			if (!droppingSettingsMap.containsKey(settings.getDropping())) {
-				droppingSettingsMap.put(settings.getDropping(),
-						new ArrayList<SignalGroupSettingsData>());
+				droppingSettingsMap.put(settings.getDropping(), new ArrayList<>());
 			}
 			droppingSettingsMap.get(settings.getDropping()).add(settings);
 		}
 		return droppingSettingsMap;
 	}
 
-	private Map<Id, Set<SignalGroupSettingsData>> createOverlappingSettingsMap() {
-		Map<Id, Set<SignalGroupSettingsData>> overlappingSettingsMap = new HashMap<Id, Set<SignalGroupSettingsData>>();
+	private Map<Id<SignalGroup>, Set<SignalGroupSettingsData>> createOverlappingSettingsMap() {
+		Map<Id<SignalGroup>, Set<SignalGroupSettingsData>> overlappingSettingsMap = new HashMap<>();
 		for (SignalGroupSettingsData selectedSignal : groupSettingsList) {
-			overlappingSettingsMap.put(selectedSignal.getSignalGroupId(),
-					new HashSet<SignalGroupSettingsData>());
+			overlappingSettingsMap.put(selectedSignal.getSignalGroupId(), new HashSet<>());
 			for (SignalGroupSettingsData comparativeSignal : groupSettingsList) {
-				// remark: there are no overlapping signals crossing the cycle
-				// time
-				if (comparativeSignal.getOnset() < selectedSignal.getDropping()
-						&& comparativeSignal.getDropping() > selectedSignal
-								.getOnset()) {
-					overlappingSettingsMap.get(
-							selectedSignal.getSignalGroupId()).add(
-							comparativeSignal);
+				// remark: there are no overlapping signals crossing the cycle time
+				if (comparativeSignal.getOnset() < selectedSignal.getDropping() && comparativeSignal.getDropping() > selectedSignal.getOnset()) {
+					overlappingSettingsMap.get(selectedSignal.getSignalGroupId()).add(comparativeSignal);
 				}
 			}
 		}
@@ -214,10 +182,8 @@ public class TtCalculateSimplifiedIntergreens {
 	}
 
 	// fills signalGroupIdToPhaseMapping with simplified phases
-	private void createSimplifiedPhases(
-			ArrayList<SignalGroupSettingsData> sortedGroupSettingsList,
-			Map<Integer, List<SignalGroupSettingsData>> droppingSettingsMap) {
-		Set<SignalGroupSettingsData> handledSignals = new HashSet<SignalGroupSettingsData>();
+	private void createSimplifiedPhases(ArrayList<SignalGroupSettingsData> sortedGroupSettingsList, Map<Integer, List<SignalGroupSettingsData>> droppingSettingsMap) {
+		Set<SignalGroupSettingsData> handledSignals = new HashSet<>();
 		// loop through the signal settings sorted by onset
 		for (SignalGroupSettingsData selectedSignal : sortedGroupSettingsList) {
 			if (handledSignals.contains(selectedSignal)) {
@@ -225,13 +191,11 @@ public class TtCalculateSimplifiedIntergreens {
 			}
 			int phaseOn = selectedSignal.getOnset();
 			int phaseDrop = selectedSignal.getDropping();
-			Map<Id, SignalGroupSettingsData> phaseSignals = new HashMap<Id, SignalGroupSettingsData>();
+			Map<Id<SignalGroup>, SignalGroupSettingsData> phaseSignals = new HashMap<>();
 			// add all signals with the same onset to the phase
-			for (SignalGroupSettingsData sameOnsetSignal : onsetSettingsMap
-					.get(phaseOn)) {
+			for (SignalGroupSettingsData sameOnsetSignal : onsetSettingsMap.get(phaseOn)) {
 				if (!handledSignals.contains(sameOnsetSignal)) {
-					phaseSignals.put(sameOnsetSignal.getSignalGroupId(),
-							sameOnsetSignal);
+					phaseSignals.put(sameOnsetSignal.getSignalGroupId(), sameOnsetSignal);
 					handledSignals.add(sameOnsetSignal);
 					// phase ends with the last of this signals
 					if (sameOnsetSignal.getDropping() > phaseDrop) {
@@ -240,11 +204,9 @@ public class TtCalculateSimplifiedIntergreens {
 				}
 			}
 			// add all signals dropping at this end time to the phase
-			for (SignalGroupSettingsData sameDroppingSignal : droppingSettingsMap
-					.get(phaseDrop)) {
+			for (SignalGroupSettingsData sameDroppingSignal : droppingSettingsMap.get(phaseDrop)) {
 				if (!handledSignals.contains(sameDroppingSignal)) {
-					phaseSignals.put(sameDroppingSignal.getSignalGroupId(),
-							sameDroppingSignal);
+					phaseSignals.put(sameDroppingSignal.getSignalGroupId(), sameDroppingSignal);
 					handledSignals.add(sameDroppingSignal);
 				}
 			}
@@ -253,17 +215,15 @@ public class TtCalculateSimplifiedIntergreens {
 			this.sortedPhasesByOnset.add(phase);
 
 			// fill signalGroupIdToPhaseMapping with simplified phases
-			for (Id signalId : phaseSignals.keySet()) {
+			for (Id<SignalGroup> signalId : phaseSignals.keySet()) {
 				signalGroupIdToPhaseMapping.put(signalId, phase);
 			}
 		}
 	}
 
 	// fills signalGroupIdToPhaseMapping with unsimplified phases
-	private void createPhases(
-			ArrayList<SignalGroupSettingsData> sortedGroupSettingsList,
-			Map<Id, Set<SignalGroupSettingsData>> overlappingSettingsMap) {
-		Set<SignalGroupSettingsData> handledSignals = new HashSet<SignalGroupSettingsData>();
+	private void createPhases(ArrayList<SignalGroupSettingsData> sortedGroupSettingsList, Map<Id<SignalGroup>, Set<SignalGroupSettingsData>> overlappingSettingsMap) {
+		Set<SignalGroupSettingsData> handledSignals = new HashSet<>();
 		// loop through the signal settings sorted by onset
 		for (SignalGroupSettingsData selectedSignal : sortedGroupSettingsList) {
 			if (handledSignals.contains(selectedSignal)) {
@@ -271,42 +231,36 @@ public class TtCalculateSimplifiedIntergreens {
 			}
 			int phaseOn = selectedSignal.getOnset();
 			int phaseDrop = selectedSignal.getDropping();
-			Map<Id, SignalGroupSettingsData> phaseSignals = new HashMap<Id, SignalGroupSettingsData>();
+			Map<Id<SignalGroup>, SignalGroupSettingsData> phaseSignals = new HashMap<>();
 			phaseSignals.put(selectedSignal.getSignalGroupId(), selectedSignal);
 			handledSignals.add(selectedSignal);
 			SignalGroupSettingsData lastDroppingSignal = selectedSignal;
 			// recursively add all overlapping signals to the phase
 			do { // while phase dropping changes
 				phaseDrop = lastDroppingSignal.getDropping();
-				lastDroppingSignal = extendPhase(lastDroppingSignal,
-						overlappingSettingsMap, phaseSignals, handledSignals);
+				lastDroppingSignal = extendPhase(lastDroppingSignal, overlappingSettingsMap, phaseSignals, handledSignals);
 			} while (phaseDrop != lastDroppingSignal.getDropping());
 			// phase completed
 			DgPhase phase = new DgPhase(phaseOn, phaseDrop, phaseSignals);
 			this.sortedPhasesByOnset.add(phase);
 
 			// fill signalGroupIdToPhaseMapping with unsimplified phases
-			for (Id signalId : phaseSignals.keySet()) {
+			for (Id<SignalGroup> signalId : phaseSignals.keySet()) {
 				signalGroupIdToPhaseMapping.put(signalId, phase);
 			}
 		}
 	}
 
-	private SignalGroupSettingsData extendPhase(
-			SignalGroupSettingsData lastDroppingSignal,
-			Map<Id, Set<SignalGroupSettingsData>> overlappingSettingsMap,
-			Map<Id, SignalGroupSettingsData> phaseSignals,
+	private SignalGroupSettingsData extendPhase(SignalGroupSettingsData lastDroppingSignal, Map<Id<SignalGroup>, Set<SignalGroupSettingsData>> overlappingSettingsMap, Map<Id<SignalGroup>, SignalGroupSettingsData> phaseSignals,
 			Set<SignalGroupSettingsData> handledSignals) {
 
 		int phaseDrop = lastDroppingSignal.getDropping();
 		SignalGroupSettingsData newLastDroppingSignal = lastDroppingSignal;
 
-		for (SignalGroupSettingsData overlappingSignal : overlappingSettingsMap
-				.get(lastDroppingSignal.getSignalGroupId())) {
+		for (SignalGroupSettingsData overlappingSignal : overlappingSettingsMap.get(lastDroppingSignal.getSignalGroupId())) {
 			// add overlapping signal to the phase
 			if (!handledSignals.contains(overlappingSignal)) {
-				phaseSignals.put(overlappingSignal.getSignalGroupId(),
-						overlappingSignal);
+				phaseSignals.put(overlappingSignal.getSignalGroupId(), overlappingSignal);
 				handledSignals.add(overlappingSignal);
 			}
 			// look for the new last dropping signal
@@ -320,32 +274,22 @@ public class TtCalculateSimplifiedIntergreens {
 		return lastDroppingSignal;
 	}
 
-	private void handleSamePhase(
-			IntergreensForSignalSystemData systemIntergreens,
-			SignalGroupSettingsData selectedSignal) {
+	private void handleSamePhase(IntergreensForSignalSystemData systemIntergreens, SignalGroupSettingsData selectedSignal) {
 
 		// calculate intergreens to later signals in the same phase
-		DgPhase signalPhase = signalGroupIdToPhaseMapping.get(selectedSignal
-				.getSignalGroupId());
-		for (SignalGroupSettingsData samePhaseSignals : signalPhase
-				.getSignalGroupSettingsByGroupId().values()) {
+		DgPhase signalPhase = signalGroupIdToPhaseMapping.get(selectedSignal.getSignalGroupId());
+		for (SignalGroupSettingsData samePhaseSignals : signalPhase.getSignalGroupSettingsByGroupId().values()) {
 			if (samePhaseSignals.getOnset() >= selectedSignal.getDropping()) {
-				systemIntergreens.setIntergreenTime(samePhaseSignals.getOnset()
-						- selectedSignal.getDropping(),
-						selectedSignal.getSignalGroupId(),
-						samePhaseSignals.getSignalGroupId());
+				systemIntergreens.setIntergreenTime(samePhaseSignals.getOnset() - selectedSignal.getDropping(), selectedSignal.getSignalGroupId(), samePhaseSignals.getSignalGroupId());
 			}
 		}
 	}
 
-	private void handleNextPhase(
-			IntergreensForSignalSystemData systemIntergreens,
-			SignalGroupSettingsData selectedSignal) {
+	private void handleNextPhase(IntergreensForSignalSystemData systemIntergreens, SignalGroupSettingsData selectedSignal) {
 
 		// get the next phase
 		boolean cycleTimeCrossed = false;
-		DgPhase selectedPhase = this.signalGroupIdToPhaseMapping
-				.get(selectedSignal.getSignalGroupId());
+		DgPhase selectedPhase = this.signalGroupIdToPhaseMapping.get(selectedSignal.getSignalGroupId());
 		int nextPhaseIndex = this.sortedPhasesByOnset.indexOf(selectedPhase) + 1;
 		if (nextPhaseIndex >= this.sortedPhasesByOnset.size()) {
 			nextPhaseIndex = 0;
@@ -354,10 +298,8 @@ public class TtCalculateSimplifiedIntergreens {
 		DgPhase nextPhase = this.sortedPhasesByOnset.get(nextPhaseIndex);
 
 		// calculate intergreens to all signals in the next phase
-		for (SignalGroupSettingsData nextPhaseSignals : nextPhase
-				.getSignalGroupSettingsByGroupId().values()) {
-			int intergreen = nextPhaseSignals.getOnset()
-					- selectedSignal.getDropping();
+		for (SignalGroupSettingsData nextPhaseSignals : nextPhase.getSignalGroupSettingsByGroupId().values()) {
+			int intergreen = nextPhaseSignals.getOnset() - selectedSignal.getDropping();
 			if (cycleTimeCrossed) {
 				intergreen += signalSystemCycleTime;
 			}
@@ -366,30 +308,20 @@ public class TtCalculateSimplifiedIntergreens {
 			if (intergreen < 0) {
 				intergreen = 0;
 			}
-			systemIntergreens.setIntergreenTime(intergreen,
-					selectedSignal.getSignalGroupId(),
-					nextPhaseSignals.getSignalGroupId());
+			systemIntergreens.setIntergreenTime(intergreen, selectedSignal.getSignalGroupId(), nextPhaseSignals.getSignalGroupId());
 		}
 	}
 
 	/**
 	 * Please choose the boolean "simplifyPhases" here in the code.
 	 * 
-	 * Intergreen times are only calculated to signals in the next phase. So
-	 * different definitions of phases treat in different numbers of calculated
-	 * intergreens.
+	 * Intergreen times are only calculated to signals in the next phase. So different definitions of phases treat in different numbers of calculated intergreens.
 	 * 
-	 * A phase is a time period of a (fixed time) signal control, where the end
-	 * is defined by the dropping of the largest setting starting at the phase
-	 * starting time. So different such phases may overlap each other. If you
-	 * choose "simplifyPhases" as true, overlapping phases will be simplified in
-	 * the sense that they get zero intergreen times.
+	 * A phase is a time period of a (fixed time) signal control, where the end is defined by the dropping of the largest setting starting at the phase starting time. So different such phases may
+	 * overlap each other. If you choose "simplifyPhases" as true, overlapping phases will be simplified in the sense that they get zero intergreen times.
 	 * 
-	 * If you choose "simplifyPhases" as false, all these simplified phases will
-	 * be handled as one phase. They will get no intergreen times because they
-	 * are allowed to show green at the same time. In this case you will get
-	 * more intergreen times, because all intergreens to signals in the next
-	 * (now bigger) phase will be calculated.
+	 * If you choose "simplifyPhases" as false, all these simplified phases will be handled as one phase. They will get no intergreen times because they are allowed to show green at the same time. In
+	 * this case you will get more intergreen times, because all intergreens to signals in the next (now bigger) phase will be calculated.
 	 * 
 	 */
 	public static void main(String[] args) {
@@ -397,17 +329,14 @@ public class TtCalculateSimplifiedIntergreens {
 		// please choose this flag (see javadoc description above)
 		boolean simplifyPhases = true;
 
-		String signalControlFile = DgPaths.REPOS
-				+ "shared-svn/studies/projects/cottbus/cottbus_scenario/signal_control.xml";
-		String intergreensOutFile = DgPaths.REPOS
-				+ "shared-svn/studies/projects/cottbus/cottbus_scenario/";
+		String signalControlFile = "../../../shared-svn/studies/projects/cottbus/cottbus_scenario/signal_control.xml";
+		String intergreensOutFile = "../../../shared-svn/studies/projects/cottbus/cottbus_scenario/";
 		if (simplifyPhases)
 			intergreensOutFile += "signal_control_simplifiedIntergreens.xml";
 		else
 			intergreensOutFile += "signal_control_unsimplifiedIntergreens.xml";
 
-		new TtCalculateSimplifiedIntergreens().calculateIntergreens(
-				signalControlFile, intergreensOutFile, simplifyPhases);
+		new TtCalculateSimplifiedIntergreens().calculateIntergreens(signalControlFile, intergreensOutFile, simplifyPhases);
 	}
 
 }

@@ -23,7 +23,7 @@ public class LaemmerConfig {
 
     private boolean useBasicIntergreenTime = true;
 
-    private double DEFAULZT_INTERGREEN = 5;
+    private double DEFAULT_INTERGREEN = 5;
 
     private boolean analysisEnabled = true;
 
@@ -88,12 +88,12 @@ public class LaemmerConfig {
         this.useBasicIntergreenTime = useBasicIntergreenTime;
     }
 
-    public double getDEFAULZT_INTERGREEN() {
-        return DEFAULZT_INTERGREEN;
+    public double getDEFAULT_INTERGREEN() {
+        return DEFAULT_INTERGREEN;
     }
 
-    public void setDEFAULZT_INTERGREEN(double DEFAULZT_INTERGREEN) {
-        this.DEFAULZT_INTERGREEN = DEFAULZT_INTERGREEN;
+    public void setDEFAULT_INTERGREEN(double DEFAULZT_INTERGREEN) {
+        this.DEFAULT_INTERGREEN = DEFAULZT_INTERGREEN;
     }
 
 

@@ -372,7 +372,7 @@ public abstract class TtAbstractAnalysisTool implements PersonArrivalEventHandle
 	 * @param set
 	 * @return minimum and maximum entry of the set of doubles
 	 */
-	private static Tuple<Double, Double> determineMinMaxDoubleInSet(Set<Double> set) {
+	public static Tuple<Double, Double> determineMinMaxDoubleInSet(Set<Double> set) {
 		double minEntry = Long.MAX_VALUE;
 		double maxEntry = Long.MIN_VALUE;
 		for (Double currentEntry : set) {
@@ -458,23 +458,17 @@ public abstract class TtAbstractAnalysisTool implements PersonArrivalEventHandle
 		}
 
 		// fill missing time steps between first and last departure
-		long firstDeparture = Long.MAX_VALUE;
-		long lastDeparture = Long.MIN_VALUE;
-		for (Double departureTime : avgTTsPerRouteByDepartureTime.keySet()) {
-			// matsim departure times are always integer
-			if (departureTime < firstDeparture)
-				firstDeparture = departureTime.longValue();
-			if (departureTime > lastDeparture)
-				lastDeparture = departureTime.longValue();
-		}
-		for (long l = firstDeparture; l <= lastDeparture; l++) {
-			if (!avgTTsPerRouteByDepartureTime.containsKey((double) l)) {
+		Tuple<Double, Double> firstLastDepartureTuple = determineMinMaxDoubleInSet(this.routeStartsPerSecond.keySet());
+		// create a map entry for each time step between minimum and maximum departure time
+		// note: matsim departure times are always integer. time steps are assumed to be 1
+		for (long sec = firstLastDepartureTuple.getFirst().longValue(); sec <= firstLastDepartureTuple.getSecond().longValue(); sec++) {
+			if (!avgTTsPerRouteByDepartureTime.containsKey((double) sec)) {
 				// add NaN-values as travel times when no agent departures
 				double[] nanTTsPerRoute = new double[numberOfRoutes];
 				for (int i = 0; i < numberOfRoutes; i++){
 					nanTTsPerRoute[i] = Double.NaN;
 				}
-				avgTTsPerRouteByDepartureTime.put((double) l, nanTTsPerRoute);
+				avgTTsPerRouteByDepartureTime.put((double) sec, nanTTsPerRoute);
 			}
 		}
 
@@ -509,23 +503,17 @@ public abstract class TtAbstractAnalysisTool implements PersonArrivalEventHandle
 		}
 
 		// fill missing time steps between first and last departure
-		long firstDeparture = Long.MAX_VALUE;
-		long lastDeparture = Long.MIN_VALUE;
-		for (Double departureTime : avgTollsPerRouteByDepartureTime.keySet()) {
-			// matsim departure times are always integer
-			if (departureTime < firstDeparture)
-				firstDeparture = departureTime.longValue();
-			if (departureTime > lastDeparture)
-				lastDeparture = departureTime.longValue();
-		}
-		for (long l = firstDeparture; l <= lastDeparture; l++) {
-			if (!avgTollsPerRouteByDepartureTime.containsKey((double) l)) {
+		Tuple<Double, Double> firstLastDepartureTuple = determineMinMaxDoubleInSet(this.routeStartsPerSecond.keySet());
+		// create a map entry for each time step between minimum and maximum departure time
+		// note: matsim departure times are always integer. time steps are assumed to be 1
+		for (long sec = firstLastDepartureTuple.getFirst().longValue(); sec <= firstLastDepartureTuple.getSecond().longValue(); sec++) {
+			if (!avgTollsPerRouteByDepartureTime.containsKey((double) sec)) {
 				// add NaN-values as tolls when no agent departures
 				double[] nanTollsPerRoute = new double[numberOfRoutes];
 				for (int i = 0; i < numberOfRoutes; i++){
 					nanTollsPerRoute[i] = Double.NaN;
 				}
-				avgTollsPerRouteByDepartureTime.put((double) l, nanTollsPerRoute);
+				avgTollsPerRouteByDepartureTime.put((double) sec, nanTollsPerRoute);
 			}
 		}
 

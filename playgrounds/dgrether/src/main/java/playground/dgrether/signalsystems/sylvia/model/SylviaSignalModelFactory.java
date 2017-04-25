@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
-import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
@@ -55,8 +54,7 @@ public final class SylviaSignalModelFactory implements SignalModelFactory {
 
 	@Inject 
 	public SylviaSignalModelFactory(LinkSensorManager sensorManager, DgSylviaConfig sylviaConfig, Scenario scenario) {
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		this.provider = new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, signalsData);
+		this.provider = new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, scenario);
 	}
 
 	@Override

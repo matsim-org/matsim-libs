@@ -77,6 +77,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import analysis.TtAnalyzedGeneralResultsWriter;
 import analysis.TtGeneralAnalysis;
 import analysis.TtListenerToBindGeneralAnalysis;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
@@ -101,7 +102,7 @@ public class TtRunCottbusSimulation {
 
 	private static final Logger LOG = Logger.getLogger(TtRunCottbusSimulation.class);
 	
-	private final static String RUN_ID = "3046";
+	private final static String RUN_ID = "3103c";
 	
 	private final static NetworkType NETWORK_TYPE = NetworkType.V1;
 	public enum NetworkType {
@@ -120,7 +121,7 @@ public class TtRunCottbusSimulation {
 		WoMines // without mines as working places
 	}
 	
-	private final static SignalType SIGNAL_TYPE = SignalType.ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_GREEN;
+	private final static SignalType SIGNAL_TYPE = SignalType.ALL_MS_AS_SYLVIA_INSIDE_ENVELOPE_REST_GREEN;
 	public enum SignalType {
 		NONE, MS, MS_RANDOM_OFFSETS, MS_SYLVIA, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN, 
 		ALL_NODES_ALL_GREEN, ALL_NODES_DOWNSTREAM, ALL_GREEN_INSIDE_ENVELOPE, 
@@ -128,7 +129,8 @@ public class TtRunCottbusSimulation {
 		ALL_MS_AS_SYLVIA_INSIDE_ENVELOPE_REST_GREEN, // all MS systems as sylvia with MS basis, rest all green. note: green basis for sylvia does not work
 		ALL_MS_AS_DOWNSTREAM_INSIDE_ENVELOPE_REST_GREEN, // all MS systems as downstream with MS basis, rest all green
 		ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_MS, // all MS systems as downstream with MS basis, rest downstream with green basis
-		ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_GREEN // all systems inside envelope downstream with green basis
+		ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_GREEN, // all systems inside envelope downstream with green basis
+		ALL_MS_AS_DOWNSTREAM_BASIS_GREEN_INSIDE_ENVELOPE_REST_GREEN // all MS systems as downstream with green basis, rest all green
 	}
 	
 	// defines which kind of pricing should be used
@@ -147,7 +149,7 @@ public class TtRunCottbusSimulation {
 	
 	private static final boolean WRITE_INITIAL_FILES = true;
 	private static final boolean USE_COUNTS = false;
-	private static final double SCALING_FACTOR = 0.4;
+	private static final double SCALING_FACTOR = 1.;
 	
 	public static void main(String[] args) {		
 		Config config = defineConfig();
@@ -161,7 +163,7 @@ public class TtRunCottbusSimulation {
 		
 //		controler.addOverridingModule( new OTFVisWithSignalsLiveModule() ) ;
 		
-//		controler.run();
+		controler.run();
 	}
 
 	private static Config defineConfig() {
@@ -207,7 +209,7 @@ public class TtRunCottbusSimulation {
 		case WoMines:
 			// TODO choose one
 			// BaseCase output plans. the number specifies the flow and storage capacity that was used	
-			config.plans().setInputFile(OUTPUT_BASE_DIR + "run3040/3040.output_plans.xml.gz");
+			config.plans().setInputFile(OUTPUT_BASE_DIR + "run3100/3100.output_plans.xml.gz");
 			// BaseCase plans, no routes
 //			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
 			// BaseCase plans, no links for acitivties, no routes
@@ -267,6 +269,7 @@ public class TtRunCottbusSimulation {
 			case MS:
 			case DOWNSTREAM_MS: // will be changed to downstream later
 			case DOWNSTREAM_ALLGREEN: // will be changed to all day green and downstream later
+			case ALL_MS_AS_DOWNSTREAM_BASIS_GREEN_INSIDE_ENVELOPE_REST_GREEN: // will be changed to all day green and downstream later; additional signal systems will be added later
 			case ALL_MS_INSIDE_ENVELOPE_REST_GREEN: // additional signal systems will be added later
 			case ALL_MS_AS_DOWNSTREAM_INSIDE_ENVELOPE_REST_GREEN: // will be changed to downstream later; additional signal systems will be added later
 			case ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_MS: // additional signal systems will be added later
@@ -470,19 +473,28 @@ public class TtRunCottbusSimulation {
 		case DOWNSTREAM_BTUOPT:
 		case DOWNSTREAM_MS:
 		case DOWNSTREAM_ALLGREEN:
+		case ALL_MS_AS_DOWNSTREAM_BASIS_GREEN_INSIDE_ENVELOPE_REST_GREEN:
 			// adapt signal controller for downstream signal control
 			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			for (SignalSystemControllerData controllerData : signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().values()) {
 				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
-				if (SIGNAL_TYPE.equals(SignalType.DOWNSTREAM_ALLGREEN)){
+				if (SIGNAL_TYPE.toString().contains("GREEN")){
 					// change to all day green
 					for (SignalPlanData planData : controllerData.getSignalPlanData().values()) {
 						for (SignalGroupSettingsData groupSetting : planData.getSignalGroupSettingsDataByGroupId().values()) {
 							groupSetting.setOnset(0);
-							groupSetting.setDropping(planData.getCycleTime());
+							groupSetting.setDropping(planData.getCycleTime()-1);
 						}
 					}
 				}
+			}
+			if (SIGNAL_TYPE.equals(SignalType.ALL_MS_AS_DOWNSTREAM_BASIS_GREEN_INSIDE_ENVELOPE_REST_GREEN)){
+				// add additional all day green signals inside envelope
+				SignalizeScenario signalizer = new SignalizeScenario(scenario);
+				signalizer.setOverwriteSignals(false);
+				signalizer.setBoundingBox(INPUT_BASE_DIR + "shape_files/signal_systems/bounding_box.shp");
+				// note: no specific signal controller identifier - additional signals should show green all day
+				signalizer.createSignalsAndLanesForAllTurnings();
 			}
 			break;
 		case ALL_DOWNSTREAM_INSIDE_ENVELOPE_BASIS_MS:
@@ -596,7 +608,14 @@ public class TtRunCottbusSimulation {
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			controler.addOverridingModule(new CombinedSignalsModule());
+			CombinedSignalsModule signalsModule = new CombinedSignalsModule();
+			DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+			// TODO change for sylvia
+			sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(false);
+			sylviaConfig.setSignalGroupMaxGreenScale(1.5);
+//			sylviaConfig.setCheckDownstream(true);
+			signalsModule.setSylviaConfig(sylviaConfig);
+			controler.addOverridingModule(signalsModule);
 		}
 		
 		// add the module for link to link routing if enabled

@@ -40,6 +40,11 @@ public class DgSylviaConfig {
 	 * The default scale is unbounded.
 	 */
 	private double signalGroupMaxGreenScale = Double.MAX_VALUE;
+	
+	/** extends the phase only if downstream links are empty. 
+	 * except forced extension points that are extended anyway. i.e. switch off useFixedTimeCycle... too to get meaningful results
+	 */
+	private boolean checkDownstream = false;
 
 	/**
 	 * currently not used
@@ -84,5 +89,12 @@ public class DgSylviaConfig {
 		this.signalGroupMaxGreenScale = maxGreenScale;
 	}
 	
+	public void setCheckDownstream(boolean checkDownstream) {
+		this.checkDownstream = checkDownstream;
+	}
+	
+	public boolean isCheckDownstream() {
+		return checkDownstream;
+	}
 	
 }

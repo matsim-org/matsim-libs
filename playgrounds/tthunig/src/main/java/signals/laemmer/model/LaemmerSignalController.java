@@ -66,7 +66,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private Network network;
     private Lanes lanes;
 
-    private final double DEFAULT_INTERGREEN = 5;
+    private final double DEFAULT_INTERGREEN;
     private double tIdle;
 
     private double flowSum;
@@ -104,7 +104,8 @@ public class LaemmerSignalController extends AbstractSignalController implements
         this.delayCalculator = delayCalculator;
         DESIRED_PERIOD = laemmerConfig.getDESIRED_PERIOD();
         MAX_PERIOD = laemmerConfig.getMAX_PERIOD();
-        laemmerConfig.getDEFAULZT_INTERGREEN();
+        DEFAULT_INTERGREEN = laemmerConfig.getDEFAULT_INTERGREEN();
+
     }
 
     @Override

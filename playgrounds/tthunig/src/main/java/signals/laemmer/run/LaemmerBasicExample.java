@@ -87,7 +87,7 @@ public class LaemmerBasicExample {
 
         CombinedSignalsModule module = new CombinedSignalsModule();
         LaemmerConfig laemmerConfig = new LaemmerConfig();
-        laemmerConfig.setDEFAULZT_INTERGREEN(5);
+        laemmerConfig.setDEFAULT_INTERGREEN(5);
         laemmerConfig.setDESIRED_PERIOD(120);
         laemmerConfig.setMAX_PERIOD(180);
         laemmerConfig.setActiveRegime(regime);

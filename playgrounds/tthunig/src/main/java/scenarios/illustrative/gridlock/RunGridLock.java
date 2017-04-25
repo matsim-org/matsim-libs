@@ -61,6 +61,7 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -77,10 +78,12 @@ import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesFactory;
 import org.matsim.lanes.data.LanesToLinkAssignment;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import analysis.signals.TtSignalAnalysisListener;
 import analysis.signals.TtSignalAnalysisTool;
 import analysis.signals.TtSignalAnalysisWriter;
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import signals.CombinedSignalsModule;
 import signals.downstreamSensor.DownstreamSignalController;
@@ -94,9 +97,13 @@ public class RunGridLock {
 	private static final Logger log = Logger.getLogger(RunGridLock.class);
 	
 	private enum SignalType { NONE, PLANBASED, DOWNSTREAM, SYLVIA};
-	private static final SignalType SIGNALTYPE = SignalType.DOWNSTREAM;
+	private static final SignalType SIGNALTYPE = SignalType.PLANBASED;
+	
+	private enum SignalBasis { GREEN, CONFLICTING, TWO_ALTERNATING };
+	private static final SignalBasis SIGNALBASIS = SignalBasis.CONFLICTING;
 	
 	private static final double MIDDLE_LINK_CAP = 1800;
+	// no grid lock for 3600 and planbased signals: they let only 1800 vehicles enter the system
 	
 	private static final int DEMAND_START_TIME_OFFSET  = 0; // choose 0 if both streams should start at the same time
 	private enum DemandIntensity { CONSTANT, INCREASING, PERIODIC};
@@ -104,6 +111,10 @@ public class RunGridLock {
 
 	public static void main(String[] args) {
 		Config config = defineConfig();
+		
+//		OTFVisConfigGroup otfvisConfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.class ) ;
+//		otfvisConfig.setDrawTime(true);
+//		otfvisConfig.setAgentSize(80f);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
@@ -114,14 +125,21 @@ public class RunGridLock {
 		}
 		
 		Controler controler = new Controler(scenario);
+//		controler.addOverridingModule( new OTFVisWithSignalsLiveModule() ) ;
 		if (!SIGNALTYPE.equals(SignalType.NONE)) {
 			// add signal module
-			controler.addOverridingModule(new CombinedSignalsModule());
+			CombinedSignalsModule signalsModule = new CombinedSignalsModule();
+			DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+//			sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(false);
+//			sylviaConfig.setSignalGroupMaxGreenScale(2);
+//			sylviaConfig.setCheckDownstream(true);
+			signalsModule.setSylviaConfig(sylviaConfig);
+			controler.addOverridingModule(signalsModule);
 
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					// TODO add agent analysis: number of cars on link per time, departed agents, arrived agents,
+					// TODO inflow and outflow analysis so far in TtRunPostAnalysis
 
 					// bind tool to analyze signals
 					this.bind(TtSignalAnalysisTool.class).asEagerSingleton();
@@ -138,7 +156,7 @@ public class RunGridLock {
 	
 	private static Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory("../../../runs-svn/gridlock/twoStream/"+SIGNALTYPE+MIDDLE_LINK_CAP+"_demand"+DEMAND_INTENSITY+"_offset"+(int)DEMAND_START_TIME_OFFSET+"/");
+		config.controler().setOutputDirectory("../../../runs-svn/gridlock/twoStream/"+SIGNALTYPE+"_basis"+SIGNALBASIS+MIDDLE_LINK_CAP+"_demand"+DEMAND_INTENSITY+"_offset"+(int)DEMAND_START_TIME_OFFSET+"/");
 
 		// set number of iterations
 		config.controler().setLastIteration(0);
@@ -189,9 +207,11 @@ public class RunGridLock {
 		// TODO use lower values?
 		config.qsim().setStuckTime(3600);
 		config.qsim().setRemoveStuckVehicles(false);
+		
+		config.qsim().setUsingFastCapacityUpdate(false);
 
 		config.qsim().setStartTime(0);
-		config.qsim().setEndTime(24 * 3600);
+		config.qsim().setEndTime(4 * 3600);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -272,27 +292,45 @@ public class RunGridLock {
 
 			// create a start activity at the from link
 			Activity startAct = fac.createActivityFromLinkId("dummy", fromLinkId);
+			startAct.setEndTime(currentActEnd);
+			plan.addActivity(startAct);
 			if (DEMAND_INTENSITY.equals(DemandIntensity.CONSTANT)){
 				// distribute agents uniformly during one hour.
 				currentActEnd++;
 			} else if (DEMAND_INTENSITY.equals(DemandIntensity.INCREASING)) {
-				if (currentActEnd < simTime/5){
-					currentActEnd += 5;
-				} else if (currentActEnd < (simTime/5)*2){
+//				if (currentActEnd < simTime/3){
+//					currentActEnd += 4;
+//				} else if (currentActEnd < (simTime/3)*2){
+//					currentActEnd += 3;
+//				} else {
+//					currentActEnd += 2;
+//				}
+				
+				if (currentActEnd < simTime/4){
 					currentActEnd += 4;
-				} else if (currentActEnd < (simTime/5)*3){
+				} else if (currentActEnd < (simTime/4)*2){
 					currentActEnd += 3;
-				} else if (currentActEnd < (simTime/5)*4){
+				} else if (currentActEnd < (simTime/4)*3){
 					currentActEnd += 2;
 				} else {
 					currentActEnd += 1;
 				}
+				
+//				if (currentActEnd < simTime/5){
+//					currentActEnd += 5;
+//				} else if (currentActEnd < (simTime/5)*2){
+//					currentActEnd += 4;
+//				} else if (currentActEnd < (simTime/5)*3){
+//					currentActEnd += 3;
+//				} else if (currentActEnd < (simTime/5)*4){
+//					currentActEnd += 2;
+//				} else {
+//					currentActEnd += 1;
+//				}
 			} else {
 				throw new UnsupportedOperationException("The choosen demand intensity " + DEMAND_INTENSITY + " is not yet supported.");
 			}
-			startAct.setEndTime(currentActEnd);
-			plan.addActivity(startAct);
-
+			
 			// create a dummy leg
 			Leg leg = fac.createLeg(TransportMode.car);
 			if (initRoutes) {
@@ -374,26 +412,66 @@ public class RunGridLock {
 		switch (SIGNALTYPE){
 		case DOWNSTREAM:
 			signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
-			log.info("Create almost all day green base plan for downstream signal controller");
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 59));
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 0, 59));
+			switch (SIGNALBASIS){
+			case GREEN:
+				log.info("Create almost all day green base plan for downstream signal controller");
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 59));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 0, 59));
+				break;
+			case CONFLICTING:
+				log.info("Create alternating signal phases for conflicting streams");
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+				break;
+			case TWO_ALTERNATING:
+				log.info("Create two alternating signal phases like for SYLVIA");
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 30, 59));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+				break;
+			}
 			signalControl.addSignalSystemControllerData(signalSystemControl);
 			break;
 		case PLANBASED:
 			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			log.info("Create alternating signal phases for conflicting streams");
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+			switch (SIGNALBASIS){
+			case GREEN:
+				throw new UnsupportedOperationException("Planbased signals and basis green canot be combined.");
+			case CONFLICTING:
+				log.info("Create alternating signal phases for conflicting streams");
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+				break;
+			case TWO_ALTERNATING:
+				log.info("Create two alternating signal phases like for SYLVIA");
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 30, 59));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+				break;
+			}
 			signalControl.addSignalSystemControllerData(signalSystemControl);
 			break;
 		case SYLVIA:
 			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			log.warn("outgoing signal time shortend to combine signal phases for sylvia. keep in mind while comparing planbased and sylvia!");
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 30, 59));
-			signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+			switch (SIGNALBASIS) {
+			case GREEN:
+				throw new UnsupportedOperationException("Sylvia can only be combined with signal basis " + SignalBasis.TWO_ALTERNATING);
+			case CONFLICTING:
+				log.info("Create alternating signal phases for conflicting streams");
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 0, 59));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+				break;
+			case TWO_ALTERNATING:
+				log.warn("outgoing signal time shortend to combine signal phases for sylvia. keep in mind while comparing planbased and sylvia!");
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalIncomming.getId(), SignalGroup.class), 0, 29));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalOutgoing.getId(), SignalGroup.class), 30, 59));
+				signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, Id.create(signalUTurn.getId(), SignalGroup.class), 30, 59));
+				break;
+			}
 			tmpSignalControl.addSignalSystemControllerData(signalSystemControl);
 			// create the sylvia signal control by shorten the temporary signal control
 			DgSylviaPreprocessData.convertSignalControlData(tmpSignalControl, signalControl);

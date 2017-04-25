@@ -24,15 +24,12 @@ package signals.downstreamSensor;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
-import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 
 import com.google.inject.Inject;
 
@@ -55,10 +52,8 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 	private SignalControlProvider provider;
 
 	@Inject 
-	public DownstreamSignalModelFactory(LinkSensorManager sensorManager, Scenario scenario, JDEQSimConfigGroup jdeQSim) {
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		Network network = scenario.getNetwork();
-		this.provider = new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network, jdeQSim) ;
+	public DownstreamSignalModelFactory(LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, Scenario scenario) {
+		this.provider = new DownstreamSignalController.SignalControlProvider(sensorManager, downstreamSensor, scenario) ;
 	}
 	
 	@Override
