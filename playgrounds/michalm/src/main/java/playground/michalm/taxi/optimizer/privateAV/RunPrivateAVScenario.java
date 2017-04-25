@@ -16,7 +16,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunPrivateAVScenario {
 
   public static void main(String[] args) {
-    RunPrivateAVScenario.run("config.xml", "somept_small", false);
+    RunPrivateAVScenario.run("config.xml", "someav_small", true);
 
   }
 
@@ -27,12 +27,12 @@ public class RunPrivateAVScenario {
 	  config.controler().setOutputDirectory("output/" + runName);
     
 	  config.network().setInputFile("input/network.xml.gz");
-	  config.facilities().setInputFile("input/facilities.xml");
+	  config.facilities().setInputFile("input/facilities.xml.gz");
 	  config.plans().setInputFile("input/smallpopulation.xml");
 	  config.vehicles().setVehiclesFile("input/vehicles.xml");
 	  
 	  // set controler 
-	  Controler controler = createTaxiControler(config, runTaxis, "input/vehicles.xml");
+	  Controler controler = createTaxiControler(config, runTaxis, "input/taxis.xml");
 	  
 		controler.run();
 
@@ -49,6 +49,12 @@ public class RunPrivateAVScenario {
       config.addModule(new DvrpConfigGroup());
 
       DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
+      
+      // added in response to error in run
+      config.qsim().addParam("simStarttimeInterpretation", "onlyUseStarttime");
+      config.qsim().setStartTime(0);
+      //
+
       TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME); 
       taxi.setTaxisFile(taxisFile);
 
@@ -57,7 +63,7 @@ public class RunPrivateAVScenario {
 
       Scenario scenario = ScenarioUtils.loadScenario(config);
       FleetImpl fleet = new FleetImpl();
-      new VehicleReader(scenario.getNetwork(), fleet).readFile(taxi.getTaxisFileUrl(config.getContext()).getFile());
+      new VehicleReader(scenario.getNetwork(), fleet).readFile(taxisFile);
       
       controler.addOverridingModule(TaxiOptimizerModules.createModule(fleet, PrivateATOptimizerProvider.class));
 

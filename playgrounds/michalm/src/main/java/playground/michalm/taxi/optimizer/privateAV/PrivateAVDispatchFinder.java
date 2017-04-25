@@ -33,12 +33,10 @@ import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 public class PrivateAVDispatchFinder extends BestDispatchFinder {
 
 
-  private final TaxiOptimizerContext optimContext;
   private final BestDispatchFinder myDispatchFinder;
 
   public PrivateAVDispatchFinder(TaxiOptimizerContext optimContext) {
     super(optimContext);
-    this.optimContext = optimContext;
     this.myDispatchFinder = new BestDispatchFinder(optimContext);
   }
   
