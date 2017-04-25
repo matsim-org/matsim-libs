@@ -42,9 +42,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -76,8 +73,6 @@ import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
 import playground.dgrether.events.InMemoryEventsManager;
 import playground.dgrether.events.filters.FirstTripPerPersonEventFilter;
-import playground.dgrether.events.filters.TimeEventFilter;
-import playground.dgrether.koehlerstrehlersignal.analysis.DgAnalyseCottbusKS2010.RunInfo;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 
@@ -387,9 +382,8 @@ public class DgAnalyseCottbusKS2010 {
 					DgMfd mfd = new DgMfd(net, runInfo.storagecap);
 					eventsManager.addHandler(mfd);
 
-					TtTotalDelay totalDelay = new TtTotalDelay(net);
+					TtTotalDelay totalDelay = new TtTotalDelay(net, eventsManager);
 					totalDelay.considerDelayOfStuckedOrAbortedVehicles();
-					eventsManager.addHandler(totalDelay);
 
 					this.processEvents(eventsManager, inMemoryEvents, eventsFilename);
 

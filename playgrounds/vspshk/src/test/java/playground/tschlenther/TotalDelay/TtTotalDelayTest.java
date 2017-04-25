@@ -72,8 +72,7 @@ public class TtTotalDelayTest {
 		Scenario scenario = prepareTest(1);
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		TtTotalDelay handler = new TtTotalDelay(scenario.getNetwork());
-		events.addHandler(handler);
+		TtTotalDelay handler = new TtTotalDelay(scenario.getNetwork(), events);
 		
 		final List<Event> eventslist = new ArrayList<Event>();
 		events.addHandler(new BasicEventHandler(){
@@ -101,8 +100,7 @@ public class TtTotalDelayTest {
 		Scenario scenario = prepareTest(NUMBER_OF_PERSONS);
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		TtTotalDelay handler = new TtTotalDelay(scenario.getNetwork());
-		events.addHandler(handler);
+		TtTotalDelay handler = new TtTotalDelay(scenario.getNetwork(), events);
 		
 		final List<Event> eventslist = new ArrayList<Event>();
 		events.addHandler(new BasicEventHandler(){
