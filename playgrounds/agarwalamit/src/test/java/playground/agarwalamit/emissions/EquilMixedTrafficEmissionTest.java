@@ -78,14 +78,22 @@ public class EquilMixedTrafficEmissionTest {
 
 	private final boolean isConsideringCO2Costs ;
 
-	public EquilMixedTrafficEmissionTest (boolean isConsideringCO2Costs) {
+	private final QSimConfigGroup.VehiclesSource vehiclesSource;
+
+	public EquilMixedTrafficEmissionTest (boolean isConsideringCO2Costs, QSimConfigGroup.VehiclesSource vehiclesSource) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
+		this.vehiclesSource = vehiclesSource;
 		logger.info("Each parameter will be used in all the tests i.e. all tests will be run while inclusing and excluding CO2 costs.");
 	}
 
-	@Parameterized.Parameters(name = "{index}: considerCO2 == {0}")
+	@Parameterized.Parameters(name = "{index}: considerCO2 == {0}; vehicleSource == {1}")
 	public static List<Object> considerCO2 () {
-		Object[] considerCO2 = new Object [] { true ,false };
+		Object[] [] considerCO2 = new Object [] [] {
+				{true, QSimConfigGroup.VehiclesSource.fromVehiclesData} ,
+				{false,QSimConfigGroup.VehiclesSource.fromVehiclesData},
+//				{true, QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData} ,
+//				{false, QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData} ,
+				};
 		return Arrays.asList(considerCO2);
 	}
 
@@ -105,6 +113,11 @@ public class EquilMixedTrafficEmissionTest {
 
 		String carPersonId = "567417.1#12424";
 		String bikePersonId = "567417.1#12425"; // no emissions
+		String bikeVehicleId = bikePersonId;
+
+		if (this.vehiclesSource.equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
+			bikeVehicleId = bikePersonId+"_bike";
+		}
 
 		Vehicles vehs = sc.getVehicles();
 
@@ -119,9 +132,6 @@ public class EquilMixedTrafficEmissionTest {
 		// thus, reading from vehicles file and directly passing to vehicles container is not the same.
 		vehs.addVehicleType(car);
 
-		Vehicle carVeh = vehs.getFactory().createVehicle(Id.createVehicleId(carPersonId),car);
-		vehs.addVehicle(carVeh);
-
 		VehicleType bike = vehs.getFactory().createVehicleType(Id.create("bicycle",VehicleType.class));
 		bike.setMaximumVelocity(20./3.6);
 		bike.setPcuEquivalents(0.25);
@@ -130,12 +140,17 @@ public class EquilMixedTrafficEmissionTest {
 				EmissionSpecificationMarker.END_EMISSIONS.toString() );
 		vehs.addVehicleType(bike);
 
-		Vehicle bikeVeh = vehs.getFactory().createVehicle(Id.createVehicleId(bikePersonId),bike);
-		vehs.addVehicle(bikeVeh);
+		if(! this.vehiclesSource.equals(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData)) {
+			Vehicle carVeh = vehs.getFactory().createVehicle(Id.createVehicleId(carPersonId),car);
+			vehs.addVehicle(carVeh);
+
+			Vehicle bikeVeh = vehs.getFactory().createVehicle(Id.createVehicleId(bikeVehicleId),bike);
+			vehs.addVehicle(bikeVeh);
+		}
 
 		sc.getConfig().qsim().setMainModes(mainModes);
 		sc.getConfig().qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
-		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
+		sc.getConfig().qsim().setVehiclesSource(this.vehiclesSource);
 		sc.getConfig().qsim().setUsePersonIdForMissingVehicleId(true);
 
 		sc.getConfig().plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.pt).setTeleportedModeFreespeedFactor(1.5);
@@ -198,7 +213,7 @@ public class EquilMixedTrafficEmissionTest {
 		for (ColdEmissionEvent e : emissEventHandler.coldEvents ) {
 			if( ! ( e.getLinkId().equals(Id.createLinkId(12)) || e.getLinkId().equals(Id.createLinkId(45)) ) ) {
 				throw new RuntimeException("Cold emission event can occur only on departure link.");
-			} else if (e.getVehicleId().toString().equals(bikePersonId)) {
+			} else if (e.getVehicleId().toString().equals(bikeVehicleId)) {
 				for(double d : e.getColdEmissions().values()){
 					if (d!=0.) throw new RuntimeException("There should not be any cold emissions from bicycle mode.");
 				}
@@ -212,7 +227,7 @@ public class EquilMixedTrafficEmissionTest {
 		}
 
 		for(WarmEmissionEvent e : emissEventHandler.warmEvents) {
-			if (e.getVehicleId().toString().equals(bikePersonId)) {
+			if (e.getVehicleId().toString().equals(bikeVehicleId)) {
 				for(double d : e.getWarmEmissions().values()){
 					if (d!=0.) throw new RuntimeException("There should not be any cold emissions from bicycle mode.");
 				}
@@ -278,7 +293,7 @@ public class EquilMixedTrafficEmissionTest {
 		// now check if car is passing bike
 		// checking enter and leave time of car and bike on link 23
 		Tuple<Double,Double> carEnterLeaveTime = enterLeaveTimeEventHandler.vehicle_link23_enterLeaveTimes.get(Id.createVehicleId(carPersonId));
-		Tuple<Double,Double> bikeEnterLeaveTime = enterLeaveTimeEventHandler.vehicle_link23_enterLeaveTimes.get(Id.createVehicleId(bikePersonId));
+		Tuple<Double,Double> bikeEnterLeaveTime = enterLeaveTimeEventHandler.vehicle_link23_enterLeaveTimes.get(Id.createVehicleId(bikeVehicleId));
 
 		Assert.assertTrue("Car should enter after bicycle.",carEnterLeaveTime.getFirst() > bikeEnterLeaveTime.getFirst());
 		Assert.assertTrue("Car should leave before bicycle.",carEnterLeaveTime.getSecond() < bikeEnterLeaveTime.getSecond());

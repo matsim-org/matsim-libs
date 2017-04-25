@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -83,9 +82,7 @@ private final EmissionModule emissionModule;
             }
         }
 
-
-        String mode = emissionVehicle.getType().getId().toString(); // TODO check the translation of emission vehicles container to regular vehicle container.
-        if(mode.startsWith("PASSENGER_CAR")) mode = TransportMode.car;
+        String mode = emissionVehicle.getType().getId().toString();
 
         double distanceCostRate = cnScoringGroup.getModes().get(mode).getMonetaryDistanceRate();
         double marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(mode).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);

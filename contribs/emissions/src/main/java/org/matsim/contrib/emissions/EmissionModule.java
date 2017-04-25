@@ -102,9 +102,9 @@ public class EmissionModule {
 
 		vehicles = scenario.getVehicles();
 
-		if( vehicles == null || vehicles.getVehicles().isEmpty()) {
-			throw new RuntimeException("For emissions calculations, vehicle information is necessary." +
-					"However, vehicle container is empty. If");
+		if( vehicles == null || vehicles.getVehicleTypes().isEmpty()) {
+			throw new RuntimeException("For emissions calculations, at least vehicle type information is necessary." +
+					"However, no information is provided. Aborting...");
 		}
 
 		if(scenario.getConfig().qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.defaultVehicle)) {
