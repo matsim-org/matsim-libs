@@ -36,7 +36,6 @@ import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -50,6 +49,7 @@ import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalPlan;
 import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import signals.advancedPlanbased.AdvancedPlanBasedSignalSystemController;
+import signals.downstreamSensor.DownstreamSensor;
 import signals.downstreamSensor.DownstreamSignalController;
 import signals.laemmer.model.LaemmerConfig;
 import signals.laemmer.model.LaemmerSignalController;
@@ -69,13 +69,14 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 	private Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
 
 	@Inject
-	public CombinedSignalModelFactory(Scenario scenario, LaemmerConfig laemmerConfig, DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, JDEQSimConfigGroup jdeQSim, TtTotalDelay delayCalculator) {
+	public CombinedSignalModelFactory(Scenario scenario, LaemmerConfig laemmerConfig, DgSylviaConfig sylviaConfig, 
+			LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, TtTotalDelay delayCalculator) {
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
 		Lanes lanes = scenario.getLanes();
 		// prepare signal controller provider
-		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, signalsData));
-		signalControlProvider.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.SignalControlProvider(sensorManager, signalsData, network, jdeQSim));
+		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, scenario));
+		signalControlProvider.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.SignalControlProvider(sensorManager, downstreamSensor, scenario));
 		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(laemmerConfig, sensorManager, network, lanes, delayCalculator));
 		signalControlProvider.put(DgRoederGershensonSignalController.IDENTIFIER, new DgRoederGershensonSignalController.SignalControlProvider(sensorManager, scenario));
 		signalControlProvider.put(AdvancedPlanBasedSignalSystemController.IDENTIFIER, new AdvancedPlanBasedSignalSystemController.SignalControlProvider(sensorManager, delayCalculator));
