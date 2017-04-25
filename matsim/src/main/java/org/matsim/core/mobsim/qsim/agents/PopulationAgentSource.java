@@ -159,6 +159,9 @@ public final class PopulationAgentSource implements AgentSource {
 			// if it was not found, next step depends on config:
 			switch ( qsim.getScenario().getConfig().qsim().getVehiclesSource() ) {
 			case defaultVehicle:
+				// create vehicle but don't add it to the container. Amit Apr'17
+				vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
+				break;
 			case modeVehicleTypesFromVehiclesData:
 				// if config says mode vehicles, then create and add it:
 				vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
