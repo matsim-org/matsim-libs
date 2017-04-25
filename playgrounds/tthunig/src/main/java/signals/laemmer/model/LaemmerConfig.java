@@ -1,6 +1,9 @@
 package signals.laemmer.model;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.lanes.data.Lane;
 
@@ -15,8 +18,8 @@ public class LaemmerConfig {
     private double MAX_PERIOD = 120;
     private double DESIRED_PERIOD = 70;
 
-    private Map<Id<Signal>, Double> signalArrivalRates = new HashMap<>();
-    private Map<Id<Signal>, Map<Id<Lane>,Double>> laneArrivalRates = new HashMap<>();
+    private Map<Id<Link>, Double> linkArrivalRates = new HashMap<>();
+    private Map<Id<Link>, Map<Id<Lane>,Double>> laneArrivalRates = new HashMap<>();
 
     private boolean useBasicIntergreenTime = true;
 
@@ -24,8 +27,13 @@ public class LaemmerConfig {
 
     private boolean analysisEnabled = true;
 
-    public Map<Id<Lane>, Double> getLaneArrivalRates(Id<Signal> signalId) {
-        return this.laneArrivalRates.get(signalId);
+    @Nullable
+    public Double getLaneArrivalRate(Id<Link> linkId, Id<Lane> laneId) {
+        if(laneArrivalRates.containsKey(linkId)) {
+            return this.laneArrivalRates.get(linkId).get(laneId);
+        } else {
+            return null;
+        }
     }
 
     public enum Regime {COMBINED, OPTIMIZING, STABILIZING};
@@ -40,19 +48,20 @@ public class LaemmerConfig {
 
     private Regime activeRegime = Regime.COMBINED;
 
-    public void addArrivalRateForSignal(Id<Signal> signalId, double arrivalRate) {
-        signalArrivalRates.put(signalId, arrivalRate);
+    public void addArrivalRateForLink(Id<Link> linkId, double arrivalRate) {
+        linkArrivalRates.put(linkId, arrivalRate);
     }
 
-    public Double getSignalArrivalRate(Id<Signal> signalId) {
-        return signalArrivalRates.get(signalId);
+    @Nullable
+    public Double getLinkArrivalRate(Id<Link> linkId) {
+        return linkArrivalRates.get(linkId);
     }
 
-    public void addArrivalRateForSignalLane(Id<Signal> signalId, Id<Lane> laneId, double arrivalRate) {
-        if(!this.laneArrivalRates.containsKey(signalId)) {
-            this.laneArrivalRates.put(signalId, new HashMap<>());
+    public void addArrivalRateForLane(Id<Link> linkId, Id<Lane> laneId, double arrivalRate) {
+        if(!this.laneArrivalRates.containsKey(linkId)) {
+            this.laneArrivalRates.put(linkId, new HashMap<>());
         }
-        this.laneArrivalRates.get(signalId).put(laneId, arrivalRate);
+        this.laneArrivalRates.get(linkId).put(laneId, arrivalRate);
     }
 
     public double getMAX_PERIOD() {
