@@ -116,8 +116,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
                                 setVehicleDiversion(vehicleLinkPair, findClosestRequest(vehicleLinkPair, voronoiSet));
                             }
                         }
-                    }                  
-                    else { // send every vehicle to closest customer
+                    } else { // send every vehicle to closest customer
                         if (getAVRequests().size() > 0) {
                             getDivertableVehicles().stream() //
                                     .forEach(v -> setVehicleDiversion(v, findClosestRequest(v, getAVRequests())));
@@ -127,7 +126,6 @@ public class SelfishDispatcher extends UniversalDispatcher {
                 }
                 
                 // send remaining vehicles to their reference position
-                // getDivertableVehicles().stream().forEach(v -> setVehicleDiversion(v, ));
                 for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
                     GlobalAssert.that(refPositions.containsKey(vehicleLinkPair.avVehicle));
                     Link link = refPositions.get(vehicleLinkPair.avVehicle);
@@ -195,7 +193,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
         GlobalAssert.that(0 < networkLinksTree.size());
         for (AVVehicle avVehicle : getMaintainedVehicles()) {
             Link initialGuess = refPositions.get(avVehicle); // initialize with previous Weber link
-            Link weberLink = weberWeiszfeld(requestsServed.get(avVehicle), initialGuess);
+            Link weberLink = computeWeberLink(requestsServed.get(avVehicle), initialGuess);
             GlobalAssert.that(weberLink != null);
             refPositions.put(avVehicle, weberLink);
         }
@@ -238,54 +236,78 @@ public class SelfishDispatcher extends UniversalDispatcher {
      * @param avRequests
      *            list of requests served so far
      * @param initialGuess
-     *            2D-point initial guess for the iterative algorithm
-     * @return 2D Weber point of past requests approximated by Weiszfeld's
+     *            initial guess as a link for the iterative algorithm
+     * @return closest link to 2D Weber point of past requests approximated by Weiszfeld's
      *         algorithm
      */
-    private Link weberWeiszfeld(List<AVRequest> avRequests, Link initialGuess) {
+    private Link computeWeberLink(List<AVRequest> avRequests, Link initialGuess) {
         if (avRequests.isEmpty()) {
             return initialGuess;
         }
-        double weberX = initialGuess.getFromNode().getCoord().getX();
-        double weberY = initialGuess.getFromNode().getCoord().getY();
-        int count = 0;
-        while (count <= weiszfeldMaxIter) {
-            double X = 0.0;
-            double Y = 0.0;
-            double normalizer = 0.0;
-            for (AVRequest avRequest : avRequests) {
-                Coord point = avRequest.getFromLink().getCoord();
-                double distance = Math.hypot(point.getX() - weberX, point.getY() - weberY);
-                if (distance != 0) {
-                    X += point.getX() / distance;
-                    Y += point.getY() / distance;
-                    normalizer += 1.0 / distance;
-                } else {
-                    X = point.getX();
-                    Y = point.getY();
-                    normalizer = 1.0;
-                    break;
-                }
-            }
-            X /= normalizer;
-            Y /= normalizer;
-            double change = Math.hypot(X - weberX, Y - weberY);
-            weberX = X;
-            weberY = Y;
-            if (change < weiszfeldTol) {
-                break;
-            }
-            count++;
+        List<Coord> requestCoords = new ArrayList<>();
+        for (AVRequest avRequest : avRequests) {
+            requestCoords.add(avRequest.getFromLink().getCoord());
         }
+        
+        Coord weberCoord = weiszfeldAlgorithm(requestCoords, initialGuess.getCoord());
+        
         // Weber point must be inside the network
-        GlobalAssert.that((weberX >= networkBounds[0]) && (weberY >= networkBounds[1]) && (weberX <= networkBounds[2])
-                && (weberY <= networkBounds[3]));
+        GlobalAssert.that((weberCoord.getX() >= networkBounds[0]) 
+                       && (weberCoord.getY() >= networkBounds[1]) 
+                       && (weberCoord.getX() <= networkBounds[2])
+                       && (weberCoord.getY() <= networkBounds[3]));
 
-        Link weberLink = networkLinksTree.getClosest(weberX, weberY);
+        Link weberLink = networkLinksTree.getClosest(weberCoord.getX(), weberCoord.getY());
         GlobalAssert.that(weberLink != null);
 
         return weberLink;
     }
+    
+    /**
+    *
+    * @param data
+    *            list of data points in 2D Euclidean space
+    * @param initialGuess
+    *            initial guess as a coordinate for the iterative algorithm
+    * @return 2D Weber point of the data coordinates approximated by Weiszfeld's
+    *         algorithm
+    */
+   private Coord weiszfeldAlgorithm(List<Coord> data, Coord initialGuess) {
+       if (data.isEmpty()) {
+           return initialGuess;
+       }
+       double weberX = initialGuess.getX();
+       double weberY = initialGuess.getY();
+       int count = 0;
+       while (count <= weiszfeldMaxIter) {
+           double x = 0.0;
+           double y = 0.0;
+           double normalizer = 0.0;
+           for (Coord point : data) {
+               double distance = Math.hypot(point.getX() - weberX, point.getY() - weberY);
+               if (distance != 0) {
+                   x += point.getX() / distance;
+                   y += point.getY() / distance;
+                   normalizer += 1.0 / distance;
+               } else {
+                   x = point.getX();
+                   y = point.getY();
+                   normalizer = 1.0;
+                   break;
+               }
+           }
+           x /= normalizer;
+           y /= normalizer;
+           double change = Math.hypot(x - weberX, y - weberY);
+           weberX = x;
+           weberY = y;
+           if (change < weiszfeldTol) {
+               break;
+           }
+           count++;
+       }
+       return new Coord(weberX, weberY);
+   }
 
     /**
      * initializes the vehicle Lists which are used for vehicle specific
