@@ -3,7 +3,6 @@ package playground.clruch.prep;
 import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -13,7 +12,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.util.distance.DistanceCalculator;
 
 /**
  * Created by Claudio on 1/4/2017.
@@ -26,7 +24,7 @@ import org.matsim.contrib.util.distance.DistanceCalculator;
  * "NextActivityStartTime-PrevActivityEndTime"> </leg>
  */
 
-class PopulationTools {
+public class PopulationTools {
 
     private static final Logger log = Logger.getLogger(PopulationTools.class);
 

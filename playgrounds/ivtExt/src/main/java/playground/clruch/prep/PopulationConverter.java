@@ -17,6 +17,7 @@ import playground.clruch.utils.GZHandler;
 /**
  * Created by Claudio on 1/4/2017.
  */
+@Deprecated // integrated into ScenarioPreparer
 public class PopulationConverter {
     public static void main(String[] args) throws MalformedURLException {
         final File dir = new File(args[0]);
@@ -40,9 +41,6 @@ public class PopulationConverter {
         // edit the configuration file - change all modes of transport to "av"
         // increasing the second value goes north
         // increasing the first value goes right
-        //Coord center = new Coord(2704366.0,1236061.0);
-        //Coord center = new Coord(2684648.0,1251492.0);
-        //Coord center = new Coord(2684648.0,1251492.0); Center in Kloten
         Coord center = new Coord(2682000.0,1247492.0);
         double radius = 12000;
         PopulationTools.elminateOutsideRadius(population, center, radius);

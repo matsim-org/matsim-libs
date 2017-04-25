@@ -1,9 +1,11 @@
 package playground.clruch.netdata;
 
+import java.io.Serializable;
+
 /**
  * Created by Claudio on 2/8/2017.
  */
-public class VirtualLink {
+public class VirtualLink implements Serializable {
     /**
      * index is counting from 0,1,...
      * index is used to assign entries in vectors and matrices

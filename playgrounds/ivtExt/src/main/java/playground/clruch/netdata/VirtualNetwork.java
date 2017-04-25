@@ -1,6 +1,7 @@
 package playground.clruch.netdata;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,7 +20,7 @@ import playground.clruch.utils.GlobalAssert;
 /**
  * Created by Claudio on 2/8/2017.
  */
-public class VirtualNetwork {
+public class VirtualNetwork implements Serializable {
 
     private final List<VirtualNode> virtualNodes = new ArrayList<>();
     private final List<VirtualLink> virtualLinks = new ArrayList<>();

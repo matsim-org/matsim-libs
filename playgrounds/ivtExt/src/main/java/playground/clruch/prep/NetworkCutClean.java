@@ -12,22 +12,22 @@ import org.matsim.core.network.algorithms.NetworkScenarioCut;
  *
  */
 
-
 public class NetworkCutClean {
 
     private static final Logger log = Logger.getLogger(NetworkCutClean.class);
 
     public static void elminateOutsideRadius(Network network, Coord center, double radius) {
+        if (radius > 0) {
+            log.info("All network elements which are more than " + radius + " [m] away from Coord " + center.toString() + " removed.");
 
-        log.info("All network elements which are more than " + radius + " [m] away from Coord " + center.toString() + " removed.");
-        
-        System.out.println("network size before operation: " + network.getNodes().size());
-        NetworkScenarioCut networkScenarioCut = new NetworkScenarioCut(center, radius);
-        networkScenarioCut.run(network);
-        System.out.println("network size after cutting: " + network.getNodes().size());
-        NetworkCleaner networkCleaner = new NetworkCleaner();
-        networkCleaner.run(network);
-        System.out.println("network size after cleaning: " + network.getNodes().size());
+            System.out.println("network size before operation: " + network.getNodes().size());
+            NetworkScenarioCut networkScenarioCut = new NetworkScenarioCut(center, radius);
+            networkScenarioCut.run(network);
+            System.out.println("network size after cutting: " + network.getNodes().size());
+            NetworkCleaner networkCleaner = new NetworkCleaner();
+            networkCleaner.run(network);
+            System.out.println("network size after cleaning: " + network.getNodes().size());
+        }
 
     }
 }

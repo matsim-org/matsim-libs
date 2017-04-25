@@ -1,5 +1,6 @@
 package playground.clruch.netdata;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -12,7 +13,7 @@ import playground.clruch.utils.GlobalAssert;
 /**
  * Created by Claudio on 2/8/2017.
  */
-public class VirtualNode {
+public class VirtualNode implements Serializable {
     /**
      * index is counting from 0,1,...
      * index is used to assign entries in vectors and matrices

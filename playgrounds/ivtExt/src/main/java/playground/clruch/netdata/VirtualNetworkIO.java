@@ -178,7 +178,6 @@ public class VirtualNetworkIO {
 
         // display ml
         xmlOutput.setFormat(Format.getPrettyFormat());
-        xmlOutput.output(doc, System.out);
         xmlOutput.output(doc, new FileWriter(fileName));
 
     }

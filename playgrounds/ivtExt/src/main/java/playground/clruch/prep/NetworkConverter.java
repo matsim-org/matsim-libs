@@ -14,6 +14,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.clruch.utils.GZHandler;
 
+@Deprecated //was integrated into ScenarioPreparer
 public class NetworkConverter {
     public static void main(String[] args) throws MalformedURLException {
         final File dir = new File(args[0]);
