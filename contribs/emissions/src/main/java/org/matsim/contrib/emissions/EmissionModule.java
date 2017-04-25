@@ -98,9 +98,14 @@ public class EmissionModule {
 		getInputFiles();
 		
 		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
-		if(this.vehicles == null){
-			vehicles = scenario.getVehicles();
+
+		vehicles = scenario.getVehicles();
+
+		if( vehicles == null || vehicles.getVehicles().isEmpty()) {
+			throw new RuntimeException("For emissions calculations, vehicle information is necessary." +
+					"However, vehicle container is empty. If");
 		}
+
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
