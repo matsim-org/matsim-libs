@@ -19,32 +19,76 @@
 
 package playground.michalm.taxi.optimizer.privateAV;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
 /**
  * @author michalm
  */
 public class PrivateAVDispatchFinder extends BestDispatchFinder {
 
-	public PrivateAVDispatchFinder(TaxiOptimizerContext optimContext) {
-		super(optimContext);
-	}
+
+  private final TaxiOptimizerContext optimContext;
+  private final BestDispatchFinder myDispatchFinder;
+
+  public PrivateAVDispatchFinder(TaxiOptimizerContext optimContext) {
+    super(optimContext);
+    this.optimContext = optimContext;
+    this.myDispatchFinder = new BestDispatchFinder(optimContext);
+  }
+  
+
 
 	@Override
 	public Dispatch<TaxiRequest> findBestRequestForVehicle(Vehicle veh, Iterable<TaxiRequest> unplannedRequests) {
-		// check if veh can serve any of the unplanned requests; if yes, then choose one
+
+	  // See if vehicle can serve any of the unplanned requests
+	  String vehID = veh.getId().toString().substring(0,6);
+	  
+	  // filter requests down to requests from own household
+	  List<TaxiRequest> ownRequests = new ArrayList<TaxiRequest>();
+
+	  for(TaxiRequest req : unplannedRequests){
+	    String requester = req.getPassenger().getId().toString();
+	    String hh = requester.substring(0, 6);
+
+	    if(vehID == hh){
+	      ownRequests.add(req);
+	    }
+	  }
+	  
+	  // check if veh can serve any of the unplanned requests; if yes, then choose one
 		//
 		// return new Dispatch<>(veh, selectedRequest, vrpPathFromVehicleLocationToSelectedRequest);
-		return null;
+    Dispatch<TaxiRequest> myDispatch = myDispatchFinder.findBestRequestForVehicle(veh, ownRequests);
+		return myDispatch;
 	}
 
 	@Override
 	public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req, Iterable<? extends Vehicle> vehicles) {
-		// check if req can be served by any of the idle vehicles; if yes, then choose one
-		//
-		// return new Dispatch<>(selectedVehicle, req, vrpPathFromVehicleLocationToSelectedRequest);
-		return null;
+    // check if req can be served by any of the idle vehicles; if yes, then choose one
+    // filter own vehicles from all idle vehicles
+    String requester = req.getPassenger().getId().toString();
+    String hh = requester.substring(0, 6);
+
+    List<Vehicle> ownVehicles = new ArrayList<Vehicle>();
+
+    // make a list of the AV's available to the household
+    for(Vehicle  veh : vehicles){
+      String vehID = veh.getId().toString().substring(0,6);
+      
+      if(vehID == hh){
+        ownVehicles.add(veh);
+      }
+    }
+    
+    //call BestDispatchFinder for the selected subset of vehicles
+    Dispatch<TaxiRequest> myDispatch = myDispatchFinder.findBestVehicleForRequest(req, ownVehicles);
+    return myDispatch;
 	}
 }
