@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.9.0-SNAPSHOT</version>
+		<version>0.9.0</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>playground</groupId>
@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>benjamin</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.9.0</version>
 		</dependency>
 <!-- 		<dependency> -->
 <!-- 			<groupId>playground</groupId> -->
@@ -35,12 +35,12 @@
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>gunnar</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>kai</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.9.0</version>
 		</dependency>
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.matsim.contrib</groupId> -->
@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>evacuation</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vividsolutions</groupId>
@@ -65,7 +65,7 @@
 	<dependency>
 		<groupId>org.matsim.contrib</groupId>
 		<artifactId>cadytsIntegration</artifactId>
-		<version>0.9.0-SNAPSHOT</version>
+		<version>0.9.0</version>
 	</dependency>
 <!-- 	<dependency> -->
 <!-- 		<groupId>org.matsim.contrib</groupId> -->
