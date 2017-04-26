@@ -1,10 +1,9 @@
 package signals.laemmer.model;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
+//import com.sun.istack.internal.NotNull;
+//import com.sun.istack.internal.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.model.Signal;
 import org.matsim.lanes.data.Lane;
 
 import java.util.HashMap;
@@ -27,7 +26,7 @@ public class LaemmerConfig {
 
     private boolean analysisEnabled = true;
 
-    @Nullable
+//    @Nullable
     public Double getLaneArrivalRate(Id<Link> linkId, Id<Lane> laneId) {
         if(laneArrivalRates.containsKey(linkId)) {
             return this.laneArrivalRates.get(linkId).get(laneId);
@@ -52,7 +51,7 @@ public class LaemmerConfig {
         linkArrivalRates.put(linkId, arrivalRate);
     }
 
-    @Nullable
+//    @Nullable
     public Double getLinkArrivalRate(Id<Link> linkId) {
         return linkArrivalRates.get(linkId);
     }
