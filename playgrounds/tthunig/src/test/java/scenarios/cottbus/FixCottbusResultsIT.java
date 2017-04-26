@@ -141,6 +141,8 @@ public class FixCottbusResultsIT {
 		} else if (signalType.equals(SignalType.BTU_OPT)){ 
 			signalConfigGroup.setSignalControlFile(testUtils.getClassInputDirectory() + "btuOpt/signal_control_opt.xml");
 		}
+
+		config.qsim().setUsingFastCapacityUpdate(false);
 		
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta( 2 );

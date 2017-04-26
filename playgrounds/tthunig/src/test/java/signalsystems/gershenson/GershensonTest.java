@@ -340,6 +340,8 @@ public class GershensonTest {
 		// able or enable signals and lanes
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalConfigGroup.setUseSignalSystems(true);
+		
+		config.qsim().setUsingFastCapacityUpdate(false);
 
 		// set brain exp beta
 //		config.planCalcScore().setBrainExpBeta(2);
