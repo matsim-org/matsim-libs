@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -20,7 +19,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.router.FuturePathContainer;
-import playground.clruch.utils.AVLocation;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -33,23 +31,15 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
- * purpose of {@link UniversalDispatcher} is to collect and manage {@link AVRequest}s alternative
- * implementation of {@link AVDispatcher}; supersedes {@link AbstractDispatcher}.
+ * purpose of {@link UniversalDispatcher} is to collect and manage {@link AVRequest}s alternative implementation of {@link AVDispatcher}; supersedes
+ * {@link AbstractDispatcher}.
  */
 public abstract class UniversalBindingDispatcher extends AbstractUniversalDispatcher {
 
-                                                                          // getAVRequests()
     private final Set<AVRequest> assignedRequests = new HashSet<>(); // pending requests which are assigned to an AV
     private final Set<AVRequest> unassignedRequests = new HashSet<>(); // pending requests which are still unassigned
-    private final Set<AVVehicle> assignedVehicles = new HashSet<>(); //
-    private final HashMap<AVRequest, AVVehicle> matchings = new HashMap<>(); // customer/AV matchings
-
-    /**
-     * map stores most recently known location of vehicles. map is used in case obtaining the
-     * vehicle location fails
-     */
-
-
+    private final Set<AVVehicle> assignedVehicles = new HashSet<>(); // vehicles which are currently assigned to a request
+    private final HashMap<AVRequest, AVVehicle> matchings = new HashMap<>(); // history of customer/AV matchings
 
     protected UniversalBindingDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -57,49 +47,26 @@ public abstract class UniversalBindingDispatcher extends AbstractUniversalDispat
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager //
     ) {
-        super(avDispatcherConfig,travelTime,parallelLeastCostPathCalculator,eventsManager);
+        super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
     }
 
-    @Override
-    void updateDatastructures(Collection<AVVehicle> stayVehicles) {
-        stayVehicles.forEach(vehiclesWithCustomer::remove);
-        // ---
-        int failed = 0;
-        Collection<AVVehicle> collection = getFunctioningVehicles();
-        if (!collection.isEmpty()) {
-            for (AVVehicle avVehicle : collection) {
-                final Link link = AVLocation.of(avVehicle);
-                if (link != null)
-                    vehicleLocations.put(avVehicle, link);
-                else
-                    ++failed;
-            }
-            if (AVVEHILCECOUNT == null)
-                AVVEHILCECOUNT = vehicleLocations.size();
-            GlobalAssert.that(AVVEHILCECOUNT == collection.size());
-            GlobalAssert.that(AVVEHILCECOUNT == vehicleLocations.size());
-        }
-    }
-
-
-
+    /**
+     * @return AVRequests which are currently not assigned to a vehicle
+     */
     protected synchronized final Collection<AVRequest> getUnassignedAVRequests() {
         GlobalAssert.that(pendingRequests.size() == assignedRequests.size() + unassignedRequests.size());
         return Collections.unmodifiableCollection(unassignedRequests);
     }
 
-
-
     /**
-     * Function called from derived class to match a vehicle with a request. The function appends
-     * the pick-up, drive, and drop-off tasks for the car.
+     * Function called from derived class to match a vehicle with a request. The function appends the pick-up, drive, and drop-off tasks for the car.
      * 
      * @param avVehicle
      *            vehicle in {@link AVStayTask} in order to match the request
      * @param avRequest
      *            provided by getAVRequests()
      */
-    @Override 
+    @Override
     protected synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
@@ -121,8 +88,6 @@ public abstract class UniversalBindingDispatcher extends AbstractUniversalDispat
         Link returnVal = vehiclesWithCustomer.put(avVehicle, avRequest.getToLink());
         GlobalAssert.that(returnVal == null);
 
-
-
         // this is only functional if the Set "assignedVehicles" was used (e.g. by
         // SingleHeuristicDispatcher)
         boolean succPR = pendingRequests.remove(avRequest);
@@ -134,10 +99,8 @@ public abstract class UniversalBindingDispatcher extends AbstractUniversalDispat
         GlobalAssert.that(pendingRequests.size() == unassignedRequests.size() + assignedRequests.size());
     }
 
-
     /**
-     * Sends a stay vehicle to a customer in a way such that it can be made unavailalbe for future
-     * dispatcher calls
+     * Sends a stay vehicle to a customer in a way such that it can be made unavailalbe for future dispatcher calls
      * 
      * @param avVehicle
      * @param avRequest
@@ -195,9 +158,6 @@ public abstract class UniversalBindingDispatcher extends AbstractUniversalDispat
         ++total_matchedRequests;
     }
 
-    
-
-    
     /**
      * 
      * @return available vehicles which are yet unassigned to a request as vehicle Link pairs
@@ -205,25 +165,19 @@ public abstract class UniversalBindingDispatcher extends AbstractUniversalDispat
     protected List<VehicleLinkPair> getavailableUnassignedVehicleLinkPairs() {
         // get the staying vehicles and requests
         List<AVVehicle> availableVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toList());
-        List<AVVehicle> availableUnassignedVehicles =  availableVehicles.stream().filter(v -> !assignedVehicles.contains(v)).collect(Collectors.toList());
+        List<AVVehicle> availableUnassignedVehicles = availableVehicles.stream().filter(v -> !assignedVehicles.contains(v))
+                .collect(Collectors.toList());
         List<VehicleLinkPair> returnList = new ArrayList<>();
-        
-        for(AVVehicle avVehicle : availableUnassignedVehicles ){
+
+        for (AVVehicle avVehicle : availableUnassignedVehicles) {
             final Schedule schedule = avVehicle.getSchedule();
             AVStayTask task = (AVStayTask) schedule.getCurrentTask();
             LinkTimePair linkTimePair = new LinkTimePair(task.getLink(), getTimeNow());
             VehicleLinkPair vehicleLinkPair = new VehicleLinkPair(avVehicle, linkTimePair, null);
             returnList.add(vehicleLinkPair);
         }
-        
+
         return returnList;
-    }
-    
-
-
-    @Override
-    public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
-        // default implementation: for now, do nothing
     }
 
     @Override
@@ -233,7 +187,6 @@ public abstract class UniversalBindingDispatcher extends AbstractUniversalDispat
         GlobalAssert.that(succAddP == succAddU);
         GlobalAssert.that(pendingRequests.size() == unassignedRequests.size() + assignedRequests.size());
     }
-
 
     /**
      * 
