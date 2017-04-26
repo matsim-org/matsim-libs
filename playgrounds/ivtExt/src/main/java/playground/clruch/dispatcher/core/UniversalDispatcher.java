@@ -43,25 +43,8 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * purpose of {@link UniversalDispatcher} is to collect and manage {@link AVRequest}s
  * alternative implementation of {@link AVDispatcher}; supersedes {@link AbstractDispatcher}.
  */
-public abstract class UniversalDispatcher extends VehicleMaintainer {
-    private final FuturePathFactory futurePathFactory;
+public abstract class UniversalDispatcher extends AbstractUniversalDispatcher {
 
-    private final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via getAVRequests()
-    private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
-    private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
-
-    /**
-     * map stores most recently known location of vehicles.
-     * map is used in case obtaining the vehicle location fails
-     */
-    private final Map<AVVehicle, Link> vehicleLocations = new HashMap<>();
-
-    private final double pickupDurationPerStop;
-    private final double dropoffDurationPerStop;
-    private final int publishPeriod;
-
-    private int total_matchedRequests = 0;
-    private Integer AVVEHILCECOUNT = null;
 
     protected UniversalDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -69,15 +52,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager //
     ) {
-        super(eventsManager);
-        this.futurePathFactory = new FuturePathFactory(parallelLeastCostPathCalculator, travelTime);
-
-        pickupDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getPickupDurationPerStop();
-        dropoffDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getDropoffDurationPerStop();
-
-        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        setInfoLinePeriod(safeConfig.getInteger("infoLinePeriod", 10));
-        publishPeriod = safeConfig.getInteger("publishPeriod", 10);
+        super(avDispatcherConfig,travelTime,parallelLeastCostPathCalculator,eventsManager);
     }
 
     @Override
@@ -104,28 +79,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // System.out.println("failed to extract location for " + failed + " vehicles");
     }
 
-    /**
-     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
-     * successive calls to the function return the identical collection.
-     * 
-     * @return collection of all requests that have not been matched
-     */
-    protected synchronized final Collection<AVRequest> getAVRequests() {
-        pendingRequests.removeAll(matchedRequests);
-        matchedRequests.clear();
-        return Collections.unmodifiableCollection(pendingRequests);
-    }
 
-    /**
-     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
-     * successive calls to the function return the identical collection.
-     * 
-     * @return list of {@link AVRequest}s grouped by link
-     */
-    public final Map<Link, List<AVRequest>> getAVRequestsAtLinks() {
-        return getAVRequests().stream() // <- intentionally not parallel to guarantee ordering of requests
-                .collect(Collectors.groupingBy(AVRequest::getFromLink));
-    }
+
 
     /**
      * Function called from derived class to match a vehicle with a request.
@@ -136,6 +91,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest
      *            provided by getAVRequests()
      */
+    @Override
     protected synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
@@ -158,50 +114,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         ++total_matchedRequests;
     }
 
-    /**
-     * assigns new destination to vehicle.
-     * if vehicle is already located at destination, nothing happens.
-     * 
-     * in one pass of redispatch(...), the function setVehicleDiversion(...)
-     * may only be invoked once for a single vehicle (specified in vehicleLinkPair).
-     *
-     * @param vehicleLinkPair
-     *            is provided from super.getDivertableVehicles()
-     * @param destination
-     */
-    protected final void setVehicleDiversion(final VehicleLinkPair vehicleLinkPair, final Link destination) {
-        final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
-        Task task = schedule.getCurrentTask(); // <- implies that task is started
-        new AVTaskAdapter(task) {
-            @Override
-            public void handle(AVDriveTask avDriveTask) {
-                if (!avDriveTask.getPath().getToLink().equals(destination)) { // ignore when vehicle is already going there
-                    FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
-                            vehicleLinkPair.linkTimePair.link, destination, vehicleLinkPair.linkTimePair.time);
 
-                    assignDirective(vehicleLinkPair.avVehicle, new DriveVehicleDiversionDirective( //
-                            vehicleLinkPair, destination, futurePathContainer));
-                } else
-                    assignDirective(vehicleLinkPair.avVehicle, new EmptyDirective());
-            }
 
-            @Override
-            public void handle(AVStayTask avStayTask) {
-                if (!avStayTask.getLink().equals(destination)) { // ignore request where location == target
-                    FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
-                            vehicleLinkPair.linkTimePair.link, destination, vehicleLinkPair.linkTimePair.time);
-
-                    assignDirective(vehicleLinkPair.avVehicle, new StayVehicleDiversionDirective( //
-                            vehicleLinkPair, destination, futurePathContainer));
-                } else
-                    assignDirective(vehicleLinkPair.avVehicle, new EmptyDirective());
-            }
-        };
-    }
-
-    public final void setVehicleDiversion(final Entry<VehicleLinkPair, Link> entry) {
-        setVehicleDiversion(entry.getKey(), entry.getValue());
-    }
 
     @Override
     public void onNextLinkEntered(AVVehicle avVehicle, DriveTask driveTask, LinkTimePair linkTimePair) {
@@ -213,12 +127,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         pendingRequests.add(request); // <- store request
     }
 
-    /**
-     * @return map of vehicles that carry a customer and their destination links
-     */
-    protected final Map<AVVehicle, Link> getVehiclesWithCustomer() {
-        return Collections.unmodifiableMap(vehiclesWithCustomer);
-    }
+
 
     /**
      * {@link PartitionedDispatcher} overrides the function
@@ -228,50 +137,4 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     protected Map<AVVehicle, Link> getRebalancingVehicles() {
         return Collections.emptyMap();
     }
-
-    /**
-     * @param avVehicle
-     * @return estimated current location of avVehicle, never null
-     */
-    protected Link getVehicleLocation(AVVehicle avVehicle) {
-        Link link = vehicleLocations.get(avVehicle);
-        GlobalAssert.that(link != null);
-        return link;
-    }
-
-    @Override
-    final void notifySimulationSubscribers(long round_now) {
-        if (round_now % publishPeriod == 0) {
-            SimulationObjectCompiler simulationObjectCompiler = SimulationObjectCompiler.create( //
-                    round_now, getInfoLine(), total_matchedRequests);
-            simulationObjectCompiler.addRequests(getAVRequests());
-            simulationObjectCompiler.addVehiclesWithCustomer(getVehiclesWithCustomer(), vehicleLocations);
-            simulationObjectCompiler.addRebalancingVehicles(getRebalancingVehicles(), vehicleLocations);
-            SimulationObject simulationObject = simulationObjectCompiler.compile( //
-                    getDivertableVehicles(), vehicleLocations);
-
-            // in the first pass, the vehicles is typically empty
-            // in that case, the simObj will not be stored or communicated
-            if (SimulationObjects.hasVehicles(simulationObject)) {
-                // GlobalAssert.that(AVVEHILCECOUNT == simulationObject.vehicles.size());
-                SimulationDistribution.of(simulationObject); // store simObj and distribute to clients
-            }
-        }
-    }
-
-    /**
-     * @return total matched request until now
-     */
-    public int getTotalMatchedRequests() {
-        return total_matchedRequests;
-    }
-
-    @Override
-    public String getInfoLine() {
-        return String.format("%s R=(%5d) MR=%6d", //
-                super.getInfoLine(), //
-                getAVRequests().size(), //
-                total_matchedRequests);
-    }
-
 }
