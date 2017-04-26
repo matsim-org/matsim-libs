@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.tensor.io.ObjectFormat;
+import playground.clruch.utils.GlobalAssert;
 
 public class VirtualNetworkIO {
     
@@ -53,6 +54,7 @@ public class VirtualNetworkIO {
      * @throws IOException
      */
     public static void toByte(File file, VirtualNetwork virtualNetwork) throws IOException{
+        virtualNetwork.checkConsistency();
         Files.write(file.toPath(), ObjectFormat.of(virtualNetwork));        
     }
     
@@ -68,7 +70,8 @@ public class VirtualNetworkIO {
      */
     public static VirtualNetwork fromByte(Network network, File file) throws ClassNotFoundException, DataFormatException, IOException{
         VirtualNetwork virtualNetwork = ObjectFormat.parse(Files.readAllBytes(file.toPath())); 
-        virtualNetwork.fillSerializationInfo(network);  
+        virtualNetwork.fillSerializationInfo(network);
+        GlobalAssert.that(virtualNetwork.linkVNodeMap!=null);
         return virtualNetwork;
     }
     
@@ -149,6 +152,7 @@ public class VirtualNetworkIO {
      * @return
      */
     @Deprecated // only bitmap storage will be supported
+    // DANGEROUS, THIS WILL NOT BE STABLE  AND NOT WORK WELL, IMPORTANT DATA IS NOT SAVED. 
     public static VirtualNetwork fromXML(Network network, File file) {
         VirtualNetwork virtualNetwork = new VirtualNetwork();
 
@@ -218,6 +222,8 @@ public class VirtualNetworkIO {
                             Double.parseDouble(virtualLinkTtime)); //
                 }
             }
+            
+            virtualNetwork.fillSerializationInfo(network);
             return virtualNetwork;
         } catch (IOException | JDOMException io) {
             System.out.println(io.getMessage());

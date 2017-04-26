@@ -46,7 +46,6 @@ import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.netdata.vLinkDataReader;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -68,7 +67,6 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
-    final Map<VirtualLink, Double> travelTimes;
     final int numberOfAVs;
     private int total_rebalanceCount = 0;
     private final int nVNodes;
@@ -90,12 +88,11 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRequestSelector abstractRequestSelector, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            Map<VirtualLink, Double> travelTimesIn, ArrivalInformation arrivalInformationIn) {
+            ArrivalInformation arrivalInformationIn) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         this.virtualNodeDest = abstractVirtualNodeDest;
         this.requestSelector = abstractRequestSelector;
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
-        travelTimes = travelTimesIn;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = Integer.parseInt(config.getParams().get(KEY_REBALANCINGPERIOD));
         System.out.println(config.getParams().get(KEX_REDISPATCHPERIOD));
@@ -105,7 +102,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         nVLinks = virtualNetwork.getvLinksCount();
         rebalanceCount = Array.zeros(nVNodes, nVNodes);
         rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
-        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork, travelTimes);
+        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
     }
 
     @Override
@@ -254,7 +251,6 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         private Population population;
 
         public static VirtualNetwork virtualNetwork;
-        public static Map<VirtualLink, Double> travelTimes;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
@@ -269,7 +265,6 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
                 GlobalAssert.that(virtualnetworkFile.isFile());
                 virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
-                travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkFile, virtualNetwork, "Ttime");
             }
 
             ArrivalInformation arrivalInformationIn = null;
@@ -296,7 +291,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             }
 
             return new LPFeedforwardDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork,
-                    abstractVirtualNodeDest, abstractRequestSelector, abstractVehicleDestMatcher, travelTimes, arrivalInformationIn);
+                    abstractVirtualNodeDest, abstractRequestSelector, abstractVehicleDestMatcher, arrivalInformationIn);
         }
     }
 }

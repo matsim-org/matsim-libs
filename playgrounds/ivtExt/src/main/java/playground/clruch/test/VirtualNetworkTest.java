@@ -51,7 +51,7 @@ public class VirtualNetworkTest {
         // Solving the LP with deleting
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < iter; ++i) {
-            LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork, travelTimes);
+            LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
             Tensor rhs = Array.zeros(virtualNetwork.getvNodesCount());
             Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);
             lpVehicleRebalancing.closeLP();
@@ -60,7 +60,7 @@ public class VirtualNetworkTest {
 
         // Solving the LP without deleting
         startTime = System.currentTimeMillis();
-        LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork, travelTimes);
+        LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         for (int i = 0; i < iter * 10000; ++i) {
             Tensor rhs = Array.zeros(virtualNetwork.getvNodesCount());
             Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);

@@ -27,7 +27,7 @@ public class VirtualNetwork implements Serializable {
     private final List<VirtualNode> virtualNodes = new ArrayList<>();
     private final List<VirtualLink> virtualLinks = new ArrayList<>();
     // the map is for checking that all links in the network are assigned to one vNode
-    private transient final Map<Link, VirtualNode> linkVNodeMap = new HashMap<>();
+    protected transient Map<Link, VirtualNode> linkVNodeMap = new HashMap<>();
     private final Map<String, VirtualNode> linkVNodeMapRAWVERYPRIVATE = new HashMap<>(); // is
                                                                                          // stored
                                                                                          // but only
@@ -72,6 +72,13 @@ public class VirtualNetwork implements Serializable {
      * @return virtual node belonging to link
      */
     public final VirtualNode getVirtualNode(Link link) {
+        GlobalAssert.that(link!=null);
+        if(!linkVNodeMap.containsKey(link)){
+            System.out.println("link: " + link.getId().toString());
+            System.out.println("virtualNode not found ");
+        }
+
+
         return linkVNodeMap.get(link);
     }
 
@@ -137,28 +144,50 @@ public class VirtualNetwork implements Serializable {
     public boolean containsVirtualLink(VirtualNode fromIn, VirtualNode toIn) {
         return virtualLinkPairs.containsKey(nodePair_key(fromIn, toIn));
     }
-    
-    
+
     /**
-     * Completes the missing references after the virtualNetwork was read from a serialized bitmap. 
+     * Completes the missing references after the virtualNetwork was read from a serialized bitmap.
+     * 
      * @param network
      */
-    public void fillSerializationInfo(Network network){
+    public void fillSerializationInfo(Network network) {
         fillLinkVNodeMap(network);
-        virtualNodes.stream().forEach(v->v.setLinksAfterSerialization(network));
+        virtualNodes.stream().forEach(v -> v.setLinksAfterSerialization(network));
     }
-    
 
     private void fillLinkVNodeMap(Network network) {
+        
+        linkVNodeMap = new HashMap<>();
+        
         for (String linkIDString : linkVNodeMapRAWVERYPRIVATE.keySet()) {
             Optional<Id<Link>> optLinkFound = network.getLinks().keySet().stream().filter(v -> v.toString().equals(linkIDString)).findAny();
             GlobalAssert.that(optLinkFound.isPresent());
 
             Link link = network.getLinks().get(optLinkFound.get());
             VirtualNode vNode = linkVNodeMapRAWVERYPRIVATE.get(linkIDString);
+            GlobalAssert.that(linkVNodeMap!=null);
+            GlobalAssert.that(link!=null);
+            GlobalAssert.that(vNode!=null);
             linkVNodeMap.put(link, vNode);
-
         }
+        checkConsistency();
+    }
+    
+    
+    
+    protected void fillVNodeMapRAWVERYPRIVATE(){
+        GlobalAssert.that(!linkVNodeMap.isEmpty());
+        for(Link link : linkVNodeMap.keySet()){
+            linkVNodeMapRAWVERYPRIVATE.put(link.getId().toString(), linkVNodeMap.get(link));
+        }
+        
+        GlobalAssert.that(linkVNodeMap.size() == linkVNodeMapRAWVERYPRIVATE.size());
+        GlobalAssert.that(!linkVNodeMapRAWVERYPRIVATE.isEmpty());        
+    }
+    
+    public void checkConsistency(){
+        GlobalAssert.that(!linkVNodeMapRAWVERYPRIVATE.isEmpty());
+        GlobalAssert.that(linkVNodeMap!=null);
     }
 
     // TODO don't delete this function but move outside into class e.g. VirtualNetworkHelper

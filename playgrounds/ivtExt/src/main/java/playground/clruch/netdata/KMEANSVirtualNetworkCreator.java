@@ -136,6 +136,9 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
                 }
             }
         }
+        
+        // FILL information for serialization
+        virtualNetwork.fillVNodeMapRAWVERYPRIVATE();
 
         return virtualNetwork;
 

@@ -7,10 +7,12 @@
 package playground.clruch.dispatcher;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -41,7 +43,6 @@ import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.netdata.vLinkDataReader;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -56,7 +57,6 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     public final int redispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
-    final Map<VirtualLink, Double> travelTimes;
     final int numberOfAVs;
     private int total_rebalanceCount = 0;
     Tensor printVals = Tensors.empty();
@@ -70,18 +70,16 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             EventsManager eventsManager, //
             VirtualNetwork virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            Map<VirtualLink, Double> travelTimesIn) {
+            AbstractVehicleDestMatcher abstractVehicleDestMatcher) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         this.virtualNodeDest = abstractVirtualNodeDest;
 
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
-        travelTimes = travelTimesIn;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
         // setup linear program
-        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork, travelTimes);
+        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
     }
 
     @Override
@@ -202,7 +200,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         public static Map<VirtualLink, Double> travelTimes;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig){
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
@@ -210,14 +208,18 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
             GlobalAssert.that(virtualnetworkDir.isDirectory());
             {
-                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
+                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork");
                 System.out.println("" + virtualnetworkFile.getAbsoluteFile());
-                virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
-                travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkFile, virtualNetwork, "Ttime");
+                try {
+                    virtualNetwork = VirtualNetworkIO.fromByte(network, virtualnetworkFile);
+                } catch (ClassNotFoundException | DataFormatException | IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
 
             return new LPFeedbackLIPDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork,
-                    abstractVirtualNodeDest, abstractVehicleDestMatcher, travelTimes);
+                    abstractVirtualNodeDest, abstractVehicleDestMatcher);
         }
     }
 }

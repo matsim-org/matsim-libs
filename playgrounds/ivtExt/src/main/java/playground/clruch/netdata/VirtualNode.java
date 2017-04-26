@@ -55,7 +55,9 @@ public class VirtualNode implements Serializable {
         GlobalAssert.that(this.links.size() == 0);
         for (Link link : linksIn) {
             this.links.add(link);
+            this.linkIDsforSerialization.add(link.getId().toString());
         }
+        GlobalAssert.that(links.size() == linkIDsforSerialization.size());
     }
 
     /**

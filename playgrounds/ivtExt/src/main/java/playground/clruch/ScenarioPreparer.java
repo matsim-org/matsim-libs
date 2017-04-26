@@ -107,9 +107,8 @@ public class ScenarioPreparer {
         // 2) create virtual Network
         KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
         VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes);
-        VirtualNetworkIO.toXML(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME + ".xml", virtualNetwork);
         VirtualNetworkIO.toByte(new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME), virtualNetwork);
+        VirtualNetworkIO.toXML(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME+".xml", virtualNetwork);
         System.out.println("saved virtual network byte format to : "+ new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME));
-        System.out.println("saved virtual network to: " + dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME + ".xml");
     }
 }
