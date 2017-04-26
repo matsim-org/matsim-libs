@@ -24,6 +24,7 @@ public class RequestsLayer extends ViewerLayer {
 
     private static Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
     // ---
+    private volatile boolean maxWaitTimeInHud = true;
     private volatile boolean drawNumber = true;
     private volatile boolean drawRequestDestinations = false;
 
@@ -127,7 +128,7 @@ public class RequestsLayer extends ViewerLayer {
             infoString.color = Color.BLACK; // new Color(204, 122, 0);
             matsimMapComponent.append(infoString);
         }
-        {
+        if (maxWaitTimeInHud) {
             InfoString infoString = new InfoString(String.format("%5d %s", Math.round(maxWaitTime / 60), "maxWaitTime [min]"));
             infoString.color = Color.BLACK; // new Color(255, 102, 0);
             matsimMapComponent.append(infoString);
@@ -166,6 +167,16 @@ public class RequestsLayer extends ViewerLayer {
         }
         createHeatmapPanel(rowPanel, "source", requestHeatMap);
         createHeatmapPanel(rowPanel, "sink", requestDestMap);
+        {
+            final JCheckBox jCheckBox = new JCheckBox("max. waittime");
+            jCheckBox.setToolTipText("show max wait time in HUD");
+            jCheckBox.setSelected(maxWaitTimeInHud);
+            jCheckBox.addActionListener(event -> {
+                maxWaitTimeInHud = jCheckBox.isSelected();
+                matsimMapComponent.repaint();
+            });
+            rowPanel.add(jCheckBox);
+        }
     }
 
     @Override

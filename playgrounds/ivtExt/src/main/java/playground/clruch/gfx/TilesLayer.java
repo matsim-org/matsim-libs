@@ -13,6 +13,15 @@ import playground.clruch.utils.gui.SpinnerLabel;
 
 public class TilesLayer extends ViewerLayer {
 
+    static enum Blend {
+        Dark(0), Light(255);
+        final int rgb;
+
+        private Blend(int rgb) {
+            this.rgb = rgb;
+        }
+    }
+
     protected TilesLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
     }
@@ -26,11 +35,11 @@ public class TilesLayer extends ViewerLayer {
         {
             JPanel jPanel = new JPanel(new FlowLayout(1, 2, 2));
             {
-                SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
-                spinnerLabel.setArray(0, 128, 255);
-                spinnerLabel.setValueSafe(matsimMapComponent.mapGrayCover);
+                SpinnerLabel<Blend> spinnerLabel = new SpinnerLabel<>();
+                spinnerLabel.setArray(Blend.values());
+                spinnerLabel.setValueSafe(matsimMapComponent.mapGrayCover == 255 ? Blend.Light : Blend.Dark);
                 spinnerLabel.addSpinnerListener(i -> {
-                    matsimMapComponent.mapGrayCover = i;
+                    matsimMapComponent.mapGrayCover = i.rgb;
                     matsimMapComponent.repaint();
                 });
                 spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(55, DEFAULT_HEIGHT));
