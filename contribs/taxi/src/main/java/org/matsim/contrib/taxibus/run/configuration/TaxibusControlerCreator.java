@@ -21,27 +21,33 @@ package org.matsim.contrib.taxibus.run.configuration;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.taxibus.algorithm.passenger.OrderManager;
+import org.matsim.contrib.taxibus.algorithm.passenger.StopBasedTaxibusPassengerOrderManager;
 import org.matsim.contrib.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
 import org.matsim.contrib.taxibus.algorithm.utils.TaxibusUtils;
+import org.matsim.contrib.taxibus.routing.StopBasedTaxibusRoutingModule;
 import org.matsim.contrib.taxibus.run.sim.TaxibusQSimProvider;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.*;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.name.*;
-import com.google.inject.util.Providers;
 
 /**
  * @author jbischoff
  *
  */
-public class ConfigBasedTaxibusLaunchUtils {
+public class TaxibusControlerCreator {
 	private Controler controler;
 
-	public ConfigBasedTaxibusLaunchUtils(Controler controler) {
+	public TaxibusControlerCreator(Controler controler) {
 		this.controler = controler;
 
 	}
@@ -49,19 +55,13 @@ public class ConfigBasedTaxibusLaunchUtils {
 	public void initiateTaxibusses() {
 		// this is done exactly once per simulation
 
-		Scenario scenario = controler.getScenario();
+		final Scenario scenario = controler.getScenario();
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup)scenario.getConfig().getModules()
 				.get(TaxibusConfigGroup.GROUP_NAME);
 		final FleetImpl fleetData = new FleetImpl();
 		new VehicleReader(scenario.getNetwork(), fleetData)
 				.parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
-		final TaxibusPassengerOrderManager orderManager;
-
-		if ((tbcg.getAlgorithm().equals("clustered_jsprit")) || (tbcg.getAlgorithm().equals("jsprit"))) {
-			orderManager = new TaxibusPassengerOrderManager();
-		} else {
-			orderManager = null;
-		}
+		
 
 		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
 		controler.addOverridingModule(new DynQSimModule<>(TaxibusQSimProvider.class));
@@ -69,16 +69,19 @@ public class ConfigBasedTaxibusLaunchUtils {
 
 			@Override
 			public void install() {
-
-				if (orderManager != null) {
-					addEventHandlerBinding().toInstance(orderManager);
-					bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
+				
+				if (tbcg.getStopsfile()==null) {
+					bind(OrderManager.class).to(TaxibusPassengerOrderManager.class).asEagerSingleton();
+					addRoutingModuleBinding(TaxibusUtils.TAXIBUS_MODE).toInstance(new DynRoutingModule(TaxibusUtils.TAXIBUS_MODE));
 				} else {
-					bind(TaxibusPassengerOrderManager.class)
-							.toProvider(Providers.<TaxibusPassengerOrderManager> of(null));
+					final Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+					new TransitScheduleReader(scenario2)
+							.readFile(tbcg.getTransitStopsFileUrl(scenario.getConfig().getContext()).getFile());
+					bind(TransitSchedule.class).annotatedWith(Names.named("taxibus")).toInstance(scenario2.getTransitSchedule());;
+					bind(OrderManager.class).to(StopBasedTaxibusPassengerOrderManager.class).asEagerSingleton();
+					addRoutingModuleBinding(TaxibusUtils.TAXIBUS_MODE).to(StopBasedTaxibusRoutingModule.class).asEagerSingleton();
+					
 				}
-				addRoutingModuleBinding(TaxibusUtils.TAXIBUS_MODE)
-						.toInstance(new DynRoutingModule(TaxibusUtils.TAXIBUS_MODE));
 				bind(Fleet.class).toInstance(fleetData);
 				bind(Network.class).annotatedWith(Names.named(DvrpModule.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
 			}

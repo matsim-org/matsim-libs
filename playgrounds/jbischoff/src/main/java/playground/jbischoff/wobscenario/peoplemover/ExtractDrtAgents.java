@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.jbischoff.peoplemover.preparation;
+package playground.jbischoff.wobscenario.peoplemover;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -55,8 +55,9 @@ public static void main(String[] args) {
 			Plan plan = person.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()){
 				if (pe instanceof Leg){
-					if (((Leg) pe).getMode().equals("drt")){
+					if (((Leg) pe).getMode().equals("taxibus")){
 						if(!pop2.getPersons().containsKey(person.getId())){
+						((Leg) pe).setRoute(null);
 						Person p1 = pop2.getFactory().createPerson(person.getId());
 						p1.addPlan(plan);
 						pop2.addPerson(p1);
@@ -68,7 +69,7 @@ public static void main(String[] args) {
 			
 		}
 	});
-	spr.readFile("../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/runPM120.10.150.plans.xml.gz");
-	new PopulationWriter(pop2).write("../../../shared-svn/projects/vw_rufbus/projekt2/input/peoplemover/testscenario/drtPlans.xml");
+	spr.readFile("../../../shared-svn/projects/vw_rufbus/projekt2/input/population/run112.output_plans.xml.gz");
+	new PopulationWriter(pop2).write("../../../shared-svn/projects/vw_rufbus/projekt2/input/population/run112.tbplans.xml.gz");
 }
 }

@@ -39,10 +39,10 @@ public class RunTaxibusExample {
 
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig("taxibus_example/configJsprit.xml", new TaxibusConfigGroup(),
-				new DvrpConfigGroup());
-		// Config config = ConfigUtils.loadConfig("taxibus_example/configClustered.xml", new TaxibusConfigGroup(), new
-		// DvrpConfigGroup());
+//		Config config = ConfigUtils.loadConfig("taxibus_example/configJsprit.xml", new TaxibusConfigGroup(),
+//				new DvrpConfigGroup());
+		 Config config = ConfigUtils.loadConfig("taxibus_example/configClustered.xml", new TaxibusConfigGroup(), new
+		 DvrpConfigGroup());
 		// for a different algorithm.
 
 		// set to "false", if you do not require OTFVis visualisation
@@ -64,7 +64,7 @@ public class RunTaxibusExample {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
+		new TaxibusControlerCreator(controler).initiateTaxibusses();
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

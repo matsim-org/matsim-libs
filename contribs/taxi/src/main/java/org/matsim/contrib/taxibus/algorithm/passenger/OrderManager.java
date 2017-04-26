@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.scenario;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.taxibus.run.configuration.*;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author jbischoff
+ * 
+ */
+package org.matsim.contrib.taxibus.algorithm.passenger;
+/**
+ * @author  jbischoff
  *
  */
-public class RunConfigBasedExample {
+/**
+ *
+ */
+public interface OrderManager {
 
-	public static void main(String[] args) {
-		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup(), new DvrpConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+	/**
+	 * @param passengerEngine
+	 */
+	void setPassengerEngine(TaxibusPassengerEngine passengerEngine);
 
-		Controler controler = new Controler(scenario);
-		new TaxibusControlerCreator(controler).initiateTaxibusses();
-		controler.run();
-	}
 }

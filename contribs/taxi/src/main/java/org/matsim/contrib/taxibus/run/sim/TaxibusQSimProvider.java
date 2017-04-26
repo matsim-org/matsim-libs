@@ -37,6 +37,7 @@ import org.matsim.contrib.taxibus.algorithm.scheduler.*;
 import org.matsim.contrib.taxibus.algorithm.utils.TaxibusUtils;
 import org.matsim.contrib.taxibus.run.configuration.TaxibusConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.router.util.*;
 
@@ -55,12 +56,12 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 	private final Fleet fleetData;
 	private final TravelTime travelTime;
 	private final TaxibusConfigGroup tbcg;
-	private final TaxibusPassengerOrderManager orderManager;
+	private final OrderManager orderManager;
 
 	@Inject
 	TaxibusQSimProvider(Scenario scenario, EventsManager events, Collection<AbstractQSimPlugin> plugins, Fleet vrpData,
 			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
-			@Nullable TaxibusPassengerOrderManager orderManager) {
+			OrderManager orderManager) {
 		this.scenario = scenario;
 		this.events = events;
 		this.plugins = plugins;
@@ -81,9 +82,10 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 				new TaxibusRequestCreator(), optimizer, scenario.getNetwork());
 		qSim.addMobsimEngine(passengerEngine);
 		qSim.addDepartureHandler(passengerEngine);
+		
 		if (orderManager != null) {
 			orderManager.setPassengerEngine(passengerEngine);
-			qSim.addQueueSimulationListeners(orderManager);
+			qSim.addQueueSimulationListeners((MobsimListener) orderManager);
 		}
 
 		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
