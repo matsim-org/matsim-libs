@@ -3,16 +3,18 @@ package playground.clruch.gheat.graphics;
 import java.awt.image.BufferedImage;
 
 public enum ColorSchemes {
-    Classic(CommonPalettes.createClassic()), //
-    Fire(CommonPalettes.createFire()), //
-    Pbj(CommonPalettes.createPbj()), //
-    Pgaitch(CommonPalettes.createPgaitch()), //
-    Omg(CommonPalettes.createOmg()), //
-    Orange(CommonPalettes.createOrange()), //
-    OrangeContour(CommonPalettes.createOrangeContour()), //
-    Green(CommonPalettes.createGreen()), //
-    GreenContour(CommonPalettes.createGreenContour()), //
-    Black(CommonPalettes.createBlack()), //
+    Classic(GheatPalettes.createClassic()), //
+    Fire(GheatPalettes.createFire()), //
+    Pbj(GheatPalettes.createPbj()), //
+    Pgaitch(GheatPalettes.createPgaitch()), //
+    Omg(GheatPalettes.createOmg()), //
+    Orange(CustomPalettes.createOrange()), //
+    OrangeContour(CustomPalettes.createOrangeContour()), //
+    Green(CustomPalettes.createGreen()), //
+    GreenContour(CustomPalettes.createGreenContour()), //
+    Black(CustomPalettes.createBlack()), //
+    Jet(InternetPalettes.createJet()), //
+    Parula(InternetPalettes.createParula()), //
     ;
 
     public final ColorScheme colorScheme;
