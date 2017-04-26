@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
+import org.matsim.contrib.taxibus.run.configuration.TaxibusControlerCreator;
 import org.matsim.contrib.taxibus.run.configuration.TaxibusConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -70,7 +70,7 @@ public class RunTaxibusPolicyCase {
 
 		Controler controler = new Controler(scenario);
 
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
+		new TaxibusControlerCreator(controler).initiateTaxibusses();
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override
