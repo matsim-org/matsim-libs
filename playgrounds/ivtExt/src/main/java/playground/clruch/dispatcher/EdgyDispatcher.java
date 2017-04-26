@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,7 +46,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
-//        vehicleRequestMatcher = ;
+        // vehicleRequestMatcher = ;
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
     }
 
@@ -75,7 +77,8 @@ public class EdgyDispatcher extends UniversalDispatcher {
         final long round_now = Math.round(now);
         if (round_now % dispatchPeriod == 0) {
 
-            total_abortTrip += new DrivebyRequestStopper(this::setVehicleDiversion).realize(getAVRequestsAtLinks(), getDivertableVehicles());
+            total_abortTrip += new DrivebyRequestStopper(this::setVehicleDiversion).realize(getAVRequestsAtLinks(),
+                    getDivertableVehicles());
 
             { // TODO this should be replaceable by some naive matcher
                 Iterator<AVRequest> requestIterator = getAVRequests().iterator();
@@ -83,9 +86,15 @@ public class EdgyDispatcher extends UniversalDispatcher {
                     Link dest = vehicleLinkPair.getCurrentDriveDestination();
                     if (dest == null) { // vehicle in stay task
                         if (requestIterator.hasNext()) {
-                            Link link = requestIterator.next().getFromLink();
-                            setVehicleDiversion(vehicleLinkPair, link);
-                            ++total_driveOrder;
+                            AVRequest nextRequest = requestIterator.next();
+                            Link link = nextRequest.getFromLink();
+                            // if(coordDistance(link.getCoord(),vehicleLinkPair.getDivertableLocation().getCoord())<
+                            // 3000 || nextRequest.getSubmissionTime()-now > 20*60){
+                            if (coordDistance(link.getCoord(), vehicleLinkPair.getDivertableLocation().getCoord()) < 3000
+                                    || now - nextRequest.getSubmissionTime() > 10 * 60) {
+                                setVehicleDiversion(vehicleLinkPair, link);
+                                ++total_driveOrder;
+                            }
                         } else
                             break;
                     }
@@ -94,6 +103,13 @@ public class EdgyDispatcher extends UniversalDispatcher {
 
         }
 
+    }
+
+    // TODO: is there MATSim internal function?
+    private static double coordDistance(Coord c1, Coord c2) {
+        double dX = c1.getX() - c2.getX();
+        double dY = c1.getY() - c2.getY();
+        return Math.hypot(dX, dY);
     }
 
     @Override

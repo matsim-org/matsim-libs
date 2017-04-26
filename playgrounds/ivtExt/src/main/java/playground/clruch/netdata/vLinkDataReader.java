@@ -11,6 +11,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
+@Deprecated // this will be deletd as traveltime directly included in virtual network
 public class vLinkDataReader {
     public static Map<VirtualLink, Double> fillvLinkData(File file, VirtualNetwork virtualNetwork, String datastring) {
         // open the linkWeightFile and parse the parameter values

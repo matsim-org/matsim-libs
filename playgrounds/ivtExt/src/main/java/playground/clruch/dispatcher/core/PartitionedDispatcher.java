@@ -37,6 +37,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
             VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
+        GlobalAssert.that(virtualNetwork!=null);
     }
 
     @Override

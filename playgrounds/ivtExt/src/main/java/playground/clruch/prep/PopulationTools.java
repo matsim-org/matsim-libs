@@ -3,17 +3,19 @@ package playground.clruch.prep;
 import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.util.distance.DistanceCalculator;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * Created by Claudio on 1/4/2017.
@@ -26,7 +28,7 @@ import org.matsim.contrib.util.distance.DistanceCalculator;
  * "NextActivityStartTime-PrevActivityEndTime"> </leg>
  */
 
-class PopulationTools {
+public class PopulationTools {
 
     private static final Logger log = Logger.getLogger(PopulationTools.class);
 
@@ -94,6 +96,8 @@ class PopulationTools {
 
     }
 
+    
+    @Deprecated // reduce the network to some disk and use the next function supplying the network only
     public static void elminateOutsideRadius(Population population, Coord center, double radius) {
 
         log.info("All population elements which are more than " + radius + " [m] away from Coord " + center.toString() + " removed.");
@@ -108,7 +112,7 @@ class PopulationTools {
                     if (planElement instanceof Activity) {
                         Activity act = (Activity) planElement;
                         Coord actCoord = act.getCoord();
-                        if (coordDistance(actCoord, center) > radius) {
+                        if (CoordUtils.calcEuclideanDistance(actCoord, center) > radius) {
                             removePerson = true;
                             break;
                         }
@@ -119,11 +123,68 @@ class PopulationTools {
                 itPerson.remove();
         }
     }
+    
+    
+    
+    
+    public static void elminateOutsideNetwork(Population population, Network network) {
 
-    // TODO: is there MATSim internal function?
-    private static double coordDistance(Coord c1, Coord c2) {
-        double dX = c1.getX() - c2.getX();
-        double dY = c1.getY() - c2.getY();
-        return Math.hypot(dX, dY);
+        log.info("All population elements which have activities inside the provided network are removed.");
+
+        Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
+
+        while (itPerson.hasNext()) {
+            Person person = itPerson.next();
+            boolean removePerson = false;
+            for (Plan plan : person.getPlans()) {
+                for (PlanElement planElement : plan.getPlanElements()) {
+                    if (planElement instanceof Activity) {
+                        Activity act = (Activity) planElement;
+                        Coord actCoord = act.getCoord();
+                        Id<Link> actLink = act.getLinkId();
+                        if (!network.getLinks().containsKey(actLink)) {
+                            removePerson = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (removePerson)
+                itPerson.remove();
+        }
     }
+    
+    
+    
+    
+
+    /** removes all persons with activity Type "freight" from population
+     * @param population
+     */
+    public static void eliminateFreight(Population population) {
+        log.info("All population elements with activity freight are removed.");
+
+        Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
+
+        while (itPerson.hasNext()) {
+            Person person = itPerson.next();
+            boolean removePerson = false;
+            for (Plan plan : person.getPlans()) {
+                for (PlanElement planElement : plan.getPlanElements()) {
+                    if (planElement instanceof Activity) {
+                        Activity act = (Activity) planElement;
+                        if (act.getType() == "freight") {
+                            removePerson = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (removePerson)
+                itPerson.remove();
+        }
+
+    }
+
+
 }
