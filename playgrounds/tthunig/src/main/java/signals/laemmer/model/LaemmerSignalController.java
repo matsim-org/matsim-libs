@@ -53,12 +53,11 @@ public class LaemmerSignalController extends AbstractSignalController implements
     private Queue<LaemmerSignal> regulationQueue = new LinkedList<>();
 
     private final LaemmerConfig laemmerConfig;
+    private final List<LaemmerSignal> laemmerSignals = new ArrayList<>();
 
     private final double DESIRED_PERIOD;
 
     private final double MAX_PERIOD;
-
-    private Map<Id<Signal>, LaemmerSignal> signalId2LaemmerSignal;
 
     private Request activeRequest = null;
     private LinkSensorManager sensorManager;
@@ -110,11 +109,11 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
     @Override
     public void simulationInitialized(double simStartTimeSeconds) {
-        signalId2LaemmerSignal = new HashMap<>();
         this.initializeSensoring();
         for (SignalGroup group : this.system.getSignalGroups().values()) {
             this.system.scheduleDropping(simStartTimeSeconds, group.getId());
             LaemmerSignal laemmerSignal = new LaemmerSignal(group);
+            laemmerSignals.add(laemmerSignal);
             flowSum += laemmerSignal.determiningOutflow;
         }
     }
@@ -141,72 +140,72 @@ public class LaemmerSignalController extends AbstractSignalController implements
     }
 
     private void updateActiveRegulation(double now) {
-//        if (activeRequest != null && !regulationQueue.isEmpty() && regulationQueue.peek().equals(activeRequest.signal)) {
-//            LaemmerSignal signal = regulationQueue.peek();
-//            log.info("Remaining regulation time for " + signal.group.getId() + ": " + (activeRequest.time + activeRequest.signal.regulationTime - now));
-//            int n;
-//            if (signal.determiningLane != null) {
-//                n = getNumberOfExpectedVehiclesOnLane(now, signal.link.getId(), signal.determiningLane);
-//            } else {
-//                n = getNumberOfExpectedVehiclesOnLink(now, signal.link.getId());
-//            }
-//            if (activeRequest.signal.regulationTime + activeRequest.time - now <= 0 || n == 0) {
-//                regulationQueue.poll();
-//                log.info("Stopping regulation for " + signal.signalId + " remaining vehicles: " + n);
-//            }
-//        }
+        if (activeRequest != null && !regulationQueue.isEmpty() && regulationQueue.peek().equals(activeRequest.signal)) {
+            LaemmerSignal signal = regulationQueue.peek();
+            log.info("Remaining regulation time for " + signal.group.getId() + ": " + (activeRequest.time + activeRequest.signal.regulationTime - now));
+            int n;
+            if (signal.determiningLane != null) {
+                n = getNumberOfExpectedVehiclesOnLane(now, signal.determiningLink, signal.determiningLane);
+            } else {
+                n = getNumberOfExpectedVehiclesOnLink(now, signal.determiningLink);
+            }
+            if (activeRequest.signal.regulationTime + activeRequest.time - now <= 0 || n == 0) {
+                regulationQueue.poll();
+                log.info("Stopping regulation for " + signal.group.getId() + " remaining vehicles: " + n);
+            }
+        }
     }
 
     private LaemmerSignal selectSignal() {
         LaemmerSignal max = null;
-//        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.OPTIMIZING)) {
-//            max = regulationQueue.peek();
-//            if (max == null) {
-//                log.debug("no queue selected.");
-//            } else {
-//                log.debug("regulating for " + max.signalId);
-//            }
-//        }
-//        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.STABILIZING)) {
-//            if (max == null) {
-//                double index = 0;
-//                for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
-//                    if (signal.index > index) {
-//                        max = signal;
-//                        index = signal.index;
-//                        log.debug("Max index of " + index + ".Signal " + max.signalId + " of Group " + max.group);
-//                    }
-//                }
-//            }
-//        }
+        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.OPTIMIZING)) {
+            max = regulationQueue.peek();
+            if (max == null) {
+                log.debug("no queue selected.");
+            } else {
+                log.debug("regulating for " + max.group.getId());
+            }
+        }
+        if (!laemmerConfig.getActiveRegime().equals(LaemmerConfig.Regime.STABILIZING)) {
+            if (max == null) {
+                double index = 0;
+                for (LaemmerSignal signal : laemmerSignals) {
+                    if (signal.index > index) {
+                        max = signal;
+                        index = signal.index;
+                        log.debug("Max index of " + index + ".Signal " + max.group.getId() + " of Group " + max.group);
+                    }
+                }
+            }
+        }
         return max;
     }
 
     private void processSelection(double now, LaemmerSignal max) {
 
-//        if (activeRequest != null && activeRequest.signal != max) {
-//            log.info("Dropping group " + activeRequest.signal.group + " after " + (now - activeRequest.time + "s."));
-//            this.system.scheduleDropping(now, activeRequest.signal.group);
-//            activeRequest = null;
-//        }
-//
-//        if (activeRequest == null && max != null || activeRequest != null && max != null && !max.equals(activeRequest.signal)) {
-//            log.debug("Driveway changed. Creating new Request for " + (now + DEFAULT_INTERGREEN) + " granted time: " + max.regulationTime);
-//            activeRequest = new Request(now + DEFAULT_INTERGREEN, max);
-//        }
-//
-//        if (activeRequest != null) {
-//            if (activeRequest.isDue(now)) {
-//                log.info("Setting group " + activeRequest.signal.group);
-//                this.system.scheduleOnset(now, activeRequest.signal.group);
-//            } else if (activeRequest.time > now) {
-//                log.debug("Remaining in-between-time " + (activeRequest.time - now));
-//            }
-//        }
+        if (activeRequest != null && activeRequest.signal != max) {
+            log.info("Dropping group " + activeRequest.signal.group + " after " + (now - activeRequest.time + "s."));
+            this.system.scheduleDropping(now, activeRequest.signal.group.getId());
+            activeRequest = null;
+        }
+
+        if (activeRequest == null && max != null || activeRequest != null && max != null && !max.equals(activeRequest.signal)) {
+            log.debug("Driveway changed. Creating new Request for " + (now + DEFAULT_INTERGREEN) + " granted time: " + max.regulationTime);
+            activeRequest = new Request(now + DEFAULT_INTERGREEN, max);
+        }
+
+        if (activeRequest != null) {
+            if (activeRequest.isDue(now)) {
+                log.info("Setting group " + activeRequest.signal.group);
+                this.system.scheduleOnset(now, activeRequest.signal.group.getId());
+            } else if (activeRequest.time > now) {
+                log.debug("Remaining in-between-time " + (activeRequest.time - now));
+            }
+        }
     }
 
     private void updateSignals(double now) {
-        for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
+        for (LaemmerSignal signal : laemmerSignals) {
             signal.update(now);
             if (signal.stabilize && !regulationQueue.contains(signal)) {
                 regulationQueue.add(signal);
@@ -216,7 +215,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
     private void updateTIdle() {
         tIdle = DESIRED_PERIOD;
-        for (LaemmerSignal signal : signalId2LaemmerSignal.values()) {
+        for (LaemmerSignal signal : laemmerSignals) {
             tIdle -= (signal.determiningLoad * DESIRED_PERIOD + DEFAULT_INTERGREEN);
         }
     }
@@ -273,36 +272,24 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
         StringBuilder builder = new StringBuilder();
         builder.append("t_idle;selected;total delay;");
-        for (SignalGroup group : this.system.getSignalGroups().values()) {
-            for (Signal signal : group.getSignals().values()) {
-                LaemmerSignal laemmerSignal = signalId2LaemmerSignal.get(signal.getId());
-                if (laemmerSignal != null) {
-                    laemmerSignal.getStatFields(builder);
-                }
-            }
+        for (LaemmerSignal laemmerSignal : laemmerSignals) {
+            laemmerSignal.getStatFields(builder);
         }
         return builder.toString();
     }
 
     @Override
     public String getStepStats(double now) {
-        if (signalId2LaemmerSignal == null) {
-            return "";
-        }
+
         StringBuilder builder = new StringBuilder();
-//        String selected = "none";
-//        if (activeRequest != null) {
-//            selected = activeRequest.signal.signalId.toString();
-//        }
-//        builder.append(tIdle + ";" + selected + ";" + delayCalculator.getTotalDelay() + ";");
-//        for (SignalGroup group : this.system.getSignalGroups().values()) {
-//            for (Signal signal : group.getSignals().values()) {
-//                LaemmerSignal laemmerSignal = signalId2LaemmerSignal.get(signal.getId());
-//                if (laemmerSignal != null) {
-//                    laemmerSignal.getStepStats(builder, now);
-//                }
-//            }
-//        }
+        String selected = "none";
+        if (activeRequest != null) {
+            selected = activeRequest.signal.group.getId().toString();
+        }
+        builder.append(tIdle + ";" + selected + ";" + delayCalculator.getTotalDelay() + ";");
+        for (LaemmerSignal laemmerSignal : laemmerSignals) {
+            laemmerSignal.getStepStats(builder, now);
+        }
         return builder.toString();
     }
 
@@ -331,7 +318,8 @@ public class LaemmerSignalController extends AbstractSignalController implements
         private double a = DEFAULT_INTERGREEN;
         private double regulationTime = 0;
 
-        private Id determiningLane;
+        private Id<Lane> determiningLane;
+        private Id<Link> determiningLink;
         private double determiningArrivalRate;
         private double determiningOutflow;
         private double determiningLoad;
@@ -340,40 +328,37 @@ public class LaemmerSignalController extends AbstractSignalController implements
 
             this.group = signalGroup;
 
-//            for (Signal signal : group.getSignals().values()) {
-//                if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
-//                    this.signalLanes = signal.getLaneIds();
-//                    if (laemmerConfig.getLaneArrivalRates(signal.getId()) == null || laemmerConfig.getLaneArrivalRates(signal.getId()).isEmpty()) {
-//                        this.liveArrivalRate = true;
-//                        //TODO: register method for lanes
-//                    } else {
-//                        this.determiningLoad = 0;
-//                        Map<Id<Lane>, Double> laneArrivalRates = laemmerConfig.getLaneArrivalRates(signal.getId());
-//                        for (Id<Lane> laneId : signalLanes) {
-//                            double arrivalRate = laneArrivalRates.get(laneId);
-//                            double outflow = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(laneId).getCapacityVehiclesPerHour() / 3600;
-//                            double tempLoad = arrivalRate / outflow;
-//                            if (tempLoad > this.determiningLoad) {
-//                                this.determiningOutflow = outflow;
-//                                this.determiningLoad = tempLoad;
-//                                this.determiningArrivalRate = arrivalRate;
-//                                this.determiningLane = laneId;
-//                            }
-//                        }
-//                    }
-//
-//                } else {
-//                    if (laemmerConfig.getSignalArrivalRate(signal.getId()) == null) {
-//                        this.liveArrivalRate = true;
-//                        sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId());
-//                    } else {
-//                        this.determiningOutflow = link.getCapacity() / 3600;
-//                        this.determiningArrivalRate = laemmerConfig.getSignalArrivalRate(signal.getId());
-//                        this.determiningLoad = this.determiningArrivalRate / this.determiningOutflow;
-//                    }
-//                }
-//                signalLog.debug("LaemmeSignal for signal " + signal.getId() + " created.");
+            this.determiningLoad = 0;
+            for (Signal signal : group.getSignals().values()) {
+                if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
+                    for (Id<Lane> laneId : signal.getLaneIds()) {
+                        double arrivalRate = getAverageLaneArrivalRate(0, signal.getLinkId(), laneId);
+                        double outflow = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().get(laneId).getCapacityVehiclesPerHour() / 3600;
+                        double tempLoad = arrivalRate / outflow;
+                        if (tempLoad > this.determiningLoad) {
+                            this.determiningOutflow = outflow;
+                            this.determiningLoad = tempLoad;
+                            this.determiningArrivalRate = arrivalRate;
+                            this.determiningLane = laneId;
+                            this.determiningLink = signal.getLinkId();
+                        }
+                    }
+                } else {
+                    sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId());
+                    double outflow = network.getLinks().get(signal.getLinkId()).getCapacity() / 3600;
+                    double arrivalRate = getAverageArrivalRate(0, signal.getLinkId());
+                    double tempLoad = this.determiningArrivalRate / this.determiningOutflow;
+                    if (tempLoad > this.determiningLoad) {
+                        this.determiningOutflow = outflow;
+                        this.determiningLoad = tempLoad;
+                        this.determiningArrivalRate = arrivalRate;
+                        this.determiningLane = null;
+                        this.determiningLink = signal.getLinkId();
+                    }
+                }
             }
+            signalLog.debug("LaemmeSignal for signal " + group.getId() + " created.");
+        }
 
         private void update(double now) {
             signalLog.info("---------------------------------------------------");
@@ -514,66 +499,70 @@ public class LaemmerSignalController extends AbstractSignalController implements
                 return;
             }
 
-//            signalLog.debug("Checking for regulation");
-//
-//            double n = 0;
-//            if (signalLanes != null && !signalLanes.isEmpty()) {
-//                n = getNumberOfExpectedVehiclesOnLane(now, link.getId(), determiningLane);
-//            } else {
-//                n = getNumberOfExpectedVehiclesOnLink(now, link.getId());
-//            }
-//
-//            if (n == 0) {
-//                a = DEFAULT_INTERGREEN;
-//            } else {
-//                a++;
-//            }
-//
-//            if (regulationQueue.contains(this)) {
-//                signalLog.debug("Already in regulation queue. Aborting.");
-//                return;
-//            }
-//
-//            this.regulationTime = 0;
-//            this.stabilize = false;
-//            double nCrit = determiningArrivalRate * DESIRED_PERIOD
-//                    * ((MAX_PERIOD - (a / (1 - determiningLoad)))
-//                    / (MAX_PERIOD - DESIRED_PERIOD));
-//            signalLog.debug("n = " + n);
-//            signalLog.debug("nCrit = " + nCrit);
-//            if (n >= nCrit) {
-//                regulationQueue.add(this);
-//                signalLog.debug("Regulation time parameters: lambda: " + determiningLoad + " | T: " + DESIRED_PERIOD + " | qmax: " + determiningOutflow + " | qsum: " + flowSum + " | T_idle:" + tIdle);
-//                this.regulationTime = Math.rint(determiningLoad * DESIRED_PERIOD + (determiningOutflow / flowSum) * tIdle);
-//                signalLog.info("Granted time " + regulationTime);
-//                this.stabilize = true;
-//            }
+            signalLog.debug("Checking for regulation");
+
+            double n = 0;
+            if (determiningLane != null) {
+                n = getNumberOfExpectedVehiclesOnLane(now, determiningLink, determiningLane);
+            } else {
+                n = getNumberOfExpectedVehiclesOnLink(now, determiningLink);
+            }
+
+            if (n == 0) {
+                a = DEFAULT_INTERGREEN;
+            } else {
+                a++;
+            }
+
+            if (regulationQueue.contains(this)) {
+                signalLog.debug("Already in regulation queue. Aborting.");
+                return;
+            }
+
+            this.regulationTime = 0;
+            this.stabilize = false;
+            double nCrit = determiningArrivalRate * DESIRED_PERIOD
+                    * ((MAX_PERIOD - (a / (1 - determiningLoad)))
+                    / (MAX_PERIOD - DESIRED_PERIOD));
+            signalLog.debug("n = " + n);
+            signalLog.debug("nCrit = " + nCrit);
+            if (n >= nCrit) {
+                regulationQueue.add(this);
+                signalLog.debug("Regulation time parameters: lambda: " + determiningLoad + " | T: " + DESIRED_PERIOD + " | qmax: " + determiningOutflow + " | qsum: " + flowSum + " | T_idle:" + tIdle);
+                this.regulationTime = Math.rint(determiningLoad * DESIRED_PERIOD + (determiningOutflow / flowSum) * tIdle);
+                signalLog.info("Granted time " + regulationTime);
+                this.stabilize = true;
+            }
         }
 
         public void getStatFields(StringBuilder builder) {
-//            builder.append("index_" + this.signalId + ";");
-//            builder.append("load_" + this.signalId + ";");
-//            builder.append("a_" + this.signalId + ";");
-//            builder.append("abortionPen_" + this.signalId + ";");
-//            builder.append("regTime_" + this.signalId + ";");
-//            builder.append("nTotal_" + this.signalId + ";");
+            builder.append("state_" + this.group.getId() +";");
+            builder.append("index_" + this.group.getId() + ";");
+            builder.append("load_" + this.group.getId() + ";");
+            builder.append("a_" + this.group.getId() + ";");
+            builder.append("abortionPen_" + this.group.getId() + ";");
+            builder.append("regTime_" + this.group.getId() + ";");
+            builder.append("nTotal_" + this.group.getId() + ";");
         }
 
-//        public void getStepStats(StringBuilder builder, double now) {
-//            int totalN = 0;
-//            if (signalLanes != null && !signalLanes.isEmpty()) {
-//                for (Id<Lane> laneId : signalLanes) {
-//                    totalN += getNumberOfExpectedVehiclesOnLane(now, link.getId(), laneId);
-//                }
-//            } else {
-//                totalN = getNumberOfExpectedVehiclesOnLink(now, link.getId());
-//            }
-//            builder.append(this.index + ";")
-//                    .append(this.determiningLoad + ";")
-//                    .append(this.a + ";")
-//                    .append(this.abortionPenalty + ";")
-//                    .append(this.regulationTime + ";")
-//                    .append(totalN + ";");
-//        }
+        public void getStepStats(StringBuilder builder, double now) {
+            int totalN = 0;
+            for (Signal signal : group.getSignals().values()) {
+                if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
+                    for (Id<Lane> laneId : signal.getLaneIds()) {
+                        totalN += getNumberOfExpectedVehiclesOnLane(now, signal.getLinkId(), laneId);
+                    }
+                } else {
+                    totalN += getNumberOfExpectedVehiclesOnLink(now, signal.getLinkId());
+                }
+            }
+            builder.append(this.group.getState().name()+ ";")
+                    .append(this.index + ";")
+                    .append(this.determiningLoad + ";")
+                    .append(this.a + ";")
+                    .append(this.abortionPenalty + ";")
+                    .append(this.regulationTime + ";")
+                    .append(totalN + ";");
+        }
     }
 }

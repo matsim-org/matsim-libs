@@ -61,7 +61,7 @@ public class LaemmerBasicExample {
         log.info("Running Laemmer main method...");
 
         for (int i = 0; i <= 1200; i += 60) {
-            run(180, i, LaemmerConfig.Regime.COMBINED, false, false, true, true);
+            run(180, i, LaemmerConfig.Regime.COMBINED, false, false, false, true);
 //            run(180, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, true);
 //            run(180, i, LaemmerConfig.Regime.STABILIZING, false, false, false, true);
         }
@@ -135,6 +135,8 @@ public class LaemmerBasicExample {
 
         if(lanes) {
             config.qsim().setUseLanes(true);
+            config.controler().setLinkToLinkRoutingEnabled(true);
+            config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
         }
 
         SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -456,7 +458,7 @@ public class LaemmerBasicExample {
         Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
         SignalGroupData signalGroup3 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId3);
-        Id<Signal> id4_3 = Id.create("4_3", Signal.class);
+        Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
         signalGroup3.addSignalId(id4_3);
         if(useLanes) {
             laemmerConfig.addArrivalRateForLane(Id.createLinkId("4_3"), Id.create("4_3.l", Lane.class), (flowWE / 3600) / 2);
