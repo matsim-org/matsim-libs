@@ -298,7 +298,7 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 
 		DefaultTableXYDataset dataset = new DefaultTableXYDataset();
 		XYSeries[] seriesArray = new XYSeries[maxcap + 2];
-		for (int s = 0; s < maxcap + 2; s++) {
+		for (int s = maxcap+1; s >=0; s--) {
 			String seriesName = (s - 1) + " pax";
 			if (s == 0)
 				seriesName = "idle";
