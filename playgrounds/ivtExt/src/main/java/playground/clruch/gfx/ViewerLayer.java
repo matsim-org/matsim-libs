@@ -71,6 +71,7 @@ public abstract class ViewerLayer {
                 matsimMapComponent.repaint();
             });
             spinner.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));
+            spinner.setMenuHover(true);
             rowPanel.add(spinner.getLabelComponent());
         }
     }
