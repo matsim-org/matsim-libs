@@ -78,7 +78,7 @@ import java.util.Map;
 	public void writePerson(final Person person, final BufferedWriter out) throws IOException {
 		this.startPerson(person, out);
 		for (Plan plan : person.getPlans()) {
-			PopulationWriterHandlerImplV6.startPlan(plan, out);
+			startPlan(plan, out);
 			// act/leg
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -121,7 +121,7 @@ import java.util.Map;
 		out.write("\t</person>\n\n");
 	}
 
-	private static void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
+	private void startPlan(final Plan plan, final BufferedWriter out) throws IOException {
 		out.write("\t\t<plan");
 		if (plan.getScore() != null) {
 			out.write(" score=\"");
@@ -141,6 +141,9 @@ import java.util.Map;
 			}
 		}
 		out.write(">\n");
+		
+		attributesWriter.writeAttributes( "\t\t\t\t" , out , plan.getAttributes() );
+
 	}
 
 	private static void endPlan(final BufferedWriter out) throws IOException {

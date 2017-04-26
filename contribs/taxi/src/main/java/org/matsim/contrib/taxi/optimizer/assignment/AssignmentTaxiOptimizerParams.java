@@ -23,44 +23,39 @@ import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 
+public class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
+	public static final String MODE = "mode";
+	public static final String NULL_PATH_COST = "nullPathCost";
 
-public class AssignmentTaxiOptimizerParams
-    extends AbstractTaxiOptimizerParams
-{
-    public static final String MODE = "mode";
-    public static final String NULL_PATH_COST = "nullPathCost";
+	public static final String VEH_PLANNING_HORIZON_OVERSUPPLY = "vehPlanningHorizonOversupply";
+	public static final String VEH_PLANNING_HORIZON_UNDERSUPPLY = "vehPlanningHorizonUndersupply";
 
-    public static final String VEH_PLANNING_HORIZON_OVERSUPPLY = "vehPlanningHorizonOversupply";
-    public static final String VEH_PLANNING_HORIZON_UNDERSUPPLY = "vehPlanningHorizonUndersupply";
+	// TODO should we adjust both the limits based on the current demand-supply relation?
+	public static final String NEAREST_REQUESTS_LIMIT = "nearestRequestsLimit";
+	public static final String NEAREST_VEHICLES_LIMIT = "nearestVehiclesLimit";
 
-    //TODO should we adjust both the limits based on the current demand-supply relation?
-    public static final String NEAREST_REQUESTS_LIMIT = "nearestRequestsLimit";
-    public static final String NEAREST_VEHICLES_LIMIT = "nearestVehiclesLimit";
+	public final Mode mode;
+	public final double nullPathCost;
 
-    public final Mode mode;
-    public final double nullPathCost;
+	public final double vehPlanningHorizonOversupply;// 120 s used in the IEEE IS paper
+	public final double vehPlanningHorizonUndersupply;// 30 s used in the IEEE IS paper
 
-    public final double vehPlanningHorizonOversupply;// 120 s used in the IEEE IS paper
-    public final double vehPlanningHorizonUndersupply;// 30 s used in the IEEE IS paper
+	public final int nearestRequestsLimit;
+	public final int nearestVehiclesLimit;
 
-    public final int nearestRequestsLimit;
-    public final int nearestVehiclesLimit;
+	public AssignmentTaxiOptimizerParams(Configuration optimizerConfig) {
+		super(optimizerConfig);
 
+		mode = Mode.valueOf(optimizerConfig.getString(MODE));
 
-    public AssignmentTaxiOptimizerParams(Configuration optimizerConfig)
-    {
-        super(optimizerConfig);
+		// when the cost is measured in time units (seconds),
+		// 48 * 36000 s (2 days) seem big enough to prevent such assignments
+		nullPathCost = optimizerConfig.getDouble(NULL_PATH_COST, 48 * 3600);
 
-        mode = Mode.valueOf(optimizerConfig.getString(MODE));
+		vehPlanningHorizonOversupply = optimizerConfig.getInt(VEH_PLANNING_HORIZON_OVERSUPPLY);
+		vehPlanningHorizonUndersupply = optimizerConfig.getInt(VEH_PLANNING_HORIZON_UNDERSUPPLY);
 
-        // when the cost is measured in time units (seconds),
-        //48 * 36000 s (2 days) seem big enough to prevent such assignments
-        nullPathCost = optimizerConfig.getDouble(NULL_PATH_COST, 48 * 3600);
-
-        vehPlanningHorizonOversupply = optimizerConfig.getInt(VEH_PLANNING_HORIZON_OVERSUPPLY);
-        vehPlanningHorizonUndersupply = optimizerConfig.getInt(VEH_PLANNING_HORIZON_UNDERSUPPLY);
-
-        nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
-        nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
-    }
+		nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
+		nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
+	}
 }

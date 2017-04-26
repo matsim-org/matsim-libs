@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -26,111 +28,98 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+/**
+ * @author michalm
+ */
+class OnlineDriveTaskTrackerImpl implements OnlineDriveTaskTracker {
+	private final Vehicle vehicle;
+	private final DriveTask driveTask;
+	private final VrpLeg vrpDynLeg;
 
-class OnlineDriveTaskTrackerImpl
-    implements OnlineDriveTaskTracker
-{
-    private final DriveTask driveTask;
-    private final VrpLeg vrpDynLeg;
+	private final VrpOptimizerWithOnlineTracking optimizer;
+	private final MobsimTimer timer;
 
-    private final VrpOptimizerWithOnlineTracking optimizer;
-    private final MobsimTimer timer;
+	private VrpPath path;
+	private int currentLinkIdx;
+	private double linkEnterTime;
+	private double[] remainingTTs;// excluding the current link
 
-    private VrpPath path;
-    private int currentLinkIdx;
-    private double linkEnterTime;
-    private double[] remainingTTs;//excluding the current link 
+	OnlineDriveTaskTrackerImpl(Vehicle vehicle, VrpLeg vrpDynLeg, VrpOptimizerWithOnlineTracking optimizer,
+			MobsimTimer timer) {
+		this.vehicle = vehicle;
+		this.driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
+		this.vrpDynLeg = vrpDynLeg;
+		this.optimizer = optimizer;
+		this.timer = timer;
 
+		initForPath(driveTask.getPath());
+		currentLinkIdx = 0;
+		linkEnterTime = driveTask.getBeginTime();
+	}
 
-    OnlineDriveTaskTrackerImpl(DriveTask driveTask, VrpLeg vrpDynLeg,
-            VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
-    {
-        this.driveTask = driveTask;
-        this.vrpDynLeg = vrpDynLeg;
-        this.optimizer = optimizer;
-        this.timer = timer;
+	private void initForPath(VrpPath path) {
+		this.path = path;
+		remainingTTs = new double[path.getLinkCount()];
 
-        initForPath(driveTask.getPath());
-        currentLinkIdx = 0;
-        linkEnterTime = driveTask.getBeginTime();
-    }
+		double tt = 0;
+		for (int i = remainingTTs.length - 1; i >= 0; i--) {
+			remainingTTs[i] = tt;
+			tt += path.getLinkTravelTime(i);
+		}
+	}
 
+	@Override
+	public void movedOverNode(Link nextLink) {
+		currentLinkIdx++;
+		linkEnterTime = timer.getTimeOfDay();
+		optimizer.vehicleEnteredNextLink(vehicle, nextLink);
+	}
 
-    private void initForPath(VrpPath path)
-    {
-        this.path = path;
-        remainingTTs = new double[path.getLinkCount()];
+	/**
+	 * Assumption: vehicle is diverted as soon as possible, i.e.:
+	 * <ul>
+	 * <li>if the next link can be changed: after the current link</li>
+	 * <li>If not then, (a) if the current link is not the last one, after the next link, or</li>
+	 * <li>(b) no diversion possible (the leg ends on the current link)</li>
+	 * </ul>
+	 */
+	@Override
+	public LinkTimePair getDiversionPoint() {
+		if (vrpDynLeg.canChangeNextLink()) {
+			return new LinkTimePair(path.getLink(currentLinkIdx), predictLinkExitTime());
+		}
 
-        double tt = 0;
-        for (int i = remainingTTs.length - 1; i >= 0; i--) {
-            remainingTTs[i] = tt;
-            tt += path.getLinkTravelTime(i);
-        }
-    }
+		if (path.getLinkCount() == currentLinkIdx + 1) {// the current link is the last one
+			return null;// too late to divert (reason: cannot change the next link)
+		}
 
+		double nextLinkTT = path.getLinkTravelTime(currentLinkIdx + 1);
+		double predictedNextLinkExitTime = predictLinkExitTime() + nextLinkTT;
+		return new LinkTimePair(path.getLink(currentLinkIdx + 1), predictedNextLinkExitTime);
+	}
 
-    @Override
-    public void movedOverNode()
-    {
-        currentLinkIdx++;
-        linkEnterTime = timer.getTimeOfDay();
-        optimizer.nextLinkEntered(driveTask);
-    }
+	public void divertPath(VrpPathWithTravelData newSubPath) {
+		LinkTimePair diversionPoint = getDiversionPoint();
 
+		if (!newSubPath.getFromLink().equals(diversionPoint.link)
+				|| newSubPath.getDepartureTime() != diversionPoint.time) {
+			throw new IllegalArgumentException();
+		}
 
-    /**
-     * Assumption: vehicle is diverted as soon as possible, i.e.:
-     * <ul>
-     * <li>if the next link can be changed: after the current link</li>
-     * <li>If not then, (a) if the current link is not the last one, after the next link, or</li>
-     * <li>(b) no diversion possible (the leg ends on the current link)</li>
-     * </ul>
-     */
-    @Override
-    public LinkTimePair getDiversionPoint()
-    {
-        if (vrpDynLeg.canChangeNextLink()) {
-            return new LinkTimePair(path.getLink(currentLinkIdx), predictLinkExitTime());
-        }
+		int diversionLinkIdx = currentLinkIdx + (vrpDynLeg.canChangeNextLink() ? 0 : 1);
+		DivertedVrpPath divertedPath = new DivertedVrpPath(path, newSubPath, diversionLinkIdx);
+		initForPath(divertedPath);
 
-        if (path.getLinkCount() == currentLinkIdx + 1) {//the current link is the last one
-            return null;//too late to divert (reason: cannot change the next link) 
-        }
+		vrpDynLeg.pathDiverted(divertedPath);
+		driveTask.pathDiverted(divertedPath, newSubPath.getArrivalTime());
+	}
 
-        double nextLinkTT = path.getLinkTravelTime(currentLinkIdx + 1);
-        double predictedNextLinkExitTime = predictLinkExitTime() + nextLinkTT;
-        return new LinkTimePair(path.getLink(currentLinkIdx + 1), predictedNextLinkExitTime);
-    }
+	@Override
+	public double predictEndTime() {
+		return predictLinkExitTime() + remainingTTs[currentLinkIdx];
+	}
 
-
-    public void divertPath(VrpPathWithTravelData newSubPath)
-    {
-        LinkTimePair diversionPoint = getDiversionPoint();
-
-        if (!newSubPath.getFromLink().equals(diversionPoint.link)
-                || newSubPath.getDepartureTime() != diversionPoint.time) {
-            throw new IllegalArgumentException();
-        }
-
-        int diversionLinkIdx = currentLinkIdx + (vrpDynLeg.canChangeNextLink() ? 0 : 1);
-        DivertedVrpPath divertedPath = new DivertedVrpPath(path, newSubPath, diversionLinkIdx);
-        initForPath(divertedPath);
-
-        vrpDynLeg.pathDiverted(divertedPath);
-        driveTask.pathDiverted(divertedPath, newSubPath.getArrivalTime());
-    }
-
-
-    @Override
-    public double predictEndTime()
-    {
-        return predictLinkExitTime() + remainingTTs[currentLinkIdx];
-    }
-
-
-    private double predictLinkExitTime()
-    {
-        return Math.max(timer.getTimeOfDay(),
-                linkEnterTime + path.getLinkTravelTime(currentLinkIdx));
-    }
+	private double predictLinkExitTime() {
+		return Math.max(timer.getTimeOfDay(), linkEnterTime + path.getLinkTravelTime(currentLinkIdx));
+	}
 }

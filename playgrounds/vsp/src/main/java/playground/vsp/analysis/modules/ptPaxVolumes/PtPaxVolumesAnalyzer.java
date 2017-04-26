@@ -86,7 +86,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(MGC.getCRS(targetCoordinateSystem));
 		b.setName("all");
-		b.add("location", LineString.class);
+		b.add("the_geom", LineString.class);
 		b.add("line", String.class);
 		b.add("linkId", String.class);
 		b.add("paxTotal", Double.class);
@@ -131,7 +131,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 	private Collection<SimpleFeature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem) {
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(MGC.getCRS(targetCoordinateSystem));
-		b.setName("transitLineFeature");
+		b.setName("the_geom");
 		b.add("location", LineString.class);
 		b.add("line", String.class);
 		b.add("linkId", String.class);

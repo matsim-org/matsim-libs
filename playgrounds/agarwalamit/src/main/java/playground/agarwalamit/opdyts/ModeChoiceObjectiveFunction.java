@@ -25,7 +25,6 @@ import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.TransportPlanningMainModeIdentifier;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -40,7 +39,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
 
 /**
  *
@@ -51,13 +49,12 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     @SuppressWarnings("unused")
     private static final Logger log = Logger.getLogger( ModeChoiceObjectiveFunction.class );
 
-    private MainModeIdentifier mainModeIdentifier ;
-    private final OpdytsScenarios opdytsScenarios;
-    private final PatnaCMPDistanceDistribution distriInfo ;
+    private final MainModeIdentifier mainModeIdentifier ;
+    private final DistanceDistribution distriInfo ;
 
-    @Inject ExperiencedPlansService service ;
-    @Inject TripRouter tripRouter ;
-    @Inject Network network ;
+    @Inject private ExperiencedPlansService service ;
+    @Inject private TripRouter tripRouter ;
+    @Inject private Network network ;
     // Documentation: "Guice injects ... fields of all values that are bound using toInstance(). These are injected at injector-creation time."
     // https://github.com/google/guice/wiki/InjectionPoints
     // I read that as "the fields are injected (every time again) when the instance is injected".
@@ -72,21 +69,18 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private final Map<StatType,DataMap<String>> sumsContainer  = new TreeMap<>() ;
     private final Map<StatType,Databins<String>> refStatsContainer = new TreeMap<>() ;
 
-
-    public ModeChoiceObjectiveFunction(final OpdytsScenarios opdytsScenarios) {
-        this.opdytsScenarios = opdytsScenarios;
-        this.distriInfo = new PatnaCMPDistanceDistribution(opdytsScenarios);
+     public ModeChoiceObjectiveFunction(final DistanceDistribution distriInfo) {
+        this.distriInfo = distriInfo;
         for ( StatType statType : StatType.values() ) {
             // define the bin boundaries:
             switch ( statType ) {
                 case tripBeelineDistances: {
-                    double[] dataBoundariesTmp = getDataBoundaries();
+                    double[] dataBoundariesTmp = distriInfo.getDistClasses();
                     {
                         this.simStatsContainer.put( statType, new Databins<>( statType.name(), dataBoundariesTmp )) ;
                     }
                     {
                         final Databins<String> databins = new Databins<>( statType.name(), dataBoundariesTmp ) ;
-
                         fillDatabins(databins);
                         this.refStatsContainer.put( statType, databins) ;
                     }
@@ -97,7 +91,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
 
         // for Patna, all legs have same trip mode.
-        switch (opdytsScenarios){
+        switch (this.distriInfo.getOpdytsScenario()){
             case EQUIL:
                 mainModeIdentifier = new TransportPlanningMainModeIdentifier();
                 break;
@@ -118,49 +112,13 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         }
     }
 
-    private void fillDatabins(Databins<String> databins) {
-        switch (this.opdytsScenarios) {
-            case EQUIL:
-                double carVal = 1000. ;
-                databins.addValue( TransportMode.car, 8, carVal);
-                databins.addValue( TransportMode.pt, 8, 4000.-carVal);
-                break;
-            case EQUIL_MIXEDTRAFFIC:
-                carVal = 1000.;
-                databins.addValue( TransportMode.car, 8, carVal);
-                databins.addValue( "bicycle", 8, 4000.- carVal);
-                break;
-            case PATNA_1Pct:
-                double totalLegs = 13278.0 * 2.0; // each person make two trips; here trips are counted not persons.
-                patnaModalDistDistribution(totalLegs,databins);
-            break;
-            case PATNA_10Pct:
-                totalLegs = 13278.0 * 10 * 2.0; // each person make two trips; here trips are counted not persons.
-                patnaModalDistDistribution(totalLegs,databins);
-            default: throw new RuntimeException("not implemented");
-        }
-    }
-
-    private void patnaModalDistDistribution(final double totalLegs, final Databins<String> databins){
-        double legsSumAllModes = 0;
-        SortedMap<String, double []> mode2distanceBasedLegs = distriInfo.getMode2DistanceBasedLegs();
+    private void fillDatabins(final Databins<String> databins) {
+        Map<String, double []> mode2distanceBasedLegs = distriInfo.getMode2DistanceBasedLegs();
         for (String mode : mode2distanceBasedLegs.keySet()) {
             double [] distBasedLegs = mode2distanceBasedLegs.get(mode);
             for (int idx = 0; idx < databins.getDataBoundaries().length; idx++) {
                 databins.addValue(mode, idx, distBasedLegs[idx]);
             }
-        }
-    }
-
-    private double [] getDataBoundaries() {
-        switch (this.opdytsScenarios){
-            case EQUIL:
-            case EQUIL_MIXEDTRAFFIC:
-                return new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};
-            case PATNA_1Pct:
-            case PATNA_10Pct:
-                return distriInfo.getDistClasses();
-            default: throw new RuntimeException("not implemented");
         }
     }
 
@@ -204,66 +162,10 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
         for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
             StatType theStatType = entry.getKey();  // currently only one type ;
             log.warn("statType=" + theStatType);
-            Databins<String> databins = entry.getValue();
-            objectiveFnValue = objectiveFunctionEvaluator.getObjectiveFunctionValue(entry.getValue(), this.refStatsContainer.get(theStatType));
+            objectiveFnValue = objectiveFunctionEvaluator.getObjectiveFunctionValue(this.refStatsContainer.get(theStatType), entry.getValue());
         }
         return objectiveFnValue;
     }
-
-//    private double getSumOfAbsoluteErrorsObjectiveFunctionValue() {
-//        double objective = 0. ;
-//        for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
-//            StatType theStatType = entry.getKey() ;  // currently only one type ;
-//            log.warn( "statType=" + theStatType );
-//            if(! theStatType.equals(StatType.tripBeelineDistances)) throw new RuntimeException("not implemented yet.");
-//
-//            Databins<String> databins = entry.getValue() ;
-//            for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
-//                String mode = theEntry.getKey() ;
-//                log.warn("mode=" + mode);
-//
-//                double[] simValue = theEntry.getValue() ;
-//                double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
-//                for ( int ii=0 ; ii<simValue.length ; ii++ ) {
-//                    double diff = Math.abs( simValue[ii] - reaVal[ii] ) ;
-//                    if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
-//                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
-//                    }
-//                    objective +=  diff ;
-//                }
-//            }
-//        }
-//        log.warn( "objective=" + objective );
-//        return objective ;
-//    }
-//
-//    private double getSumOfSquareObjectiveFunctionValue(){
-//        log.error("This should be used with great caution, with Patna, it was not a good experience. See email from GF on 24.11.2016");
-//        double objective = 0. ;
-//        double sum = 0.;
-//        for ( Map.Entry<StatType, Databins<String>> entry : simStatsContainer.entrySet() ) {
-//            StatType theStatType = entry.getKey() ;  // currently only one type ;
-//            log.warn( "statType=" + theStatType );
-//            Databins<String> databins = entry.getValue() ;
-//            for ( Map.Entry<String, double[]> theEntry : databins.entrySet() ) {
-//                String mode = theEntry.getKey() ;
-//                log.warn("mode=" + mode);
-//                double[] simValue = theEntry.getValue() ;
-//                double[] reaVal = this.refStatsContainer.get( theStatType).getValues(mode) ;
-//                for ( int ii=0 ; ii<simValue.length ; ii++ ) {
-//                    double diff = simValue[ii] - reaVal[ii] ;
-//                    if ( reaVal[ii]>0.1 || simValue[ii]>0.1 ) {
-//                        log.warn( "distanceBnd=" + databins.getDataBoundaries()[ii] + "; objVal=" + reaVal[ii] + "; simVal=" + simValue[ii] ) ;
-//                    }
-//                    objective += diff * diff ;
-//                    sum += reaVal[ii] ;
-//                }
-//            }
-//        }
-//        objective /= (sum*sum) ;
-//        log.warn( "objective=" + objective );
-//        return objective ;
-//    }
 
     private void resetContainers() {
         for ( StatType statType : StatType.values() ) {

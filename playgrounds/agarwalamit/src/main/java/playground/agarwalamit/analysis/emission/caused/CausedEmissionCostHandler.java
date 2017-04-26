@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.*;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.vehicles.Vehicle;
@@ -62,7 +63,12 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 	public static void main(String[] args) {
 		String emissionEventsFile = FileUtils.RUNS_SVN+ "/detEval/emissionCongestionInternalization/iatbr/output/ei/ITERS/it.1500/1500.emission.events.xml.gz";
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionCostModule ecm = new EmissionCostModule(1.0, true);
+
+		EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
+		emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.);
+		emissionsConfigGroup.setConsideringCO2Costs(true);
+
+		EmissionCostModule ecm = new EmissionCostModule(emissionsConfigGroup);
 		CausedEmissionCostHandler ech = new CausedEmissionCostHandler(ecm);
 		eventsManager.addHandler(ech);
 		new EmissionEventsReader(eventsManager).readFile(emissionEventsFile);
@@ -80,43 +86,39 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
-		double warmEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
-		double amount2Pay =  warmEmissionCosts;
 
 		if(this.vehicleId2WarmEmissCosts.containsKey(vehicleId)){
 			double nowCost = this.vehicleId2WarmEmissCosts.get(vehicleId);
-			this.vehicleId2WarmEmissCosts.put(vehicleId, nowCost+amount2Pay);
+			this.vehicleId2WarmEmissCosts.put(vehicleId, nowCost+ this.emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions()));
 		} else {
-			this.vehicleId2WarmEmissCosts.put(vehicleId, amount2Pay);
+			this.vehicleId2WarmEmissCosts.put(vehicleId,
+					this.emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions()));
 		}
 	}
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
-		double coldEmissionCosts = this.emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
-		double amount2Pay =  coldEmissionCosts;
 
 		if(this.vehicleId2ColdEmissCosts.containsKey(vehicleId)){
 			double nowCost = this.vehicleId2ColdEmissCosts.get(vehicleId);
-			this.vehicleId2ColdEmissCosts.put(vehicleId, nowCost+amount2Pay);
+			this.vehicleId2ColdEmissCosts.put(vehicleId, nowCost+ this.emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions()));
 		} else {
-			this.vehicleId2ColdEmissCosts.put(vehicleId, amount2Pay);
+			this.vehicleId2ColdEmissCosts.put(vehicleId,
+					this.emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions()));
 		}
 	}
 
 	public Map<Id<Person>, Double> getPersonId2ColdEmissionCosts() {
-		final Map<Id<Person>, Double> personId2ColdEmissCosts =	this.vehicleId2ColdEmissCosts.entrySet().stream().collect(
+		return this.vehicleId2ColdEmissCosts.entrySet().stream().collect(
 				Collectors.toMap(entry -> Id.createPersonId(entry.getKey().toString()), entry -> entry.getValue())
 		);
-		return personId2ColdEmissCosts;
 	}
 
 	public Map<Id<Person>, Double> getPersonId2WarmEmissionCosts() {
-		final Map<Id<Person>, Double> personId2WarmEmissCosts =	this.vehicleId2WarmEmissCosts.entrySet().stream().collect(
+		return this.vehicleId2WarmEmissCosts.entrySet().stream().collect(
 				Collectors.toMap(entry -> Id.createPersonId(entry.getKey().toString()), entry -> entry.getValue())
 		);
-		return personId2WarmEmissCosts;
 	}
 
 	@Override
@@ -168,6 +170,12 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 						entry -> entry.getValue() + getUserGroup2WarmEmissionCosts().get(entry.getKey()))
 		);
 	}
+
+	@Override
+	public boolean isFiltering() {
+		return ! (pf==null);
+	}
+
 
 	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionCosts() {
 		return this.vehicleId2ColdEmissCosts;

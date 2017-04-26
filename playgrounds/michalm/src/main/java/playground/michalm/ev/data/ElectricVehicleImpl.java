@@ -24,69 +24,50 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.michalm.ev.discharging.*;
 
+public class ElectricVehicleImpl implements ElectricVehicle {
+	private final Id<Vehicle> vehicleId;
+	private Battery battery;// not final -- can be swapped
 
-public class ElectricVehicleImpl
-    implements ElectricVehicle
-{
-    private final Id<Vehicle> vehicleId;
-    private Battery battery;//not final -- can be swapped
+	private DriveEnergyConsumption driveEnergyConsumption;
+	private AuxEnergyConsumption auxEnergyConsumption;
 
-    private DriveEnergyConsumption driveEnergyConsumption;
-    private AuxEnergyConsumption auxEnergyConsumption;
+	public ElectricVehicleImpl(Id<Vehicle> vehicleId, Battery battery) {
+		this.vehicleId = vehicleId;
+		this.battery = battery;
+	}
 
+	@Override
+	public Id<Vehicle> getId() {
+		return vehicleId;
+	}
 
-    public ElectricVehicleImpl(Id<Vehicle> vehicleId, Battery battery)
-    {
-        this.vehicleId = vehicleId;
-        this.battery = battery;
-    }
+	@Override
+	public Battery getBattery() {
+		return battery;
+	}
 
+	@Override
+	public DriveEnergyConsumption getDriveEnergyConsumption() {
+		return driveEnergyConsumption;
+	}
 
-    @Override
-    public Id<Vehicle> getId()
-    {
-        return vehicleId;
-    }
+	@Override
+	public AuxEnergyConsumption getAuxEnergyConsumption() {
+		return auxEnergyConsumption;
+	}
 
+	@Override
+	public Battery swapBattery(Battery battery) {
+		Battery old = this.battery;
+		this.battery = battery;
+		return old;
+	}
 
-    @Override
-    public Battery getBattery()
-    {
-        return battery;
-    }
+	public void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption) {
+		this.driveEnergyConsumption = driveEnergyConsumption;
+	}
 
-
-    @Override
-    public DriveEnergyConsumption getDriveEnergyConsumption()
-    {
-        return driveEnergyConsumption;
-    }
-
-
-    @Override
-    public AuxEnergyConsumption getAuxEnergyConsumption()
-    {
-        return auxEnergyConsumption;
-    }
-
-
-    @Override
-    public Battery swapBattery(Battery battery)
-    {
-        Battery old = this.battery;
-        this.battery = battery;
-        return old;
-    }
-
-
-    public void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption)
-    {
-        this.driveEnergyConsumption = driveEnergyConsumption;
-    }
-
-
-    public void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption)
-    {
-        this.auxEnergyConsumption = auxEnergyConsumption;
-    }
+	public void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption) {
+		this.auxEnergyConsumption = auxEnergyConsumption;
+	}
 }

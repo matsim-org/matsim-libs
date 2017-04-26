@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.core.config.Config;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
@@ -64,7 +64,7 @@ org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
 	private Config config;
-	private CharyparNagelScoringParameters params;
+	private ScoringParameters params;
 	private Plan plan;
 
 	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
@@ -75,7 +75,7 @@ org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunction.class);
 
-	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities, Config config) {
+	public ActivityScoringFunction(Plan plan, ScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities, Config config) {
 		super(params);
 		this.params = params;
 		this.plan = plan;

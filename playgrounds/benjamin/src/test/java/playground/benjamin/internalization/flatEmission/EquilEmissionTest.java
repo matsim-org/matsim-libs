@@ -50,10 +50,10 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.benjamin.internalization.EquilTestSetUp;
-import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.EmissionTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 
 /**
  * @author amit
@@ -69,16 +69,35 @@ public class EquilEmissionTest {
 
 	private DecimalFormat df = new DecimalFormat("#.###");
 
-	private boolean isConsideringCO2Costs ;
+	private final boolean isConsideringCO2Costs ;
+	private final double emissionCostMultiplicationFactor;
+	private final double emissionEfficiencyFactor;
 
-	public EquilEmissionTest (boolean isConsideringCO2Costs) {
+	public EquilEmissionTest (final boolean isConsideringCO2Costs, final double emissionCostMultiplicationFactor, final double emissionEfficiencyFactor) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
+		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
+		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 		logger.info("Each parameter will be used in all the tests i.e. all tests will be run while inclusing and excluding CO2 costs.");
 	}
 
-	@Parameters(name = "{index}: considerCO2 == {0}")
-	public static List<Object> considerCO2 () {
-		Object[] considerCO2 = new Object [] { true, false };
+	@Parameters(name = "{index}: considerCO2 == {0}; emissionCostMultiplicationFactor == {1}; emissionEfficiencyFactor == {2}")
+	public static List<Object[]> considerCO2 () {
+		Object[] [] considerCO2 = new Object [] [] {
+				// general cases
+				{true, 1.0, 1.0},
+				{false, 1.0, 1.0},
+				// no emission costs
+				{true, 0.0, 1.0},
+				{false, 0.0, 1.0},
+				// higher emission costs
+				{true, 10.0, 1.0},
+				// electric vehicle or efficient vehicle
+				{true, 1.0, 0.0},
+				{false, 1.0, 0.0},
+				{true, 1.0, 0.1},
+				// combination
+				{true, 10.0, 0.5}
+		};
 		return Arrays.asList(considerCO2);
 	}
 
@@ -92,30 +111,28 @@ public class EquilEmissionTest {
 		equilTestSetUp.createActiveAgents(sc);
 		equilTestSetUp.createPassiveAgents(sc);
 
-		emissionSettings(sc);
+		emissionSettings(sc, this.isConsideringCO2Costs, this.emissionCostMultiplicationFactor, this.emissionEfficiencyFactor);
 		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 
 		Controler controler = new Controler(sc);
 		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
-		EmissionModule emissionModule = new EmissionModule(sc);
-		emissionModule.setEmissionEfficiencyFactor( 1.0 );
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-
-		EmissionCostModule emissionCostModule = new EmissionCostModule( 1.0, isConsideringCO2Costs );
 		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()),emissionModule, emissionCostModule, controler.getConfig().planCalcScore());
-//		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, sc.getConfig().planCalcScore());
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car,controler.getConfig().planCalcScore()));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				// emissions settings
+				bind(EmissionModule.class).asEagerSingleton();
+				bind(EmissionCostModule.class).asEagerSingleton();
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+
 				bindCarTravelDisutilityFactory().toInstance(emissionTducf);
 			}
 		});
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+
 
 		MyPersonMoneyEventHandler personMoneyHandler = new MyPersonMoneyEventHandler();
 		controler.getEvents().addHandler(personMoneyHandler);
@@ -128,7 +145,7 @@ public class EquilEmissionTest {
 		MyEmissionEventHandler emissEventHandler = new MyEmissionEventHandler();
 		events.addHandler(emissEventHandler);
 		int lastIt = sc.getConfig().controler().getLastIteration();
-		reader.readFile(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz");
+		reader.readFile(outputDirectory + "/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz");
 
 		// first check for cold emission, which are generated only on departure link.
 		for (ColdEmissionEvent e : emissEventHandler.coldEvents ) {
@@ -152,8 +169,8 @@ public class EquilEmissionTest {
 			totalColdEmissAmount += EmissionCostFactors.getCostFactor(cp.toString()) * coldEmiss.get(cp);
 		}
 
-		Assert.assertEquals("Cold emission toll from emission event and emission cost factors does not match from manual calculation.",totalColdEmissAmount, 0.008416, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Cold emission toll from emission event and emission cost factors does not match from money event.",firstMoneyEventToll, - totalColdEmissAmount, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Cold emission toll from emission event and emission cost factors does not match from manual calculation.",totalColdEmissAmount * this.emissionCostMultiplicationFactor, 0.008416 * this.emissionEfficiencyFactor * this.emissionCostMultiplicationFactor, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Cold emission toll from emission event and emission cost factors does not match from money event.", firstMoneyEventToll, - totalColdEmissAmount * this.emissionCostMultiplicationFactor , MatsimTestUtils.EPSILON);
 
 		/*
 		 * There are two routes --> 12-23-38-84-45 and 12-23-39-94-45. 12 is departure link --> no warmEmissionevent. 
@@ -170,7 +187,7 @@ public class EquilEmissionTest {
 			if( wp.toString().equalsIgnoreCase(WarmPollutant.CO2_TOTAL.toString()) && !isConsideringCO2Costs ) {
 				//nothing to do 
 			} else {
-				totalWarmEmissAmount += EmissionCostFactors.getCostFactor(wp.toString()) * warmEmiss.get(wp);	
+				totalWarmEmissAmount +=  EmissionCostFactors.getCostFactor(wp.toString()) * warmEmiss.get(wp);
 			}
 		}
 		double tollFromMoneyEvent = 0.; 
@@ -180,15 +197,15 @@ public class EquilEmissionTest {
 		}
 
 		if ( isConsideringCO2Costs ) {
-			Assert.assertEquals( "Warm emission toll from emission event and emission cost factors does not match from manual calculation.", df.format( 0.112236043 ), df.format( totalWarmEmissAmount ) );
-			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from money event.",tollFromMoneyEvent, - totalWarmEmissAmount, MatsimTestUtils.EPSILON);
+			Assert.assertEquals( "Warm emission toll from emission event and emission cost factors does not match from manual calculation.", df.format( 0.112236043  * this.emissionEfficiencyFactor * this.emissionCostMultiplicationFactor ), df.format( totalWarmEmissAmount * this.emissionCostMultiplicationFactor ) );
+			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from money event.",tollFromMoneyEvent, - totalWarmEmissAmount * this.emissionCostMultiplicationFactor, MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from manual calculation.", df.format( 0.027613043 ), df.format( totalWarmEmissAmount ) );
-			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from money event.",tollFromMoneyEvent, - totalWarmEmissAmount, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from manual calculation.", df.format( 0.027613043  * this.emissionEfficiencyFactor * this.emissionCostMultiplicationFactor ), df.format( totalWarmEmissAmount * this.emissionCostMultiplicationFactor ) );
+			Assert.assertEquals("Warm emission toll from emission event and emission cost factors does not match from money event.",tollFromMoneyEvent, - totalWarmEmissAmount * this.emissionCostMultiplicationFactor, MatsimTestUtils.EPSILON);
 		}
 	}
 	
-	private void emissionSettings(Scenario scenario){
+	private void emissionSettings(Scenario scenario, boolean isConsideringCO2Costs, double emissionCostMultiplicationFactor, double emissionEfficiencyFactor){
 		
 		// since same files are used for multiple test, files are added to ONE MORE level up then the test package directory
 		String packageInputDir = helper.getPackageInputDirectory();
@@ -218,6 +235,9 @@ public class EquilEmissionTest {
 		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+		ecg.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
+		ecg.setConsideringCO2Costs(isConsideringCO2Costs);
+		ecg.setEmissionCostMultiplicationFactor(emissionCostMultiplicationFactor);
 
 		config.addModule(ecg);
 	}

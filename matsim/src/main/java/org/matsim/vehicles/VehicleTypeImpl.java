@@ -29,7 +29,8 @@ public class VehicleTypeImpl implements VehicleType {
 	private double width = 1.0;
 	private double maxVelocity = Double.POSITIVE_INFINITY; // default: constrained only by the link speed
 	private double length = 7.5;
-	private double pcuEquivalents = 1.0;
+    private double pcuEquivalents = 1.0;
+    private double flowEfficiencyFactor = 1.0;
 	private EngineInformation engineInformation;
 	private String description;
 	private VehicleCapacity capacity;
@@ -147,14 +148,23 @@ public class VehicleTypeImpl implements VehicleType {
 		this.doorOperationMode = mode;
 	}
 
-	@Override
-	public double getPcuEquivalents() {
-		return pcuEquivalents;
-	}
+    @Override
+    public double getPcuEquivalents() {
+        return pcuEquivalents;
+    }
 
-	@Override
-	public void setPcuEquivalents(double pcuEquivalents) {
-		this.pcuEquivalents = pcuEquivalents;
-	}
+    @Override
+    public void setPcuEquivalents(double pcuEquivalents) {
+        this.pcuEquivalents = pcuEquivalents;
+    }
 
+    @Override
+    public double getFlowEfficiencyFactor() {
+        return flowEfficiencyFactor;
+    }
+
+    @Override
+    public void setFlowEfficiencyFactor(double flowEfficiencyFactor) {
+        this.flowEfficiencyFactor = flowEfficiencyFactor;
+    }
 }

@@ -22,8 +22,6 @@ package playground.michalm.demand;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.zone.Zone;
 
-
-public interface ActivityCreator
-{
-    public Activity createActivity(Zone zone, String actType);
+public interface ActivityCreator {
+	public Activity createActivity(Zone zone, String actType);
 }

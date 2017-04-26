@@ -37,14 +37,13 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
 public class CongestionCostCollector implements CongestionEventHandler {
 	private final static Logger LOG = Logger.getLogger(CongestionCostCollector.class);
 
-	private final MutableScenario scenario;
 	private final double vttsCar;
 	private double amountSum = 0.;
 	private final Map<Id<Person>, Double> causingPerson2Cost = new HashMap<>();
 
 	public CongestionCostCollector(MutableScenario scenario) {
-		this.scenario = scenario;
-		this.vttsCar = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+        this.vttsCar = (scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - scenario
+				.getConfig().planCalcScore().getPerforming_utils_hr()) / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
 		LOG.info("VTTS_car: " + vttsCar);
 	}

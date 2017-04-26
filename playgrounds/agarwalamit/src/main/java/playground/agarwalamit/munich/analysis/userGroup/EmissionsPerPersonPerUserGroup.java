@@ -54,7 +54,6 @@ public class EmissionsPerPersonPerUserGroup {
 	private final MunichPersonFilter pf = new MunichPersonFilter();
 	
 	public EmissionsPerPersonPerUserGroup(String outputDir) {
-
 		this.outputDir = outputDir;
 	}
 
@@ -73,10 +72,10 @@ public class EmissionsPerPersonPerUserGroup {
 		
 		this.userGroupToEmissions = new TreeMap<>();
 		this.emissionsPerPerson = new HashMap<>();
-		
+
 		for(MunichUserGroup ug:MunichUserGroup.values()){
 			SortedMap<String, Double> pollutantToValue = new TreeMap<>();
-			for(WarmPollutant wm:WarmPollutant.values()){ //because ('warmPollutants' U 'coldPollutants') = 'warmPollutants'
+			for(WarmPollutant wm:WarmPollutant.values()) {//because ('warmPollutants' U 'coldPollutants') = 'warmPollutants'
 				pollutantToValue.put(wm.toString(), 0.0);
 			}
 			this.userGroupToEmissions.put(ug, pollutantToValue);

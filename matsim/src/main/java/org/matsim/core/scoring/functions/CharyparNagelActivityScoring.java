@@ -43,18 +43,18 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 	private static int firstLastActWarning = 0;
 	private static short firstLastActOpeningTimesWarning = 0;
 
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	private final OpeningIntervalCalculator openingIntervalCalculator;
 
 	private Activity firstActivity;
 
 	private static final Logger log = Logger.getLogger(CharyparNagelActivityScoring.class);
 
-	public CharyparNagelActivityScoring(final CharyparNagelScoringParameters params) {
+	public CharyparNagelActivityScoring(final ScoringParameters params) {
 		this(params, new ActivityTypeOpeningIntervalCalculator(params));
 	}
 
-	public CharyparNagelActivityScoring(final CharyparNagelScoringParameters params, final OpeningIntervalCalculator openingIntervalCalculator) {
+	public CharyparNagelActivityScoring(final ScoringParameters params, final OpeningIntervalCalculator openingIntervalCalculator) {
 		this.params = params;
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;

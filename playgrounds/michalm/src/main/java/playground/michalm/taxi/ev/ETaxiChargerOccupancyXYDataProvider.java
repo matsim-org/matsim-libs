@@ -28,28 +28,20 @@ import playground.michalm.ev.data.*;
 import playground.michalm.util.XYDataCollector;
 import playground.michalm.util.XYDataCollector.XYDataCalculator;
 
+public class ETaxiChargerOccupancyXYDataProvider implements Provider<MobsimListener> {
+	private final EvData evData;
+	private final MatsimServices matsimServices;
 
-public class ETaxiChargerOccupancyXYDataProvider
-    implements Provider<MobsimListener>
-{
-    private final EvData evData;
-    private final MatsimServices matsimServices;
+	@Inject
+	public ETaxiChargerOccupancyXYDataProvider(EvData evData, MatsimServices matsimServices) {
+		this.evData = evData;
+		this.matsimServices = matsimServices;
+	}
 
-
-    @Inject
-    public ETaxiChargerOccupancyXYDataProvider(EvData evData, MatsimServices matsimServices)
-    {
-        this.evData = evData;
-        this.matsimServices = matsimServices;
-    }
-
-
-    @Override
-    public MobsimListener get()
-    {
-        XYDataCalculator<Charger> calc = ETaxiChargerXYDataUtils
-                .createChargerOccupancyCalculator(evData, false);
-        return new XYDataCollector<>(evData.getChargers().values(), calc, 300,
-                "charger_occupancy_absolute", matsimServices);
-    }
+	@Override
+	public MobsimListener get() {
+		XYDataCalculator<Charger> calc = ETaxiChargerXYDataUtils.createChargerOccupancyCalculator(evData, false);
+		return new XYDataCollector<>(evData.getChargers().values(), calc, 300, "charger_occupancy_absolute",
+				matsimServices);
+	}
 }

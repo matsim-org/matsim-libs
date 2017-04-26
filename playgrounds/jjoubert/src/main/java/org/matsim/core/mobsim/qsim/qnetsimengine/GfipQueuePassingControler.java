@@ -59,6 +59,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -190,11 +191,11 @@ public class GfipQueuePassingControler {
 		switch (queueType) {
 		case FIFO:
 		case GFIP_FIFO:
-			config.qsim().setLinkDynamics("FIFO");
+			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.FIFO);
 			break;
 		case BASIC_PASSING:
 		case GFIP_PASSING:
-			config.qsim().setLinkDynamics("PassingQ");
+			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 		default:
 			break;
 		}

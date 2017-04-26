@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -59,7 +60,7 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Override
-	protected void checkConsistency() {
+	protected void checkConsistency(Config config) {
 		if ((this.signalSystemFile == null) && (this.signalControlFile != null)) {
 			throw new IllegalStateException("For using a SignalSystemConfiguration a definition of the signal systems must exist!");
 		}

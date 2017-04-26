@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.gbl.Gbl;
 
@@ -201,8 +202,8 @@ public class StrategyPopsConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	protected void checkConsistency() {
-		super.checkConsistency();
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
 
 		// check that the strategies are numbered from 1 to n
 		for(Entry<String, LinkedHashMap<Id, StrategySettings>> popSettingsE:this.settings.entrySet()) {

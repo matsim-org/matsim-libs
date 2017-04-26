@@ -28,9 +28,9 @@ import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 /**
  * Scoring function accumulator using {@link BvgLegScoringFunction} instead of {@link CharyparNagelLegScoring}
@@ -42,12 +42,12 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private static final Logger log = Logger.getLogger(BvgScoringFunctionFactory.class);
 
-	private final CharyparNagelScoringParametersForPerson parametersForPerson;
+	private final ScoringParametersForPerson parametersForPerson;
 	private final BvgScoringFunctionParameters bvgParameters;
 	private final Network network;
 
 	public BvgScoringFunctionFactory( final Scenario scenario, final BvgScoringFunctionConfigGroup bvgConfig ) {
-		this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.parametersForPerson = new SubpopulationScoringParameters( scenario );
 		this.bvgParameters = new BvgScoringFunctionParameters(bvgConfig);
 		this.network = scenario.getNetwork();
 		log.info("...constructed.");
@@ -55,7 +55,7 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		final CharyparNagelScoringParameters charyparNagelConfigParameters = parametersForPerson.getScoringParameters( person );
+		final ScoringParameters charyparNagelConfigParameters = parametersForPerson.getScoringParameters( person );
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new BvgActivityScoringFunction(person.getSelectedPlan(), charyparNagelConfigParameters));
 		scoringFunctionAccumulator.addScoringFunction(new BvgLegScoringFunction(person.getSelectedPlan(), charyparNagelConfigParameters, this.bvgParameters, charyparNagelConfigParameters.utilityOfLineSwitch, this.network));

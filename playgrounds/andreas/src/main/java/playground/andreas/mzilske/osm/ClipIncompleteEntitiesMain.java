@@ -22,9 +22,9 @@ package playground.andreas.mzilske.osm;
 import java.io.File;
 
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
-import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.v0_6.FastXmlReader;
+import org.openstreetmap.osmosis.xml.v0_6.XmlWriter;
 
 public class ClipIncompleteEntitiesMain {
 	

@@ -33,7 +33,7 @@ import org.matsim.contrib.evacuation.control.Controller;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.utils.misc.Time;
 
 /**

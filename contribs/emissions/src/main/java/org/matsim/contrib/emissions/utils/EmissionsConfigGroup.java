@@ -50,6 +50,18 @@ extends ReflectiveConfigGroup
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	private boolean isUsingVehicleIdAsVehicleDescription = false;
 
+	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
+	private boolean isWritingEmissionsEvents = true;
+
+	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
+	private double emissionEfficiencyFactor = 1.0;
+
+	private static final String EMISSION_COST_MULTIPLICATION_FACTOR = "emissionCostMultiplicationFactor";
+	private double emissionCostMultiplicationFactor = 1.0;
+
+	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
+	private boolean consideringCO2Costs = false;
+
 	static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings";
 	static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
 	static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
@@ -61,13 +73,19 @@ extends ReflectiveConfigGroup
 			" - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
 			" - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
 			" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"."+
-
-			"\n" +
-
-			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n"+
+			"\n\t\t" +
+			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n\t\t"+
 			"FALSE: vehicle description is used for the emission specifications." +
 			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
 			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
+
+	static final String WRITING_EMISSIONS_EVENTS_CMT = "if false, emission events will not appear in the events file.";
+
+	static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; the factor is applied to the whole fleet. ";
+
+	static final String EMISSION_COST_MULTIPLICATION_FACTOR_CMT = "A factor, by which the emission cost factors from literature (Maibach et al. (2008)) are increased.";
+
+	static final String CONSIDERING_CO2_COSTS_CMT = "if true, only flat emissions will be considered irrespective of pricing either flat air pollution or exposure of air pollution.";
 
 	@Override
 	public Map<String, String> getComments() {
@@ -87,6 +105,14 @@ extends ReflectiveConfigGroup
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, EMISSION_FACTORS_COLD_FILE_DETAILED_CMT);
 
 		map.put(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT);
+
+		map.put(WRITING_EMISSIONS_EVENTS, WRITING_EMISSIONS_EVENTS_CMT);
+
+		map.put(EMISSION_EFFICIENCY_FACTOR, EMISSION_EFFICIENCY_FACTOR_CMT);
+
+		map.put(EMISSION_COST_MULTIPLICATION_FACTOR, EMISSION_COST_MULTIPLICATION_FACTOR_CMT);
+
+		map.put(CONSIDERING_CO2_COSTS, CONSIDERING_CO2_COSTS_CMT);
 
 		return map;
 	}
@@ -198,5 +224,52 @@ extends ReflectiveConfigGroup
 	@StringSetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
 	public void setUsingVehicleTypeIdAsVehicleDescription(boolean usingVehicleIdAsVehicleDescription) {
 		isUsingVehicleIdAsVehicleDescription = usingVehicleIdAsVehicleDescription;
+	}
+
+	@StringGetter(WRITING_EMISSIONS_EVENTS)
+	public boolean isWritingEmissionsEvents() {
+		return isWritingEmissionsEvents;
+	}
+
+	/**
+	 * @param ignoringEmissionsFromEventsFile -- {@value #WRITING_EMISSIONS_EVENTS_CMT}
+	 */
+	@StringSetter(WRITING_EMISSIONS_EVENTS)
+	public void setIgnoringEmissionsFromEventsFile(boolean ignoringEmissionsFromEventsFile) {
+		isWritingEmissionsEvents = ignoringEmissionsFromEventsFile;
+	}
+
+	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
+	public double getEmissionEfficiencyFactor() {
+		return emissionEfficiencyFactor;
+	}
+	/**
+	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+	 */
+	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
+	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
+		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+	}
+	@StringGetter(EMISSION_COST_MULTIPLICATION_FACTOR)
+	public double getEmissionCostMultiplicationFactor() {
+		return emissionCostMultiplicationFactor;
+	}
+	/**
+	 * @param emissionCostMultiplicationFactor -- {@value #EMISSION_COST_MULTIPLICATION_FACTOR_CMT}
+	 */
+	@StringSetter(EMISSION_COST_MULTIPLICATION_FACTOR)
+	public void setEmissionCostMultiplicationFactor(double emissionCostMultiplicationFactor) {
+		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
+	}
+	@StringGetter(CONSIDERING_CO2_COSTS)
+	public boolean isConsideringCO2Costs() {
+		return consideringCO2Costs;
+	}
+	/**
+	 * @param consideringCO2Costs -- {@value #CONSIDERING_CO2_COSTS_CMT}
+	 */
+	@StringSetter(CONSIDERING_CO2_COSTS)
+	public void setConsideringCO2Costs(boolean consideringCO2Costs) {
+		this.consideringCO2Costs = consideringCO2Costs;
 	}
 }

@@ -50,7 +50,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
@@ -91,7 +91,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -154,7 +154,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -207,7 +207,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
+		ScoringParameters params = new ScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		

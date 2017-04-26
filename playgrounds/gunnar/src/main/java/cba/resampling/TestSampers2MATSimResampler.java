@@ -58,7 +58,7 @@ class TestSampers2MATSimResampler {
 		}
 		matsimChoiceModel.enforcedUpdate();
 
-		final LogitEpsilonDistribution logitEpsDistr = new LogitEpsilonDistribution(scale);
+		final MyGumbelDistribution logitEpsDistr = new MyGumbelDistribution(scale);
 		final Map<Alternative, Double> alternative2sampersChoiceProba = new LinkedHashMap<>();
 		final Map<Alternative, Double> alternative2matsimChoiceProba = new LinkedHashMap<>();
 		for (int i = 0; i < universalChoiceSetSize; i++) {

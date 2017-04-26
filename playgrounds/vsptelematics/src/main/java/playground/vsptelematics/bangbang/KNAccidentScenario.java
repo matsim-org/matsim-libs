@@ -94,15 +94,16 @@ public class KNAccidentScenario {
 
 		// ===
 
-		final Config config = ConfigUtils.loadConfig("../../../../shared-svn/studies/countries/de/berlin/telematics/funkturm-example/baseconfig.xml") ;
+		final Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin/telematics/funkturm-example/baseconfig.xml") ;
 
-		config.network().setInputFile("../../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz");
+		config.network().setInputFile("../../counts/iv_counts/network.xml.gz");
 		config.network().setTimeVariantNetwork(true);
 
-		config.plans().setInputFile("../../../../shared-svn/studies/countries/de/berlin/telematics/funkturm-example/reduced-plans.xml.gz");
+		config.plans().setInputFile("reduced-plans.xml.gz");
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 
-		config.controler().setLastIteration(10);
+		config.controler().setFirstIteration(9);
+		config.controler().setLastIteration(9);
 		config.controler().setOutputDirectory("./output/telematics/funkturm-example");
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
@@ -164,7 +165,7 @@ public class KNAccidentScenario {
 //				addControlerListenerBinding().to( ExecutedPlansServiceImpl.class ) ;
 //				
 //				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecuted.class) ;
-//
+
 				this.bind( MyIterationCounter.class ).asEagerSingleton();
 
 				// ---

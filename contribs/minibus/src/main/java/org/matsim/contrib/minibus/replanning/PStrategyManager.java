@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConfigGroup.PStrategySettings;
 import org.matsim.contrib.minibus.fare.StageContainerCreator;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.operator.TimeProvider;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -45,7 +45,7 @@ public final class PStrategyManager {
 	private double totalWeights = 0.0;
 	private boolean allStrategiesAreDisabled = false;
 
-	public void init(PConfigGroup pConfig, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
+	public void init(PConfigGroup pConfig, StageContainerCreator stageContainerCreator, TicketMachineI ticketMachine, TimeProvider timeProvider) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			String classname = settings.getModuleName();
 			double rate = settings.getProbability();
@@ -60,7 +60,7 @@ public final class PStrategyManager {
 		log.info("enabled with " + this.strategies.size()  + " strategies");
 	}
 
-	private PStrategy loadStrategy(final String name, final PStrategySettings settings, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
+	private PStrategy loadStrategy(final String name, final PStrategySettings settings, StageContainerCreator stageContainerCreator, TicketMachineI ticketMachine, TimeProvider timeProvider) {
 		PStrategy strategy = null;
 		
 		if (name.equals(MaxRandomStartTimeAllocator.STRATEGY_NAME)) {

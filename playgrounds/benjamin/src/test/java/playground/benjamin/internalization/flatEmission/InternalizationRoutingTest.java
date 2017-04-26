@@ -51,10 +51,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
+import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerListener;
 
 /**
@@ -69,8 +68,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private Config config;
 	private Scenario scenario;
 	private Controler controler;
-	private Vehicles emissionVehicles;
-	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 
 	public void testDistanceRouting() {
@@ -191,10 +188,10 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.controler = new Controler(this.scenario);
 		specifyControler();
 
-		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		emissionCostModule = new EmissionCostModule(100.0);
+		EmissionsConfigGroup emissionsConfigGroup = new EmissionsConfigGroup();
+		emissionsConfigGroup.setEmissionCostMultiplicationFactor(100.);
+
+		emissionCostModule = new EmissionCostModule(emissionsConfigGroup);
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
 		pcs.setPerforming_utils_hr(0.0);
@@ -225,12 +222,19 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void installEmissionInternalizationListener() {
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(EmissionModule.class).asEagerSingleton();
+				bind(EmissionCostModule.class).toInstance(emissionCostModule);
+				addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
+			}
+		});
 	}
 
 	private void installEmissionDisutilityCalculatorFactory() {
-		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
-				emissionCostModule, config.planCalcScore());
+		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(
+        );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -359,13 +363,13 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void createVehicles() {
-		this.emissionVehicles = VehicleUtils.createVehiclesContainer();
+		Vehicles emissionVehicles = scenario.getVehicles();
 		Id<VehicleType> vehTypeId = Id.create(HbefaVehicleCategory.PASSENGER_CAR.toString(), VehicleType.class);
-		VehicleType vehicleType = this.emissionVehicles.getFactory().createVehicleType(vehTypeId);
-		this.emissionVehicles.addVehicleType(vehicleType);
+		VehicleType vehicleType = emissionVehicles.getFactory().createVehicleType(vehTypeId);
+		emissionVehicles.addVehicleType(vehicleType);
 		for(Person person : scenario.getPopulation().getPersons().values()){
-			Vehicle vehicle = this.emissionVehicles.getFactory().createVehicle(Id.create(person.getId(), Vehicle.class), vehicleType);
-			this.emissionVehicles.addVehicle(vehicle);
+			Vehicle vehicle = emissionVehicles.getFactory().createVehicle(Id.create(person.getId(), Vehicle.class), vehicleType);
+			emissionVehicles.addVehicle(vehicle);
 		}
 	}
 

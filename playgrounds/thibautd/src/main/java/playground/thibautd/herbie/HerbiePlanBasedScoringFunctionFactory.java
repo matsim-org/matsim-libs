@@ -27,7 +27,7 @@ import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.deprecated.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.facilities.ActivityFacilities;
@@ -45,7 +45,7 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
 	private final Network network;
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	
 	public HerbiePlanBasedScoringFunctionFactory(
 			final Config config, 
@@ -53,7 +53,7 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final ActivityFacilities facilities, 
 			final Network network) {
-		this.params = new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build();
+		this.params = new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build();
 		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;
@@ -97,7 +97,7 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 		return scoringFunctionAccumulator;
 	}
 
-	public CharyparNagelScoringParameters getParams() {
+	public ScoringParameters getParams() {
 		return params;
 	}
 }

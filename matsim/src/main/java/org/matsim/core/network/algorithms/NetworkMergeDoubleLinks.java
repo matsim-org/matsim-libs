@@ -30,7 +30,7 @@ import org.matsim.core.utils.misc.Time;
 
 import java.util.Iterator;
 
-public class NetworkMergeDoubleLinks implements NetworkRunnable {
+public final class NetworkMergeDoubleLinks implements NetworkRunnable {
 
 	public enum MergeType {
 		/** no merge, instead remove additionals (random) */

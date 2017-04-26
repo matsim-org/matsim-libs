@@ -17,6 +17,15 @@
             <url>http://download.osgeo.org/webdav/geotools</url>
         </repository>
     </repositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>19.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.swinglabs</groupId>
@@ -72,7 +81,7 @@
     </build>
 
     <properties>
-        <geotools.version>13.0</geotools.version>
+        <geotools.version>14.0</geotools.version>
     </properties>
 
 </project>

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -69,6 +69,10 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 
 		@Override
 	    public void reset(int iteration){
+			this.numberOfTrips = 0;
+			this.totalWaitingTime = 0.0;
+			this.personsTaxiCallTime = new HashMap<Id<Person>, Double>();
+			initializeZoneMaps();
 	    }
 	    
 	    @Override

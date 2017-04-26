@@ -19,21 +19,21 @@
 
 package org.matsim.contrib.minibus.scoring;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.minibus.fare.StageContainer;
 import org.matsim.contrib.minibus.fare.StageContainerHandler;
-import org.matsim.contrib.minibus.fare.TicketMachine;
+import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * Collects {@link StageContainer} and creates {@link PersonMoneyEvent}.
@@ -46,9 +46,9 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 	private final EventsManager eventsManager;
 	private final double mobsimShutdownTime;
 	private HashMap<Id<Person>, List<StageContainer>> agentId2stageContainerListMap = new HashMap<>();
-	private final TicketMachine ticketMachine;
+	private final TicketMachineI ticketMachine;
 
-	public StageContainer2AgentMoneyEvent(MatsimServices controler, TicketMachine ticketMachine) {
+	public StageContainer2AgentMoneyEvent(MatsimServices controler, TicketMachineI ticketMachine) {
 		controler.addControlerListener(this);
 		this.eventsManager = controler.getEvents();
 		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime();
@@ -63,7 +63,7 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 			for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
 				totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
 			}
-			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), totalFareOfAgent));
+			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), -totalFareOfAgent));
 		}
 	}
 

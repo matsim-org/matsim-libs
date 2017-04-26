@@ -25,23 +25,26 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
-import playground.agarwalamit.opdyts.OpdytsScenarios;
+import playground.agarwalamit.opdyts.OpdytsScenario;
+import playground.agarwalamit.utils.FileUtils;
 
 /**
  * @author amit
  */
 
-public class PatnaPlansRelaxor {
+class PatnaPlansRelaxor {
 
 	public void run (String[] args) {
 
@@ -57,8 +60,8 @@ public class PatnaPlansRelaxor {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 		modes2consider.add("motorbike");
-//		modes2consider.add("pt");
-//		modes2consider.add("walk");
+		modes2consider.add("pt");
+		modes2consider.add("walk");
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
@@ -75,9 +78,28 @@ public class PatnaPlansRelaxor {
 				this.bind(ModalTripTravelTimeHandler.class);
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
-				this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, OpdytsScenarios.PATNA_1Pct));
+				this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new PatnaOneBinDistanceDistribution(
+						OpdytsScenario.PATNA_1Pct)));
 			}
 		});
-	controler.run();
+
+		// adding pt fare system based on distance
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().to(PtFareEventHandler.class);
+			}
+		});
+		// for above make sure that util_dist and monetary dist rate for pt are zero.
+		PlanCalcScoreConfigGroup.ModeParams mp = controler.getConfig().planCalcScore().getModes().get("pt");
+		mp.setMarginalUtilityOfDistance(0.0);
+		mp.setMonetaryDistanceRate(0.0);
+
+		controler.run();
+
+		// delete unnecessary iterations folder here.
+		int firstIt = controler.getConfig().controler().getFirstIteration();
+		int lastIt = controler.getConfig().controler().getLastIteration();
+		FileUtils.deleteIntermediateIterations(config.controler().getOutputDirectory(),firstIt,lastIt);
 	}
 }

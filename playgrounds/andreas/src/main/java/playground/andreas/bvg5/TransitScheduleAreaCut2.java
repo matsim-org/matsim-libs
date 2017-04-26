@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
-import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
+import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.LineId2PtMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -75,7 +75,7 @@ public class TransitScheduleAreaCut2 {
 			.getLogger(TransitScheduleAreaCut2.class);
 	private Geometry area;
 	private TransitSchedule schedule;
-	private PtMode2LineSetter ptMode2LineSetter;
+	private LineId2PtMode ptMode2LineSetter;
 	private Set<String> modes2Cut;
 	private TransitSchedule newSchedule;
 	private Vehicles vehicles;
@@ -90,7 +90,7 @@ public class TransitScheduleAreaCut2 {
 	 * @param modes2Cut,
 	 * @param vehicles, the old vehicles
 	 */
-	public TransitScheduleAreaCut2(TransitSchedule transitSchedule, String areaShape, PtMode2LineSetter ptMode2LineSetter, Set<String> modes2Cut, Vehicles vehicles) {
+	public TransitScheduleAreaCut2(TransitSchedule transitSchedule, String areaShape, LineId2PtMode ptMode2LineSetter, Set<String> modes2Cut, Vehicles vehicles) {
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(areaShape);
 		this.ptMode2LineSetter = ptMode2LineSetter;
 		this.modes2Cut = modes2Cut;
@@ -113,7 +113,7 @@ public class TransitScheduleAreaCut2 {
 	 * @param modes2Cut,
 	 * @param vehicles, the old vehicles
 	 */
-	public TransitScheduleAreaCut2(TransitSchedule transitSchedule, Geometry area2Cut, PtMode2LineSetter ptMode2LineSetter, Set<String> modes2Cut, Vehicles vehicles){
+	public TransitScheduleAreaCut2(TransitSchedule transitSchedule, Geometry area2Cut, LineId2PtMode ptMode2LineSetter, Set<String> modes2Cut, Vehicles vehicles){
 		this.ptMode2LineSetter = ptMode2LineSetter;
 		this.modes2Cut = modes2Cut;
 		this.area = area2Cut;

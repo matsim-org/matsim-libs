@@ -30,66 +30,53 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.Maps;
 
+public class DijkstraWithDijkstraTreeCache implements LeastCostPathCalculatorWithCache {
+	private final Network network;
+	private final TravelDisutility costFunction;
+	private final TravelTime timeFunction;
+	private final TimeDiscretizer timeDiscretizer;
+	private final Map<Id<Node>, DijkstraTree>[] treeCache;
 
-public class DijkstraWithDijkstraTreeCache
-    implements LeastCostPathCalculatorWithCache
-{
-    private final Network network;
-    private final TravelDisutility costFunction;
-    private final TravelTime timeFunction;
-    private final TimeDiscretizer timeDiscretizer;
-    private final Map<Id<Node>, DijkstraTree>[] treeCache;
+	private CacheStats cacheStats = new CacheStats();
 
-    private CacheStats cacheStats = new CacheStats();
+	@SuppressWarnings("unchecked")
+	public DijkstraWithDijkstraTreeCache(Network network, TravelDisutility costFunction, final TravelTime timeFunction,
+			TimeDiscretizer timeDiscretizer) {
+		this.network = network;
+		this.costFunction = costFunction;
+		this.timeFunction = timeFunction;
+		this.timeDiscretizer = timeDiscretizer;
 
+		treeCache = new Map[timeDiscretizer.getIntervalCount()];
+		for (int i = 0; i < treeCache.length; i++) {
+			treeCache[i] = Maps.newHashMap();
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    public DijkstraWithDijkstraTreeCache(Network network, TravelDisutility costFunction,
-            final TravelTime timeFunction, TimeDiscretizer timeDiscretizer)
-    {
-        this.network = network;
-        this.costFunction = costFunction;
-        this.timeFunction = timeFunction;
-        this.timeDiscretizer = timeDiscretizer;
+	@Override
+	public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, Person person, Vehicle vehicle) {
+		return getTree(fromNode, startTime).calcLeastCostPath(fromNode, toNode, timeDiscretizer.discretize(startTime),
+				person, vehicle);
+	}
 
-        treeCache = new Map[timeDiscretizer.getIntervalCount()];
-        for (int i = 0; i < treeCache.length; i++) {
-            treeCache[i] = Maps.newHashMap();
-        }
-    }
+	public DijkstraTree getTree(Node fromNode, double startTime) {
+		Map<Id<Node>, DijkstraTree> treeCacheSlice = treeCache[timeDiscretizer.getIdx(startTime)];
+		DijkstraTree tree = treeCacheSlice.get(fromNode.getId());
 
+		if (tree == null) {
+			cacheStats.incMisses();
+			tree = new DijkstraTree(network, costFunction, timeFunction);
+			tree.calcLeastCostPathTree(fromNode, timeDiscretizer.discretize(startTime));
+			treeCacheSlice.put(fromNode.getId(), tree);
+		} else {
+			cacheStats.incHits();
+		}
 
-    @Override
-    public Path calcLeastCostPath(Node fromNode, Node toNode, double startTime, Person person,
-            Vehicle vehicle)
-    {
-        return getTree(fromNode, startTime).calcLeastCostPath(fromNode, toNode,
-                timeDiscretizer.discretize(startTime), person, vehicle);
-    }
+		return tree;
+	}
 
-
-    public DijkstraTree getTree(Node fromNode, double startTime)
-    {
-        Map<Id<Node>, DijkstraTree> treeCacheSlice = treeCache[timeDiscretizer.getIdx(startTime)];
-        DijkstraTree tree = treeCacheSlice.get(fromNode.getId());
-
-        if (tree == null) {
-            cacheStats.incMisses();
-            tree = new DijkstraTree(network, costFunction, timeFunction);
-            tree.calcLeastCostPathTree(fromNode, timeDiscretizer.discretize(startTime));
-            treeCacheSlice.put(fromNode.getId(), tree);
-        }
-        else {
-            cacheStats.incHits();
-        }
-
-        return tree;
-    }
-
-
-    @Override
-    public CacheStats getCacheStats()
-    {
-        return cacheStats;
-    }
+	@Override
+	public CacheStats getCacheStats() {
+		return cacheStats;
+	}
 }

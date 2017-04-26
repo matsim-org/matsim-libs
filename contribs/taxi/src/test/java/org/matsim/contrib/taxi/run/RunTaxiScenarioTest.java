@@ -21,13 +21,10 @@ package org.matsim.contrib.taxi.run;
 
 import org.junit.Test;
 
-
-public class RunTaxiScenarioTest
-{
-    @Test
-    public void testRunOneTaxi()
-    {
-        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
-        RunTaxiScenario.run(configFile, false);
-    }
+public class RunTaxiScenarioTest {
+	@Test
+	public void testRunOneTaxi() {
+		String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+		RunTaxiScenario.run(configFile, false);
+	}
 }

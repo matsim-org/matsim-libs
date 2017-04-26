@@ -76,7 +76,7 @@ public class CompareCongestionEvents  {
 		new CompareCongestionEvents().compareTwoImplForSameRun();
 	}
 
-	List<String> wronglyChargedEventsList ;
+	private List<String> wronglyChargedEventsList ;
 	
 	private void compareTwoImplForSameRun(){
 

@@ -14,7 +14,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -113,12 +113,12 @@ public class DeriveSmallScenarioFromBigOne {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 
 		final Population plans = (Population) scenario.getPopulation();
-		StreamingUtils.setIsStreaming(plans, true);
+		StreamingDeprecated.setIsStreaming(plans, true);
 		final MatsimReader plansReader = new PopulationReader(scenario);
-		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, network);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		plansWriter.startStreaming(xy2linksOut);//config.plans().getOutputFile());
-		StreamingUtils.addAlgorithm(plans, new org.matsim.core.population.algorithms.XY2Links(network, null));
-		StreamingUtils.addAlgorithm(plans, plansWriter);
+		StreamingDeprecated.addAlgorithm(plans, new org.matsim.core.population.algorithms.XY2Links(network, null));
+		StreamingDeprecated.addAlgorithm(plans, plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
 		PopulationUtils.printPlansCount(plans) ;
 		plansWriter.closeStreaming();

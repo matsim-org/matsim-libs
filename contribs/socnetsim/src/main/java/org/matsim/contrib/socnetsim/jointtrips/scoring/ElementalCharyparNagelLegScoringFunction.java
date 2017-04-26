@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 
@@ -125,21 +125,21 @@ public class ElementalCharyparNagelLegScoringFunction implements LegScoring, Sco
 			this.marginalUtilityOfDistance_m = marginalUtilityOfDistance_m;
 		}
 
-		public static LegScoringParameters createForCar(final CharyparNagelScoringParameters params) {
+		public static LegScoringParameters createForCar(final ScoringParameters params) {
 			return new LegScoringParameters(
 					params.modeParams.get(TransportMode.car).constant,
 					params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s,
 					params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m);
 		}
 
-		public static LegScoringParameters createForPt(final CharyparNagelScoringParameters params) {
+		public static LegScoringParameters createForPt(final ScoringParameters params) {
 			return new LegScoringParameters(
 					params.modeParams.get(TransportMode.pt).constant,
 					params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s,
 					params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m);
 		}
 
-		public static LegScoringParameters createForBike(final CharyparNagelScoringParameters params) {
+		public static LegScoringParameters createForBike(final ScoringParameters params) {
 			return new LegScoringParameters(
 					params.modeParams.get(TransportMode.bike).constant,
 					params.modeParams.get(TransportMode.bike).marginalUtilityOfTraveling_s,
@@ -147,7 +147,7 @@ public class ElementalCharyparNagelLegScoringFunction implements LegScoring, Sco
 					0 );
 		}
 
-		public static LegScoringParameters createForWalk(final CharyparNagelScoringParameters params) {
+		public static LegScoringParameters createForWalk(final ScoringParameters params) {
 			return new LegScoringParameters(
 					params.modeParams.get(TransportMode.walk).constant,
 					params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s,

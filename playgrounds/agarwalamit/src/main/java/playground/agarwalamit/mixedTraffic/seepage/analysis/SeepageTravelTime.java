@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.seepage.analysis;
 
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.mixedTraffic.seepage.TestSetUp.SeepageControler;
 
 /**

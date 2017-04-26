@@ -70,7 +70,7 @@ public class TestTravelTimesAndDistances {
         Double[] transit_walk = results.get("transit_walk");
 
 		// TripProcessing.analyzeTrips - Time tests
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode time sum not as expected.", 442532, car[0], 0);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode time sum not as expected.", 442452, car[0], 0);
 		Assert.assertEquals("Test: TripProcessing.analyzeTrips - pt mode time sum not as expected.", 1540528, pt[0], 0);
 		Assert.assertEquals("Test: TripProcessing.analyzeTrips - transit_walk mode time sum not as expected.", 1236305, transit_walk[0], 0);
 		// TripProcessing.analyzeTrips - Distance tests

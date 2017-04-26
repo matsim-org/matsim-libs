@@ -19,58 +19,46 @@
 
 package playground.michalm.util;
 
-public class Interpolation
-{
-    public interface Interpolator
-    {
-        double interpolate(double time);
-    }
+public class Interpolation {
+	public interface Interpolator {
+		double interpolate(double time);
+	}
 
+	public static double interpolate(double[] vals, int timeInterval, double time) {
+		int idx0 = (int)time / timeInterval;
+		int idx1 = idx0 + 1;
 
-    public static double interpolate(double[] vals, int timeInterval, double time)
-    {
-        int idx0 = (int)time / timeInterval;
-        int idx1 = idx0 + 1;
+		double weight1 = time % timeInterval;
+		double weight0 = timeInterval - weight1;
 
-        double weight1 = time % timeInterval;
-        double weight0 = timeInterval - weight1;
+		double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];
+		return weightedSum / timeInterval;
+	}
 
-        double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];
-        return weightedSum / timeInterval;
-    }
+	public static double interpolate(int[] vals, int timeInterval, double time) {
+		int idx0 = (int)time / timeInterval;
+		int idx1 = idx0 + 1;
 
+		double weight1 = time % timeInterval;
+		double weight0 = timeInterval - weight1;
 
-    public static double interpolate(int[] vals, int timeInterval, double time)
-    {
-        int idx0 = (int)time / timeInterval;
-        int idx1 = idx0 + 1;
+		double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];// int -> double
+		return weightedSum / timeInterval;
+	}
 
-        double weight1 = time % timeInterval;
-        double weight0 = timeInterval - weight1;
+	public static Interpolator createInterpolator(final int[] values, final int timeInterval) {
+		return new Interpolator() {
+			public double interpolate(double time) {
+				return Interpolation.interpolate(values, timeInterval, time);
+			}
+		};
+	}
 
-        double weightedSum = weight0 * vals[idx0] + weight1 * vals[idx1];// int -> double
-        return weightedSum / timeInterval;
-    }
-
-
-    public static Interpolator createInterpolator(final int[] values, final int timeInterval)
-    {
-        return new Interpolator() {
-            public double interpolate(double time)
-            {
-                return Interpolation.interpolate(values, timeInterval, time);
-            }
-        };
-    }
-
-
-    public static Interpolator createInterpolator(final double[] values, final int timeInterval)
-    {
-        return new Interpolator() {
-            public double interpolate(double time)
-            {
-                return Interpolation.interpolate(values, timeInterval, time);
-            }
-        };
-    }
+	public static Interpolator createInterpolator(final double[] values, final int timeInterval) {
+		return new Interpolator() {
+			public double interpolate(double time) {
+				return Interpolation.interpolate(values, timeInterval, time);
+			}
+		};
+	}
 }

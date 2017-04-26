@@ -229,6 +229,8 @@ public abstract class Gbl {
 			+ "needs to sort out if it wants that, or if it just wants to replan the current leg.  kai, feb'16" ;
 
 	public static final String WRONG_IMPLEMENTATION = "wrong implementation of interface; " ;
+	
+	public static final String COPY_PASTE_FROM_CORE_NO_LONGER_WORKING="Another solution for this has been found in the core, and thus this copy-and-paste from the core is no longer working." ;
 
 
 	

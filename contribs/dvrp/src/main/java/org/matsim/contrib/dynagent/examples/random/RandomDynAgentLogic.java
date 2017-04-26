@@ -27,57 +27,43 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import com.google.common.collect.Iterators;
 
+public class RandomDynAgentLogic implements DynAgentLogic {
+	private final Network network;
 
-public class RandomDynAgentLogic
-    implements DynAgentLogic
-{
-    private final Network network;
+	private DynAgent agent;
 
-    private DynAgent agent;
+	public RandomDynAgentLogic(Network network) {
+		this.network = network;
+	}
 
+	@Override
+	public DynActivity computeInitialActivity(DynAgent agent) {
+		this.agent = agent;
+		return new RandomDynActivity(0);
+	}
 
-    public RandomDynAgentLogic(Network network)
-    {
-        this.network = network;
-    }
+	@Override
+	public DynAgent getDynAgent() {
+		return agent;
+	}
 
+	@Override
+	public DynAction computeNextAction(DynAction oldAction, double now) {
+		// I am tired, I want to stop being simulated (1% chance)
+		if (MatsimRandom.getRandom().nextInt(100) == 0) {
+			return new StaticDynActivity("Infinite laziness :-)", Double.POSITIVE_INFINITY);
+		}
 
-    @Override
-    public DynActivity computeInitialActivity(DynAgent agent)
-    {
-        this.agent = agent;
-        return new RandomDynActivity(0);
-    }
+		// Do I want to stay or drive? (50-50 choice)
+		if (MatsimRandom.getRandom().nextBoolean()) {
+			return new RandomDynActivity(now);
+		} else {
+			return new RandomDynLeg(agent.getCurrentLinkId(), network);
+		}
+	}
 
-
-    @Override
-    public DynAgent getDynAgent()
-    {
-        return agent;
-    }
-
-
-    @Override
-    public DynAction computeNextAction(DynAction oldAction, double now)
-    {
-        //I am tired, I want to stop being simulated (1% chance)
-        if (MatsimRandom.getRandom().nextInt(100) == 0) {
-            return new StaticDynActivity("Infinite laziness :-)", Double.POSITIVE_INFINITY);
-        }
-
-        //Do I want to stay or drive? (50-50 choice)
-        if (MatsimRandom.getRandom().nextBoolean()) {
-            return new RandomDynActivity(now);
-        }
-        else {
-            return new RandomDynLeg(agent.getCurrentLinkId(), network);
-        }
-    }
-
-
-    static <E> E chooseRandomElement(Set<E> set)
-    {
-        int randomIndex = MatsimRandom.getRandom().nextInt(set.size());
-        return Iterators.get(set.iterator(), randomIndex);
-    }
+	static <E> E chooseRandomElement(Set<E> set) {
+		int randomIndex = MatsimRandom.getRandom().nextInt(set.size());
+		return Iterators.get(set.iterator(), randomIndex);
+	}
 }

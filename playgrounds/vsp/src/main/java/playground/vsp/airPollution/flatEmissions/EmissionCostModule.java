@@ -20,10 +20,11 @@
 package playground.vsp.airPollution.flatEmissions;
 
 import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 
 
 /**
@@ -35,32 +36,19 @@ public class EmissionCostModule {
 	
 	private final double emissionCostFactor;
 	private boolean considerCO2Costs = false;
-	
-	/*Values taken from IMPACT (Maibach et al.(2008))*/
-	// following is not required any more, using EmissionCostFactors instead, amit Nov 16.
-//	private final double EURO_PER_GRAMM_NOX = 9600. / (1000. * 1000.);
-//	private final double EURO_PER_GRAMM_NMVOC = 1700. / (1000. * 1000.);
-//	private final double EURO_PER_GRAMM_SO2 = 11000. / (1000. * 1000.);
-//	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
-//	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 
+	@Inject
+	public EmissionCostModule( EmissionsConfigGroup emissionsConfigGroup ) {
+		this.emissionCostFactor = emissionsConfigGroup.getEmissionCostMultiplicationFactor();
+		this.considerCO2Costs = emissionsConfigGroup.isConsideringCO2Costs();
 
-	public EmissionCostModule(double emissionCostFactor, boolean considerCO2Costs) {
-		this.emissionCostFactor = emissionCostFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		
 		if(considerCO2Costs){
-			this.considerCO2Costs = true;
 			logger.info("CO2 emission costs will be calculated... ");
 		} else {
 			logger.info("CO2 emission costs will NOT be calculated... ");
 		}
-	}
-	
-	public EmissionCostModule(double emissionCostFactor) {
-		this.emissionCostFactor = emissionCostFactor;
-		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
-		logger.info("CO2 emission costs will NOT be calculated... ");
 	}
 
 	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions) {
@@ -86,5 +74,4 @@ public class EmissionCostModule {
 		}
 		return this.emissionCostFactor * coldEmissionCosts;
 	}
-
 }

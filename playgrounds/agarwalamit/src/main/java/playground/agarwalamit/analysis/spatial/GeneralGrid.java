@@ -300,7 +300,7 @@ public class GeneralGrid{
 	 *
 	 * @author jwjoubert
 	 */
-	public static enum GridType{
+	public enum GridType{
 		SQUARE, 
 		HEX,
 		UNKNOWN

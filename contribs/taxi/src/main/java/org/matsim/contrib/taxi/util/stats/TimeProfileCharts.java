@@ -28,91 +28,80 @@ import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.*;
 
+public class TimeProfileCharts {
+	public interface Customizer {
+		void customize(JFreeChart chart, ChartType chartType);
+	}
 
-public class TimeProfileCharts
-{
-    public interface Customizer
-    {
-        void customize(JFreeChart chart, ChartType chartType);
-    }
+	public enum ChartType {
+		Line, StackedArea;
+	}
 
+	public static JFreeChart chartProfile(String[] series, List<Double> times, List<Object[]> timeProfile,
+			ChartType type) {
+		DefaultTableXYDataset dataset = createXYDataset(series, times, timeProfile);
+		JFreeChart chart;
+		switch (type) {
+			case Line:
+				chart = ChartFactory.createXYLineChart("TimeProfile", "Time [h]", "Values", dataset,
+						PlotOrientation.VERTICAL, true, false, false);
+				break;
 
-    public enum ChartType
-    {
-        Line, StackedArea;
-    }
+			case StackedArea:
+				chart = ChartFactory.createStackedXYAreaChart("TimeProfile", "Time [h]", "Values", dataset,
+						PlotOrientation.VERTICAL, true, false, false);
+				break;
 
+			default:
+				throw new IllegalArgumentException();
+		}
 
-    public static JFreeChart chartProfile(String[] series, List<Double> times,
-            List<String[]> timeProfile, ChartType type)
-    {
-        DefaultTableXYDataset dataset = createXYDataset(series, times, timeProfile);
-        JFreeChart chart;
-        switch (type) {
-            case Line:
-                chart = ChartFactory.createXYLineChart("TimeProfile", "Time [h]", "Values", dataset,
-                        PlotOrientation.VERTICAL, true, false, false);
-                break;
+		XYPlot plot = chart.getXYPlot();
+		plot.setRangeGridlinesVisible(false);
+		plot.setDomainGridlinesVisible(false);
+		plot.setBackgroundPaint(Color.white);
 
-            case StackedArea:
-                chart = ChartFactory.createStackedXYAreaChart("TimeProfile", "Time [h]", "Values",
-                        dataset, PlotOrientation.VERTICAL, true, false, false);
-                break;
+		NumberAxis xAxis = (NumberAxis)plot.getDomainAxis();
+		xAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
 
-            default:
-                throw new IllegalArgumentException();
-        }
+		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+		yAxis.setAutoRange(true);
 
-        XYPlot plot = chart.getXYPlot();
-        plot.setRangeGridlinesVisible(false);
-        plot.setDomainGridlinesVisible(false);
-        plot.setBackgroundPaint(Color.white);
+		XYItemRenderer renderer = plot.getRenderer();
+		for (int s = 0; s < series.length; s++) {
+			renderer.setSeriesStroke(s, new BasicStroke(2));
+		}
 
-        NumberAxis xAxis = (NumberAxis)plot.getDomainAxis();
-        xAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+		return chart;
+	}
 
-        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
-        yAxis.setAutoRange(true);
+	public static DefaultTableXYDataset createXYDataset(String[] series, List<Double> times,
+			List<Object[]> timeProfile) {
+		DefaultTableXYDataset dataset = new DefaultTableXYDataset();
+		XYSeries[] seriesArray = new XYSeries[series.length];
+		for (int s = 0; s < series.length; s++) {
+			seriesArray[s] = new XYSeries(series[s], false, false);
+		}
 
-        XYItemRenderer renderer = plot.getRenderer();
-        for (int s = 0; s < series.length; s++) {
-            renderer.setSeriesStroke(s, new BasicStroke(2));
-        }
+		for (int t = 0; t < timeProfile.size(); t++) {
+			Object[] timePoint = timeProfile.get(t);
+			double hour = times.get(t) / 3600;
+			for (int s = 0; s < series.length; s++) {
+				seriesArray[s].add(hour, Double.parseDouble(timePoint[s] + ""));
+			}
+		}
 
-        return chart;
-    }
+		for (int s = 0; s < series.length; s++) {
+			dataset.addSeries(seriesArray[s]);
+		}
 
+		return dataset;
+	}
 
-    public static DefaultTableXYDataset createXYDataset(String[] series, List<Double> times,
-            List<String[]> timeProfile)
-    {
-        DefaultTableXYDataset dataset = new DefaultTableXYDataset();
-        XYSeries[] seriesArray = new XYSeries[series.length];
-        for (int s = 0; s < series.length; s++) {
-            seriesArray[s] = new XYSeries(series[s], false, false);
-        }
-
-        for (int t = 0; t < timeProfile.size(); t++) {
-            String[] timePoint = timeProfile.get(t);
-            double hour = times.get(t) / 3600;
-            for (int s = 0; s < series.length; s++) {
-                seriesArray[s].add(hour, Double.parseDouble(timePoint[s]));
-            }
-        }
-
-        for (int s = 0; s < series.length; s++) {
-            dataset.addSeries(seriesArray[s]);
-        }
-
-        return dataset;
-    }
-
-
-    public static void changeSeriesColors(JFreeChart chart, Paint... paints)
-    {
-        XYItemRenderer renderer = chart.getXYPlot().getRenderer();
-        for (int i = 0; i < paints.length; i++) {
-            renderer.setSeriesPaint(i, paints[i]);
-        }
-    }
+	public static void changeSeriesColors(JFreeChart chart, Paint... paints) {
+		XYItemRenderer renderer = chart.getXYPlot().getRenderer();
+		for (int i = 0; i < paints.length; i++) {
+			renderer.setSeriesPaint(i, paints[i]);
+		}
+	}
 }

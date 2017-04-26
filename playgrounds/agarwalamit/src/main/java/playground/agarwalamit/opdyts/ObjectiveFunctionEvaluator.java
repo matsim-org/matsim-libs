@@ -29,6 +29,7 @@ import org.matsim.contrib.analysis.kai.Databins;
  */
 
 
+@SuppressWarnings("DefaultFileTemplate")
 public class ObjectiveFunctionEvaluator {
 
     private static final Logger LOG = Logger.getLogger(ObjectiveFunctionEvaluator.class);
@@ -43,7 +44,7 @@ public class ObjectiveFunctionEvaluator {
         this(ObjectiveFunctionType.SUM_SQR_DIFF_NORMALIZED);
     }
 
-    public ObjectiveFunctionEvaluator(ObjectiveFunctionType objectiveFunctionType) {
+    public ObjectiveFunctionEvaluator(final ObjectiveFunctionType objectiveFunctionType) {
         this.objectiveFunctionType = objectiveFunctionType;
     }
 
@@ -51,11 +52,11 @@ public class ObjectiveFunctionEvaluator {
         // databins to maps.
 
         Map<String, double [] > realCountMap = realCounts.entrySet().stream().collect(
-                Collectors.toMap(e -> e.getKey(), e -> e.getValue())
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
         );
 
         Map<String, double [] > simCountMap = simCounts.entrySet().stream().collect(
-                Collectors.toMap(e -> e.getKey(), e -> e.getValue())
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
         );
 
         return getObjectiveFunctionValue(realCountMap, simCountMap);
@@ -72,10 +73,10 @@ public class ObjectiveFunctionEvaluator {
             double[] simValue = simCounts.get(mode);
 
             for ( int ii=0 ; ii < realValue.length ; ii++ ) {
-                double diff = 0;
+                double diff ;
 
-                if(realValue==null) diff = simValue[ii];
-                else if (simValue == null) diff = realValue[ii];
+                // realValue cant be null here.
+                if (simValue == null) diff = realValue[ii];
                 else if(realValue.length != simValue.length) {
                     throw new RuntimeException("The length of the real ("+realValue.length+") and sim value ("+simValue.length+ ") arrays for the mode "+mode+" are not same " +
                             "i.e. one of the distance class is missing. The simulation is aborting, because not sure, which bin is missing.");
@@ -88,7 +89,7 @@ public class ObjectiveFunctionEvaluator {
                         break;
                     case SUM_SQR_DIFF_NORMALIZED:
                         objective += diff * diff;
-                        realValueSum += simValue[ii];
+                        realValueSum += realValue[ii];
                         break;
                     default:
                         throw new RuntimeException("not implemented yet.");
@@ -107,7 +108,7 @@ public class ObjectiveFunctionEvaluator {
                 throw new RuntimeException("not implemented yet.");
         }
 
-//        LOG.warn( "objective=" + objective );
+        LOG.warn( "objective=" + objective );
         return objective;
     }
 }

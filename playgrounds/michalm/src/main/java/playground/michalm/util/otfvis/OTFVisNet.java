@@ -23,27 +23,21 @@ import java.util.Arrays;
 
 import org.matsim.contrib.otfvis.OTFVis;
 
+public class OTFVisNet {
+	public static void main(String[] args) {
+		String dir;
+		String netFile;
 
-public class OTFVisNet
-{
-    public static void main(String[] args)
-    {
-        String dir;
-        String netFile;
+		if (args.length == 1 && args[0].equals("test")) {// for testing
+			dir = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
+			netFile = "network.xml";
+		} else if (args.length == 2) {
+			dir = args[0];
+			netFile = args[1];
+		} else {
+			throw new IllegalArgumentException("Incorrect program arguments: " + Arrays.toString(args));
+		}
 
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            dir = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
-            netFile = "network.xml";
-        }
-        else if (args.length == 2) {
-            dir = args[0];
-            netFile = args[1];
-        }
-        else {
-            throw new IllegalArgumentException(
-                    "Incorrect program arguments: " + Arrays.toString(args));
-        }
-
-        OTFVis.playNetwork(dir + netFile);
-    }
+		OTFVis.playNetwork(dir + netFile);
+	}
 }

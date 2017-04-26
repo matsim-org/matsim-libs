@@ -25,44 +25,35 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
+/**
+ * @author michalm
+ */
+public class OneTaxiRequest extends RequestImpl implements PassengerRequest {
+	private final MobsimPassengerAgent passenger;
+	private final Link fromLink;
+	private final Link toLink;
 
-public class OneTaxiRequest
-    extends RequestImpl
-    implements PassengerRequest
-{
-    private final MobsimPassengerAgent passenger;
-    private final Link fromLink;
-    private final Link toLink;
+	public OneTaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+			double submissionTime) {
+		// I want a taxi now, i.e. earliestStartTime == latestStartTime == submissionTime
+		super(id, 1, submissionTime, submissionTime, submissionTime);
+		this.passenger = passenger;
+		this.fromLink = fromLink;
+		this.toLink = toLink;
+	}
 
+	@Override
+	public Link getFromLink() {
+		return fromLink;
+	}
 
-    public OneTaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink,
-            Link toLink, double time)
-    {
-        //I want a taxi now, i.e. t0 == t1 == submissionTime
-        super(id, 1, time, time, time);
-        this.passenger = passenger;
-        this.fromLink = fromLink;
-        this.toLink = toLink;
-    }
+	@Override
+	public Link getToLink() {
+		return toLink;
+	}
 
-
-    @Override
-    public Link getFromLink()
-    {
-        return fromLink;
-    }
-
-
-    @Override
-    public Link getToLink()
-    {
-        return toLink;
-    }
-
-
-    @Override
-    public MobsimPassengerAgent getPassenger()
-    {
-        return passenger;
-    }
+	@Override
+	public MobsimPassengerAgent getPassenger() {
+		return passenger;
+	}
 }

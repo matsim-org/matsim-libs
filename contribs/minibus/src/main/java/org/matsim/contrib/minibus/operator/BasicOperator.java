@@ -45,7 +45,7 @@ public final class BasicOperator extends AbstractOperator{
 		
 		if(this.testPlan != null){
 			// compare scores
-			if (this.score > this.scoreLastIteration){
+			if (this.getScore() > this.getScoreLastIteration()){
 				// testPlan improves the plan, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
 				// changed to get a more useful output in the pOperatorLogger /dr
 				this.testPlan.setNVehicles(this.testPlan.getNVehicles() + this.bestPlan.getNVehicles());

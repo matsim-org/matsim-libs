@@ -97,7 +97,7 @@ public class BackwardCompatibilityForOldPlansType {
 	 * All main mode had "Generic" route type which is converted to "links" route (nov'15).
 	 * Consequently, old plans file can not be used with the current head. Routes needs to be converted first.
 	 */
-	public void extractPlansIncludingLegRoutes(){
+	private void extractPlansIncludingLegRoutes(){
 		Scenario scIn = LoadMyScenarios.loadScenarioFromPlans(inputPlans);
 		Population popOut = scOut.getPopulation();
 		for (Person p : scIn.getPopulation().getPersons().values()) {
@@ -117,7 +117,7 @@ public class BackwardCompatibilityForOldPlansType {
 							List<Id<Link>> linkIds = convertRouteDescriptionToListOfLinkIds(routeLinks);
 							NetworkRoute nr = popOut.getFactory().getRouteFactories().createRoute(NetworkRoute.class, r.getStartLinkId(), r.getEndLinkId());
 							//exclude first and last lnik from linkIds
-							if( linkIds.size() == 0) {
+							if(linkIds.isEmpty()) {
 							} else if(linkIds.size()==1) {
 								linkIds.remove(0);
 							} else {

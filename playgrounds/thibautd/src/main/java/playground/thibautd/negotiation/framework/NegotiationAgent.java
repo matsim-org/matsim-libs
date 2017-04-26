@@ -37,8 +37,11 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 	private final AlternativesGenerator<P> alternativesGenerator;
 	private final NegotiatingAgents<P> negotiatingAgents;
 
-	private double currentBestUtil;
+	private double currentBestUtil = Double.NEGATIVE_INFINITY;
 	private P currentBestProp = null;
+
+	private double currentBestUtilAlone = Double.NEGATIVE_INFINITY;
+	private P currentBestPropAlone;
 
 	NegotiationAgent( final Id<Person> id,
 			final NegotiatingAgents<P> negotiatingAgents,
@@ -49,6 +52,8 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 		// ie cost of being alone
 		// find a way to do without nulls
 		this.currentBestUtil = utility.utility( this , null );
+		this.currentBestUtilAlone = utility.utility( this , null );
+
 		this.alternativesGenerator = negotiatingAgents.getAlternativesGenerator();
 		this.negotiatingAgents = negotiatingAgents;
 	}
@@ -58,8 +63,21 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 	}
 
 	private void notifyAccepted( P proposition ) {
+		if ( currentBestProp != null ) {
+			currentBestProp.getGroup().stream()
+					.map( Person::getId )
+					.map( negotiatingAgents::get )
+					.forEach( a -> a.notifyBreakAgreement( currentBestProp ) );
+		}
 		this.currentBestUtil = utility.utility( this , proposition );
 		this.currentBestProp = proposition;
+	}
+
+	private void notifyBreakAgreement( P proposition ) {
+		if ( currentBestProp == proposition ) {
+			currentBestProp = currentBestPropAlone;
+			currentBestUtil = currentBestUtilAlone;
+		}
 	}
 
 	public boolean planActivity() {
@@ -77,6 +95,12 @@ public class NegotiationAgent<P extends Proposition> implements Identifiable<Per
 			stopwatch.startMeasurement( StopWatchMeasurement.utility );
 			final double u = utility.utility( this , proposition );
 			stopwatch.endMeasurement( StopWatchMeasurement.utility );
+
+			if ( proposition.getProposed().isEmpty() && u > currentBestUtilAlone ) {
+				currentBestPropAlone = proposition;
+				currentBestUtilAlone = u;
+			}
+
 			if ( u < currentBestUtil ) continue;
 
 			stopwatch.startMeasurement( StopWatchMeasurement.askAcceptance );

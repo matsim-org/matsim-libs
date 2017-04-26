@@ -41,7 +41,7 @@ import java.util.*;
  * @author ychen
  * @author mrieser
  */
-public class SubsequentLinksAnalyzer {
+public final class SubsequentLinksAnalyzer {
 
 	private final Network network;
 

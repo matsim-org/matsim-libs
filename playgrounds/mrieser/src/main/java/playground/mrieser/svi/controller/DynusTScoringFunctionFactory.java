@@ -24,7 +24,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.deprecated.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import playground.mrieser.svi.data.ActivityToZoneMapping;
 import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
@@ -37,9 +37,9 @@ public class DynusTScoringFunctionFactory implements ScoringFunctionFactory {
 	private final DynusTConfig dc;
 	private final DynamicTravelTimeMatrix ttMatrix;
 	private final ActivityToZoneMapping act2zones;
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	
-	public DynusTScoringFunctionFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final ActivityToZoneMapping act2zones, final CharyparNagelScoringParameters params) {
+	public DynusTScoringFunctionFactory(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final ActivityToZoneMapping act2zones, final ScoringParameters params) {
 		this.dc = dc;
 		this.ttMatrix = ttMatrix;
 		this.act2zones = act2zones;

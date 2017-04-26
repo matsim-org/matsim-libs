@@ -15,14 +15,14 @@ public class VehicleTypeChoice implements ChooseVehicleType {
 
 		
 		int index = plan.getPlanElements().indexOf(currentLeg);
-		
+		//check if the activity brings a penalty if not a transporter is sued
 		Activity a = (Activity) plan.getPlanElements().get(index + 1);
 		
 		String type = a.getType();
 		
-		Random random = MatsimRandom.getRandom();
 		if (type.startsWith("secondary") && currentLeg.getMode().equals("freefloating")) {
-			if (random.nextDouble() < 0.1)
+			
+			if (((Boolean)plan.getPerson().getAttributes().getAttribute("bulky")))
 				return "transporter";
 			else
 				return "car";

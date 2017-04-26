@@ -87,20 +87,14 @@ public class ModalShareFromPlans implements ModalShare{
 			for(Person person : pop.getPersons().values()){
 				if (this.userGroup != null && this.pf != null // => if using filtering  
 					&& ! this.userGroup.equals(this.pf.getUserGroupAsStringFromPersonId(person.getId())) // => and person not from desired user group 
-					) continue; 
-				
-				Plan plan = person.getSelectedPlan();
-				List<PlanElement> planElements = plan.getPlanElements();
-				for(PlanElement pe : planElements){
-					if(pe instanceof Leg){
-						Leg leg = (Leg) pe;
-						String legMode = leg.getMode();
-						if(legMode.equals(mode)){
-							noOfLegs ++;
-						}
+					) continue;
 
-					}
-				}
+				noOfLegs += person.getSelectedPlan().getPlanElements().stream()
+								  .filter(pe -> pe instanceof Leg)
+								  .map(pe -> (Leg) pe)
+								  .map(Leg::getMode)
+								  .filter(legMode -> legMode.equals(mode))
+								  .count();
 			}
 			this.mode2numberOflegs.put(mode, noOfLegs);
 		}

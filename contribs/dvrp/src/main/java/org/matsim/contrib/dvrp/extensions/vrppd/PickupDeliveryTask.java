@@ -23,21 +23,14 @@ import java.util.List;
 
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
+public interface PickupDeliveryTask extends StayTask {
+	boolean isPickup();
 
-public interface PickupDeliveryTask
-    extends StayTask
-{
-    boolean isPickup();
+	List<PickupDeliveryRequest> getRequests();
 
+	void addRequest(PickupDeliveryRequest request);
 
-    List<PickupDeliveryRequest> getRequests();
+	void removeRequest(PickupDeliveryRequest request);
 
-
-    void addRequest(PickupDeliveryRequest request);
-
-
-    void removeRequest(PickupDeliveryRequest request);
-
-
-    void removeAllRequests();
+	void removeAllRequests();
 }

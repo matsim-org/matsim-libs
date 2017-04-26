@@ -26,102 +26,84 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
+/**
+ * @author michalm
+ */
+public class VehicleData {
+	public static class Entry extends LinkTimePair {
+		public final int idx;
+		public final Vehicle vehicle;
+		public final boolean idle;
 
-public class VehicleData
-{
-    public static class Entry
-        extends LinkTimePair
-    {
-        public final int idx;
-        public final Vehicle vehicle;
-        public final boolean idle;
+		public Entry(int idx, Vehicle vehicle, Link link, double time, boolean idle) {
+			super(link, time);
+			this.idx = idx;
+			this.vehicle = vehicle;
+			this.idle = idle;
+		}
+	}
 
+	// max 48 hours of departure delay (== not a real constraint)
+	private static final double NO_PLANNING_HORIZON = 2 * 24 * 3600;
 
-        public Entry(int idx, Vehicle vehicle, Link link, double time, boolean idle)
-        {
-            super(link, time);
-            this.idx = idx;
-            this.vehicle = vehicle;
-            this.idle = idle;
-        }
-    }
+	private final List<Entry> entries = new ArrayList<>();
+	private final int idleCount;
 
+	public VehicleData(Iterable<Entry> vehEntries) {
+		int idx = 0;
+		int idleCounter = 0;
+		for (Entry e : vehEntries) {
+			entries.add(new Entry(idx++, e.vehicle, e.link, e.time, e.idle));
+			if (e.idle) {
+				idleCounter++;
+			}
+		}
 
-    //max 48 hours of departure delay (== not a real constraint)
-    private static final double NO_PLANNING_HORIZON = 2 * 24 * 3600;
+		idleCount = idleCounter;
+	}
 
-    private final List<Entry> entries = new ArrayList<>();
-    private final int idleCount;
+	public VehicleData(TaxiOptimizerContext optimContext, Iterable<? extends Vehicle> vehicles) {
+		this(optimContext, vehicles, NO_PLANNING_HORIZON);
+	}
 
+	// skipping vehicles with departure.time > curr_time + maxDepartureDelay
+	public VehicleData(TaxiOptimizerContext optimContext, Iterable<? extends Vehicle> vehicles,
+			double planningHorizon) {
+		double currTime = optimContext.timer.getTimeOfDay();
+		double maxDepartureTime = currTime + planningHorizon;
+		TaxiScheduleInquiry scheduleInquiry = optimContext.scheduler;
 
-    public VehicleData(Iterable<Entry> vehEntries)
-    {
-        int idx = 0;
-        int idleCounter = 0;
-        for (Entry e : vehEntries) {
-            entries.add(new Entry(idx++, e.vehicle, e.link, e.time, e.idle));
-            if (e.idle) {
-                idleCounter++;
-            }
-        }
+		int idx = 0;
+		int idleCounter = 0;
+		for (Vehicle v : vehicles) {
+			LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
 
-        idleCount = idleCounter;
-    }
+			if (departure != null && departure.time <= maxDepartureTime) {
+				boolean idle = departure.time == currTime // to avoid unnecessary calls to Scheduler.isIdle()
+						&& scheduleInquiry.isIdle(v);
+				entries.add(new Entry(idx++, v, departure.link, departure.time, idle));
+				if (idle) {
+					idleCounter++;
+				}
+			}
+		}
 
+		idleCount = idleCounter;
+	}
 
-    public VehicleData(TaxiOptimizerContext optimContext, Iterable<Vehicle> vehicles)
-    {
-        this(optimContext, vehicles, NO_PLANNING_HORIZON);
-    }
+	public int getSize() {
+		return entries.size();
+	}
 
+	public Entry getEntry(int idx) {
+		return entries.get(idx);
+	}
 
-    //skipping vehicles with departure.time > curr_time + maxDepartureDelay
-    public VehicleData(TaxiOptimizerContext optimContext, Iterable<Vehicle> vehicles,
-            double planningHorizon)
-    {
-        double currTime = optimContext.timer.getTimeOfDay();
-        double maxDepartureTime = currTime + planningHorizon;
-        TaxiScheduleInquiry scheduleInquiry = optimContext.scheduler;
+	public List<Entry> getEntries() {
+		return entries;
+	}
 
-        int idx = 0;
-        int idleCounter = 0;
-        for (Vehicle v : vehicles) {
-            LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
-
-            if (departure != null && departure.time <= maxDepartureTime) {
-                boolean idle = departure.time == currTime //(small optimization to avoid unnecessary calls to Scheduler.isIdle())
-                        && scheduleInquiry.isIdle(v);
-                entries.add(new Entry(idx++, v, departure.link, departure.time, idle));
-                if (idle) {
-                    idleCounter++;
-                }
-            }
-        }
-
-        idleCount = idleCounter;
-    }
-
-
-    public int getSize()
-    {
-        return entries.size();
-    }
-
-
-    public Entry getEntry(int idx)
-    {
-        return entries.get(idx);
-    }
-
-
-    public List<Entry> getEntries()
-    {
-        return entries;
-    }
-
-
-    public int getIdleCount()
-    {
-        return idleCount;
-    }
+	public int getIdleCount() {
+		return idleCount;
+	}
 }

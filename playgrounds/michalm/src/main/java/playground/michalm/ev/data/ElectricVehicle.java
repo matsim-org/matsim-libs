@@ -24,18 +24,12 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.michalm.ev.discharging.*;
 
+public interface ElectricVehicle extends Identifiable<Vehicle> {
+	DriveEnergyConsumption getDriveEnergyConsumption();
 
-public interface ElectricVehicle
-    extends Identifiable<Vehicle>
-{
-    DriveEnergyConsumption getDriveEnergyConsumption();
+	AuxEnergyConsumption getAuxEnergyConsumption();
 
+	Battery getBattery();
 
-    AuxEnergyConsumption getAuxEnergyConsumption();
-
-
-    Battery getBattery();
-
-
-    Battery swapBattery(Battery battery);
+	Battery swapBattery(Battery battery);
 }

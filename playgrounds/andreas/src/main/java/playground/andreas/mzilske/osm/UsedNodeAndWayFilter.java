@@ -20,6 +20,8 @@ import org.openstreetmap.osmosis.core.store.SingleClassObjectSerializationFactor
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.core.task.v0_6.SinkSource;
 
+import java.util.Map;
+
 
 /**
  * Restricts output of nodes to those that are used in ways.
@@ -188,5 +190,10 @@ public class UsedNodeAndWayFilter implements SinkSource, EntityProcessor {
 	 */
 	public void setSink(Sink sink) {
 		this.sink = sink;
+	}
+
+	@Override
+	public void initialize(Map<String, Object> map) {
+
 	}
 }

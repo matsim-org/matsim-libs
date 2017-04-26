@@ -27,55 +27,47 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
+class AdvanceRequestStorage {
+	private final Map<Id<Person>, Queue<PassengerRequest>> advanceRequests = new HashMap<>();
 
-class AdvanceRequestStorage
-{
-    private final Map<Id<Person>, Queue<PassengerRequest>> advanceRequests = new HashMap<>();
+	public void storeAdvanceRequest(PassengerRequest request) {
+		Id<Person> passengerId = request.getPassenger().getId();
+		Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerId);
 
+		if (passengerAdvReqs == null) {
+			passengerAdvReqs = new PriorityQueue<>(3, Requests.T0_COMPARATOR);
+			advanceRequests.put(passengerId, passengerAdvReqs);
+		}
 
-    public void storeAdvanceRequest(PassengerRequest request)
-    {
-        Id<Person> passengerId = request.getPassenger().getId();
-        Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerId);
+		passengerAdvReqs.add(request);
+	}
 
-        if (passengerAdvReqs == null) {
-            passengerAdvReqs = new PriorityQueue<>(3, Requests.T0_COMPARATOR);
-            advanceRequests.put(passengerId, passengerAdvReqs);
-        }
+	public PassengerRequest retrieveAdvanceRequest(MobsimAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
+			double now) {
+		Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
 
-        passengerAdvReqs.add(request);
-    }
+		if (passengerAdvReqs != null) {
+			PassengerRequest req = passengerAdvReqs.peek();
 
+			if (req != null) {
+				if (req.getFromLink().getId() == fromLinkId //
+						&& req.getToLink().getId() == toLinkId) {
+					// so this is the advance request for this leg
+					//
+					// This conclusion is based only on the from-to pair, we do not check how
+					// req.getT0() and context.getTime() relate to each other
+					//
+					// TODO should we verify if abs(T0-currTime) <= threshold
+					passengerAdvReqs.poll();
+					return req;
+				} else if (now > req.getEarliestStartTime()) {
+					// TODO do we have to somehow handle it?
+					// Currently this is not a problem; we do not have cases of not turning up...
+					throw new IllegalStateException("Seems that the agent has skipped a previously submitted request");
+				}
+			}
+		}
 
-    public PassengerRequest retrieveAdvanceRequest(MobsimAgent passenger, Id<Link> fromLinkId,
-            Id<Link> toLinkId, double now)
-    {
-        Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
-
-        if (passengerAdvReqs != null) {
-            PassengerRequest req = passengerAdvReqs.peek();
-
-            if (req != null) {
-                if (req.getFromLink().getId() == fromLinkId //
-                        && req.getToLink().getId() == toLinkId) {
-                    // so this is the advance request for this leg
-                    //
-                    // This conclusion is based only on the from-to pair, we do not check how
-                    // req.getT0() and context.getTime() relate to each other
-                    //
-                    // TODO should we verify if abs(T0-currTime) <= threshold 
-                    passengerAdvReqs.poll();
-                    return req;
-                }
-                else if (now > req.getT0()) {
-                    //TODO do we have to somehow handle it?
-                    //Currently this is not a problem; we do not have cases of not turning up...
-                    throw new IllegalStateException(
-                            "Seems that the agent has skipped a previously submitted request");
-                }
-            }
-        }
-
-        return null;//this is an immediate request
-    }
+		return null;// this is an immediate request
+	}
 }

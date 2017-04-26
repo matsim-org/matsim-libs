@@ -23,41 +23,24 @@
 package playground.jbischoff.pt.scenario;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
+import org.matsim.contrib.av.intermodal.router.config.*;
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareHandler;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
-import org.matsim.contrib.taxi.run.TaxiQSimProvider;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.taxi.run.*;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import com.google.inject.Binder;
-
-import playground.jbischoff.analysis.TripHistogramModule;
-import playground.jbischoff.pt.VariableAccessConfigGroup;
-import playground.jbischoff.pt.VariableAccessModeConfigGroup;
-import playground.jbischoff.pt.VariableAccessTransitRouterModule;
 
 /**
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class RunRWPTComboExample {
-public static void main(String[] args) {
+	public static void main(String[] args) {
 	
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/config.xml", new TaxiConfigGroup());
+		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/10pct/config.xml", new TaxiConfigGroup(), new DvrpConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		VariableAccessModeConfigGroup walk = new VariableAccessModeConfigGroup();
 		walk.setDistance(1000);
@@ -85,16 +68,13 @@ public static void main(String[] args) {
 		config.transitRouter().setSearchRadius(3000);
 		config.transitRouter().setExtensionRadius(0);
 		
-	   TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		DvrpConfigGroup.get(config).setMode(TaxiModule.TAXI_MODE);
        config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
        config.checkConsistency();
 
        Scenario scenario = ScenarioUtils.loadScenario(config);
-       TaxiData taxiData = new TaxiData();
-       new VehicleReader(scenario.getNetwork(), taxiData).readFile(taxiCfg.getTaxisFileUrl(config.getContext()).getFile());
        Controler controler = new Controler(scenario);
-       controler.addOverridingModule(new TaxiModule(taxiData));
-       double expAveragingAlpha = 0.05;//from the AV flow paper 
+       controler.addOverridingModule(new TaxiOutputModule());
        
        controler.addOverridingModule(new AbstractModule() {
 		@Override
@@ -103,9 +83,7 @@ public static void main(String[] args) {
 		}
 	});
        
-       controler.addOverridingModule(
-               VrpTravelTimeModules.createTravelTimeEstimatorModule(expAveragingAlpha));
-       controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
+       controler.addOverridingModule(new TaxiModule());
        controler.addOverridingModule(new VariableAccessTransitRouterModule());
 //       controler.addOverridingModule(new TripHistogramModule());
 //       controler.addOverridingModule(new OTFVisLiveModule());
@@ -113,5 +91,5 @@ public static void main(String[] args) {
        controler.run();
 
 
-}
+	}
 }

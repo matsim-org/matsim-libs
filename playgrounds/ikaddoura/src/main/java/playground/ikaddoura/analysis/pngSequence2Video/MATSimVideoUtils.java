@@ -62,15 +62,15 @@ public class MATSimVideoUtils {
 				
 				try {
 					pngFile = outputDirectory + "ITERS/it." + i + "/" + i + "." + pngFileName + ".png";
-					log.info("Trying to read " + pngFile + "...");
+//					log.info("Trying to read " + pngFile + "...");
 					image = ImageIO.read(new File(pngFile));
 				
 				} catch (IOException e) {
-					log.info("File does not exist.");
+//					log.info("File does not exist.");
 					
 					try {
 						pngFile = outputDirectory + "ITERS/it." + i + "/" + pngFileName + ".png";
-						log.info("Trying to read " + pngFile + "...");
+//						log.info("Trying to read " + pngFile + "...");
 						image = ImageIO.read(new File(pngFile));
 					} catch (IOException e2){
 						log.warn("Skipping...");
@@ -78,7 +78,7 @@ public class MATSimVideoUtils {
 				}
 								
 				if (image != null) {
-					log.info("... File successfully read.");
+//					log.info("... File successfully read.");
 					enc.encodeImage(image);
 				} else {
 					log.warn("Skipping...");

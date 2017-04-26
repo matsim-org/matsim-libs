@@ -35,7 +35,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -52,7 +52,7 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 	private boolean initialized = false;
 
-	private CharyparNagelScoringParameters params = null;
+	private ScoringParameters params = null;
 	
 	public DCScoringFunctionFactory(Config config, MatsimServices controler, DestinationChoiceBestResponseContext dcContext) {
 		this.controler = controler;
@@ -84,7 +84,7 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 			this.dcCalculator = new CalculateDestinationChoice(this.dcContext.getScenario());
 			this.dcCalculator.calculateVTODForDCModule();
 
-		this.params = new CharyparNagelScoringParameters.Builder(this.config.planCalcScore(), this.config.planCalcScore().getScoringParameters(null), this.controler.getConfig().scenario()).build();
+		this.params = new ScoringParameters.Builder(this.config.planCalcScore(), this.config.planCalcScore().getScoringParameters(null), this.controler.getConfig().scenario()).build();
 			
 			// actually not necessary here:
 //			this.dcCalculator.calculateDynamicFactors(

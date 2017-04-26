@@ -49,18 +49,18 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.others.PatnaVehiclesGenerator;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.VehicleUtils;
 
 /**
  * @author amit
@@ -74,7 +74,7 @@ public class PatnaBikeTrackConnectionControler {
 
 	private static int numberOfConnectors = 499;
 	private static int updateConnectorsAfterIteration = 2;
-	private static double reduceLinkLengthBy = 1.;
+	private static double reduceLinkLengthBy = PatnaUtils.BIKE_TRACK_LEGNTH_REDUCTION_FACTOR;
 	private static boolean useBikeTravelTime = true;
 
 	private static boolean modeChoiceUntilLastIteration = true;
@@ -214,11 +214,11 @@ public class PatnaBikeTrackConnectionControler {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		String vehiclesFile = inputDir+"output_vehicles.xml.gz"; // following is required to extract only vehicle types and not vehicle info. Amit Nov 2016
-		PatnaVehiclesGenerator.addVehiclesToScenarioFromVehicleFile(vehiclesFile, scenario);
+		VehicleUtils.addVehiclesToScenarioFromVehicleFile(vehiclesFile, scenario);
 
 		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData
 		if ( scenario.getConfig().qsim().getVehiclesSource()==QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData  &&
-				scenario.getVehicles().getVehicles().size() != 0 ) {
+                !scenario.getVehicles().getVehicles().isEmpty()) {
 			throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
 					QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
 		}
@@ -227,7 +227,7 @@ public class PatnaBikeTrackConnectionControler {
 
 	private static void addScoringFunction(final Controler controler){
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( controler.getScenario() );
 			@Inject
 			Network network;
 			@Inject
@@ -238,7 +238,7 @@ public class PatnaBikeTrackConnectionControler {
 			ScenarioConfigGroup scenarioConfig;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final ScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
@@ -256,9 +256,9 @@ public class PatnaBikeTrackConnectionControler {
 
 				ScoringParameterSet scoringParameterSet = planCalcScoreConfigGroup.getScoringParameters( null ); // parameters set is same for all subPopulations 
 
-				CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(
+				ScoringParameters.Builder builder = new ScoringParameters.Builder(
 						planCalcScoreConfigGroup, scoringParameterSet, scenarioConfig);
-				final CharyparNagelScoringParameters modifiedParams = builder.build();
+				final ScoringParameters modifiedParams = builder.build();
 
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(modifiedParams, network));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(modifiedParams));

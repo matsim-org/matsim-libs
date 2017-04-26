@@ -20,17 +20,7 @@ package org.matsim.integration.weekly.fundamentaldiagram;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -59,7 +49,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
@@ -94,29 +83,25 @@ public class CreateAutomatedFDTest {
 	/**
 	 * Constructor.  Even if it does not look like one.
 	 */
-	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics, InflowConstraint inflowConstraint) {
+	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
 		this.linkDynamics = linkDynamics;
 		this.trafficDynamics = trafficDynamics;
-		this.inflowConstraint = inflowConstraint;
 		this.travelModes = new String [] {"car","bike"};
 	}
 
 	private LinkDynamics linkDynamics;
 	private TrafficDynamics trafficDynamics;
-	private InflowConstraint inflowConstraint;
 	private final Map<Id<Person>,String> person2Mode = new HashMap<>();
 
-	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}; InflowConstraint == {2};")
+	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1};")
 	public static Collection<Object[]> createFds() {
-		int combos = LinkDynamics.values().length * TrafficDynamics.values().length * InflowConstraint.values().length;
-		Object [][] combos2run = new Object [combos][3]; // #ld x #td x #ic x #params
+		int combos = LinkDynamics.values().length * TrafficDynamics.values().length ;
+		Object [][] combos2run = new Object [combos][2]; // #ld x #td x #params
 		int index = 0;
 		for (LinkDynamics ld : LinkDynamics.values()) {
 			for (TrafficDynamics td : TrafficDynamics.values()) {
-				for (InflowConstraint ic : InflowConstraint.values()) {
-					combos2run[index] = new Object [] {ld, td, ic};
-					index++;
-				}
+				combos2run[index] = new Object [] {ld, td};
+				index++;
 			}
 		}
 		return Arrays.asList(combos2run);
@@ -164,9 +149,8 @@ public class CreateAutomatedFDTest {
 		final Config config = ConfigUtils.createConfig();
 		config.qsim().setMainModes(Arrays.asList(travelModes));
 		config.qsim().setEndTime(14*3600);
-		config.qsim().setLinkDynamics(linkDynamics.name());
-		config.qsim().setInflowConstraint(inflowConstraint);
-	
+		config.qsim().setLinkDynamics(linkDynamics);
+
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
 			config.qsim().setSeepModes(Arrays.asList("bike"));
 			config.qsim().setSeepModeStorageFree(false);
@@ -301,12 +285,10 @@ public class CreateAutomatedFDTest {
 		 */
 
 		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
-		String fileName = linkDynamics+"_"+trafficDynamics+"_"+inflowConstraint+".png";
-		
-		new File(outDir+ linkDynamics+"_"+trafficDynamics+".png").deleteOnExit();
-		
-		String outFile ; 
-		//ZZ_TODO : what if, there exists some different directory (or files with old filename) => changing method name will keep collecting the old data.
+		String fileName = linkDynamics+"_"+trafficDynamics+".png";
+
+		String outFile ;
+		//TODO : what if, there exists some different directory (or files with old filename) => changing method name will keep collecting the old data.
 		if(!new File(outDir).exists() || new File(outDir+fileName).exists()){
 			outFile = helper.getOutputDirectory()+fileName;
 		} else {

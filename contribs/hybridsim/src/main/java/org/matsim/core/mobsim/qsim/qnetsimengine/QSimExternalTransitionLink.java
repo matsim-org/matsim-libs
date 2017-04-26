@@ -224,7 +224,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		boolean isAcceptingFromWait() {
+		boolean isAcceptingFromWait(QVehicle veh) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -252,7 +252,11 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
-
+		
+		@Override
+		void initBeforeSimStep() {
+		    // TODO Auto-generated method stub
+		}
 	}
 
 

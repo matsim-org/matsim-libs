@@ -19,16 +19,13 @@
 
 package playground.michalm.poznan.supply;
 
-public class SzymonCreatePoznanPT
-{
-    public static void main(String[] args)
-    {
-        String visumFile = "d:/OneDrive/Poznan/Visum_2014/network/network_ver.4.net";
-        String transitScheduleWithNetworkFile = "d:/transitSchedule.networkOevModellZH.xml";
-        String transitNetworkFile = "d:/network.oevModellZH.xml";
-        String vehicleFile = "d:/vehicles.xml";
+public class SzymonCreatePoznanPT {
+	public static void main(String[] args) {
+		String visumFile = "d:/OneDrive/Poznan/Visum_2014/network/network_ver.4.net";
+		String transitScheduleWithNetworkFile = "d:/transitSchedule.networkOevModellZH.xml";
+		String transitNetworkFile = "d:/network.oevModellZH.xml";
+		String vehicleFile = "d:/vehicles.xml";
 
-        CreatePoznanPT.go(visumFile, transitScheduleWithNetworkFile, transitNetworkFile,
-                vehicleFile);
-    }
+		CreatePoznanPT.go(visumFile, transitScheduleWithNetworkFile, transitNetworkFile, vehicleFile);
+	}
 }

@@ -53,7 +53,7 @@ public class BerlinTaxiVehicleCreatorV3
 
     private Scenario scenario;
     private Map<Id<Zone>, Zone> zones;
-    private List<Vehicle> vehicles;
+    private List<? extends Vehicle> vehicles;
 
     double evShare;
     double maxTime;

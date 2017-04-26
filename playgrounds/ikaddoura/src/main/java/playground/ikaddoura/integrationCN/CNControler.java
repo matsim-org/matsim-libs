@@ -40,10 +40,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
@@ -69,6 +68,8 @@ public class CNControler {
 	private static boolean noisePricing;
 	
 	private static double sigma;
+	private static double congestionFactor;
+	private static double noiseTollFactor;
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -89,6 +90,12 @@ public class CNControler {
 			sigma = Double.parseDouble(args[4]);
 			log.info("Sigma: " + sigma);
 			
+			congestionFactor = Double.parseDouble(args[5]);
+			log.info("congestion toll factor: " + congestionFactor);
+			
+			noiseTollFactor = Double.parseDouble(args[6]);
+			log.info("noise toll factor: " + noiseTollFactor);
+			
 		} else {
 			
 			outputDirectory = null;
@@ -96,6 +103,8 @@ public class CNControler {
 			congestionPricing = true;
 			noisePricing = true;
 			sigma = 0.;
+			congestionFactor = 1.;
+			noiseTollFactor = 1.;
 		}
 				
 		CNControler cnControler = new CNControler();
@@ -129,7 +138,7 @@ public class CNControler {
 		
 		NoiseContext noiseContext = null;
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
@@ -196,13 +205,15 @@ public class CNControler {
 		
 		noiseParameters.setWriteOutputIteration(10);
 		
+		noiseParameters.setNoiseTollFactor(noiseTollFactor);
+		
 		noiseContext = new NoiseContext(controler.getScenario());
-
+		
 		// congestion
 		
 		final TollHandler congestionTollHandler;
 		if (congestionPricing) {
-			congestionTollHandler = new TollHandler(controler.getScenario());
+			congestionTollHandler = new TollHandler(controler.getScenario(), congestionFactor);
 		} else {
 			congestionTollHandler = null;
 		}
@@ -234,7 +245,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + consideration in scoring
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario()), congestionFactor));
 		
 		} else if (noisePricing && congestionPricing == false) {
 			// only noise pricing
@@ -260,7 +271,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + NO consideration in scoring
-			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
+			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
 			
 		} else if (noisePricing == false && congestionPricing) {
 			// only congestion pricing
@@ -286,7 +297,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + consideration in scoring
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario()), congestionFactor));
 			
 		} else if (noisePricing == false && congestionPricing == false) {
 			// base case
@@ -309,7 +320,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + NO consideration in scoring
-			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
+			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
 
 		} else {
 			throw new RuntimeException("This setup is not considered. Aborting...");
@@ -320,7 +331,7 @@ public class CNControler {
 		controler.run();
 		
 		// analysis
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		PersonTripCongestionNoiseAnalysisRun analysis = new PersonTripCongestionNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 	}
 	

@@ -22,8 +22,6 @@ package playground.michalm.demand;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.zone.Zone;
 
-
-public interface PersonCreator
-{
-    Person createPerson(Plan plan, Zone fromZone, Zone toZone);
+public interface PersonCreator {
+	Person createPerson(Plan plan, Zone fromZone, Zone toZone);
 }

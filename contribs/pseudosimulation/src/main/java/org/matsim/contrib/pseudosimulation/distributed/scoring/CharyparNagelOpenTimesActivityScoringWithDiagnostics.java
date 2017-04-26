@@ -25,7 +25,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.Iterator;
@@ -42,7 +42,7 @@ public class CharyparNagelOpenTimesActivityScoringWithDiagnostics extends org.ma
 
 	private final ActivityFacilities facilities;
 
-	public CharyparNagelOpenTimesActivityScoringWithDiagnostics(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+	public CharyparNagelOpenTimesActivityScoringWithDiagnostics(final ScoringParameters params, final ActivityFacilities facilities) {
 		super(params);
 		this.facilities = facilities;
 	}

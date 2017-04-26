@@ -19,27 +19,34 @@
 
 package playground.agarwalamit.opdyts.patna;
 
-import java.util.SortedMap;
+import java.util.Collections;
+import java.util.Map;
 import java.util.TreeMap;
-import playground.agarwalamit.opdyts.OpdytsScenarios;
+import playground.agarwalamit.opdyts.DistanceDistribution;
+import playground.agarwalamit.opdyts.OpdytsScenario;
+import playground.agarwalamit.opdyts.equil.EquilDistanceDistribution;
 
 /**
  * Created by amit on 21/10/16.
  */
 
 
-public final class PatnaCMPDistanceDistribution {
+@SuppressWarnings("DefaultFileTemplate")
+public final class PatnaCMPDistanceDistribution implements DistanceDistribution {
 
-    private final SortedMap<String, double []> mode2legs = new TreeMap<>();
+    private final Map<String, double []> mode2legs = new TreeMap<>();
     private final double [] distClasses = new double[] {0., 2000., 4000., 6000., 8000., 10000.};
     private double legsSumAllModes = 0;
+    private final OpdytsScenario opdytsScenario;
 
-    public PatnaCMPDistanceDistribution (final OpdytsScenarios opdytsScenarios){
-        double totalLegs = 0 ;
-        switch (opdytsScenarios) {
+    PatnaCMPDistanceDistribution (final OpdytsScenario opdytsScenario){
+        this.opdytsScenario = opdytsScenario;
+        double totalLegs ;
+        switch (opdytsScenario) {
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:
-                default:
+                throw new RuntimeException("Use "+ EquilDistanceDistribution.class.getSimpleName()+" instead.");
+            default:
                 throw new RuntimeException("not implemented yet.");
             case PATNA_1Pct:
                 totalLegs = 13278.0 * 2.0 ;
@@ -63,24 +70,22 @@ public final class PatnaCMPDistanceDistribution {
             double bikeLegs = 0.33 * totalLegs;
             mode2legs.put("bike", getModeDistanceLegs(bikeLegs, bikeVals));
         }
-//        {
-//            double [] ptVals = {6.4, 23.9, 34.5, 10.5, 12.7, 12.0};
-//            double ptLegs = 0.22 * totalLegs;
-//            mode2legs.put("pt", getModeDistanceLegs(ptLegs, ptVals));
-//        }
-//        {
-//            double [] walkVals = {70.0, 28.0, 1.0, 1., 0.0, 0.0};
-//            double walkLegs = 0.29 * totalLegs;
-//            mode2legs.put("walk", getModeDistanceLegs(walkLegs, walkVals));
-//        }
-
-        System.out.println("Total legs "+totalLegs+" ans sum of all legs "+legsSumAllModes);
+        {
+            double [] ptVals = {6.4, 23.9, 34.5, 10.5, 12.7, 12.0};
+            double ptLegs = 0.22 * totalLegs;
+            mode2legs.put("pt", getModeDistanceLegs(ptLegs, ptVals));
+        }
+        {
+            double [] walkVals = {70.0, 28.0, 1.0, 1., 0.0, 0.0};
+            double walkLegs = 0.29 * totalLegs;
+            mode2legs.put("walk", getModeDistanceLegs(walkLegs, walkVals));
+        }
 
         // check if difference is not greaater than 1%, due to rounding.
         if( legsSumAllModes >= 0.99*totalLegs && legsSumAllModes <= 1.01 * totalLegs) {
             // everything is fine
         }  else {
-//            throw new RuntimeException("sum of legs is wrong.");
+            throw new RuntimeException("sum of legs is wrong.");
         }
     }
 
@@ -94,11 +99,18 @@ public final class PatnaCMPDistanceDistribution {
         return modeDistLegs;
     }
 
+    @Override
     public double [] getDistClasses(){
         return this.distClasses;
     }
 
-    public SortedMap<String, double []> getMode2DistanceBasedLegs(){
-        return this.mode2legs;
+    @Override
+    public Map<String, double []> getMode2DistanceBasedLegs(){
+        return Collections.unmodifiableMap(this.mode2legs);
+    }
+
+    @Override
+    public OpdytsScenario getOpdytsScenario(){
+        return this.opdytsScenario;
     }
 }

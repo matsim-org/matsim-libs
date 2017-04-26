@@ -1,136 +1,105 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.dziemke.accessibility;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.CSVWriter;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Labels;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.core.utils.collections.Tuple;
 
+/**
+ * @author dziemke
+ */
 public class CalculateCompositeAccessibility {
-	
-	private static final Logger log = Logger.getLogger(CalculateCompositeAccessibility.class);
-	
 
+	private static final Logger LOG = Logger.getLogger(CalculateCompositeAccessibility.class);
+
+	private static int globalLineCount = -1;
+	private static Map<Tuple<String, Integer>, String[]> accessibilityMaps = new HashMap<>();
+	private static String[] header = null;
+	private static List<Integer> columnsToModify = new ArrayList<>();
+
+	
 	public static void main(String[] args) {
-		String directoryRoot = "../../accessibility-sa/data/18/";
-		String[] activityTypes = {"s", "l", "t", "e"};
-		boolean includeDensityLayer = true;
-		double cellSize = 200.;
-		
-		// create maps
-		Map<String,Map<Modes4Accessibility,SpatialGrid>> accessibilityGrids = 
-				new HashMap<String, Map<Modes4Accessibility,SpatialGrid>>() ;
-		
-		for (String type : activityTypes) {
-			Map<Modes4Accessibility,SpatialGrid> typeAccessibilityGrids = new HashMap<Modes4Accessibility,SpatialGrid>();
-			accessibilityGrids.put(type, typeAccessibilityGrids);
-		}
-		
+		String directoryRoot = "../../../shared-svn/projects/maxess/data/nmb/output/17compRestricted500/";
+		String[] activityTypes = {FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION};
 
-		// check structure of input files
-		String[] header = null;
-		
-		for (String type : activityTypes) {
-			String inputFile = directoryRoot + type + "/accessibilities.csv";
-			FileReader fileReader;
-			BufferedReader bufferedReader;
+		setHeader(directoryRoot, activityTypes);
+		collectData(directoryRoot, activityTypes);
+		writeFile(directoryRoot, activityTypes);
+	}
 
-			try {
-				fileReader = new FileReader(inputFile);
-				bufferedReader = new BufferedReader(fileReader);
-
-				String line = bufferedReader.readLine();
-				header = line.split(",");
-
-				if (!header[0].equals(Labels.X_COORDINATE)) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[1].equals(Labels.Y_COORDINATE)) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[2].equals(Modes4Accessibility.freespeed + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[3].equals(Modes4Accessibility.car + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[4].equals(Modes4Accessibility.bike + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[5].equals(Modes4Accessibility.walk + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
-				if (!header[6].equals(Modes4Accessibility.pt + "_accessibility")) { throw new RuntimeException("Column is not the expected one!"); }
-				if (includeDensityLayer == true) {
-					if (!header[7].equals(Labels.POPULATION_DENSITIY)) { throw new RuntimeException("Column is not the expected one!"); }
-					if (!header[8].equals(Labels.POPULATION_DENSITIY)) { throw new RuntimeException("Column is not the expected one!"); }
-				}
-			} catch (FileNotFoundException ex) {
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			} 
-		}
-		
-		
-		// now look up coordinates in input files
-		// does not change if they are the same in all fiels
-		Double minX = (double) Integer.MAX_VALUE;
-		Double maxX = (double) Integer.MIN_VALUE;
-		Double minY = (double) Integer.MAX_VALUE;
-		Double maxY = (double) Integer.MIN_VALUE;
-
-		for (String type : activityTypes) {
-			String inputFile = directoryRoot + type + "/accessibilities.csv";
-			FileReader fileReader;
-			BufferedReader bufferedReader;
-
-			try {
-				fileReader = new FileReader(inputFile);
-				bufferedReader = new BufferedReader(fileReader);
-
-				String line = null;
-
-				bufferedReader.readLine(); // skip the header
-
-				while ((line = bufferedReader.readLine()) != null) {
-					String[] entry = line.split(",");
-
-					// line must not be empty
-					if (line != null && !line.equals("")) {
-						double x = Double.parseDouble(entry[0]);
-						double y = Double.parseDouble(entry[1]);
 	
-						if (x < minX) { minX = x; }
-						if (x > maxX) { maxX = x; }
-						if (y < minY) { minY = y; }
-						if (y > maxY) { maxY = y; }
-					}
-				}
-			} catch (FileNotFoundException ex) {
-				ex.printStackTrace();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			} 
-		}
-		System.out.println("minX = " + minX + " -- maxX = " + maxX + " -- minY = " + minY + " -- maxY = " + maxY);
+	private static void setHeader(String directoryRoot, String[] activityTypes) {
+		String inputFile = directoryRoot + activityTypes[0] + "/accessibilities.csv";
+		FileReader fileReader = null;
+		BufferedReader bufferedReader;
 	
-		
-		
-		
-		
-		// create spatial grids
-		for (String type : activityTypes) {
-			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-				accessibilityGrids.get(type).put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
-			}
-		}
-		
-		SpatialGrid densityGrid = null;
-		if (includeDensityLayer == true) {
-			densityGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN);
-		}
-		
-		// read in information
-		for (String type : activityTypes) {
+		try {
+			fileReader = new FileReader(inputFile);
+			bufferedReader = new BufferedReader(fileReader);
+	
+			String line = bufferedReader.readLine();
+			header = line.split(",");
+			LOG.info("Header has " + header.length + " fields.");
 			
+			if (!header[0].equals(Labels.X_COORDINATE)) {
+				fileReader.close();
+				throw new RuntimeException("Column is not the expected one!");
+			}
+			if (!header[1].equals(Labels.Y_COORDINATE)) {
+				fileReader.close();
+				throw new RuntimeException("Column is not the expected one!");
+			}
+			for (int i = 2; i < header.length; i++) {
+				if (header[i].contains("access"))
+					columnsToModify.add(i);
+			}
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		try {
+			fileReader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	
+	private static void collectData(String directoryRoot, String[] activityTypes) {
+		for (String type : activityTypes) {
+
 			String inputFile = directoryRoot + type + "/accessibilities.csv";
-			FileReader fileReader;
+			FileReader fileReader = null;
 			BufferedReader bufferedReader;
 
 			try {
@@ -139,29 +108,32 @@ public class CalculateCompositeAccessibility {
 
 				String line = null;
 
-				bufferedReader.readLine(); // skip the header
+				// Header
+				line = bufferedReader.readLine();
+				String[] currentHeader = line.split(",");
+				for (int i = 0; i < header.length; i++) {
+					if (!header[i].equals(currentHeader[i])) {
+						throw new RuntimeException("Headers do not match!");
+					}
+				}
 				
-					
-
+				// Other lines
+				int lineCount = 1;	
 				while ((line = bufferedReader.readLine()) != null) {
 					String[] entry = line.split(",");
 					
-					// line must not be empty
 					if (line != null && !line.equals("")) {
-						
-						
-						double x = Double.parseDouble(entry[0]);
-						double y = Double.parseDouble(entry[1]);
-		
-						int i = 2;
-						
-						for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-							accessibilityGrids.get(type).get(mode).setValue( Double.parseDouble(entry[i]), x, y ) ;
-							i++;
-						}
-						
-						densityGrid.setValue(Double.parseDouble(entry[i]), x, y);
-						
+						accessibilityMaps.put(new Tuple<String, Integer>(type, lineCount), entry);
+						lineCount++;
+					}
+				}
+				if (globalLineCount == -1) {
+					globalLineCount = lineCount;
+					LOG.info("Overall line count set to " + globalLineCount + ".");
+				} else {
+					if (globalLineCount != lineCount) {
+						fileReader.close();
+						throw new RuntimeException("Files must be of equal lenghts!");
 					}
 				}
 			} catch (FileNotFoundException ex) {
@@ -169,63 +141,48 @@ public class CalculateCompositeAccessibility {
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
+			try {
+				fileReader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
-		
-		// write new output file
-		final CSVWriter writer = new CSVWriter(directoryRoot + "composite/" + CSVWriter.FILE_NAME ) ;
-		
-		// write header
-		writer.writeField(Labels.X_COORDINATE);
-		writer.writeField(Labels.Y_COORDINATE);
-//		writer.writeField(Labels.ACCESSIBILITY_BY_FREESPEED);
-//		writer.writeField(Labels.ACCESSIBILITY_BY_CAR);
-//		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
-//		writer.writeField(Labels.ACCESSIBILITY_BY_WALK);
-//		writer.writeField(Labels.ACCESSIBILITY_BY_PT);
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			writer.writeField(mode.toString() + "_accessibility");
-		}
-		
-		
-		if (includeDensityLayer) {
-			// TODO dont really know why this is always twice, but keep it for the moment
-			writer.writeField(Labels.POPULATION_DENSITIY);
-			writer.writeField(Labels.POPULATION_DENSITIY);
+	}
+	
+	
+	private static void writeFile(String directoryRoot, String[] activityTypes) {
+		String directory = directoryRoot + "composite/";
+		new File(directory).mkdir();
+		CSVWriter writer = new CSVWriter(directory + "accessibilities.csv");
+		LOG.info("Start writing output file.");
+
+		for (int i = 0; i < header.length; i++) {
+			writer.writeField(header[i]);
 		}
 		writer.writeNewLine();
-		
-		// write data
-		double resolution = accessibilityGrids.get(activityTypes[0]).get(Modes4Accessibility.freespeed).getResolution();
-		
-		for(double y = minY; y <= maxY ; y += resolution) {
-			for(double x = minX; x <= maxX; x += resolution) {
-				
-				writer.writeField(x);
-				writer.writeField(y);
 
-				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+		for (int i = 1 ; i < globalLineCount; i++) {
+			String[] resultingLine = new String[header.length];
+			String[] line = accessibilityMaps.get(new Tuple<String, Integer>(activityTypes[0], i));
+			for (int j = 0; j < line.length ; j++) {
+				if (!columnsToModify.contains(j)) {
+					resultingLine[j] = line[j];
+				} else {
 					double value = 0.;
 					for (String type : activityTypes) {
-						value = value + accessibilityGrids.get(type).get(mode).getValue(x, y);
+						String[] typeSpecificLine = accessibilityMaps.get(new Tuple<String, Integer>(type, i));
+						value += Double.parseDouble(typeSpecificLine[j]);
 					}
-					value = value / activityTypes.length;
-					
-					writer.writeField(value);
+					Double result = value / activityTypes.length;
+					resultingLine[j] = result.toString();
 				}
-				
-				if (includeDensityLayer) {
-					double densityValue = densityGrid.getValue(x, y);
-					// TODO dont really know why this is always twice, but keep it for the moment
-					writer.writeField(densityValue);
-					writer.writeField(densityValue);
-				}
-				
-				writer.writeNewLine(); 
 			}
+			for (int k = 0; k < line.length; k++) {
+				writer.writeField(resultingLine[k]);
+			}
+			writer.writeNewLine();
 		}
-		writer.close() ;
-
-		log.info("Writing plotting data for other analysis done!");
+		writer.close();
+		LOG.info("Finished writing output file.");
 	}
 }

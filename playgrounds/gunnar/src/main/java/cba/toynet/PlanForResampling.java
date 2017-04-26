@@ -20,11 +20,13 @@ class PlanForResampling implements Alternative {
 
 	private final double teleportationTravelTimeUtility;
 
-	private final double congestedTravelTimeUtility;
+	private double congestedTravelTimeUtility;
 
 	private final double sampersChoiceProba;
 
 	private final EpsilonDistribution epsDistr;
+
+	private Double epsilonRealization = null;
 
 	private Double matsimChoiceProba = null;
 
@@ -87,4 +89,41 @@ class PlanForResampling implements Alternative {
 	public double getMATSimTimeScore() {
 		return this.congestedTravelTimeUtility;
 	}
+
+	@Override
+	public double getSampersEpsilonRealization() {
+		return this.epsilonRealization;
+	}
+
+	@Override
+	public void setSampersEpsilonRealization(double eps) {
+		this.epsilonRealization = eps;
+	}
+
+	@Override
+	public void setMATSimTimeScore(double score) {
+		this.congestedTravelTimeUtility = score;
+	}
+
+	// -------------------- OVERRIDING OF Object --------------------
+
+	@Override
+	public String toString() {
+		final StringBuffer result = new StringBuffer();
+		result.append(this.getClass().getSimpleName() + " for person " + this.plan.getPerson() + " and type "
+				+ this.tourSequence.type + "\n");
+		result.append("V(type,dest,mode) = " + this.activityModeOnlyUtility + "\n");
+		result.append("V_Sampers(time)   = " + this.teleportationTravelTimeUtility + "\n");
+		result.append("V_MATSim(time)    = " + this.congestedTravelTimeUtility + "\n");
+		result.append("P_sampers(this)   = " + this.sampersChoiceProba + "\n");
+		result.append("P_MATSim(this)    = " + this.matsimChoiceProba);
+		return result.toString();
+	}
+
+	@Override
+	public Plan getMATSimPlan() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

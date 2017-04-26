@@ -38,38 +38,37 @@ import playground.agarwalamit.utils.FileUtils;
 
 public class EvacProgress {
 
-	private final int shortestPathRunIteration = 0;
-	private final int NERunIteration = 100;
+    private final String runCase = "PassingQ";
 
-	private final String runCase = "PassingQ";
-	private final String dir = FileUtils.RUNS_SVN+"/patnaIndia/run109/1pct/withoutHoles/evac_"+runCase;
-	private final String inputDir = FileUtils.RUNS_SVN+"/patnaIndia/run109/1pct/input/";
-
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		new EvacProgress().runAndWrite();
 	}
 
 	public void runAndWrite (){
 
-		String eventsFileSP = dir+"/ITERS/it."+shortestPathRunIteration+"/"+shortestPathRunIteration+".events.xml.gz";
-		String eventsFileNE = dir+"/ITERS/it."+NERunIteration+"/"+NERunIteration+".events.xml.gz";
+        String dir = FileUtils.RUNS_SVN + "/patnaIndia/run109/1pct/withoutHoles/evac_" + runCase;
+        int shortestPathRunIteration = 0;
+        String eventsFileSP = dir +"/ITERS/it."+ shortestPathRunIteration +"/"+ shortestPathRunIteration +".events.xml.gz";
+        int NERunIteration = 100;
+        String eventsFileNE = dir +"/ITERS/it."+ NERunIteration +"/"+ NERunIteration +".events.xml.gz";
 
-		String networkFile = dir+"/output_network.xml.gz";
-		String shapeFile = inputDir+"/patnaEvacAnalysisArea.shp";
+		String networkFile = dir +"/output_network.xml.gz";
+        String inputDir = FileUtils.RUNS_SVN + "/patnaIndia/run109/1pct/input/";
+        String shapeFile = inputDir +"/patnaEvacAnalysisArea.shp";
 //		String outputFilePrefix = "_analysisArea";
 		String outputFilePrefix = "";
 
-		PersonArrivalAnalyzer arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileSP, dir+"/output_config.xml.gz"); 
+		PersonArrivalAnalyzer arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileSP, dir +"/output_config.xml.gz");
 		arrivalAnalyzer.run();
 //		arrivalAnalyzer.run(shapeFile,networkFile);
 		SortedMap<String,SortedMap<Integer, Integer>> evacProgressSP = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
-		arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileNE, dir+"/output_config.xml.gz"); 
+		arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileNE, dir +"/output_config.xml.gz");
 //		arrivalAnalyzer.run(shapeFile,networkFile);
 		arrivalAnalyzer.run();
 		SortedMap<String,SortedMap<Integer, Integer>>  evacProgressNE = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
-		String outFile = dir+"/analysis/evacuationProgress"+outputFilePrefix+".txt";
+		String outFile = dir +"/analysis/evacuationProgress"+outputFilePrefix+".txt";
 		
 		SortedSet<Integer> timeBins = new TreeSet<>();
 		timeBins.addAll(evacProgressSP.get(TransportMode.car).keySet());
@@ -103,7 +102,7 @@ public class EvacProgress {
 			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}
 		
-		outFile = dir+"/analysis/evacuationProgress"+outputFilePrefix+"_ggplot.txt";
+		outFile = dir +"/analysis/evacuationProgress"+outputFilePrefix+"_ggplot.txt";
 		Map<String,double[]> evacSP = getCummulative(evacProgressSP);
 		Map<String,double[]> evacNE = getCummulative(evacProgressNE);
 		

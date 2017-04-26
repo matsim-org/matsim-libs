@@ -40,20 +40,21 @@ import java.util.LinkedList;
  *
  */
 public final class OperatorInitializer {
-	
+
 	private final static Logger log = Logger.getLogger(OperatorInitializer.class);
 	private final PConfigGroup pConfig;
 	private final OperatorFactory operatorFactory;
 	private final PRouteProvider routeProvider;
 	private final PStrategy initialStrategy;
 	private int counter;
-	
-	
-	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, MatsimServices controler, TimeProvider timeProvider, WelfareAnalyzer welfareAnalyzer) {
+
+
+	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, MatsimServices controler, 
+			TimeProvider timeProvider) {
 		this.pConfig = pConfig;
-		this.operatorFactory = new OperatorFactory(this.pConfig, franchise, welfareAnalyzer);
-        this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getScenario().getNetwork(), controler.getScenario().getPopulation(), this.pConfig, pStopsOnly, controler.getControlerIO().getOutputPath(), controler.getEvents());
-		
+		this.operatorFactory = new OperatorFactory(this.pConfig, franchise);
+		this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getScenario().getNetwork(), controler.getScenario().getPopulation(), this.pConfig, pStopsOnly, controler.getControlerIO().getOutputPath(), controler.getEvents());
+
 		if (this.pConfig.getStartWith24Hours()) {
 			this.initialStrategy = new CreateNew24hPlan(new ArrayList<String>());
 		} else {
@@ -64,7 +65,7 @@ public final class OperatorInitializer {
 			((CreateNewPlan) this.initialStrategy).setTimeProvider(timeProvider);
 		}
 	}
-	
+
 	/**
 	 * Creates operators from a given transit schedule
 	 *  
@@ -74,7 +75,7 @@ public final class OperatorInitializer {
 	public LinkedList<Operator> createOperatorsFromSchedule(TransitSchedule originalSchedule){
 		return new CreateOperatorFromTransitSchedule(this.operatorFactory, this.routeProvider, this.pConfig, originalSchedule).run();
 	}
-	
+
 	/**
 	 * Create the number of additional operators
 	 * 
@@ -89,7 +90,7 @@ public final class OperatorInitializer {
 			Operator operator = this.operatorFactory.createNewOperator(this.createNewIdForOperator(iteration));
 			emptyOperators.add(operator);
 		}
-		
+
 		LinkedList<Operator> initializedOperator = new LinkedList<>();
 		int numberOfOperatorsFailedToBeInitialized = 0;
 		for (Operator operator : emptyOperators) {
@@ -101,14 +102,14 @@ public final class OperatorInitializer {
 				numberOfOperatorsFailedToBeInitialized++;
 			}
 		}
-		
+
 		if (numberOfOperatorsFailedToBeInitialized > 0) {
 			log.warn(numberOfOperatorsFailedToBeInitialized + " out of " + numberOfNewOperators + " operators could no be initialized. Proceeding with " + initializedOperator.size() + " new operators.");
 		}
-		
+
 		return initializedOperator;
 	}
-	
+
 	private Id<Operator> createNewIdForOperator(int iteration){
 		this.counter++;
 		return Id.create(this.pConfig.getPIdentifier() + iteration + "_" + this.counter, Operator.class);

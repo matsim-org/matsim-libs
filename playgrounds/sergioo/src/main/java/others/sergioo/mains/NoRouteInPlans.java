@@ -9,7 +9,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -37,8 +37,8 @@ public class NoRouteInPlans implements PersonAlgorithm {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		new MatsimFacilitiesReader((MutableScenario) scenario).readFile(args[1]);
-		StreamingUtils.setIsStreaming(((Population)scenario.getPopulation()), true);
-		StreamingUtils.addAlgorithm(((Population)scenario.getPopulation()), new NoRouteInPlans());
+		StreamingDeprecated.setIsStreaming(((Population)scenario.getPopulation()), true);
+		StreamingDeprecated.addAlgorithm(((Population)scenario.getPopulation()), new NoRouteInPlans());
 		new PopulationReader(scenario).readFile(args[2]);
 	}
 

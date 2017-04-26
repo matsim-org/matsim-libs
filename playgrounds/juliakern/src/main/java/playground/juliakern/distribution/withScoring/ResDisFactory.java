@@ -19,6 +19,7 @@
 
 package playground.juliakern.distribution.withScoring;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.emissions.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -27,6 +28,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
@@ -37,6 +39,8 @@ public class ResDisFactory implements TravelDisutilityFactory {
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
+
+	@Inject private Vehicles vehicles;
 	
 	public ResDisFactory(EmissionControlerListener ecl, EmissionModule emissionModule, 
 			EmissionCostModule emissionCostModule, PlanCalcScoreConfigGroup cnScoringGroup){
@@ -50,7 +54,7 @@ public class ResDisFactory implements TravelDisutilityFactory {
 	@Override
 	public TravelDisutility createTravelDisutility( TravelTime timeCalculator) {
 		double marginalutilityOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		final ResDisCalculator resdiscal = new ResDisCalculator(tdf.createTravelDisutility(timeCalculator), ecl, marginalutilityOfMoney, this.emissionModule, this.emissionCostModule);
+		final ResDisCalculator resdiscal = new ResDisCalculator(tdf.createTravelDisutility(timeCalculator), ecl, marginalutilityOfMoney, this.emissionModule, this.emissionCostModule, vehicles );
 		
 		return resdiscal;
 

@@ -92,13 +92,13 @@ public class JointConfigWriter {
 		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE); //1.06% sample
 		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setEndTime(30*3600);
-		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
+		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setMainModes(PatnaUtils.ALL_MAIN_MODES);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 
 		{//urban
 			StrategySettings expChangeBeta = new StrategySettings();
-			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			expChangeBeta.setSubpopulation(PatnaUserGroup.urban.name());
 			expChangeBeta.setWeight(0.7);
 			config.strategy().addStrategySettings(expChangeBeta);
@@ -129,7 +129,7 @@ public class JointConfigWriter {
 
 		{//commuters
 			StrategySettings expChangeBeta = new StrategySettings();
-			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			expChangeBeta.setSubpopulation(PatnaUserGroup.commuter.name());
 			expChangeBeta.setWeight(0.85);
 			config.strategy().addStrategySettings(expChangeBeta);
@@ -143,7 +143,7 @@ public class JointConfigWriter {
 
 		{//through
 			StrategySettings expChangeBeta = new StrategySettings();
-			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
+			expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			expChangeBeta.setSubpopulation(PatnaUserGroup.through.name());
 			expChangeBeta.setWeight(0.85);
 			config.strategy().addStrategySettings(expChangeBeta);

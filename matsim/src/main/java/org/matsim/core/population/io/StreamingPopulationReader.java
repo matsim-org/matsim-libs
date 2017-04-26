@@ -90,11 +90,13 @@ public final class StreamingPopulationReader implements MatsimReader {
 
 
 	@SuppressWarnings("static-method")
+	@Deprecated // dec'16
 	public final boolean isStreaming() {
 		return true ;
 	}
 
 	@SuppressWarnings("static-method")
+	@Deprecated // dec'16
 	final void setIsStreaming(final boolean isStreaming) {
 		if ( isStreaming==false ) {
 			log.error( "streaming == false currently not supported with this approach; please program it yourself; something like" ) ;
@@ -170,6 +172,7 @@ public final class StreamingPopulationReader implements MatsimReader {
 		}
 	}
 
+	@Deprecated // do not use from outside; will be removed as public functionality eventually yy
 	public void printPlansCount() {
 		log.info("processed " + cnt + " persons.");
 	}

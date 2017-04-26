@@ -10,13 +10,13 @@ import org.matsim.facilities.ActivityFacility;
  * @author thibautd
  * @author michaz
  */
-class LeastCostPathCalculatorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
+public final class LeastCostPathCalculatorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private final LeastCostPathCalculator leastCostPathCalculator;
 	private final PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	private Node fromNode;
 	private Double departureTime;
 
-	LeastCostPathCalculatorAccessibilityContributionCalculator(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, LeastCostPathCalculator leastCostPathCalculator) {
+	public LeastCostPathCalculatorAccessibilityContributionCalculator(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, LeastCostPathCalculator leastCostPathCalculator) {
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
 		this.leastCostPathCalculator = leastCostPathCalculator;
 	}

@@ -25,12 +25,12 @@ import java.io.Serializable;
 /**
  * In MATSim, generally Cartesian Coordinates are used, with x increasing
  * to the right, and y increasing to the top:
- * <pre>
+ * {@literal
  *     ^
  *   y |
  *     |     x
  *   (0/0) ---->
- * </pre>
+ * }
  */
 public final class Coord implements Serializable {
 

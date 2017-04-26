@@ -1,6 +1,8 @@
 package org.matsim.contrib.accessibility;
 
-public class FacilityTypes {
+public final class FacilityTypes {
+	private FacilityTypes(){} // do not instantiate
+	
 	public static final String HOME = "home";
 	public static final String WORK = "work";
 	public static final String EDUCATION = "education";

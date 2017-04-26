@@ -25,98 +25,69 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 import com.opencsv.CSVWriter;
 
+public class CompactCSVWriter extends CSVWriter {
+	public static final String[] EMPTY_LINE = {};
+	public static final String EMPTY_CELL = null;
 
-public class CompactCSVWriter
-    extends CSVWriter
-{
-    public static final String[] EMPTY_LINE = {};
-    public static final String EMPTY_CELL = null;
+	public CompactCSVWriter(Writer writer) {
+		this(writer, '\t');
+	}
 
+	public CompactCSVWriter(Writer writer, char separator) {
+		super(writer, separator, CSVWriter.NO_QUOTE_CHARACTER);
+	}
 
-    public CompactCSVWriter(Writer writer)
-    {
-        this(writer, '\t');
-    }
+	@Override
+	public void writeNext(String... nextLine) {
+		super.writeNext(nextLine);
+	}
 
+	public void writeNext(String first, String[] tail) {
+		writeHeadAndTail(tail, first);
+	}
 
-    public CompactCSVWriter(Writer writer, char separator)
-    {
-        super(writer, separator, CSVWriter.NO_QUOTE_CHARACTER);
-    }
+	public void writeNext(String first, String second, String[] tail) {
+		writeHeadAndTail(tail, first, second);
+	}
 
+	public void writeNext(String first, String second, String third, String[] tail) {
+		writeHeadAndTail(tail, first, second, third);
+	}
 
-    @Override
-    public void writeNext(String... nextLine)
-    {
-        super.writeNext(nextLine);
-    }
+	public void writeNext(String first, String second, String third, String fourth, String[] tail) {
+		writeHeadAndTail(tail, first, second, third, fourth);
+	}
 
+	private void writeHeadAndTail(String[] tail, String... head) {
+		String[] nextLine = new String[head.length + tail.length];
+		System.arraycopy(head, 0, nextLine, 0, head.length);
+		System.arraycopy(tail, 0, nextLine, head.length, tail.length);
+		writeNext(nextLine);
+	}
 
-    public void writeNext(String first, String[] tail)
-    {
-        writeHeadAndTail(tail, first);
-    }
+	public void writeNextEmpty() {
+		writeNext(EMPTY_LINE);
+	}
 
+	public void writeNext(CSVLineBuilder lineBuilder) {
+		writeNext(lineBuilder.build());
+	}
 
-    public void writeNext(String first, String second, String[] tail)
-    {
-        writeHeadAndTail(tail, first, second);
-    }
+	@Override
+	public void flush() {
+		try {
+			super.flush();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 
-
-    public void writeNext(String first, String second, String third, String[] tail)
-    {
-        writeHeadAndTail(tail, first, second, third);
-    }
-
-
-    public void writeNext(String first, String second, String third, String fourth, String[] tail)
-    {
-        writeHeadAndTail(tail, first, second, third, fourth);
-    }
-    
-    
-    private void writeHeadAndTail(String[] tail, String... head)
-    {
-        String[] nextLine = new String[head.length + tail.length];
-        System.arraycopy(head, 0, nextLine, 0, head.length);
-        System.arraycopy(tail, 0, nextLine, head.length, tail.length);
-        writeNext(nextLine);
-    }
-
-
-    public void writeNextEmpty()
-    {
-        writeNext(EMPTY_LINE);
-    }
-
-
-    public void writeNext(CSVLineBuilder lineBuilder)
-    {
-        writeNext(lineBuilder.build());
-    }
-
-
-    @Override
-    public void flush()
-    {
-        try {
-            super.flush();
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-
-    @Override
-    public void close()
-    {
-        try {
-            super.close();
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
+	@Override
+	public void close() {
+		try {
+			super.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 }

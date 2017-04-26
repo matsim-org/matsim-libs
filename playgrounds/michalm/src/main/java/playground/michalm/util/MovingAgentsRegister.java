@@ -28,60 +28,43 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 
-
 public class MovingAgentsRegister
-    implements EventHandler, PersonDepartureEventHandler, PersonStuckEventHandler,
-    PersonArrivalEventHandler
-{
-    private Map<Id<Person>, PersonDepartureEvent> movingAgentsMap = new HashMap<>();
+		implements EventHandler, PersonDepartureEventHandler, PersonStuckEventHandler, PersonArrivalEventHandler {
+	private Map<Id<Person>, PersonDepartureEvent> movingAgentsMap = new HashMap<>();
 
+	@Override
+	public void handleEvent(PersonDepartureEvent event) {
+		movingAgentsMap.put(event.getPersonId(), event);
+	}
 
-    @Override
-    public void handleEvent(PersonDepartureEvent event)
-    {
-        movingAgentsMap.put(event.getPersonId(), event);
-    }
+	@Override
+	public void handleEvent(PersonArrivalEvent event) {
+		movingAgentsMap.remove(event.getPersonId());
+	}
 
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		// throw new RuntimeException();
+		System.err.println("AgentStuckEvent:");
+		System.err.println(event);
+	}
 
-    @Override
-    public void handleEvent(PersonArrivalEvent event)
-    {
-        movingAgentsMap.remove(event.getPersonId());
-    }
+	public Set<Id<Person>> getMovingAgentIds() {
+		return movingAgentsMap.keySet();
+	}
 
+	@Override
+	public void reset(int iteration) {
+		movingAgentsMap.clear();
+	}
 
-    @Override
-    public void handleEvent(PersonStuckEvent event)
-    {
-        //throw new RuntimeException();
-        System.err.println("AgentStuckEvent:");
-        System.err.println(event);
-    }
+	private static final MovingAgentsRegister MOVING_AGENTS_REGISTER = new MovingAgentsRegister();
 
-
-    public Set<Id<Person>> getMovingAgentIds()
-    {
-        return movingAgentsMap.keySet();
-    }
-
-
-    @Override
-    public void reset(int iteration)
-    {
-        movingAgentsMap.clear();
-    }
-
-
-    private static final MovingAgentsRegister MOVING_AGENTS_REGISTER = new MovingAgentsRegister();
-
-
-    public static AbstractModule createModule()
-    {
-        return new AbstractModule() {
-            public void install()
-            {
-                addEventHandlerBinding().toInstance(MOVING_AGENTS_REGISTER);
-            }
-        };
-    }
+	public static AbstractModule createModule() {
+		return new AbstractModule() {
+			public void install() {
+				addEventHandlerBinding().toInstance(MOVING_AGENTS_REGISTER);
+			}
+		};
+	}
 }

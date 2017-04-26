@@ -165,7 +165,7 @@ public class CemdapPersonFileAnalyzer {
 				
 				// (further) trip-specific attributes
 				boolean doesWorkTrip = false;
-	    		if (trip.getActivityEndActType().equals("work")) {
+	    		if (trip.getActivityTypeBeforeTrip().equals("work")) {
 	    			doesWorkTrip = true;	    			
 	    		}
 	    		

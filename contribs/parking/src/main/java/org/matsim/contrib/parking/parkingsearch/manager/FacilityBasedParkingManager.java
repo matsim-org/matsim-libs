@@ -43,7 +43,7 @@ import org.matsim.vehicles.Vehicle;
 import com.google.inject.Inject;
 
 /**
- * @author  jbischoff
+ * @author  jbischoff, schlenther
  *
  */
 /**
@@ -51,13 +51,13 @@ import com.google.inject.Inject;
  */
 public class FacilityBasedParkingManager implements ParkingSearchManager {
 
-	Map<Id<Link>, Integer> capacity = new HashMap<>();
-	Map<Id<ActivityFacility>, MutableLong> occupation = new HashMap<>();
-	Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities;
-	Map<Id<Vehicle>, Id<ActivityFacility>> parkingLocations = new HashMap<>();
-	Map<Id<Vehicle>, Id<ActivityFacility>> parkingReservation = new HashMap<>();
-	Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
-	Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
+	protected Map<Id<Link>, Integer> capacity = new HashMap<>();
+	protected Map<Id<ActivityFacility>, MutableLong> occupation = new HashMap<>();
+	protected 	Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities;
+	protected Map<Id<Vehicle>, Id<ActivityFacility>> parkingLocations = new HashMap<>();
+	protected Map<Id<Vehicle>, Id<ActivityFacility>> parkingReservation = new HashMap<>();
+	protected Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
+	protected Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
 
 	Network network;
 
@@ -168,7 +168,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	 * @param linkId
 	 * @param time
 	 */
-	private boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
+	protected boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			this.parkingLocationsOutsideFacilities.put(vehicleId, linkId);
@@ -224,6 +224,32 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 		return stats;
 	}
 
+	public double getNrOfAllParkingSpacesOnLink (Id<Link> linkId){
+		double allSpaces = 0;
+		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		if (!(parkingFacilitiesAtLink == null)) {
+			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink){
+				allSpaces += this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
+			}
+		}
+		return allSpaces;
+	}
+	
+	public double getNrOfFreeParkingSpacesOnLink (Id<Link> linkId){
+		double allFreeSpaces = 0;
+		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		if (parkingFacilitiesAtLink == null) {
+			return 0;
+		} else {
+			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink){
+				int cap = (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
+				allFreeSpaces += (cap - this.occupation.get(fac).intValue());
+			}
+		}
+		return allFreeSpaces;
+	}
+
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -235,4 +261,5 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	}
 
+	
 }

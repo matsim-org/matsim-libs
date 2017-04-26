@@ -19,98 +19,76 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import java.util.*;
+
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.CSVLineBuilder;
 
+public class TimeProfiles {
+	public static ProfileCalculator combineProfileCalculators(final ProfileCalculator... calculators) {
+		CSVLineBuilder builder = new CSVLineBuilder();
+		for (ProfileCalculator pc : calculators) {
+			builder.addAll(pc.getHeader());
+		}
+		final String[] header = builder.build();
 
-public class TimeProfiles
-{
-    public static ProfileCalculator combineProfileCalculators(
-            final ProfileCalculator... calculators)
-    {
-        CSVLineBuilder builder = new CSVLineBuilder();
-        for (ProfileCalculator pc : calculators) {
-            builder.addAll(pc.getHeader());
-        }
-        final String[] header = builder.build();
+		return new ProfileCalculator() {
+			@Override
+			public String[] getHeader() {
+				return header;
+			}
 
-        return new ProfileCalculator() {
-            @Override
-            public String[] getHeader()
-            {
-                return header;
-            }
+			@Override
+			public Object[] calcValues() {
+				List<Object> values = new ArrayList<>(header.length);
+				for (ProfileCalculator pc : calculators) {
+					for (Object val : pc.calcValues()) {
+						values.add(val);
+					}
+				}
+				return values.toArray();
+			}
+		};
+	}
 
+	public static String[] combineValuesIntoStrings(Object... values) {
+		String[] strings = new String[values.length];
+		for (int i = 0; i < values.length; i++) {
+			strings[i] = values[i] + "";
+		}
+		return strings;
+	}
 
-            @Override
-            public String[] calcValues()
-            {
-                CSVLineBuilder builder = new CSVLineBuilder();
-                for (ProfileCalculator pc : calculators) {
-                    builder.addAll(pc.calcValues());
-                }
-                return builder.build();
-            }
-        };
-    }
+	public static abstract class SingleValueProfileCalculator implements ProfileCalculator {
+		private final String[] headerArray;
 
+		public SingleValueProfileCalculator(String header) {
+			this.headerArray = new String[] { header };
+		}
 
-    public static String[] combineValues(Object... values)
-    {
-        String[] strings = new String[values.length];
-        for (int i = 0; i < values.length; i++) {
-            strings[i] = values[i] + "";
-        }
-        return strings;
-    }
+		@Override
+		public String[] getHeader() {
+			return headerArray;
+		}
 
+		@Override
+		public Object[] calcValues() {
+			return new Object[] { calcValue() };
+		}
 
-    public static abstract class SingleValueProfileCalculator
-        implements ProfileCalculator
-    {
-        private final String[] headerArray;
+		public abstract Object calcValue();
+	}
 
+	public static abstract class MultiValueProfileCalculator implements ProfileCalculator {
+		private final String[] headerArray;
 
-        public SingleValueProfileCalculator(String header)
-        {
-            this.headerArray = new String[] { header };
-        }
+		public MultiValueProfileCalculator(String... header) {
+			this.headerArray = header;
+		}
 
-
-        @Override
-        public String[] getHeader()
-        {
-            return headerArray;
-        }
-
-
-        @Override
-        public String[] calcValues()
-        {
-            return new String[] { calcValue() };
-        }
-
-
-        public abstract String calcValue();
-    }
-
-
-    public static abstract class MultiValueProfileCalculator
-        implements ProfileCalculator
-    {
-        private final String[] headerArray;
-
-
-        public MultiValueProfileCalculator(String... header)
-        {
-            this.headerArray = header;
-        }
-
-
-        @Override
-        public String[] getHeader()
-        {
-            return headerArray;
-        }
-    }
+		@Override
+		public String[] getHeader() {
+			return headerArray;
+		}
+	}
 }

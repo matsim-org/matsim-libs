@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package playground.agarwalamit.siouxFalls.sampleSizePricing;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,17 +41,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * @author amit
@@ -106,10 +104,7 @@ public class TestingPricing4SamplePopulation {
 			//			emissionModule.createLookupTables();
 			//			emissionModule.createEmissionHandler();
 
-			controler.getConfig().controler().setOverwriteFileSetting(
-					true ?
-							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 			controler.getConfig().controler().setCreateGraphs(true);
 			controler.getConfig().controler().setDumpDataAtEnd(false);
 
@@ -118,7 +113,7 @@ public class TestingPricing4SamplePopulation {
 			//			controler.run();
 			double delaysCosts = getDelaysFromEventsDefaultHandler(outputDir,(MutableScenario) scenario );
 			//			double[] delaysCosts = getDelaysFromEvents(outputDir,(ScenarioImpl) controler.getScenario());
-			double emissionsCosts = getTotalEmissionsCostsFromEmissionsEvents(outputDir, (MutableScenario) scenario);
+			double emissionsCosts = getTotalEmissionsCostsFromEmissionsEvents(outputDir, scenario);
 
 			flowCap2NoOfPersons.put(d, scenario.getPopulation().getPersons().size());
 			int carCounter =0;
@@ -195,7 +190,6 @@ public class TestingPricing4SamplePopulation {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
 		String inputEventsFile = outputDir+"/ITERS/it.500/500.events.xml.gz";
 		eventsReader.readFile(inputEventsFile);
-		double flowAndStorageDelays = congestionHandlerImplV3.getTotalInternalizedDelay()*VTTS_CAR; 
-		return flowAndStorageDelays;
+        return congestionHandlerImplV3.getTotalInternalizedDelay()*VTTS_CAR;
 	}
 }

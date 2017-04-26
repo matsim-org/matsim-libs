@@ -19,10 +19,15 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies.analysis;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import playground.agarwalamit.analysis.modeSwitcherRetainer.ModeSwitchersTripDistance;
 import playground.agarwalamit.analysis.modeSwitcherRetainer.ModeSwitchersTripTime;
+import playground.agarwalamit.analysis.tripDistance.TripDistanceType;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.PersonFilter;
 
 /**
@@ -32,29 +37,48 @@ import playground.agarwalamit.utils.PersonFilter;
 
 public class PatnaModeSwitcherStats {
 
-    private final String dir = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/bikeTrackConnectors_0/_4/";
+    private final String dir = FileUtils.RUNS_SVN+"patnaIndia/run108/jointDemand/policies/0.15pcu/BT-b/";
 
     private final PersonFilter pf = new PatnaPersonFilter();
     private final String userGroup = PatnaPersonFilter.PatnaUserGroup.urban.toString();
     private final int firstIteration = 1200;
-    private final int lastIteration = 1300;
+    private final int lastIteration = 1400;
 
     public static void main(String[] args) {
         new PatnaModeSwitcherStats().run();
     }
 
     private void run(){
+        Scenario scenario = LoadMyScenarios.loadScenarioFromNetworkAndConfig(dir+"/output_network.xml.gz",dir+"/output_config.xml.gz");
+        scenario.getConfig().controler().setOutputDirectory(dir);
 
         ModeSwitchersTripTime mstt = new ModeSwitchersTripTime(userGroup, pf);
-        mstt.processEventsFiles(dir, firstIteration, lastIteration);
+        mstt.processEventsFiles(scenario);
         mstt.writeResults(dir+"/analysis/");
 
-        ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance(userGroup,pf);
-        mstd.processEventsFiles(dir, firstIteration, lastIteration);
-        mstd.writeResults(dir+"/analysis/");
+        {
+            ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance(userGroup, pf, TripDistanceType.BEELINE_DISTANCE);
+            mstd.processEventsFiles(scenario);
+            mstd.writeResults(dir+"/analysis/");
+        }
 
+        {
+            ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance(userGroup, pf, TripDistanceType.ROUTE_DISTANCE);
 
+            updateBikeTrackLinkLength(scenario);
+
+            mstd.processEventsFiles(scenario);
+            mstd.writeResults(dir+"/analysis/correctedBikeLinksLength_");
+        }
     }
 
+    private void updateBikeTrackLinkLength (final  Scenario scenario) {
 
+        for(Link l : scenario.getNetwork().getLinks().values()) {
+            String linkId = l.getId().toString();
+            if (linkId.startsWith(PatnaUtils.BIKE_TRACK_PREFIX) ||linkId.startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX)) {
+                l.setLength(l.getLength() * PatnaUtils.BIKE_TRACK_LEGNTH_REDUCTION_FACTOR );
+            }
+        }
+    }
 }

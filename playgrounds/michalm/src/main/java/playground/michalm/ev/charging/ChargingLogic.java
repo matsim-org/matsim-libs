@@ -23,26 +23,18 @@ import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.michalm.ev.data.*;
 
+public interface ChargingLogic {
+	void addVehicle(ElectricVehicle ev, double now);
 
-public interface ChargingLogic
-{
-    void addVehicle(ElectricVehicle ev, double now);
+	void removeVehicle(ElectricVehicle ev, double now);
 
+	boolean isPlugged(ElectricVehicle ev);
 
-    void removeVehicle(ElectricVehicle ev, double now);
+	void chargeVehicles(double chargePeriod, double now);
 
+	Charger getCharger();
 
-    boolean isPlugged(ElectricVehicle ev);
+	void reset();
 
-
-    void chargeVehicles(double chargePeriod, double now);
-
-
-    Charger getCharger();
-
-
-    void reset();
-
-
-    void initEventsHandling(EventsManager eventsManager);
+	void initEventsHandling(EventsManager eventsManager);
 }

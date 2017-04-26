@@ -20,12 +20,14 @@
 package org.matsim.contrib.transEnergySim.example.car;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.HashMap;
 
@@ -44,7 +46,8 @@ public class DisChargingControler {
 
 	
 	public DisChargingControler(Config config,  HashMap<Id<Vehicle>, Vehicle> vehicles) {
-		this.controler = new Controler(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		this.controler = new Controler(scenario);
 		init(vehicles);
 		
 	}

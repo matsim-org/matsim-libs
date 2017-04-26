@@ -35,162 +35,147 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.util.chart.CoordDataset;
 import org.matsim.contrib.util.chart.CoordDataset.CoordSource;
 
-
 /**
  * @author michalm
  */
-public class RouteCharts
-{
-    public static JFreeChart chartRoutes(Collection<? extends Vehicle> vehicles)
-    {
-        CoordDataset lData = new CoordDataset();
-        int i = 0;
-        for (Vehicle v : vehicles) {
-            Schedule<?> schedule = v.getSchedule();
-            lData.addSeries(Integer.toString(i++),
-                    ScheduleCoordSources.createCoordSource(schedule));
-        }
+public class RouteCharts {
+	public static JFreeChart chartRoutes(Collection<? extends Vehicle> vehicles) {
+		CoordDataset lData = new CoordDataset();
+		int i = 0;
+		for (Vehicle v : vehicles) {
+			Schedule schedule = v.getSchedule();
+			lData.addSeries(Integer.toString(i++), ScheduleCoordSources.createCoordSource(schedule));
+		}
 
-        JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", lData,
-                PlotOrientation.VERTICAL, true, true, false);
+		JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", lData, PlotOrientation.VERTICAL, true,
+				true, false);
 
-        XYPlot plot = (XYPlot)chart.getPlot();
-        plot.setRangeGridlinesVisible(false);
-        plot.setDomainGridlinesVisible(false);
-        plot.setBackgroundPaint(Color.white);
+		XYPlot plot = (XYPlot)chart.getPlot();
+		plot.setRangeGridlinesVisible(false);
+		plot.setDomainGridlinesVisible(false);
+		plot.setBackgroundPaint(Color.white);
 
-        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
-        yAxis.setAutoRangeIncludesZero(false);
+		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+		yAxis.setAutoRangeIncludesZero(false);
 
-        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
-        renderer.setSeriesShapesVisible(0, true);
-        renderer.setSeriesLinesVisible(0, false);
-        renderer.setSeriesItemLabelsVisible(0, true);
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+		renderer.setSeriesShapesVisible(0, true);
+		renderer.setSeriesLinesVisible(0, false);
+		renderer.setSeriesItemLabelsVisible(0, true);
 
-        renderer.setBaseItemLabelGenerator(new XYItemLabelGenerator() {
-            public String generateLabel(XYDataset dataset, int series, int item)
-            {
-                return ((CoordDataset)dataset).getText(series, item);
-            }
-        });
+		renderer.setBaseItemLabelGenerator(new XYItemLabelGenerator() {
+			public String generateLabel(XYDataset dataset, int series, int item) {
+				return ((CoordDataset)dataset).getText(series, item);
+			}
+		});
 
-        for (int j = 1; j <= vehicles.size(); j++) {
-            renderer.setSeriesShapesVisible(j, true);
-            renderer.setSeriesLinesVisible(j, true);
-            renderer.setSeriesItemLabelsVisible(j, true);
-        }
+		for (int j = 1; j <= vehicles.size(); j++) {
+			renderer.setSeriesShapesVisible(j, true);
+			renderer.setSeriesLinesVisible(j, true);
+			renderer.setSeriesItemLabelsVisible(j, true);
+		}
 
-        return chart;
-    }
+		return chart;
+	}
 
+	public static JFreeChart chartRoutesByStatus(List<? extends Vehicle> vehicles) {
+		CoordDataset nData = new CoordDataset();
 
-    public static JFreeChart chartRoutesByStatus(List<? extends Vehicle> vehicles)
-    {
-        CoordDataset nData = new CoordDataset();
+		for (int i = 0; i < vehicles.size(); i++) {
+			Schedule schedule = vehicles.get(i).getSchedule();
+			Map<TaskStatus, CoordSource> vsByStatus = createLinkSourceByStatus(schedule);
+			nData.addSeries(i + "-PR", vsByStatus.get(TaskStatus.PERFORMED));
+			nData.addSeries(i + "-ST", vsByStatus.get(TaskStatus.STARTED));
+			nData.addSeries(i + "-PL", vsByStatus.get(TaskStatus.PLANNED));
+		}
 
-        for (int i = 0; i < vehicles.size(); i++) {
-            Schedule<?> schedule = vehicles.get(i).getSchedule();
-            Map<TaskStatus, CoordSource> vsByStatus = createLinkSourceByStatus(schedule);
-            nData.addSeries(i + "-PR", vsByStatus.get(TaskStatus.PERFORMED));
-            nData.addSeries(i + "-ST", vsByStatus.get(TaskStatus.STARTED));
-            nData.addSeries(i + "-PL", vsByStatus.get(TaskStatus.PLANNED));
-        }
+		JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", nData, PlotOrientation.VERTICAL, false,
+				true, false);
 
-        JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", nData,
-                PlotOrientation.VERTICAL, false, true, false);
+		XYPlot plot = (XYPlot)chart.getPlot();
+		plot.setRangeGridlinesVisible(false);
+		plot.setDomainGridlinesVisible(false);
+		plot.setBackgroundPaint(Color.white);
 
-        XYPlot plot = (XYPlot)chart.getPlot();
-        plot.setRangeGridlinesVisible(false);
-        plot.setDomainGridlinesVisible(false);
-        plot.setBackgroundPaint(Color.white);
+		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+		yAxis.setAutoRangeIncludesZero(false);
 
-        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
-        yAxis.setAutoRangeIncludesZero(false);
+		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+		renderer.setSeriesShapesVisible(0, true);
+		renderer.setSeriesLinesVisible(0, false);
+		renderer.setSeriesItemLabelsVisible(0, true);
 
-        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
-        renderer.setSeriesShapesVisible(0, true);
-        renderer.setSeriesLinesVisible(0, false);
-        renderer.setSeriesItemLabelsVisible(0, true);
+		renderer.setBaseItemLabelGenerator(new LabelGenerator());
 
-        renderer.setBaseItemLabelGenerator(new LabelGenerator());
+		Paint[] paints = DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE;
+		Shape[] shapes = DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE;
 
-        Paint[] paints = DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE;
-        Shape[] shapes = DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE;
+		for (int i = 0; i < vehicles.size(); i++) {
+			int s = 3 * i;
 
-        for (int i = 0; i < vehicles.size(); i++) {
-            int s = 3 * i;
+			renderer.setSeriesItemLabelsVisible(s + 1, true);
+			renderer.setSeriesItemLabelsVisible(s + 2, true);
+			renderer.setSeriesItemLabelsVisible(s + 3, true);
 
-            renderer.setSeriesItemLabelsVisible(s + 1, true);
-            renderer.setSeriesItemLabelsVisible(s + 2, true);
-            renderer.setSeriesItemLabelsVisible(s + 3, true);
+			renderer.setSeriesShapesVisible(s + 1, true);
+			renderer.setSeriesShapesVisible(s + 2, true);
+			renderer.setSeriesShapesVisible(s + 3, true);
 
-            renderer.setSeriesShapesVisible(s + 1, true);
-            renderer.setSeriesShapesVisible(s + 2, true);
-            renderer.setSeriesShapesVisible(s + 3, true);
+			renderer.setSeriesLinesVisible(s + 1, true);
+			renderer.setSeriesLinesVisible(s + 2, true);
+			renderer.setSeriesLinesVisible(s + 3, true);
 
-            renderer.setSeriesLinesVisible(s + 1, true);
-            renderer.setSeriesLinesVisible(s + 2, true);
-            renderer.setSeriesLinesVisible(s + 3, true);
+			renderer.setSeriesPaint(s + 1, paints[(i + 1) % paints.length]);
+			renderer.setSeriesPaint(s + 2, paints[(i + 1) % paints.length]);
+			renderer.setSeriesPaint(s + 3, paints[(i + 1) % paints.length]);
 
-            renderer.setSeriesPaint(s + 1, paints[ (i + 1) % paints.length]);
-            renderer.setSeriesPaint(s + 2, paints[ (i + 1) % paints.length]);
-            renderer.setSeriesPaint(s + 3, paints[ (i + 1) % paints.length]);
+			renderer.setSeriesShape(s + 1, shapes[(i + 1) % shapes.length]);
+			renderer.setSeriesShape(s + 2, shapes[(i + 1) % shapes.length]);
+			renderer.setSeriesShape(s + 3, shapes[(i + 1) % shapes.length]);
 
-            renderer.setSeriesShape(s + 1, shapes[ (i + 1) % shapes.length]);
-            renderer.setSeriesShape(s + 2, shapes[ (i + 1) % shapes.length]);
-            renderer.setSeriesShape(s + 3, shapes[ (i + 1) % shapes.length]);
+			renderer.setSeriesStroke(s + 2, new BasicStroke(3));
+			renderer.setSeriesStroke(s + 3,
+					new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1, new float[] { 5f, 5f }, 0));
+		}
 
-            renderer.setSeriesStroke(s + 2, new BasicStroke(3));
-            renderer.setSeriesStroke(s + 3, new BasicStroke(1, BasicStroke.CAP_ROUND,
-                    BasicStroke.JOIN_ROUND, 1, new float[] { 5f, 5f }, 0));
-        }
+		return chart;
+	}
 
-        return chart;
-    }
+	private static Map<TaskStatus, CoordSource> createLinkSourceByStatus(Schedule schedule) {
+		Iterable<DriveTask> tasks = Schedules.createDriveTaskIter(schedule);
 
+		// creating lists of DriveTasks
+		Map<TaskStatus, List<DriveTask>> taskListByStatus = new EnumMap<>(TaskStatus.class);
 
-    private static Map<TaskStatus, CoordSource> createLinkSourceByStatus(
-            Schedule<? extends Task> schedule)
-    {
-        Iterable<DriveTask> tasks = Schedules.createDriveTaskIter(schedule);
+		for (TaskStatus ts : TaskStatus.values()) {
+			taskListByStatus.put(ts, new ArrayList<DriveTask>());
+		}
 
-        // creating lists of DriveTasks
-        Map<TaskStatus, List<DriveTask>> taskListByStatus = new EnumMap<>(TaskStatus.class);
+		for (DriveTask t : tasks) {
+			taskListByStatus.get(t.getStatus()).add(t);
+		}
 
-        for (TaskStatus ts : TaskStatus.values()) {
-            taskListByStatus.put(ts, new ArrayList<DriveTask>());
-        }
+		// creating LinkSources
+		Map<TaskStatus, CoordSource> linkSourceByStatus = new EnumMap<>(TaskStatus.class);
 
-        for (DriveTask t : tasks) {
-            taskListByStatus.get(t.getStatus()).add(t);
-        }
+		for (TaskStatus ts : TaskStatus.values()) {
+			linkSourceByStatus.put(ts, ScheduleCoordSources.createCoordSource(taskListByStatus.get(ts)));
+		}
 
-        // creating LinkSources
-        Map<TaskStatus, CoordSource> linkSourceByStatus = new EnumMap<>(TaskStatus.class);
+		return linkSourceByStatus;
+	}
 
-        for (TaskStatus ts : TaskStatus.values()) {
-            linkSourceByStatus.put(ts,
-                    ScheduleCoordSources.createCoordSource(taskListByStatus.get(ts)));
-        }
+	private static class LabelGenerator implements XYItemLabelGenerator {
+		public String generateLabel(XYDataset dataset, int series, int item) {
+			if (series == 0) {
+				return "D";
+			}
 
-        return linkSourceByStatus;
-    }
+			if (item == 0) {
+				return null;
+			}
 
-
-    private static class LabelGenerator
-        implements XYItemLabelGenerator
-    {
-        public String generateLabel(XYDataset dataset, int series, int item)
-        {
-            if (series == 0) {
-                return "D";
-            }
-
-            if (item == 0) {
-                return null;
-            }
-
-            return ((CoordDataset)dataset).getText(series, item);
-        }
-    }
+			return ((CoordDataset)dataset).getText(series, item);
+		}
+	}
 }

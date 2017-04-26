@@ -11,15 +11,15 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 import javax.inject.Inject;
 
 public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	private final Scenario scenario;
-	private final CharyparNagelScoringParametersForPerson params;
+	private final ScoringParametersForPerson params;
 	private final DemandHandler demandHandler;
 	private final CostsCalculatorContainer costsCalculatorContainer;
 	private final CarsharingSupplyInterface carsharingSupplyContainer;
@@ -27,7 +27,7 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	CarsharingScoringFunctionFactory( final Scenario sc, final DemandHandler demandHandler,
 			final CostsCalculatorContainer costsCalculatorContainer, final CarsharingSupplyInterface carsharingSupplyContainer) {
 		this.scenario = sc;
-		this.params = new SubpopulationCharyparNagelScoringParameters( sc );
+		this.params = new SubpopulationScoringParameters( sc );
 		this.demandHandler = demandHandler;
 		this.costsCalculatorContainer = costsCalculatorContainer;
 		this.carsharingSupplyContainer = carsharingSupplyContainer;
@@ -43,7 +43,7 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	    new CarsharingLegScoringFunction( params.getScoringParameters( person ),
 	    								 this.scenario.getConfig(),
 	    								 this.scenario.getNetwork(), this.demandHandler, this.costsCalculatorContainer, 
-	    								 this.carsharingSupplyContainer, person.getId()));
+	    								 this.carsharingSupplyContainer, person));
 		scoringFunctionSum.addScoringFunction(
 				new CharyparNagelLegScoring(
 						params.getScoringParameters( person ),

@@ -67,15 +67,10 @@ public class EmissionOfflineMaryland {
 		System.out.println(config.network().getInputFile());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
+		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
+
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
@@ -84,7 +79,7 @@ public class EmissionOfflineMaryland {
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 
 	private static int getLastIteration() {		

@@ -40,7 +40,7 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 	public Collection<String> getPermissibleModes(Plan plan) {
 		final Person person;
 		Id<Person> personId;
-		List<String> l; 
+		List<String> l = new ArrayList<String>();
 		try {
 			person = plan.getPerson();
 			personId = person.getId();
@@ -48,14 +48,6 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException( "I need a PersonImpl to get car availability" );
 		}
-
-		final boolean carAvail =
-			!"no".equals( PersonUtils.getLicense(person) ) &&
-			!"never".equals( PersonUtils.getCarAvail(person) );
-		if (carAvail)			 
-			  l = new ArrayList<String>( this.availableModes );
-		  else
-			  l = new ArrayList<String>( this.availableModesWithoutCar );
 		
 		 if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
 		

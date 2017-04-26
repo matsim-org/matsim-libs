@@ -86,7 +86,7 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 	private XMLAttributesContent edgeAttributeContentsContainer;
 
 
-	public GexfPStat(PConfigGroup pConfig, boolean writeOperatorInDetail){
+	public GexfPStat(boolean writeOperatorInDetail, PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.writeOperatorInDetail = writeOperatorInDetail;
 		this.pIdentifier = pConfig.getPIdentifier();

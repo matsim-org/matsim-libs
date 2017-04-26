@@ -41,6 +41,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.integration.invertednetworks.InvertedNetworkRoutingTestFixture;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 /**
@@ -53,6 +54,7 @@ public class InvertedNetworkRoutingSignalsFixture extends InvertedNetworkRouting
 			boolean doCreateLanes, boolean doCreateSignals) {
 		super(doCreateModes, doCreateLanes, doCreateSignals);
 		if (doCreateSignals){
+		    scenario.getConfig().qsim().setUsingFastCapacityUpdate(false);
 			ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 			createSignals();
 		}

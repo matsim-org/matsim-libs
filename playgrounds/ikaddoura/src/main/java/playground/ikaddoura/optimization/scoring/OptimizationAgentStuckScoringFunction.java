@@ -20,13 +20,13 @@
 
 package playground.ikaddoura.optimization.scoring;
 
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 public class OptimizationAgentStuckScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring {
 	
 	private final double agentStuckScore;
 	
-	public OptimizationAgentStuckScoringFunction(CharyparNagelScoringParameters params, double agentStuckScore) {
+	public OptimizationAgentStuckScoringFunction(ScoringParameters params, double agentStuckScore) {
 		super(params);
 		this.agentStuckScore = agentStuckScore;
 	}

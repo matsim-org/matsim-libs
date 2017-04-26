@@ -15,8 +15,8 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -27,9 +27,9 @@ import java.util.*;
  * @author thibautd
  */
 @Singleton
-public class MATSim2010ScoringParametersPerPerson implements CharyparNagelScoringParametersForPerson {
+public class MATSim2010ScoringParametersPerPerson implements ScoringParametersForPerson {
 	private final Scenario scenario;
-	private final Map<Id<Person>, CharyparNagelScoringParameters> cache = new HashMap<>();
+	private final Map<Id<Person>, ScoringParameters> cache = new HashMap<>();
 
 	private final StageActivityTypes typesNotToScore = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE );
 
@@ -39,7 +39,7 @@ public class MATSim2010ScoringParametersPerPerson implements CharyparNagelScorin
 	}
 
 	@Override
-	public CharyparNagelScoringParameters getScoringParameters(Person person) {
+	public ScoringParameters getScoringParameters(Person person) {
 		if ( cache.containsKey( person.getId() ) ) {
 			return cache.get( person.getId() );
 		}
@@ -48,8 +48,8 @@ public class MATSim2010ScoringParametersPerPerson implements CharyparNagelScorin
 		final ScenarioConfigGroup scenarioConfig = scenario.getConfig().scenario();
 		final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
 
-		final CharyparNagelScoringParameters.Builder builder =
-				new CharyparNagelScoringParameters.Builder(
+		final ScoringParameters.Builder builder =
+				new ScoringParameters.Builder(
 						config,
 						config.getScoringParameters(null),
 						scenarioConfig);
@@ -122,7 +122,7 @@ public class MATSim2010ScoringParametersPerPerson implements CharyparNagelScorin
 					config.getModes().get( TransportMode.pt ).getMarginalUtilityOfDistance() * ktiConfig.getTravelCardRatio() );
 		}
 
-		final CharyparNagelScoringParameters params =
+		final ScoringParameters params =
 				builder.build();
 		cache.put( person.getId() , params );
 		return params;

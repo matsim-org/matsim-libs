@@ -31,93 +31,74 @@ import org.matsim.core.mobsim.framework.listeners.*;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
+public class TimeProfileCollector implements MobsimBeforeSimStepListener, MobsimBeforeCleanupListener {
+	public interface ProfileCalculator {
+		String[] getHeader();
 
-public class TimeProfileCollector
-    implements MobsimBeforeSimStepListener, MobsimBeforeCleanupListener
-{
-    public interface ProfileCalculator
-    {
-        String[] getHeader();
+		Object[] calcValues();
+	}
 
+	private final ProfileCalculator calculator;
+	private final List<Double> times = new ArrayList<>();
+	private final List<Object[]> timeProfile = new ArrayList<>();
+	private final int interval;
+	private final String outputFile;
+	private final MatsimServices matsimServices;
 
-        String[] calcValues();
-    }
+	private Customizer chartCustomizer;
+	private ChartType[] chartTypes = { ChartType.Line };
 
+	public TimeProfileCollector(ProfileCalculator calculator, int interval, String outputFile,
+			MatsimServices matsimServices) {
+		this.calculator = calculator;
+		this.interval = interval;
+		this.outputFile = outputFile;
+		this.matsimServices = matsimServices;
+	}
 
-    private final ProfileCalculator calculator;
-    private final List<Double> times = new ArrayList<>();
-    private final List<String[]> timeProfile = new ArrayList<>();
-    private final int interval;
-    private final String outputFile;
-    private final MatsimServices matsimServices;
+	@Override
+	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
+		if (e.getSimulationTime() % interval == 0) {
+			times.add(e.getSimulationTime());
+			timeProfile.add(calculator.calcValues());
+		}
+	}
 
-    private Customizer chartCustomizer;
-    private ChartType[] chartTypes = { ChartType.Line };
+	public void setChartCustomizer(TimeProfileCharts.Customizer chartCustomizer) {
+		this.chartCustomizer = chartCustomizer;
+	}
 
+	public void setChartTypes(ChartType... chartTypes) {
+		this.chartTypes = chartTypes;
+	}
 
-    public TimeProfileCollector(ProfileCalculator calculator, int interval, String outputFile,
-            MatsimServices matsimServices)
-    {
-        this.calculator = calculator;
-        this.interval = interval;
-        this.outputFile = outputFile;
-        this.matsimServices = matsimServices;
-    }
+	@Override
+	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
+		String file = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(),
+				outputFile);
+		String timeFormat = interval % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
+		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
+			writer.writeNext("time", calculator.getHeader());
+			for (int i = 0; i < timeProfile.size(); i++) {
+				writer.writeNext(Time.writeTime(times.get(i), timeFormat), //
+						TimeProfiles.combineValuesIntoStrings(timeProfile.get(i)));
+			}
+		}
 
-    @Override
-    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
-    {
-        if (e.getSimulationTime() % interval == 0) {
-            times.add(e.getSimulationTime());
-            timeProfile.add(calculator.calcValues());
-        }
-    }
+		for (ChartType t : chartTypes) {
+			generateImage(t);
+		}
+	}
 
+	private void generateImage(ChartType chartType) {
+		JFreeChart chart = TimeProfileCharts.chartProfile(calculator.getHeader(), times, timeProfile, chartType);
+		if (chartCustomizer != null) {
+			chartCustomizer.customize(chart, chartType);
+		}
 
-    public void setChartCustomizer(TimeProfileCharts.Customizer chartCustomizer)
-    {
-        this.chartCustomizer = chartCustomizer;
-    }
-
-
-    public void setChartTypes(ChartType... chartTypes)
-    {
-        this.chartTypes = chartTypes;
-    }
-
-
-    @Override
-    public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
-    {
-        String file = matsimServices.getControlerIO()
-                .getIterationFilename(matsimServices.getIterationNumber(), outputFile);
-        String timeFormat = interval % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
-
-        try (CompactCSVWriter writer = new CompactCSVWriter(
-                IOUtils.getBufferedWriter(file + ".txt"))) {
-            writer.writeNext("time", calculator.getHeader());
-            for (int i = 0; i < timeProfile.size(); i++) {
-                writer.writeNext(Time.writeTime(times.get(i), timeFormat), timeProfile.get(i));
-            }
-        }
-
-        for (ChartType t : chartTypes) {
-            generateImage(t);
-        }
-    }
-
-
-    private void generateImage(ChartType chartType)
-    {
-        JFreeChart chart = TimeProfileCharts.chartProfile(calculator.getHeader(), times,
-                timeProfile, chartType);
-        if (chartCustomizer != null) {
-            chartCustomizer.customize(chart, chartType);
-        }
-
-        String imageFile = matsimServices.getControlerIO().getIterationFilename(
-                matsimServices.getIterationNumber(), outputFile + "_" + chartType.name());
-        ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
-    }
+		String imageFile = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(),
+				outputFile + "_" + chartType.name());
+		ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
+	}
 }

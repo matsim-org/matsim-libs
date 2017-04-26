@@ -36,6 +36,11 @@
 			<artifactId>taxi</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
+			<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>av</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
@@ -49,11 +54,6 @@
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>michalm</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-		</dependency>
-				<dependency>
-			<groupId>playground</groupId>
-			<artifactId>mzilske</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 				<dependency>
@@ -84,5 +84,15 @@
 	<artifactId>json-simple</artifactId>
 	<version>1.1.1</version>
 </dependency>
+<dependency>
+   <groupId>com.graphhopper</groupId>
+   <artifactId>jsprit-core</artifactId>
+   <version>1.7-RC1</version>
+</dependency>
+	  <dependency>
+		  <groupId>org.matsim.contrib</groupId>
+		  <artifactId>matsim-gtfs</artifactId>
+		  <version>0.8.0</version>
+	  </dependency>
   </dependencies>
 </project>

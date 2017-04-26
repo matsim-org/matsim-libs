@@ -25,129 +25,97 @@ import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.xy.*;
 import org.matsim.api.core.v01.Coord;
 
-
 /**
  * @author michalm
  */
 @SuppressWarnings("serial")
-public class CoordDataset
-    extends AbstractXYDataset
-    implements XYDataset
-{
-    public interface CoordSource
-    {
-        int getCount();
+public class CoordDataset extends AbstractXYDataset implements XYDataset {
+	public interface CoordSource {
+		int getCount();
 
+		Coord getCoord(int item);
+	}
 
-        Coord getCoord(int item);
-    }
+	private List<Comparable<String>> seriesKeys;
+	private List<CoordSource> seriesList;
 
+	public CoordDataset() {
+		seriesKeys = new ArrayList<>();
+		seriesList = new ArrayList<>();
+	}
 
-    private List<Comparable<String>> seriesKeys;
-    private List<CoordSource> seriesList;
+	@Override
+	public int getSeriesCount() {
+		return seriesList.size();
+	}
 
+	@Override
+	public Comparable<String> getSeriesKey(int series) {
+		return seriesKeys.get(series);
+	}
 
-    public CoordDataset()
-    {
-        seriesKeys = new ArrayList<>();
-        seriesList = new ArrayList<>();
-    }
+	@Override
+	public int getItemCount(int series) {
+		return seriesList.get(series).getCount();
+	}
 
+	@Override
+	public Number getX(int series, int item) {
+		return new Double(getXValue(series, item));
+	}
 
-    @Override
-    public int getSeriesCount()
-    {
-        return seriesList.size();
-    }
+	@Override
+	public double getXValue(int series, int item) {
+		return getItem(series, item).getX();
+	}
 
+	@Override
+	public Number getY(int series, int item) {
+		return new Double(getYValue(series, item));
+	}
 
-    @Override
-    public Comparable<String> getSeriesKey(int series)
-    {
-        return seriesKeys.get(series);
-    }
+	@Override
+	public double getYValue(int series, int item) {
+		return getItem(series, item).getY();
+	}
 
+	public String getText(int series, int item) {
+		return getItem(series, item).toString();
+	}
 
-    @Override
-    public int getItemCount(int series)
-    {
-        return seriesList.get(series).getCount();
-    }
+	public Coord getItem(int series, int item) {
+		return seriesList.get(series).getCoord(item);
+	}
 
+	public void addSeries(String seriesKey, CoordSource data) {
+		if (seriesKey == null) {
+			throw new IllegalArgumentException("The 'seriesKey' cannot be null.");
+		}
 
-    @Override
-    public Number getX(int series, int item)
-    {
-        return new Double(getXValue(series, item));
-    }
+		if (data == null) {
+			throw new IllegalArgumentException("The 'data' is null.");
+		}
 
+		int seriesIndex = indexOf(seriesKey);
 
-    @Override
-    public double getXValue(int series, int item)
-    {
-        return getItem(series, item).getX();
-    }
+		if (seriesIndex == -1) { // add a new series
+			seriesKeys.add(seriesKey);
+			seriesList.add(data);
+		} else { // replace an existing series
+			seriesList.set(seriesIndex, data);
+		}
 
+		notifyListeners(new DatasetChangeEvent(this, this));
+	}
 
-    @Override
-    public Number getY(int series, int item)
-    {
-        return new Double(getYValue(series, item));
-    }
+	public void removeSeries(String seriesKey) {
+		int seriesIndex = indexOf(seriesKey);
 
+		if (seriesIndex >= 0) {
+			seriesKeys.remove(seriesIndex);
+			seriesList.remove(seriesIndex);
 
-    @Override
-    public double getYValue(int series, int item)
-    {
-        return getItem(series, item).getY();
-    }
-
-
-    public String getText(int series, int item)
-    {
-        return getItem(series, item).toString();
-    }
-
-
-    public Coord getItem(int series, int item)
-    {
-        return seriesList.get(series).getCoord(item);
-    }
-
-
-    public void addSeries(String seriesKey, CoordSource data)
-    {
-        if (seriesKey == null) {
-            throw new IllegalArgumentException("The 'seriesKey' cannot be null.");
-        }
-
-        if (data == null) {
-            throw new IllegalArgumentException("The 'data' is null.");
-        }
-
-        int seriesIndex = indexOf(seriesKey);
-
-        if (seriesIndex == -1) { // add a new series
-            seriesKeys.add(seriesKey);
-            seriesList.add(data);
-        }
-        else { // replace an existing series
-            seriesList.set(seriesIndex, data);
-        }
-
-        notifyListeners(new DatasetChangeEvent(this, this));
-    }
-
-
-    public void removeSeries(String seriesKey)
-    {
-        int seriesIndex = indexOf(seriesKey);
-
-        if (seriesIndex >= 0) {
-            seriesKeys.remove(seriesIndex);
-            seriesList.remove(seriesIndex);
-
-            notifyListeners(new DatasetChangeEvent(this, this));
-        }
-    }
+			notifyListeners(new DatasetChangeEvent(this, this));
+		}
+	}
 }

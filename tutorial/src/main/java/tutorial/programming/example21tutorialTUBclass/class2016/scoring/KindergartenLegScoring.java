@@ -21,11 +21,11 @@ package tutorial.programming.example21tutorialTUBclass.class2016.scoring;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 public class KindergartenLegScoring extends CharyparNagelLegScoring {
 
-	public KindergartenLegScoring(CharyparNagelScoringParameters params, Network network) {
+	public KindergartenLegScoring(ScoringParameters params, Network network) {
 		super(params, network);
 		// TODO Auto-generated constructor stub
 	}

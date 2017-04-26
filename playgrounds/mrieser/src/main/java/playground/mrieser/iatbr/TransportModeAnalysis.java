@@ -35,7 +35,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -98,7 +98,7 @@ public class TransportModeAnalysis extends AbstractPersonAlgorithm {
 		infoFile.write("X\tY\tID\tTYPE\n");
 //		Population reader = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 		reader.addAlgorithm(new TransportModeAnalysis(infoFile));
 //		new MatsimPopulationReader(scenario).parse("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");
 		reader.readFile("/Volumes/Data/VSP/projects/diss/runs/tr100pct1NoTr/output_plans.xml.gz");

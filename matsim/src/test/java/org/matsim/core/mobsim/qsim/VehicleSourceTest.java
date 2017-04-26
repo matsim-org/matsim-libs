@@ -117,7 +117,7 @@ public class VehicleSourceTest {
 		config.qsim().setStorageCapFactor(1.0);
 		config.qsim().setMainModes(Arrays.asList(transportModes));
 		//config.plansCalcRoute().setNetworkModes(Arrays.asList(transportModes));
-		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
 		config.qsim().setVehiclesSource(this.vehicleSource);
 		config.qsim().setUsePersonIdForMissingVehicleId(this.isUsingPersonIdForMissionVehicleId);
@@ -192,9 +192,9 @@ public class VehicleSourceTest {
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord(0.0, 1000.0));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord(0.0, 1100.0));
 
-        link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), node1, node2, (double) 100, (double) 25, (double) 60, (double) 1, null, "22");
-        link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), node2, node3, (double) 1000, (double) 25, (double) 60, (double) 1, null, "22");
-        link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), node3, node4, (double) 100, (double) 25, (double) 60, (double) 1, null, "22");
+        link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), node1, node2, (double) 100, (double) 25, (double) 600, (double) 1, null, "22");
+        link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), node2, node3, (double) 1000, (double) 25, (double) 600, (double) 1, null, "22");
+        link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), node3, node4, (double) 100, (double) 25, (double) 600, (double) 1, null, "22");
 	}
 
 	private void createPlans(){

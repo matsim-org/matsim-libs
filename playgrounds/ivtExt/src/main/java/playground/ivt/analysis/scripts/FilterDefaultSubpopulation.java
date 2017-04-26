@@ -26,7 +26,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -53,10 +53,10 @@ public class FilterDefaultSubpopulation {
 		final MutableScenario sc = ScenarioUtils.createMutableScenario( ConfigUtils.createConfig() );
 //		final Population population = (Population) sc.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 
 		final String attName = new PlansConfigGroup().getSubpopulationAttributeName();
-		final StreamingPopulationWriter writer = new StreamingPopulationWriter( sc.getPopulation() , sc.getNetwork() );
+		final StreamingPopulationWriter writer = new StreamingPopulationWriter( );
 
 		reader.addAlgorithm(new PersonAlgorithm() {
 			@Override

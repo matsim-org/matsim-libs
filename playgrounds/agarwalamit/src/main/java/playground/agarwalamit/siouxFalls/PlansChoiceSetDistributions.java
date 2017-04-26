@@ -210,9 +210,8 @@ public class PlansChoiceSetDistributions {
 		Map<Id<Person>, double[]> personId2LegsCountsLater = getPersonId2LegsCountInChoiceSet(personId2legsLater);
 
 		Map<Id<Person>, Double>  personId2ChangeInCars = getChangeInLegs(personId2LegsCountsInitial, personId2LegsCountsLater);
-		SortedMap<Double, Double> changeInCarsDistribution =  getChangeInCarDistribution(personId2ChangeInCars);
 
-		return changeInCarsDistribution;
+		return getChangeInCarDistribution(personId2ChangeInCars);
 	}
 
 	private Map<Id<Person>, List<String>> getScoresForAllPlansInChoiceSet(final String plansFile){
@@ -341,9 +340,9 @@ public class PlansChoiceSetDistributions {
 
 		for(int j=(int) min; j<diffClasses.length;j++){
 			for(Id<Person> pId:personId2ChangeInCars.keySet()){
-				double d = (double) personId2ChangeInCars.get(pId);
-				if((double)d==j){
-					double classCounter = ((double) differenceClass2PersonCounter.get(d))+1;
+				double d = personId2ChangeInCars.get(pId);
+				if(d ==j){
+					double classCounter = differenceClass2PersonCounter.get(d) +1;
 					differenceClass2PersonCounter.put(d, classCounter);
 				}
 			}

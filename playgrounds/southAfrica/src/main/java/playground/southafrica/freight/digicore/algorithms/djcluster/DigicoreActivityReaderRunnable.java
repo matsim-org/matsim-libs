@@ -49,18 +49,46 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 	private int outCount = 0;
 	private GeometryFactory gf = new GeometryFactory();
 	private final Map<Id<MyZone>, List<Coord>> map = new HashMap<Id<MyZone>, List<Coord>>();;
-	private final File vehicleFile;
+	private DigicoreVehicle vehicle;
 	private final QuadTree<MyZone> zoneQT;
 	private Counter counter;
 	
+	
+	/**
+	 * This constructor is now deprecated since it caters for reading each 
+	 * {@link DigicoreVehicle} from file. As an argument, it therefore takes
+	 * the specific vehicle's file. Rather use {@link #DigicoreActivityReaderRunnable(DigicoreVehicle, QuadTree, Counter)} 
+	 * @param vehicleFile
+	 * @param zoneQT
+	 * @param counter
+	 */
+	@Deprecated
 	public DigicoreActivityReaderRunnable(final File vehicleFile, QuadTree<MyZone> zoneQT, Counter counter) {
-		this.vehicleFile = vehicleFile;
+		this(parseVehicleForConstructor(vehicleFile.getAbsolutePath()), zoneQT, counter);
+	}
+	
+	
+	/**
+	 * Instantiates an instance of the class.
+	 * @param vehicle
+	 * @param zoneQT
+	 * @param counter
+	 */
+	public DigicoreActivityReaderRunnable(DigicoreVehicle vehicle, QuadTree<MyZone> zoneQT, Counter counter) {
+		this.vehicle = vehicle;
 		this.zoneQT = zoneQT;
 		this.counter = counter;
 		
 		for(MyZone mz : this.zoneQT.values()){
 			map.put(mz.getId(), new ArrayList<Coord>());
 		}
+	}
+	
+	
+	private static DigicoreVehicle parseVehicleForConstructor(String file){
+		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
+		dvr.readFile(file);
+		return dvr.getVehicle();
 	}
 	
 	
@@ -76,10 +104,7 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 
 	@Override
 	public void run() {
-		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.readFile(this.vehicleFile.getAbsolutePath());
-		DigicoreVehicle dv = dvr.getVehicle();
-		for(DigicoreChain dc : dv.getChains()){
+		for(DigicoreChain dc : this.vehicle.getChains()){
 			
 			/* Read in ALL activities, not just minor activities. */
 			for(DigicoreActivity da : dc.getAllActivities()){
@@ -96,9 +121,23 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 				 * efficient, is to check the number of MyZones in the QT. If 
 				 * only one, then check that one zone. Alternatively, follow 
 				 * the original procedure of looking for only the surrounding 
-				 * zones. */
+				 * zones. 
+				 * 
+				 * !! This is VERY BAD (Johan, Jan '17... the radius is 
+				 * hard-coded, and it seems to only be compatible with GAP 
+				 * zones.) */
 				if(zoneQT.size() > 1){
-					Collection<MyZone> neighbourhood =  zoneQT.getDisk(p.getX(), p.getY(), 10000);
+					double radius = 10000.;
+					Collection<MyZone> neighbourhood =  zoneQT.getDisk(p.getX(), p.getY(), radius);
+					while(neighbourhood.size() < .1*zoneQT.size()){
+						/* This threshold is again hard-coded, but should at 
+						 * least provide more useful clustering, albeit at the
+						 * price of the computational burden, especially when 
+						 * there are many zone, like GAP. */
+						radius *= 2.;
+						neighbourhood =  zoneQT.getDisk(p.getX(), p.getY(), radius);
+					}
+					
 					boolean found = false;
 					Iterator<MyZone> iterator = neighbourhood.iterator();
 					while(iterator.hasNext() && !found){

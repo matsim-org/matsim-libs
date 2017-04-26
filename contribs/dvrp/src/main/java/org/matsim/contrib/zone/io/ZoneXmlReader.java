@@ -26,39 +26,29 @@ import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+public class ZoneXmlReader extends MatsimXmlParser {
+	private final static String ZONE = "zone";
 
-public class ZoneXmlReader
-    extends MatsimXmlParser
-{
-    private final static String ZONE = "zone";
+	private final Map<Id<Zone>, Zone> zones = new LinkedHashMap<>();
 
-    private final Map<Id<Zone>, Zone> zones = new LinkedHashMap<>();
+	public Map<Id<Zone>, Zone> getZones() {
+		return zones;
+	}
 
+	@Override
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		if (ZONE.equals(name)) {
+			startZone(atts);
+		}
+	}
 
-    public Map<Id<Zone>, Zone> getZones()
-    {
-        return zones;
-    }
+	@Override
+	public void endTag(String name, String content, Stack<String> context) {
+	}
 
-
-    @Override
-    public void startTag(String name, Attributes atts, Stack<String> context)
-    {
-        if (ZONE.equals(name)) {
-            startZone(atts);
-        }
-    }
-
-
-    @Override
-    public void endTag(String name, String content, Stack<String> context)
-    {}
-
-
-    private void startZone(Attributes atts)
-    {
-        Id<Zone> id = Id.create(atts.getValue("id"), Zone.class);
-        String type = atts.getValue("type");
-        zones.put(id, new Zone(id, type));
-    }
+	private void startZone(Attributes atts) {
+		Id<Zone> id = Id.create(atts.getValue("id"), Zone.class);
+		String type = atts.getValue("type");
+		zones.put(id, new Zone(id, type));
+	}
 }

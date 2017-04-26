@@ -22,21 +22,14 @@ package org.matsim.contrib.dynagent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
+public interface DynLeg extends DynAction {
+	String getMode();
 
-public interface DynLeg
-    extends DynAction
-{
-    String getMode();
+	void arrivedOnLinkByNonNetworkMode(Id<Link> linkId);
 
+	Id<Link> getDestinationLinkId();
 
-    void arrivedOnLinkByNonNetworkMode(Id<Link> linkId);
+	Double getExpectedTravelTime();
 
-
-    Id<Link> getDestinationLinkId();
-
-
-    Double getExpectedTravelTime();
-
-
-    Double getExpectedTravelDistance();
+	Double getExpectedTravelDistance();
 }

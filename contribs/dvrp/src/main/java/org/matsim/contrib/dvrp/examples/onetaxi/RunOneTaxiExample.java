@@ -22,61 +22,57 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
-import org.matsim.contrib.dynagent.run.*;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+/**
+ * @author michalm
+ */
+public class RunOneTaxiExample {
+	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
+	private static final String TAXIS_FILE = "./src/main/resources/one_taxi/one_taxi_vehicles.xml";
 
-public class RunOneTaxiExample
-{
-    public static final String MODE = "taxi";
-    private static final String ONE_TAXI_GROUP_NAME = "one_taxi";
-    private static final String TAXIS_FILE = "taxisFile";
+	public static void run(boolean otfvis, int lastIteration) {
+		// load config
+		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DvrpConfigGroup(), new OTFVisConfigGroup());
+		config.controler().setLastIteration(lastIteration);
+		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
+		config.checkConsistency();
 
+		// load scenario
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-    public static void run(boolean otfvis)
-    {
-        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
-        run(configFile, otfvis);
-    }
+		// load fleet
+		final FleetImpl fleet = new FleetImpl();
+		new VehicleReader(scenario.getNetwork(), fleet).readFile(TAXIS_FILE);
 
+		// setup controler
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new DvrpModule( //
+				OneTaxiOptimizer.class, // optimizer that dispatches taxis
+				OneTaxiRequestCreator.class, // converts departures of the "taxi" mode into taxi requests
+				OneTaxiActionCreator.class)); // converts scheduled tasks into simulated actions (legs and activities)
+		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Fleet.class).toInstance(fleet);
+			}
+		});
 
-    public static void run(String configFile, boolean otfvis)
-    {
-        ConfigGroup oneTaxiCfg = new ConfigGroup(ONE_TAXI_GROUP_NAME) {};
-        Config config = ConfigUtils.loadConfig(configFile, new OTFVisConfigGroup(), oneTaxiCfg);
-        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
-        config.checkConsistency();
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
+		}
 
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+		// run simulation
+		controler.run();
+	}
 
-        final VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(scenario.getNetwork(), vrpData).readFile(oneTaxiCfg.getValue(TAXIS_FILE));
-
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new AbstractModule() {
-            public void install()
-            {
-                addRoutingModuleBinding(MODE).toInstance(new DynRoutingModule(MODE));
-                bind(VrpData.class).toInstance(vrpData);
-            }
-        });
-        controler.addOverridingModule(new DynQSimModule<>(OneTaxiQSimProvider.class));
-
-        if (otfvis) {
-            controler.addOverridingModule(new OTFVisLiveModule());
-        }
-
-        controler.run();
-    }
-
-
-    public static void main(String... args)
-    {
-        run(true);
-    }
+	public static void main(String... args) {
+		run(true, 0); // switch to 'false' to turn off visualisation
+	}
 }

@@ -30,27 +30,24 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 
 import com.google.common.collect.*;
 
+public class AudiAVSmallFleetCreator {
+	public static void main(String[] args) {
+		String dir = "../../../shared-svn/projects/audi_av/scenario/";
+		String netFile = dir + "networkc.xml.gz";
+		String vehFile = dir + "v100pct/taxi_vehicles_100000.xml.gz";
+		String fractVehFilePrefix = dir + "v_small/taxi_vehicles_";
 
-public class AudiAVSmallFleetCreator
-{
-    public static void main(String[] args)
-    {
-        String dir = "../../../shared-svn/projects/audi_av/scenario/";
-        String netFile = dir + "networkc.xml.gz";
-        String vehFile = dir + "v100pct/taxi_vehicles_100000.xml.gz";
-        String fractVehFilePrefix = dir + "v_small/taxi_vehicles_";
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile(netFile);
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(network, fleet).readFile(vehFile);
 
-        Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile(netFile);
-        VrpData data = new VrpDataImpl();
-        new VehicleReader(network, data).readFile(vehFile);
-
-        UniformRandom uniform = RandomUtils.getGlobalUniform();
-        for (int i = 5; i <= 20; i++) {
-            double fraction = (double)i / 10_000;
-            List<Vehicle> fractVehs = Lists.newArrayList(Iterables
-                    .filter(data.getVehicles().values(), v -> uniform.trueOrFalse(fraction)));
-            new VehicleWriter(fractVehs).write(fractVehFilePrefix + fractVehs.size() + ".xml.gz");
-        }
-    }
+		UniformRandom uniform = RandomUtils.getGlobalUniform();
+		for (int i = 5; i <= 20; i++) {
+			double fraction = (double)i / 10_000;
+			List<Vehicle> fractVehs = Lists
+					.newArrayList(Iterables.filter(fleet.getVehicles().values(), v -> uniform.trueOrFalse(fraction)));
+			new VehicleWriter(fractVehs).write(fractVehFilePrefix + fractVehs.size() + ".xml.gz");
+		}
+	}
 }

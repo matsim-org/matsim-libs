@@ -21,52 +21,32 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.path.*;
 
+public class DriveTaskImpl extends AbstractTask implements DriveTask {
+	private VrpPath path;
 
-public class DriveTaskImpl
-    extends AbstractTask
-    implements DriveTask
-{
-    private VrpPath path;
+	public DriveTaskImpl(VrpPathWithTravelData path) {
+		super(path.getDepartureTime(), path.getArrivalTime());
+		this.path = path;
+	}
 
+	@Override
+	public VrpPath getPath() {
+		return path;
+	}
 
-    public DriveTaskImpl(VrpPathWithTravelData path)
-    {
-        super(path.getDepartureTime(), path.getArrivalTime());
-        this.path = path;
-    }
+	@Override
+	public void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
+		// can only divert an ongoing task
+		if (getStatus() != TaskStatus.STARTED) {
+			throw new IllegalStateException();
+		}
 
+		path = divertedPath;
+		setEndTime(newEndTime);
+	}
 
-    @Override
-    public TaskType getType()
-    {
-        return TaskType.DRIVE;
-    }
-
-
-    @Override
-    public VrpPath getPath()
-    {
-        return path;
-    }
-
-
-    @Override
-    public void pathDiverted(DivertedVrpPath divertedPath, double newEndTime)
-    {
-        //can only divert an ongoing task
-        if (getStatus() != TaskStatus.STARTED) {
-            throw new IllegalStateException();
-        }
-
-        path = divertedPath;
-        setEndTime(newEndTime);
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "D(@" + path.getFromLink().getId() + "->@" + path.getToLink().getId() + ")"
-                + commonToString();
-    }
+	@Override
+	public String toString() {
+		return "D(@" + path.getFromLink().getId() + "->@" + path.getToLink().getId() + ")" + commonToString();
+	}
 }

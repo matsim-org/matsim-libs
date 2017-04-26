@@ -122,7 +122,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 		final ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
 
 		return new CharyparNagelLegScoring(
-				new CharyparNagelScoringParameters.Builder(conf, conf.getScoringParameters(null), scenarioConfig).build(),
+				new ScoringParameters.Builder(conf, conf.getScoringParameters(null), scenarioConfig).build(),
 				network);
 	}
 

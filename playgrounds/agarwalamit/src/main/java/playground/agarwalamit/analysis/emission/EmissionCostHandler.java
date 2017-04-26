@@ -36,4 +36,6 @@ public interface EmissionCostHandler extends EventHandler {
 
     Map<String, Double> getUserGroup2TotalEmissionCosts();
 
+    boolean isFiltering();
+
 }

@@ -9,7 +9,7 @@ public class VehicleRequestPaths
         @Override
         public double getCost(BestDispatchFinder.Dispatch<TaxiRequest> vrp)
         {
-            return VehicleRequestPaths.getPickupBeginTime(vrp) - vrp.destination.getT0();
+            return VehicleRequestPaths.getPickupBeginTime(vrp) - vrp.destination.getEarliestStartTime();
         }
     };
 
@@ -24,6 +24,6 @@ public class VehicleRequestPaths
     
     public static double getPickupBeginTime(BestDispatchFinder.Dispatch<TaxiRequest> vrp)
     {
-        return Math.max(vrp.destination.getT0(), vrp.path.getArrivalTime());
+        return Math.max(vrp.destination.getEarliestStartTime(), vrp.path.getArrivalTime());
     }
 }

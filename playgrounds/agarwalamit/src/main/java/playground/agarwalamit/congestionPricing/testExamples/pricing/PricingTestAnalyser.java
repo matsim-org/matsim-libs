@@ -33,7 +33,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.analysis.travelTime.LinkTravelTimeCalculator;
+import playground.agarwalamit.analysis.tripTime.LinkTravelTimeCalculator;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**

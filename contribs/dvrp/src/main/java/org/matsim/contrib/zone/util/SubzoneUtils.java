@@ -29,41 +29,37 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
+public class SubzoneUtils {
+	public static Map<Id<Zone>, List<Polygon>> extractSubzonePolygons(Map<Id<Zone>, Zone> zones,
+			Collection<SimpleFeature> subzonePattern) {
+		Map<Id<Zone>, List<Polygon>> polygonsByZone = new HashMap<>();
+		int topologyExceptionCount = 0;
 
-public class SubzoneUtils
-{
-    public static Map<Id<Zone>, List<Polygon>> extractSubzonePolygons(Map<Id<Zone>, Zone> zones,
-            Collection<SimpleFeature> subzonePattern)
-    {
-        Map<Id<Zone>, List<Polygon>> polygonsByZone = new HashMap<>();
-        int topologyExceptionCount = 0;
+		for (Zone z : zones.values()) {
+			MultiPolygon zoneMultiPoly = z.getMultiPolygon();
+			GeometryCollector geometryCollector = new GeometryCollector();
 
-        for (Zone z : zones.values()) {
-            MultiPolygon zoneMultiPoly = z.getMultiPolygon();
-            GeometryCollector geometryCollector = new GeometryCollector();
+			for (SimpleFeature f : subzonePattern) {
+				Geometry featureGeometry = (Geometry)f.getDefaultGeometry();
 
-            for (SimpleFeature f : subzonePattern) {
-                Geometry featureGeometry = (Geometry)f.getDefaultGeometry();
+				try {
+					geometryCollector.add(zoneMultiPoly.intersection(featureGeometry));
+				} catch (TopologyException e) {
+					topologyExceptionCount++;
+				}
+			}
 
-                try {
-                    geometryCollector.add(zoneMultiPoly.intersection(featureGeometry));
-                }
-                catch (TopologyException e) {
-                    topologyExceptionCount++;
-                }
-            }
+			@SuppressWarnings("unchecked")
+			List<Polygon> polygons = PolygonExtracter.getPolygons(geometryCollector.collect());
+			polygonsByZone.put(z.getId(), polygons);
+		}
 
-            @SuppressWarnings("unchecked")
-            List<Polygon> polygons = PolygonExtracter.getPolygons(geometryCollector.collect());
-            polygonsByZone.put(z.getId(), polygons);
-        }
+		// TODO check out if geometries overlay one another!!!
 
-        //TODO check out if geometries overlay one another!!!
+		if (topologyExceptionCount > 0) {
+			System.err.println(topologyExceptionCount + " ignored TopologyExceptions");
+		}
 
-        if (topologyExceptionCount > 0) {
-            System.err.println(topologyExceptionCount + " ignored TopologyExceptions");
-        }
-
-        return polygonsByZone;
-    }
+		return polygonsByZone;
+	}
 }

@@ -21,49 +21,39 @@ package org.matsim.contrib.util.random;
 
 import org.apache.commons.math3.random.RandomGenerator;
 
+public class UniformRandom {
+	private final RandomGenerator rg;
 
-public class UniformRandom
-{
-    private final RandomGenerator rg;
+	public UniformRandom(RandomGenerator rg) {
+		this.rg = rg;
+	}
 
+	public double nextDouble(double from, double to) {
+		return from == to ? from : from + (to - from) * rg.nextDouble();
+	}
 
-    public UniformRandom(RandomGenerator rg)
-    {
-        this.rg = rg;
-    }
+	/**
+	 * @param from
+	 *            (inclusive)
+	 * @param to
+	 *            (inclusive)
+	 */
+	public int nextInt(int from, int to) {
+		if (from == to) {
+			return from;
+		}
 
+		long delta = (long)((1L + (long)to - (long)from) * rg.nextDouble());
+		return (int)(from + delta);
+	}
 
-    public double nextDouble(double from, double to)
-    {
-        return from == to ? from : from + (to - from) * rg.nextDouble();
-    }
+	public double floorOrCeil(double value) {
+		double floor = Math.floor(value);
+		boolean selectCeil = trueOrFalse(value - floor);
+		return selectCeil ? floor + 1 : floor;
+	}
 
-
-    /**
-     * @param from (inclusive)
-     * @param to (inclusive)
-     */
-    public int nextInt(int from, int to)
-    {
-        if (from == to) {
-            return from;
-        }
-
-        long delta = (long) ( (1L + (long)to - (long)from) * rg.nextDouble());
-        return (int) (from + delta);
-    }
-
-
-    public double floorOrCeil(double value)
-    {
-        double floor = Math.floor(value);
-        boolean selectCeil = trueOrFalse(value - floor);
-        return selectCeil ? floor + 1 : floor;
-    }
-
-
-    public boolean trueOrFalse(double trueProbability)
-    {
-        return rg.nextDouble() < trueProbability;
-    }
+	public boolean trueOrFalse(double trueProbability) {
+		return rg.nextDouble() < trueProbability;
+	}
 }

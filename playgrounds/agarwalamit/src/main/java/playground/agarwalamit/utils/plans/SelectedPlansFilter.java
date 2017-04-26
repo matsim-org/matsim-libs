@@ -20,14 +20,10 @@ package playground.agarwalamit.utils.plans;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-
+import playground.agarwalamit.utils.FileUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -36,11 +32,11 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class SelectedPlansFilter {
 
-	public static final Logger LOG = Logger.getLogger(SelectedPlansFilter.class);
+	private static final Logger LOG = Logger.getLogger(SelectedPlansFilter.class);
 
-	private final static String RUN_DIR = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/run22/";
-	private final static String INPUT_PLANS = RUN_DIR + "/output_plans.xml.gz";
-	private final static String OUTPUT_PLANS = RUN_DIR + "selectedPlansOnly.xml.gz"; 
+	private final static String RUN_DIR = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/";
+	private final static String INPUT_PLANS = RUN_DIR + "/population_1pct_v2_baseCaseOutputPlans.xml.gz";
+	private final static String OUTPUT_PLANS = RUN_DIR + "/population_1pct_v2_baseCaseSelectedPlans.xml.gz";
 	
 	private Scenario scOut;
 

@@ -7,7 +7,7 @@ import org.matsim.contrib.carsharing.vehicles.CSVehicle;
  */
 public interface VehiclesContainer {
 	
-	public void reserveVehicle(CSVehicle vehicle);
+	public boolean reserveVehicle(CSVehicle vehicle);
 	public void parkVehicle(CSVehicle vehicle, Link link);
 	public Link getVehicleLocation(CSVehicle vehicle);
 	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance);

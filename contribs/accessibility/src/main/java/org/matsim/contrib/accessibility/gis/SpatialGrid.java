@@ -26,6 +26,7 @@ package org.matsim.contrib.accessibility.gis;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.utils.io.IOUtils;
@@ -44,6 +45,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author tthunig
  */
 public final class SpatialGrid{
+	private static final Logger LOG = Logger.getLogger(SpatialGrid.class);
 	
 	private double[][] matrix;
 	

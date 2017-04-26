@@ -28,8 +28,7 @@ public class MixedTrafficVehiclesUtils {
 	public final static String CAR = TransportMode.car;
 	public final static String BIKE = TransportMode.bike;
 	public final static String WALK = TransportMode.walk;
-	// TODO [AA] : check PT speed and PCU.
-	public final static String PT = TransportMode.pt;
+//	public final static String PT = TransportMode.pt;
 	public final static String MOTORBIKE = "motorbike";
 	public final static String TRUCK = "truck";
 	
@@ -45,7 +44,7 @@ public class MixedTrafficVehiclesUtils {
 		case BIKE: pcu = 0.25; break;
 		case MOTORBIKE: pcu = 0.25;break;
 		case WALK: pcu = 0.10;break;
-		case PT :
+//		case PT :
 		case TRUCK: pcu = 3.0; break;
 		default: throw new RuntimeException("No PCU is set for travel mode "+travelMode+ ".");
 		}
@@ -64,7 +63,7 @@ public class MixedTrafficVehiclesUtils {
 		case BIKE: speed = 4.17; break;
 		case MOTORBIKE: speed = 16.67;break;
 		case WALK: speed = 1.2;break;
-		case PT :
+//		case PT :
 		case TRUCK : speed = 8.33; break;
 		default: throw new RuntimeException("No speed is set for travel mode "+travelMode+ ".");
 		}

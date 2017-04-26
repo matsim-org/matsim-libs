@@ -22,45 +22,33 @@ package playground.michalm.demand.aggregator;
 import java.text.*;
 import java.util.Date;
 
+public class FormatBasedDateDiscretizer implements DateDiscretizer {
+	public static final String YMDH = "yy_MM_dd_HH";
+	public static final String YMD = "yy_MM_dd";
+	public static final String H = "HH";
+	public static final String u = "u";
+	public static final String uH = "u_HH";
 
-public class FormatBasedDateDiscretizer
-    implements DateDiscretizer
-{
-    public static final String YMDH = "yy_MM_dd_HH";
-    public static final String YMD = "yy_MM_dd";
-    public static final String H = "HH";
-    public static final String u = "u";
-    public static final String uH = "u_HH";
+	private final DateFormat dateFormat;
 
-    private final DateFormat dateFormat;
+	public FormatBasedDateDiscretizer(String pattern) {
+		this.dateFormat = new SimpleDateFormat(pattern);
+	}
 
+	public FormatBasedDateDiscretizer(DateFormat dateFormat) {
+		this.dateFormat = dateFormat;
+	}
 
-    public FormatBasedDateDiscretizer(String pattern)
-    {
-        this.dateFormat = new SimpleDateFormat(pattern);
-    }
+	@Override
+	public String discretize(Date date) {
+		return dateFormat.format(date);
+	}
 
-
-    public FormatBasedDateDiscretizer(DateFormat dateFormat)
-    {
-        this.dateFormat = dateFormat;
-    }
-
-
-    @Override
-    public String discretize(Date date)
-    {
-        return dateFormat.format(date);
-    }
-
-
-    public Date parseDiscretizedDate(String date)
-    {
-        try {
-            return dateFormat.parse(date);
-        }
-        catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	public Date parseDiscretizedDate(String date) {
+		try {
+			return dateFormat.parse(date);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -92,16 +92,10 @@ public class RunEmissionToolOffline {
 		loadScenario();
 		
 		setInputFiles();
-		
-		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
+		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
+
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
@@ -110,7 +104,7 @@ public class RunEmissionToolOffline {
 		
 		emissionEventWriter.closeFile();
 
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		emissionModule.writeEmissionInformation();
 	}
 
 	private void setInputFiles() {

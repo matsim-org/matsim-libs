@@ -24,9 +24,9 @@ import playground.johannes.studies.matrix2014.matrix.postprocess.SeasonTask;
 import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
 import playground.johannes.synpop.analysis.AnalyzerTaskRunner;
 import playground.johannes.synpop.analysis.FileIOContext;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainFactory;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.processing.TaskRunner;
 
 import java.util.Set;
@@ -41,7 +41,7 @@ public class AnalyseInfermo {
 
         FileIOContext ioContext = new FileIOContext("/Users/johannes/gsv/germany-scenario/invermo/analysis");
 
-//        TaskRunner.run(new InputeLegPurpose(), persons);
+        TaskRunner.run(new InputeDummyDistance(), persons);
         TaskRunner.run(new SetSeason(), persons);
 
         AnalyzerTaskComposite tasks = new AnalyzerTaskComposite();
@@ -49,6 +49,16 @@ public class AnalyseInfermo {
         tasks.addComponent(new DayTask(ioContext));
 
         AnalyzerTaskRunner.run(persons, tasks, ioContext);
+    }
+
+    private static class InputeDummyDistance implements EpisodeTask {
+
+        @Override
+        public void apply(Episode episode) {
+            for(Segment leg : episode.getLegs()) {
+                leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, "100000");
+            }
+        }
     }
 
 //    private static class InputeLegPurpose implements EpisodeTask {

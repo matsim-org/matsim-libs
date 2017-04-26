@@ -26,7 +26,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -46,7 +46,7 @@ public class CharyparNagelOpenTimesActivityScoring extends org.matsim.deprecated
 	private final ActivityFacilities facilities;
 	private final static Logger log = Logger.getLogger(RunSingapore.class);
 	
-	public CharyparNagelOpenTimesActivityScoring(final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+	public CharyparNagelOpenTimesActivityScoring(final ScoringParameters params, final ActivityFacilities facilities) {
 		super(params);
 		this.facilities = facilities;
 	}

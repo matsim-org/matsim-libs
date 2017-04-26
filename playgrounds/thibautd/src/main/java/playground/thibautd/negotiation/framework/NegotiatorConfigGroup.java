@@ -28,6 +28,7 @@ public class NegotiatorConfigGroup extends ReflectiveConfigGroup {
 
 	private int rollingAverageWindow = 100;
 	private double improvingFractionThreshold = 0.01;
+	private double maxRoundsPerAgent = 100;
 	private boolean logStopwatch = false;
 
 	public NegotiatorConfigGroup() {
@@ -64,5 +65,15 @@ public class NegotiatorConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("logStopwatch")
 	public void setLogStopwatch( final boolean logStopwatch ) {
 		this.logStopwatch = logStopwatch;
+	}
+
+	@StringGetter("maxRoundsPerAgent")
+	public double getMaxRoundsPerAgent() {
+		return maxRoundsPerAgent;
+	}
+
+	@StringSetter("maxRoundsPerAgent")
+	public void setMaxRoundsPerAgent( final double maxRoundsPerAgent ) {
+		this.maxRoundsPerAgent = maxRoundsPerAgent;
 	}
 }

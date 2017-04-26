@@ -24,56 +24,48 @@ import java.util.Map;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+public class FilterTaxiRequestsWithinBerlin {
+	private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
+	private static final String BERLIN_BRB_NET_FILE = DIR + "network/berlin_brb.xml.gz";
+	private static final String ONLY_BERLIN_NET_FILE = DIR + "network/only_berlin.xml.gz";
 
-public class FilterTaxiRequestsWithinBerlin
-{
-    private static final String DIR = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
-    private static final String BERLIN_BRB_NET_FILE = DIR + "network/berlin_brb.xml.gz";
-    private static final String ONLY_BERLIN_NET_FILE = DIR + "network/only_berlin.xml.gz";
+	public static void filterRequestsWithinBerlin(String allPlansFile, String berlinPlansFile) {
+		Scenario berlinBrbScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(berlinBrbScenario.getNetwork()).readFile(BERLIN_BRB_NET_FILE);
+		new PopulationReader(berlinBrbScenario).readFile(DIR + allPlansFile);
 
+		Scenario onlyBerlinScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(onlyBerlinScenario.getNetwork()).readFile(ONLY_BERLIN_NET_FILE);
+		Population onlyBerlinPop = PopulationUtils.createPopulation(onlyBerlinScenario.getConfig(),
+				onlyBerlinScenario.getNetwork());
+		Map<Id<Link>, ? extends Link> onlyBerlinLinks = onlyBerlinScenario.getNetwork().getLinks();
 
-    public static void filterRequestsWithinBerlin(String allPlansFile, String berlinPlansFile)
-    {
-        Scenario berlinBrbScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(berlinBrbScenario.getNetwork()).readFile(BERLIN_BRB_NET_FILE);
-        new PopulationReader(berlinBrbScenario).readFile(DIR + allPlansFile);
+		for (Person p : berlinBrbScenario.getPopulation().getPersons().values()) {
+			Plan plan = p.getPlans().get(0);
+			Activity fromActivity = (Activity)plan.getPlanElements().get(0);
+			Activity toActivity = (Activity)plan.getPlanElements().get(2);
 
-        Scenario onlyBerlinScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(onlyBerlinScenario.getNetwork()).readFile(ONLY_BERLIN_NET_FILE);
-        Population onlyBerlinPop = PopulationUtils.createPopulation(onlyBerlinScenario.getConfig(),
-                onlyBerlinScenario.getNetwork());
-        Map<Id<Link>, ? extends Link> onlyBerlinLinks = onlyBerlinScenario.getNetwork().getLinks();
+			if (onlyBerlinLinks.containsKey(fromActivity.getLinkId())
+					&& onlyBerlinLinks.containsKey(toActivity.getLinkId())) {
+				onlyBerlinPop.addPerson(p);
+			}
+		}
 
-        for (Person p : berlinBrbScenario.getPopulation().getPersons().values()) {
-            Plan plan = p.getPlans().get(0);
-            Activity fromActivity = (Activity)plan.getPlanElements().get(0);
-            Activity toActivity = (Activity)plan.getPlanElements().get(2);
+		new PopulationWriter(onlyBerlinPop, onlyBerlinScenario.getNetwork()).write(DIR + berlinPlansFile);
+	}
 
-            if (onlyBerlinLinks.containsKey(fromActivity.getLinkId())
-                    && onlyBerlinLinks.containsKey(toActivity.getLinkId())) {
-                onlyBerlinPop.addPerson(p);
-            }
-        }
-
-        new PopulationWriter(onlyBerlinPop, onlyBerlinScenario.getNetwork())
-                .write(DIR + berlinPlansFile);
-    }
-
-
-    public static void main(String[] args)
-    {
-        for (double i = 10; i < 51; i++) {
-            String suffix = "/plans/plans4to3_" + (i / 10) + ".xml.gz";
-            String in = "scenarios/2014_10_basic_scenario_v4" + suffix;
-            String out = "scenarios/2015_08_only_berlin_v1" + suffix;
-            filterRequestsWithinBerlin(in, out);
-        }
-    }
+	public static void main(String[] args) {
+		for (double i = 10; i < 51; i++) {
+			String suffix = "/plans/plans4to3_" + (i / 10) + ".xml.gz";
+			String in = "scenarios/2014_10_basic_scenario_v4" + suffix;
+			String out = "scenarios/2015_08_only_berlin_v1" + suffix;
+			filterRequestsWithinBerlin(in, out);
+		}
+	}
 }

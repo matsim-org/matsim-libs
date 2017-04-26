@@ -11,7 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
@@ -51,7 +51,7 @@ public class QuickfixLegDistanceDistributionWriter {
 		
 //		Population reader = (Population) scenario.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( scenario ) ;
-		StreamingUtils.setIsStreaming(reader, true);
+		StreamingDeprecated.setIsStreaming(reader, true);
 		
 		Network network = scenario.getNetwork();
 

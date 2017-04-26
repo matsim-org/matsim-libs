@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.emissions.example;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -34,8 +33,8 @@ import org.matsim.core.controler.MatsimServices;
  * Creates a config file 
  * with necessary emission input files for the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}.
  * 
- * This config file is used by the {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExample OfflineExample} and 
- * the {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample OnlineExample} 
+ * This config file is used by the {@link org.matsim.contrib.emissions.example.RunEmissionToolOfflineExampleV2 OfflineExample} and
+ * the {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExampleV2 OnlineExample}
  * 
  * @author benjamin, julia
  *
@@ -65,7 +64,7 @@ public class CreateEmissionConfig {
 			 	"sample_EFA_ColdStart_SubSegm_2005detailed.txt";
 		
 		private static final String outputPath = "./test/output/";
-		private static final String configFilePath = inputPath + "config.xml";
+		private static final String configFilePath = inputPath + "config_v2.xml";
 		
 		private static final int numberOfIterations = 6;
 		
@@ -93,7 +92,7 @@ public class CreateEmissionConfig {
 
 		// strategy
 			StrategyConfigGroup scg = controler.getConfig().strategy();
-			StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
+			StrategySettings strategySettings = new StrategySettings();
 			strategySettings.setStrategyName("ChangeExpBeta");
 			strategySettings.setWeight(1.0);
 			scg.addStrategySettings(strategySettings);
@@ -112,12 +111,19 @@ public class CreateEmissionConfig {
 	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
 	        // emission vehicles are now set in the default vehicle container
 	        config.vehicles().setVehiclesFile(emissionVehicleFile);
-	        ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+
+	        ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
+
 	        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 	        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 	        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 	        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 	        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+
+	        ecg.setIgnoringEmissionsFromEventsFile(false);
+	        ecg.setEmissionCostMultiplicationFactor(1.0);
+	        ecg.setConsideringCO2Costs(true);
+	        ecg.setEmissionEfficiencyFactor(1.0);
 	        
 	   // write config     
 	        ConfigWriter cw = new ConfigWriter(config);

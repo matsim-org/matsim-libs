@@ -20,10 +20,12 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.policies;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -45,12 +47,12 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import playground.agarwalamit.analysis.StatsWriter;
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.router.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
@@ -58,6 +60,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.VehicleUtils;
 
 /**
  * @author amit
@@ -66,37 +69,33 @@ import playground.agarwalamit.utils.FileUtils;
 public class PatnaPolicyControler {
 
 	private static String dir = FileUtils.RUNS_SVN + "/patnaIndia/run108/jointDemand/policies/0.15pcu/";
-	private static boolean applyTrafficRestrain = false;
+	private static String configFile = dir + "/input/configBaseCaseCtd.xml";
 	private static boolean addBikeTrack = false;
-	private static boolean isAllwoingMotorbikeOnBikeTrack = true;
+	private static boolean isAllwoingMotorbikeOnBikeTrack = false;
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
 
+		Config config = ConfigUtils.createConfig();
 		String outputDir ;
 
 		if(args.length>0){
 			dir = args[0];
-			applyTrafficRestrain = Boolean.valueOf(args[1]);
+			configFile = args[1];
 			addBikeTrack = Boolean.valueOf(args[2]);
 			isAllwoingMotorbikeOnBikeTrack = Boolean.valueOf(args[3]);
-			outputDir = dir+args[4];
 		}  else {
-			if(applyTrafficRestrain ) {
-//				if (isAllwoingMotorbikeOnBikeTrack) throw new RuntimeException("Two situations -- traffic restrain and motorbike on bike track -- are not considered.");
-//				if (addBikeTrack) outputDir = dir+"/both/";
-//				else outputDir = dir+"/trafficRestrain/";
-				throw new RuntimeException("not implemented yet.");
-			} else if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-b/";
-			else if(isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-mb/";
-			else outputDir = dir+"/baseCaseCtd/";			
+			//nothing to do
 		}
 
-		String inputDir = dir+"/input/";
+		if (addBikeTrack  && isAllwoingMotorbikeOnBikeTrack) outputDir = dir+"/BT-mb/";
+		else if(addBikeTrack ) outputDir = dir+"/BT-b/";
+		else if (! addBikeTrack ) outputDir = dir + "/bau/";
+		else throw new RuntimeException("not implemented yet.");
+
+		String inputDir = dir + "/input/";
 		String configFile = inputDir + "configBaseCaseCtd.xml";
 
 		ConfigUtils.loadConfig(config, configFile);
-
 		config.controler().setOutputDirectory(outputDir);
 
 		//==
@@ -114,6 +113,9 @@ public class PatnaPolicyControler {
 		// not anymore, there is now second calibration after cadyts and before baseCaseCtd; thus all plans in the choice set.
 		String inPlans = "baseCaseOutput_plans.xml.gz";
 		config.plans().setInputFile(inputDir + inPlans);
+		config.plans().setInputPersonAttributeFile(inputDir+"output_personAttributes.xml.gz");
+
+		config.vehicles().setVehiclesFile(null); // vehicle types are added from vehicle file later.
 		//==
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -122,21 +124,31 @@ public class PatnaPolicyControler {
 		config.travelTimeCalculator().setFilterModes(true);
 		config.travelTimeCalculator().setAnalyzedModes(String.join(",", PatnaUtils.ALL_MAIN_MODES));
 
-		// policies if any
-//		if (applyTrafficRestrain && addBikeTrack ) {
-//			config.network().setInputFile(inputDir + "/networkWithTrafficRestricationAndBikeTrack.xml.gz");
-//		} else if (applyTrafficRestrain ) {
-//			config.network().setInputFile(inputDir + "/networkWithTrafficRestrication.xml.gz");
-//		} else
-		if(addBikeTrack && !isAllwoingMotorbikeOnBikeTrack) {
-			config.network().setInputFile(inputDir + "/networkWithBikeTrack.xml.gz");
-		} else if (isAllwoingMotorbikeOnBikeTrack) {
-			config.network().setInputFile(inputDir + "/networkWithBikeMotorbikeTrack.xml.gz");
-		}
+		if( addBikeTrack) config.network().setInputFile(inputDir + "/networkWithOptimizedConnectors_halfLength.xml.gz"); // must be after getting optimum number of connectors
+		else config.network().setInputFile(inputDir+"/network.xml.gz");
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		if ( scenario.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
+		if ( addBikeTrack ) {
+			// remove the connectors on which freespeed is only 0.01 m/s
+			scenario.getNetwork().getLinks().values().stream().filter(
+					link -> link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX) && link.getFreespeed() == 0.01
+			).collect(Collectors.toList()).forEach(link -> scenario.getNetwork().removeLink(link.getId()));
+		}
+
+		if ( isAllwoingMotorbikeOnBikeTrack ) {
+			Set<String> allowedModesOnBikeTrack = new HashSet<>(Arrays.asList(TransportMode.bike, "motorbike"));
+			List<Link> bikeLinks = scenario.getNetwork().getLinks().values().stream().filter(
+					link -> link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_PREFIX) || link.getId().toString().startsWith(PatnaUtils.BIKE_TRACK_CONNECTOR_PREFIX)
+			).collect(Collectors.toList());
+			bikeLinks.forEach(link -> link.setAllowedModes(allowedModesOnBikeTrack));
+			bikeLinks.forEach(link -> link.setFreespeed(60./3.6)); // naturally, bikes must also be faster
+		}
+
+		String vehiclesFile = inputDir+"/output_vehicles.xml.gz"; // following is required to extract only vehicle types and not vehicle info. Amit Nov 2016
+		VehicleUtils.addVehiclesToScenarioFromVehicleFile(vehiclesFile, scenario);
+
+		if (!scenario.getVehicles().getVehicles().isEmpty()) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
 				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
@@ -205,7 +217,7 @@ public class PatnaPolicyControler {
 	private static void addScoringFunction(final Controler controler){
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( controler.getScenario() );
 			@Inject
              Network network;
 			@Inject
@@ -216,7 +228,7 @@ public class PatnaPolicyControler {
              ScenarioConfigGroup scenarioConfig;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final ScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
@@ -234,9 +246,9 @@ public class PatnaPolicyControler {
 
 				ScoringParameterSet scoringParameterSet = planCalcScoreConfigGroup.getScoringParameters( null ); // parameters set is same for all subPopulations 
 
-				CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(
+				ScoringParameters.Builder builder = new ScoringParameters.Builder(
 						planCalcScoreConfigGroup, scoringParameterSet, scenarioConfig);
-				final CharyparNagelScoringParameters modifiedParams = builder.build();
+				final ScoringParameters modifiedParams = builder.build();
 
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(modifiedParams, network));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(modifiedParams));

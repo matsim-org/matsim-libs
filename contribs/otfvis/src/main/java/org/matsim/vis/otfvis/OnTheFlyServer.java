@@ -20,37 +20,26 @@
 
 package org.matsim.vis.otfvis;
 
+import java.nio.ByteBuffer;
+import java.util.*;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.config.*;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.vis.otfvis.data.OTFConnectionManager;
-import org.matsim.vis.otfvis.data.OTFDataWriter;
-import org.matsim.vis.otfvis.data.OTFServerQuadTree;
-import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
-import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
-import org.matsim.vis.otfvis.interfaces.OTFLiveServer;
-import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
+import org.matsim.vis.otfvis.data.*;
+import org.matsim.vis.otfvis.handler.*;
+import org.matsim.vis.otfvis.interfaces.*;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
-import org.matsim.vis.snapshotwriters.VisData;
-import org.matsim.vis.snapshotwriters.VisMobsim;
-import org.matsim.vis.snapshotwriters.VisNetwork;
-
-import java.nio.ByteBuffer;
-import java.util.*;
+import org.matsim.vis.snapshotwriters.*;
 
 /**
  * OnTheFlyServer is the live server of the OTFVis.
@@ -70,28 +59,34 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
 		@Override
-		public Map<Id<Person>, Plan> getPlans() {
-			Map<Id<Person>, Plan> plans = new HashMap<>();
-			if (visMobsim != null ) {
-				Collection<MobsimAgent> agents = visMobsim.getAgents();
-				for (MobsimAgent agent : agents) {
-					if (agent instanceof PlanAgent) {
-						PlanAgent pa = (PlanAgent) agent;
-						plans.put(pa.getCurrentPlan().getPerson().getId(), pa.getCurrentPlan());
-					}
-				}
-			} else {
-				for (Person person : scenario.getPopulation().getPersons().values()) {
-					Plan plan = person.getSelectedPlan();
-					plans.put(person.getId(), plan);
-				}
-			}
-			return plans;
+		public Map<Id<Person>, MobsimAgent> getMobsimAgents() {
+			return visMobsim.getAgents();
 		}
 
 		@Override
-		public Map<Id<Person>, MobsimAgent> getAgents() {
-			return ((QSim) visMobsim).getAgentMap();
+		public Plan getPlan(MobsimAgent agent) {
+			if (agent instanceof PlanAgent) {
+				return ((PlanAgent) agent).getCurrentPlan();
+			} else if (nonPlanAgentQueryHelper != null) {
+				return OnTheFlyServer.this.nonPlanAgentQueryHelper.getPlan(agent);
+			}
+			else {
+				return null;
+			}
+		}
+
+		@Override
+		public Activity getCurrentActivity(MobsimAgent mobsimAgent)	{		    
+            if (mobsimAgent == null || mobsimAgent.getState() != MobsimAgent.State.ACTIVITY) {
+                return null;
+            }
+            if (mobsimAgent instanceof PlanAgent) {
+                return (Activity) ((PlanAgent)mobsimAgent).getCurrentPlanElement();
+            }
+            if (nonPlanAgentQueryHelper != null) {
+                return nonPlanAgentQueryHelper.getCurrentActivity(mobsimAgent);
+            }
+            return null;
 		}
 
 		@Override
@@ -123,7 +118,15 @@ public class OnTheFlyServer implements OTFLiveServer {
 		public double getTime() {
 			return ((QSim) visMobsim).getSimTimer().getTimeOfDay();
 		}
-
+	}
+	
+	/**
+	 * Used to query MobsimAgents that are not PlanAgents (e.g. DynAgents)
+	 */
+	public interface NonPlanAgentQueryHelper {
+	    Plan getPlan(MobsimAgent mobsimAgent);
+	    
+	    Activity getCurrentActivity(MobsimAgent mobsimAgent);
 	}
 
 	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
@@ -141,20 +144,27 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private VisMobsim visMobsim;
 
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
+	
+	private final NonPlanAgentQueryHelper nonPlanAgentQueryHelper;
 
 	private Scenario scenario;
 
-	OnTheFlyServer(Scenario scenario, EventsManager events, VisMobsim qSim) {
+	OnTheFlyServer(Scenario scenario, EventsManager events, VisMobsim qSim, NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
 		this.scenario = scenario;
 		this.events = events;
 		this.visMobsim = qSim;
+		this.nonPlanAgentQueryHelper = nonPlanAgentQueryHelper;
 		playPauseSimulationControl = new PlayPauseSimulationControl(qSim);
-
 	}
 
-	public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events, VisMobsim qSim) {
-		return new OnTheFlyServer(scenario, events, qSim);
-	}
+    public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events, VisMobsim qSim) {
+        return createInstance(scenario, events, qSim, null);
+    }
+
+    public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events, VisMobsim qSim,
+            NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
+        return new OnTheFlyServer(scenario, events, qSim, nonPlanAgentQueryHelper);
+    }
 
 	@Override
 	public boolean isLive() {

@@ -48,7 +48,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
 
     private final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
 
-    private final Vehicles emissionVehicles;
+    private final Vehicles vehicles;
     private final Network network;
     private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
@@ -60,12 +60,12 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
     private final Map<Id<Vehicle>, Id<Link>> vehicleId2coldEmissionEventLinkId = new HashMap<>();
     
     public ColdEmissionHandler(
-            Vehicles emissionVehicles,
+            Vehicles vehicles,
             Network network,
             ColdEmissionAnalysisModuleParameter parameterObject2,
             EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
-        this.emissionVehicles = emissionVehicles;
+        this.vehicles = vehicles;
         this.network = network;
         this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
     }
@@ -91,7 +91,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
             double parkingDuration = this.vehicleId2parkingDuration.get(vehicleId);
             Id<Link> coldEmissionEventLinkId = this.vehicleId2coldEmissionEventLinkId.get(vehicleId);
 
-            Vehicle vehicle = emissionVehicles.getVehicles().get(vehicleId);
+            Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
 
             if ((distance / 1000) > 1.0) {
                 this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
@@ -148,7 +148,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
         this.vehicleId2parkingDuration.put(vehicleId, parkingDuration);
         this.vehicleId2accumulatedDistance.put(vehicleId, 0.0);
 
-        Vehicle vehicle = emissionVehicles.getVehicles().get(vehicleId);
+        Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
         VehicleType vt = vehicle.getType();
 
         this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(

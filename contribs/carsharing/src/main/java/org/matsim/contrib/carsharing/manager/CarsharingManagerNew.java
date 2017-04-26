@@ -23,6 +23,7 @@ import org.matsim.contrib.carsharing.manager.supply.VehiclesContainer;
 import org.matsim.contrib.carsharing.models.ChooseTheCompany;
 import org.matsim.contrib.carsharing.models.ChooseVehicleType;
 import org.matsim.contrib.carsharing.models.KeepingTheCarModel;
+import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
@@ -60,16 +61,19 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		CSVehicle vehicle = getVehicleAtLocation(startLink,	plan.getPerson(), carsharingType);		
 
 		boolean willHaveATripFromLocation = willUseTheVehicleLaterFromLocation(destinationLink.getId(), plan, legToBeRouted);
-		
 		double durationOfNextActivity = getDurationOfNextActivity(plan, legToBeRouted, time);		
-		
-		boolean keepTheCar = keepTheCarModel.keepTheCarDuringNextActivity(durationOfNextActivity, plan.getPerson(), carsharingType);	
+		boolean keepTheCar;
+		if (((CarsharingRoute)legToBeRouted.getRoute()).isOldRoute()) 
+			keepTheCar = ((CarsharingRoute)legToBeRouted.getRoute()).isKeepthecar();
+		else 		
+			keepTheCar = keepTheCarModel.keepTheCarDuringNextActivity(durationOfNextActivity, plan.getPerson(), carsharingType);	
 		//TODO: create a method for getting the search distance
 		double searchDistance = 1000.0;
 		if (vehicle != null) {
 			
 			if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
-			return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
+				((CarsharingRoute)legToBeRouted.getRoute()).setKeepthecar(true);
+				return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
 					startLink, destinationLink, true, true);
 			}
 			else {
@@ -107,21 +111,33 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 
 			String companyId = chooseCompany.pickACompany(plan, legToBeRouted, time, typeOfVehicle);
 			if (!companyId.equals("")) {
+				
+				//in the current state, the company is not remembered in the carsharing route
+				//one might want to add this or not, depending on the behavior one 
+				//wants to observe
 				vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
 						carsharingType, typeOfVehicle, companyId, searchDistance);
 				if (vehicle == null) {					
-					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, startLink.getId(), carsharingType));				
+					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, companyId, startLink, destinationLink));
+
 					return null;				
 				}
-				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
 
+				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
 				VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
 				Link stationLink = vehiclesContainer.getVehicleLocation(vehicle);
-				companyContainer.reserveVehicle(vehicle);
+
+				if (false == companyContainer.reserveVehicle(vehicle)) {
+					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, companyId, startLink, destinationLink));
+
+					return null;
+				}
 			
-				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, startLink, stationLink, person.getId(), vehicle.getVehicleId()));
+				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, companyId, startLink, stationLink, destinationLink, person.getId(), vehicle.getVehicleId()));
 			
 				if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
+					((CarsharingRoute)legToBeRouted.getRoute()).setKeepthecar(true);
+
 					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
 							stationLink, destinationLink, true, false);
 				}
@@ -141,8 +157,10 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 							stationLink, destinationLink, false, false);				
 				}	
 			}
-			else
+			else {
+				eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, companyId, startLink, destinationLink));
 				return null;
+			}
 		}					
 	}
 	
@@ -187,12 +205,10 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	public void freeParkingSpot(String vehicleId, Id<Link> linkId) {
 		
 		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleWithId(vehicleId);
-		Network network = scenario.getNetwork();
-		Link link = network.getLinks().get(linkId);
 		CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(vehicle.getCompanyId());
 		VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(vehicle.getCsType());
 		
-		((OneWayContainer)vehiclesContainer).freeParkingSpot(link);			
+		((OneWayContainer)vehiclesContainer).freeParkingSpot(vehicle);			
 	}
 
 	@Override

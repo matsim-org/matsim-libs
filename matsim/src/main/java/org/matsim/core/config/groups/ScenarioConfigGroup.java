@@ -42,7 +42,7 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( ScenarioConfigGroup.class ) ;
 
-	private int simulationPeriodInDays = 1;
+	private double simulationPeriodInDays = 1.0;
 	
 	public ScenarioConfigGroup() {
 		super(GROUP_NAME);
@@ -128,12 +128,12 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	}
 
 	@StringSetter( SIMULATION_PERIOD_DAYS )
-	public void setSimulationPeriodInDays(final int simulationPeriodInDays) {
+	public void setSimulationPeriodInDays(final double simulationPeriodInDays) {
 		this.simulationPeriodInDays = simulationPeriodInDays;
 	}
 	
 	@StringGetter( SIMULATION_PERIOD_DAYS )
-	public int getSimulationPeriodInDays() {
+	public double getSimulationPeriodInDays() {
 		return this.simulationPeriodInDays;
 	}
 

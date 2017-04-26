@@ -28,8 +28,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.Toll.TripTollHandler;
-import playground.agarwalamit.analysis.trip.FilteredTripDistanceHandler;
+import playground.agarwalamit.analysis.toll.TripTollHandler;
+import playground.agarwalamit.analysis.tripDistance.ModeFilterTripDistanceHandler;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.agarwalamit.utils.FileUtils;
@@ -43,12 +43,12 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class HourlyTripTollPerKmWriter {
 	
 	private final TripTollHandler tollHandler ;
-	private final FilteredTripDistanceHandler distHandler;
+	private final ModeFilterTripDistanceHandler distHandler;
 	private final MunichPersonFilter pf = new MunichPersonFilter();
 	
 	public HourlyTripTollPerKmWriter(final Network network, final double simulationEndTime, final int noOfTimeBins) {
 		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );
-		this.distHandler = new FilteredTripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+		this.distHandler = new ModeFilterTripDistanceHandler(network, simulationEndTime, noOfTimeBins);
 	}
 	
 	public static void main(String[] args) {

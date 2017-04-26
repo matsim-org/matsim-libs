@@ -28,75 +28,61 @@ import com.google.common.collect.Iterables;
 
 import playground.michalm.ev.data.*;
 
+public class EvTimeProfiles {
+	public static ProfileCalculator createSocHistogramCalculator(final EvData evData) {
+		String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
+		return new TimeProfiles.MultiValueProfileCalculator(header) {
+			@Override
+			public Long[] calcValues() {
+				UniformHistogram histogram = new UniformHistogram(0.1, header.length);
+				for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
+					histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
+				}
 
-public class EvTimeProfiles
-{
-    public static ProfileCalculator createSocHistogramCalculator(final EvData evData)
-    {
-        String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+",
-                "0.9+" };
-        return new TimeProfiles.MultiValueProfileCalculator(header) {
-            @Override
-            public String[] calcValues()
-            {
-                UniformHistogram histogram = new UniformHistogram(0.1, header.length);
-                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
-                }
+				Long[] values = new Long[header.length];
+				for (int b = 0; b < header.length; b++) {
+					values[b] = histogram.getCount(b);
+				}
+				return values;
+			}
+		};
+	}
 
-                String[] values = new String[header.length];
-                for (int b = 0; b < header.length; b++) {
-                    values[b] = histogram.getCount(b) + "";
-                }
-                return values;
-            }
-        };
-    }
+	public static ProfileCalculator createMeanSocCalculator(final EvData evData) {
+		return new TimeProfiles.SingleValueProfileCalculator("meanSOC") {
+			@Override
+			public Double calcValue() {
+				Mean mean = new Mean();
+				for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
+					mean.increment(ev.getBattery().getSoc());
+				}
+				return mean.getResult() / EvUnitConversions.J_PER_kWh;// in [kWh]
+			}
+		};
+	}
 
+	private static final int MAX_VEHICLE_COLUMNS = 50;
 
-    public static ProfileCalculator createMeanSocCalculator(final EvData evData)
-    {
-        return new TimeProfiles.SingleValueProfileCalculator("meanSOC") {
-            @Override
-            public String calcValue()
-            {
-                Mean mean = new Mean();
-                for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
-                    mean.increment(ev.getBattery().getSoc());
-                }
-                return String.format("%.3f", mean.getResult() / EvUnitConversions.J_PER_kWh);//print out in [kWh]
-            }
-        };
-    }
+	public static ProfileCalculator createIndividualSocCalculator(final EvData evData) {
+		int columns = Math.min(evData.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
+		Iterable<ElectricVehicle> selectedEvs = Iterables.limit(evData.getElectricVehicles().values(), columns);
 
+		String[] header = new String[columns];
+		int col = 0;
+		for (ElectricVehicle ev : selectedEvs) {
+			header[col++] = ev.getId() + "";
+		}
 
-    private static final int MAX_VEHICLE_COLUMNS = 50;
-
-
-    public static ProfileCalculator createIndividualSocCalculator(final EvData evData)
-    {
-        int columns = Math.min(evData.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
-        Iterable<ElectricVehicle> selectedEvs = Iterables
-                .limit(evData.getElectricVehicles().values(), columns);
-
-        String[] header = new String[columns];
-        int col = 0;
-        for (ElectricVehicle ev : selectedEvs) {
-            header[col++] = ev.getId() + "";
-        }
-
-        return new TimeProfiles.MultiValueProfileCalculator(header) {
-            @Override
-            public String[] calcValues()
-            {
-                String[] vals = new String[columns];
-                int col = 0;
-                for (ElectricVehicle ev : selectedEvs) {
-                    vals[col++] = String.format("%.3f",
-                            ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh);//print out in [kWh]
-                }
-                return vals;
-            }
-        };
-    }
+		return new TimeProfiles.MultiValueProfileCalculator(header) {
+			@Override
+			public Double[] calcValues() {
+				Double[] vals = new Double[columns];
+				int col = 0;
+				for (ElectricVehicle ev : selectedEvs) {
+					vals[col++] = ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh;// in [kWh]
+				}
+				return vals;
+			}
+		};
+	}
 }

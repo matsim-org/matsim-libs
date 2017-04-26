@@ -20,12 +20,14 @@
 package playground.agarwalamit.opdyts;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -36,9 +38,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.legMode.distributions.LegModeBeelineDistanceDistributionHandler;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
-import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
+import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
 
 /**
  * Created by amit on 20/09/16.
@@ -50,20 +51,22 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
     private EventsManager events;
 
     private final FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
-    private final PatnaCMPDistanceDistribution referenceStudyDistri ;
+    private final DistanceDistribution referenceStudyDistri ;
     private LegModeBeelineDistanceDistributionHandler beelineDistanceDistributionHandler;
 
     private final SortedMap<String, SortedMap<Double, Integer>> initialMode2DistanceClass2LegCount = new TreeMap<>();
 
     private BufferedWriter writer;
     private final Set<String> mode2consider;
-    private final OpdytsScenarios opdytsScenarios ;
 
-    public OpdytsModalStatsControlerListener(final Set<String> modes2consider, final OpdytsScenarios opdytsScenarios) {
+    /*
+     * after every 10/20/50 iterations, distance distribution will be written out.
+     */
+    private final int distriEveryItr = 50;
+
+    public OpdytsModalStatsControlerListener(final Set<String> modes2consider, final DistanceDistribution referenceStudyDistri) {
         this.mode2consider = modes2consider;
-        this.opdytsScenarios = opdytsScenarios;
-
-        this.referenceStudyDistri = new PatnaCMPDistanceDistribution(this.opdytsScenarios);
+        this.referenceStudyDistri = referenceStudyDistri;
     }
 
     public OpdytsModalStatsControlerListener() {
@@ -72,7 +75,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
 
     @Override
     public void notifyStartup(StartupEvent event) {
-        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/modalStats.txt";
+        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/opdyts_modalStats.txt";
         writer = IOUtils.getBufferedWriter(outFile);
         try {
             writer.write("iterationNr" + "\t" +
@@ -106,7 +109,10 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
 
-        if(event.getIteration() == event.getServices().getConfig().controler().getFirstIteration()) {
+       final int iteration = event.getIteration();
+       final Config config = event.getServices().getConfig();
+
+        if (iteration == config.controler().getFirstIteration()) {
             this.initialMode2DistanceClass2LegCount.putAll(this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts());
         } else {
             // nothing to do
@@ -116,26 +122,32 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
 
         // evaluate objective function value
         ObjectiveFunctionEvaluator objectiveFunctionEvaluator = new ObjectiveFunctionEvaluator();
-        Map<String, double []> realCounts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
-        Map<String, double []> simCounts = new TreeMap<>();
+        Map<String, double[]> realCounts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
+        Map<String, double[]> simCounts = new TreeMap<>();
+
+        // initialize simcounts array for each mode
+        realCounts.entrySet().forEach(entry -> simCounts.put(entry.getKey(), new double[entry.getValue().length]));
 
         SortedMap<String, SortedMap<Double, Integer>> simCountsHandler = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
-        for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet() ) {
-            double [] counts = new double [simCountsHandler.get(e.getKey()).size()] ;
+        for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet()) {
+            if (!realCounts.containsKey(e.getKey())) continue;
+            double[] counts = new double[realCounts.get(e.getKey()).length];
             int index = 0;
             for (Integer count : simCountsHandler.get(e.getKey()).values()) {
-                counts [index++] = count;
+                counts[index++] = count;
             }
-            simCounts.put(e.getKey(),counts);
+            simCounts.put(e.getKey(), counts);
         }
 
         try {
-            writer.write(event.getIteration() + "\t" +
+            writer.write(iteration + "\t" +
                     mode2Legs.keySet().toString() + "\t" +
                     mode2Legs.values().toString() + "\t");
 
             // write modalParams
-            Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = event.getServices().getConfig().planCalcScore().getModes();
+            Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = config
+                                                                                .planCalcScore()
+                                                                                .getModes();
 
             SortedMap<String, Double> ascs = new TreeMap<>();
             SortedMap<String, Double> travs = new TreeMap<>();
@@ -157,16 +169,20 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
                     dists.values().toString() + "\t" +
                     moneyRates.values().toString());
 
-            writer.write( "\t" + objectiveFunctionEvaluator.getObjectiveFunctionValue(realCounts,simCounts));
+            writer.write("\t" + objectiveFunctionEvaluator.getObjectiveFunctionValue(realCounts, simCounts));
             writer.newLine();
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("File not found.");
         }
 
-        // dist-distribution file
-        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it."+event.getIteration()+"/"+event.getIteration()+".distanceDistri.txt";
-        writeDistanceDistribution(outFile);
+        if( iteration % distriEveryItr == 0 || iteration == config.controler().getLastIteration() ) {
+            // dist-distribution file
+            String distriDir = config.controler().getOutputDirectory() + "/distanceDistri/";
+            new File(distriDir).mkdir();
+            String outFile = distriDir + "/" + iteration + ".distanceDistri.txt";
+            writeDistanceDistribution(outFile);
+        }
     }
 
     @Override
@@ -209,7 +225,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
                 writer2.write("===== begin writing distribution from objective function ===== ");
                 writer2.newLine();
 
-                SortedMap<String, double []> mode2counts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
+                Map<String, double []> mode2counts = this.referenceStudyDistri.getMode2DistanceBasedLegs();
                 for (String mode : mode2counts.keySet()) {
                     writer2.write(mode + "\t");
                     for (Double d : mode2counts.get(mode)) {

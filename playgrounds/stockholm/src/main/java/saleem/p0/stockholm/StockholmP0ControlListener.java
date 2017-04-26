@@ -17,10 +17,13 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 
-import saleem.p0.GenericP0ControlHandler;
+import saleem.p0.policy.GenericP0ControlHandler;
 
-// For Generic Junctions
-
+/**
+ * To set up P0 for Stockholm
+ * 
+ * @author Mohammad Saleem
+ */
 public class StockholmP0ControlListener implements StartupListener, IterationStartsListener,IterationEndsListener {
 	public Network network;
 	List<GenericP0ControlHandler> handlers = new ArrayList<GenericP0ControlHandler>();
@@ -36,6 +39,11 @@ public class StockholmP0ControlListener implements StartupListener, IterationSta
 		this.outgoinglinks=outgoinglinks;
 		
 	}
+	/**
+	 * Notifies all observers of the Controler that a iteration is setup
+	 *
+	 * @param event
+	 */
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		List<NetworkChangeEvent> allchangeevents = new ArrayList<NetworkChangeEvent>() ;
@@ -50,6 +58,10 @@ public class StockholmP0ControlListener implements StartupListener, IterationSta
 	    NetworkUtils.setNetworkChangeEvents(network,events);
 	    allchangeevents.removeAll(allchangeevents);
 	}
+	/**
+	 * Notifies all observers of the Controler that a iteration is finished
+	 * @param event
+	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Iterator<GenericP0ControlHandler> hiter = handlers.iterator();
@@ -59,6 +71,11 @@ public class StockholmP0ControlListener implements StartupListener, IterationSta
 			handler.printDelayStats();
 		}
 	}
+	/**
+	 * Notifies all observers that the controler is initialized and they should do the same
+	 *
+	 * @param event
+	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Iterator<String> pretimednodes = this.incominglinks.keySet().iterator();

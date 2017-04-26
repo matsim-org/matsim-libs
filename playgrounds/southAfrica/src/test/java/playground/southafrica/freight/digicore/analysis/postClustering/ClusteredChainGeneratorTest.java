@@ -48,6 +48,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.HullConverter;
+import playground.southafrica.freight.digicore.algorithms.postclustering.ClusteredChainGenerator;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreFacility;

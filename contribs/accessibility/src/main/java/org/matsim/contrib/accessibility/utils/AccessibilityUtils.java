@@ -1,7 +1,14 @@
 package org.matsim.contrib.accessibility.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -19,13 +26,17 @@ import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.FacilitiesWriter;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author dziemke
@@ -35,17 +46,17 @@ public class AccessibilityUtils {
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
-	 * 
-	 * @param scenario
-	 * @param activityOptionType
-	 * @return
 	 */
 	public static ActivityFacilities collectActivityFacilitiesWithOptionOfType(Scenario scenario, String activityOptionType) {
 		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(activityOptionType) ;
-		for (ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()) {
-			for (ActivityOption option : fac.getActivityOptions().values()) {
-				if (option.getType().equals(activityOptionType)) {
-					activityFacilities.addActivityFacility(fac);
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			if (activityOptionType == null) { // no activity option type for facility given, use all of them
+				activityFacilities.addActivityFacility(facility);
+			} else {
+				for (ActivityOption option : facility.getActivityOptions().values()) {
+					if (option.getType().equals(activityOptionType)) {
+						activityFacilities.addActivityFacility(facility);
+					}
 				}
 			}
 		}
@@ -55,12 +66,9 @@ public class AccessibilityUtils {
 	
 	/**
 	 * Collects the types of all facilities that have been loaded to the scenario.
-	 * 
-	 * @param scenario
-	 * @return
 	 */
 	public static List<String> collectAllFacilityOptionTypes(Scenario scenario) {
-		List<String> activityOptionTypes = new ArrayList<String>() ;
+		List<String> activityOptionTypes = new ArrayList<>() ;
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			for (ActivityOption option : facility.getActivityOptions().values()) {
 				// collect all activity types that are contained within the provided facilities file
@@ -72,7 +80,63 @@ public class AccessibilityUtils {
 		LOG.warn("The following activity option types where found within the activity facilities: " + activityOptionTypes);
 		return activityOptionTypes;
 	}
-
+	
+	
+	public static void combineDifferentActivityOptionTypes(final Scenario scenario, String combinedType, final List<String> activityOptionsToBeIncluded) {
+		ActivityOption markerOption = new ActivityOptionImpl(combinedType); 
+		
+		// Memorize all facilities that have certain activity options in a activity facilities container
+		final ActivityFacilities consideredFacilities = FacilitiesUtils.createActivityFacilities();
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			for (ActivityOption option : facility.getActivityOptions().values()) {
+				if (activityOptionsToBeIncluded.contains(option.getType())) {
+					// if (!option.getType().equals(FacilityTypes.HOME) && !option.getType().equals(FacilityTypes.WORK) && !option.getType().equals("minor")) {
+					if (!consideredFacilities.getFacilities().containsKey(facility.getId())) {
+						consideredFacilities.addActivityFacility(facility);
+					}
+				}
+			}
+		}
+		
+		// Add  marker option to facilities to be considered
+		for (ActivityFacility facility : consideredFacilities.getFacilities().values()) {
+			facility.addActivityOption(markerOption);
+		}
+	}
+	
+	
+	public static final ActivityFacilities createFacilityForEachLink( Network network ) {
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("LinkFacilities") ;
+		ActivityFacilitiesFactory ff = facilities.getFactory() ;
+		for ( Link link : network.getLinks().values() ) {
+			ActivityFacility facility = ff.createActivityFacility( Id.create(link.getId(),ActivityFacility.class) , link.getCoord(), link.getId() ) ;
+			facilities.addActivityFacility(facility);
+		}
+		return facilities ;
+	}
+	
+	
+	public static final ActivityFacilities createFacilityFromBuildingShapefile(String shapeFileName, String identifierCaption, String numberOfHouseholdsCaption) {
+		ShapeFileReader shapeFileReader = new ShapeFileReader();
+		Collection<SimpleFeature> features = shapeFileReader.readFileAndInitialize(shapeFileName);
+		
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("DensitiyFacilities");
+		ActivityFacilitiesFactory aff = facilities.getFactory();
+		
+		for (SimpleFeature feature : features) {
+			String featureId = (String) feature.getAttribute(identifierCaption);
+			Integer numberOfHouseholds = Integer.parseInt((String) feature.getAttribute(numberOfHouseholdsCaption));
+			Geometry geometry = (Geometry) feature.getDefaultGeometry();
+			Coord coord = CoordUtils.createCoord(geometry.getCentroid().getX(), geometry.getCentroid().getY());
+			
+			for (int i = 0; i < numberOfHouseholds; i++) {
+				ActivityFacility facility = aff.createActivityFacility(Id.create(featureId + "_" + i, ActivityFacility.class), coord);
+				facilities.addActivityFacility(facility);
+			}
+		}
+		return facilities ;
+	}
+	
 	
 	/**
 	 * Goes through a given set of measuring points and creates a facility on the measuring point if the
@@ -80,24 +144,22 @@ public class AccessibilityUtils {
 	 * of such networkDensityFacilites can then be used to plot a density layer, e.g. to excluded tiles
 	 * from being drawn if there is no network. The network density is thereby used as a proxy for settlement
 	 * density if no information of settlement density is available.
-	 * 
-	 * @param network
-	 * @param measuringPoints
-	 * @param cellSize
-	 * @return
 	 */
+	@Deprecated
 	public static ActivityFacilities createNetworkDensityFacilities(Network network,
 			ActivityFacilities measuringPoints, double maximumAllowedDistance) {
+		// yyyyyy This method scares me ... since in the code it is used by code that does not really know the measuring points and so
+		// only speculates about it.  kai, dec'16
+		// yyyyyy Why not just create a facility for each link?  (The GridBasedAccessibilityListener aggregates those anyways ...).  kai, dec'16
+		
 		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
 		ActivityFacilities networkDensityFacilities = FacilitiesUtils.createActivityFacilities("network_densities");
 
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values() ) {
 			Coord coord = measuringPoint.getCoord();
 			Link link = NetworkUtils.getNearestLink(network, coord);
-			final Coord coord1 = coord;
-			Link r = ((Link) link);
 			// TODO check if this is good or if orthogonal projection etc. is more suitable
-			double distance = CoordUtils.distancePointLinesegment(r.getFromNode().getCoord(), r.getToNode().getCoord(), coord1);
+			double distance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
 			if (distance <= maximumAllowedDistance) {
 				ActivityFacility facility = aff.createActivityFacility(measuringPoint.getId(), coord);
 				networkDensityFacilities.addActivityFacility(facility);
@@ -109,10 +171,6 @@ public class AccessibilityUtils {
 
 	/**
 	 * Creates measuring points based on the scenario's network and a specified cell size.
-	 * 
-	 * @param scenario
-	 * @param cellSize
-	 * @return
 	 */
 	public static ActivityFacilities createMeasuringPointsFromNetworkBounds(Network network, double cellSize) {
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(network);
@@ -225,4 +283,15 @@ public class AccessibilityUtils {
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		return date;
 	}
+	
+	
+//	public static File createOSMDownloadScript(String regionName, String minLon, String minLat, String maxLon, String maxLat) throws IOException {
+//	    File osmDownloadScript = new File("script");
+//	    Writer streamWriter = new OutputStreamWriter(new FileOutputStream(osmDownloadScript));
+//	    PrintWriter printWriter = new PrintWriter(streamWriter);
+//	    String command = "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"";
+//	    printWriter.println(command);
+//	    printWriter.close();
+//	    return osmDownloadScript;
+//	}
 }

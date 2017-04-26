@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -63,7 +64,7 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 		final List<PlanElement> trip = new ArrayList<PlanElement>();		
 
 		Person person = plan.getPerson();
-		NetworkRoute route = (NetworkRoute) legToBeRouted.getRoute();
+		CarsharingRoute route = (CarsharingRoute) legToBeRouted.getRoute();
 		final Link currentLink = scenario.getNetwork().getLinks().get(route.getStartLinkId());
 		final Link destinationLink = scenario.getNetwork().getLinks().get(route.getEndLinkId());
 		

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -47,9 +48,8 @@ public class EmissionModule {
 	private final Scenario scenario;
 	private WarmEmissionHandler warmEmissionHandler;
 	private ColdEmissionHandler coldEmissionHandler;
-	public EventsManager emissionEventsManager;
-	private Double emissionEfficiencyFactor; // i think, this can also go to EmissionsConfigGroup. Amit Sep 2016
 
+	private final EventsManager eventsManager;
 	private final EmissionsConfigGroup ecg;
 
 	//===
@@ -63,7 +63,7 @@ public class EmissionModule {
 	
 	//===
     private Map<Integer, String> roadTypeMapping;
-	private Vehicles emissionVehicles;
+	private Vehicles vehicles;
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
@@ -71,26 +71,35 @@ public class EmissionModule {
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
-
-	public EmissionModule(Scenario scenario) {
+	@Inject
+	public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
 		this.scenario = scenario;
-		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
+
+		this.ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+
+		if ( !ecg.isWritingEmissionsEvents() ) {
+			logger.warn("Emission events are excluded from events file. A new events manager is created.");
+			this.eventsManager = EventsUtils.createEventsManager();
+		} else {
+			this.eventsManager = eventsManager;
+		}
+
+		createLookupTables();
+		createEmissionHandler();
+
+		// add event handlers here and restrict the access outside the emission Module.  Amit Apr'17.
+		this.eventsManager.addHandler(warmEmissionHandler);
+		this.eventsManager.addHandler(coldEmissionHandler);
 	}
 	
-	public EmissionModule(Scenario scenario, Vehicles emissionVehicles) { // TODO : probably we dont need this anymore. Amit sep 16
-		this.scenario = scenario;
-		this.emissionVehicles = emissionVehicles;
-		ecg = (EmissionsConfigGroup)scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
-	}
-
-	public void createLookupTables() {
+	private void createLookupTables() {
 		logger.info("entering createLookupTables");
 		
 		getInputFiles();
 		
 		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
-		if(this.emissionVehicles == null){
-			emissionVehicles = scenario.getVehicles();
+		if(this.vehicles == null){
+			vehicles = scenario.getVehicles();
 		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
@@ -107,8 +116,6 @@ public class EmissionModule {
 	}
 
 	private void getInputFiles() {
-	    EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
-
 		URL context = scenario.getConfig().getContext();
 
 		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFileURL(context).getFile();
@@ -122,17 +129,16 @@ public class EmissionModule {
 		}
 	}
 
-	public void createEmissionHandler() {
+	private void createEmissionHandler() {
 		logger.info("entering createEmissionHandler");
 		
-		emissionEventsManager = EventsUtils.createEventsManager();
 		Network network = scenario.getNetwork() ;
 
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
 		
-		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager, emissionEfficiencyFactor);
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
+		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
+		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -380,30 +386,17 @@ public class EmissionModule {
 		return hbefaTrafficSituation;
 	}
 
-	public WarmEmissionHandler getWarmEmissionHandler() {
-		return warmEmissionHandler;	
+	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
+		return this. warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
-	public ColdEmissionHandler getColdEmissionHandler() {
-		return coldEmissionHandler;
-	}
-
+	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
+	// for the analysis purpose. Need a test. Amit Apr'17
 	public EventsManager getEmissionEventsManager() {
-		return emissionEventsManager;
+		return eventsManager;
 	}
 
-	@Deprecated // use scenario.getVehicles() instead.
-	public Vehicles getEmissionVehicles() {
-		return emissionVehicles;
-	}
-
-    public void setEmissionEfficiencyFactor(Double emissionEfficiencyFactor) {
-		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-		logger.info("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
-//		logger.warn("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
-	}
-
-	public void writeEmissionInformation(String emissionEventOutputFile) {
+	public void writeEmissionInformation() {
 		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
 				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
 		
@@ -434,6 +427,6 @@ public class EmissionModule {
 //				+ cam.getVehAttributesNotSpecified().size() + " of "
 //				+ cam.getVehicleIdSet().size() + " vehicles.");
 		
-		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
+		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
 	}
 }

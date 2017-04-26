@@ -1,21 +1,16 @@
 package playground.dziemke.utils;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.Random;
 
 /**
  * @author dziemke
@@ -32,7 +27,7 @@ public class PlanFileModifier {
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static boolean onlyConsiderPeopleAlwaysGoingByCar = false;
-	static int maxNumberOfAgentsConsidered = 1000000;
+	static int maxNumberOfAgentsConsidered = 10000000;
 //	static String runId = "run_194";
 //	static int iteration = 300;
 	static boolean removeLinksAndRoutes = true;
@@ -50,8 +45,12 @@ public class PlanFileModifier {
 //	static final String OUTPUT_PLANS_FILE = OUTPUT_ROOT + "population.xml";
 	
 	// In case using input plans that have not yet been iterated
-	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans.xml.gz";
-	static final String OUTPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans_no_links_routes.xml.gz";
+//	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans.xml.gz";
+//	static final String OUTPUT_PLANS_FILE = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/30/plans_no_links_routes.xml.gz";
+//	static String inputPlansFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/100/plans.xml.gz";
+//	static String outputPlansFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/100/plans_no_links_routes.xml.gz";
+	static String inputPlansFile = "../../../runs-svn/berlin_scenario_2016/be_118/be_118.output_plans.xml.gz";
+	static String outputPlansFile = "../../../runs-svn/berlin_scenario_2016/be_118/be_118.output_plans_no_links_routes.xml.gz";
 	
 	
 //	if (onlyTransferSelectedPlan == true) {
@@ -63,12 +62,24 @@ public class PlanFileModifier {
 	
 	
 	public static void main(String[] args) {
+		if (args.length != 0) {
+			inputPlansFile = args[0];
+			outputPlansFile = args[1];
+			selectionProbability = Double.parseDouble(args[2]);
+			onlyTransferSelectedPlan = Boolean.parseBoolean(args[3]);
+			considerHomeStayingAgents = Boolean.parseBoolean(args[4]);
+			includeStayHomePlans = Boolean.parseBoolean(args[5]);
+			onlyConsiderPeopleAlwaysGoingByCar = Boolean.parseBoolean(args[6]);
+			maxNumberOfAgentsConsidered = Integer.parseInt(args[7]);
+			removeLinksAndRoutes = Boolean.parseBoolean(args[8]);
+		}
+
 //		LogToOutputSaver.setOutputDirectory(OUTPUT_ROOT);
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		PopulationReader reader = new PopulationReader(scenario);
-		reader.readFile(INPUT_PLANS_FILE);
+		reader.readFile(inputPlansFile);
 		Population population = scenario.getPopulation();
 		
 		
@@ -88,7 +99,7 @@ public class PlanFileModifier {
 				
 				Plan selectedPlan = person.getSelectedPlan();
 				int numberOfPlanElementsSelectedPlan = selectedPlan.getPlanElements().size();
-				if (considerHomeStayingAgents == false) {
+				if (!considerHomeStayingAgents) {
 					if (numberOfPlanElementsSelectedPlan <= 1) {
 						considerPerson = false;
 					}
@@ -96,7 +107,7 @@ public class PlanFileModifier {
 				
 				int numberOfPlans = person.getPlans().size();
 				
-				if (onlyConsiderPeopleAlwaysGoingByCar == true) {
+				if (onlyConsiderPeopleAlwaysGoingByCar) {
 					for (int i=0; i < numberOfPlans; i++) {
 						//boolean considerPlan = true;
 						
@@ -107,7 +118,7 @@ public class PlanFileModifier {
 						for (int j=0; j < numberOfPlanElements; j++) {
 							if (plan.getPlanElements().get(j) instanceof Leg) {
 								Leg leg = (Leg) plan.getPlanElements().get(j);
-								if (!leg.getMode().equals("car")) {
+								if (!leg.getMode().equals(TransportMode.car)) {
 									considerPerson = false;
 								}
 							}
@@ -121,13 +132,13 @@ public class PlanFileModifier {
 				 * to new population
 				 */
 				if (random.nextDouble() <= selectionProbability) {
-					if (considerPerson == true) {
+					if (considerPerson) {
 						Id<Person> id = person.getId();
 						Person person2 = population.getFactory().createPerson(id);
 						
-						if (onlyTransferSelectedPlan == true) {
+						if (onlyTransferSelectedPlan) {
 //							Person person2 = population.getFactory().createPerson(id);
-							if (removeLinksAndRoutes == true) {
+							if (removeLinksAndRoutes) {
 								removeLinksAndRoutes(selectedPlan);
 							}
 							person2.addPlan(selectedPlan);
@@ -142,14 +153,14 @@ public class PlanFileModifier {
 								Plan plan = person.getPlans().get(i);
 								int numberOfPlanElements = plan.getPlanElements().size();
 								
-								if (includeStayHomePlans == false) {
+								if (!includeStayHomePlans) {
 									if (numberOfPlanElements <= 1) {
 										considerPlan = false;
 									}
 								}
 								
-								if (considerPlan == true) {
-									if (removeLinksAndRoutes == true) {
+								if (considerPlan) {
+									if (removeLinksAndRoutes) {
 										removeLinksAndRoutes(plan);
 									}
 									person2.addPlan(plan);
@@ -165,10 +176,10 @@ public class PlanFileModifier {
 						
 		
 		// write population file
-		new PopulationWriter(scenario2.getPopulation(), null).write(OUTPUT_PLANS_FILE);
+		new PopulationWriter(scenario2.getPopulation(), null).write(outputPlansFile);
 		
 		log.info("Modified plans file contains " + agentCounter + " agents.");
-		log.info("Modified plans file has been written to " + OUTPUT_PLANS_FILE);
+		log.info("Modified plans file has been written to " + outputPlansFile);
 	}
 	
 	

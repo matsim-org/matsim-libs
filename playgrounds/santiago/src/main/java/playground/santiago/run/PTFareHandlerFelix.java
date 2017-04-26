@@ -35,6 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
@@ -59,10 +61,6 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 	private final double offPeakFare = -640.;
 	
 	private final double studentSeniorFare = -210.;
-
-//	Double lineFare = (Double) this.controler.getScenario().getTransitSchedule().getTransitLinesAttributes().getAttribute("Liniennummer","fare");
-	// you cannot do the above ... since when this is called, this.controler has not yet been set.  kai, nov'16
-	Double lineFare = null ;
 	
 	private final double startIntermediateTimeMorning = 6.5 * 3600;
 //	private final double endIntermediateTimeMorning = (7.0 * 3600) - 1;
@@ -70,7 +68,7 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 //	private final double endIntermediateTimeDay = (18.0 * 3600) - 1;
 //	private final double startIntermediateTimeEvening = 20.0 * 3600;
 	private final double endIntermediateTimeEvening = (20.75 * 3600) - 1;
-	
+	private int colectivoRides = 0;
 	private final double startPeakTimeMorning = 7.0 * 3600;
 	private final double endPeakTimeMorning = (9.0 * 3600) - 1;
 	private final double startPeakTimeEvening = 18.0 * 3600;
@@ -79,16 +77,17 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 	private final MatsimServices controler;
 	private boolean doModeChoice;
 	private Vehicles transitVehicles;
+	private TransitSchedule transitSchedule;
 	private Population population;
 	private Set<String> ptModes;
 	private Set<Id<Person>> personsOnPtTrip = new HashSet<Id<Person>>();
 	
 	public PTFareHandlerFelix(final MatsimServices controler, boolean doModeChoice, Population population){
 		this.controler = controler;
-		this.lineFare = (Double) this.controler.getScenario().getTransitSchedule().getTransitLinesAttributes().getAttribute("Liniennummer","fare");
 		this.doModeChoice = doModeChoice;
 		if(this.doModeChoice){
 			this.transitVehicles = controler.getScenario().getTransitVehicles();
+			this.transitSchedule = controler.getScenario().getTransitSchedule();
 			this.population = population;
 		} else {
 			this.ptModes = definePtModes();
@@ -98,6 +97,8 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 	@Override
 	public void reset(int iteration) {
 		personsOnPtTrip.clear();
+		Logger.getLogger(getClass()).info("Iteration :" + iteration + " Collectivo Rides: "+ colectivoRides );
+		colectivoRides = 0;
 	}
 
 	@Override
@@ -122,13 +123,28 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 				log.warn("Vehicle is not properly defined; cannot prove if it is a PT vehicle. Hence, no fare is collected from person " + pid);
 			}
 			
-			if(this.transitVehicles.getVehicleTypes().containsKey("co")){
-				double fare = lineFare;
-				this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, fare));
-			}
-			else if(this.transitVehicles.getVehicles().get(vid) == null){
+//	colectivo fares
+//			if(this.transitVehicles.getVehicles().get(vid).toString().contains("co")){
+			
+			 if(this.transitVehicles.getVehicles().get(vid) == null){
 				// person is entering a non-transit vehicle; no fare to pay.
-			} else {
+			 }
+			 else if(this.transitVehicles.getVehicles().get(vid).getId().toString().startsWith("co")){
+				 	if(population.getPersons().get(pid) == null){
+						//this is a TransitDriverAgent who should not pay fare.
+					} else{
+						String line = vid.toString().split("_")[0];
+						colectivoRides++;
+						Double fare = (Double) this.transitSchedule.getTransitLinesAttributes().getAttribute(line, "fare");
+						if (fare!=null){
+						this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -fare));
+						}
+						else{
+							this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -800));
+
+							Logger.getLogger(getClass()).warn("Fare for line "+line+ "not found.");
+						}}
+			 } else {
 				if(population.getPersons().get(pid) == null){
 					//this is a TransitDriverAgent who should not pay fare.
 				} else {

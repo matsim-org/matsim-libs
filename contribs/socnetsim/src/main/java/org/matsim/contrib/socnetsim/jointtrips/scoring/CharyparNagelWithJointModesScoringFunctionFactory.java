@@ -35,7 +35,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import com.google.inject.Inject;
 
@@ -48,7 +48,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 
 
 	private final StageActivityTypes blackList;
-	private final CharyparNagelScoringParameters params;
+	private final ScoringParameters params;
 	private final Map<String, LegScoringParameters> parametersPerMode = new HashMap<String, LegScoringParameters>();
     private final Scenario scenario;
 
@@ -65,7 +65,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 			final StageActivityTypes typesNotToScore,
 			final Scenario scenario) {
 		log.warn( "initializing the \"CharyparNagel\" scoring function: this has no special parameters for joint modes!" );
-		this.params = new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
+		this.params = new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 

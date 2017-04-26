@@ -159,6 +159,35 @@ public class PopulationV6IOTest {
 	}
 
 	@Test
+	public void testPlanAttributesIO() {
+		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
+
+		final Person person = population.getFactory().createPerson(Id.createPersonId( "Donald Trump"));
+		population.addPerson( person );
+
+		final Plan plan = population.getFactory().createPlan();
+		person.addPlan( plan );
+		final Leg leg = population.getFactory().createLeg( "SUV" );
+		plan.addActivity( population.getFactory().createActivityFromLinkId( "speech" , Id.createLinkId( 1 )));
+		plan.addLeg( leg );
+		plan.addActivity( population.getFactory().createActivityFromLinkId( "tweet" , Id.createLinkId( 2 )));
+
+		plan.getAttributes().putAttribute( "beauty" , 0.000001d );
+
+		final String file = utils.getOutputDirectory()+"/population.xml";
+		new PopulationWriter( population ).writeV6( file );
+
+		final Scenario readScenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new PopulationReader( readScenario ).readFile( file );
+
+		final Person readPerson = readScenario.getPopulation().getPersons().get( Id.createPersonId( "Donald Trump" ) );
+		final Plan readPlan = readPerson.getSelectedPlan() ;
+
+		Assert.assertEquals( 				plan.getAttributes().getAttribute( "beauty" ) ,
+				readPlan.getAttributes().getAttribute( "beauty" ) );
+	}
+
+	@Test
 	public void testPopulationAttributesIO() {
 		final Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig() );
 

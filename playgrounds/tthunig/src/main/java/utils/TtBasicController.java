@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -66,11 +65,6 @@ public class TtBasicController {
 			controler.addOverridingModule(new CombinedSignalsModule());
 		}
 				
-		// add the module for link to link routing if enabled
-		if (config.controler().isLinkToLinkRoutingEnabled()){
-			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		}
-		
 		// add analysis tools
 		controler.addOverridingModule(new AbstractModule() {			
 			@Override

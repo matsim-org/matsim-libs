@@ -15,17 +15,52 @@ public class DocumentationUtils {
 
 	public static final Logger log = Logger.getLogger(DocumentationUtils.class);
 
+	private static final String SEPERATOR = "\t-\t";
+
 	public static void main(String[] args) {
-		String rootRunDirectory = "../../../runs-svn/cemdapMatsimCadyts/run_198";
+		String rootRunDirectory = "../../../runs-svn/berlin_scenario_2016/be_109";
 		List<String> tripAnalyzerExtendedAnalysisDirectories = new ArrayList<>();
 		tripAnalyzerExtendedAnalysisDirectories.add("analysis_300");
 		tripAnalyzerExtendedAnalysisDirectories.add("analysis_300_ber_dist");
+
+		String rootRunDirectory2 = "../../../runs-svn/berlin_scenario_2016/be_109a";
+		List<String> tripAnalyzerExtendedAnalysisDirectories2 = new ArrayList<>();
+		tripAnalyzerExtendedAnalysisDirectories2.add("analysis_300");
+		tripAnalyzerExtendedAnalysisDirectories2.add("analysis_300_ber_dist");
 		try {
 			List<String> output = searchDocumentationValues(rootRunDirectory, tripAnalyzerExtendedAnalysisDirectories);
-			output.forEach(System.out::println);
+			List<String> output2 = searchDocumentationValues(rootRunDirectory2, tripAnalyzerExtendedAnalysisDirectories2);
+
+			writeOutput(output2);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@SafeVarargs
+	private static void writeOutput(List<String>... outputLists) {
+		List<String> output = new ArrayList<>();
+
+		boolean instantiated = false;
+		for (List<String> outputList : outputLists) {
+			if (!instantiated) {
+				for (String outputLine : outputList) {
+					output.add(outputLine);
+				}
+				instantiated = true;
+			} else {
+				for (int i = 0; i < outputList.size(); i++) {
+					output.set(i, output.get(i) + SEPERATOR + outputList.get(i));
+				}
+			}
+		}
+
+		output.forEach(System.out::println);
+	}
+
+	private static void compare(List<String> output1, List<String> output2) {
+
 	}
 
 	private static List<String> searchDocumentationValues(String rootRunDirectory, List<String> tripAnalyzerExtendedAnalysisDirectories) throws IOException {
@@ -41,8 +76,8 @@ public class DocumentationUtils {
 			String line = lines.get(lines.size()-1);
 			String[] splitLine = line.split("	");
 			String totalLL = splitLine[3];
-			result.add(formatInput(totalLL));
-			result.add("auto");
+			result.add("logLike after final it: " + formatInput(totalLL));
+			result.add("logLike/measure: auto");
 		} else {
 			result.add("Did not found \"" + calibrationStats + "\" at \"" + calibrationStatsFile.getAbsolutePath()+ "\"");
 		}
@@ -54,9 +89,9 @@ public class DocumentationUtils {
 			String line = lines.get(lines.size()-1);
 			String[] splitLine = line.split("	");
 			String stayHomePlans = splitLine[1];
-			result.add(formatInput(stayHomePlans));
+			result.add("Plan Selection SH: " + formatInput(stayHomePlans));
 			String otherPlans = splitLine[2];
-			result.add(formatInput(otherPlans));
+			result.add("Plan Selection Other: " + formatInput(otherPlans));
 		} else {
 			result.add("-");
 			result.add("-");
@@ -72,7 +107,7 @@ public class DocumentationUtils {
 			String line = lines.get(lines.size()-1);
 			String[] splitLine = line.split("	");
 			String avgExec = splitLine[1];
-			result.add(formatInput(avgExec));
+			result.add("Avg Exec Score: " + formatInput(avgExec));
 		}
 
 		return result;
@@ -88,25 +123,34 @@ public class DocumentationUtils {
 	private static void searchTripAnalyzerExtendedDocumentationValues(List<String> result,
 																	  String rootRunDirectory,
 																	  List<String> tripAnalyzerExtendedAnalysisDirectories) throws IOException {
-		result.add("TAEs");
 
+		int i = 0;
 		for (String currentSubDirectory : tripAnalyzerExtendedAnalysisDirectories) {
+
 			String otherInformation = "otherInformation.txt";
 			File otherInformationFile = new File(rootRunDirectory + currentSubDirectory + "/" + otherInformation);
-			if(otherInformationFile.exists() && !otherInformationFile.isDirectory()) {
+			if(i==0 && otherInformationFile.exists() && !otherInformationFile.isDirectory()) {
 				List<String> lines = Files.readAllLines(otherInformationFile.toPath());
 				String line = lines.get(1);
 				String[] splitLine = line.split("	");
 				String incompleteTrips = splitLine[splitLine.length-1];
-				result.add(formatInput(incompleteTrips));
-				result.add("auto");
+				result.add("Incomplete Trips: " + formatInput(incompleteTrips));
+				result.add("Non-removed Agents: auto");
 				String line2 = lines.get(0);
 				String[] splitLine2 = line2.split("	");
 				String completeTrips = splitLine2[splitLine2.length-1];
-				result.add(formatInput(completeTrips));
-				result.add("auto");
-				result.add("auto");
+				result.add("Column BJ: " + formatInput(completeTrips));
+				result.add("Complete Trips (m): auto");
+				result.add("Trips per person: auto");
+			} else {
+				List<String> lines = Files.readAllLines(otherInformationFile.toPath());
+				String line2 = lines.get(0);
+				String[] splitLine2 = line2.split("	");
+				String completeTrips = splitLine2[splitLine2.length-1];
+				result.add("Column BM: " + formatInput(completeTrips));
 			}
+
+			result.add("Analysis " + i);
 
 			String beeline = "beeline.txt";
 			File beelineFile = new File(rootRunDirectory + currentSubDirectory + "/" + beeline);
@@ -137,9 +181,9 @@ public class DocumentationUtils {
 				String avgDuration = splitLine[splitLine.length-1];
 				result.add(formatInput(avgDuration));
 			}
+			result.add("/Analysis " + i++);
 		}
 
-		result.add("/TAEs");
 	}
 
 	private static String formatInput(String input) {

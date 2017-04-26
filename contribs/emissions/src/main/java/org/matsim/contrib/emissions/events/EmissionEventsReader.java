@@ -19,21 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.events;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
 
 
 /**
@@ -137,10 +135,6 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					vehicleId,
 					coldEmissions
 			));
-		}
-		else{
-			logger.warn("You are trying to read a non emission events file. For reading this, please use " + EventsReaderXMLv1.class);
-			throw new RuntimeException();
 		}
 	}
 }

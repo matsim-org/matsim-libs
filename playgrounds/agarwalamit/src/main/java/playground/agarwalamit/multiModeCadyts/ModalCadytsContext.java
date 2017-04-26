@@ -20,6 +20,10 @@
 
 package playground.agarwalamit.multiModeCadyts;
 
+import java.io.IOException;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.supply.SimResults;
 import org.apache.log4j.Logger;
@@ -39,11 +43,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
@@ -71,7 +70,7 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 	private final Map<String,ModalLink> modalLinkContainer;
 
 	@Inject
-	ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<ModalLink> calibrationCounts, EventsManager eventsManager, 
+	private ModalCadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<ModalLink> calibrationCounts, EventsManager eventsManager,
 			VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO, Map<String,ModalLink> modalLinkContainer) {
 		this.scenario = scenario;
 		this.calibrationCounts = calibrationCounts;
@@ -104,7 +103,7 @@ public class ModalCadytsContext implements CadytsContextI<ModalLink>, StartupLis
 		this.plansTranslator = new ModalPlansTranslatorBasedOnEvents(scenario, modalLinkContainer);
 		this.eventsManager.addHandler(plansTranslator);
 
-		this.calibrator =  new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new ModalLinkLookUp(modalLinkContainer) /*, cadytsConfig.getTimeBinSize()*/, ModalLink.class);
+		this.calibrator =  CadytsBuilderImpl.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new ModalLinkLookUp(modalLinkContainer) /*, cadytsConfig.getTimeBinSize()*/, ModalLink.class);
 	}
 
 	@Override

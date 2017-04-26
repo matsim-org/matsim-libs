@@ -41,7 +41,7 @@ public class TimeAllocator<L, M> {
 
 	private final boolean interpolate;
 
-	private final boolean verbose = false;
+	private boolean verbose = false;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -52,6 +52,10 @@ public class TimeAllocator<L, M> {
 		this.repairTimeStructure = repairTimeStructure;
 		this.randomSmoothing = randomSmoothing;
 		this.interpolate = interpolate;
+	}
+	
+	public void setVerbose(final boolean verbose) {
+		this.verbose = verbose;
 	}
 
 	// -------------------- INTERNALS --------------------

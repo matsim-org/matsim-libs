@@ -11,7 +11,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.DigicoreClusterRunner;
-import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
+import playground.southafrica.freight.digicore.algorithms.postclustering.ClusteredChainGenerator;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreFacility;

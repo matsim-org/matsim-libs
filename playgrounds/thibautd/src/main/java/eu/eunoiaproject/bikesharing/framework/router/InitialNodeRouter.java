@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
@@ -37,13 +37,13 @@ public class InitialNodeRouter {
 	private final double searchRadius;
 
 	private final int desiredNumberOfCalls;
-	private final CharyparNagelScoringParameters scoringParams;
+	private final ScoringParameters scoringParams;
 
 	public InitialNodeRouter(
 			final RoutingModule delegate,
 			final double searchRadius,
 			final int desiredNumberOfCalls,
-			final CharyparNagelScoringParameters scoringParams) {
+			final ScoringParameters scoringParams) {
 		this.delegate = delegate;
 		this.searchRadius = searchRadius;
 		this.desiredNumberOfCalls = desiredNumberOfCalls;

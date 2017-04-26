@@ -26,175 +26,153 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+public class TaxiBenchmarkPostProcessor {
+	private static class Experiment {
+		private final String id;
+		private final List<Stats> stats = new ArrayList<>();
 
-public class TaxiBenchmarkPostProcessor
-{
-    private static class Experiment
-    {
-        private final String id;
-        private final List<Stats> stats = new ArrayList<>();
+		private Experiment(String id) {
+			this.id = id;
+		}
+	}
 
+	/**
+	 * represents a single row in a file created by MultiRunStats all stats in such a file have the same values for 'n'
+	 * and 'm'
+	 */
+	private static class Stats {
+		// private final String cfg;
+		private final int n;
+		private final int m;
 
-        private Experiment(String id)
-        {
-            this.id = id;
-        }
-    }
+		private final double[] values;
 
+		private Stats(Scanner sc, int count) {
+			// cfg = sc.next();
+			n = sc.nextInt();
+			m = sc.nextInt();
 
-    /**
-     * represents a single row in a file created by MultiRunStats all stats in such a file have the
-     * same values for 'n' and 'm'
-     */
-    private static class Stats
-    {
-        //private final String cfg;
-        private final int n;
-        private final int m;
+			values = new double[count];
+			for (int i = 0; i < count; i++) {
+				values[i] = sc.nextDouble();
+			}
+		}
+	}
 
-        private final double[] values;
+	private static final Experiment EMPTY_COLUMN = new Experiment("empty column");
 
+	private final String[] header;
+	private final Experiment[] experiments;
+	private final String[] statsColumns;
 
-        private Stats(Scanner sc, int count)
-        {
-            //cfg = sc.next();
-            n = sc.nextInt();
-            m = sc.nextInt();
+	public TaxiBenchmarkPostProcessor(String[] header, String... ids) {
+		this.header = header;
 
-            values = new double[count];
-            for (int i = 0; i < count; i++) {
-                values[i] = sc.nextDouble();
-            }
-        }
-    }
+		experiments = new Experiment[ids.length];
+		for (int i = 0; i < experiments.length; i++) {
+			String id = ids[i];
+			experiments[i] = id == null ? EMPTY_COLUMN : new Experiment(ids[i]);
+		}
 
+		if (!header[0].equals("n") || !header[1].equals("m")) {
+			throw new IllegalArgumentException("Incompatibile header");
+		}
+		statsColumns = Arrays.copyOfRange(header, 2, header.length);
+	}
 
-    private static final Experiment EMPTY_COLUMN = new Experiment("empty column");
+	public void process(String dir, String subDirPrefix, String file) {
+		for (Experiment e : experiments) {
+			if (e != EMPTY_COLUMN) {
+				readFile(dir + subDirPrefix + e.id + "/" + file + ".txt", e);
+			}
+		}
 
-    private final String[] header;
-    private final Experiment[] experiments;
-    private final String[] statsColumns;
+		for (int i = 0; i < statsColumns.length; i++) {
+			writeValues(dir + file, i);
+		}
+	}
 
+	private void readFile(String file, Experiment experiment) {
+		try (Scanner sc = new Scanner(new File(file))) {
+			String header = sc.nextLine();
+			if (!header.equals(this.header)) {
+				throw new RuntimeException("Incompatibile header");
+			}
 
-    public TaxiBenchmarkPostProcessor(String[] header, String... ids)
-    {
-        this.header = header;
+			if (!sc.hasNext()) {
+				throw new RuntimeException("No stats");
+			}
 
-        experiments = new Experiment[ids.length];
-        for (int i = 0; i < experiments.length; i++) {
-            String id = ids[i];
-            experiments[i] = id == null ? EMPTY_COLUMN : new Experiment(ids[i]);
-        }
+			Stats s0 = new Stats(sc, statsColumns.length);
+			experiment.stats.add(s0);
 
-        if (!header[0].equals("n") || !header[1].equals("m")) {
-            throw new IllegalArgumentException("Incompatibile header");
-        }
-        statsColumns = Arrays.copyOfRange(header, 2, header.length);
-    }
+			while (sc.hasNext()) {
+				Stats stats = new Stats(sc, statsColumns.length);
 
+				if (stats.m != s0.m || stats.n != s0.n) {
+					throw new RuntimeException("The file must contain result for the same 'm' and 'n'");
+				}
 
-    public void process(String dir, String subDirPrefix, String file)
-    {
-        for (Experiment e : experiments) {
-            if (e != EMPTY_COLUMN) {
-                readFile(dir + subDirPrefix + e.id + "/" + file + ".txt", e);
-            }
-        }
+				experiment.stats.add(stats);
+			}
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-        for (int i = 0; i < statsColumns.length; i++) {
-            writeValues(dir + file, i);
-        }
-    }
+	private void writeValues(String file, int column) {
+		String field = statsColumns[column];
+		PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(file + "_" + field + ".txt"));
+		StringBuffer lineId = new StringBuffer(StringUtils.leftPad(field, 20));
+		StringBuffer lineN = new StringBuffer(StringUtils.leftPad("n", 20));
+		StringBuffer lineM = new StringBuffer(StringUtils.leftPad("m", 20));
+		StringBuffer lineRatio = new StringBuffer(StringUtils.leftPad("ratio", 20));
 
+		for (Experiment e : experiments) {
+			if (e == EMPTY_COLUMN) {
+				lineId.append('\t');
+				lineN.append('\t');
+				lineM.append('\t');
+				lineRatio.append('\t');
+			} else {
+				Stats s = e.stats.get(0);
+				double ratio = (double)s.n / s.m;
+				lineId.append('\t').append(e.id);
+				lineN.append('\t').append(s.n);
+				lineM.append('\t').append(s.m);
+				lineRatio.append('\t').append(String.format("%.2f", ratio));
+			}
+		}
 
-    private void readFile(String file, Experiment experiment)
-    {
-        try (Scanner sc = new Scanner(new File(file))) {
-            String header = sc.nextLine();
-            if (!header.equals(this.header)) {
-                throw new RuntimeException("Incompatibile header");
-            }
+		pw.println(lineId.toString());
+		pw.println(lineN.toString());
+		pw.println(lineM.toString());
+		pw.println(lineRatio.toString());
 
-            if (!sc.hasNext()) {
-                throw new RuntimeException("No stats");
-            }
+		int statsCount = experiments[0].stats.size();
+		DecimalFormat format = new DecimalFormat("#.###");
 
-            Stats s0 = new Stats(sc, statsColumns.length);
-            experiment.stats.add(s0);
+		for (int i = 0; i < statsCount; i++) {
+			// String cfg0 = experiments[0].stats.get(i).cfg;
+			// pw.printf("%20s", cfg0);
 
-            while (sc.hasNext()) {
-                Stats stats = new Stats(sc, statsColumns.length);
+			for (Experiment e : experiments) {
+				if (e == EMPTY_COLUMN) {
+					pw.print('\t');// insert one empty column
+				} else {
+					Stats s = e.stats.get(i);
 
-                if (stats.m != s0.m || stats.n != s0.n) {
-                    throw new RuntimeException(
-                            "The file must contain result for the same 'm' and 'n'");
-                }
+					// if (!cfg0.equals(s.cfg)) {
+					// throw new RuntimeException();
+					// }
 
-                experiment.stats.add(stats);
-            }
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
+					pw.print("\t" + format.format(s.values[column]));
+				}
+			}
 
+			pw.println();
+		}
 
-    private void writeValues(String file, int column)
-    {
-        String field = statsColumns[column];
-        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(file + "_" + field + ".txt"));
-        StringBuffer lineId = new StringBuffer(StringUtils.leftPad(field, 20));
-        StringBuffer lineN = new StringBuffer(StringUtils.leftPad("n", 20));
-        StringBuffer lineM = new StringBuffer(StringUtils.leftPad("m", 20));
-        StringBuffer lineRatio = new StringBuffer(StringUtils.leftPad("ratio", 20));
-
-        for (Experiment e : experiments) {
-            if (e == EMPTY_COLUMN) {
-                lineId.append('\t');
-                lineN.append('\t');
-                lineM.append('\t');
-                lineRatio.append('\t');
-            }
-            else {
-                Stats s = e.stats.get(0);
-                double ratio = (double)s.n / s.m;
-                lineId.append('\t').append(e.id);
-                lineN.append('\t').append(s.n);
-                lineM.append('\t').append(s.m);
-                lineRatio.append('\t').append(String.format("%.2f", ratio));
-            }
-        }
-
-        pw.println(lineId.toString());
-        pw.println(lineN.toString());
-        pw.println(lineM.toString());
-        pw.println(lineRatio.toString());
-
-        int statsCount = experiments[0].stats.size();
-        DecimalFormat format = new DecimalFormat("#.###");
-
-        for (int i = 0; i < statsCount; i++) {
-            //String cfg0 = experiments[0].stats.get(i).cfg;
-            //pw.printf("%20s", cfg0);
-
-            for (Experiment e : experiments) {
-                if (e == EMPTY_COLUMN) {
-                    pw.print('\t');//insert one empty column
-                }
-                else {
-                    Stats s = e.stats.get(i);
-
-                    //if (!cfg0.equals(s.cfg)) {
-                    //    throw new RuntimeException();
-                    //}
-
-                    pw.print("\t" + format.format(s.values[column]));
-                }
-            }
-
-            pw.println();
-        }
-
-        pw.close();
-    }
+		pw.close();
+	}
 }

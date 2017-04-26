@@ -29,7 +29,7 @@ import org.matsim.core.api.internal.NetworkRunnable;
  *
  * @author mrieser
  */
-public class CalcBoundingBox implements NetworkRunnable {
+public final class CalcBoundingBox implements NetworkRunnable {
 
 	private double minX = Double.POSITIVE_INFINITY;
 	private double minY = Double.POSITIVE_INFINITY;

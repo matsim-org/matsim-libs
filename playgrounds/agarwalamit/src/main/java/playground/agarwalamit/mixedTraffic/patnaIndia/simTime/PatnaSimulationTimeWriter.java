@@ -116,7 +116,7 @@ public class PatnaSimulationTimeWriter {
 		TravelTimeComperator time = new TravelTimeComperator(runDir+"/"+cloningFactor+"pct/");
 		time.run();
 
-		TravelDistanceComperator dist = new TravelDistanceComperator(runDir+"/"+cloningFactor+"pct/",inputFilesDir+"/network.xml.gz");
+		TravelDistanceForSimTimeExp dist = new TravelDistanceForSimTimeExp(runDir+"/"+cloningFactor+"pct/",inputFilesDir+"/network.xml.gz");
 		dist.run();
 	}
 
@@ -139,7 +139,7 @@ public class PatnaSimulationTimeWriter {
 		config.network().setInputFile(inputFilesDir+"/network.xml.gz");
 		config.counts().setInputFile(inputFilesDir+"counts/countsCarMotorbikeBike.xml");
 
-		config.qsim().setLinkDynamics(ld.toString());
+		config.qsim().setLinkDynamics(ld);
 		config.qsim().setTrafficDynamics(td);
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 

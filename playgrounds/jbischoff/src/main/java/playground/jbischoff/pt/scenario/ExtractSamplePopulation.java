@@ -48,7 +48,7 @@ public class ExtractSamplePopulation {
 
 	public static void main(String[] args) {
 		String inputPlans = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/flowpaper/taxiplans/plansCarsRoutesAV1.00.xml.gz";
-		String net = "C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/network.final.xml.gz";
+		String net = "C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/network.final10pct.xml.gz";
 		double samplesize = 0.01;
 		String outputPlans = "C:/Users/Joschka/Documents/shared-svn/studies/jbischoff/multimodal/berlin/input/testplans"+samplesize+".xml.gz";
 		Random r = MatsimRandom.getLocalInstance();
@@ -68,7 +68,9 @@ public class ExtractSamplePopulation {
 				leg.setTravelTime(Time.UNDEFINED_TIME);
 				leg.setRoute(null);
 				act0.setCoord(scenario.getNetwork().getLinks().get(act0.getLinkId()).getCoord());
+				act0.setLinkId(null);
 				act1.setCoord(scenario.getNetwork().getLinks().get(act1.getLinkId()).getCoord());
+				act1.setLinkId(null);
 				scenario2.getPopulation().addPerson(p);
 				
 				

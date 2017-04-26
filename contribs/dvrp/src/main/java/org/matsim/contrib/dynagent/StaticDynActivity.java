@@ -24,22 +24,16 @@ package org.matsim.contrib.dynagent;
  * 
  * @author michalm
  */
-public class StaticDynActivity
-    extends AbstractDynActivity
-{
-    private final double endTime;
+public class StaticDynActivity extends AbstractDynActivity {
+	private final double endTime;
 
+	public StaticDynActivity(String activityType, double endTime) {
+		super(activityType);
+		this.endTime = endTime;
+	}
 
-    public StaticDynActivity(String activityType, double endTime)
-    {
-        super(activityType);
-        this.endTime = endTime;
-    }
-
-
-    @Override
-    public double getEndTime()
-    {
-        return endTime;
-    }
+	@Override
+	public double getEndTime() {
+		return endTime;
+	}
 }

@@ -127,7 +127,7 @@ public class DigicoreFileSplitter {
 	 */
 	public static void main( String[] args){
 		if(args.length != 9){
-			throw new RuntimeException("Must provide 9 field arguments: filename, startLine, outputfolder and the field locations for VehId, Time, Long, Lat, Status and Speed.");
+			throw new RuntimeException("Must provide 9 field arguments: filename, outputfolder, startLine and the field locations for VehId, Time, Long, Lat, Status and Speed.");
 		}
 		
 		log.info("=================================================================");
@@ -185,8 +185,7 @@ public class DigicoreFileSplitter {
 		
 		DateString ds = new DateString();
 		try {
-			File inputFolder = (new File(inputFilename)).getParentFile();
-			BufferedWriter logRecords = IOUtils.getBufferedWriter(inputFolder.getAbsolutePath() + "/logRecordsRead_" + ds.toString() + ".txt");
+			BufferedWriter logRecords = IOUtils.getBufferedWriter(outputFolder + "/logRecordsRead_" + ds.toString() + ".txt");
 			input = IOUtils.getBufferedReader(inputFilename);
 			try{
 				String inputLine = null;
@@ -230,7 +229,6 @@ public class DigicoreFileSplitter {
 
 							// Read the next input line
 							inputString = inputLine.split(delimiter);	
-							lineCounter.incCounter();
 							if(++line >= startLine && lineCounter.getCounter() <= numberOfLinesToRead){
 								if(inputString.length == 6){
 									/* Check the record's date against earliest and latest. */
@@ -268,6 +266,8 @@ public class DigicoreFileSplitter {
 									logRecords.newLine();
 
 									vehID = inputString[fieldVehId];
+
+									lineCounter.incCounter();
 								}
 							}
 						}

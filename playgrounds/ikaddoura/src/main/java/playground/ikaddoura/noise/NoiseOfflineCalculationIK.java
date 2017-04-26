@@ -78,12 +78,14 @@ public class NoiseOfflineCalculationIK {
 			
 		} else {
 			
-			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile_kaiserdamm/";
-			receiverPointGap = 5.;
+//			runDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+//			outputDirectory = "../../../runs-svn/berlin_internalizationCar/output/baseCase_2/noiseAnalysis_gridCSVFile_heerstrasse/";
+			runDirectory = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/cordonToll_0/";
+			outputDirectory = "/Users/ihab/Desktop/ils4i/kaddoura/cn_cordon/output/cordonToll_0/noiseAnalysis-withEvents/";
+			receiverPointGap = 100.;
 			lastIteration = 100;
 			timeBinSize = 3600.;
-			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/FP_gesamt_Atom_repaired_kaiserdamm.csv";
+//			receiverPointsGridCSVFile = "../../../shared-svn/studies/countries/de/berlin_noise/Fassadenpegel/FP_gesamt_Atom_repaired_heerstrasse.csv";
 		}
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
@@ -95,10 +97,10 @@ public class NoiseOfflineCalculationIK {
 						
 		// adjust the default noise parameters
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
 		noiseParameters.setReceiverPointGap(receiverPointGap);
-		noiseParameters.setReceiverPointsCSVFile(receiverPointsGridCSVFile);
-		noiseParameters.setReceiverPointsCSVFileCoordinateSystem(TransformationFactory.DHDN_SoldnerBerlin);
+//		noiseParameters.setReceiverPointsCSVFile(receiverPointsGridCSVFile);
+//		noiseParameters.setReceiverPointsCSVFileCoordinateSystem(TransformationFactory.DHDN_SoldnerBerlin);
 		
 		// Wilmersdorf with motorway: 4589486 , 5816193 : 4590778 , 5817029
 //		double xMin = 4589486.;
@@ -154,28 +156,28 @@ public class NoiseOfflineCalculationIK {
 //		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
 //		 Berlin Activity Types
-//		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForDamages = {"home"};
 //		String[] consideredActivitiesForDamages = {"work"};
 //		String[] consideredActivitiesForDamages = {"educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForDamages = {"leisure"};
 //		String[] consideredActivitiesForDamages = {"home", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-//		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 		
-//		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga", "leisure"};
-//		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 		
 		// ################################
 		
-		noiseParameters.setUseActualSpeedLevel(false);
+		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(10.);
-		noiseParameters.setComputePopulationUnits(false);
-		noiseParameters.setComputeNoiseDamages(false);
+		noiseParameters.setComputePopulationUnits(true);
+		noiseParameters.setComputeNoiseDamages(true);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		noiseParameters.setComputeCausingAgents(false);
-		noiseParameters.setThrowNoiseEventsAffected(false);
+		noiseParameters.setThrowNoiseEventsAffected(true);
 		noiseParameters.setThrowNoiseEventsCaused(false);
 		
 		String[] hgvIdPrefixes = { "lkw" };
@@ -240,20 +242,23 @@ public class NoiseOfflineCalculationIK {
 		noiseCalculation.run();	
 		
 		// some processing of the output data
-		String outputFilePath = outputDirectory + "analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
+		String outputFilePath = outputDirectory + "nosie-analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
 		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
 				
 //		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
 //		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
-//
-//		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-//		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
-//		merger.setOutputDirectory(outputFilePath);
-//		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
-//		merger.setWorkingDirectory(workingDirectories);
-//		merger.setLabel(labels);
-//		merger.run();
+
+		final String[] labels = { "damages_receiverPoint" };
+		final String[] workingDirectories = { outputFilePath + "/damages_receiverPoint/" };
+
+		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
+		merger.setOutputDirectory(outputFilePath);
+		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+		merger.setWorkingDirectory(workingDirectories);
+		merger.setLabel(labels);
+		merger.run();
 	}
 }
 		

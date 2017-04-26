@@ -22,92 +22,80 @@ package org.matsim.contrib.zone;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 
+public class SquareGrid {
+	private final Network network;
+	private final double cellSize;
 
-public class SquareGrid
-{
-    private final Network network;
-    private final double cellSize;
+	private double minX;
+	private double minY;
+	private double maxX;
+	private double maxY;
 
-    private double minX;
-    private double minY;
-    private double maxX;
-    private double maxY;
+	private int cols;
+	private int rows;
 
-    private int cols;
-    private int rows;
+	private Zone[] zones;
 
-    private Zone[] zones;
+	public SquareGrid(Network network, double cellSize) {
+		this.network = network;
+		this.cellSize = cellSize;
 
+		initBounds();
 
-    public SquareGrid(Network network, double cellSize)
-    {
-        this.network = network;
-        this.cellSize = cellSize;
+		cols = (int)Math.ceil((maxX - minX) / cellSize);
+		rows = (int)Math.ceil((maxY - minY) / cellSize);
 
-        initBounds();
+		initZones();
+	}
 
-        cols = (int)Math.ceil( (maxX - minX) / cellSize);
-        rows = (int)Math.ceil( (maxY - minY) / cellSize);
+	// This method's content has been copied from NetworkImpl
+	private void initBounds() {
+		minX = Double.POSITIVE_INFINITY;
+		minY = Double.POSITIVE_INFINITY;
+		maxX = Double.NEGATIVE_INFINITY;
+		maxY = Double.NEGATIVE_INFINITY;
+		for (Node n : network.getNodes().values()) {
+			if (n.getCoord().getX() < minX) {
+				minX = n.getCoord().getX();
+			}
+			if (n.getCoord().getY() < minY) {
+				minY = n.getCoord().getY();
+			}
+			if (n.getCoord().getX() > maxX) {
+				maxX = n.getCoord().getX();
+			}
+			if (n.getCoord().getY() > maxY) {
+				maxY = n.getCoord().getY();
+			}
+		}
+		minX -= 1.0;// TODO use epsilon instead
+		minY -= 1.0;
+		maxX += 1.0;
+		maxY += 1.0;
+		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
+	}
 
-        initZones();
-    }
+	private void initZones() {
+		zones = new Zone[rows * cols];
+		double x0 = minX + cellSize / 2;
+		double y0 = minY + cellSize / 2;
 
+		for (int r = 0; r < rows; r++) {
+			for (int c = 0; c < cols; c++) {
+				int idx = r * cols + c;
+				Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
+				zones[idx] = new Zone(Id.create(idx, Zone.class), "square", centroid);
+			}
+		}
+	}
 
-    //This method's content has been copied from NetworkImpl
-    private void initBounds()
-    {
-        minX = Double.POSITIVE_INFINITY;
-        minY = Double.POSITIVE_INFINITY;
-        maxX = Double.NEGATIVE_INFINITY;
-        maxY = Double.NEGATIVE_INFINITY;
-        for (Node n : network.getNodes().values()) {
-            if (n.getCoord().getX() < minX) {
-                minX = n.getCoord().getX();
-            }
-            if (n.getCoord().getY() < minY) {
-                minY = n.getCoord().getY();
-            }
-            if (n.getCoord().getX() > maxX) {
-                maxX = n.getCoord().getX();
-            }
-            if (n.getCoord().getY() > maxY) {
-                maxY = n.getCoord().getY();
-            }
-        }
-        minX -= 1.0;//TODO use epsilon instead
-        minY -= 1.0;
-        maxX += 1.0;
-        maxY += 1.0;
-        // yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
-    }
+	public Zone[] getZones() {
+		return zones;
+	}
 
-
-    private void initZones()
-    {
-        zones = new Zone[rows * cols];
-        double x0 = minX + cellSize / 2;
-        double y0 = minY + cellSize / 2;
-
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                int idx = r * cols + c;
-                Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
-                zones[idx] = new Zone(Id.create(idx, Zone.class), "square", centroid);
-            }
-        }
-    }
-
-
-    public Zone[] getZones()
-    {
-        return zones;
-    }
-
-
-    public Zone getZone(Coord coord)
-    {
-        int r = (int) ( (coord.getY() - minY) / cellSize);// == Math.floor
-        int c = (int) ( (coord.getX() - minX) / cellSize);// == Math.floor
-        return zones[r * cols + c];
-    }
+	public Zone getZone(Coord coord) {
+		int r = (int)((coord.getY() - minY) / cellSize);// == Math.floor
+		int c = (int)((coord.getX() - minX) / cellSize);// == Math.floor
+		return zones[r * cols + c];
+	}
 }

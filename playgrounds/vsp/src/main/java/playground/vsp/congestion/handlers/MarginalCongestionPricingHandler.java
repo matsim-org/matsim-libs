@@ -23,10 +23,11 @@
 package playground.vsp.congestion.handlers;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -44,14 +45,23 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 	private final static Logger log = Logger.getLogger(MarginalCongestionPricingHandler.class);
 
 	private final EventsManager events;
-	private final MutableScenario scenario;
+	private final Scenario scenario;
 	private final double vtts_car;
+	private final double factor;
+	
 	private double amountSum = 0.;
 
-	public MarginalCongestionPricingHandler(EventsManager eventsManager, MutableScenario scenario) {
+	public MarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario) {
+		this(eventsManager, scenario, 1.0);
+	}
+	
+	public MarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario, double factor) {
 		this.events = eventsManager;
 		this.scenario = scenario;
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.factor = factor;
+		
+		log.info("Using the toll factor " + factor);
 		log.info("Using the same VTTS for each agent to translate delays into monetary units.");
 		log.info("VTTS_car: " + vtts_car);
 	}
@@ -64,11 +74,14 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 	@Override
 	public void handleEvent(CongestionEvent event) {
 		
-		double amount = event.getDelay() / 3600 * this.vtts_car;
+		double amount = this.factor * event.getDelay() / 3600 * this.vtts_car;
 		this.amountSum = this.amountSum + amount;
 		
 		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
 		this.events.processEvent(moneyEvent);
+		
+		PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, event.getEmergenceTime());
+		this.events.processEvent(linkMoneyEvent);
 	}
 
 	public double getAmountSum() {

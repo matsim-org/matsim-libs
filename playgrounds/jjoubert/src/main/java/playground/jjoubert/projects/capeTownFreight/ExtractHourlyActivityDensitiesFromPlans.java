@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections15.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
@@ -114,7 +113,7 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 		
 		/* Set up the necessary hourly maps. */
 		Collection<Point> cells = grid.getGrid().values();
-		map = new HashedMap<Point, int[]>(cells.size());
+		map = new HashMap<Point, int[]>(cells.size());
 		for(Point p : cells){
 			int[] array = new int[24];
 			map.put(p, array);

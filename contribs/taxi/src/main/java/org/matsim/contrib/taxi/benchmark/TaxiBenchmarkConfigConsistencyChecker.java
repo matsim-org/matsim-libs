@@ -20,34 +20,33 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 
+public class TaxiBenchmarkConfigConsistencyChecker extends TaxiConfigConsistencyChecker {
+	private static final Logger log = Logger.getLogger(TaxiBenchmarkConfigConsistencyChecker.class);
 
-public class TaxiBenchmarkConfigConsistencyChecker
-    extends TaxiConfigConsistencyChecker
-{
-    private static final Logger log = Logger.getLogger(TaxiBenchmarkConfigConsistencyChecker.class);
+	@Override
+	public void checkConsistency(Config config) {
+		super.checkConsistency(config);
 
+		if (config.network().isTimeVariantNetwork() && config.network().getChangeEventsInputFile() == null) {
+			log.warn("No change events provided for the time variant network");
+		}
 
-    @Override
-    public void checkConsistency(Config config)
-    {
-        super.checkConsistency(config);
+		if (!config.network().isTimeVariantNetwork() && config.network().getChangeEventsInputFile() != null) {
+			log.warn("Change events ignored, because the network is not time variant");
+		}
 
-        if (config.network().isTimeVariantNetwork()
-                && config.network().getChangeEventsInputFile() == null) {
-            log.warn("No change events provided for the time variant network");
-        }
+		if (config.qsim().getFlowCapFactor() < 100) {
+			log.warn("FlowCapFactor should be large enough (e.g. 100) to obtain deterministic travel times");
+		}
 
-        if (!config.network().isTimeVariantNetwork()
-                && config.network().getChangeEventsInputFile() != null) {
-            log.warn("Change events ignored, because the network is not time variant");
-        }
-
-        if (config.qsim().getFlowCapFactor() < 100) {
-            log.warn(
-                    "FlowCapFactor should be large enough (e.g. 100) to obtain deterministic travel times");
-        }
-    }
+		if (config.network().isTimeVariantNetwork() && DvrpConfigGroup.get(config).getNetworkMode() != null) {
+			throw new RuntimeException("The current version of RunTaxiBenchmark does not support this case: "
+					+ "@Named(DvrpModule.DVRP_ROUTING) Network would consists of links having "
+					+ "VariableIntervalTimeVariantAttributes instead of FixedIntervalTimeVariantAttributes.");
+		}
+	}
 }

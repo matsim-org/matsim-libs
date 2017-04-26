@@ -22,36 +22,31 @@ package playground.michalm.jtrrouter;
 /**
  * @author michalm
  */
-public class Turn
-{
-    // structure
-    final int node;
-    final int prev;
-    final int[] next;
-    final double[] probs;
+public class Turn {
+	// structure
+	final int node;
+	final int prev;
+	final int[] next;
+	final double[] probs;
 
-    // algorithm
-    boolean visited;
+	// algorithm
+	boolean visited;
 
+	public Turn(int node, int prev, int[] next, double[] probs) {
+		this.node = node;
+		this.prev = prev;
+		this.next = next;
+		this.probs = probs;
+	}
 
-    public Turn(int node, int prev, int[] next, double[] probs)
-    {
-        this.node = node;
-        this.prev = prev;
-        this.next = next;
-        this.probs = probs;
-    }
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(prev).append(" -> ").append(node).append('\n');
 
+		for (int i = 0; i < next.length; i++) {
+			sb.append(next[i]).append(':').append(probs[i]).append('\n');
+		}
 
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prev).append(" -> ").append(node).append('\n');
-
-        for (int i = 0; i < next.length; i++) {
-            sb.append(next[i]).append(':').append(probs[i]).append('\n');
-        }
-
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 }

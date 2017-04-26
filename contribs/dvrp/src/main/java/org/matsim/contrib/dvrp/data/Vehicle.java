@@ -21,40 +21,49 @@ package org.matsim.contrib.dvrp.data;
 
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-
+import org.matsim.contrib.dvrp.schedule.Schedule;
 
 /**
  * @author michalm
  */
-public interface Vehicle
-    extends Identifiable<Vehicle>
-{
-    Link getStartLink();
+public interface Vehicle extends Identifiable<Vehicle> {
 
+	/**
+	 * @return the link at which vehicle starts operating (i.e. depot)
+	 */
+	Link getStartLink();
 
-    double getCapacity();
+	void setStartLink(Link link);
 
+	/**
+	 * @return the amount of people/goods that can be served/transported at the same time (see:
+	 *         {@link Request#getQuantity()})
+	 */
+	double getCapacity();
 
-    // vehicle's time window [T0, T1) (from T0 inclusive to T1 exclusive)
-    double getT0();
+	/**
+	 * @return (desired) time when the vehicle should start operating (inclusive); can be different from
+	 *         {@link Schedule#getBeginTime()}
+	 */
+	double getServiceBeginTime();
 
+	/**
+	 * @return (desired) time by which the vehicle should stop operating (exclusive); can be different from
+	 *         {@link Schedule#getEndTime()}
+	 */
+	double getServiceEndTime();
 
-    double getT1();
+	/**
+	 * Design comment(s):
+	 * <ul>
+	 * <li>Typically, the Schedule is meant to be changed only by the optimizer. Note, however, that the present design
+	 * does not prevent other classes to change it, so be careful. kai, feb'17
+	 * </ul>
+	 */
+	Schedule getSchedule();
 
-
-    void setT1(double t1);
-
-
-    Schedule<? extends Task> getSchedule();
-
-
-    VrpAgentLogic getAgentLogic();
-
-
-    void setAgentLogic(VrpAgentLogic agentLogic);
-
-
-    void resetSchedule();
+	/**
+	 * Resets the schedule. For instance, by creating a new Schedule object.
+	 */
+	void resetSchedule();
 }

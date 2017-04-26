@@ -37,8 +37,8 @@ import org.matsim.lanes.data.v11.LanesToLinkAssignment11Impl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import saleem.stockholmmodel.utils.StockholmTransformationFactory;
 import floetteroed.utilities.Units;
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 /**
  * Turns a mesoscopic Transmodeler network (defined through a set of files in

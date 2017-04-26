@@ -20,8 +20,7 @@
 package playground.michalm.barcelona.supply;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.zone.util.RandomPointUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -32,31 +31,24 @@ import com.vividsolutions.jts.geom.prep.PreparedPolygon;
 
 import playground.michalm.barcelona.BarcelonaZones;
 
+public class BarcelonaTaxiCreator implements VehicleGenerator.VehicleCreator {
+	private static final int PAXPERCAR = 4;
 
-public class BarcelonaTaxiCreator
-    implements VehicleCreator
-{
-    private static final int PAXPERCAR = 4;
+	private final Network network;
+	private final PreparedPolygon preparedPolygon;
 
-    private final Network network;
-    private final PreparedPolygon preparedPolygon;
+	private int currentVehicleId = 0;
 
-    private int currentVehicleId = 0;
+	public BarcelonaTaxiCreator(Scenario scenario) {
+		network = (Network)scenario.getNetwork();
+		preparedPolygon = new PreparedPolygon(BarcelonaZones.readAgglomerationArea());
+	}
 
-
-    public BarcelonaTaxiCreator(Scenario scenario)
-    {
-        network = (Network)scenario.getNetwork();
-        preparedPolygon = new PreparedPolygon(BarcelonaZones.readAgglomerationArea());
-    }
-
-
-    @Override
-    public Vehicle createVehicle(double t0, double t1)
-    {
-        Id<Vehicle> vehId = Id.create("taxi" + currentVehicleId++, Vehicle.class);
-        Point p = RandomPointUtils.getRandomPointInGeometry(preparedPolygon);
-        Link link = NetworkUtils.getNearestLinkExactly(network,MGC.point2Coord(p));
-        return new VehicleImpl(vehId, link, PAXPERCAR, Math.round(t0), Math.round(t1));
-    }
+	@Override
+	public VehicleImpl createVehicle(double t0, double t1) {
+		Id<Vehicle> vehId = Id.create("taxi" + currentVehicleId++, Vehicle.class);
+		Point p = RandomPointUtils.getRandomPointInGeometry(preparedPolygon);
+		Link link = NetworkUtils.getNearestLinkExactly(network, MGC.point2Coord(p));
+		return new VehicleImpl(vehId, link, PAXPERCAR, Math.round(t0), Math.round(t1));
+	}
 }

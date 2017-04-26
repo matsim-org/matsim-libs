@@ -20,6 +20,7 @@ package playground.agarwalamit.InternalizationEmissionAndCongestion;
 
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -31,6 +32,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
 
@@ -39,26 +41,25 @@ import playground.vsp.congestion.handlers.TollHandler;
  */
 public class EmissionCongestionTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
-	private final EmissionModule emissionModule;
-	private final EmissionCostModule emissionCostModule;
+	@Inject private EmissionModule emissionModule;
+	@Inject private EmissionCostModule emissionCostModule;
+	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
+	@Inject private Vehicles vehicles;
+
 	private final RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
 	private Set<Id<Link>> hotspotLinks;
 	private final TollHandler tollHandler;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private double sigma=0.;
 	
-	public EmissionCongestionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, EmissionCostModule emissionCostModule, EmissionModule emissionModule,
-															   PlanCalcScoreConfigGroup cnScoringGroup, TollHandler tollHandler) {
+	public EmissionCongestionTravelDisutilityCalculatorFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory,
+															   TollHandler tollHandler) {
 		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-		this.emissionModule = emissionModule;
-		this.emissionCostModule = emissionCostModule;
 		this.tollHandler = tollHandler;
-		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
-		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(this.randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator), timeCalculator, cnScoringGroup, this.emissionModule, this.emissionCostModule, this.sigma, this.hotspotLinks, this.tollHandler);
+		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(this.randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator), timeCalculator, cnScoringGroup, this.emissionModule, this.emissionCostModule, this.sigma, this.hotspotLinks, this.tollHandler, vehicles);
 
 		return new TravelDisutility(){
 

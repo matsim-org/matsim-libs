@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-cd ../../matsim
+cd ../../examples
+mvn clean
+mvn install -DskipTests=true
+
+
+cd ../matsim
 mvn clean
 mvn install -DskipTests=true
 

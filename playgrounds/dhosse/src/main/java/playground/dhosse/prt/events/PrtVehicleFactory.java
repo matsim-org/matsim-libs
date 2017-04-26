@@ -12,15 +12,17 @@ import playground.michalm.taxi.data.*;
 
 public class PrtVehicleFactory {
 
-	private VrpData vrpData;
+	private FleetImpl fleet;
+	private TaxiRankDataImpl taxiRankData;
 	private Scenario scenario;
 	private PrtRankAndPassengerStatsHandler handler;
 	private PrtConfig config;
 	
-	public PrtVehicleFactory(PrtConfig config, VrpData vrpData, Scenario scenario, PrtRankAndPassengerStatsHandler rankHandler){
+	public PrtVehicleFactory(PrtConfig config, FleetImpl fleet, TaxiRankDataImpl taxiRankData, Scenario scenario, PrtRankAndPassengerStatsHandler rankHandler){
 		
 		this.config = config;
-		this.vrpData = vrpData;
+		this.fleet = fleet;
+		this.taxiRankData = taxiRankData;
 		this.scenario = scenario;
 		this.handler = rankHandler;
 		
@@ -30,20 +32,21 @@ public class PrtVehicleFactory {
 		
 		if(event.getIteration() > 0){
 			
-			TaxiDataWithRanks data = new TaxiDataWithRanks();
+		    FleetImpl vData = new FleetImpl();
+            TaxiRankDataImpl rData = new TaxiRankDataImpl();
 			
-			for(TaxiRank rank : ((TaxiDataWithRanks)this.vrpData).getTaxiRanks().values()){
-				data.addTaxiRank(rank);
+			for(TaxiRank rank : (this.taxiRankData).getTaxiRanks().values()){
+				rData.addTaxiRank(rank);
 			}
 			
-			for(Vehicle vehicle : this.vrpData.getVehicles().values()){
-				data.addVehicle(new VehicleImpl(Id.create(vehicle.getId(), Vehicle.class),
-						vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getT0(), vehicle.getT1()));
+			for(Vehicle vehicle : this.fleet.getVehicles().values()){
+				vData.addVehicle(new VehicleImpl(Id.create(vehicle.getId(), Vehicle.class),
+						vehicle.getStartLink(), vehicle.getCapacity(), vehicle.getServiceBeginTime(), vehicle.getServiceEndTime()));
 			}
 			
 			double maxWTime = Double.NEGATIVE_INFINITY;
 			TaxiRank maxWTimeRank = null;
-			for(TaxiRank rank : ((TaxiDataWithRanks)this.vrpData).getTaxiRanks().values()){
+			for(TaxiRank rank : (this.taxiRankData).getTaxiRanks().values()){
 				if(this.handler.rankIds2PassengerWaitingTimes.containsKey(rank.getId())){
 					double wtime = this.handler.rankIds2PassengerWaitingTimes.get(rank.getId()).getMax();
 					if(wtime > maxWTime){
@@ -54,12 +57,12 @@ public class PrtVehicleFactory {
 			}
 			
 			if(maxWTimeRank != null){
-				data.addVehicle(new VehicleImpl(Id.create(maxWTimeRank.getId() + "_" + data.getVehicles().size(),
+				vData.addVehicle(new VehicleImpl(Id.create(maxWTimeRank.getId() + "_" + vData.getVehicles().size(),
 						Vehicle.class), maxWTimeRank.getLink(), config.getVehicleCapacity(),
 						0, this.scenario.getConfig().qsim().getEndTime()));
 			}
 			
-			VehicleWriter writer = new VehicleWriter(data.getVehicles().values());
+			VehicleWriter writer = new VehicleWriter(vData.getVehicles().values());
 			
 			String path = this.config.getPrtOutputDirectory() + "it." + event.getIteration() + "/";
 			File f = new File(path);

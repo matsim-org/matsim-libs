@@ -1,5 +1,7 @@
 package cba.resampling;
 
+import org.matsim.api.core.v01.population.Plan;
+
 /**
  * 
  * @author Gunnar Flötteröd
@@ -57,6 +59,30 @@ class DummySampersAlternative implements Alternative {
 	@Override
 	public EpsilonDistribution getEpsilonDistribution() {
 		return this.epsilonDistribution;
+	}
+
+	@Override
+	public double getSampersEpsilonRealization() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setSampersEpsilonRealization(double eps) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setMATSimTimeScore(double score) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Plan getMATSimPlan() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

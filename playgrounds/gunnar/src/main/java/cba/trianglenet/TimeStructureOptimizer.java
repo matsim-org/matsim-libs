@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
@@ -39,7 +39,7 @@ class TimeStructureOptimizer {
 
 	private final TimeDiscretization timeDiscretization;
 
-	private final SubpopulationCharyparNagelScoringParameters scoringParams;
+	private final SubpopulationScoringParameters scoringParams;
 
 	final Provider<TripRouter> tripRouterProvider;
 
@@ -55,7 +55,7 @@ class TimeStructureOptimizer {
 			final int maxFailures, final Map<String, TravelTime> mode2travelTime) {
 		this.scenario = scenario;
 		this.timeDiscretization = TimeDiscretizationFactory.newInstance(scenario.getConfig());
-		this.scoringParams = new SubpopulationCharyparNagelScoringParameters(scenario);
+		this.scoringParams = new SubpopulationScoringParameters(scenario);
 		this.tripRouterProvider = tripRouterProvider;
 		this.maxTrials = maxTrials;
 		this.maxFailures = maxFailures;

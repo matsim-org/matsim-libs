@@ -21,8 +21,6 @@ package org.matsim.contrib.util.distance;
 
 import org.matsim.api.core.v01.Coord;
 
-
-public interface DistanceCalculator
-{
-    double calcDistance(Coord from, Coord to);
+public interface DistanceCalculator {
+	double calcDistance(Coord from, Coord to);
 }

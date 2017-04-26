@@ -28,33 +28,26 @@ import com.google.inject.Inject;
 import playground.michalm.ev.EvConfigGroup;
 import playground.michalm.ev.data.*;
 
+public class ChargingHandler implements MobsimAfterSimStepListener {
+	private final Iterable<? extends Charger> chargers;
+	private final int chargeTimeStep;
 
-public class ChargingHandler
-    implements MobsimAfterSimStepListener
-{
-    private final Iterable<? extends Charger> chargers;
-    private final int chargeTimeStep;
+	@Inject
+	public ChargingHandler(EvData evData, EvConfigGroup evConfig, EventsManager eventsManager) {
+		this.chargers = evData.getChargers().values();
+		this.chargeTimeStep = evConfig.getChargeTimeStep();
 
+		for (Charger c : chargers) {
+			c.getLogic().initEventsHandling(eventsManager);
+		}
+	}
 
-    @Inject
-    public ChargingHandler(EvData evData, EvConfigGroup evConfig, EventsManager eventsManager)
-    {
-        this.chargers = evData.getChargers().values();
-        this.chargeTimeStep = evConfig.getChargeTimeStep();
-        
-        for (Charger c : chargers) {
-            c.getLogic().initEventsHandling(eventsManager);
-        }
-    }
-
-
-    @Override
-    public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e)
-    {
-        if ( (e.getSimulationTime() + 1) % chargeTimeStep == 0) {
-            for (Charger c : chargers) {
-                c.getLogic().chargeVehicles(chargeTimeStep, e.getSimulationTime());
-            }
-        }
-    }
+	@Override
+	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
+		if ((e.getSimulationTime() + 1) % chargeTimeStep == 0) {
+			for (Charger c : chargers) {
+				c.getLogic().chargeVehicles(chargeTimeStep, e.getSimulationTime());
+			}
+		}
+	}
 }

@@ -21,61 +21,48 @@ package org.matsim.contrib.util.histogram;
 
 import java.util.Arrays;
 
+public class BoundedHistogram extends AbstractHistogram<Double> {
+	public static BoundedHistogram create(double[] bounds, double[] values) {
+		BoundedHistogram histogram = new BoundedHistogram(bounds);
+		histogram.addValues(values);
+		return histogram;
+	}
 
-public class BoundedHistogram
-    extends AbstractHistogram<Double>
-{
-    public static BoundedHistogram create(double[] bounds, double[] values)
-    {
-        BoundedHistogram histogram = new BoundedHistogram(bounds);
-        histogram.addValues(values);
-        return histogram;
-    }
+	private final double[] bounds;
 
+	public BoundedHistogram(double[] bounds) {
+		super(bounds.length - 1);
 
-    private final double[] bounds;
+		for (int i = 1; i < bounds.length; i++) {
+			if (bounds[i - 1] >= bounds[i]) {
+				throw new IllegalArgumentException("Bounds are not sorted");
+			}
+		}
 
+		this.bounds = bounds;
+	}
 
-    public BoundedHistogram(double[] bounds)
-    {
-        super(bounds.length - 1);
+	public void addValues(double[] values) {
+		for (double v : values) {
+			addValue(v);
+		}
+	}
 
-        for (int i = 1; i < bounds.length; i++) {
-            if (bounds[i - 1] >= bounds[i]) {
-                throw new IllegalArgumentException("Bounds are not sorted");
-            }
-        }
+	public void addValue(double value) {
+		if (value < bounds[0] || value >= bounds[bounds.length - 1]) {
+			throw new IllegalArgumentException("Value=" + value + " beyond the bounds");
+		}
 
-        this.bounds = bounds;
-    }
+		int idx = Arrays.binarySearch(bounds, value);
+		if (idx < 0) {
+			idx = -idx - 2;
+		}
 
+		increment(idx);
+	}
 
-    public void addValues(double[] values)
-    {
-        for (double v : values) {
-            addValue(v);
-        }
-    }
-
-
-    public void addValue(double value)
-    {
-        if (value < bounds[0] || value >= bounds[bounds.length - 1]) {
-            throw new IllegalArgumentException("Value=" + value + " beyond the bounds");
-        }
-
-        int idx = Arrays.binarySearch(bounds, value);
-        if (idx < 0) {
-            idx = -idx - 2;
-        }
-
-        increment(idx);
-    }
-
-
-    @Override
-    public Double getBin(int idx)
-    {
-        return bounds[idx];
-    }
+	@Override
+	public Double getBin(int idx) {
+		return bounds[idx];
+	}
 }

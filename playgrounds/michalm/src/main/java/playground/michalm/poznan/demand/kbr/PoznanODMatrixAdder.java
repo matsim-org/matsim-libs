@@ -26,81 +26,70 @@ import java.util.Map;
 import playground.michalm.poznan.demand.kbr.PoznanLanduseDemandGeneration.ActivityPair;
 import playground.michalm.util.visum.VisumMatrixReader;
 
+public class PoznanODMatrixAdder {
+	private static String dir = "D:\\eTaxi\\Poznan_MATSim\\";
+	private static String odMatrixFilePrefix = dir + "odMatricesByType\\";
+	private static String put2PrtRatiosFile = dir + "PuT_PrT_ratios";
 
-public class PoznanODMatrixAdder
-{
-    private static String dir = "D:\\eTaxi\\Poznan_MATSim\\";
-    private static String odMatrixFilePrefix = dir + "odMatricesByType\\";
-    private static String put2PrtRatiosFile = dir + "PuT_PrT_ratios";
+	private static Map<ActivityPair, Double> prtCoeffs;
+	private static double[][][] totalODMatrices;
 
-    private static Map<ActivityPair, Double> prtCoeffs;
-    private static double[][][] totalODMatrices;
+	public static void main(String[] args) {
+		prtCoeffs = PoznanLanduseDemandGeneration.readPrtCoeffs(put2PrtRatiosFile);
 
+		totalODMatrices = new double[24][][];
 
-    public static void main(String[] args)
-    {
-        prtCoeffs = PoznanLanduseDemandGeneration.readPrtCoeffs(put2PrtRatiosFile);
+		for (ActivityPair ap : ActivityPair.values()) {
+			readMatrix(odMatrixFilePrefix, ap);
+		}
 
-        totalODMatrices = new double[24][][];
+		writeMatricesByHour(odMatrixFilePrefix);
+	}
 
-        for (ActivityPair ap : ActivityPair.values()) {
-            readMatrix(odMatrixFilePrefix, ap);
-        }
+	private static void readMatrix(String filePrefix, ActivityPair actPair) {
+		double flowCoeff = prtCoeffs.get(actPair);
 
-        writeMatricesByHour(odMatrixFilePrefix);
-    }
+		for (int i = 0; i < 24; i++) {
+			String odMatrixFile = filePrefix + actPair.name() + "_" + i + "-" + (i + 1);
 
+			System.out.println("readMatrix: " + odMatrixFile);
 
-    private static void readMatrix(String filePrefix, ActivityPair actPair)
-    {
-        double flowCoeff = prtCoeffs.get(actPair);
+			double[][] odMatrix = VisumMatrixReader.readMatrix(odMatrixFile);
 
-        for (int i = 0; i < 24; i++) {
-            String odMatrixFile = filePrefix + actPair.name() + "_" + i + "-" + (i + 1);
+			if (totalODMatrices[i] == null) {
+				totalODMatrices[i] = (double[][])Array.newInstance(//
+						double.class, odMatrix.length, odMatrix[0].length);
+			}
 
-            System.out.println("readMatrix: " + odMatrixFile);
+			for (int j = 0; j < odMatrix.length; j++) {
+				for (int k = 0; k < odMatrix[j].length; k++) {
+					totalODMatrices[i][j][k] += flowCoeff * odMatrix[j][k];
+				}
+			}
+		}
+	}
 
-            double[][] odMatrix = VisumMatrixReader.readMatrix(odMatrixFile);
+	private static void writeMatricesByHour(String filePrefix) {
+		for (int i = 0; i < 24; i++) {
+			String odMatrixFile = filePrefix + "_" + i + "-" + (i + 1);
 
-            if (totalODMatrices[i] == null) {
-                totalODMatrices[i] = (double[][])Array.newInstance(//
-                        double.class, odMatrix.length, odMatrix[0].length);
-            }
+			System.out.println("writeMatrix: " + odMatrixFile);
 
-            for (int j = 0; j < odMatrix.length; j++) {
-                for (int k = 0; k < odMatrix[j].length; k++) {
-                    totalODMatrices[i][j][k] += flowCoeff * odMatrix[j][k];
-                }
-            }
-        }
-    }
+			writeMatrix(totalODMatrices[i], odMatrixFile);
+		}
+	}
 
+	private static void writeMatrix(double[][] array, String file) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+			for (int i = 0; i < array.length; i++) {
+				for (int j = 0; j < array[i].length; j++) {
+					writer.write(array[i][j] + "\t");
+				}
 
-    private static void writeMatricesByHour(String filePrefix)
-    {
-        for (int i = 0; i < 24; i++) {
-            String odMatrixFile = filePrefix + "_" + i + "-" + (i + 1);
-
-            System.out.println("writeMatrix: " + odMatrixFile);
-
-            writeMatrix(totalODMatrices[i], odMatrixFile);
-        }
-    }
-
-
-    private static void writeMatrix(double[][] array, String file)
-    {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (int i = 0; i < array.length; i++) {
-                for (int j = 0; j < array[i].length; j++) {
-                    writer.write(array[i][j] + "\t");
-                }
-
-                writer.newLine();
-            }
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+				writer.newLine();
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -22,8 +22,6 @@ package org.matsim.contrib.zone.util;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.zone.Zone;
 
-
-public interface ZoneFinder
-{
-    Zone findZone(Coord coord);
+public interface ZoneFinder {
+	Zone findZone(Coord coord);
 }

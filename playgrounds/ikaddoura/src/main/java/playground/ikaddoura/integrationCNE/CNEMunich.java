@@ -24,17 +24,17 @@ package playground.ikaddoura.integrationCNE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
@@ -56,12 +56,12 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
+import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -89,7 +89,9 @@ public class CNEMunich {
 	
 	private static CongestionTollingApproach congestionTollingApproach;
 	private static double kP;
-	
+
+	private static boolean modeChoice = false;
+		
 	public static void main(String[] args) throws IOException {
 				
 		if (args.length > 0) {
@@ -116,6 +118,8 @@ public class CNEMunich {
 			
 			if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV3.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.QBPV3;
+			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV9.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.QBPV9;
 			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionPID.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 			} else {
@@ -125,14 +129,19 @@ public class CNEMunich {
 			
 			kP = Double.parseDouble(args[7]);
 			log.info("kP: " + kP);
+
+			modeChoice = Boolean.valueOf(args[8]);
+			log.info("Mode choice for Munich scenario is "+ modeChoice);
 			
 		} else {
-			
-			configFile = "../../../runs-svn/cne_test/input/config.xml";
+
+//			if (modeChoice) configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
+//			else configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
+			configFile = "../../../shared-svn/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
+
 		}
 
 		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
-		config.vehicles().setVehiclesFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/emissionVehicles_1pct.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -146,44 +155,55 @@ public class CNEMunich {
 		
 		// scenario-specific settings
 		
-		// TODO: set files in config
-		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
-		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_vehcat_2005average.txt");
-		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_vehcat_2005average.txt");
-		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_ColdStart_SubSegm_2005detailed.txt");
-		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/emissions/hbefaForMatsim/EFA_HOT_SubSegm_2005detailed.txt");
-		ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/detEval/emissionCongestionInternalization/iatbr/input/roadTypeMapping.txt");
-		ecg.setUsingDetailedEmissionCalculation(true);
-		ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
-		
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		
+		if (modeChoice) {
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+					String ug = "COMMUTER_REV_COMMUTER";
+					addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name()
+							.concat("_")
+							.concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
+						final String[] availableModes = {"car", "pt_".concat(ug)};
+						final String[] chainBasedModes = {"car", "bike"};
+						@Inject
+						Scenario sc;
+
+						@Override
+						public PlanStrategy get() {
+							final Builder builder = new Builder(new RandomPlanSelector<>());
+							builder.addStrategyModule(new SubtourModeChoice(sc.getConfig()
+									.global()
+									.getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
+							return builder.build();
+						}
+					});
+				}
+			});
+		}
+
+		// additional things to get the networkRoute for ride mode. For this, ride mode must be assigned in networkModes of the config file.
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				String ug = "Rev_Commuter"; //TODO [AA] probably, this can cause an exception, to fix, this either change ("COMMUTER_REV_COMMUTER") or make changes in config and person attributes.
-				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name().concat("_").concat(ug)).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					final String[] availableModes = {"car", "pt_".concat(ug)};
-					final String[] chainBasedModes = {"car", "bike"};
-					@Inject
-					Scenario sc;
-
-					@Override
-					public PlanStrategy get() {
-						final Builder builder = new Builder(new RandomPlanSelector<>());
-						builder.addStrategyModule(new SubtourModeChoice(sc.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
-						builder.addStrategyModule(new ReRoute(sc, tripRouterProvider));
-						return builder.build();
-					}
-				});
+				addTravelTimeBinding("ride").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
 			}
 		});
-		
+
+		// allowing car and ride on all links (it is also necessary in order to get network routes for ride mode).
+		for (Link l : controler.getScenario().getNetwork().getLinks().values()){
+			Set<String> modes = new HashSet<>(Arrays.asList("car","ride"));
+			l.setAllowedModes(modes);
+		}
+
 		// noise Munich settings
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getScenario().getConfig().getModule("noise");
+		NoiseConfigGroup noiseParameters =  (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 
 		noiseParameters.setTimeBinSizeNoiseComputation(timeBinSize);
 
@@ -212,6 +232,7 @@ public class CNEMunich {
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
 		noiseParameters.setScaleFactor(100.);
+		noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(false);
 
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("591881193", Link.class));
@@ -243,6 +264,8 @@ public class CNEMunich {
 		tunnelLinkIDs.add(Id.create("595870463-586909531-594897602", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 		
+		noiseParameters.setWriteOutputIteration(config.controler().getLastIteration() - config.controler().getFirstIteration());
+		
 		// CNE Integration
 		
 		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
@@ -253,6 +276,16 @@ public class CNEMunich {
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
 		cne.setPersonFilter(new MunichPersonFilter());
+
+		cne.setAgentFilter(new AgentFilter() {
+			final String goodsVehiclesPrefix = "gv";
+			@Override
+			public String getAgentTypeFromId(Id<Person> id) {
+				if (id.toString().startsWith(goodsVehiclesPrefix)) return "gv";
+				else return "pv";
+			}
+		});
+
 		controler = cne.prepareControler();
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -260,14 +293,13 @@ public class CNEMunich {
 			
 		// analysis
 		
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		PersonTripCongestionNoiseAnalysisRun analysis = new PersonTripCongestionNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
 		String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		
-		NoiseConfigGroup ncg =  (NoiseConfigGroup) controler.getConfig().getModule("noise");
-		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, ncg.getReceiverPointGap());
+		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();
 		
 		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
@@ -276,7 +308,7 @@ public class CNEMunich {
 		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
 		merger.setReceiverPointsFile(receiverPointsFile);
 		merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
-		merger.setTimeBinSize(ncg.getTimeBinSizeNoiseComputation());
+		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
 		merger.run();

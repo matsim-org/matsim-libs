@@ -51,12 +51,12 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
 import playground.agarwalamit.analysis.StatsWriter;
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
-import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.counts.MultiModeCountsControlerListener;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
@@ -109,7 +109,7 @@ public class JointCalibrationControler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		// no vehicle info should be present if using VehiclesSource.modeVEhicleTypesFromVehiclesData
-		if ( sc.getVehicles().getVehicles().size() != 0 ) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
+		if (!sc.getVehicles().getVehicles().isEmpty()) throw new RuntimeException("Only vehicle types should be loaded if vehicle source "+
 				QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData +" is assigned.");
 		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
@@ -207,7 +207,7 @@ public class JointCalibrationControler {
 
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( controler.getScenario() );
 			@Inject
              Network network;
 			@Inject
@@ -220,7 +220,7 @@ public class JointCalibrationControler {
              ModalCadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final ScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
@@ -246,9 +246,9 @@ public class JointCalibrationControler {
 
 				ScoringParameterSet scoringParameterSet = planCalcScoreConfigGroup.getScoringParameters( null ); // parameters set is same for all subPopulations 
 
-				CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(
+				ScoringParameters.Builder builder = new ScoringParameters.Builder(
 						planCalcScoreConfigGroup, scoringParameterSet, scenarioConfig);
-				final CharyparNagelScoringParameters modifiedParams = builder.build();
+				final ScoringParameters modifiedParams = builder.build();
 
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(modifiedParams, network));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(modifiedParams));

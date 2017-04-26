@@ -28,9 +28,8 @@ package playground.michalm.ev;
  * <li>power - watt [W]</li>
  * </ul>
  * <p>
- * In particular, the use of [kWh] and [s] generates confusion and leads to bugs, as 1 kWh = 1,000 J
- * * 3,600 s
+ * In particular, the use of [kWh] and [s] generates confusion and leads to bugs, as 1 kWh = 1,000 J * 3,600 s
  * <p>
- * Consequently, energy consumption is measured in [J/m], instead of [kWh/100km] or [Wh/km], as
- * typically done in transport.
+ * Consequently, energy consumption is measured in [J/m], instead of [kWh/100km] or [Wh/km], as typically done in
+ * transport.
  */

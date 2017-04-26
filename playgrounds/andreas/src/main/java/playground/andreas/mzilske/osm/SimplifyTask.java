@@ -21,6 +21,7 @@ package playground.andreas.mzilske.osm;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
@@ -227,5 +228,9 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 	public void setSink(Sink sink) {
 		this.sink = sink;
 	}
-	
+
+	@Override
+	public void initialize(Map<String, Object> map) {
+
+	}
 }

@@ -45,7 +45,7 @@ import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.SumScoringFunction.MoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 final class RunFreight {
 
@@ -66,7 +66,7 @@ final class RunFreight {
 				SumScoringFunction sum = new SumScoringFunction();
 
 				/* Add leg and money scoring. */
-				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build();
+				ScoringParameters params = new ScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build();
 				final LegScoring legScoringFunction = new CharyparNagelLegScoring(params , scenario.getNetwork());
 				final MoneyScoring moneyScoringFunction = new CharyparNagelMoneyScoring(params);
 				sum.addScoringFunction(legScoringFunction);

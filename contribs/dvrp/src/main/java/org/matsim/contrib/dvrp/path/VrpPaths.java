@@ -19,81 +19,108 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import java.util.ArrayList;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.population.routes.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+public class VrpPaths {
+	/**
+	 * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
+	 */
+	public static VrpPathWithTravelData calcAndCreatePath(Link fromLink, Link toLink, double departureTime,
+			LeastCostPathCalculator router, TravelTime travelTime) {
+		Path path = null;
+		if (fromLink != toLink) {
+			// calc path for departureTime+1 (we need 1 second to move over the node)
+			path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + 1, null, null);
+		}
 
-public class VrpPaths
-{
-    /**
-     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
-     */
-    public static VrpPathWithTravelData calcAndCreatePath(Link fromLink, Link toLink,
-            double departureTime, LeastCostPathCalculator router, TravelTime travelTime)
-    {
-        Path path = null;
-        if (fromLink != toLink) {
-            //calc path for departureTime+1 (we need 1 second to move over the node)
-            path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
-                    departureTime + 1, null, null);
-        }
+		return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime);
+	}
 
-        return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime);
-    }
+	public static VrpPathWithTravelData createZeroLengthPath(Link fromTolink, double departureTime) {
+		return new VrpPathWithTravelDataImpl(departureTime, 0, new Link[] { fromTolink }, new double[] { 0 });
+	}
 
+	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
+			TravelTime travelTime) {
+		if (fromLink == toLink) {
+			return createZeroLengthPath(fromLink, departureTime);
+		}
 
-    public static VrpPathWithTravelData createZeroLengthPath(Link fromTolink, double departureTime)
-    {
-        return new VrpPathWithTravelDataImpl(departureTime, 0, new Link[] { fromTolink },
-                new double[] { 0 });
-    }
+		int count = path.links.size();
+		if (count > 0) {
+			if (fromLink.getToNode() != path.links.get(0).getFromNode()) {
+				throw new IllegalArgumentException("fromLink and path are not connected; fromLink: "+fromLink +"\n path beg"+path.links.get(0));
+			}
+			if (path.links.get(count - 1).getToNode() != toLink.getFromNode()) {
+				throw new IllegalArgumentException("path and toLink are not connected; path end:"+path.links.get(count - 1).toString()+ "\n toLink: "+toLink.toString());
+			}
+		}
+		
+		
+		Link[] links = new Link[count + 2];
+		double[] linkTTs = new double[count + 2];
 
+		// we start at the end of fromLink
+		// actually, in QSim, it usually takes 1 second to move over the first node
+		// (when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
+		// otherwise it can take much longer)
+		double currentTime = departureTime;
+		links[0] = fromLink;
+		double linkTT = FIRST_LINK_TT;
+		linkTTs[0] = linkTT;
+		currentTime += linkTT;
 
-    public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime,
-            Path path, TravelTime travelTime)
-    {
-        if (fromLink == toLink) {
-            return createZeroLengthPath(fromLink, departureTime);
-        }
+		for (int i = 1; i <= count; i++) {
+			Link link = path.links.get(i - 1);
+			links[i] = link;
+			linkTT = travelTime.getLinkTravelTime(link, currentTime, null, null);
+			linkTTs[i] = linkTT;
+			currentTime += linkTT;
+		}
 
-        int count = path.links.size();
-        Link[] links = new Link[count + 2];
-        double[] linkTTs = new double[count + 2];
+		// there is no extra time spent on queuing at the end of the last link
+		links[count + 1] = toLink;
+		linkTT = getLastLinkTT(toLink, currentTime);// as long as we cannot divert from the last link this is okay
+		linkTTs[count + 1] = linkTT;
+		double totalTT = 1 + path.travelTime + linkTT;
 
-        //we start at the end of fromLink
-        //actually, in QSim, it usually takes 1 second to move over the first node
-        //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
-        //otherwise it can take much longer)
-        double currentTime = departureTime;
-        links[0] = fromLink;
-        double linkTT = FIRST_LINK_TT;
-        linkTTs[0] = linkTT;
-        currentTime += linkTT;
+		return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
+	}
 
-        for (int i = 1; i <= count; i++) {
-            Link link = path.links.get(i - 1);
-            links[i] = link;
-            linkTT = travelTime.getLinkTravelTime(link, currentTime, null, null);
-            linkTTs[i] = linkTT;
-            currentTime += linkTT;
-        }
+	public static final double FIRST_LINK_TT = 1;
 
-        //there is no extra time spent on queuing at the end of the last link
-        links[count + 1] = toLink;
-        linkTT = getLastLinkTT(toLink, currentTime);//as long as we cannot divert from the last link this is okay
-        linkTTs[count + 1] = linkTT;
-        double totalTT = 1 + path.travelTime + linkTT;
+	public static double getLastLinkTT(Link lastLink, double time) {
+		return lastLink.getLength() / lastLink.getFreespeed(time);
+	}
 
-        return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
-    }
+	/**
+	 * Used for OTFVis. Does not contain info on timing, distance and cost. Can be extended...
+	 * 
+	 * @param path
+	 * @param routeFactories
+	 * @return
+	 */
+	public static NetworkRoute createNetworkRoute(VrpPath path, RouteFactories routeFactories) {
+		Id<Link> fromLinkId = path.getFromLink().getId();
+		Id<Link> toLinkId = path.getToLink().getId();
+		NetworkRoute route = routeFactories.createRoute(NetworkRoute.class, fromLinkId, toLinkId);
 
+		int length = path.getLinkCount();
+		if (length >= 2) {// means: fromLink != toLink
+			// all except the first and last ones (== fromLink and toLink)
+			ArrayList<Id<Link>> linkIdList = new ArrayList<>(length - 2);
+			for (int i = 1; i < length - 1; i++) {
+				linkIdList.add(path.getLink(i).getId());
+			}
+			route.setLinkIds(fromLinkId, linkIdList, toLinkId);
+		}
 
-    public static final double FIRST_LINK_TT = 1;
-
-
-    public static double getLastLinkTT(Link lastLink, double time)
-    {
-        return lastLink.getLength() / lastLink.getFreespeed(time);
-    }
+		return route;
+	}
 }

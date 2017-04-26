@@ -53,6 +53,12 @@ public class Trip {
             trip.setMode(first.getMode());
         }
         
+        for (Leg leg : legs) {
+        	if (leg.getMode().equals("pt")) {
+        		trip.setMode("pt");
+        	}
+        }
+        
         double distance = 0.0;
         
         for (Leg leg : legs) {

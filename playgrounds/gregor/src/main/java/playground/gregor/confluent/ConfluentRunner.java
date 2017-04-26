@@ -1,4 +1,5 @@
-package playground.gregor.confluent;/* *********************************************************************** *
+package playground.gregor.confluent;
+/* *********************************************************************** *
  * project: org.matsim.*
  *
  *                                                                         *
@@ -19,6 +20,9 @@ package playground.gregor.confluent;/* *****************************************
  * *********************************************************************** */
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -27,15 +31,32 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ConfluentRunner {
 
+    private static String NET_FILE = "/Users/laemmel/scenarios/padang/output_network.xml.gz";
+    private static String POP_FILE = "/Users/laemmel/scenarios/padang/10p_sample.plans.xml.gz";
+    private static String OUT_DIR = "/tmp/output/";
+    private static boolean HEADLESS = false;
+    private static Integer ITERATIONS = 500;
+
     public static void main(String[] args) {
+
+        if (args.length == 5) {
+            NET_FILE = args[0];
+            POP_FILE = args[1];
+            OUT_DIR = args[2];
+            HEADLESS = Boolean.parseBoolean(args[3]);
+            ITERATIONS = Integer.parseInt(args[4]);
+
+        }
+
+
         Config c = ConfigUtils.createConfig();
         Scenario sc = ScenarioUtils.createScenario(c);
 
@@ -45,45 +66,43 @@ public class ConfluentRunner {
         Controler controler = new Controler(sc);
 
 
-        //that doesn't work
+        SimulatedAnnealingTravelDisutility tc = new SimulatedAnnealingTravelDisutility();
+
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                this.bind(TravelDisutilityModule.class).to(MSATravelDisutilityModule.class);
+                bind(SimulatedAnnealingTravelDisutility.class).toInstance(tc);
+                addControlerListenerBinding().toInstance(tc);
+                addEventHandlerBinding().toInstance(tc);
+                bindCarTravelDisutilityFactory().to(SimulatedAnnealingTravelDisutilityFactory.class);
             }
         });
-//
-//        //that neither
-//        controler.addOverridingModule( new AbstractModule(){
-//       			@Override public void install() {
-//                    addEventHandlerBinding().to(MSATravelDisutility.class);
-//                    this.bind(TravelDisutility.class).to(MSATravelDisutility.class);
-//       			}
-//       		});
-//        //none of them work
-//        controler.addOverridingModule( new AbstractModule(){
-//       			@Override public void install() {
-//                    addEventHandlerBinding().to(MSATravelDisutility.class);
-//                    this.bind(TravelDisutilityFactory.class).to(MSATravelDisutilityFactory.class);
-//       			}
-//       		});
+
 
         controler.run();
     }
 
     private static void loadsc(Scenario sc) {
-        new MatsimNetworkReader(sc.getNetwork()).readFile("examples/scenarios/equil/network.xml");
-        new PopulationReader(sc).readFile("examples/scenarios/equil/plans1.xml");
+        new MatsimNetworkReader(sc.getNetwork()).readFile(NET_FILE);
+        new PopulationReader(sc).readFile(POP_FILE);
+        for (Person pers : sc.getPopulation().getPersons().values()) {
+            List<Plan> rm = new ArrayList<>();
+
+            Plan selected = pers.getSelectedPlan();
+            pers.getPlans().removeIf(plan -> plan != selected);
+
+            ((Leg) pers.getPlans().get(0).getPlanElements().get(1)).setRoute(null);
+        }
     }
 
     private static void configure(Config c) {
 
-        boolean verbose = true;
+        boolean verbose = false;
         c.global().setRandomSeed(4711L);
         c.global().setNumberOfThreads(6);
 
-        c.controler().setLastIteration(1);
-        c.controler().setOutputDirectory("/tmp/output/");
+        c.controler().setLastIteration(ITERATIONS);
+        c.controler().setOutputDirectory(OUT_DIR);
         c.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
         c.qsim().setFlowCapFactor(.1);
@@ -103,8 +122,8 @@ public class ConfluentRunner {
         //        c.travelTimeCalculator().setTravelTimeAggregatorType("experimental_LastMile");
         c.travelTimeCalculator().setTraveltimeBinSize(24 * 3600);
 
-        c.controler().setCreateGraphs(verbose);
-        c.controler().setDumpDataAtEnd(verbose);
+        c.controler().setCreateGraphs(!HEADLESS);
+        c.controler().setDumpDataAtEnd(true);
         c.controler().setWriteEventsInterval(verbose ? 1 : 0);
         c.controler().setWritePlansInterval(verbose ? 1 : 0);
 

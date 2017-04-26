@@ -2,7 +2,6 @@ package playground.ikaddoura.analysis.detailedPersonTripAnalysis;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -28,9 +27,9 @@ import playground.tschlenther.createNetwork.ForkNetworkCreator;
  */
 public class BasicPersonTripAnalysisTest {
 	
-	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysisMain.class);
+	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysisRun.class);
 
-	private static final boolean printResults = false;
+	private static final boolean printResults = true;
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
@@ -131,8 +130,6 @@ public class BasicPersonTripAnalysisTest {
 		
 		Assert.assertEquals("Unexpected departureTime on trip 1 from Person 2: ", 30500.0, 
 				basicHandler.getPersonId2tripNumber2departureTime().get(Id.create(2, Person.class)).get(1), MatsimTestUtils.EPSILON);
-//		TODO Why isn't this null? There is no PersonDepartureEvent. Is it Possible to have an Activity on the same link(like home-office)?
-//		Assert.assertNull(basicHandler.getPersonId2tripNumber2departureTime().get(Id.create(2, Person.class)));
 		Assert.assertNull(basicHandler.getPersonId2tripNumber2arrivalTime().get(Id.create(2, Person.class)));
 		
 		if (printResults) printResults(basicHandler, scenario);
@@ -141,10 +138,8 @@ public class BasicPersonTripAnalysisTest {
 	/**
 	 * Scenario: 1 Person
 	 * 	1.Person: 2 different trips with different vehicles
-	 * current status: Fail; because vehicle id is assumed to be always the same as person id
 	 */
 	@Test
-	@Ignore // TODO
 	public void testVariousVehiclesPerPerson() {
 		
 		String eventsFile = utils.getInputDirectory() + "testVariousVehiclesPerPersonEvents.xml";
@@ -175,7 +170,8 @@ public class BasicPersonTripAnalysisTest {
 	
 	public BasicPersonTripAnalysisHandler analyseScenario(String eventsFile, Scenario scenario) {
 
-		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler(scenario);	
+		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();	
+		basicHandler.setScenario(scenario);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);

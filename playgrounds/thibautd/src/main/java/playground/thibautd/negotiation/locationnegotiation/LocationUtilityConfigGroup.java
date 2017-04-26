@@ -26,12 +26,37 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class LocationUtilityConfigGroup extends ReflectiveConfigGroup {
 	private static final String GROUP_NAME = "locationUtility";
 
+	@StringGetter("contactErrorTermDistribution")
+	public DistributionType getContactErrorTermDistribution() {
+		return contactErrorTermDistribution;
+	}
+
+	@StringSetter("contactErrorTermDistribution")
+	public void setContactErrorTermDistribution( final DistributionType contactErrorTermDistribution ) {
+		this.contactErrorTermDistribution = contactErrorTermDistribution;
+	}
+
+	@StringGetter("facilityErrorTermDistribution")
+	public DistributionType getFacilityErrorTermDistribution() {
+		return facilityErrorTermDistribution;
+	}
+
+	@StringSetter("facilityErrorTermDistribution")
+	public void setFacilityErrorTermDistribution( final DistributionType facilityErrorTermDistribution ) {
+		this.facilityErrorTermDistribution = facilityErrorTermDistribution;
+	}
+
 	public enum TravelTimeType { crowFly }
+	public enum DistributionType {normal,uniform}
 
 	private TravelTimeType travelTimeType = TravelTimeType.crowFly;
-	private double betaTime = -1;
+	private double betaDistance = -1;
+	private double fixedUtilContact = 1;
 	private double muContact = 1;
 	private double sigmaFacility = 1;
+
+	private DistributionType contactErrorTermDistribution = DistributionType.normal;
+	private DistributionType facilityErrorTermDistribution = DistributionType.normal;
 
 	public LocationUtilityConfigGroup( ) {
 		super( GROUP_NAME );
@@ -47,19 +72,29 @@ public class LocationUtilityConfigGroup extends ReflectiveConfigGroup {
 		this.travelTimeType = travelTimeType;
 	}
 
-	@StringGetter("betaTime")
-	public double getBetaTime() {
-		return betaTime;
+	@StringGetter("betaDistance")
+	public double getBetaDistance() {
+		return betaDistance;
 	}
 
-	@StringSetter("betaTime")
-	public void setBetaTime( final double betaTime ) {
-		this.betaTime = betaTime;
+	@StringSetter("betaDistance")
+	public void setBetaDistance( final double betaDistance ) {
+		this.betaDistance = betaDistance;
 	}
 
 	@StringGetter("muContact")
 	public double getMuContact() {
 		return muContact;
+	}
+
+	@StringGetter("fixedUtilContact")
+	public double getFixedUtilContact() {
+		return fixedUtilContact;
+	}
+
+	@StringSetter("fixedUtilContact")
+	public void setFixedUtilContact( final double fixedUtilContact ) {
+		this.fixedUtilContact = fixedUtilContact;
 	}
 
 	@StringSetter("muContact")

@@ -30,37 +30,34 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+public class SubNetworkCreator {
+	public static void main(String[] args) {
+		// String dir = "D:/PP-rad/poznan/";
+		// String networkFile = dir + "network.xml";
+		// String polygonFile = dir + "poznan_polygon/poznan_city_polygon.shp";
+		// String subNetworkFile = dir + "sub-network-2.xml";
 
-public class SubNetworkCreator
-{
-    public static void main(String[] args)
-    {
-//        String dir = "D:/PP-rad/poznan/";
-//        String networkFile = dir + "network.xml";
-//        String polygonFile = dir + "poznan_polygon/poznan_city_polygon.shp";
-//        String subNetworkFile = dir + "sub-network-2.xml";
+		String dir = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
+		String networkFile = dir + "network/berlin_brb.xml.gz";
+		String polygonFile = dir + "shp_merged/berlin_zones_convex_hull_with_buffer_DHDN_GK4.shp";
+		String subNetworkFile = dir + "network/berlin.xml.gz";
 
-        String dir = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
-        String networkFile = dir + "network/berlin_brb.xml.gz";
-        String polygonFile = dir + "shp_merged/berlin_zones_convex_hull_with_buffer_DHDN_GK4.shp";
-        String subNetworkFile = dir + "network/berlin.xml.gz";
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
+		nr.readFile(networkFile);
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
-        nr.readFile(networkFile);
+		Network network = scenario.getNetwork();
+		List<Link> allLinks = new ArrayList<>(network.getLinks().values());
 
-        Network network = scenario.getNetwork();
-        List<Link> allLinks = new ArrayList<>(network.getLinks().values());
+		Geometry polygonGeometry = PolygonBasedFilter.readPolygonGeometry(polygonFile);
+		Iterable<? extends Link> outerLinks = PolygonBasedFilter.filterLinksOutsidePolygon(allLinks, polygonGeometry,
+				false);
 
-        Geometry polygonGeometry = PolygonBasedFilter.readPolygonGeometry(polygonFile);
-        Iterable<? extends Link> outerLinks = PolygonBasedFilter.filterLinksOutsidePolygon(allLinks,
-                polygonGeometry, false);
+		for (Link link : outerLinks) {
+			network.removeLink(link.getId());
+		}
 
-        for (Link link : outerLinks) {
-            network.removeLink(link.getId());
-        }
-
-        new NetworkCleaner().run(network);
-        new NetworkWriter(network).write(subNetworkFile);
-    }
+		new NetworkCleaner().run(network);
+		new NetworkWriter(network).write(subNetworkFile);
+	}
 }

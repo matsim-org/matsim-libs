@@ -25,145 +25,118 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.vehicles.Vehicle;
 
-
 /**
  * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
+ *
+ * @author michalm
  */
-public class VrpLeg
-    implements DivertibleLeg
-{
-    private OnlineDriveTaskTracker onlineTracker;
+public class VrpLeg implements DivertibleLeg {
+	private OnlineDriveTaskTracker onlineTracker;
 
-    private VrpPath path;
-    private int currentLinkIdx = 0;
-    private boolean askedAboutNextLink = false;
+	private VrpPath path;
+	private int currentLinkIdx = 0;
+	private boolean askedAboutNextLink = false;
 
-    private final String mode = TransportMode.car;//TODO
+	private final String mode = TransportMode.car;// TODO
 
+	public VrpLeg(VrpPath path) {
+		this.path = path;
+	}
 
-    public VrpLeg(VrpPath path)
-    {
-        this.path = path;
-    }
+	public void initOnlineTracking(OnlineDriveTaskTracker onlineTracker) {
+		if (this.onlineTracker != null) {
+			throw new IllegalStateException("Tracking already initialized");
+		}
 
+		if (currentLinkIdx != 0) {
+			throw new IllegalStateException("Too late for initializing online tracking");
+		}
 
-    public void initOnlineTracking(OnlineDriveTaskTracker onlineTracker)
-    {
-        if (this.onlineTracker != null) {
-            throw new IllegalStateException("Tracking already initialized");
-        }
+		this.onlineTracker = onlineTracker;
+	}
 
-        if (currentLinkIdx != 0) {
-            throw new IllegalStateException("Too late for initializing online tracking");
-        }
+	@Override
+	public void movedOverNode(Id<Link> newLinkId) {
+		currentLinkIdx++;
+		askedAboutNextLink = false;
 
-        this.onlineTracker = onlineTracker;
-    }
+		Link currentLink = path.getLink(currentLinkIdx);
+		if (currentLink.getId() != newLinkId) {
+			throw new IllegalStateException();
+		}
 
+		if (onlineTracker != null) {
+			onlineTracker.movedOverNode(currentLink);
+		}
+	}
 
-    @Override
-    public void movedOverNode(Id<Link> newLinkId)
-    {
-        currentLinkIdx++;
-        askedAboutNextLink = false;
+	@Override
+	public boolean canChangeNextLink() {
+		return !askedAboutNextLink;
+	}
 
-        if (path.getLink(currentLinkIdx).getId() != newLinkId) {
-            throw new IllegalStateException();
-        }
+	@Override
+	public void pathDiverted(DivertedVrpPath divertedPath) {
+		int immediateDiversionLinkIdx = currentLinkIdx + (canChangeNextLink() ? 0 : 1);
+		if (divertedPath.getDiversionLinkIdx() < immediateDiversionLinkIdx) {
+			throw new IllegalStateException();
+		}
 
-        if (onlineTracker != null) {
-            onlineTracker.movedOverNode();
-        }
-    }
+		// divertedPath must be derived from the original one
+		if (divertedPath.getOriginalPath() != path) {
+			throw new IllegalArgumentException();
+		}
 
+		path = divertedPath;
+	}
 
-    @Override
-    public boolean canChangeNextLink()
-    {
-        return !askedAboutNextLink;
-    }
+	@Override
+	public VrpPath getPath() {
+		return path;
+	}
 
+	@Override
+	public Id<Link> getNextLinkId() {
+		askedAboutNextLink = true;
 
-    @Override
-    public void pathDiverted(DivertedVrpPath divertedPath)
-    {
-        int immediateDiversionLinkIdx = currentLinkIdx + (canChangeNextLink() ? 0 : 1);
-        if (divertedPath.getDiversionLinkIdx() < immediateDiversionLinkIdx) {
-            throw new IllegalStateException();
-        }
+		if (currentLinkIdx == path.getLinkCount() - 1) {
+			return null;
+		}
 
-        //divertedPath must be derived from the original one 
-        if (divertedPath.getOriginalPath() != path) {
-            throw new IllegalArgumentException();
-        }
+		return path.getLink(currentLinkIdx + 1).getId();
+	}
 
-        path = divertedPath;
-    }
+	@Override
+	public Id<Link> getDestinationLinkId() {
+		return path.getToLink().getId();
+	}
 
+	@Override
+	public void finalizeAction(double now) {
+	}
 
-    @Override
-    public VrpPath getPath()
-    {
-        return path;
-    }
+	@Override
+	public String getMode() {
+		return mode;
+	}
 
+	@Override
+	public Id<Vehicle> getPlannedVehicleId() {
+		return null;
+	}
 
-    @Override
-    public Id<Link> getNextLinkId()
-    {
-        askedAboutNextLink = true;
+	@Override
+	public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId) {
+		throw new UnsupportedOperationException();
+	}
 
-        if (currentLinkIdx == path.getLinkCount() - 1) {
-            return null;
-        }
+	@Override
+	public Double getExpectedTravelTime() {
+		return null;// teleportation is not handled
+	}
 
-        return path.getLink(currentLinkIdx + 1).getId();
-    }
-
-
-    @Override
-    public Id<Link> getDestinationLinkId()
-    {
-        return path.getToLink().getId();
-    }
-
-
-    @Override
-    public void finalizeAction(double now)
-    {}
-
-
-    @Override
-    public String getMode()
-    {
-        return mode;
-    }
-
-
-    @Override
-    public Id<Vehicle> getPlannedVehicleId()
-    {
-        return null;
-    }
-
-
-    @Override
-    public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId)
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
-    @Override
-    public Double getExpectedTravelTime()
-    {
-        return null;//teleportation is not handled
-    }
-
-
-    @Override
-    public Double getExpectedTravelDistance()
-    {
-        return null;//teleportation is not handled
-    }
+	@Override
+	public Double getExpectedTravelDistance() {
+		return null;// teleportation is not handled
+	}
 }

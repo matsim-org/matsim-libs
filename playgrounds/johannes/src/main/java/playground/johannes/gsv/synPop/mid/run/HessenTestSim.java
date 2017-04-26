@@ -77,7 +77,7 @@ public class HessenTestSim {
 
 		logger.info("Loading data...");
 		DataPool dataPool = new DataPool();
-		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
+		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), null, random), FacilityDataLoader.KEY);
 		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
 		logger.info("Done.");
 

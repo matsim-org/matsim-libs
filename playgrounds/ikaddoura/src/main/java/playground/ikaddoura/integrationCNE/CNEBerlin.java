@@ -36,7 +36,6 @@ import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
-import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -44,8 +43,9 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
+import playground.ikaddoura.moneyTravelDisutility.data.BerlinAgentFilter;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
 
@@ -77,7 +77,7 @@ public class CNEBerlin {
 	
 	private static CongestionTollingApproach congestionTollingApproach;
 	private static double kP;
-	
+		
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
@@ -104,6 +104,8 @@ public class CNEBerlin {
 			
 			if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV3.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.QBPV3;
+			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.QBPV9.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.QBPV9;
 			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionPID.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
 			} else {
@@ -117,7 +119,7 @@ public class CNEBerlin {
 		} else {
 			
 			outputDirectory = null;
-			configFile = "../../../runs-svn/berlin-an-time/input/config.xml";
+			configFile = "../../../runs-svn/berlin-an/input/config.xml";
 			
 			congestionPricing = true;
 			noisePricing = true;
@@ -126,7 +128,7 @@ public class CNEBerlin {
 			sigma = 0.;
 			
 			congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
-			kP = 2 * ( 10 / 3600. );
+			kP = 2 * ( 10 / 3600. );			
 		}
 				
 		CNEBerlin cnControler = new CNEBerlin();
@@ -136,7 +138,6 @@ public class CNEBerlin {
 	public void run() {
 						
 		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
-		config.vehicles().setVehiclesFile("../../../runs-svn/berlin-an-time/input/population_1agent.emissionVehicle.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -151,21 +152,10 @@ public class CNEBerlin {
 		int noOfYCells = 446;
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		
-		// TODO: set files in config
-		EmissionsConfigGroup ecg = (EmissionsConfigGroup) controler.getConfig().getModule("emissions");
-		ecg.setAverageColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_vehcat_2005average.txt");
-		ecg.setAverageWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_vehcat_2005average.txt");
-		ecg.setDetailedColdEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_ColdStart_SubSegm_2005detailed.txt");
-		ecg.setDetailedWarmEmissionFactorsFile("../../../shared-svn/projects/detailedEval/matsim-input-files/hbefa-files-v3.2/EFA_HOT_SubSegm_2005detailed.txt");
-		ecg.setEmissionRoadTypeMappingFile("../../../runs-svn/berlin-an-time/input/roadTypeMapping_berlin.txt");
-		ecg.setUsingDetailedEmissionCalculation(false);
-		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 	
 		// noise Berlin settings
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getScenario().getConfig().getModule("noise");
-
+		NoiseConfigGroup noiseParameters =  (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 		noiseParameters.setTimeBinSizeNoiseComputation(timeBinSize);
 		
 		noiseParameters.setReceiverPointGap(100.);
@@ -186,6 +176,7 @@ public class CNEBerlin {
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
 		noiseParameters.setScaleFactor(10.);
+		noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(false);
 		
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("108041", Link.class));
@@ -241,6 +232,8 @@ public class CNEBerlin {
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
 		cne.setkP(kP);
+		cne.setAgentFilter(new BerlinAgentFilter());
+
 		controler = cne.prepareControler();
 				
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -248,14 +241,13 @@ public class CNEBerlin {
 		
 		// analysis
 		
-		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		PersonTripCongestionNoiseAnalysisRun analysis = new PersonTripCongestionNoiseAnalysisRun(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 		
 		String immissionsDir = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		
-		NoiseConfigGroup ncg =  (NoiseConfigGroup) controler.getConfig().getModule("noise");
-		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, ncg.getReceiverPointGap());
+		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();
 		
 		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
@@ -264,7 +256,7 @@ public class CNEBerlin {
 		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
 		merger.setReceiverPointsFile(receiverPointsFile);
 		merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
-		merger.setTimeBinSize(ncg.getTimeBinSizeNoiseComputation());
+		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
 		merger.run();

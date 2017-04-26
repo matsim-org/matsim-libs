@@ -20,7 +20,7 @@
 
 package org.matsim.deprecated.scoring.functions;
 
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 
@@ -37,9 +37,9 @@ public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicS
 	private static final double INITIAL_SCORE = 0.0;
 
 	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
+	protected final ScoringParameters params;
 
-	public CharyparNagelAgentStuckScoring(final CharyparNagelScoringParameters params) {
+	public CharyparNagelAgentStuckScoring(final ScoringParameters params) {
 		this.params = params;
 		this.reset();
 	}

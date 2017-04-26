@@ -21,54 +21,51 @@ package org.matsim.contrib.dvrp.data;
 
 import java.util.*;
 
+/**
+ * @author michalm
+ */
+public class VehicleCounter {
+	private final Collection<? extends Vehicle> vehicles;
+	private final Queue<Vehicle> waitingVehicles;
+	private final Queue<Vehicle> activeVehicles;
 
-public class VehicleCounter
-{
-    private final Collection<Vehicle> vehicles;
-    private final Queue<Vehicle> waitingVehicles;
-    private final Queue<Vehicle> activeVehicles;
+	public VehicleCounter(Collection<? extends Vehicle> vehicles) {
+		this.vehicles = vehicles;
 
+		int queueCapacity = vehicles.size();
+		this.waitingVehicles = new PriorityQueue<Vehicle>(queueCapacity, Vehicles.T0_COMPARATOR);
+		this.activeVehicles = new PriorityQueue<Vehicle>(queueCapacity, Vehicles.T1_COMPARATOR);
+	}
 
-    public VehicleCounter(Collection<Vehicle> vehicles)
-    {
-        this.vehicles = vehicles;
+	public List<Integer> countVehiclesOverTime(double timeStep) {
+		List<Integer> vehicleCounts = new ArrayList<>();
+		double currentTime = 0;
+		waitingVehicles.addAll(vehicles);
 
-        int queueCapacity = vehicles.size();
-        this.waitingVehicles = new PriorityQueue<Vehicle>(queueCapacity, Vehicles.T0_COMPARATOR);
-        this.activeVehicles = new PriorityQueue<Vehicle>(queueCapacity, Vehicles.T1_COMPARATOR);
-    }
+		while (!waitingVehicles.isEmpty() || !activeVehicles.isEmpty()) {
+			// move waiting->active
+			while (!waitingVehicles.isEmpty()) {
+				if (waitingVehicles.peek().getServiceBeginTime() > currentTime) {
+					break;
+				}
 
+				Vehicle newActiveVehicle = waitingVehicles.poll();
+				activeVehicles.add(newActiveVehicle);
+			}
 
-    public List<Integer> countVehiclesOverTime(double timeStep)
-    {
-        List<Integer> vehicleCounts = new ArrayList<>();
-        double currentTime = 0;
-        waitingVehicles.addAll(vehicles);
+			// remove from active
+			while (!activeVehicles.isEmpty()) {
+				if (activeVehicles.peek().getServiceEndTime() > currentTime) {
+					break;
+				}
 
-        while (!waitingVehicles.isEmpty() || !activeVehicles.isEmpty()) {
-            //move waiting->active
-            while (!waitingVehicles.isEmpty()) {
-                if (waitingVehicles.peek().getT0() > currentTime) {
-                    break;
-                }
+				activeVehicles.poll();
+			}
 
-                Vehicle newActiveVehicle = waitingVehicles.poll();
-                activeVehicles.add(newActiveVehicle);
-            }
+			vehicleCounts.add(activeVehicles.size());
+			currentTime += timeStep;
+		}
 
-            //remove from active
-            while (!activeVehicles.isEmpty()) {
-                if (activeVehicles.peek().getT1() > currentTime) {
-                    break;
-                }
-
-                activeVehicles.poll();
-            }
-
-            vehicleCounts.add(activeVehicles.size());
-            currentTime += timeStep;
-        }
-
-        return vehicleCounts;
-    }
+		return vehicleCounts;
+	}
 }

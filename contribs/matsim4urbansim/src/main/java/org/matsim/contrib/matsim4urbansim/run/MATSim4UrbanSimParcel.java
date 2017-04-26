@@ -24,13 +24,7 @@
 package org.matsim.contrib.matsim4urbansim.run;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -50,11 +44,11 @@ import org.matsim.contrib.accessibility.AccessibilityCalculator;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityContributionCalculator;
-import org.matsim.contrib.accessibility.ConstantSpeedModeProvider;
-import org.matsim.contrib.accessibility.FreeSpeedNetworkModeProvider;
+import org.matsim.contrib.accessibility.ConstantSpeedAccessibilityExpContributionCalculator;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityShutdownListenerV3;
-import org.matsim.contrib.accessibility.NetworkModeProvider;
-import org.matsim.contrib.accessibility.PtMatrixModeProvider;
+import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.NetworkModeAccessibilityExpContributionCalculator;
+import org.matsim.contrib.accessibility.PtMatrixAccessibilityUtils;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -86,17 +80,16 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 
-import com.google.inject.Key;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
 import com.vividsolutions.jts.geom.Geometry;
 
 
@@ -363,42 +356,6 @@ class MATSim4UrbanSimParcel{
 	 * @param controler
 	 */
 	final void addControlerListener(final ActivityFacilitiesImpl zones, final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl opportunities, final Controler controler, final PtMatrix ptMatrix) {
-		if ( computeZoneBasedAccessibilities || computeGridBasedAccessibility ) {
-			controler.addOverridingModule(new AbstractModule() {
-				@Override public void install() {
-					MapBinder<String,AccessibilityContributionCalculator> accBinder = MapBinder.newMapBinder(this.binder(), String.class, AccessibilityContributionCalculator.class);
-					{
-						String mode = "freespeed";
-						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new FreeSpeedNetworkModeProvider(TransportMode.car));
-						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					}
-					{
-						String mode = TransportMode.car;
-						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new NetworkModeProvider(mode));
-						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					}
-					{ 
-						String mode = TransportMode.bike;
-						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					}
-					{
-						final String mode = TransportMode.walk;
-						this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new ConstantSpeedModeProvider(mode));
-						accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-					}
-					{
-						final String mode = TransportMode.pt;
-						// yyyy don't know if the following works; the test case does not test it.  kai, nov'16
-						if ( ptMatrix!=null ) {
-							this.binder().bind(AccessibilityContributionCalculator.class).annotatedWith(Names.named(mode)).toProvider(new PtMatrixModeProvider(ptMatrix));
-							accBinder.addBinding(mode).to(Key.get(AccessibilityContributionCalculator.class, Names.named(mode)));
-						} 
-					}
-				}
-			});
-		}
-
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -418,25 +375,54 @@ class MATSim4UrbanSimParcel{
 				}
 
 				if(computeZoneBasedAccessibilities){
-					// creates zone based table of log sums
+					// yy the following should better use AccessibilityModule().  kai, feb'17
+
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-						@Inject Map<String, AccessibilityContributionCalculator> calculators;
+						@Inject private Map<String,TravelTime> travelTimes ;
+						@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
+						@Inject private Config config ;
+						@Inject private Network network ;
 						@Override public ControlerListener get() {
 							AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, zones);
-
-							List<String> tmp = new ArrayList<>( calculators.keySet() ) ;
-
-							// keeping control over the sequence in order to pass test:
-							final String[] array = new String [] {"freespeed", "car", "walk", "bike" };
-							LinkedHashSet<String> modes = (LinkedHashSet<String>) CollectionUtils.stringArrayToSet( array );
-							for ( String mode : modes ) {
-								tmp.remove(mode) ;
-								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
-							}
-							// add modes not contained before:
-							for ( String mode : tmp ) {
-								log.warn("Adding accessibility calculator for mode = " + mode ) ;
-								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
+//							AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
+							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+//								if ( !acg.getIsComputingMode().contains( mode ) ) {
+//									continue ;
+//								}
+								AccessibilityContributionCalculator calc = null ;
+								switch( mode ) {
+								case bike:
+									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+									break;
+								case car: {
+									final TravelTime travelTime = travelTimes.get(mode.name());
+									Gbl.assertNotNull(travelTime);
+									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+									calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
+									break; }
+								case freespeed: {
+									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
+									Gbl.assertNotNull(travelDisutilityFactory);
+									calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
+									break; }
+								case matrixBasedPt:
+									if ( ptMatrix != null ) {
+										calc = PtMatrixAccessibilityUtils.createPtMatrixAccessibilityCalculator(ptMatrix, config) ;
+									} else {
+										continue ;
+									}
+									break ;
+								case walk:
+									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+									break;
+									//$CASES-OMITTED$
+								default:
+									log.warn("Accessibility computation not implemented for mode=" + mode + ". Since this is matsim4urbansim, which is deprecated, we will continue anyways.") ;
+									calc=null ;
+								}
+								if ( calc != null ) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								}
 							}
 
 							final UrbanSimParameterConfigModuleV3 urbanSimConfig = ConfigUtils.addOrGetModule( getConfig(), UrbanSimParameterConfigModuleV3.class);
@@ -460,9 +446,13 @@ class MATSim4UrbanSimParcel{
 				}
 
 				if(computeGridBasedAccessibility){
+					// yy the following should better use AccessibilityModule().  kai, feb'17
+
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
-						@Inject Map<String, AccessibilityContributionCalculator> calculators;
-						@Inject Config config;
+						@Inject private Map<String,TravelTime> travelTimes ;
+						@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
+						@Inject private Config config ;
+						@Inject private Network network ;
 						@Override public ControlerListener get() {
 							AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 							double cellSize_m = acg.getCellSizeCellBasedAccessibility();
@@ -488,20 +478,44 @@ class MATSim4UrbanSimParcel{
 								log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
 							}
 							final AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints);
-							
-							List<String> tmp = new ArrayList<>( calculators.keySet() ) ;
-
-							// keeping control over the sequence in order to pass test:
-							final String[] array = new String [] {"freespeed", "car", "walk", "bike" };
-							LinkedHashSet<String> modes = (LinkedHashSet<String>) CollectionUtils.stringArrayToSet( array );
-							for ( String mode : modes ) {
-								tmp.remove(mode) ;
-								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
-							}
-							// add modes not contained before:
-							for ( String mode : tmp ) {
-								log.warn("Adding accessibility calculator for mode = " + mode ) ;
-								accessibilityCalculator.putAccessibilityContributionCalculator( mode, calculators.get(mode) ) ;
+							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+//								if ( !acg.getIsComputingMode().contains( mode ) ) {
+//									continue ;
+//								}
+								
+								AccessibilityContributionCalculator calc = null ;
+								switch( mode ) {
+								case bike:
+									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+									break;
+								case car: {
+									final TravelTime travelTime = travelTimes.get(mode.name());
+									Gbl.assertNotNull(travelTime);
+									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+									calc = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario) ;
+									break; }
+								case freespeed: {
+									final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
+									Gbl.assertNotNull(travelDisutilityFactory);
+									calc = new NetworkModeAccessibilityExpContributionCalculator( new FreeSpeedTravelTime(), travelDisutilityFactory, scenario) ;
+									break; }
+								case pt:
+									if ( ptMatrix != null ) {
+										calc = PtMatrixAccessibilityUtils.createPtMatrixAccessibilityCalculator(ptMatrix, config) ;
+									} else {
+										continue ;
+									}
+									break ;
+								case walk:
+									calc = new ConstantSpeedAccessibilityExpContributionCalculator( mode.name(), config, network);
+									break;
+								default:
+									log.warn("Accessibility computation not implemented for mode=" + mode + ". Since this is matsim4urbansim, which is deprecated, we will continue anyways.") ;
+									calc=null ;
+								}
+								if ( calc != null ) {
+									accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calc ) ;
+								}
 							}
 							
 							final GridBasedAccessibilityShutdownListenerV3 gbacl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, opportunities, ptMatrix, scenario, boundingBox, cellSize_m);

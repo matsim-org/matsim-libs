@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * For performance reasons.
@@ -49,6 +51,11 @@ public final class PlanWithCachedJointPlan implements Plan {
 	private final int[] keys = new int[ SIZE ];
 
 	private int accessCount = 0;
+	private final Attributes attributes = new Attributes();
+	@Override
+	public final Attributes getAttributes() {
+		return this.attributes;
+	}
 
 	public PlanWithCachedJointPlan( final Person person ) {
 		delegate = PopulationUtils.createPlan(person) ;
@@ -178,6 +185,14 @@ public final class PlanWithCachedJointPlan implements Plan {
 	public final void copyFrom( Plan in) {
 		// yy we really need a more systematic way for plans copying.  kai, nov15
 		PopulationUtils.copyFromTo(in, delegate);
+	}
+
+	@Override
+	public String toString() {
+		return "PlanWithCachedJointPlan{" +
+				"delegate=" + delegate +
+				", jointPlans=" + Arrays.toString( jointPlans ) +
+				'}';
 	}
 }
 

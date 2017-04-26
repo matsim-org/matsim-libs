@@ -19,36 +19,26 @@
 
 package org.matsim.contrib.util;
 
-public abstract class AbstractEnumAdder<K extends Enum<K>, N extends Number>
-    implements EnumAdder<K, N>
-{
-    protected final K[] keys;
+public abstract class AbstractEnumAdder<K extends Enum<K>, N extends Number> implements EnumAdder<K, N> {
+	protected final K[] keys;
 
+	public AbstractEnumAdder(Class<K> clazz) {
+		this.keys = clazz.getEnumConstants();
+	}
 
-    public AbstractEnumAdder(Class<K> clazz)
-    {
-        this.keys = clazz.getEnumConstants();
-    }
+	public K[] getKeys() {
+		return keys;
 
+	}
 
-    public K[] getKeys()
-    {
-        return keys;
+	public void increment(K e) {
+		add(e, 1);// (Integer)1 is cached internally by JVM, so shouldn't be so costly
+	}
 
-    }
-
-
-    public void increment(K e)
-    {
-        add(e, 1);//(Integer)1 is cached internally by JVM, so shouldn't be so costly
-    }
-
-
-    @Override
-    public void addAll(EnumAdder<K, ?> enumAdder)
-    {
-        for (K e : keys) {
-            add(e, enumAdder.get(e));
-        }
-    }
+	@Override
+	public void addAll(EnumAdder<K, ?> enumAdder) {
+		for (K e : keys) {
+			add(e, enumAdder.get(e));
+		}
+	}
 }

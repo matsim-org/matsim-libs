@@ -1,7 +1,6 @@
 package playground.kairuns.run;
 
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -19,15 +18,10 @@ import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.config.groups.QSimConfigGroup.InflowConstraint;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.controler.PrepareForSim;
-import org.matsim.core.controler.PrepareForSimMultimodalImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -254,11 +248,11 @@ public final class KNBerlinControler {
 			config.qsim().setFlowCapFactor(100);
 			config.qsim().setStorageCapFactor(100);
 		} else {
-			config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
+			config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves); // this means, using with holes AND constraining inflow from maxFlowFromFdiag.
 
-			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
-				config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
-			}
+//			if ( config.qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
+//				config.qsim().setInflowConstraint(InflowConstraint.maxflowFromFdiag);
+//			}
 		}
 
 		config.qsim().setNumberOfThreads(6);

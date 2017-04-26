@@ -47,6 +47,7 @@ public class DigicoreChainExtractorTest {
 			@SuppressWarnings("unused")
 			DigicoreChainExtractor dce = setup();
 		} catch(Exception r){
+			r.printStackTrace();
 			fail("Should have created class without exceptions.");
 		}
 	}

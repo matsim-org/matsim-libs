@@ -6,8 +6,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -19,20 +19,20 @@ import java.util.Map;
 /**
  * Created by artemc on 24/06/16.
  */
-public class HeterogeneousSubpopulationScoringParameters implements CharyparNagelScoringParametersForPerson {
+public class HeterogeneousSubpopulationScoringParameters implements ScoringParametersForPerson {
 
 	private final PlanCalcScoreConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
 	private final ObjectAttributes personAttributes;
 	private final String subpopulationAttributeName;
-	private final Map<String, CharyparNagelScoringParameters> params = new HashMap<>();
+	private final Map<String, ScoringParameters> params = new HashMap<>();
 
 	private final Scenario scenario;
 	private final String heterogeneityType;
 
 	// Save indvidual scoring parametrs in a map in order to prevents re-generation of person parameters each call/iteration.
-	private Map<Id<Person>,CharyparNagelScoringParameters> individualScoringParamters = new HashMap<>();
+	private Map<Id<Person>,ScoringParameters> individualScoringParamters = new HashMap<>();
 	// private Map<Id<Person>,String> personToSubpopulation = new HashMap<>();
 
 	@javax.inject.Inject
@@ -51,7 +51,7 @@ public class HeterogeneousSubpopulationScoringParameters implements CharyparNage
 	}
 
 	@Override
-	public CharyparNagelScoringParameters getScoringParameters(Person person) {
+	public ScoringParameters getScoringParameters(Person person) {
 
 		final String subpopulation = (String) personAttributes.getAttribute(person.getId().toString(),
 				                                                                   subpopulationAttributeName);
@@ -62,7 +62,7 @@ public class HeterogeneousSubpopulationScoringParameters implements CharyparNage
 			 * values in them due to using the same config. Still much better from a memory performance
 			 * point of view than giving each ScoringFunction its own copy of the params.
 			 */
-			CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(this.config, this.config.getScoringParameters(subpopulation), scConfig);
+			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, this.config.getScoringParameters(subpopulation), scConfig);
 			if (transitConfigGroup.isUseTransit()) {
 				// yyyy this should go away somehow. :-)
 
@@ -85,7 +85,7 @@ public class HeterogeneousSubpopulationScoringParameters implements CharyparNage
 
 			if (individualScoringParamters.containsKey(person.getId())) return individualScoringParamters.get(person.getId());
 
-			CharyparNagelScoringParameters parameters = params.get(subpopulation);
+			ScoringParameters parameters = params.get(subpopulation);
 
 			if(heterogeneityType.equals("hetero")) {
 				ProportionalHeterogeneityScoringParametersBuilder heterogeneousScoringParametersBuilder = new ProportionalHeterogeneityScoringParametersBuilder(scenario);

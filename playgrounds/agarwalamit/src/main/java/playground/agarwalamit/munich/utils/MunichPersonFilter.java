@@ -18,9 +18,11 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.utils;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -40,7 +42,12 @@ public class MunichPersonFilter extends PersonFilter implements playground.agarw
 	public String getUserGroupAsStringFromPersonId (final Id<Person> personId) {
 		return getMunichUserGroupFromPersonId(personId).toString();
 	}
-	
+
+	@Override
+	public List<String> getUserGroupsAsStrings() {
+		return Arrays.stream(MunichUserGroup.values()).map(Enum::toString).collect(Collectors.toList());
+	}
+
 	/**
 	 * @return Urban or (Rev) commuter or Freight from person id.
 	 */
@@ -56,11 +63,11 @@ public class MunichPersonFilter extends PersonFilter implements playground.agarw
 	 */
 	public MunichUserGroup getMunichUserGroup(final UserGroup ug){
 		switch(ug){
-		case REV_COMMUTER:
-		case COMMUTER: return MunichUserGroup.Rev_Commuter;
-		case FREIGHT: return MunichUserGroup.Freight;
-		case URBAN: return MunichUserGroup.Urban;
-		default: throw new RuntimeException("User group "+ug+" is not recongnised. Aborting ...");
+			case REV_COMMUTER:
+			case COMMUTER: return MunichUserGroup.Rev_Commuter;
+			case FREIGHT: return MunichUserGroup.Freight;
+			case URBAN: return MunichUserGroup.Urban;
+			default: throw new RuntimeException("User group "+ug+" is not recongnised. Aborting ...");
 		}
 	}
 }

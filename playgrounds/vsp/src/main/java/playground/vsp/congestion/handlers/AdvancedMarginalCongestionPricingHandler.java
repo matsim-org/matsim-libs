@@ -43,9 +43,10 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 
 import playground.vsp.congestion.events.CongestionEvent;
@@ -68,6 +69,8 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	private final Scenario scenario;
 	private final EventsManager events;
 	
+	private double factor = 1.0;
+	
 	private double amountSum = 0.;
 	
 	private Map<Id<Person>, Double> affectedPersonId2delayToProcess = new HashMap<Id<Person>, Double>();
@@ -82,14 +85,20 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	private MarginalSumScoringFunction marginaSumScoringFunction;
 	
 	public AdvancedMarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario) {
+		this(eventsManager, scenario, 1.0);
+	}
+	
+	public AdvancedMarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario, double factor) {
+		log.info("Using the toll factor " + factor);
 		log.info("Using different VTTS to translate delays into monetary units. Computing the actual activity delay costs for each agent.");
 		
 		this.events = eventsManager;
 		this.scenario = scenario;
-
+		this.factor = factor;
+		
 		this.marginaSumScoringFunction =
 				new MarginalSumScoringFunction(
-						new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build());
+						new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build());
 	}
 
 	@Override
@@ -182,7 +191,6 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			// The agent was delayed on the previous trip...
 			// ... now calculate the agent's disutility from being late at the current activity: score(arrivalTime_ohneDelay) - score(arrivalTime_withDelay)			
 			double activityDelayDisutility = 0.;
-//			double activityDelayDisutilityOneSec = 0.;
 			
 			// First, check if the plan completed is completed, i.e. if the agent has arrived at an activity (after being delayed)
 			if (this.personId2currentActivityType.containsKey(personId) && this.personId2currentActivityStartTime.containsKey(personId)) {
@@ -200,8 +208,6 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 					activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
 						
 					activityDelayDisutility = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activityMorning, activityEvening, totalDelayThisPerson);
-//					activityDelayDisutilityOneSec = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activityMorning, activityEvening, 1.0);
-
 					
 				} else {
 					// The activity has an end time indicating a 'normal' activity.
@@ -210,7 +216,6 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 					activity.setStartTime(this.personId2currentActivityStartTime.get(personId));
 					activity.setEndTime(activityEndTime);	
 					activityDelayDisutility = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity, totalDelayThisPerson);
-//					activityDelayDisutilityOneSec = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity, 1.);
 				}
 				
 			} else {
@@ -227,17 +232,14 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 					incompletedPlanWarning++;
 				}
 				activityDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().planCalcScore().getPerforming_utils_hr();
-//				activityDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getPerforming_utils_hr();
 			}
 			
 			// Calculate the agent's trip delay disutility (could be done similar to the activity delay disutility).
 			double tripDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() * (-1);
-//			double tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
 			
 			// Translate the disutility into monetary units.
 			double totalDelayCost = (activityDelayDisutility + tripDelayDisutility) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 			double delayCostPerSecond = totalDelayCost / totalDelayThisPerson;
-//			double delayCostPerSec_usingActivityDelayOneSec = (activityDelayDisutilityOneSec + tripDelayDisutilityOneSec) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 			
 			// store the VTTS for analysis purposes
 			if (this.personId2VTTSh.containsKey(personId)) {
@@ -251,7 +253,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			
 			for (CongestionEvent congestionEvent : this.affectedPersonId2congestionEventsToProcess.get(personId)) {
 				
-				double amount = congestionEvent.getDelay() * delayCostPerSecond * (-1);
+				double amount = this.factor * congestionEvent.getDelay() * delayCostPerSecond * (-1);
 				this.amountSum = this.amountSum + amount;
 				
 				if (activityEndTime == Time.UNDEFINED_TIME) {
@@ -259,7 +261,10 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 				}
 				
 				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount);				
-				this.events.processEvent(moneyEvent);				
+				this.events.processEvent(moneyEvent);
+				
+				PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), congestionEvent.getLinkId(), amount, congestionEvent.getEmergenceTime());
+				this.events.processEvent(linkMoneyEvent);
 			}
 		}
 	}

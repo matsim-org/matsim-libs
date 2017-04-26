@@ -50,7 +50,7 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.linkVolume.FilteredLinkVolumeHandler;
+import playground.agarwalamit.analysis.linkVolume.ModeFilterLinkVolumeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
@@ -60,7 +60,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
  * Created by amit on 24/11/2016.
  */
 
-public class BikeConnectorControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+class BikeConnectorControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
     private static final Logger LOG = Logger.getLogger(PatnaBikeTrackConnectionControler.class);
     private static final List<String> allowedModes = Arrays.asList(TransportMode.bike);
@@ -70,7 +70,7 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
     private final int initialStabilizationIterations ;
 
     private final List<Id<Link>> removedConnectorLinks = new ArrayList<>();
-    private final FilteredLinkVolumeHandler handler = new FilteredLinkVolumeHandler(allowedModes);
+    private final ModeFilterLinkVolumeHandler handler = new ModeFilterLinkVolumeHandler(allowedModes);
 
     private final List<Id<Link>> bikeConnectorLinks = new ArrayList<>(); // in total 500 links will be added to the list.
     private int totalPossibleConnectors = 0;
@@ -86,7 +86,6 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
 
 
     private boolean terminateSimulation = false;
-    private PlanAlgorithm router;
 
     public BikeConnectorControlerListener(final int numberOfConnectorsRequired, final int removeOneConnectorAfterIteration, final int initialStabilizationIterations) {
         this.numberOfBikeConnectorsRequired = numberOfConnectorsRequired;
@@ -198,7 +197,7 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
     }
 
     private void reRoutePlan(final Id<Link> linkId) {
-        this.router = getRouter();
+        PlanAlgorithm router = getRouter();
         for (Person p : this.scenario.getPopulation().getPersons().values()) {
             for (Plan plan : p.getPlans()) {
                 boolean needsReRoute = false;
@@ -211,7 +210,7 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
                         }
                     }
                 }
-                if (needsReRoute) this.router.run(plan);
+                if (needsReRoute) router.run(plan);
             }
         }
     }
@@ -225,7 +224,6 @@ public class BikeConnectorControlerListener implements StartupListener, Iteratio
 //                new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.bike, scenario.getConfig().planCalcScore()).createTravelDisutility(travelTime));
 
         final TripRouter tripRouter = routerFactory.build(this.scenario).get();
-        PlanAlgorithm router = new PlanRouter(tripRouter);
-        return router;
+        return new PlanRouter(tripRouter);
     }
 }

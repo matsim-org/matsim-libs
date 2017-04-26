@@ -47,7 +47,7 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -150,13 +150,13 @@ public class MATSimUtils {
 		
 		new PopulationReader(this.scenario).readFile(this.plansFile);		
 		final Population plans = (Population) this.scenario.getPopulation();
-		StreamingUtils.setIsStreaming(plans, true);
+		StreamingDeprecated.setIsStreaming(plans, true);
 		
 		final MatsimReader plansReader = new PopulationReader(this.scenario);
-		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter(plans, network);
+		final StreamingPopulationWriter plansWriter = new StreamingPopulationWriter();
 		
 
-		StreamingUtils.addAlgorithm(plans, plansWriter);
+		StreamingDeprecated.addAlgorithm(plans, plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plansWriter.startStreaming(this.outPlansFile);
 		PlansFilterNoRoute pf = new PlansFilterNoRoute();

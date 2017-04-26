@@ -30,10 +30,10 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.FacilityOpeningIntervalCalculator;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 /**
  * Generates {@link CharyparNagelOpenTimesActivityScoring}s.
@@ -44,17 +44,17 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 
     private Scenario scenario;
 	private PlanCalcScoreConfigGroup config;
-	private CharyparNagelScoringParametersForPerson parametersForPerson;
+	private ScoringParametersForPerson parametersForPerson;
 
     public CharyparNagelOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
     	this.config = config;
 		this.scenario = scenario;
-		this.parametersForPerson = new SubpopulationCharyparNagelScoringParameters( scenario );
+		this.parametersForPerson = new SubpopulationScoringParameters( scenario );
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
+		final ScoringParameters params = parametersForPerson.getScoringParameters( person );
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		//sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params, new FacilityOpeningIntervalCalculator(scenario.getActivityFacilities())));

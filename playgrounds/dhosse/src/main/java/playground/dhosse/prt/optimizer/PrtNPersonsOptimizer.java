@@ -11,24 +11,24 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 	
 	public PrtNPersonsOptimizer(TaxiOptimizerContext optimContext) {
 		
-		super(optimContext, null, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), false);
+		super(optimContext, null, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), false, false);
 		
 	}
 	
 	@Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        if (requiresReoptimization) {
+        if (isRequiresReoptimization()) {
             scheduleUnplannedRequests();
-            if(this.unplannedRequests.size() < 1){
-                requiresReoptimization = false;
+            if(this.getUnplannedRequests().size() < 1){
+                setRequiresReoptimization(false);
             }
         }
     }
 
 	protected void scheduleUnplannedRequests() {
 		
-		new NPersonsProblem(optimContext).scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
+		new NPersonsProblem(getOptimContext()).scheduleUnplannedRequests((Queue<TaxiRequest>)getUnplannedRequests());
 		
 	}
 

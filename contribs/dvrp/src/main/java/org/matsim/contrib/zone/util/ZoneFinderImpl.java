@@ -29,88 +29,77 @@ import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
+public class ZoneFinderImpl implements ZoneFinder {
+	private final SpatialIndex quadTree = new Quadtree();
+	private final double expansionDistance;
 
-public class ZoneFinderImpl
-    implements ZoneFinder
-{
-    private final SpatialIndex quadTree = new Quadtree();
-    private final double expansionDistance;
+	public ZoneFinderImpl(Map<Id<Zone>, Zone> zones, double expansionDistance) {
+		this.expansionDistance = expansionDistance;
 
+		for (Zone z : zones.values()) {
+			quadTree.insert(z.getMultiPolygon().getEnvelopeInternal(), z);
+		}
+	}
 
-    public ZoneFinderImpl(Map<Id<Zone>, Zone> zones, double expansionDistance)
-    {
-        this.expansionDistance = expansionDistance;
+	@Override
+	@SuppressWarnings("unchecked")
+	public Zone findZone(Coord coord) {
+		Point point = MGC.coord2Point(coord);
+		Envelope env = point.getEnvelopeInternal();
 
-        for (Zone z : zones.values()) {
-            quadTree.insert(z.getMultiPolygon().getEnvelopeInternal(), z);
-        }
-    }
+		Zone zone = getSmallestZoneContainingPoint(quadTree.query(env), point);
+		if (zone != null) {
+			return zone;
+		}
 
+		if (expansionDistance > 0) {
+			env.expandBy(expansionDistance);
+			zone = getNearestZone(quadTree.query(env), point);
+		}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Zone findZone(Coord coord)
-    {
-        Point point = MGC.coord2Point(coord);
-        Envelope env = point.getEnvelopeInternal();
+		return zone;
+	}
 
-        Zone zone = getSmallestZoneContainingPoint(quadTree.query(env), point);
-        if (zone != null) {
-            return zone;
-        }
+	private Zone getSmallestZoneContainingPoint(List<Zone> zones, Point point) {
+		if (zones.size() == 1) {// almost 100% cases
+			return zones.get(0);
+		}
 
-        if (expansionDistance > 0) {
-            env.expandBy(expansionDistance);
-            zone = getNearestZone(quadTree.query(env), point);
-        }
+		double minArea = Double.MAX_VALUE;
+		Zone smallestZone = null;
 
-        return zone;
-    }
+		for (Zone z : zones) {
+			if (z.getMultiPolygon().contains(point)) {
+				double area = z.getMultiPolygon().getArea();
+				if (area < minArea) {
+					minArea = area;
+					smallestZone = z;
+				}
+			}
+		}
 
+		return smallestZone;
+	}
 
-    private Zone getSmallestZoneContainingPoint(List<Zone> zones, Point point)
-    {
-        if (zones.size() == 1) {//almost 100% cases
-            return zones.get(0);
-        }
+	private Zone getNearestZone(List<Zone> zones, Point point) {
+		if (zones.size() == 1) {
+			return zones.get(0);
+		}
 
-        double minArea = Double.MAX_VALUE;
-        Zone smallestZone = null;
+		double minDistance = Double.MAX_VALUE;
+		Zone nearestZone = null;
 
-        for (Zone z : zones) {
-            if (z.getMultiPolygon().contains(point)) {
-                double area = z.getMultiPolygon().getArea();
-                if (area < minArea) {
-                    minArea = area;
-                    smallestZone = z;
-                }
-            }
-        }
+		for (Zone z : zones) {
+			double distance = z.getMultiPolygon().distance(point);
+			if (distance <= expansionDistance) {
+				if (distance < minDistance) {
+					minDistance = distance;
+					nearestZone = z;
+				}
+			}
+		}
 
-        return smallestZone;
-    }
-
-
-    private Zone getNearestZone(List<Zone> zones, Point point)
-    {
-        if (zones.size() == 1) {
-            return zones.get(0);
-        }
-
-        double minDistance = Double.MAX_VALUE;
-        Zone nearestZone = null;
-
-        for (Zone z : zones) {
-            double distance = z.getMultiPolygon().distance(point);
-            if (distance <= expansionDistance) {
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearestZone = z;
-                }
-            }
-        }
-
-        return nearestZone;
-    }
+		return nearestZone;
+	}
 
 }

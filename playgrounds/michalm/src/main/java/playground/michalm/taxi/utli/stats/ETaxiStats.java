@@ -21,31 +21,22 @@ package playground.michalm.taxi.utli.stats;
 
 import org.matsim.contrib.util.*;
 
+public class ETaxiStats {
+	public enum ETaxiState {
+		QUEUED, PLUGGED;
+	}
 
-public class ETaxiStats
-{
-    public enum ETaxiState
-    {
-        QUEUED, PLUGGED;
-    }
+	public final String id;
 
+	public final EnumAdder<ETaxiState, Long> stateTimeSumsByState = new LongEnumAdder<>(ETaxiState.class);
 
-    public final String id;
+	public ETaxiStats(String id) {
+		this.id = id;
+	}
 
-    public final EnumAdder<ETaxiState, Long> stateTimeSumsByState = new LongEnumAdder<>(
-            ETaxiState.class);
-
-
-    public ETaxiStats(String id)
-    {
-        this.id = id;
-    }
-
-
-    public double getFleetQueuedTimeRatio()
-    {
-        double queued = stateTimeSumsByState.get(ETaxiState.QUEUED);
-        double plugged = stateTimeSumsByState.get(ETaxiState.PLUGGED);
-        return queued / (queued + plugged);
-    }
+	public double getFleetQueuedTimeRatio() {
+		double queued = stateTimeSumsByState.get(ETaxiState.QUEUED);
+		double plugged = stateTimeSumsByState.get(ETaxiState.PLUGGED);
+		return queued / (queued + plugged);
+	}
 }

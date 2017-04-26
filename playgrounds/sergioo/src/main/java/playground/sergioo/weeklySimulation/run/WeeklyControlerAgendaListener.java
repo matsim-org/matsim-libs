@@ -78,13 +78,13 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		final MatsimServices controler = event.getServices();
         TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
         Network net = NetworkUtils.createNetwork();
-		HashSet<String> carMode = new HashSet<String>();
+		HashSet<String> carMode = new HashSet<>();
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLinkExactly(((Network)net),facility.getCoord()).getId());
-		Collection<Person> toBeAdded = new ArrayList<Person>();
-		Set<String> modes = new HashSet<String>();
+		Collection<Person> toBeAdded = new ArrayList<>();
+		Set<String> modes = new HashSet<>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
 		if(controler.getConfig().transit().isUseTransit())
 			modes.add("pt");
@@ -113,10 +113,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		new SocialNetworkReader(scenario).readFile(args.length>1 ? args[1] : null);
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().put("empty", 0.0);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.setScoringFunctionFactory(new CharyparNagelWeekScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.addControlerListener(new LegHistogramListener(controler.getEvents()));
 		controler.addControlerListener(new WeeklyControlerAgendaListener(new Boolean(args[2])));

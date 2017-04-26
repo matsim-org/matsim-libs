@@ -15,8 +15,7 @@ public class PrtRequestCreator implements PassengerRequestCreator {
 	@Override
 	public PassengerRequest createRequest(Id<Request> id,
 			MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-			double t0, double t1, double now) {
-		return new TaxiRequest(id, passenger, fromLink, toLink, t0, now);
+			double departureTime, double submissionTime) {
+		return new TaxiRequest(id, passenger, fromLink, toLink, departureTime, submissionTime);
 	}
-	
 }

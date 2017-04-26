@@ -1,6 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * CadytsController.java
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,7 +25,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class StandardController {
-	//private final static Logger log = Logger.getLogger(StandardController.class);
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]) ;

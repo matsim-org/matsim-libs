@@ -33,7 +33,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-
+@Deprecated
 public class AccessibilityComputationNMBWorkEquiv {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBWorkEquiv.class);
 	

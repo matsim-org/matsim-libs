@@ -35,7 +35,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.distributions.LegModeDepartureArrivalTimeHandler;
+import playground.agarwalamit.analysis.activity.departureArrival.LegModeDepartureArrivalTimeHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -48,7 +48,6 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalysisMod
 	private final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeDistribution.class);
 	private final LegModeDepartureArrivalTimeHandler lmdah;
 	private Map<String, Map<Id<Person>, List<Double> >> mode2PersonId2DepartureTime;
-	private Map<String, Map<Id<Person>, List<Double> >> mode2PersonId2ArrivalTime;
 	private final List<Integer> timeStepClasses;
 	private final List<String> travelModes;
 	private SortedMap<String, Map<Integer, Integer>> mode2DepartureTimeClasses2LegCount;
@@ -102,11 +101,10 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalysisMod
 	@Override
 	public void postProcessData() {
 		this.mode2PersonId2DepartureTime = this.lmdah.getLegMode2PersonId2DepartureTime();
-		this.mode2PersonId2ArrivalTime=this.lmdah.getLegMode2PersonId2ArrivalTime();
 		initializeTimeStepClasses();
 		getTravelModes();
 		this.mode2DepartureTimeClasses2LegCount = calculateMode2DepOrArrTimeClases2LegCount(this.mode2PersonId2DepartureTime);
-		this.mode2ArrivalTimeClasses2LegCount = calculateMode2DepOrArrTimeClases2LegCount(this.mode2PersonId2ArrivalTime);
+		this.mode2ArrivalTimeClasses2LegCount = calculateMode2DepOrArrTimeClases2LegCount(this.lmdah.getLegMode2PersonId2ArrivalTime());
 	}
 
 	private SortedMap<String, Map<Integer, Integer>> calculateMode2DepOrArrTimeClases2LegCount (Map<String, Map<Id<Person>, List<Double> >> mode2personId2DepOrArrTime) {

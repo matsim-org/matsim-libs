@@ -50,7 +50,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.southafrica.freight.digicore.algorithms.concaveHull.ConcaveHull;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.ClusterActivity;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.DigicoreCluster;
-import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
+import playground.southafrica.freight.digicore.algorithms.postclustering.ClusteredChainGenerator;
+import playground.southafrica.freight.digicore.algorithms.postclustering.FacilityToActivityAssigner;
+import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
+import playground.southafrica.freight.digicore.io.DigicoreVehiclesReader;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
@@ -68,7 +72,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Class to cluster the activities of Digicore vehicles' activity chains using
  * the {@link DJCluster} approach. Once clustered, the activity chains are <i>not</i>
  * adjusted. Rather, the clustering outputs can be used as inputs to a class 
- * such as {@link ClusteredChainGenerator}. 
+ * such as {@link ClusteredChainGenerator} (now deprecated) or {@link FacilityToActivityAssigner}. 
  *
  * @author jwjoubert
  */
@@ -85,15 +89,17 @@ public class DigicoreClusterRunner {
 	 * Clustering the minor activities from Digicore vehicle chains. The following
 	 * parameters are required, and in the following order:
 	 * <ol>
-	 * 		<li> absolute path of the folder containing the Digicore vehicle files,
-	 * 			 in XML-format;
-	 * 		<li> the shapefile within which activities will be clustered. Activities
+	 * 		<li> the input source. This may be an absolute path of the folder 
+	 * 			 containing the Digicore vehicle files, in XML-format, or the
+	 			 {@link DigicoreVehicles} container file. The former (XML folder)
+	 			 is deprecated but still retained for backward compatibility.
+	 * 		<li> The shapefile within which activities will be clustered. Activities
 	 * 			 outside the shapefile are ignored. NOTE: It is actually recommended
 	 * 			 that smaller demarcation areas, such as the Geospatial Analysis 
 	 * 			 Platform (GAP) zones, be used.
-	 * 		<li> field of the shapefile that will be used as identifier;
-	 * 		<li> number of threads to use for the run;
-	 * 		<li> absolute path of the output folder to which the facilities, 
+	 * 		<li> Field of the shapefile that will be used as identifier;
+	 * 		<li> Number of threads to use for the run;
+	 * 		<li> Absolute path of the output folder to which the facilities, 
 	 * 		     facility attributes, and the facility CSV file will be written.
 	 * </ol>
 	 * @param args
@@ -102,7 +108,7 @@ public class DigicoreClusterRunner {
 		long jobStart = System.currentTimeMillis();
 		Header.printHeader(DigicoreClusterRunner.class.toString(), args);
 
-		String sourceFolder = args[0];
+		String input = args[0];
 		String shapefile = args[1];
 		int idField = Integer.parseInt(args[2]);
 		int numberOfThreads = Integer.parseInt(args[3]);
@@ -112,7 +118,7 @@ public class DigicoreClusterRunner {
 		LOG.info(" Reading points to cluster...");
 		DigicoreClusterRunner dcr = new DigicoreClusterRunner(numberOfThreads);
 		try {
-			dcr.buildPointLists(sourceFolder, shapefile, idField);
+			dcr.buildPointLists(input, shapefile, idField);
 		} catch (IOException e) {
 			throw new RuntimeException("Could not build minor points list.");
 		}
@@ -123,8 +129,8 @@ public class DigicoreClusterRunner {
 		LOG.info(" Clustering the points...");
 		
 		/* These values should be set following Meintjes and Joubert, City Logistics paper? */
-		double[] radii = {20}; ////, 10, 15, 20, 25, 30, 35, 40};
-		int[] pmins = {20}; //, 10, 15, 20, 25};
+		double[] radii = {10}; ////, 10, 15, 20, 25, 30, 35, 40};
+		int[] pmins = {10}; //, 10, 15, 20, 25};
 
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
@@ -138,7 +144,7 @@ public class DigicoreClusterRunner {
 				String outputFolder = String.format("%s%.0f_%d/", outputFolderName, thisRadius, thisPmin);
 				String theFacilityFile = outputFolder + String.format("%.0f_%d_facilities.xml.gz", thisRadius, thisPmin);
 				String theFacilityAttributeFile = outputFolder + String.format("%.0f_%d_facilityAttributes.xml.gz", thisRadius, thisPmin);
-				String theFacilityCsvFile = outputFolder + String.format("%.0f_%d_facilityCsv.csv", thisRadius, thisPmin);
+				String theFacilityCsvFile = outputFolder + String.format("%.0f_%d_facilityCsv.csv.gz", thisRadius, thisPmin);
 				String facilityPointFolder = String.format("%sfacilityPoints/", outputFolder);
 				
 				/* Create the output folders. If it exists... first delete it. */
@@ -314,7 +320,7 @@ public class DigicoreClusterRunner {
 					 * Update (20130627): Or, rather write out the concave hull. */
 					/* FIXME Consider 'not' writing the facilities to file, as 
 					 * this takes up a HUGE amount of disk space (JWJ Nov '13) */
-					String clusterFile = String.format("%s%.0f_%d_points_%s.csv", outputFolder, radius, minimumPoints, facilityId.toString());
+					String clusterFile = String.format("%s%.0f_%d_points_%s.csv.gz", outputFolder, radius, minimumPoints, facilityId.toString());
 					BufferedWriter bw = IOUtils.getBufferedWriter(clusterFile);
 					try{
 						bw.write("Long,Lat");
@@ -352,12 +358,12 @@ public class DigicoreClusterRunner {
 	 * Reads all activities from extracted Digicore vehicle files in a (possibly)
 	 * multi-threaded manner. This used to only read in 'minor' points, but since
 	 * July 2013, it now reads in <i>all</i> activity types.
-	 * @param sourceFolder
+	 * @param source
 	 * @param shapefile
 	 * @param idField
 	 * @throws IOException
 	 */
-	private void buildPointLists(String sourceFolder, String shapefile, int idField) throws IOException {
+	private void buildPointLists(String source, String shapefile, int idField) throws IOException {
 		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
 		mfr.readMultizoneShapefile(shapefile, idField);
 		List<MyZone> zoneList = mfr.getAllZones();
@@ -380,11 +386,27 @@ public class DigicoreClusterRunner {
 		}
 		LOG.info("Done building QuadTree.");
 				
-		/* Read the activities from vehicle files. */
+		/* Read the activities from vehicle files. If the input is a single 
+		 * DigicoreVehicles file, then the single (V2) container will be read, 
+		 * and each vehicle will be passed to the multi-threaded infrastructure. 
+		 * Alternatively, if the input is a folder containing individual (V1) 
+		 * DigicoreVehicle files, then they will be sampled, and each will be
+		 * read by the multi-threaded infrastructure. */
 		long startTime = System.currentTimeMillis();
 
-		File folder = new File(sourceFolder);
-		List<File> vehicleList = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter("xml.gz"));
+		
+		List<Object> vehicles = new ArrayList<>();
+		File folder = new File(source);
+		if(folder.isFile() && source.endsWith("xml.gz")){
+			/* It is a V2 DigicoreVehicles container. */
+			DigicoreVehicles dvs = new DigicoreVehicles();
+			new DigicoreVehiclesReader(dvs).readFile(source);
+			vehicles.addAll(dvs.getVehicles().values());
+		} else if(folder.isDirectory()){
+			/* It is a folder with individual V1 DigicoreVehicle files. */
+			List<File> vehicleList = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter("xml.gz"));
+			vehicles.addAll(vehicleList);
+		}
 		int inActivities = 0;
 		int outActivities = 0;
 
@@ -396,23 +418,34 @@ public class DigicoreClusterRunner {
 		Counter counter = new Counter("   Vehicles completed: ");
 
 		/* Set up the output infrastructure:
-		 * Create a new map with an empty list for each zone. These will be passed to threads later. */
+		 * Create a new map with an empty list for each zone. These will be 
+		 * passed to threads later. */
 		zoneMap = new HashMap<Id<MyZone>, List<Coord>>();
 		for(MyZone mz : zoneList){
 			zoneMap.put(mz.getId(), new ArrayList<Coord>());
 		}
 		Map<Id<MyZone>, List<Coord>> theMap = null;
 		
-		while(vehicleCounter < vehicleList.size()){
+		while(vehicleCounter < vehicles.size()){
 			int blockCounter = 0;
 			threadExecutor = Executors.newFixedThreadPool(this.numberOfThreads);
 			threadList = new ArrayList<DigicoreActivityReaderRunnable>();
 			
 			/* Assign the jobs in blocks. */
-			while(blockCounter++ < BLOCK_SIZE && vehicleCounter < vehicleList.size()){
-				File vehicleFile = vehicleList.get(vehicleCounter++);
+			while(blockCounter++ < BLOCK_SIZE && vehicleCounter < vehicles.size()){
+				Object o = vehicles.get(vehicleCounter++);
+				DigicoreActivityReaderRunnable rdar;
+				if(o instanceof DigicoreVehicle){
+					DigicoreVehicle vehicle = (DigicoreVehicle)o;
+					rdar = new DigicoreActivityReaderRunnable(vehicle, zoneQT, counter);
+				} else if(o instanceof File){
+					// This is just kept for backward compatability.
+					File vehicleFile = (File)o;
+					rdar = new DigicoreActivityReaderRunnable(vehicleFile, zoneQT, counter);
+				} else{
+					throw new RuntimeException("Don't know what to do with a list with types " + o.getClass().toString());
+				}
 
-				DigicoreActivityReaderRunnable rdar = new DigicoreActivityReaderRunnable(vehicleFile, zoneQT, counter);
 				threadList.add(rdar);
 				threadExecutor.execute(rdar);
 			}

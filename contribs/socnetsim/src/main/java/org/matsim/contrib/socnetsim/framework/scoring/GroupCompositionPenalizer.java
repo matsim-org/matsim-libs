@@ -19,12 +19,20 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.scoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
-
 import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
+import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
+import org.matsim.core.utils.misc.Time;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Scoring element that computes a penalty for "joint activities"
@@ -36,12 +44,12 @@ import org.matsim.contrib.socnetsim.framework.events.CourtesyEvent;
  * @author thibautd
  */
 public class GroupCompositionPenalizer implements ArbitraryEventScoring {
+	private static final Logger log = Logger.getLogger( GroupCompositionPenalizer.class );
 	private final UtilityOfTimeCalculator utilityCalculator;
 
 	private final String activityType;
 
-	private boolean inAct = false;
-	private double lastChangeInNCoparticipants = Double.NaN;
+	private double lastChangeInNCoparticipants = -1;
 	private int currentNCoparticipants = 0;
 
 	private double score = 0;
@@ -54,9 +62,7 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 	}
 
 	@Override
-	public void finish() {
-
-	}
+	public void finish() {}
 
 	@Override
 	public double getScore() {
@@ -66,26 +72,36 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 	@Override
 	public void handleEvent( final Event event ) {
 		if ( event instanceof ActivityStartEvent ) {
-			startActivity( ( ActivityStartEvent ) event );
+			startActivity( (ActivityStartEvent) event );
 		}
 		if ( event instanceof ActivityEndEvent ) {
-			endActivity( ( ActivityEndEvent ) event );
+			endActivity( (ActivityEndEvent) event );
 		}
 		if ( event instanceof CourtesyEvent ) {
-			handleCoutesy( ( CourtesyEvent ) event );
+			handleCourtesy( (CourtesyEvent) event );
 		}
 	}
 
 	private void startActivity( final ActivityStartEvent event ) {
-		if ( !event.getActType().equals( activityType ) ) return;
+		if ( !event.getActType().equals( activityType ) ) {
+			assert currentNCoparticipants == 0 : currentNCoparticipants;
+			return;
+		}
 
-		inAct = true;
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Starting activity at time "+Time.writeTime( event.getTime() ) );
+		}
+
 		lastChangeInNCoparticipants = event.getTime();
-		currentNCoparticipants = 0;
 	}
 
-	private void handleCoutesy( final CourtesyEvent event ) {
-		if ( !inAct ) return;
+	private void handleCourtesy( final CourtesyEvent event ) {
+		if ( !event.getActType().equals( activityType ) ) return;
+
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Handle "+event.getType()+" at time "+Time.writeTime( event.getTime() ) );
+		}
+
 		updateScore( event.getTime() );
 
 		lastChangeInNCoparticipants = event.getTime();
@@ -99,29 +115,45 @@ public class GroupCompositionPenalizer implements ArbitraryEventScoring {
 			default:
 				throw new RuntimeException( event.getType()+"?" );
 		}
+
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Now "+currentNCoparticipants+" participants" );
+		}
+
 		assert currentNCoparticipants >= 0 : event +" -> "+ currentNCoparticipants;
 	}
 
 	private void endActivity( final ActivityEndEvent event ) {
 		if ( !event.getActType().equals( activityType ) ) return;
 
+		if ( log.isTraceEnabled() ) {
+			log.trace( "Ending activity at time "+Time.writeTime( event.getTime() ) );
+		}
+
 		updateScore( event.getTime() );
-		inAct = false;
+		lastChangeInNCoparticipants = -1;
 	}
 
 	private void updateScore( final double time ) {
-		assert time >= lastChangeInNCoparticipants;
+		if (lastChangeInNCoparticipants < 0) return;
+		assert time >= lastChangeInNCoparticipants : time +" < "+ lastChangeInNCoparticipants;
+
 		this.score += utilityCalculator.getUtilityOfTime( currentNCoparticipants ) *
 			(time - lastChangeInNCoparticipants );
+
+		if ( log.isTraceEnabled() ) {
+			log.trace( "update score "+Time.writeTime( lastChangeInNCoparticipants )+"->"+Time.writeTime( time )+
+					": currently "+currentNCoparticipants+" participants, score="+score );
+		}
 	}
 
-	public static interface UtilityOfTimeCalculator {
-		public double getUtilityOfTime( int nCoParticipants );
+	public interface UtilityOfTimeCalculator {
+		double getUtilityOfTime( int nCoParticipants );
 	}
 
 	public static class MinGroupSizeLinearUtilityOfTime implements UtilityOfTimeCalculator {
 		private final int minGroupSize;
-		private double utilOfMissingContact;
+		private final double utilOfMissingContact;
 
 		public MinGroupSizeLinearUtilityOfTime(
 				final int minGroupSize,

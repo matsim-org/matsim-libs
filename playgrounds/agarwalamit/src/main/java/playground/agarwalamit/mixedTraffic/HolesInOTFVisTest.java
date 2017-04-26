@@ -144,7 +144,7 @@ public class HolesInOTFVisTest {
 			config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 
-			network = (Network) scenario.getNetwork();
+			network = scenario.getNetwork();
 
 			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(-100., -100.0));
 			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord(0.0, 0.0));
@@ -155,13 +155,16 @@ public class HolesInOTFVisTest {
 			final Node fromNode = node1;
 			final Node toNode = node2;
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), fromNode, toNode, (double) 10000, (double) 25, (double) 3600, (double) 1, null, (String) "22");
+			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId("1"), fromNode, toNode, (double) 10000, (double) 25, (double) 3600, (double) 1, null,
+					"22");
 			final Node fromNode1 = node2;
 			final Node toNode1 = node3; 
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), fromNode1, toNode1, (double) 1000, (double) 15, (double) 360, (double) 1, null, (String) "22");
+			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId("2"), fromNode1, toNode1, (double) 1000, (double) 15, (double) 360, (double) 1, null,
+					"22");
 			final Node fromNode2 = node3;
 			final Node toNode2 = node4;	//flow capacity is 1 PCU per min.
-			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("3"), fromNode2, toNode2, (double) 10000, (double) 25, (double) 3600, (double) 1, null, (String) "22");
+			link3 = NetworkUtils.createAndAddLink(network,Id.createLinkId("3"), fromNode2, toNode2, (double) 10000, (double) 25, (double) 3600, (double) 1, null,
+					"22");
 
 			population = scenario.getPopulation();
 		}

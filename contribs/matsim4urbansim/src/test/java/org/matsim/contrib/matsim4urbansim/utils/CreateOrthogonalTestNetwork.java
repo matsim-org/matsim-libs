@@ -24,7 +24,8 @@ public class CreateOrthogonalTestNetwork {
 	 * 
 	 * @return the network
 	 */
-	public static Network createOrthogonalDistanceTestNetwork() {
+	private static Network createOrthogonalDistanceTestNetwork() {
+		// yyyy not used anywhere.  kai, feb'17
 
 		/*
 		 * (3)	   (4)-----(5)

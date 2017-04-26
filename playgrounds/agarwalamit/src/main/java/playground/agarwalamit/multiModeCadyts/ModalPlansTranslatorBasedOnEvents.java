@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
-public class ModalPlansTranslatorBasedOnEvents implements PlansTranslator<ModalLink>, LinkLeaveEventHandler, 
+class ModalPlansTranslatorBasedOnEvents implements PlansTranslator<ModalLink>, LinkLeaveEventHandler,
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
 	private static final Logger log = Logger.getLogger(ModalPlansTranslatorBasedOnEvents.class);
@@ -53,7 +53,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private int iteration = -1;
 
 	// this is _only_ there for output:
-    final Set<Plan> plansEverSeen = new HashSet<>();
+    private final Set<Plan> plansEverSeen = new HashSet<>();
 
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
@@ -82,8 +82,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			return null;
 		}
 		this.plansFound++;
-		final cadyts.demand.Plan<ModalLink> planSteps = planStepFactory.getResult();
-		return planSteps;
+		return planStepFactory.getResult();
 	}
 
 	@Override

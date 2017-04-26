@@ -28,36 +28,27 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+public class ZoneShpReader {
+	private final Map<Id<Zone>, Zone> zones;
 
-public class ZoneShpReader
-{
-    private final Map<Id<Zone>, Zone> zones;
+	public ZoneShpReader(Map<Id<Zone>, Zone> zones) {
+		this.zones = zones;
+	}
 
+	public void readZones(String file) {
+		readZones(file, ZoneShpWriter.ID_HEADER);
+	}
 
-    public ZoneShpReader(Map<Id<Zone>, Zone> zones)
-    {
-        this.zones = zones;
-    }
+	public void readZones(String file, String idHeader) {
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(file);
+		if (features.size() != zones.size()) {
+			throw new RuntimeException("Features#: " + features.size() + "; zones#: " + zones.size());
+		}
 
-
-    public void readZones(String file)
-    {
-        readZones(file, ZoneShpWriter.ID_HEADER);
-    }
-
-
-    public void readZones(String file, String idHeader)
-    {
-        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(file);
-        if (features.size() != zones.size()) {
-            throw new RuntimeException(
-                    "Features#: " + features.size() + "; zones#: " + zones.size());
-        }
-
-        for (SimpleFeature ft : features) {
-            String id = ft.getAttribute(idHeader).toString();
-            Zone z = zones.get(Id.create(id, Zone.class));
-            z.setMultiPolygon((MultiPolygon)ft.getDefaultGeometry());
-        }
-    }
+		for (SimpleFeature ft : features) {
+			String id = ft.getAttribute(idHeader).toString();
+			Zone z = zones.get(Id.create(id, Zone.class));
+			z.setMultiPolygon((MultiPolygon)ft.getDefaultGeometry());
+		}
+	}
 }

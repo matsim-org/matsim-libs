@@ -20,6 +20,9 @@ class TourSequence {
 		work_car, work_car_other1_car, work_car_other1_pt, work_car_other2_car,
 
 		work_pt, work_pt_other1_car, work_pt_other1_pt, work_pt_other2_car
+
+		// two new alternatives (the policy measure option)
+		// work_car_other2_pt, work_pt_other2_pt
 	}
 
 	final Type type;
@@ -32,9 +35,9 @@ class TourSequence {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	static final String homeLoc = "1_2";
-	static final String dest1 = "3_2";
-	static final String dest2 = "5_4";
+	static final String homeLoc = "home"; // "1_2";
+	static final String dest1 = "dest1"; // "3_2";
+	static final String dest2 = "dest2"; // "5_4";
 
 	private void addHomeAct(final Plan plan, final String homeActType, final Double endTime_s,
 			final Scenario scenario) {
@@ -93,7 +96,19 @@ class TourSequence {
 			this.addTour(result, "work", "pt", dest1, 16 * 3600, scenario);
 			this.addHomeAct(result, "home2", 17.0 * 3600, scenario);
 			this.addTour(result, "other", "car", dest2, 18 * 3600, scenario);
-		} else {
+		}
+		// else if (Type.work_car_other2_pt.equals(this.type)) {
+		// // new, with policy alternative
+		// this.addTour(result, "work", "car", dest1, 16 * 3600, scenario);
+		// this.addHomeAct(result, "home2", 17.0 * 3600, scenario);
+		// this.addTour(result, "other", "pt", dest2, 18 * 3600, scenario);
+		// } else if (Type.work_pt_other2_pt.equals(this.type)) {
+		// // new, with policy alternative
+		// this.addTour(result, "work", "pt", dest1, 16 * 3600, scenario);
+		// this.addHomeAct(result, "home2", 17.0 * 3600, scenario);
+		// this.addTour(result, "other", "pt", dest2, 18 * 3600, scenario);
+		// }
+		else {
 			throw new RuntimeException("unknown type: " + this.type);
 		}
 

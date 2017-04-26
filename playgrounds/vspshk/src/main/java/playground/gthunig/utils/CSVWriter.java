@@ -18,6 +18,10 @@ public class CSVWriter {
 
 	private BufferedWriter writer ;
 
+	public CSVWriter( String path) {
+		initialize(path);
+	}
+
 	public CSVWriter( String path, String seperator ) {
 		SEPARATOR = seperator;
 		initialize(path);
@@ -45,6 +49,16 @@ public class CSVWriter {
 	public final void writeLine( String[] line ) {
 		for (String field : line) {
 			writeField(field);
+		}
+		writeNewLine();
+	}
+
+	public final void writeLine( String line ) {
+		try {
+			writer.write( line ) ;
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("could not write");
 		}
 		writeNewLine();
 	}

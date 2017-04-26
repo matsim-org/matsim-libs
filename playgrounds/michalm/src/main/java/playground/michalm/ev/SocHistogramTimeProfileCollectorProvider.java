@@ -32,43 +32,35 @@ import com.google.inject.*;
 
 import playground.michalm.ev.data.EvData;
 
+public class SocHistogramTimeProfileCollectorProvider implements Provider<MobsimListener> {
+	private final EvData evData;
+	private final MatsimServices matsimServices;
 
-public class SocHistogramTimeProfileCollectorProvider
-    implements Provider<MobsimListener>
-{
-    private final EvData evData;
-    private final MatsimServices matsimServices;
+	@Inject
+	public SocHistogramTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices) {
+		this.evData = evData;
+		this.matsimServices = matsimServices;
+	}
 
+	@Override
+	public MobsimListener get() {
+		ProfileCalculator calc = EvTimeProfiles.createSocHistogramCalculator(evData);
+		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "soc_histogram_time_profiles",
+				matsimServices);
 
-    @Inject
-    public SocHistogramTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices)
-    {
-        this.evData = evData;
-        this.matsimServices = matsimServices;
-    }
+		collector.setChartCustomizer(new Customizer() {
+			public void customize(JFreeChart chart, ChartType chartType) {
+				Paint[] paints = new Paint[10];
+				for (int i = 0; i < 10; i++) {
+					float f = (float)Math.sin(Math.PI * (9f - i) / 9 / 2);
+					paints[i] = new Color(f, (float)Math.sqrt(1 - f * f), 0f);
+				}
 
+				TimeProfileCharts.changeSeriesColors(chart, paints);
+			}
+		});
 
-    @Override
-    public MobsimListener get()
-    {
-        ProfileCalculator calc = EvTimeProfiles.createSocHistogramCalculator(evData);
-        TimeProfileCollector collector = new TimeProfileCollector(calc, 300,
-                "soc_histogram_time_profiles", matsimServices);
-
-        collector.setChartCustomizer(new Customizer() {
-            public void customize(JFreeChart chart, ChartType chartType)
-            {
-                Paint[] paints = new Paint[10];
-                for (int i = 0; i < 10; i++) {
-                    float f = (float)Math.sin(Math.PI * (9f - i) / 9 / 2);
-                    paints[i] = new Color(f, (float)Math.sqrt(1 - f * f), 0f);
-                }
-
-                TimeProfileCharts.changeSeriesColors(chart, paints);
-            }
-        });
-
-        collector.setChartTypes(ChartType.StackedArea);
-        return collector;
-    }
+		collector.setChartTypes(ChartType.StackedArea);
+		return collector;
+	}
 }

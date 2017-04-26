@@ -21,40 +21,27 @@ package org.matsim.contrib.dvrp.router;
 
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
+public interface LeastCostPathCalculatorWithCache extends LeastCostPathCalculator {
+	class CacheStats {
+		private int hits = 0;
+		private int misses = 0;
 
-public interface LeastCostPathCalculatorWithCache
-    extends LeastCostPathCalculator
-{
-    class CacheStats
-    {
-        private int hits = 0;
-        private int misses = 0;
+		public void incHits() {
+			hits++;
+		}
 
+		public void incMisses() {
+			misses++;
+		}
 
-        public void incHits()
-        {
-            hits++;
-        }
+		public int getHits() {
+			return hits;
+		}
 
+		public int getMisses() {
+			return misses;
+		}
+	}
 
-        public void incMisses()
-        {
-            misses++;
-        }
-
-
-        public int getHits()
-        {
-            return hits;
-        }
-
-
-        public int getMisses()
-        {
-            return misses;
-        }
-    }
-
-
-    CacheStats getCacheStats();
+	CacheStats getCacheStats();
 }

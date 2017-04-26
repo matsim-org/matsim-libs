@@ -24,40 +24,38 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 
 import playground.michalm.ev.data.*;
+import playground.michalm.taxi.vrpagent.ETaxiAtChargerActivity;
 
+public class EvrpVehicle extends VehicleImpl {
+	public class Ev extends ElectricVehicleImpl {
+		private ETaxiAtChargerActivity atChargerActivity;
 
-public class EvrpVehicle
-    extends VehicleImpl
-{
-    public class Ev
-        extends ElectricVehicleImpl
-    {
-        public Ev(Id<Vehicle> id, Battery battery)
-        {
-            super(Id.createVehicleId(id), battery);
-        }
+		public Ev(Id<Vehicle> id, Battery battery) {
+			super(Id.createVehicleId(id), battery);
+		}
 
+		public EvrpVehicle getEvrpVehicle() {
+			return EvrpVehicle.this;
+		}
 
-        public EvrpVehicle getEvrpVehicle()
-        {
-            return EvrpVehicle.this;
-        }
-    }
+		public ETaxiAtChargerActivity getAtChargerActivity() {
+			return atChargerActivity;
+		}
 
+		public void setAtChargerActivity(ETaxiAtChargerActivity atChargerActivity) {
+			this.atChargerActivity = atChargerActivity;
+		}
+	}
 
-    private final Ev ev;
+	private final Ev ev;
 
+	public EvrpVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1, double batteryCapacity,
+			double initialSoc) {
+		super(id, startLink, capacity, t0, t1);
+		ev = new Ev(id, new BatteryImpl(batteryCapacity, initialSoc));
+	}
 
-    public EvrpVehicle(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1,
-            double batteryCapacity, double initialSoc)
-    {
-        super(id, startLink, capacity, t0, t1);
-        ev = new Ev(id, new BatteryImpl(batteryCapacity, initialSoc));
-    }
-
-
-    public Ev getEv()
-    {
-        return ev;
-    }
+	public Ev getEv() {
+		return ev;
+	}
 }

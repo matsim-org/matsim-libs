@@ -1,6 +1,8 @@
 package org.matsim.contrib.accessibility;
 
-public class Labels {
+public final class Labels {
+	private Labels(){} // do not instantiate
+	
 	public static final String _ACCESSIBILITY = "_accessibility" ;
 	
 	public static final String ZONE_ID = "zone_id";

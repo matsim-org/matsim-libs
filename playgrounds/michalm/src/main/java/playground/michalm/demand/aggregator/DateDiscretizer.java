@@ -21,8 +21,6 @@ package playground.michalm.demand.aggregator;
 
 import java.util.Date;
 
-
-public interface DateDiscretizer
-{
-    String discretize(Date date);
+public interface DateDiscretizer {
+	String discretize(Date date);
 }

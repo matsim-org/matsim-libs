@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,10 +19,15 @@
 
 package org.matsim.contrib.accessibility;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	// yyyy todo: change in similar way as with other modes ("_mode") 
@@ -47,16 +52,41 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     private double boundingBoxRight;
     private double boundingBoxBottom;
 	
-	private Integer cellSizeCellBasedAccessibility;
+	private Long cellSizeCellBasedAccessibility;
 	private String shapeFileCellBasedAccessibility;
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
-	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile } 
+	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile, fromFile } 
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
 	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
+	
+	// ---
+	private String outputCrs = null ;
+	private static final String OUTPUT_CRS="outputCRS" ;
 
 	
 	// ===
+	@StringGetter(OUTPUT_CRS)
+	public final String getOutputCrs() {
+		return this.outputCrs;
+	}
+	@StringSetter(OUTPUT_CRS)
+	public final void setOutputCrs(String outputCrs) {
+		this.outputCrs = outputCrs;
+	}
+
+	private String measuringPointsFile;
+	private static final String MEASURING_POINTS_FILE="measuringPointsFile";
+	
+	@StringGetter(MEASURING_POINTS_FILE)
+	public String getMeasuringPointsFile(){
+		return this.measuringPointsFile;
+	}
+	
+	@StringSetter(MEASURING_POINTS_FILE)
+	public void setMeasuringPointsFile(String measuringPointsFile){
+		this.measuringPointsFile = measuringPointsFile;
+	}
 
 	public static final String TIME_OF_DAY = "timeOfDay";
 	private Double timeOfDay = 8.*3600 ;
@@ -88,6 +118,8 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		}
 		map.put(AREA_OF_ACC_COMP, "method to determine the area for which the accessibility will be computed; possible values: " + stb ) ;
 		
+		map.put(MEASURING_POINTS_FILE, "if the accibility is computed using the `fromFile` option, " +
+				"the this must be the file containing the measuring points' coordinates. ");
 		return map ;
 	}
 	
@@ -108,11 +140,11 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	// keeping the code compact
 	
 	@StringGetter("cellSizeForCellBasedAccessibility") 
-    public Integer getCellSizeCellBasedAccessibility() {
+    public Long getCellSizeCellBasedAccessibility() {
 		return this.cellSizeCellBasedAccessibility;
     }
 	@StringSetter("cellSizeForCellBasedAccessibility")  // size in meters (whatever that is since the coord system does not know about meters)
-    public void setCellSizeCellBasedAccessibility(int value) {
+    public void setCellSizeCellBasedAccessibility(long value) {
 		if (value <= 0) {
 			throw new IllegalArgumentException("Cell size must be greater than zero.");
 		}
@@ -126,11 +158,22 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     public String getShapeFileCellBasedAccessibility() {
         return this.shapeFileCellBasedAccessibility;
     }
+	
 	@StringSetter("extentOfAccessibilityComputationShapeFile")
     public void setShapeFileCellBasedAccessibility(String value) {
         this.shapeFileCellBasedAccessibility = value;
     }
 
+//	@StringGetter("extentOfAccessibilityComputationFile")
+//	public String getFileBasedAccessibility() {
+//		return this.fileBasedAccessibility;
+//	}
+//	
+//	@StringSetter("extentOfAccessibilityComputationFile")
+//	public void setFileBasedAccessibility(String value) {
+//		this.fileBasedAccessibility = value;
+//	}
+	
 	@StringGetter(TIME_OF_DAY)
 	public Double getTimeOfDay() {
 		return this.timeOfDay ;
@@ -188,25 +231,35 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     public void setBoundingBoxBottom(double value) {
         this.boundingBoxBottom = value;
     }
+    
+    /**
+	 * helper method to set bounding box in code
+	 */
+    public void setEnvelope( Envelope envelope ) {
+	    this.boundingBoxBottom = envelope.getMinY() ;
+	    this.boundingBoxLeft = envelope.getMinX() ;
+	    this.boundingBoxRight = envelope.getMaxX() ;
+	    this.boundingBoxTop = envelope.getMaxY() ;
+    }
 
     @StringGetter(AREA_OF_ACC_COMP)
-	public String getAreaOfAccessibilityComputation() {
-		return areaOfAccessibilityComputation.toString();
+	public AreaOfAccesssibilityComputation getAreaOfAccessibilityComputation() {
+		return areaOfAccessibilityComputation;
 	}
 
     @StringSetter(AREA_OF_ACC_COMP)
-	public void setAreaOfAccessibilityComputation(
-			String areaOfAccessibilityComputation) {
-    	boolean problem = true ;
-    	for ( AreaOfAccesssibilityComputation var : AreaOfAccesssibilityComputation.values() ) {
-    		if ( var.toString().equals(areaOfAccessibilityComputation) ) {
-    			this.areaOfAccessibilityComputation = var ;
-    			problem = false ;
-    		}
-    	}
-    	if ( problem ){
-    		throw new RuntimeException("string typo error") ;
-    	}
+	public void setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation areaOfAccessibilityComputation) {
+	    this.areaOfAccessibilityComputation = areaOfAccessibilityComputation ;
+//    	boolean problem = true ;
+//    	for ( AreaOfAccesssibilityComputation var : AreaOfAccesssibilityComputation.values() ) {
+//    		if ( var.toString().equals(areaOfAccessibilityComputation) ) {
+//    			this.areaOfAccessibilityComputation = var ;
+//    			problem = false ;
+//    		}
+//    	}
+//    	if ( problem ){
+//    		throw new RuntimeException("string typo error") ;
+//    	}
 	}
     
 }

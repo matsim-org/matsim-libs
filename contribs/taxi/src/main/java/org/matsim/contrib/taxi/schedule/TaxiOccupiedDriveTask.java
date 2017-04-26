@@ -23,51 +23,30 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 
+public class TaxiOccupiedDriveTask extends DriveTaskImpl implements TaxiTaskWithRequest {
+	private TaxiRequest request;// non-final due to vehicle diversion
 
-public class TaxiOccupiedDriveTask
-    extends DriveTaskImpl
-    implements TaxiTaskWithRequest
-{
-    private TaxiRequest request;//non-final due to vehicle diversion
+	public TaxiOccupiedDriveTask(VrpPathWithTravelData path, TaxiRequest request) {
+		super(path);
 
+		if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
+			throw new IllegalArgumentException();
+		}
 
-    public TaxiOccupiedDriveTask(VrpPathWithTravelData path, TaxiRequest request)
-    {
-        super(path);
+		this.request = request;
+	}
 
-        if (request.getFromLink() != path.getFromLink()
-                && request.getToLink() != path.getToLink()) {
-            throw new IllegalArgumentException();
-        }
+	@Override
+	public TaxiTaskType getTaxiTaskType() {
+		return TaxiTaskType.OCCUPIED_DRIVE;
+	}
 
-        this.request = request;
-        request.setOccupiedDriveTask(this);
-    }
+	public TaxiRequest getRequest() {
+		return request;
+	}
 
-
-    @Override
-    public void disconnectFromRequest()
-    {
-        request.setOccupiedDriveTask(null);
-    }
-
-
-    @Override
-    public TaxiTaskType getTaxiTaskType()
-    {
-        return TaxiTaskType.OCCUPIED_DRIVE;
-    }
-
-
-    public TaxiRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
-    }
+	@Override
+	protected String commonToString() {
+		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+	}
 }

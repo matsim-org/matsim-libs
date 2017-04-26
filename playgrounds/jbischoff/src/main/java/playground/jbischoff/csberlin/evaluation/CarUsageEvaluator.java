@@ -69,7 +69,7 @@ public static void main(String[] args) {
 		persons++;
 		for (PlanElement pe : plan.getPlanElements()){
 			if (pe instanceof Leg){
-				if (((Leg) pe).getMode().equals("car")){
+				if (((Leg) pe).getMode().equals("car")||((Leg) pe).getMode().equals("freefloating")){
 					firstCarUsers.add(p.getId());
 					break;
 				}
@@ -87,7 +87,7 @@ public static void main(String[] args) {
 		}
 		for (PlanElement pe : plan.getPlanElements()){
 			if (pe instanceof Leg){
-				if (((Leg) pe).getMode().equals("car")){
+				if (((Leg) pe).getMode().equals("car")||((Leg) pe).getMode().equals("freefloating")){
 					secondCarUsers.add(p.getId());
 					break;
 				}

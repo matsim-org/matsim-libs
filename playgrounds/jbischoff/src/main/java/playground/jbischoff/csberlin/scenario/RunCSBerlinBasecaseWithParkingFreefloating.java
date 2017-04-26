@@ -25,6 +25,7 @@ package playground.jbischoff.csberlin.scenario;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -72,7 +73,7 @@ public class RunCSBerlinBasecaseWithParkingFreefloating {
 			runId = args[1];
 			outputdir = args[2];
 		}
-		Config config = ConfigUtils.loadConfig(configfile, new FFCSConfigGroup());
+		Config config = ConfigUtils.loadConfig(configfile, new FFCSConfigGroup(), new DvrpConfigGroup());
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(outputdir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -87,23 +88,7 @@ public class RunCSBerlinBasecaseWithParkingFreefloating {
 				addControlerListenerBinding().to(TripHistogramListener.class).asEagerSingleton();
 				bind(TripHistogram.class).asEagerSingleton();
 				bind(BerlinCSPermissibleModesCalculator.class).asEagerSingleton();
-//				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.toString()).toProvider(new Provider<PlanStrategy>() {
-//					@Inject Scenario scenario;
-//					@Inject Provider<TripRouter> tripRouterProvider;
-//					@Inject BerlinCSPermissibleModesCalculator berlinCSAvailableModeSelector;
-//					@Override
-//					public PlanStrategy get() {
-//						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-//						SubtourModeChoice subtourmodechoice = new SubtourModeChoice(scenario.getConfig().global().getNumberOfThreads(), scenario.getConfig().subtourModeChoice().getModes(), scenario.getConfig().subtourModeChoice().getChainBasedModes(), false, tripRouterProvider);
-//						subtourmodechoice.setPermissibleModesCalculator(berlinCSAvailableModeSelector);
-//						builder.addStrategyModule(subtourmodechoice);
-//						builder.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
-//						return builder.build();
-//
-//
-//					}
-//				});
-				
+			
 				addPlanStrategyBinding(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(new Provider<PlanStrategy>() {
 					@Inject Scenario scenario;
 					@Inject Provider<TripRouter> tripRouterProvider;

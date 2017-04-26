@@ -21,11 +21,8 @@ package playground.michalm.audiAV;
 
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 
-
-public class RunAudiAVBenchmark
-{
-    public static void main(String[] args)
-    {
-        RunTaxiBenchmark.run(args[0], 1);
-    }
+public class RunAudiAVBenchmark {
+	public static void main(String[] args) {
+		RunTaxiBenchmark.run(args[0], 1);
+	}
 }

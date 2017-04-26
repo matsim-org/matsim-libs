@@ -31,8 +31,11 @@ class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 	private enum Coverage {uniform,power}
 	private Coverage coverage = Coverage.uniform;
 	private int nPoints = 10;
+
+	private double firstSample = 0;
 	private double lastSample = 1;
 	private double powerBase = 2;
+
 
 	public ScalabilityConfigGroup() {
 		super( "scalability" );
@@ -41,8 +44,8 @@ class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 	public double[] getSamples() {
 		switch ( coverage ) {
 			case uniform:
-				final double step = lastSample / nPoints;
-				return DoubleStream.iterate( step , c -> c + step )
+				final double step = (lastSample - firstSample) / nPoints;
+				return DoubleStream.iterate( firstSample + step , c -> c + step )
 						.limit( nPoints )
 						.toArray();
 			case power:
@@ -105,5 +108,15 @@ class ScalabilityConfigGroup extends ReflectiveConfigGroup {
 	private void setPowerBase( final double powerBase ) {
 		if ( powerBase <= 1 ) throw new IllegalArgumentException( "power base "+powerBase+" < 1" );
 		this.powerBase = powerBase;
+	}
+
+	@StringGetter("firstSample")
+	private double getFirstSample() {
+		return firstSample;
+	}
+
+	@StringSetter("firstSample")
+	private void setFirstSample( final double firstSample ) {
+		this.firstSample = firstSample;
 	}
 }

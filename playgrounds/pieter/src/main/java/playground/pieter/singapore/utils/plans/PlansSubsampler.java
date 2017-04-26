@@ -7,15 +7,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 
 class PlansSubsampler {
 
 	public void run(Scenario s, String fileName, double samplingProbability) {
 		Population plans = (Population) s.getPopulation();
-		StreamingUtils.setIsStreaming(plans, true);
-		StreamingPopulationWriter pw = new StreamingPopulationWriter(
-				plans, s.getNetwork());
+		StreamingDeprecated.setIsStreaming(plans, true);
+		StreamingPopulationWriter pw = new StreamingPopulationWriter();
 		pw.startStreaming(fileName);
 		System.out.println("    running " + this.getClass().getName()
 				+ " algorithm...");

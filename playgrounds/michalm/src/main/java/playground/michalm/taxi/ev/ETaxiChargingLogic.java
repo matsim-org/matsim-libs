@@ -26,144 +26,101 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.michalm.ev.charging.FixedSpeedChargingWithQueueingLogic;
 import playground.michalm.ev.data.*;
-import playground.michalm.taxi.data.EvrpVehicle;
 import playground.michalm.taxi.data.EvrpVehicle.Ev;
-import playground.michalm.taxi.vrpagent.ETaxiAtChargerActivity;
 
+public class ETaxiChargingLogic extends FixedSpeedChargingWithQueueingLogic {
+	// fast charging up to 80% of the battery capacity
+	private static final double MAX_RELATIVE_SOC = 0.8;
 
-public class ETaxiChargingLogic
-    extends FixedSpeedChargingWithQueueingLogic
-{
-    //fast charging up to 80% of the battery capacity
-    private static final double MAX_RELATIVE_SOC = 0.8;
+	private final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new HashMap<>();
+	private final double effectivePower;
 
-    private final Map<Id<Vehicle>, ElectricVehicle> assignedVehicles = new HashMap<>();
-    private final double effectivePower;
+	public ETaxiChargingLogic(Charger charger, double chargingSpeedFactor) {
+		super(charger);
+		effectivePower = charger.getPower() * chargingSpeedFactor;
+	}
 
+	// at this point ETaxiChargingTask should point to Charger
+	public void addAssignedVehicle(ElectricVehicle ev) {
+		assignedVehicles.put(ev.getId(), ev);
+	}
 
-    public ETaxiChargingLogic(Charger charger, double chargingSpeedFactor)
-    {
-        super(charger);
-        effectivePower = charger.getPower() * chargingSpeedFactor;
-    }
+	// on deleting ETaxiChargingTask or vehicle arrival (the veh becomes plugged or queued)
+	public void removeAssignedVehicle(ElectricVehicle ev) {
+		if (assignedVehicles.remove(ev.getId()) == null) {
+			throw new IllegalArgumentException();
+		}
+	}
 
+	@Override
+	protected boolean doStopCharging(ElectricVehicle ev) {
+		Battery b = ev.getBattery();
+		return b.getSoc() >= MAX_RELATIVE_SOC * b.getCapacity();
+	}
 
-    //at this point ETaxiChargingTask should point to Charger
-    public void addAssignedVehicle(ElectricVehicle ev)
-    {
-        assignedVehicles.put(ev.getId(), ev);
-    }
+	@Override
+	protected void notifyVehicleQueued(ElectricVehicle ev, double now) {
+		((Ev)ev).getAtChargerActivity().vehicleQueued(now);
+	}
 
+	@Override
+	protected void notifyChargingStarted(ElectricVehicle ev, double now) {
+		((Ev)ev).getAtChargerActivity().chargingStarted(now);
+	}
 
-    //on deleting ETaxiChargingTask or vehicle arrival (the veh becomes plugged or queued)
-    public void removeAssignedVehicle(ElectricVehicle ev)
-    {
-        if (assignedVehicles.remove(ev.getId()) == null) {
-            throw new IllegalArgumentException();
-        }
-    }
+	@Override
+	protected void notifyChargingEnded(ElectricVehicle ev, double now) {
+		((Ev)ev).getAtChargerActivity().chargingEnded(now);
+	}
 
+	public double getEnergyToCharge(ElectricVehicle ev) {
+		Battery b = ev.getBattery();
+		return Math.max(0, MAX_RELATIVE_SOC * b.getCapacity() - b.getSoc());
+	}
 
-    @Override
-    protected boolean doStopCharging(ElectricVehicle ev)
-    {
-        Battery b = ev.getBattery();
-        return b.getSoc() >= MAX_RELATIVE_SOC * b.getCapacity();
-    }
+	public double estimateChargeTime(ElectricVehicle ev) {
+		// System.err.println("energy to charge" + getEnergyToCharge(vehicle));
+		// System.err.println("effectivePower = " + effectivePower);
+		return getEnergyToCharge(ev) / effectivePower;
+	}
 
+	// TODO using task timing from schedules will be more accurate in predicting charge demand
 
-    private ETaxiAtChargerActivity getActivity(ElectricVehicle ev)
-    {
-        EvrpVehicle evrpVehicle = ((Ev)ev).getEvrpVehicle();
-        return (ETaxiAtChargerActivity)evrpVehicle.getAgentLogic().getDynAgent().getCurrentAction();
-    }
+	// does not include further demand (AUX for queued vehs)
+	public double estimateMaxWaitTimeOnArrival() {
+		if (pluggedVehicles.size() < charger.getPlugs()) {
+			return 0;
+		}
 
+		double sum = sumEnergyToCharge(pluggedVehicles.values()) + sumEnergyToCharge(queuedVehicles);
+		return sum / effectivePower / charger.getPlugs();
+	}
 
-    @Override
-    protected void notifyVehicleQueued(ElectricVehicle ev, double now)
-    {
-        getActivity(ev).vehicleQueued(now);
-    }
+	// does not include further demand (AUX for queued vehs; AUX+driving for dispatched vehs)
+	public double estimateAssignedWorkload() {
+		double total = sumEnergyToCharge(pluggedVehicles.values()) //
+				+ sumEnergyToCharge(queuedVehicles) //
+				+ sumEnergyToCharge(assignedVehicles.values());
+		return total / effectivePower;
+	}
 
+	private double sumEnergyToCharge(Iterable<ElectricVehicle> evs) {
+		double energyToCharge = 0;
+		for (ElectricVehicle ev : evs) {
+			energyToCharge += getEnergyToCharge(ev);
+		}
+		return energyToCharge;
+	}
 
-    @Override
-    protected void notifyChargingStarted(ElectricVehicle ev, double now)
-    {
-        getActivity(ev).chargingStarted(now);
-    }
+	public int getPluggedCount() {
+		return pluggedVehicles.size();
+	}
 
+	public int getQueuedCount() {
+		return queuedVehicles.size();
+	}
 
-    @Override
-    protected void notifyChargingEnded(ElectricVehicle ev, double now)
-    {
-        getActivity(ev).chargingEnded(now);
-    }
-
-
-    public double getEnergyToCharge(ElectricVehicle ev)
-    {
-        Battery b = ev.getBattery();
-        return Math.max(0, MAX_RELATIVE_SOC * b.getCapacity() - b.getSoc());
-    }
-
-
-    public double estimateChargeTime(ElectricVehicle ev)
-    {
-        //        System.err.println("energy to charge" + getEnergyToCharge(vehicle));
-        //        System.err.println("effectivePower = " + effectivePower);
-        return getEnergyToCharge(ev) / effectivePower;
-    }
-
-    //TODO using task timing from schedules will be more accurate in predicting charge demand
-
-
-    //does not include further demand (AUX for queued vehs)
-    public double estimateMaxWaitTimeOnArrival()
-    {
-        if (pluggedVehicles.size() < charger.getPlugs()) {
-            return 0;
-        }
-
-        double sum = sumEnergyToCharge(pluggedVehicles.values())
-                + sumEnergyToCharge(queuedVehicles);
-        return sum / effectivePower / charger.getPlugs();
-    }
-
-
-    //does not include further demand (AUX for queued vehs; AUX+driving for dispatched vehs)
-    public double estimateAssignedWorkload()
-    {
-        double total = sumEnergyToCharge(pluggedVehicles.values()) //
-                + sumEnergyToCharge(queuedVehicles) //
-                + sumEnergyToCharge(assignedVehicles.values());
-        return total / effectivePower;
-    }
-
-
-    private double sumEnergyToCharge(Iterable<ElectricVehicle> evs)
-    {
-        double energyToCharge = 0;
-        for (ElectricVehicle ev : evs) {
-            energyToCharge += getEnergyToCharge(ev);
-        }
-        return energyToCharge;
-    }
-
-
-    public int getPluggedCount()
-    {
-        return pluggedVehicles.size();
-    }
-
-
-    public int getQueuedCount()
-    {
-        return queuedVehicles.size();
-    }
-
-
-    public int getAssignedCount()
-    {
-        return assignedVehicles.size();
-    }
+	public int getAssignedCount() {
+		return assignedVehicles.size();
+	}
 }

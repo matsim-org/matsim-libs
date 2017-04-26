@@ -37,17 +37,13 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class MinibusControler {
 
-	private static String baseCaseFolder = "/Users/ihab/Documents/workspace/shared-svn/projects/paratransit/baseCase/scenarios/grid/";
-	private static String profitMaximizationFolder = "C:/Users/ihab/Documents/workspace/shared-svn/projects/paratransit/paratransitProfitExample/scenarios/grid/";
-	private static String welfareMaximizationFolder = "C:/Users/ihab/Documents/workspace/shared-svn/projects/paratransit/paratransitWelfareExample/scenarios/grid/";
+	private static String baseCaseConfig = "/Users/ihab/Documents/workspace/shared-svn/projects/paratransit/10_workPackage_welfare-profit/test-grid/config_baseCase.xml";
+	private static String profitMaximizationConfig = "/Users/ihab/Documents/workspace/shared-svn/projects/paratransit/10_workPackage_welfare-profit/test-grid/config_profitMax.xml";
+	private static String welfareMaximizationConfig = "/Users/ihab/Documents/workspace/shared-svn/projects/paratransit/10_workPackage_welfare-profit/test-grid/config_welfareMax.xml";
 	
-//	private static String baseCaseFolder = "C:/Users/dhosse/workspace/shared-svn/projects/paratransit/baseCase/scenarios/grid/";
-//	private static String profitMaximizationFolder = "C:/Users/dhosse/workspace/shared-svn/projects/paratransit/paratransitProfitExample/scenarios/grid/";
-//	private static String welfareMaximizationFolder = "C:/Users/dhosse/workspace/shared-svn/projects/paratransit/paratransitWelfareExample/scenarios/grid/";
-
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig( welfareMaximizationFolder + "config.xml", new PConfigGroup() ) ;
+		Config config = ConfigUtils.loadConfig( welfareMaximizationConfig, new PConfigGroup() ) ;
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
@@ -56,8 +52,7 @@ public class MinibusControler {
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		
-		PModule builder = new PModule() ;
-		builder.configureControler(controler);
+		controler.addOverridingModule(new PModule()) ;
 
 		controler.run();
 		

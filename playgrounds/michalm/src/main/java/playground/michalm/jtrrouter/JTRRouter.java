@@ -24,220 +24,199 @@ import java.util.*;
 import org.apache.commons.configuration.*;
 import org.matsim.contrib.util.random.*;
 
-
 /**
  * @author michalm
  */
-public abstract class JTRRouter
-{
-    private static final int MAX_NODE_ID = 100;
+public abstract class JTRRouter {
+	private static final int MAX_NODE_ID = 100;
 
-    protected final Flow[] flows;
-    private final Turn[][] turns;// [prev_node_id][current_node_id] -> Turn
-    private int genStartTime;
-    private int genStopTime;
-    private double flowFactor;
-    private double genPeriod;
+	protected final Flow[] flows;
+	private final Turn[][] turns;// [prev_node_id][current_node_id] -> Turn
+	private int genStartTime;
+	private int genStopTime;
+	private double flowFactor;
+	private double genPeriod;
 
-    private final UniformRandom uniform;
+	private final UniformRandom uniform;
 
-    // temp var for route constraction
-    private List<Integer> seq = new ArrayList<>();
-    private Flow inFlow;
+	// temp var for route constraction
+	private List<Integer> seq = new ArrayList<>();
+	private Flow inFlow;
 
+	public JTRRouter() {
+		flows = new Flow[MAX_NODE_ID];
+		turns = new Turn[MAX_NODE_ID][];
 
-    public JTRRouter()
-    {
-        flows = new Flow[MAX_NODE_ID];
-        turns = new Turn[MAX_NODE_ID][];
+		for (int i = 0; i < MAX_NODE_ID; i++) {
+			turns[i] = new Turn[MAX_NODE_ID];
+		}
 
-        for (int i = 0; i < MAX_NODE_ID; i++) {
-            turns[i] = new Turn[MAX_NODE_ID];
-        }
+		uniform = RandomUtils.getGlobalUniform();
+	}
 
-        uniform = RandomUtils.getGlobalUniform();
-    }
+	public void generate(String dir, String flowsFile, String turnsFile) {
+		readConfigs(dir, flowsFile, turnsFile);
+		// long t1 = System.currentTimeMillis();
+		generateRoutes();
+		// long t2 = System.currentTimeMillis();
+		generatePlans();
+		// long t3 = System.currentTimeMillis();
+		writePlans(dir);
+		// System.out.println("routes:" + (t2-t1));
+		// System.out.println("plans:" + (t3-t2));
+	}
 
+	protected void readConfigs(String dir, String flowsFile, String turnsFile) {
 
-    public void generate(String dir, String flowsFile, String turnsFile)
-    {
-        readConfigs(dir, flowsFile, turnsFile);
-        // long t1 = System.currentTimeMillis();
-        generateRoutes();
-        // long t2 = System.currentTimeMillis();
-        generatePlans();
-        // long t3 = System.currentTimeMillis();
-        writePlans(dir);
-        // System.out.println("routes:" + (t2-t1));
-        // System.out.println("plans:" + (t3-t2));
-    }
+		// process flows.xml
+		//
+		// <flows startTime="0" stopTime="3600">
+		// ....
+		// ....
+		// </flows>
 
+		try {
+			HierarchicalConfiguration flowCfg = new XMLConfiguration(dir + "\\" + flowsFile);
 
-    protected void readConfigs(String dir, String flowsFile, String turnsFile)
-    {
+			genStartTime = flowCfg.getInt("[@startTime]");
+			genStopTime = flowCfg.getInt("[@stopTime]");
+			genPeriod = genStopTime - genStartTime;
 
-        // process flows.xml
-        //
-        // <flows startTime="0" stopTime="3600">
-        // ....
-        // ....
-        // </flows>
+			flowFactor = flowCfg.getDouble("[@flowFactor]");
 
-        try {
-            HierarchicalConfiguration flowCfg = new XMLConfiguration(dir + "\\" + flowsFile);
+			int count = flowCfg.getMaxIndex("flow") + 1;
+			for (int i = 0; i < count; i++) {
+				initFlow((HierarchicalConfiguration)flowCfg.subset("flow(" + i + ')'));
+			}
 
-            genStartTime = flowCfg.getInt("[@startTime]");
-            genStopTime = flowCfg.getInt("[@stopTime]");
-            genPeriod = genStopTime - genStartTime;
+			// process turns.xml
+			HierarchicalConfiguration nodeCfg = new XMLConfiguration(dir + "\\" + turnsFile);
 
-            flowFactor = flowCfg.getDouble("[@flowFactor]");
+			count = nodeCfg.getMaxIndex("turn") + 1;
+			for (int i = 0; i < count; i++) {
+				initTurn((HierarchicalConfiguration)nodeCfg.subset("turn(" + i + ')'));
+			}
+		} catch (ConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-            int count = flowCfg.getMaxIndex("flow") + 1;
-            for (int i = 0; i < count; i++) {
-                initFlow((HierarchicalConfiguration)flowCfg.subset("flow(" + i + ')'));
-            }
+	protected abstract void initFlow(HierarchicalConfiguration flowCfg);
 
-            // process turns.xml
-            HierarchicalConfiguration nodeCfg = new XMLConfiguration(dir + "\\" + turnsFile);
+	// <turn id="1" prev="11" type="cross">
+	// ....<next node="2" probability="0.671"/>
+	// ....<next node="3" probability="0.329"/>
+	// </turn>
+	protected void initTurn(HierarchicalConfiguration nodeCfg) {
+		int id = nodeCfg.getInt("[@id]");
+		int prev = nodeCfg.getInt("[@prev]");
+		int length = nodeCfg.getMaxIndex("next") + 1;
 
-            count = nodeCfg.getMaxIndex("turn") + 1;
-            for (int i = 0; i < count; i++) {
-                initTurn((HierarchicalConfiguration)nodeCfg.subset("turn(" + i + ')'));
-            }
-        }
-        catch (ConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		int[] nodes = new int[length];
+		double[] probs = new double[length];
 
+		for (int i = 0; i < length; i++) {
+			Configuration nextCfg = nodeCfg.subset("next(" + i + ')');
+			nodes[i] = nextCfg.getInt("[@node]");
+			probs[i] = nextCfg.getDouble("[@probability]");
+		}
 
-    protected abstract void initFlow(HierarchicalConfiguration flowCfg);
+		turns[prev][id] = new Turn(id, prev, nodes, probs);
+	}
 
+	protected void generateRoutes() {
+		for (int i = 0; i < flows.length; i++) {
+			inFlow = flows[i];
 
-    // <turn id="1" prev="11" type="cross">
-    // ....<next node="2" probability="0.671"/>
-    // ....<next node="3" probability="0.329"/>
-    // </turn>
-    protected void initTurn(HierarchicalConfiguration nodeCfg)
-    {
-        int id = nodeCfg.getInt("[@id]");
-        int prev = nodeCfg.getInt("[@prev]");
-        int length = nodeCfg.getMaxIndex("next") + 1;
+			if (inFlow == null || !inFlow.isInFlow) {
+				continue;
+			}
 
-        int[] nodes = new int[length];
-        double[] probs = new double[length];
+			addTurn(inFlow.node, inFlow.next, 1);
 
-        for (int i = 0; i < length; i++) {
-            Configuration nextCfg = nodeCfg.subset("next(" + i + ')');
-            nodes[i] = nextCfg.getInt("[@node]");
-            probs[i] = nextCfg.getDouble("[@probability]");
-        }
+			System.out.println(i + " " + inFlow.routes.size());
 
-        turns[prev][id] = new Turn(id, prev, nodes, probs);
-    }
+			// for (int j = 0; j < inFlow.routes.size(); j++) {
+			// System.out.println(inFlow.routes.get(j).toString());
+			// }
+		}
 
+	}
 
-    protected void generateRoutes()
-    {
-        for (int i = 0; i < flows.length; i++) {
-            inFlow = flows[i];
+	private void addTurn(int prev, int node, double p) {
+		Turn turn = turns[prev][node];
 
-            if (inFlow == null || !inFlow.isInFlow) {
-                continue;
-            }
+		if (turn == null) {
+			inFlow.routes.add(new Route(inFlow, flows[node], seq, p));
+			return;
+		} else if (flows[node] != null) {// just check correctness
+			throw new RuntimeException();// only: flow XOR turn
+		}
 
-            addTurn(inFlow.node, inFlow.next, 1);
+		if (turn.visited) {
+			return;
+		}
 
-            System.out.println(i + " " + inFlow.routes.size());
+		seq.add(node);
+		turn.visited = true;
 
-            // for (int j = 0; j < inFlow.routes.size(); j++) {
-            // System.out.println(inFlow.routes.get(j).toString());
-            // }
-        }
+		for (int i = 0; i < turn.next.length; i++) {
+			addTurn(node, turn.next[i], p * turn.probs[i]);
+		}
 
-    }
+		turn.visited = false;
+		if (seq.remove(seq.size() - 1) != node) {// just check correctness
+			throw new RuntimeException("Error");
+		}
+	}
 
+	protected void generatePlans() {
+		int id = 1;
 
-    private void addTurn(int prev, int node, double p)
-    {
-        Turn turn = turns[prev][node];
+		for (int i = 0; i < flows.length; i++) {
+			Flow flow = flows[i];
 
-        if (turn == null) {
-            inFlow.routes.add(new Route(inFlow, flows[node], seq, p));
-            return;
-        }
-        else if (flows[node] != null) {// just check correctness
-            throw new RuntimeException();// only: flow XOR turn
-        }
+			if (flow == null) {
+				continue;
+			}
 
-        if (turn.visited) {
-            return;
-        }
+			List<Route> routes = flow.routes;
+			double[] cumProb = new double[routes.size()];
+			double totalProb = 0;
 
-        seq.add(node);
-        turn.visited = true;
+			for (int r = 0; r < cumProb.length; r++) {
+				totalProb += routes.get(r).prob;
+				cumProb[r] = totalProb;
+			}
 
-        for (int i = 0; i < turn.next.length; i++) {
-            addTurn(node, turn.next[i], p * turn.probs[i]);
-        }
+			for (int subFlow = 0; subFlow < flow.counts.length; subFlow++) {
+				int count = (int)Math.round(flowFactor * flow.counts[subFlow]);
 
-        turn.visited = false;
-        if (seq.remove(seq.size() - 1) != node) {// just check correctness
-            throw new RuntimeException("Error");
-        }
-    }
+				double interval = genPeriod / count;
 
+				for (int v = 0; v < count; v++) {
+					int startTime = genStartTime + (int)(v * interval);
 
-    protected void generatePlans()
-    {
-        int id = 1;
+					// select route
+					Route route = null;
+					double random = uniform.nextDouble(0, totalProb);
 
-        for (int i = 0; i < flows.length; i++) {
-            Flow flow = flows[i];
+					for (int r = 0; r < cumProb.length; r++) {
+						if (cumProb[r] > random) {
+							route = routes.get(r);
+							break;
+						}
+					}
 
-            if (flow == null) {
-                continue;
-            }
+					addPlan(id, startTime, route, subFlow);
 
-            List<Route> routes = flow.routes;
-            double[] cumProb = new double[routes.size()];
-            double totalProb = 0;
+					id++;
+				}
+			}
+		}
+	}
 
-            for (int r = 0; r < cumProb.length; r++) {
-                totalProb += routes.get(r).prob;
-                cumProb[r] = totalProb;
-            }
+	protected abstract void addPlan(int id, int startTime, Route route, int subFlow);
 
-            for (int subFlow = 0; subFlow < flow.counts.length; subFlow++) {
-                int count = (int)Math.round(flowFactor * flow.counts[subFlow]);
-
-                double interval = genPeriod / count;
-
-                for (int v = 0; v < count; v++) {
-                    int startTime = genStartTime + (int) (v * interval);
-
-                    // select route
-                    Route route = null;
-                    double random = uniform.nextDouble(0, totalProb);
-
-                    for (int r = 0; r < cumProb.length; r++) {
-                        if (cumProb[r] > random) {
-                            route = routes.get(r);
-                            break;
-                        }
-                    }
-
-                    addPlan(id, startTime, route, subFlow);
-
-                    id++;
-                }
-            }
-        }
-    }
-
-
-    protected abstract void addPlan(int id, int startTime, Route route, int subFlow);
-
-
-    protected abstract void writePlans(String dir);
+	protected abstract void writePlans(String dir);
 }

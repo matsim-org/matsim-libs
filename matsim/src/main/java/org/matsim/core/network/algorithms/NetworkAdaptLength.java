@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class NetworkAdaptLength implements NetworkRunnable {
+public final class NetworkAdaptLength implements NetworkRunnable {
 
 	private static final double overLengthFactor = 1.001; // link length is at least 1 permil longer than euclidean distance
 

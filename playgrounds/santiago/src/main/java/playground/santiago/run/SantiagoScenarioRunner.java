@@ -60,8 +60,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingModule;
@@ -80,38 +80,44 @@ import javax.inject.Provider;
  */
 public class SantiagoScenarioRunner {
 		
-	
+	/**GENERAL**/
 	private static String configFile;
+	private static String gantriesFile;
 	private static int policy;
 	private static int sigma;	
 	private static boolean doModeChoice; 
 	private static boolean mapActs2Links;
-	private static String gantriesFile;
+	private static boolean cadyts;
+	/***/
 
+	private static String simulationStep = "Step0_3";
 	private static String caseName = "baseCase1pct";
 	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/";
-	
+
 	
 	
 	public static void main(String args[]){		
 
-		if (args.length==6){ //ONLY FOR CMD CASES
-			
+		if (args.length==7){ //ONLY FOR CMD CASES
+
 			configFile = args[0]; //COMPLETE PATH TO CONFIG.
 			gantriesFile = args[1]; //COMPLETE PATH TO TOLL LINKS FILE
 			policy = Integer.parseInt(args[2]) ; //POLICY? - 0: BASE CASE, 1: CORDON.
 			sigma = Integer.parseInt(args[3]); //SIGMA. 
 			doModeChoice = Boolean.parseBoolean(args[4]); //DOMODECHOICE?
 			mapActs2Links = Boolean.parseBoolean(args[5]); //MAPACTS2LINKS?
+			cadyts = Boolean.parseBoolean(args[6]); //CADYTS?
 			
 		} else {
 		
-			configFile=inputPath + "config_" + caseName + ".xml" ; 
-			gantriesFile = inputPath + "input/gantries.xml";
+//			configFile=inputPath + "config_" + caseName + ".xml" ;
+			configFile = inputPath + "config" + simulationStep + ".xml";
+			gantriesFile = inputPath + "inputFor" + simulationStep + "/gantries.xml";
 			policy=0;    
 			sigma=3 ;    
-			doModeChoice=true ; 
-			mapActs2Links=false; 
+			doModeChoice=true; //TODO:BE AWARE OF THIS!
+			mapActs2Links=false;
+			cadyts=false; //TODO:BE AWARE OF THIS!
 		
 		}	
 			
@@ -147,29 +153,35 @@ public class SantiagoScenarioRunner {
 			config.plansCalcRoute().setRoutingRandomness(sigma); 
 
 			controler.addOverridingModule(new RoadPricingModule());	
-			controler.addOverridingModule(new CadytsCarModule());
-
-			// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
-			controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-				@Inject CadytsContext cadytsContext;
-				@Inject CharyparNagelScoringParametersForPerson parameters;
-				@Override
-				public ScoringFunction createNewScoringFunction(Person person) {
-					final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
-					
-					SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-					final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
-					scoringFunction.setWeightOfCadytsCorrection(30. * config.planCalcScore().getBrainExpBeta()) ;
-					scoringFunctionAccumulator.addScoringFunction(scoringFunction );
-
-					return scoringFunctionAccumulator;
-				}
-			}) ;
 			
+			
+
+			if (cadyts){
+				controler.addOverridingModule(new CadytsCarModule());
+				// include cadyts into the plan scoring (this will add the cadyts corrections to the scores)
+				controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+					@Inject CadytsContext cadytsContext;
+					@Inject ScoringParametersForPerson parameters;
+					@Override
+					public ScoringFunction createNewScoringFunction(Person person) {
+						final ScoringParameters params = parameters.getScoringParameters(person);
+						
+						SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+						scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+	
+						final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
+						scoringFunction.setWeightOfCadytsCorrection(30. * config.planCalcScore().getBrainExpBeta()) ;
+						scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+	
+						return scoringFunctionAccumulator;
+					}
+				}) ;
+				
+				
+			}
+
 			
 			
 			//Run!
@@ -249,7 +261,8 @@ public class SantiagoScenarioRunner {
 		StrategySettings changeExpSettings = new StrategySettings();
 		changeExpSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpSettings.setSubpopulation(subpopName);
-		changeExpSettings.setWeight(0.7);
+//		changeExpSettings.setWeight(0.85);
+		changeExpSettings.setWeight(0.7); //TODO: BE AWARE OF THIS!!!
 		controler.getConfig().strategy().addStrategySettings(changeExpSettings);
 	}
 

@@ -21,119 +21,90 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
+/**
+ * @author michalm
+ */
+public abstract class AbstractTask implements Task {
+	// ==== BEGIN: fields managed by ScheduleImpl
+	int taskIdx;
+	TaskStatus status;
+	// ==== END: fields managed by ScheduleImpl
 
-public abstract class AbstractTask
-    implements Task
-{
-    // ==== BEGIN: fields managed by ScheduleImpl
-    Schedule<? extends AbstractTask> schedule;
-    int taskIdx;
+	private double beginTime;
+	private double endTime;
 
-    TaskStatus status;
-    // ==== END: fields managed by ScheduleImpl
+	private TaskTracker taskTracker;
 
-    private double beginTime;
-    private double endTime;
+	public AbstractTask(double beginTime, double endTime) {
+		if (beginTime > endTime) {
+			throw new IllegalArgumentException("beginTime=" + beginTime + "; endTime=" + endTime);
+		}
 
-    private TaskTracker taskTracker;
+		this.beginTime = beginTime;
+		this.endTime = endTime;
+	}
 
+	@Override
+	public final TaskStatus getStatus() {
+		return status;
+	}
 
-    public AbstractTask(double beginTime, double endTime)
-    {
-        if (beginTime > endTime) {
-            throw new IllegalArgumentException();
-        }
+	@Override
+	public final int getTaskIdx() {
+		return taskIdx;
+	}
 
-        this.beginTime = beginTime;
-        this.endTime = endTime;
-    }
+	@Override
+	public final double getBeginTime() {
+		return beginTime;
+	}
 
+	@Override
+	public final double getEndTime() {
+		return endTime;
+	}
 
-    @Override
-    public final TaskStatus getStatus()
-    {
-        return status;
-    }
+	@Override
+	public void setBeginTime(double beginTime) {
+		if (status == TaskStatus.STARTED || status == TaskStatus.PERFORMED) {
+			throw new IllegalStateException("It is too late to change the beginTime");
+		}
 
+		this.beginTime = beginTime;
+	}
 
-    @Override
-    public final int getTaskIdx()
-    {
-        return taskIdx;
-    }
+	@Override
+	public void setEndTime(double endTime) {
+		if (status == TaskStatus.PERFORMED) {
+			throw new IllegalStateException("It is too late to change the endTime");
+		}
 
+		this.endTime = endTime;
+	}
 
-    @Override
-    public final Schedule<? extends AbstractTask> getSchedule()
-    {
-        return schedule;
-    }
+	@Override
+	public TaskTracker getTaskTracker() {
+		if (status != TaskStatus.STARTED) {
+			throw new IllegalStateException("Allowed only for STARTED tasks");
+		}
 
+		return taskTracker;
+	}
 
-    @Override
-    public final double getBeginTime()
-    {
-        return beginTime;
-    }
+	@Override
+	public void initTaskTracker(TaskTracker taskTracker1) {
+		if (this.taskTracker != null) {
+			throw new IllegalStateException("Tracking already initialized");
+		}
 
+		if (status != TaskStatus.STARTED) {
+			throw new IllegalStateException("Allowed only for STARTED tasks");
+		}
 
-    @Override
-    public final double getEndTime()
-    {
-        return endTime;
-    }
+		this.taskTracker = taskTracker1;
+	}
 
-
-    @Override
-    public void setBeginTime(double beginTime)
-    {
-        if (status == TaskStatus.STARTED || status == TaskStatus.PERFORMED) {
-            throw new IllegalStateException("It is too late to change the beginTime");
-        }
-
-        this.beginTime = beginTime;
-    }
-
-
-    @Override
-    public void setEndTime(double endTime)
-    {
-        if (status == TaskStatus.PERFORMED) {
-            throw new IllegalStateException("It is too late to change the endTime");
-        }
-
-        this.endTime = endTime;
-    }
-
-
-    @Override
-    public TaskTracker getTaskTracker()
-    {
-        if (status != TaskStatus.STARTED) {
-            throw new IllegalStateException("Allowed only for STARTED tasks");
-        }
-
-        return taskTracker;
-    }
-
-
-    @Override
-    public void initTaskTracker(TaskTracker taskTracker)
-    {
-        if (this.taskTracker != null) {
-            throw new IllegalStateException("Tracking already initialized");
-        }
-
-        if (status != TaskStatus.STARTED) {
-            throw new IllegalStateException("Allowed only for STARTED tasks");
-        }
-
-        this.taskTracker = taskTracker;
-    }
-
-
-    protected String commonToString()
-    {
-        return " [" + beginTime + " : " + endTime + "]";
-    }
+	protected String commonToString() {
+		return " [" + beginTime + " : " + endTime + "]";
+	}
 }

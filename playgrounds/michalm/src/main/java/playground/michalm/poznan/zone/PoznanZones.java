@@ -28,34 +28,27 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+public class PoznanZones {
+	public static Map<Id<Zone>, Zone> readVisumZones() {
+		String zonesXmlFile = "d:/eTaxi/Poznan_MATSim/zones.xml";
+		String zonesShpFile = "d:/eTaxi/Poznan_MATSim/GIS/zones.shp";
+		return Zones.readZones(zonesXmlFile, zonesShpFile);
+	}
 
-public class PoznanZones
-{
-    public static Map<Id<Zone>, Zone> readVisumZones()
-    {
-        String zonesXmlFile = "d:/eTaxi/Poznan_MATSim/zones.xml";
-        String zonesShpFile = "d:/eTaxi/Poznan_MATSim/GIS/zones.shp";
-        return Zones.readZones(zonesXmlFile, zonesShpFile);
-    }
+	public static Map<Id<Zone>, Zone> readTaxiZones() {
+		String zonesXmlFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.xml";
+		String zonesShpFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.shp";
+		return Zones.readZones(zonesXmlFile, zonesShpFile);
+	}
 
+	public static MultiPolygon readAgglomerationArea() {
+		String agglomerationShpFile = "d:/eTaxi/Poznan_MATSim/GIS/agglomeration.shp";
 
-    public static Map<Id<Zone>, Zone> readTaxiZones()
-    {
-        String zonesXmlFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.xml";
-        String zonesShpFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.shp";
-        return Zones.readZones(zonesXmlFile, zonesShpFile);
-    }
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(agglomerationShpFile);
+		if (features.size() != 1) {
+			throw new RuntimeException();
+		}
 
-
-    public static MultiPolygon readAgglomerationArea()
-    {
-        String agglomerationShpFile = "d:/eTaxi/Poznan_MATSim/GIS/agglomeration.shp";
-
-        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(agglomerationShpFile);
-        if (features.size() != 1) {
-            throw new RuntimeException();
-        }
-
-        return (MultiPolygon)features.iterator().next().getDefaultGeometry();
-    }
+		return (MultiPolygon)features.iterator().next().getDefaultGeometry();
+	}
 }

@@ -30,7 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingUtils;
+import org.matsim.core.population.io.StreamingDeprecated;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -89,7 +89,7 @@ public class AgeWorkChecker {
 //		final Population population2 = (Population)scenario.getPopulation();
 		StreamingPopulationReader population2 = new StreamingPopulationReader( scenario ) ;
 		population2.addAlgorithm(algo);
-		StreamingUtils.setIsStreaming(population2, true);
+		StreamingDeprecated.setIsStreaming(population2, true);
 		
 //		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		population2.readFile(population);

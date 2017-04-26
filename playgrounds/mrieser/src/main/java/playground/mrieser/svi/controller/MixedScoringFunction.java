@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.deprecated.scoring.functions.CharyparNagelAgentStuckScoring;
@@ -34,7 +34,7 @@ public class MixedScoringFunction implements ScoringFunction {
 
 	private final ScoringFunction delegate;
 	
-	public MixedScoringFunction(final CharyparNagelScoringParameters params) {
+	public MixedScoringFunction(final ScoringParameters params) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, null));

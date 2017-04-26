@@ -72,7 +72,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.box.SchrimpfFactory;
@@ -330,9 +330,9 @@ public class KNFreight4 {
 			public ScoringFunction createScoringFunction(final Carrier carrier) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 				// yyyyyy I am almost sure that we better use separate scoring functions for carriers. kai, oct'13
-				sum.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build(),
+				sum.addScoringFunction(new CharyparNagelLegScoring(new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build(),
 						scenario.getNetwork() ) ) ;
-				sum.addScoringFunction( new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build()) ) ;
+				sum.addScoringFunction( new CharyparNagelMoneyScoring(new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build()) ) ;
 				ActivityScoring scoringFunction = new ActivityScoring() {
 					private double score = 0. ;
 					private final double margUtlOfTime_s = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600. ;

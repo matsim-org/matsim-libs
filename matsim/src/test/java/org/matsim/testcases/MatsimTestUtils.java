@@ -45,7 +45,7 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  *
  * @author mrieser
  */
-public class MatsimTestUtils extends TestWatchman {
+public final class MatsimTestUtils extends TestWatchman {
 
 	/** A constant for the exactness when comparing doubles. */
 	public static final double EPSILON = 1e-10;

@@ -18,17 +18,12 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import playground.agarwalamit.utils.ListUtils;
 
 /**
  * @author amit
@@ -48,9 +43,9 @@ public class UserGroupUtilsExtended {
 					allQty.add(inputMap.get(mode).get(id));
 				}
 			}
-			mode2Mean.put(mode, calculateMean(quants));
+			mode2Mean.put(mode, ListUtils.doubleMean(quants));
 		}
-		mode2Mean.put("allModes", calculateMean(allQty));
+		mode2Mean.put("allModes", ListUtils.doubleMean(allQty));
 		return mode2Mean;
 	}
 
@@ -66,9 +61,9 @@ public class UserGroupUtilsExtended {
 					allQty.addAll(inputMap.get(mode).get(id));
 				}
 			}
-			mode2Mean.put(mode, calculateMean(quants));
+			mode2Mean.put(mode, ListUtils.doubleMean(quants));
 		}
-		mode2Mean.put("allModes", calculateMean(allQty));
+		mode2Mean.put("allModes", ListUtils.doubleMean(allQty));
 		return mode2Mean;
 	}
 
@@ -119,7 +114,7 @@ public class UserGroupUtilsExtended {
 	}
 
 	public double calculateMedian(List<Double> inputList){
-		if(inputList.size()==0){
+		if(inputList.isEmpty()){
 			return 0.;
 		} else {
 			Collections.sort(inputList);
@@ -129,18 +124,6 @@ public class UserGroupUtilsExtended {
 			} else {
 				return (inputList.get(middle-1) + inputList.get(middle)) / 2.0;
 			}
-		}
-	}
-
-	public double calculateMean(List<Double> inputList){
-		if(inputList.size()==0){
-			return 0.;
-		} else {
-			double sum = 0;
-			for(double d:inputList){
-				sum +=d;
-			}
-			return sum/inputList.size();
 		}
 	}
 }

@@ -210,6 +210,9 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 				link.getVehiclePositionsEquil(positions, time, this.snapshotInfoFactory);
 			}
 		} else {
+			// log statement to clarify: why only two snapshot styles. Amit Mar'17
+			log.warn("Cannot generate snapshots offline (e.g., from events) for "+this.snapshotStyle
+					+ ". This snapshot style is supported during simulation only.");
 			throw new RuntimeException("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
 		}
 		return positions;

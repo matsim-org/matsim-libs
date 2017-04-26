@@ -85,7 +85,8 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	
 	private boolean throwNoiseEventsAffected = true;
 	private boolean computeNoiseDamages = true;
-	private boolean internalizeNoiseDamages = true;
+	private boolean internalizeNoiseDamages = true; // throw money events based on caused noise cost
+	private boolean computeAvgNoiseCostPerLinkAndTime = true;
 	private boolean computeCausingAgents = true; 
 	private boolean throwNoiseEventsCaused = true;
 	private boolean computePopulationUnits = true;
@@ -95,6 +96,8 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private String[] hgvIdPrefixes = { "lkw" };
 	private Set<String> busIdIdentifier = new HashSet<String>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
+	
+	private double noiseTollFactor = 1.0;
 	
 	// ########################################################################################################
 	
@@ -136,9 +139,14 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		comments.put("computeCausingAgents", "Set to 'true' if the noise damages should be traced back and a causing agent should be identified. Otherwise set to 'false'." ) ;
 		comments.put("throwNoiseEventsCaused", "Set to 'true' if noise events (providing information about the causing agent) should be thrown. Otherwise set to 'false'." ) ;
 		comments.put("computePopulationUnits", "Set to 'true' if population densities should be computed. Otherwise set to 'false'." ) ;
+		comments.put("internalizeNoiseDamages", "Set to 'true' if money events should be thrown based on the caused noise damages. Otherwise set to 'false'." ) ;
+		comments.put("computeAvgNoiseCostPerLinkAndTime", "Set to 'true' if average noise cost per link and time bin should be computed (required by the default noise travel distutility uesed for routing)."
+				+ "Set to 'false' if you use your own statistics for your own travel disutility." ) ;
 
 		comments.put("hgvIdPrefixes", "Specifies the HGV (heavy goods vehicles, trucks) ID prefix." ) ;
 		comments.put("busIdIdentifier", "Specifies the public transit vehicle ID identifiers. Buses are treated as HGV, other public transit vehicles are neglected." ) ;
+
+		comments.put("noiseTollFactor", "To be used for sensitivity analysis. Default: 1.0 (= the parameter has no effect)" ) ;
 
 		return comments;
 	}
@@ -652,4 +660,25 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		return tmp;
 	}
 
+	@StringGetter( "noiseTollFactor" )
+	public double getNoiseTollFactor() {
+		return noiseTollFactor;
+	}
+
+	@StringSetter( "noiseTollFactor" )
+	public void setNoiseTollFactor(double noiseTollFactor) {
+		this.noiseTollFactor = noiseTollFactor;
+	}
+
+	@StringGetter( "computeAvgNoiseCostPerLinkAndTime" )
+	public boolean isComputeAvgNoiseCostPerLinkAndTime() {
+		return computeAvgNoiseCostPerLinkAndTime;
+	}
+
+	@StringSetter( "computeAvgNoiseCostPerLinkAndTime" )
+	public void setComputeAvgNoiseCostPerLinkAndTime(boolean computeAvgNoiseCostPerLinkAndTime) {
+		this.computeAvgNoiseCostPerLinkAndTime = computeAvgNoiseCostPerLinkAndTime;
+	}
+
+	
 }

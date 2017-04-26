@@ -8,6 +8,8 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.LinkedList;
 import java.util.List;
 
+import contrib.baseline.modification.EndTimeDiluter;
+import contrib.baseline.modification.FreespeedAdjustment;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.network.Network;
@@ -308,7 +310,6 @@ public class Builder {
 		"defaultIVTConfig.xml",
 		"facilities.xml.gz",
 		"household_attributes.xml.gz",
-		"facilitiesLinks.f2l",
 		"households.xml.gz",
 		"mmNetwork.xml.gz",
 		"mmSchedule.xml.gz",
@@ -363,6 +364,38 @@ public class Builder {
 		
 		return valid;
 	}
+
+	private void applyModifications() throws IOException {
+        System.out.println("Diluting population end times ...");
+
+        FileUtils.moveFile(
+                new File(scenarioDirectory, "population.xml.gz"),
+                new File(scenarioDirectory, "population_original.xml.gz")
+        );
+
+        new EndTimeDiluter().dilutePopulation(
+                new File(scenarioDirectory, "population_original.xml.gz").getAbsolutePath(),
+                new File(scenarioDirectory, "population.xml.gz").getAbsolutePath()
+        );
+
+        System.gc();
+
+        FileUtils.deleteQuietly(new File(scenarioDirectory, "population_original.xml.gz"));
+
+        System.out.println("Adjusting freespeeds ...");
+
+        FileUtils.moveFile(
+                new File(scenarioDirectory, "mmNetwork.xml.gz"),
+                new File(scenarioDirectory, "mmNetwork_original.xml.gz")
+        );
+
+        new FreespeedAdjustment().adjustSpeeds(
+                new File(scenarioDirectory, "mmNetwork_original.xml.gz").getAbsolutePath(),
+                new File(scenarioDirectory, "mmNetwork.xml.gz").getAbsolutePath()
+        );
+
+        FileUtils.deleteQuietly(new File(scenarioDirectory, "mmNetwork_original.xml.gz"));
+    }
 	
 	private void createFinalScenario() throws IOException {
 		System.out.println("Creating final scenario ...");
@@ -372,12 +405,24 @@ public class Builder {
 		List<String> command = new LinkedList<>();
 		command.add(scenarioDirectory.getAbsolutePath());
 		command.add(resourcesDirectory.getAbsolutePath());
-		command.add("1");
+
+		switch (config.getScaling()) {
+			case SCALING_1:
+				command.add("1"); break;
+			case SCALING_10:
+				command.add("10"); break;
+			case SCALING_100:
+				command.add("100"); break;
+			default:
+				throw new IllegalStateException();
+		}
 		
 		String[] arguments = new String[command.size()];
 		PreparationScript.main(command.toArray(arguments));
 		System.gc();
-		
+
+        applyModifications();
+
 		System.out.println("Done creating final scenario.");
 	}
 	

@@ -16,9 +16,13 @@ public class RunBikes {
 
 //		//boddin
 //		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/boddin/config_bike_boddin.xml", new BikeConfigGroup());
-		//berlin
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/config_bike_berlin.xml", new BikeConfigGroup());
+//		//berlin
+//		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/input/szenarios/berlin/config_bike_berlin.xml", new BikeConfigGroup());
 
+		//Oslo
+		Config config = ConfigUtils.loadConfig("../../../../desktop/Oslo/config_bike_oslo.xml", new BikeConfigGroup());
+
+		
 //		config.controler().setOutputDirectory("../../../runs-svn/berlin-bike/BerlinBike_0804_BVG_15000");
 //		
 //		config.plans().setInputFile("demand/bvg.run189.10pct.100.plans.selected_bikeonly_1percent_clean.xml.gz" );
@@ -26,7 +30,7 @@ public class RunBikes {
 //		config.network().setInputFile("network/BerlinBikeNet_MATsim.xml");
 		
 
-//		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		

@@ -24,20 +24,14 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
 
+public interface EvData {
+	public Map<Id<Charger>, Charger> getChargers();
 
-public interface EvData
-{
-    public Map<Id<Charger>, Charger> getChargers();
+	public void addCharger(Charger charger);
 
+	public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles();
 
-    public void addCharger(Charger charger);
+	public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev);
 
-
-    public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles();
-
-
-    public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev);
-
-
-    public void clearQueuesAndResetBatteries();
+	public void clearQueuesAndResetBatteries();
 }

@@ -19,19 +19,14 @@
 
 package playground.michalm.ev.data;
 
-public interface Battery
-{
-    double getCapacity();
+public interface Battery {
+	double getCapacity();
 
+	double getSoc();
 
-    double getSoc();
+	void charge(double energy);
 
+	void discharge(double energy);
 
-    void charge(double energy);
-
-
-    void discharge(double energy);
-
-
-    void resetSoc();
+	void resetSoc();
 }

@@ -111,8 +111,7 @@ public class CountsInserter {
 				String surveyLocation = parts[0];
 				String linkId = parts[1];
 
-				Tuple<Id<Link>,String> nowTuple = new Tuple<>(Id.createLinkId(linkId), surveyLocation);
-				link2stationNumber = nowTuple;
+				link2stationNumber = new Tuple<>(Id.createLinkId(linkId), surveyLocation);
 
 				int timebin = Integer.valueOf(parts[2]);
 				Map<String,Double> mode2count = new HashMap<>();

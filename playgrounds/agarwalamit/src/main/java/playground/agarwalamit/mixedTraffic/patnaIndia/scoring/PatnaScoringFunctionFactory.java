@@ -36,9 +36,9 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -50,10 +50,10 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 public class PatnaScoringFunctionFactory implements ScoringFunctionFactory{
 	
 	public PatnaScoringFunctionFactory(Scenario sc) {
-		parameters = new SubpopulationCharyparNagelScoringParameters( sc );
+		parameters = new SubpopulationScoringParameters( sc );
 	}
 	
-	final CharyparNagelScoringParametersForPerson parameters ;
+	final ScoringParametersForPerson parameters ;
 	@Inject Network network;
 	@Inject Population population;
 	@Inject PlanCalcScoreConfigGroup planCalcScoreConfigGroup; // to modify the util parameters
@@ -61,7 +61,7 @@ public class PatnaScoringFunctionFactory implements ScoringFunctionFactory{
 	
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+		final ScoringParameters params = parameters.getScoringParameters( person );
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
@@ -100,9 +100,9 @@ public class PatnaScoringFunctionFactory implements ScoringFunctionFactory{
 			
 			ScoringParameterSet scoringParameterSet = planCalcScoreConfigGroup.getScoringParameters( null ); // parameters set is same for all subPopulations 
 			
-			CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(
+			ScoringParameters.Builder builder = new ScoringParameters.Builder(
 					planCalcScoreConfigGroup, scoringParameterSet, scenarioConfig);
-			final CharyparNagelScoringParameters modifiedParams = builder.build();
+			final ScoringParameters modifiedParams = builder.build();
 			
 			legScoringFunction = new CharyparNagelLegScoring(modifiedParams, network);
 			moneyScoringFunction = new CharyparNagelMoneyScoring(modifiedParams); 

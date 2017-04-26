@@ -24,6 +24,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -36,9 +37,12 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -51,6 +55,8 @@ import java.util.stream.DoubleStream;
  */
 public class ScalabilityStatisticsListener implements AutoCloseable {
 	private static final Logger log = Logger.getLogger( ScalabilityStatisticsListener.class );
+
+	private static final int N_DISTANCES = 10000;
 	
 	private final BufferedWriter writer;
 	private final Set<Set<Ego>> cliques = new HashSet<>();
@@ -70,12 +76,13 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 		try {
 			writer.write( "currSample\ttryNr\t" +
 					"duration_ms\tpopulationSize\t" +
-					"cliqueSizeMin\tcliqueSizeQ1\tcliqueSizeMedian\tcliqueSizeQ3\tcliqueSizeMax\t" +
-					"degreeMin\tdegreeQ1\tdegreeMedian\tdegreeQ3\tdegreeMax\t" +
-					"distanceMin\tdistanceQ1\tdistanceMedian\tdistanceQ3\tdistanceMax\t" +
-					"overlapMin\toverlapQ1\toverlapMedian\toverlapQ3\toverlapMax\t" +
+					"cliqueSizeMin\tcliqueSizeQ1\tcliqueSizeMedian\tcliqueSizeQ3\tcliqueSizeMax\tcliqueSizeAvg\t" +
+					"degreeMin\tdegreeQ1\tdegreeMedian\tdegreeQ3\tdegreeMax\tdegreeAvg\t" +
+					"distanceMin\tdistanceQ1\tdistanceMedian\tdistanceQ3\tdistanceMax\tdistanceAvg\t" +
+					"overlapMin\toverlapQ1\toverlapMedian\toverlapQ3\toverlapMax\toverlapAvg\t" +
 					"nConnectedComponents\t" +
-					"componentSizeMin\tcomponentSizeQ1\tcomponentSizeMedian\tcomponentSizeQ3\tcomponentSizeMax\t" +
+					"componentSizeMin\tcomponentSizeQ1\tcomponentSizeMedian\tcomponentSizeQ3\tcomponentSizeMax\tcomponentSizeAvg\t" +
+					"socialDistanceMin\tsocialDistanceQ1\tsocialDistanceMedian\tsocialDistanceQ3\tsocialDistanceMax\tsocialDistanceAvg\t" +
 					"peakMemoryUsage_bytes" );
 		}
 		catch ( IOException e ) {
@@ -149,9 +156,20 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 					(Ego e) -> nCliqueTies.get( e ) / e.getAlters().size() );
 
 			log.info( "write connected components statistics..." );
-			final Collection<Set<Id>> components = SnaUtils.identifyConnectedComponents( sn );
+			final Collection<Set<Id<Person>>> components = SnaUtils.identifyConnectedComponents( sn );
 			writer.write( "\t"+components.size()+"\t" );
 			writeBoxPlot( components , Set::size );
+			writer.write( "\t" );
+
+			log.info( "write social distance statistics..." );
+			final List<Double> distances = new ArrayList<>( N_DISTANCES + 1 );
+			//distances.add( 1d ); // to be sure to have the minimum
+			SnaUtils.sampleSocialDistances(
+					sn,
+					new Random( 123 ),
+					N_DISTANCES,
+					(e,a,d) -> distances.add( d ) );
+			writeBoxPlot( distances , d -> d );
 
 			log.info( "write memory statistics..." );
 			writer.write( "\t"+peakMemory_bytes.get() );
@@ -187,7 +205,9 @@ public class ScalabilityStatisticsListener implements AutoCloseable {
 		double q3 = arr[ 3 * last / 4 ];
 		double max = arr[ last ];
 
-		writer.write( min+"\t"+q1+"\t"+median+"\t"+q3+"\t"+max );
+		double avg = Arrays.stream( arr ).average().orElse( Double.NaN );
+
+		writer.write( min+"\t"+q1+"\t"+median+"\t"+q3+"\t"+max+"\t"+avg );
 	}
 
 	@Override

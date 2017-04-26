@@ -31,7 +31,7 @@ import org.matsim.contrib.minibus.performance.PTransitLineMerger;
 import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
-import org.matsim.contrib.minibus.scoring.ScoreContainer;
+import org.matsim.contrib.minibus.scoring.PScoreContainer;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
@@ -66,13 +66,12 @@ abstract class AbstractOperator implements Operator{
 	private int numberOfIterationsForProspecting;
 	
 	double budget;
-	double score;
-	double scoreLastIteration;
+	private double score;
+	private double scoreLastIteration;
 	int numberOfVehiclesInReserve;
 	
 	PRouteProvider routeProvider;
 	int currentIteration;
-
 
 	AbstractOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
@@ -107,33 +106,42 @@ abstract class AbstractOperator implements Operator{
 	}
 
 	@Override
-	public void score(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap) {
-		this.scoreLastIteration = this.score;
-		this.score = 0;
+	public void score(Map<Id<Vehicle>, PScoreContainer> pScores, SubsidyI subsidy) {
+		this.setScoreLastIteration(this.getScore());
+		this.setScore(0);
 		
 		// score all plans
 		for (PPlan plan : this.getAllPlans()) {
-			scorePlan(driverId2ScoreMap, plan);
-			this.score += plan.getScore();
+			scorePlan(pScores, plan);
+			
+			if (subsidy != null) {
+				Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);
+				double subsidyAmount = subsidy.getSubsidy(pplanId);
+				double newPlanScore = subsidyAmount + plan.getScore();
+				plan.setScore(newPlanScore);
+			}
+			
+			this.setScore(this.getScore() + plan.getScore());
+
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
-				route.setDescription(plan.toString(this.budget + this.score));
+				route.setDescription(plan.toString(this.budget + this.getScore()));
 			}
 		}
 		
 		processScore();
 	}
 	
-	protected void processScore() {
+	void processScore() {
 		// score all vehicles not associated with plans
-		score -= this.numberOfVehiclesInReserve * this.costPerVehicleAndDay;
+		setScore(getScore() - this.numberOfVehiclesInReserve * this.costPerVehicleAndDay);
 		
-		if (this.score > 0.0) {
+		if (this.getScore() > 0.0) {
 			this.operatorState = OperatorState.INBUSINESS;
 		}
 		
 		if (this.operatorState.equals(OperatorState.PROSPECTING)) {
 			if(this.numberOfIterationsForProspecting == 0){
-				if (this.score < 0.0) {
+				if (this.getScore() < 0.0) {
 					// no iterations for prospecting left and score still negative - terminate
 					this.operatorState = OperatorState.BANKRUPT;
 				}
@@ -141,7 +149,7 @@ abstract class AbstractOperator implements Operator{
 			this.numberOfIterationsForProspecting--;
 		}
 
-		this.budget += this.score;
+		this.budget += this.getScore();
 		
 		// check, if bankrupt
 		if(this.budget < 0){
@@ -264,7 +272,7 @@ abstract class AbstractOperator implements Operator{
 		}
 	}
 
-	protected final void scorePlan(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap, PPlan plan) {
+	private final static void scorePlan(Map<Id<Vehicle>, PScoreContainer> driverId2ScoreMap, PPlan plan) {
 		double totalLineScore = 0.0;
 		int totalTripsServed = 0;
 		
@@ -275,6 +283,22 @@ abstract class AbstractOperator implements Operator{
 		
 		plan.setScore(totalLineScore);
 		plan.setTripsServed(totalTripsServed);
+	}
+
+	double getScore() {
+		return score;
+	}
+
+	void setScore(double score) {
+		this.score = score;
+	}
+
+	double getScoreLastIteration() {
+		return scoreLastIteration;
+	}
+
+	void setScoreLastIteration(double scoreLastIteration) {
+		this.scoreLastIteration = scoreLastIteration;
 	}
 	
 }

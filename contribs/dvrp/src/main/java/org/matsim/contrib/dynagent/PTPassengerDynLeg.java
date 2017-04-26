@@ -25,19 +25,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.transitSchedule.api.*;
 
+public interface PTPassengerDynLeg extends PassengerDynLeg {
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute,
+			final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle);
 
-public interface PTPassengerDynLeg
-    extends PassengerDynLeg
-{
-    public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute,
-            final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle);
+	public boolean getExitAtStop(final TransitStopFacility stop);
 
+	public Id<TransitStopFacility> getDesiredAccessStopId();
 
-    public boolean getExitAtStop(final TransitStopFacility stop);
-
-
-    public Id<TransitStopFacility> getDesiredAccessStopId();
-
-
-    public Id<TransitStopFacility> getDesiredDestinationStopId();
+	public Id<TransitStopFacility> getDesiredDestinationStopId();
 }

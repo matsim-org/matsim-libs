@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -53,6 +54,7 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 	public static class FixedGroupsProvider implements Provider<FixedGroupsIdentifier> {
 		private final Scenario scenario;
 
+		@Inject
 		public FixedGroupsProvider( final Scenario sc ) {
 			this.scenario = sc;
 		}
@@ -65,7 +67,7 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 
 			return config.households().getInputFile()!=null ?
 					new FixedGroupsIdentifier(
-							((MutableScenario) scenario).getHouseholds() ) :
+							scenario.getHouseholds() ) :
 					FixedGroupsIdentifierFileParser.readCliquesFile(
 							cliquesConf.getInputFile() );
 		}

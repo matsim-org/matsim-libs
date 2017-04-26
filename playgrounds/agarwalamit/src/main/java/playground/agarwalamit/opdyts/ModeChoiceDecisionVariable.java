@@ -30,26 +30,27 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
  */
 
 
+@SuppressWarnings("DefaultFileTemplate")
 public class ModeChoiceDecisionVariable implements DecisionVariable {
 
-    playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable delegate ;
+    private final playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable delegate ;
 
-    private final OpdytsScenarios objectiveFunctionCases;
+    private final OpdytsScenario opdytsScenario;
     private final String subPopulation;
     private final PlanCalcScoreConfigGroup newScoreConfig;
 
     public ModeChoiceDecisionVariable(final PlanCalcScoreConfigGroup neScoreConfig, final Scenario scenario,
-                                      final OpdytsScenarios objectiveFunctionCases, final String subPopulatioun){
+                                      final OpdytsScenario opdytsScenario, final String subPopulatioun){
         delegate = new playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable(neScoreConfig,scenario);
         this.newScoreConfig = neScoreConfig;
-        this.objectiveFunctionCases = objectiveFunctionCases;
+        this.opdytsScenario = opdytsScenario;
         this.subPopulation = subPopulatioun;
 
     }
 
     public ModeChoiceDecisionVariable(final PlanCalcScoreConfigGroup neScoreConfig, final Scenario scenario,
-                               final OpdytsScenarios objectiveFunctionCases){
-        this (neScoreConfig, scenario, objectiveFunctionCases, null);
+                               final OpdytsScenario opdytsScenario){
+        this (neScoreConfig, scenario, opdytsScenario, null);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class ModeChoiceDecisionVariable implements DecisionVariable {
     @Override
     public String toString(){
         final Map<String, PlanCalcScoreConfigGroup.ModeParams> allModes = this.newScoreConfig.getScoringParameters(this.subPopulation).getModes();
-        switch (this.objectiveFunctionCases){
+        switch (this.opdytsScenario){
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:
                 return delegate.toString();

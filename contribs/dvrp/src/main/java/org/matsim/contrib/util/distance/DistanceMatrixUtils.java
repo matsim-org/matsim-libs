@@ -22,22 +22,18 @@ package org.matsim.contrib.util.distance;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.matrices.Matrix;
 
+public class DistanceMatrixUtils {
+	public static Matrix calculateDistanceMatrix(DistanceCalculator calculator,
+			Iterable<? extends BasicLocation<?>> fromLocations, Iterable<? extends BasicLocation<?>> toLocations) {
+		Matrix matrix = new Matrix("distance", "distance");
 
-public class DistanceMatrixUtils
-{
-    public static Matrix calculateDistanceMatrix(DistanceCalculator calculator,
-            Iterable<? extends BasicLocation<?>> fromLocations,
-            Iterable<? extends BasicLocation<?>> toLocations)
-    {
-        Matrix matrix = new Matrix("distance", "distance");
+		for (BasicLocation<?> from : fromLocations) {
+			for (BasicLocation<?> to : toLocations) {
+				double distance = calculator.calcDistance(from.getCoord(), to.getCoord());
+				matrix.createEntry(from.getId().toString(), to.getId().toString(), distance);
+			}
+		}
 
-        for (BasicLocation<?> from : fromLocations) {
-            for (BasicLocation<?> to : toLocations) {
-                double distance = calculator.calcDistance(from.getCoord(), to.getCoord());
-                matrix.createEntry(from.getId().toString(), to.getId().toString(), distance);
-            }
-        }
-
-        return matrix;
-    }
+		return matrix;
+	}
 }

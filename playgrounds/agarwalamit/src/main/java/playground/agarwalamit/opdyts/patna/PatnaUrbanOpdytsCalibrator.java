@@ -19,8 +19,23 @@
 
 package playground.agarwalamit.opdyts.patna;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.utils.io.IOUtils;
+
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -30,21 +45,18 @@ import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import playground.agarwalamit.analysis.controlerListener.ModalShareControlerListener;
-import playground.agarwalamit.analysis.controlerListener.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
-import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
-import playground.agarwalamit.opdyts.*;
+import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
+import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
+import playground.agarwalamit.opdyts.DistanceDistribution;
+import playground.agarwalamit.opdyts.ModeChoiceDecisionVariable;
+import playground.agarwalamit.opdyts.ModeChoiceObjectiveFunction;
+import playground.agarwalamit.opdyts.ModeChoiceRandomizer;
+import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
+import playground.agarwalamit.opdyts.OpdytsScenario;
+import playground.agarwalamit.opdyts.RandomizedUtilityParametersChoser;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
@@ -54,9 +66,9 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class PatnaUrbanOpdytsCalibrator {
 
-	private static final OpdytsScenarios PATNA_1_PCT = OpdytsScenarios.PATNA_1Pct;
-	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/output222/";
-	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run108/opdyts/input/";
+	private static final OpdytsScenario PATNA_1_PCT = OpdytsScenario.PATNA_1Pct;
+	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/output222/";
+	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/input/";
 
 	public static void main(String[] args) {
 
@@ -64,16 +76,19 @@ public class PatnaUrbanOpdytsCalibrator {
 		int iterationsToConvergence = 10; //
 		int averagingIterations = 10;
 		boolean isRunningOnCluster = false;
-		double randomVariance = 0.1;
+		double randomVariance = 1.0;
 
 		if (args.length>0) isRunningOnCluster = true;
 
 		if ( isRunningOnCluster ) {
-			OUT_DIR = args[0];
+
 			configFile = args[1];
 			averagingIterations = Integer.valueOf(args[2]);
 			iterationsToConvergence = Integer.valueOf(args[3]);
 			randomVariance = Double.valueOf(args[4]);
+
+			OUT_DIR = args[0]+"RV_"+randomVariance+"_AI_"+averagingIterations+"its/";
+
 		} else {
 			configFile = configDir+"/config_urban_1pct.xml";
 		}
@@ -93,6 +108,12 @@ public class PatnaUrbanOpdytsCalibrator {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
+		// adding pt fare system based on distance
+		// for above make sure that util_dist and monetary dist rate for pt are zero.
+		PlanCalcScoreConfigGroup.ModeParams mp = scenario.getConfig().planCalcScore().getModes().get("pt");
+		mp.setMarginalUtilityOfDistance(0.0);
+		mp.setMonetaryDistanceRate(0.0);
+
 		// == opdyts settings
 		// this is something like time bin generator
 		int startTime= 0;
@@ -104,10 +125,11 @@ public class PatnaUrbanOpdytsCalibrator {
 		modes2consider.add("car");
 		modes2consider.add("bike");
 		modes2consider.add("motorbike");
-//		modes2consider.add("pt");
-//		modes2consider.add("walk");
+		modes2consider.add("pt");
+		modes2consider.add("walk");
 
-		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,PATNA_1_PCT);
+		DistanceDistribution referenceStudyDistri = new PatnaOneBinDistanceDistribution(PATNA_1_PCT);
+		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
 		// following is the  entry point to start a matsim controler together with opdyts
 		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, modes2consider);
@@ -127,13 +149,16 @@ public class PatnaUrbanOpdytsCalibrator {
 				this.bind(ModalTripTravelTimeHandler.class);
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
-				bind(CharyparNagelScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+				bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+
+				// adding pt fare system based on distance
+				this.addEventHandlerBinding().to(PtFareEventHandler.class);
 			}
 		});
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(PATNA_1_PCT); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(referenceStudyDistri); // in this, the method argument (SimulatorStat) is not used.
 
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
@@ -174,5 +199,11 @@ public class PatnaUrbanOpdytsCalibrator {
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
+
+		// remove the unused iterations
+		for (int index =0; index < maxIterations; index++) {
+			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
+			IOUtils.deleteDirectory(new File(dir2remove));
+		}
 	}
 }

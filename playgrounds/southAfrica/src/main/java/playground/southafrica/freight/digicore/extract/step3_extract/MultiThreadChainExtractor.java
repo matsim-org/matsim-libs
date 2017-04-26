@@ -27,7 +27,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
@@ -67,7 +66,11 @@ public class MultiThreadChainExtractor {
 		String threads = args[3];
 		String thresholdMinorMajor = args[4];
 		String thresholdActivity = args[5];
+		
 		String crs = args[6];
+		if(!crs.equalsIgnoreCase(TransformationFactory.HARTEBEESTHOEK94_LO29)){
+			log.warn("Expected " + TransformationFactory.HARTEBEESTHOEK94_LO29 + " as coordinate reference system.");
+		}
 
 		/* Check that file folder exists and is readable. */
 		File folder = new File(inputFolderName);

@@ -10,7 +10,7 @@ import java.util.Set;
  * @author Gunnar Flötteröd
  *
  */
-public class Sampers2MATSimResampler {
+public class Sampers2MATSimResampler implements Runnable {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -28,8 +28,8 @@ public class Sampers2MATSimResampler {
 
 	public Sampers2MATSimResampler(final Random rnd, final Set<? extends Alternative> choiceSet,
 			final int drawsWithReplacement) {
-
-		this.rnd = rnd;
+		
+		this.rnd = new Random(rnd.nextLong());
 		this.alternatives = new ArrayList<>(choiceSet.size());
 		this.acceptanceProbas = new ArrayList<>(choiceSet.size());
 
@@ -50,10 +50,6 @@ public class Sampers2MATSimResampler {
 		for (Double acceptanceWeight : acceptanceWeights) {
 			this.acceptanceProbas.add(acceptanceWeight / maxAcceptanceWeight);
 		}
-
-		// System.out.println(acceptanceWeights);
-		// System.out.println(this.acceptanceProbas);
-		// System.exit(0);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -62,7 +58,9 @@ public class Sampers2MATSimResampler {
 		final List<Double> randomUtilityRealizations = new ArrayList<>(this.alternatives.size());
 		for (Alternative alt : this.alternatives) {
 			final double targetScore = alt.getSampersOnlyScore() + alt.getMATSimTimeScore();
-			randomUtilityRealizations.add(targetScore + alt.getEpsilonDistribution().nextEpsilon());
+			final double epsilonRealization = alt.getEpsilonDistribution().nextEpsilon();
+			randomUtilityRealizations.add(targetScore + epsilonRealization);
+			alt.setSampersEpsilonRealization(epsilonRealization);
 		}
 		int result = 0;
 		double resultRU = randomUtilityRealizations.get(0);
@@ -86,5 +84,18 @@ public class Sampers2MATSimResampler {
 			}
 		}
 	}
-
+	
+	// -------------------- IMPLEMENTATION OF Runnable --------------------
+	
+	private Alternative result = null;
+	
+	public Alternative getResult() {
+		return this.result;
+	}
+	
+	@Override
+	public void run() {
+		System.out.println("Simulating a choice");
+		this.result = this.next();
+	}
 }

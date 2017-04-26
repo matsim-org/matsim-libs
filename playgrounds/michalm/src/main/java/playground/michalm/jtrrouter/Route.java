@@ -21,71 +21,55 @@ package playground.michalm.jtrrouter;
 
 import java.util.List;
 
-
 /**
  * @author michalm
  */
-public class Route
-{
-    final Flow inFlow;
-    final Flow outFlow;
+public class Route {
+	final Flow inFlow;
+	final Flow outFlow;
 
-    final int nodeCount;
-    final String nodes;
+	final int nodeCount;
+	final String nodes;
 
-    final double prob;
+	final double prob;
 
+	public Route(Flow in, Flow out, List<Integer> nodeList, double prob) {
+		this.inFlow = in;
+		this.outFlow = out;
+		this.prob = prob;
+		this.nodeCount = nodeList.size();
 
-    public Route(Flow in, Flow out, List<Integer> nodeList, double prob)
-    {
-        this.inFlow = in;
-        this.outFlow = out;
-        this.prob = prob;
-        this.nodeCount = nodeList.size();
+		StringBuilder sb = new StringBuilder(nodeCount * 3);
 
-        StringBuilder sb = new StringBuilder(nodeCount * 3);
+		for (int i = 0; i < nodeCount; i++) {
+			sb.append(nodeList.get(i)).append(' ');
+		}
 
-        for (int i = 0; i < nodeCount; i++) {
-            sb.append(nodeList.get(i)).append(' ');
-        }
+		nodes = sb.toString();
+	}
 
-        nodes = sb.toString();
-    }
+	public String toString() {
+		return new StringBuilder(nodes.length() + 15).append("IN").append(inFlow.node).append(' ').append(nodes)
+				.append("OUT").append(outFlow.node).toString();
+	}
 
+	public Flow getInFlow() {
+		return inFlow;
+	}
 
-    public String toString()
-    {
-        return new StringBuilder(nodes.length() + 15).append("IN").append(inFlow.node).append(' ')
-                .append(nodes).append("OUT").append(outFlow.node).toString();
-    }
+	public Flow getOutFlow() {
+		return outFlow;
+	}
 
+	public String getNodes() {
+		return nodes;
+	}
 
-    public Flow getInFlow()
-    {
-        return inFlow;
-    }
+	public int getNodeCount() {
+		return nodeCount;
+	}
 
-
-    public Flow getOutFlow()
-    {
-        return outFlow;
-    }
-
-
-    public String getNodes()
-    {
-        return nodes;
-    }
-
-
-    public int getNodeCount()
-    {
-        return nodeCount;
-    }
-
-
-    public double getProb()
-    {
-        return prob;
-    }
+	public double getProb() {
+		return prob;
+	}
 }

@@ -29,47 +29,41 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import playground.michalm.ev.data.*;
 import playground.michalm.ev.data.file.*;
 
+public class AudiAVSmallChargingInfrastructureCreator {
+	public static void main(String[] args) {
+		String dir = "../../../shared-svn/projects/audi_av/scenario/";
+		String netFile = dir + "networkc.xml.gz";
+		String runDir = "../../../runs-svn/avsim_time_variant_network/";
+		String chFilePrefix = runDir + "chargers/chargers_";
+		String fractChFilePrefix = runDir + "chargers_small/chargers_";
 
-public class AudiAVSmallChargingInfrastructureCreator
-{
-    public static void main(String[] args)
-    {
-        String dir = "../../../shared-svn/projects/audi_av/scenario/";
-        String netFile = dir + "networkc.xml.gz";
-        String runDir = "../../../runs-svn/avsim_time_variant_network/";
-        String chFilePrefix = runDir + "chargers/chargers_";
-        String fractChFilePrefix = runDir + "chargers_small/chargers_";
+		String[] scenarios = { "FOSSIL_FUEL_MINUS_20", "ZERO", "MINUS_20", "ONLY_DRIVE", "PLUS_20" };
 
-        String[] scenarios = { "FOSSIL_FUEL_MINUS_20", "ZERO", "MINUS_20", "ONLY_DRIVE",
-                "PLUS_20" };
+		int[] counts = { 10560, 15086, 21120, 4800, 6600 };// these numbers do not include plugs...
 
-        int[] counts = { 10560, 15086, 21120, 4800, 6600 };//these numbers do not include plugs...
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile(netFile);
 
-        Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile(netFile);
+		double fraction = 0.001;
+		UniformRandom uniform = RandomUtils.getGlobalUniform();
+		for (int i = 0; i < scenarios.length; i++) {
+			String s = scenarios[i];
+			int c = counts[i];
 
-        double fraction = 0.001;
-        UniformRandom uniform = RandomUtils.getGlobalUniform();
-        for (int i = 0; i < scenarios.length; i++) {
-            String s = scenarios[i];
-            int c = counts[i];
+			EvData data = new EvDataImpl();
+			new ChargerReader(network, data).readFile(chFilePrefix + c + "_" + s + ".xml");
 
-            EvData data = new EvDataImpl();
-            new ChargerReader(network, data).readFile(chFilePrefix + c + "_" + s + ".xml");
+			List<Charger> fractChargers = new ArrayList<>();
+			int totalPlugs = 0;
+			for (Charger ch : data.getChargers().values()) {
+				int plugs = (int)uniform.floorOrCeil(fraction * ch.getPlugs());
+				if (plugs > 0) {
+					fractChargers.add(new ChargerImpl(ch.getId(), ch.getPower(), plugs, ch.getLink()));
+					totalPlugs += plugs;
+				}
+			}
 
-            List<Charger> fractChargers = new ArrayList<>();
-            int totalPlugs = 0;
-            for (Charger ch : data.getChargers().values()) {
-                int plugs = (int)uniform.floorOrCeil(fraction * ch.getPlugs());
-                if (plugs > 0) {
-                    fractChargers
-                            .add(new ChargerImpl(ch.getId(), ch.getPower(), plugs, ch.getLink()));
-                    totalPlugs += plugs;
-                }
-            }
-
-            new ChargerWriter(fractChargers)
-                    .write(fractChFilePrefix + totalPlugs + "_" + s + ".xml");
-        }
-    }
+			new ChargerWriter(fractChargers).write(fractChFilePrefix + totalPlugs + "_" + s + ".xml");
+		}
+	}
 }

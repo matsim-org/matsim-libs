@@ -28,32 +28,27 @@ import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
+public class RunVehicleCount {
+	public static void main(String[] args) throws IOException {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		FleetImpl fleet = new FleetImpl();
+		VehicleReader reader = new VehicleReader(scenario.getNetwork(), fleet);
+		reader.readFile("d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");
 
-public class RunVehicleCount
-{
-    public static void main(String[] args)
-        throws IOException
-    {
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        VrpData data = new VrpDataImpl();
-        VehicleReader reader = new VehicleReader(scenario.getNetwork(), data);
-        reader.readFile(
-                "d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");
+		VehicleCounter counter = new VehicleCounter(fleet.getVehicles().values());
+		List<Integer> counts = counter.countVehiclesOverTime(5 * 60);
 
-        VehicleCounter counter = new VehicleCounter(data.getVehicles().values());
-        List<Integer> counts = counter.countVehiclesOverTime(5 * 60);
+		File file = new File(
+				"d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0-counts.txt");
+		BufferedWriter bf = new BufferedWriter(new FileWriter(file));
 
-        File file = new File(
-                "d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0-counts.txt");
-        BufferedWriter bf = new BufferedWriter(new FileWriter(file));
+		int time = 0;
+		bf.write("Time\tCount\n");
+		for (Integer i : counts) {
+			bf.write(time + "\t" + i + "\n");
+			time += 5 * 60;
+		}
 
-        int time = 0;
-        bf.write("Time\tCount\n");
-        for (Integer i : counts) {
-            bf.write(time + "\t" + i + "\n");
-            time += 5 * 60;
-        }
-
-        bf.close();
-    }
+		bf.close();
+	}
 }

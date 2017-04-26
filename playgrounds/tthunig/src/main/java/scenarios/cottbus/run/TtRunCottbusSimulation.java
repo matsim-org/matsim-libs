@@ -52,7 +52,6 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerDa
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignalsLiveModule;
-import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -618,11 +617,6 @@ public class TtRunCottbusSimulation {
 			controler.addOverridingModule(signalsModule);
 		}
 		
-		// add the module for link to link routing if enabled
-		if (config.controler().isLinkToLinkRoutingEnabled()){
-			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		}
-
 		if (PRICING_TYPE.toString().startsWith("CP_")){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
