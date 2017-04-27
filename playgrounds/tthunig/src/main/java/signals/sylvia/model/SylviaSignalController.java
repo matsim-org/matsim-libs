@@ -35,6 +35,7 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.AbstractSignalController;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
+import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
@@ -65,19 +66,17 @@ public class SylviaSignalController extends AbstractSignalController implements 
 	public final static class SignalControlProvider implements Provider<SignalController>{
 		private DgSylviaConfig sylviaConfig;
 		private LinkSensorManager sensorManager;
-		private Scenario scenario;
 		private DownstreamSensor downstreamSensor;
 		
-		public SignalControlProvider(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, Scenario scenario) {
+		public SignalControlProvider(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
 			this.sylviaConfig = sylviaConfig;
 			this.sensorManager = sensorManager;
-			this.scenario = scenario;
 			this.downstreamSensor = downstreamSensor;
 		}
 		
 		@Override
 		public SylviaSignalController get() {
-			return new SylviaSignalController(sylviaConfig, sensorManager, downstreamSensor, scenario);
+			return new SylviaSignalController(sylviaConfig, sensorManager, downstreamSensor);
 		}
 	}
 	
@@ -95,13 +94,11 @@ public class SylviaSignalController extends AbstractSignalController implements 
 	private final DgSylviaConfig sylviaConfig;
 	private final LinkSensorManager sensorManager;
 	private final DownstreamSensor downstreamSensor;
-	private final SignalsData signalsData;
 
-	private SylviaSignalController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, Scenario scenario) {
+	private SylviaSignalController(DgSylviaConfig sylviaConfig, LinkSensorManager sensorManager, DownstreamSensor downstreamSensor) {
 		this.sylviaConfig = sylviaConfig;
 		this.sensorManager = sensorManager;
 		this.downstreamSensor = downstreamSensor;
-		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.init();
 	}
 	
@@ -291,7 +288,7 @@ public class SylviaSignalController extends AbstractSignalController implements 
 					return false;
 			}
 		}
-		for (SignalData signal : extensionPoint.getSignals()) {
+		for (Signal signal : extensionPoint.getSignals()) {
 			if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()) {
 				// link has no lanes
 				int noCars = this.sensorManager.getNumberOfCarsInDistance(signal.getLinkId(), this.sylviaConfig.getSensorDistanceMeter(), currentTime);
@@ -440,15 +437,12 @@ public class SylviaSignalController extends AbstractSignalController implements 
 	 */
 	private void initializeSensoring(){
 		for (DgExtensionPoint extPoint : this.extensionPointMap.values()){
-			Set<SignalData> extPointSignals = new HashSet<SignalData>();
+			Set<Signal> extPointSignals = new HashSet<>();
 			for (Id<SignalGroup> signalGroupId : extPoint.getSignalGroupIds()){
-				SignalSystemData systemData = this.signalsData.getSignalSystemsData().getSignalSystemData().get(this.system.getId());
-				SignalGroupData signalGroup = this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(systemData.getId()).get(signalGroupId);
-				Set<SignalData> signals = DgSignalsUtils.getSignalDataOfSignalGroup(systemData, signalGroup);
-				extPointSignals.addAll(signals);
+				extPointSignals.addAll(system.getSignalGroups().get(signalGroupId).getSignals().values());
 			}
 			extPoint.addSignals(extPointSignals);
-			for (SignalData signal : extPointSignals){
+			for (Signal signal : extPointSignals){
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 					this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), this.sylviaConfig.getSensorDistanceMeter());
 				}

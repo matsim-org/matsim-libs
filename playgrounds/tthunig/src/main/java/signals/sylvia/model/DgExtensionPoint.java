@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 
 
@@ -40,7 +40,7 @@ public class DgExtensionPoint {
 	private Map<Id<SignalGroup>, Integer> maxGreenTimes = new HashMap<>();
 	private int secondInPlan;
 	private Set<Id<SignalGroup>> signalGroupIds = new HashSet<>();
-	private Set<SignalData> signals = new HashSet<>();
+	private Set<Signal> signals = new HashSet<>();
 
 	public DgExtensionPoint(int secondInPlan){
 		this.secondInPlan = secondInPlan;
@@ -66,11 +66,11 @@ public class DgExtensionPoint {
 		this.maxGreenTimes.put(signalGroupId, maxGreenTime);
 	}
 
-	public void addSignals(Set<SignalData> signals) {
-		this.signals .addAll(signals);
+	public void addSignals(Set<Signal> signals) {
+		this.signals.addAll(signals);
 	}
 	
-	public Set<SignalData> getSignals(){
+	public Set<Signal> getSignals(){
 		return this.signals;
 	}
 
