@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package playground.dgrether.signalsystems.sylvia.controler;
+package signals.sylvia.controler;
 
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
@@ -39,8 +39,8 @@ import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Provides;
 
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
-import playground.dgrether.signalsystems.sensor.SensorBasedSignalControlerListener;
+import signals.sensor.LinkSensorManager;
+import signals.sensor.SensorBasedSignalControlerListener;
 
 /**
  * Add this module if you want to simulate signals with sylvia. 

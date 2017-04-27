@@ -61,7 +61,7 @@ public class TtBasicController {
         
 		// add the signals module if signal systems are used
 		if (signalsConfigGroup.isUseSignalSystems()) {
-//			controler.addOverridingModule(new SignalsModule());
+			// the combined signals module works for a lot of different signal controller, e.g. planbased, sylvia, downstream, laemmer...
 			controler.addOverridingModule(new CombinedSignalsModule());
 		}
 				

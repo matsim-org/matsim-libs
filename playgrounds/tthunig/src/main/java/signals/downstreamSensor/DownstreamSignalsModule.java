@@ -36,9 +36,9 @@ import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Provides;
 
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
-import playground.dgrether.signalsystems.sensor.SensorBasedSignalControlerListener;
 import signals.CombinedSignalsModule;
+import signals.sensor.LinkSensorManager;
+import signals.sensor.SensorBasedSignalControlerListener;
 
 /**
  * Add this module to the controler if you want to simulate downstream signals, i.e.

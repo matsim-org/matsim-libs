@@ -52,9 +52,9 @@ import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.LanesToLinkAssignment;
 
-import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
 import signals.downstreamSensor.DownstreamPlanbasedSignalController;
+import signals.sylvia.data.DgSylviaPreprocessData;
 
 /**
  * Class to create signals (signal systems, signal groups and signal control) for the Braess scenario.

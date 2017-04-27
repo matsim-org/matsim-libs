@@ -17,13 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia.run;
+package signals.sylvia.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
+import signals.sylvia.controler.SylviaSignalsModule;
 
 
 /**

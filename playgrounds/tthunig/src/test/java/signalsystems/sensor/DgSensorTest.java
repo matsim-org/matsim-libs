@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems;
+package signalsystems.sensor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
-import playground.dgrether.signalsystems.sensor.LinkSensor;
+import signals.sensor.LinkSensor;
 
 
 /**

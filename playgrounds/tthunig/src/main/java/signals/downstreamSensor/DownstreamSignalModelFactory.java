@@ -33,9 +33,9 @@ import org.matsim.contrib.signals.model.SignalSystem;
 
 import com.google.inject.Inject;
 
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 import signals.CombinedSignalModelFactory;
 import signals.downstreamSensor.DownstreamPlanbasedSignalController.SignalControlProvider;
+import signals.sensor.LinkSensorManager;
 
 /**
  * @author tthunig

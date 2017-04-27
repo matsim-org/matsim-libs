@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia.model;
+package signals.sylvia.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,10 +49,10 @@ import org.matsim.lanes.data.Lane;
 
 import com.google.inject.Provider;
 
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
+import signals.sensor.LinkSensorManager;
+import signals.sylvia.controler.DgSylviaConfig;
+import signals.sylvia.data.DgSylviaPreprocessData;
 
 
 /**

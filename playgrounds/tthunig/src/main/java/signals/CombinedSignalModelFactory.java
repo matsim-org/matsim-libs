@@ -41,17 +41,17 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
-import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalPlan;
-import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import signals.advancedPlanbased.AdvancedPlanBasedSignalSystemController;
 import signals.downstreamSensor.DownstreamPlanbasedSignalController;
 import signals.downstreamSensor.DownstreamSensor;
 import signals.gershenson.DgRoederGershensonSignalController;
 import signals.laemmer.model.LaemmerConfig;
 import signals.laemmer.model.LaemmerSignalController;
+import signals.sensor.LinkSensorManager;
+import signals.sylvia.controler.DgSylviaConfig;
+import signals.sylvia.data.DgSylviaPreprocessData;
+import signals.sylvia.model.DgSylviaSignalPlan;
+import signals.sylvia.model.SylviaSignalController;
 
 /**
  * combined signal model factory that works for all provided signal controller, so far: planbased, sylvia, downstream, laemmer, gershenson

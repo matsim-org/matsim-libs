@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sensor;
+package signals.sensor;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -72,10 +72,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import analysis.signals.TtSignalAnalysisTool;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
-import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import signals.CombinedSignalsModule;
+import signals.sylvia.controler.DgSylviaConfig;
+import signals.sylvia.controler.SylviaSignalsModule;
+import signals.sylvia.data.DgSylviaPreprocessData;
 
 /**
  * Test sylvia logic at an intersection with four incoming links and one signal each.

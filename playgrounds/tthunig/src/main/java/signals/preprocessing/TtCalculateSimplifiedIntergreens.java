@@ -43,8 +43,8 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
 
-import playground.dgrether.signalsystems.sylvia.data.DgPhase;
 import playground.dgrether.signalsystems.utils.DgSignalGroupSettingsDataOnsetComparator;
+import signals.sylvia.data.DgPhase;
 
 /**
  * Class to calculate the intergreen times from a (fixed) signal control plan and write them into a xml file.

@@ -102,7 +102,7 @@ public class ConvertBraessSolution2Matsim {
 	}
 
 	public static void main(String[] args) {
-		String directory =DgPaths.REPOS + "shared-svn/projects/cottbus/data/optimization/braess2ks/"
+		String directory = "../../../shared-svn/projects/cottbus/data/optimization/braess2ks/"
 				+ "2015-02-24_minflow_1.0_morning_peak_speedFilter1.0_SP_tt_cBB100.0_sBB500.0/";
 		String fileName = "btu/fix_coordinations.xml";
 		

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia.controler;
+package signals.sylvia.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,11 +32,11 @@ import org.matsim.contrib.signals.model.SignalSystem;
 
 import com.google.inject.Inject;
 
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
-import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
-import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalPlan;
-import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
-import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController.SignalControlProvider;
+import signals.sensor.LinkSensorManager;
+import signals.sylvia.data.DgSylviaPreprocessData;
+import signals.sylvia.model.DgSylviaSignalPlan;
+import signals.sylvia.model.SylviaSignalController;
+import signals.sylvia.model.SylviaSignalController.SignalControlProvider;
 
 
 /**

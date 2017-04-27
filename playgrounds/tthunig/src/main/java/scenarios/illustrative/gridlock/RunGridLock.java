@@ -83,10 +83,10 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import analysis.signals.TtSignalAnalysisListener;
 import analysis.signals.TtSignalAnalysisTool;
 import analysis.signals.TtSignalAnalysisWriter;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import signals.CombinedSignalsModule;
 import signals.downstreamSensor.DownstreamPlanbasedSignalController;
+import signals.sylvia.controler.DgSylviaConfig;
+import signals.sylvia.data.DgSylviaPreprocessData;
 
 /**
  * @author tthunig

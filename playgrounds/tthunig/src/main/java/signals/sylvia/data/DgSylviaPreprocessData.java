@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia.data;
+package signals.sylvia.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,9 +52,9 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.xml.sax.SAXException;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import playground.dgrether.signalsystems.utils.DgSignalGroupSettingsDataOnsetComparator;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
+import signals.sylvia.model.SylviaSignalController;
 
 
 /**
@@ -477,8 +477,8 @@ public class DgSylviaPreprocessData {
 //		String signalGroupsOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups_sylvia_no_13_random_offsets.xml";
 //		DgSylviaPreprocessData.simplifySignalGroupsAndConvertFixedTimePlansToSylviaBasePlans(signalControlFile, signalControlOutFile, signalGroupsFile, signalGroupsOutFile);
 		
-		String signalControlFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_no_13_random_offsets.xml";
-		String signalControlOutFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_sylvia_no_13_random_offsets.xml";
+		String signalControlFile = "../../../shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_no_13_random_offsets.xml";
+		String signalControlOutFile = "../../../shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_sylvia_no_13_random_offsets.xml";
 		DgSylviaPreprocessData.convertFixedTimePlansToSylviaBasePlans(signalControlFile, signalControlOutFile);
 	}
 

@@ -41,12 +41,12 @@ import org.matsim.core.replanning.ReplanningContext;
 import com.google.inject.Provides;
 
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
-import playground.dgrether.signalsystems.sensor.SensorBasedSignalControlerListener;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import signals.downstreamSensor.DownstreamSensor;
 import signals.laemmer.model.LaemmerConfig;
 import signals.laemmer.model.SignalAnalyzer;
+import signals.sensor.LinkSensorManager;
+import signals.sensor.SensorBasedSignalControlerListener;
+import signals.sylvia.controler.DgSylviaConfig;
 
 /**
  * Add this module if you want to simulate fixed-time signals, sylvia, laemmer, gershenson or the downstream signals or different control schemes together at different intersections (i.e. systems) in

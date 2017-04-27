@@ -36,9 +36,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.replanning.ReplanningContext;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
-import playground.dgrether.signalsystems.sensor.SensorBasedSignalControlerListener;
 import signals.CombinedSignalsModule;
+import signals.sensor.LinkSensorManager;
+import signals.sensor.SensorBasedSignalControlerListener;
 
 /**
  * Add this module to the controler if you want to control signals by the LaemmerSignalController

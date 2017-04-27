@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sensor;
+package signals.sensor;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controler.SignalControlerListener;

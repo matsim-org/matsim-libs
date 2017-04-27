@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia.run;
+package signals.sylvia.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -38,8 +38,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.dgrether.utils.DgOTFVisUtils;
+import signals.sylvia.controler.SylviaSignalsModule;
 
 /**
  * @author dgrether

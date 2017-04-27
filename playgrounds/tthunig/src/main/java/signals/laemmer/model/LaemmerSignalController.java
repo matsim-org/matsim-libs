@@ -32,8 +32,8 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.Lanes;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
-import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 import signals.Analyzable;
+import signals.sensor.LinkSensorManager;
 
 import java.util.*;
 

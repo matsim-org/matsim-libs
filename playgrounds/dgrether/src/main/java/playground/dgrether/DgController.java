@@ -22,21 +22,19 @@ package playground.dgrether;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
-import org.matsim.contrib.signals.router.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.*;
-import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import com.google.inject.Binder;
-
-import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 
 
 /**
+ * start a simulation with fixed-time signals and visualize it with otfvis.
+ * 
  * @author dgrether, tthunig
  */
 public class DgController {
@@ -57,12 +55,14 @@ public class DgController {
 		c.addOverridingModule(new OTFVisFileWriterModule());
 		
 		// add the signals module
-		// note: This will check (in DgSylviaSignalModelFactory) if the controllerIdentifier equals sylvia..., otherwise the default
-		// (fixed time) signal controller will be used.  kai & theresa, oct'14
-		boolean alwaysSameMobsimSeed = false;
-		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
-		sylviaSignalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
-		c.addOverridingModule(sylviaSignalsModule);
+//		// note: This will check (in DgSylviaSignalModelFactory) if the controllerIdentifier equals sylvia..., otherwise the default
+//		// (fixed time) signal controller will be used.  kai & theresa, oct'14
+//		boolean alwaysSameMobsimSeed = false;
+//		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
+//		sylviaSignalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
+//		c.addOverridingModule(sylviaSignalsModule);
+		c.addOverridingModule(new SignalsModule());
+		/* sylvia moved to playground tthunig. If you want to use sylvia use e.g. TtBasicController in playground tthunig. theresa, apr'17 */
 		
 		c.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 

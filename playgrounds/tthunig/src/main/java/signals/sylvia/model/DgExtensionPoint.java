@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia.model;
+package signals.sylvia.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
