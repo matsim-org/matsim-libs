@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-import signals.sylvia.controler.SylviaSignalsModule;
+import signals.CombinedSignalsModule;
 
 
 /**
@@ -34,9 +34,6 @@ public class SylviaMain {
 
 	private static final Logger log = Logger.getLogger(SylviaMain.class);
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		log.info("Running SylviaMain...");
 		String[] args2 = null;
@@ -50,7 +47,7 @@ public class SylviaMain {
 //		DgCottbusSylviaAnalysisControlerListener analysis = new DgCottbusSylviaAnalysisControlerListener();
 		
 		Controler controler = new Controler(args2);
-		controler.addOverridingModule(new SylviaSignalsModule());
+		controler.addOverridingModule(new CombinedSignalsModule());
 		//		controler.addControlerListener(analysis);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();

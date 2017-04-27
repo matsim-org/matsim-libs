@@ -27,6 +27,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import signals.CombinedSignalsModule;
+
 
 /**
  * @author dgrether
@@ -34,15 +36,12 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class DgRoederGershensonStarter {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DgRoederGershensonSignalsModule());
+		controler.addOverridingModule(new CombinedSignalsModule());
         controler.run();
 	}
 

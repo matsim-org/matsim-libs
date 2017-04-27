@@ -62,19 +62,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import analysis.signals.TtSignalAnalysisTool;
 import signals.CombinedSignalsModule;
 import signals.sylvia.controler.DgSylviaConfig;
-import signals.sylvia.controler.SylviaSignalsModule;
 import signals.sylvia.data.DgSylviaPreprocessData;
 
 /**
@@ -181,7 +178,6 @@ public class SylviaTest {
 
 		Controler controler = new Controler(scenario);
 		// add missing modules
-//		SylviaSignalsModule signalsModule = new SylviaSignalsModule();
 		CombinedSignalsModule signalsModule = new CombinedSignalsModule();
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
 		// this is only needed because the default is to small (1.5)
