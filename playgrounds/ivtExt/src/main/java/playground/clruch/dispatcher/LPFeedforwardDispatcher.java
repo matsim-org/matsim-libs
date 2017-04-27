@@ -191,7 +191,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         }
 
         // assign destinations to vehicles using bipartite matching
-        printVals = HungarianDispatcher.globalBipartiteMatching(this, () -> getVirtualNodeDivertableNotRebalancingVehicles().values()
+        printVals = HungarianUtils.globalBipartiteMatching(this, () -> getVirtualNodeDivertableNotRebalancingVehicles().values()
                 .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));
     }
 
