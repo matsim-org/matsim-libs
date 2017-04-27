@@ -42,7 +42,9 @@ import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController.Sig
  * @author dgrether
  * @author tthunig
  *
+ * @deprecated use CombinedSignalModelFactory instead
  */
+@Deprecated 
 public final class SylviaSignalModelFactory implements SignalModelFactory {
 
 	
