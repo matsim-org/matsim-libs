@@ -80,12 +80,14 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final static Logger log = Logger.getLogger(OsmNetworkReader.class);
 
 	private final static String TAG_LANES = "lanes";
+	private final static String TAG_LANES_FORWARD = "lanes:forward";
+	private final static String TAG_LANES_BACKWARD = "lanes:backward";
 	private final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_MAXSPEED = "maxspeed";
 	private final static String TAG_JUNCTION = "junction";
     private final static String TAG_ONEWAY = "oneway";
     private final static String TAG_ACCESS = "access";
-	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS};
+	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS, TAG_LANES_FORWARD, TAG_LANES_BACKWARD};
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
@@ -482,7 +484,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			return;
 		}
 
-		double nofLanes = defaults.lanesPerDirection;
+		double nofLanesForward = defaults.lanesPerDirection;
+		double nofLanesBackward = defaults.lanesPerDirection;
 		double laneCapacity = defaults.laneCapacity;
 		double freespeed = defaults.freespeed;
 		double freespeedFactor = defaults.freespeedFactor;
@@ -519,9 +522,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
         // In case trunks, primary and secondary roads are marked as oneway,
         // the default number of lanes should be two instead of one.
         if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")){
-            if((oneway || onewayReverse) && nofLanes == 1.0){
-                nofLanes = 2.0;
-            }
+			if((oneway) && nofLanesForward == 1.0){
+				nofLanesForward = 2.0;
+			} else if(onewayReverse && nofLanesBackward == 1.0){
+				nofLanesBackward = 2.0;
+			}
 		}
 
 		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
@@ -542,14 +547,39 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			try {
 				double totalNofLanes = Double.parseDouble(lanesTag);
 				if (totalNofLanes > 0) {
-					nofLanes = totalNofLanes;
+					//If there is a tag "lanes:forward" or "lanes:backward" set, differ the values for both directions
+					//If not, handle lanes as usual.
+					//fzwick,nkuehnel, apr'17
+					String lanesForwardTag = way.tags.get(TAG_LANES_FORWARD);
+					if (lanesForwardTag != null) {
+						double parsedForwardLanes = Double.parseDouble(lanesForwardTag);
+						if(parsedForwardLanes > 0) {
+							nofLanesForward = parsedForwardLanes;
+						}
+					} else {
+						//By default, the OSM lanes tag specifies the total number of lanes in both directions.
+						//So if the road is not oneway (onewayReverse), let's distribute them between both directions
+						//michalm, jan'16
+						if(oneway) {
+							nofLanesForward = totalNofLanes;
+						} else {
+							nofLanesForward = totalNofLanes / 2.;
+						}
+					}
 
-					//By default, the OSM lanes tag specifies the total number of lanes in both directions.
-					//So if the road is not oneway (onewayReverse), let's distribute them between both directions
-					//michalm, jan'16
-		            if (!oneway && !onewayReverse) {
-		                nofLanes /= 2.;
-		            }
+					String lanesBackwardTag = way.tags.get(TAG_LANES_BACKWARD);
+					if (lanesBackwardTag != null) {
+						double parsedBackwardLanes = Double.parseDouble(lanesBackwardTag);
+						if(parsedBackwardLanes > 0) {
+							nofLanesBackward = parsedBackwardLanes;
+						}
+					} else {
+						if(onewayReverse) {
+							nofLanesBackward = totalNofLanes;
+						} else {
+							nofLanesBackward = totalNofLanes / 2.;
+						}
+					}
 				}
 			} catch (Exception e) {
 				if (!this.unknownLanesTags.contains(lanesTag)) {
@@ -560,7 +590,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 
 		// create the link(s)
-		double capacity = nofLanes * laneCapacity;
+		double capacityForward = nofLanesForward * laneCapacity;
+		double capacityBackward = nofLanesBackward * laneCapacity;
 
 		if (this.scaleMaxSpeed) {
 			freespeed = freespeed * freespeedFactor;
@@ -576,8 +607,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
-				l.setCapacity(capacity);
-				l.setNumberOfLanes(nofLanes);
+				l.setCapacity(capacityForward);
+				l.setNumberOfLanes(nofLanesForward);
 				if (l instanceof Link) {
 					final String id1 = origId;
 					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
@@ -591,8 +622,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
-				l.setCapacity(capacity);
-				l.setNumberOfLanes(nofLanes);
+				l.setCapacity(capacityBackward);
+				l.setNumberOfLanes(nofLanesBackward);
 				if (l instanceof Link) {
 					final String id1 = origId;
 					NetworkUtils.setOrigId( ((Link) l), id1 ) ;

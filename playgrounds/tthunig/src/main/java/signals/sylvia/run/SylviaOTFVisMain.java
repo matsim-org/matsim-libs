@@ -39,7 +39,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.utils.DgOTFVisUtils;
-import signals.sylvia.controler.SylviaSignalsModule;
+import signals.CombinedSignalsModule;
 
 /**
  * @author dgrether
@@ -72,7 +72,7 @@ public class SylviaOTFVisMain {
 				install(new ScenarioByInstanceModule(scenario));
 				
 				// signal specific module
-				install(new SylviaSignalsModule());
+				install(new CombinedSignalsModule());
 			}
 		});
 
