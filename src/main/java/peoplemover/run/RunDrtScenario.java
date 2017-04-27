@@ -24,8 +24,12 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.*;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+
+import peoplemover.ClosestStopBasedDrtRoutingModule;
 
 /**
  * @author michalm
@@ -34,7 +38,14 @@ public class RunDrtScenario {
 	public static void run(String configFile, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		createControler(config, otfvis).run();
+		Controler controler = createControler(config, otfvis);
+		controler.addOverridingModule(new AbstractModule() {
+		
+			@Override
+			public void install() {
+				addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode()).to(ClosestStopBasedDrtRoutingModule.class);
+			}
+		});
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
