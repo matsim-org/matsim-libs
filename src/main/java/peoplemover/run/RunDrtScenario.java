@@ -46,6 +46,7 @@ public class RunDrtScenario {
 				addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode()).to(ClosestStopBasedDrtRoutingModule.class);
 			}
 		});
+		controler.run();
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
