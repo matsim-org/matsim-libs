@@ -1,6 +1,7 @@
 package playground.clruch.gfx;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,8 @@ import playground.clruch.utils.gui.RowPanel;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 public abstract class ViewerLayer {
+    
+    static final int DEFAULT_HEIGHT = 20; 
 
     final MatsimMapComponent matsimMapComponent; // reference to viewer
 
@@ -53,7 +56,7 @@ public abstract class ViewerLayer {
     protected final void createHeatmapPanel(RowPanel rowPanel, String string, MatsimHeatMap matsimHeatMap) {
         final JCheckBox jCheckBox = new JCheckBox(string);
         jCheckBox.setSelected(matsimHeatMap.show);
-        jCheckBox.addActionListener(e -> {
+        jCheckBox.addActionListener(event -> {
             matsimHeatMap.show = jCheckBox.isSelected();
             matsimMapComponent.repaint();
         });
@@ -67,6 +70,8 @@ public abstract class ViewerLayer {
                 matsimHeatMap.colorSchemes = cs;
                 matsimMapComponent.repaint();
             });
+            spinner.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));
+            spinner.setMenuHover(true);
             rowPanel.add(spinner.getLabelComponent());
         }
     }

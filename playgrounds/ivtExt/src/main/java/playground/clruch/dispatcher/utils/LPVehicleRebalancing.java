@@ -20,7 +20,6 @@ import java.util.Optional;
 public class LPVehicleRebalancing {
     VirtualNetwork virtualNetwork;
     // TODO generalize this to "objective weights"
-    Map<VirtualLink, Double> travelTimes;
     glp_prob lp;
     glp_smcp parm = new glp_smcp();
     final int n;
@@ -28,12 +27,9 @@ public class LPVehicleRebalancing {
 
     /**
      * @param virtualNetworkIn the virtual network (complete directed graph) on which the optimization is computed.
-     * @param travelTimesIn    the travelTimes which are used as link weights.
      */
-    public LPVehicleRebalancing(VirtualNetwork virtualNetworkIn,
-                                Map<VirtualLink, Double> travelTimesIn) {
+    public LPVehicleRebalancing(VirtualNetwork virtualNetworkIn) {
         virtualNetwork = virtualNetworkIn;
-        travelTimes = travelTimesIn;
         n = virtualNetwork.getvNodesCount();
         initiateLP();
     }
@@ -151,7 +147,7 @@ public class LPVehicleRebalancing {
                 String vLinkID = numij_vLinkMap.get(var);
                 if (!vLinkID.equals("noVLink")) {
                     VirtualLink vLink = virtualNetwork.getVirtualLinks().stream().filter(v -> v.getId().toString().equals(vLinkID)).findFirst().get();
-                    GLPK.glp_set_obj_coef(lp, var, travelTimes.get(vLink));
+                    GLPK.glp_set_obj_coef(lp, var, vLink.getTtime());
                 } else {
                     GLPK.glp_set_obj_coef(lp, var, 0.0);
                 }

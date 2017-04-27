@@ -24,6 +24,7 @@ public class RequestsLayer extends ViewerLayer {
 
     private static Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
     // ---
+    private volatile boolean maxWaitTimeInHud = true;
     private volatile boolean drawNumber = true;
     private volatile boolean drawRequestDestinations = false;
 
@@ -73,6 +74,7 @@ public class RequestsLayer extends ViewerLayer {
         maxWaitTime = 0;
         // draw requests
         graphics.setFont(requestsFont);
+        final boolean showNumbers = drawNumber && 13 < matsimMapComponent.getZoom();
         Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                 .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
         for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
@@ -110,7 +112,7 @@ public class RequestsLayer extends ViewerLayer {
                         graphics.drawLine(x, y, p2.x, p2.y);
                     }
                 }
-                if (drawNumber) {
+                if (showNumbers) {
                     graphics.setColor(Color.GRAY);
                     graphics.drawString("" + numRequests, x, y); // - numRequests
                 }
@@ -126,7 +128,7 @@ public class RequestsLayer extends ViewerLayer {
             infoString.color = Color.BLACK; // new Color(204, 122, 0);
             matsimMapComponent.append(infoString);
         }
-        {
+        if (maxWaitTimeInHud) {
             InfoString infoString = new InfoString(String.format("%5d %s", Math.round(maxWaitTime / 60), "maxWaitTime [min]"));
             infoString.color = Color.BLACK; // new Color(255, 102, 0);
             matsimMapComponent.append(infoString);
@@ -148,7 +150,7 @@ public class RequestsLayer extends ViewerLayer {
     protected void createPanel(RowPanel rowPanel) {
         {
             final JCheckBox jCheckBox = new JCheckBox("number");
-            jCheckBox.setToolTipText("exact number of people waiting");
+            jCheckBox.setToolTipText("exact number of people waiting (only for zoom > 13)");
             jCheckBox.setSelected(drawNumber);
             jCheckBox.addActionListener(event -> {
                 drawNumber = jCheckBox.isSelected();
@@ -165,6 +167,16 @@ public class RequestsLayer extends ViewerLayer {
         }
         createHeatmapPanel(rowPanel, "source", requestHeatMap);
         createHeatmapPanel(rowPanel, "sink", requestDestMap);
+        {
+            final JCheckBox jCheckBox = new JCheckBox("max. waittime");
+            jCheckBox.setToolTipText("show max wait time in HUD");
+            jCheckBox.setSelected(maxWaitTimeInHud);
+            jCheckBox.addActionListener(event -> {
+                maxWaitTimeInHud = jCheckBox.isSelected();
+                matsimMapComponent.repaint();
+            });
+            rowPanel.add(jCheckBox);
+        }
     }
 
     @Override

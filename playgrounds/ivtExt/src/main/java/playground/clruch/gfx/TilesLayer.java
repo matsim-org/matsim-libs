@@ -1,6 +1,10 @@
 package playground.clruch.gfx;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics2D;
+
+import javax.swing.JPanel;
 
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.net.SimulationObject;
@@ -8,6 +12,15 @@ import playground.clruch.utils.gui.RowPanel;
 import playground.clruch.utils.gui.SpinnerLabel;
 
 public class TilesLayer extends ViewerLayer {
+
+    static enum Blend {
+        Dark(0), Light(255);
+        final int rgb;
+
+        private Blend(int rgb) {
+            this.rgb = rgb;
+        }
+    }
 
     protected TilesLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
@@ -20,12 +33,31 @@ public class TilesLayer extends ViewerLayer {
             rowPanel.add(sl.getLabelComponent());
         }
         {
-            SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
-            spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 255);
-            spinnerLabel.setValueSafe(matsimMapComponent.mapAlphaCover);
-            spinnerLabel.addSpinnerListener(i -> matsimMapComponent.setMapAlphaCover(i));
-            spinnerLabel.getLabelComponent().setToolTipText("alpha cover");
-            rowPanel.add(spinnerLabel.getLabelComponent());
+            JPanel jPanel = new JPanel(new FlowLayout(1, 2, 2));
+            {
+                SpinnerLabel<Blend> spinnerLabel = new SpinnerLabel<>();
+                spinnerLabel.setArray(Blend.values());
+                spinnerLabel.setValueSafe(matsimMapComponent.mapGrayCover == 255 ? Blend.Light : Blend.Dark);
+                spinnerLabel.addSpinnerListener(i -> {
+                    matsimMapComponent.mapGrayCover = i.rgb;
+                    matsimMapComponent.repaint();
+                });
+                spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(55, DEFAULT_HEIGHT));
+                spinnerLabel.getLabelComponent().setToolTipText("cover gray level");
+                jPanel.add(spinnerLabel.getLabelComponent());
+
+            }
+            {
+                SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
+                spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 224, 255);
+                spinnerLabel.setValueSafe(matsimMapComponent.mapAlphaCover);
+                spinnerLabel.addSpinnerListener(i -> matsimMapComponent.setMapAlphaCover(i));
+                spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(55, DEFAULT_HEIGHT));
+                spinnerLabel.getLabelComponent().setToolTipText("cover alpha");
+                jPanel.add(spinnerLabel.getLabelComponent());
+
+            }
+            rowPanel.add(jPanel);
         }
     }
 

@@ -49,4 +49,8 @@ public class OsmLink {
     public Coord getCoordTo() {
         return coords[1];
     }
+    
+    public double getLength() {
+        return link.getLength();
+    }
 }

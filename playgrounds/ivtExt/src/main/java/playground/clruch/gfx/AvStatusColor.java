@@ -5,11 +5,6 @@ import java.awt.Color;
 import playground.clruch.export.AVStatus;
 
 public enum AvStatusColor {
-    Claudios( //
-            new Color(0, 255, 0, 255), // with customer
-            new Color(255, 0, 0, 255), // to customer
-            new Color(0, 0, 255, 255), // rebalance
-            new Color(192, 192, 192, 128)), // stay
     Standard( //
             new Color(128, 0, 128), // with customer
             new Color(255, 51, 0), // to customer
@@ -19,7 +14,7 @@ public enum AvStatusColor {
             new Color(128, 0, 128), //
             new Color(255, 51, 0), //
             new Color(0, 153, 255), //
-            new Color(192, 192, 192, 128)), //
+            new Color(128, 128, 128, 64)), //
     ;
 
     private final Color[] colors;

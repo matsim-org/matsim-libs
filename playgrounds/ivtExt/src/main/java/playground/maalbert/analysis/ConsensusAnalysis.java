@@ -13,7 +13,7 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNetworkLoader;
+import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
 import playground.joel.analysis.*;
@@ -60,7 +60,7 @@ class ConsensusAnalysis {
         Network network = loadNetwork(args);
         final File virtualnetworkFile = new File("vN_40vS_L1_v2\\virtualNetwork.xml");
         GlobalAssert.that(virtualnetworkFile.isFile());
-        VirtualNetwork virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkFile);
+        VirtualNetwork virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
 
 
        MatsimStaticDatabase.initializeSingletonInstance( //
