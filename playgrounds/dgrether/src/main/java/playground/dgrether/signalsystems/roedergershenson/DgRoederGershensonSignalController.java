@@ -199,7 +199,7 @@ public class DgRoederGershensonSignalController implements SignalController {
 			GroupState state = new GroupState();
 			state.lastDropping = simStartTimeSeconds;
 			this.groupStateMap.put(g.getId(), state);
-			g.setState(SignalGroupState.RED);
+			system.scheduleDropping(simStartTimeSeconds, g.getId());
 			last = g;
 		}
 		last.setState(SignalGroupState.GREEN);
