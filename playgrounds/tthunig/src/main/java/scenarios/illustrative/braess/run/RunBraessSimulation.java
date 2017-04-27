@@ -93,7 +93,6 @@ import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalBas
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlLogic;
 import scenarios.illustrative.braess.signals.ResponsiveLocalDelayMinimizingSignal;
 import signals.CombinedSignalsModule;
-import signals.downstreamSensor.DownstreamSignalsModule;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
