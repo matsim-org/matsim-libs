@@ -41,7 +41,12 @@ public class SelfishDispatcher extends UniversalDispatcher {
     private final int updateRefPeriod; // implementation may not use this
     private final int weiszfeldMaxIter; // Weiszfeld max iterations
     private final double weiszfeldTol; // Weiszfeld convergence tolerance
-    private final boolean useVoronoiSets; // flag for using Voronoi sets in selfish strategy
+    
+    private final String subStrategy;
+    private final double primaryWeight;
+    private final double secondaryWeight;
+    
+    
     private boolean vehiclesInitialized = false;
     private final HashMap<AVVehicle, List<AVRequest>> requestsServed = new HashMap<>();
     private final HashMap<AVVehicle, Link> refPositions = new HashMap<>();
@@ -70,8 +75,14 @@ public class SelfishDispatcher extends UniversalDispatcher {
         updateRefPeriod = safeConfig.getInteger("updateRefPeriod", 3600);
         weiszfeldMaxIter = safeConfig.getIntegerStrict("weiszfeldMaxIter");
         weiszfeldTol = safeConfig.getDoubleStrict("weiszfeldTol");
-        useVoronoiSets = safeConfig.getBoolStrict("useVoronoiSets");
-
+        
+        subStrategy = safeConfig.getStringStrict("subStrategy");
+        GlobalAssert.that(subStrategy.equals("noComm") 
+                       || subStrategy.equals("voronoi")  
+                       || subStrategy.equals("selfishLoiter") );
+        primaryWeight = safeConfig.getDoubleStrict("primaryWeight");
+        secondaryWeight = safeConfig.getDoubleStrict("secondaryWeight");
+        
         network = networkIn;
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
@@ -104,24 +115,27 @@ public class SelfishDispatcher extends UniversalDispatcher {
                                
                 // if requests present ...
                 if (!getAVRequests().isEmpty()) { 
-                    if (useVoronoiSets) { // check whether to use the Voronoi sets in the selfish strategy
-           
+                    if (subStrategy.equals("noComm")) { // send every vehicle to closest customer
+                        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                            Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
+                            AVRequest closestRequest = pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());  
+                            setVehicleDiversion(vehicleLinkPair, closestRequest.getFromLink());
+                        }
+                    } else if (subStrategy.equals("voronoi")) { // use the Voronoi sets in the selfish strategy
                         HashMap<AVVehicle, QuadTree<AVRequest>> voronoiSets = computeVoronoiSets();
-                                    
                         for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
                             Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                             QuadTree<AVRequest> voronoiSet = voronoiSets.get(vehicleLinkPair.avVehicle);
                             if (voronoiSet.size() > 0) {
                                 AVRequest closestRequest = voronoiSet.getClosest(vehicleCoord.getX(), vehicleCoord.getY());
-                                // AVRequest closestRequest findClosestRequest(vehicleLinkPair, voronoiSet.values());
+                                // AVRequest closestRequest = findClosestRequest(vehicleLinkPair, voronoiSet.values());
                                 setVehicleDiversion(vehicleLinkPair, closestRequest.getFromLink());
                             }
-                        }
-                    } else { // send every vehicle to closest customer
-                        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-                            Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
-                            AVRequest closestRequest = pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());  
-                            setVehicleDiversion(vehicleLinkPair, closestRequest.getFromLink());
+                        }   
+                    } else if (subStrategy.equals("selfishLoiter")) { //
+                        for (AVRequest pendingRequest : getAVRequests()) {
+                            VehicleLinkPair closestDivertableVehicle = findClosestDivertableVehicle(pendingRequest);
+                            setVehicleDiversion(closestDivertableVehicle, pendingRequest.getFromLink());
                         }
                     }                    
                 }
@@ -179,21 +193,21 @@ public class SelfishDispatcher extends UniversalDispatcher {
      *            list of AVRequests
      * @return the closest request (with respect to its From node coord)
      */
-    private static AVRequest findClosestRequest(VehicleLinkPair vehicleLinkPair, Collection<AVRequest> avRequests) {
+    private VehicleLinkPair findClosestDivertableVehicle(AVRequest avRequest) {
         
-        Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
-        AVRequest closestRequest = null;
+        Coord requestCoord = avRequest.getFromLink().getCoord();
+        VehicleLinkPair closestVehicle = null;
         double closestDistance = Double.POSITIVE_INFINITY;
-        for (AVRequest avRequest : avRequests) {
-            Coord requestCoord = avRequest.getFromLink().getFromNode().getCoord();
+        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+            Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
             double distance = Math.hypot(requestCoord.getX() - vehicleCoord.getX(), requestCoord.getY() - vehicleCoord.getY());
             if (distance < closestDistance) {
                 closestDistance = distance;
-                closestRequest = avRequest;
+                closestVehicle = vehicleLinkPair;
             }
         }
-        GlobalAssert.that(closestRequest != null);
-        return closestRequest;
+        GlobalAssert.that(closestVehicle != null);
+        return closestVehicle;
     }
 
     /**
@@ -202,11 +216,31 @@ public class SelfishDispatcher extends UniversalDispatcher {
     private void updateRefPositions() {
         GlobalAssert.that(!getMaintainedVehicles().isEmpty());
         GlobalAssert.that(0 < networkLinksTree.size());
-        for (AVVehicle avVehicle : getMaintainedVehicles()) {
-            Link initialGuess = refPositions.get(avVehicle); // initialize with previous Weber link
-            Link weberLink = computeWeberLink(requestsServed.get(avVehicle), initialGuess);
+        for (AVVehicle thisAV : getMaintainedVehicles()) {
+            Link initialGuess = refPositions.get(thisAV); // initialize with previous Weber link
+            Link weberLink;
+            if ( subStrategy.equals("noComm")  || subStrategy.equals("voronoi") ) {
+                ArrayList<Double> useEqualWeights = new ArrayList<>();
+                weberLink = computeWeberLink(requestsServed.get(thisAV), useEqualWeights, initialGuess);
+            } else {
+                List<AVRequest> allPastRequests = new ArrayList<>();
+                ArrayList<Double> weights = new ArrayList<>();
+                for (AVVehicle otherAV : getMaintainedVehicles()) {
+                    allPastRequests.addAll(requestsServed.get(otherAV));
+                    ArrayList<Double> avWeights = new ArrayList<>(requestsServed.get(otherAV).size());
+                    for (int idx = 0; idx < requestsServed.get(otherAV).size(); idx++) {
+                        if (otherAV == thisAV) {
+                            avWeights.add(primaryWeight);   // use the primary weight for requests served by this AV      
+                        } else {
+                            avWeights.add(secondaryWeight); // use the secondary weight for requests served by others
+                        }
+                    }
+                    weights.addAll(avWeights);
+                }
+                weberLink = computeWeberLink(allPastRequests, weights, initialGuess);
+            }
             GlobalAssert.that(weberLink != null);
-            refPositions.put(avVehicle, weberLink);
+            refPositions.put(thisAV, weberLink);
         }
     }
 
@@ -227,13 +261,13 @@ public class SelfishDispatcher extends UniversalDispatcher {
             double closestDistance = Double.POSITIVE_INFINITY;
             for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
                 
-                Coord avCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
-                // Coord avCoord = refPositions.get(vehicleLinkPair.avVehicle).getCoord();
+                // Coord avCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
+                Coord avCoord = refPositions.get(vehicleLinkPair.avVehicle).getCoord();
                 
                 double distance = Math.hypot(requestCoord.getX() - avCoord.getX(), requestCoord.getY() - avCoord.getY());
                 if (distance < closestDistance) {
                     closestDistance = distance;
-                    closestVehicle = vehicleLinkPair.avVehicle; // TODO how to deal with equidistant vehicles?
+                    closestVehicle = vehicleLinkPair.avVehicle;
                 }
             }
             GlobalAssert.that(closestVehicle != null);    
@@ -252,7 +286,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
      * @return closest link to 2D Weber point of past requests approximated by Weiszfeld's
      *         algorithm
      */
-    private Link computeWeberLink(List<AVRequest> avRequests, Link initialGuess) {
+    private Link computeWeberLink(List<AVRequest> avRequests, ArrayList<Double> weights, Link initialGuess) {
         if (avRequests.isEmpty()) {
             return initialGuess;
         }
@@ -261,7 +295,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
             requestCoords.add(avRequest.getFromLink().getCoord());
         }
         
-        Coord weberCoord = weiszfeldAlgorithm(requestCoords, initialGuess.getCoord());
+        Coord weberCoord = weiszfeldAlgorithm(requestCoords, weights, initialGuess.getCoord());
         
         // Weber point must be inside the network
         GlobalAssert.that((weberCoord.getX() >= networkBounds[0]) 
@@ -279,12 +313,18 @@ public class SelfishDispatcher extends UniversalDispatcher {
     *
     * @param data
     *            list of data points in 2D Euclidean space
+    * @param weights
+    *            list of corresponding weights / multiplicities
     * @param initialGuess
     *            initial guess as a coordinate for the iterative algorithm
     * @return 2D Weber point of the data coordinates approximated by Weiszfeld's
     *         algorithm
     */
-   private Coord weiszfeldAlgorithm(List<Coord> data, Coord initialGuess) {
+   private Coord weiszfeldAlgorithm(List<Coord> data, ArrayList<Double> weights, Coord initialGuess) {
+       if (weights.size() > 0) {
+           // if using weights, we must have a weight for each data point
+           GlobalAssert.that(data.size() == weights.size()); 
+       }
        if (data.isEmpty()) {
            return initialGuess;
        }
@@ -294,13 +334,21 @@ public class SelfishDispatcher extends UniversalDispatcher {
        while (count <= weiszfeldMaxIter) {
            double x = 0.0;
            double y = 0.0;
-           double normalizer = 0.0;
-           for (Coord point : data) {
+           double normalizer = 0.0;   
+           for (int idx = 0; idx < data.size(); idx++) {
+               Coord point = data.get(idx);
+               double weight;
+               if (weights.size() > 0) {
+                   GlobalAssert.that(weights.get(idx) != null);
+                   weight = weights.get(idx);
+               } else { // empty weights array => use unit weights
+                   weight = 1.0;
+               }
                double distance = Math.hypot(point.getX() - weberX, point.getY() - weberY);
                if (distance != 0) {
-                   x += point.getX() / distance;
-                   y += point.getY() / distance;
-                   normalizer += 1.0 / distance;
+                   x += weight*point.getX() / distance;
+                   y += weight*point.getY() / distance;
+                   normalizer += weight / distance;
                } else {
                    x = point.getX();
                    y = point.getY();
@@ -308,6 +356,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
                    break;
                }
            }
+           GlobalAssert.that(normalizer > 0);
            x /= normalizer;
            y /= normalizer;
            double change = Math.hypot(x - weberX, y - weberY);

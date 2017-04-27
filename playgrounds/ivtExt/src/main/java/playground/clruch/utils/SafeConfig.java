@@ -48,6 +48,12 @@ public class SafeConfig {
         GlobalAssert.that(string != null);
         return Boolean.parseBoolean(string);
     }
+    
+    public String getStringStrict(String key) {
+        String string = reflectiveConfigGroup.getParams().get(key);
+        GlobalAssert.that(string != null);
+        return string;
+    }
 
     public static SafeConfig wrap(ReflectiveConfigGroup reflectiveConfigGroup) {
         return new SafeConfig(reflectiveConfigGroup);
