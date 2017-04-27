@@ -145,7 +145,7 @@ public class FixCottbusResultsIT {
 		config.qsim().setUsingFastCapacityUpdate(false);
 		
 		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta( 2 );
+//		config.planCalcScore().setBrainExpBeta( 2 );
 
 		// choose between link to link and node to node routing
 		// (only has effect if lanes are used)
@@ -155,7 +155,7 @@ public class FixCottbusResultsIT {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+//		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
 		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		// hash map and array produce same results. only difference: memory and time.
@@ -164,7 +164,7 @@ public class FixCottbusResultsIT {
 		// define strategies
 		{
 			StrategySettings strat = new StrategySettings();
-			strat.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
+			strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
 			strat.setWeight(1);
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
