@@ -43,7 +43,7 @@ public class RunInclusionTaxiScenario
     }
     public static void runMany(String configFile)
     {
-    	for (int i = 100; i<=250; i=i+50){
+    	for (int i = 150; i<=250; i=i+50){
     	
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
                 new OTFVisConfigGroup());
@@ -67,8 +67,8 @@ public class RunInclusionTaxiScenario
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new JbTaxiModule());
         controler.addOverridingModule(new TaxiModule(JbTaxiOptimizerProvider.class));
+//        controler.addOverridingModule(new JbTaxiModule());
 
         if (otfvis) {
             controler.addOverridingModule(new OTFVisLiveModule());
