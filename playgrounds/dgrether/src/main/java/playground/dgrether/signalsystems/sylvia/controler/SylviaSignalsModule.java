@@ -87,15 +87,14 @@ public class SylviaSignalsModule extends AbstractModule {
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
 			/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
             
-            if (getConfig().controler().isLinkToLinkRoutingEnabled()){
-                //use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
-                //michalm, jan'17
-                bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
-            }
-            
             if (getConfig().qsim().isUsingFastCapacityUpdate()) {
                 throw new RuntimeException("Fast flow capacity update does not support signals");
             }
+        }
+		if (getConfig().controler().isLinkToLinkRoutingEnabled()){
+            //use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
+            //michalm, jan'17
+            bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
         }
 	}
 	

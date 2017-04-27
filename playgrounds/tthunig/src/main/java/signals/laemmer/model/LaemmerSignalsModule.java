@@ -30,8 +30,10 @@ import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.router.NetworkWithSignalsTurnInfoBuilder;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.replanning.ReplanningContext;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import playground.dgrether.signalsystems.LinkSensorManager;
@@ -75,6 +77,15 @@ public class LaemmerSignalsModule extends AbstractModule{
             // bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
 			/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
+			
+			if (getConfig().qsim().isUsingFastCapacityUpdate()) {
+                throw new RuntimeException("Fast flow capacity update does not support signals");
+            }
+        }
+		if (getConfig().controler().isLinkToLinkRoutingEnabled()){
+            //use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
+            //michalm, jan'17
+            bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
         }
 	}
 	
