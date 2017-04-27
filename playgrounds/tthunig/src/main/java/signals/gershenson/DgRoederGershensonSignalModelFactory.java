@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.roedergershenson;
+package signals.gershenson;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,7 +32,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 import com.google.inject.Inject;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController.SignalControlProvider;
+import signals.gershenson.DgRoederGershensonSignalController.SignalControlProvider;
 
 
 /**

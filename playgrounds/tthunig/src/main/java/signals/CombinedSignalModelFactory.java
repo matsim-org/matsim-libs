@@ -43,7 +43,6 @@ import com.google.inject.Provider;
 import org.matsim.lanes.data.Lanes;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalPlan;
@@ -51,6 +50,7 @@ import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import signals.advancedPlanbased.AdvancedPlanBasedSignalSystemController;
 import signals.downstreamSensor.DownstreamSensor;
 import signals.downstreamSensor.DownstreamSignalController;
+import signals.gershenson.DgRoederGershensonSignalController;
 import signals.laemmer.model.LaemmerConfig;
 import signals.laemmer.model.LaemmerSignalController;
 

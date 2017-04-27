@@ -64,9 +64,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import analysis.signals.TtSignalAnalysisTool;
-import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalController;
-import playground.dgrether.signalsystems.roedergershenson.DgRoederGershensonSignalsModule;
 import signals.CombinedSignalsModule;
+import signals.gershenson.DgRoederGershensonSignalController;
+import signals.gershenson.DgRoederGershensonSignalsModule;
 
 /**
  * Test gershenson logic at an intersection with four incoming links and one signal each. No lanes are used.
