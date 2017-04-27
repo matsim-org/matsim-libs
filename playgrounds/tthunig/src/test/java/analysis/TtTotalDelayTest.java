@@ -1,4 +1,4 @@
-package playground.tschlenther.TotalDelay;
+package analysis;
 
 import java.util.ArrayList;
 import java.util.List;
