@@ -1,4 +1,4 @@
-package playground.tschlenther.lanes;
+package lanes;
 
 import java.util.HashMap;
 import java.util.Map;

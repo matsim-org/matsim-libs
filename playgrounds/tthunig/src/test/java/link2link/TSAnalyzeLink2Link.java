@@ -1,4 +1,4 @@
-package playground.tschlenther.Link2Link;
+package link2link;
 
 import java.util.HashMap;
 import java.util.Map;

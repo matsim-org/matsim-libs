@@ -1,4 +1,4 @@
-package playground.tschlenther.Link2Link;
+package link2link;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

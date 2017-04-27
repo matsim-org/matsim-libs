@@ -1,4 +1,4 @@
-package playground.tschlenther.lanes;
+package lanes;
 
 import java.util.ArrayList;
 import java.util.List;
