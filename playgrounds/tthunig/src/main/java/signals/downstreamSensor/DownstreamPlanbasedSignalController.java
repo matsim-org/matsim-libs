@@ -50,9 +50,9 @@ import playground.dgrether.signalsystems.LinkSensorManager;
  * @author tthunig
  *
  */
-public class DownstreamSignalController implements SignalController {
+public class DownstreamPlanbasedSignalController implements SignalController {
 
-	private static final Logger log = Logger.getLogger(DownstreamSignalController.class);
+	private static final Logger log = Logger.getLogger(DownstreamPlanbasedSignalController.class);
 
 	public final static String IDENTIFIER = "DownstreamSignalControl";
 
@@ -68,8 +68,8 @@ public class DownstreamSignalController implements SignalController {
 		}
 
 		@Override
-		public DownstreamSignalController get() {
-			return new DownstreamSignalController(sensorManager, downstreamSensor, scenario);
+		public DownstreamPlanbasedSignalController get() {
+			return new DownstreamPlanbasedSignalController(sensorManager, downstreamSensor, scenario);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class DownstreamSignalController implements SignalController {
 	private Set<Id<SignalGroup>> greenGroupsInSimulation = new HashSet<>();
 	
 
-	private DownstreamSignalController(LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, Scenario scenario) {
+	private DownstreamPlanbasedSignalController(LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, Scenario scenario) {
 		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.network = scenario.getNetwork();
 		this.downstreamSensor = downstreamSensor;

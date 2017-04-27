@@ -49,7 +49,7 @@ import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalPlan;
 import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController;
 import signals.advancedPlanbased.AdvancedPlanBasedSignalSystemController;
 import signals.downstreamSensor.DownstreamSensor;
-import signals.downstreamSensor.DownstreamSignalController;
+import signals.downstreamSensor.DownstreamPlanbasedSignalController;
 import signals.gershenson.DgRoederGershensonSignalController;
 import signals.laemmer.model.LaemmerConfig;
 import signals.laemmer.model.LaemmerSignalController;
@@ -76,7 +76,7 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 		Lanes lanes = scenario.getLanes();
 		// prepare signal controller provider
 		signalControlProvider.put(SylviaSignalController.IDENTIFIER, new SylviaSignalController.SignalControlProvider(sylviaConfig, sensorManager, scenario));
-		signalControlProvider.put(DownstreamSignalController.IDENTIFIER, new DownstreamSignalController.SignalControlProvider(sensorManager, downstreamSensor, scenario));
+		signalControlProvider.put(DownstreamPlanbasedSignalController.IDENTIFIER, new DownstreamPlanbasedSignalController.SignalControlProvider(sensorManager, downstreamSensor, scenario));
 		signalControlProvider.put(LaemmerSignalController.IDENTIFIER, new LaemmerSignalController.SignalControlProvider(laemmerConfig, sensorManager, network, lanes, delayCalculator));
 		signalControlProvider.put(DgRoederGershensonSignalController.IDENTIFIER, new DgRoederGershensonSignalController.SignalControlProvider(sensorManager, scenario));
 		signalControlProvider.put(AdvancedPlanBasedSignalSystemController.IDENTIFIER, new AdvancedPlanBasedSignalSystemController.SignalControlProvider(sensorManager, delayCalculator));

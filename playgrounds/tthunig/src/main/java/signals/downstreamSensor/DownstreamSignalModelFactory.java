@@ -35,7 +35,7 @@ import com.google.inject.Inject;
 
 import playground.dgrether.signalsystems.LinkSensorManager;
 import signals.CombinedSignalModelFactory;
-import signals.downstreamSensor.DownstreamSignalController.SignalControlProvider;
+import signals.downstreamSensor.DownstreamPlanbasedSignalController.SignalControlProvider;
 
 /**
  * @author tthunig
@@ -53,7 +53,7 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 
 	@Inject 
 	public DownstreamSignalModelFactory(LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, Scenario scenario) {
-		this.provider = new DownstreamSignalController.SignalControlProvider(sensorManager, downstreamSensor, scenario) ;
+		this.provider = new DownstreamPlanbasedSignalController.SignalControlProvider(sensorManager, downstreamSensor, scenario) ;
 	}
 	
 	@Override
@@ -63,8 +63,8 @@ public class DownstreamSignalModelFactory implements SignalModelFactory{
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
-		if (DownstreamSignalController.IDENTIFIER.equals(controllerIdentifier)){
-			log.info("Creating " + DownstreamSignalController.IDENTIFIER);
+		if (DownstreamPlanbasedSignalController.IDENTIFIER.equals(controllerIdentifier)){
+			log.info("Creating " + DownstreamPlanbasedSignalController.IDENTIFIER);
 			SignalController signalControl = this.provider.get();
 			signalControl.setSignalSystem(signalSystem);
 			return signalControl;

@@ -86,7 +86,7 @@ import analysis.signals.TtSignalAnalysisWriter;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import signals.CombinedSignalsModule;
-import signals.downstreamSensor.DownstreamSignalController;
+import signals.downstreamSensor.DownstreamPlanbasedSignalController;
 
 /**
  * @author tthunig
@@ -411,7 +411,7 @@ public class RunGridLock {
 		// specify signal group settings for the single element signal groups
 		switch (SIGNALTYPE){
 		case DOWNSTREAM:
-			signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+			signalSystemControl.setControllerIdentifier(DownstreamPlanbasedSignalController.IDENTIFIER);
 			switch (SIGNALBASIS){
 			case GREEN:
 				log.info("Create almost all day green base plan for downstream signal controller");

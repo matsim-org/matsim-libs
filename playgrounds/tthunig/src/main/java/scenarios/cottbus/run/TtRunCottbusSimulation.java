@@ -88,7 +88,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 import signals.CombinedSignalsModule;
-import signals.downstreamSensor.DownstreamSignalController;
+import signals.downstreamSensor.DownstreamPlanbasedSignalController;
 import utils.SignalizeScenario;
 
 /**
@@ -476,7 +476,7 @@ public class TtRunCottbusSimulation {
 			// adapt signal controller for downstream signal control
 			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			for (SignalSystemControllerData controllerData : signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().values()) {
-				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+				controllerData.setControllerIdentifier(DownstreamPlanbasedSignalController.IDENTIFIER);
 				if (SIGNAL_TYPE.toString().contains("GREEN")){
 					// change to all day green
 					for (SignalPlanData planData : controllerData.getSignalPlanData().values()) {
@@ -500,7 +500,7 @@ public class TtRunCottbusSimulation {
 			// change all signal controller to downstream
 			signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			for (SignalSystemControllerData controllerData : signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().values()) {
-				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+				controllerData.setControllerIdentifier(DownstreamPlanbasedSignalController.IDENTIFIER);
 			}
 			// note: no break - should continue! (signals of following types are replaced anyway)
 		case ALL_NODES_ALL_GREEN:
@@ -512,7 +512,7 @@ public class TtRunCottbusSimulation {
 			if (SIGNAL_TYPE.toString().contains("BASIS_MS"))
 				signalizer.setOverwriteSignals(false);
 			if (SIGNAL_TYPE.toString().contains("DOWNSTREAM"))
-				signalizer.setSignalControlIdentifier(DownstreamSignalController.IDENTIFIER);
+				signalizer.setSignalControlIdentifier(DownstreamPlanbasedSignalController.IDENTIFIER);
 			if (SIGNAL_TYPE.toString().contains("ENVELOPE"))
 				signalizer.setBoundingBox(INPUT_BASE_DIR + "shape_files/signal_systems/bounding_box.shp");
 			signalizer.createSignalsAndLanesForAllTurnings();
@@ -521,7 +521,7 @@ public class TtRunCottbusSimulation {
 			// change all signal controller to downstream
 			signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			for (SignalSystemControllerData controllerData : signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().values()) {
-				controllerData.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+				controllerData.setControllerIdentifier(DownstreamPlanbasedSignalController.IDENTIFIER);
 			} 
 			// note: no break - should continue! (following sylvia and ms already have correct signal controller)
 		case ALL_MS_AS_SYLVIA_INSIDE_ENVELOPE_REST_GREEN:

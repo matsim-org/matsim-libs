@@ -54,7 +54,7 @@ import org.matsim.lanes.data.LanesToLinkAssignment;
 
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
-import signals.downstreamSensor.DownstreamSignalController;
+import signals.downstreamSensor.DownstreamPlanbasedSignalController;
 
 /**
  * Class to create signals (signal systems, signal groups and signal control) for the Braess scenario.
@@ -255,7 +255,7 @@ public final class TtCreateBraessSignals {
 			// choose controller identifier
 			switch (this.signalLogic){
 			case DOWNSTREAM_RESPONSIVE:
-				signalSystemControl.setControllerIdentifier(DownstreamSignalController.IDENTIFIER);
+				signalSystemControl.setControllerIdentifier(DownstreamPlanbasedSignalController.IDENTIFIER);
 				break;
 			default:
 				// planbased controller identifier needed for planbased signal control, sylvia and the simple responsive signals used here
