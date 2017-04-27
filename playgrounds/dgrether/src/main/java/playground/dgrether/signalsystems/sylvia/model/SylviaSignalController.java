@@ -49,7 +49,7 @@ import org.matsim.lanes.data.Lane;
 
 import com.google.inject.Provider;
 
-import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;

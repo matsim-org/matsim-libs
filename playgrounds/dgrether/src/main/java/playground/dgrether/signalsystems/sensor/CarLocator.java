@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems;
+package playground.dgrether.signalsystems.sensor;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;

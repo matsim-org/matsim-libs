@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems;
+package playground.dgrether.signalsystems.sensor;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;

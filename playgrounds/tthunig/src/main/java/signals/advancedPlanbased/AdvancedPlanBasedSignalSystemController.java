@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.model.*;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
-import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 import signals.Analyzable;
 
 /**

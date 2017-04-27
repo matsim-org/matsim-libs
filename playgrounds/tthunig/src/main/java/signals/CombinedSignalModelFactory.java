@@ -42,7 +42,7 @@ import com.google.inject.Provider;
 
 import org.matsim.lanes.data.Lanes;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
-import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalPlan;

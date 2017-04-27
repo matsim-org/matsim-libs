@@ -37,7 +37,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
  * @author tthunig
  *
  */
-final class DgPhase {
+public final class DgPhase {
 
 	private static final Logger log = Logger.getLogger(DgPhase.class);
 	private Integer on = null;

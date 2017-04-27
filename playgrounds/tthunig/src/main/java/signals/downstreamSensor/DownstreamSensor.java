@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 
 import com.google.inject.Inject;
 
-import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 
 /**
  * @author tthunig

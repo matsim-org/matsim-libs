@@ -42,7 +42,7 @@ import org.matsim.lanes.data.LanesToLinkAssignment;
 
 import com.google.inject.Provider;
 
-import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 
 
 /**

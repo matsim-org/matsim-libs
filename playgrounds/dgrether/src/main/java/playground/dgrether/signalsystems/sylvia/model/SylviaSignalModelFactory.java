@@ -32,7 +32,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 
 import com.google.inject.Inject;
 
-import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.sylvia.model.SylviaSignalController.SignalControlProvider;

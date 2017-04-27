@@ -36,8 +36,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
 import org.matsim.core.replanning.ReplanningContext;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
-import playground.dgrether.signalsystems.LinkSensorManager;
-import playground.dgrether.signalsystems.sylvia.controler.SensorBasedSignalControlerListener;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.SensorBasedSignalControlerListener;
 import signals.CombinedSignalsModule;
 
 /**

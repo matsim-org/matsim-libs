@@ -39,7 +39,8 @@ import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Provides;
 
-import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.SensorBasedSignalControlerListener;
 import playground.dgrether.signalsystems.sylvia.model.SylviaSignalModelFactory;
 
 /**

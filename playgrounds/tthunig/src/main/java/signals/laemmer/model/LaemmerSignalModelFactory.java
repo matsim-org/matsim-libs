@@ -35,7 +35,7 @@ import com.google.inject.Inject;
 
 import org.matsim.lanes.data.Lanes;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
-import playground.dgrether.signalsystems.LinkSensorManager;
+import playground.dgrether.signalsystems.sensor.LinkSensorManager;
 import signals.laemmer.model.LaemmerSignalController.SignalControlProvider;
 
 

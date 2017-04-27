@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.sylvia.controler;
+package playground.dgrether.signalsystems.sensor;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controler.SignalControlerListener;
@@ -30,8 +30,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 
 import com.google.inject.Inject;
-
-import playground.dgrether.signalsystems.LinkSensorManager;
 
 
 /**

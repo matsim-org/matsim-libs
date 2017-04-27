@@ -38,6 +38,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
+import playground.dgrether.signalsystems.sensor.LinkSensor;
+
 
 /**
  * @author dgrether
