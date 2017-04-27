@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -66,6 +67,20 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
 	 * the configuration (module "TimeAllocationMutator", param "mutationRange").
 	 */
+	@Deprecated
+	public TimeAllocationMutator(Config config, Provider<TripRouter> tripRouterProvider, final double mutationRange, boolean affectingDuration) {
+		super(config.global());
+		this.tripRouterProvider = tripRouterProvider;
+		this.affectingDuration = affectingDuration;
+		this.mutationRange = mutationRange;
+		this.activityDurationInterpretation = (config.plans().getActivityDurationInterpretation());
+		this.personAttributes = null;
+		this.subpopulationAttribute = null;
+		this.subpopulationMutationRanges = null;
+		this.subpopulationAffectingDuration = null;
+		log.warn("deprecated constructor was used - individual time allocation mutator settings for subpopulations is not supported!");
+	}
+	
 	public TimeAllocationMutator(Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup) {
 		this(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup, null);
 	}
