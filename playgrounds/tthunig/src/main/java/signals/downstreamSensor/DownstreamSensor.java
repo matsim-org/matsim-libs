@@ -23,11 +23,18 @@ package signals.downstreamSensor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 
 import com.google.inject.Inject;
@@ -43,6 +50,7 @@ public final class DownstreamSensor {
 	private final LinkSensorManager sensorManager;
 	private final Network network;
 	private final JDEQSimConfigGroup jdeQSim;
+	private final SignalsData signalsData;
 	
 	private Map<Id<Link>, Integer> linkMaxNoCarsForStorage = new HashMap<>();
 	private Map<Id<Link>, Integer> linkMaxNoCarsForFreeSpeed = new HashMap<>();
@@ -58,6 +66,7 @@ public final class DownstreamSensor {
 		this.sensorManager = sensorManager;
 		this.network = scenario.getNetwork();
 		this.jdeQSim = scenario.getConfig().jdeqSim();
+		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		init();
 	}
 	
@@ -76,6 +85,26 @@ public final class DownstreamSensor {
 		}
 	}
 	
+	public void registerDownstreamSensor(Id<Link> downstreamLinkId){
+		this.sensorManager.registerNumberOfCarsMonitoring(downstreamLinkId);
+	}
+	
+	public void registerDownstreamSensors(Set<Id<Link>> downstreamLinkIds){
+		for (Id<Link> downstreamLinkId : downstreamLinkIds){
+			registerDownstreamSensor(downstreamLinkId);
+		}
+	}
+	
+	public void registerDownstreamSensors(SignalSystem signalSystem){
+		for (Signal signal : signalSystem.getSignals().values()){
+			Node systemNode = this.network.getLinks().get(signal.getLinkId()).getToNode();
+			for (Id<Link> outgoingLinkId : systemNode.getOutLinks().keySet()) {
+				this.sensorManager.registerNumberOfCarsMonitoring(outgoingLinkId);
+			}
+			break; // systemNode is the same for all signals of the system
+		}
+	}
+	
 	public boolean linkEmpty(Id<Link> downstreamLinkId) {
 		// TODO try around with different regimes
 		// stop green if one of the numbers is exceeded
@@ -85,6 +114,33 @@ public final class DownstreamSensor {
 		int maxNoCarsForFreespeed = linkMaxNoCarsForFreeSpeed.get(downstreamLinkId);
 		if (numberOfCarsOnLink > Math.min(maxNoCarsForStorage, maxNoCarsForFreespeed)) {
 			return false;
+		}
+		return true;
+	}
+	
+	public boolean allLinksEmpty(Set<Id<Link>> downstreamLinkIds) {
+		for (Id<Link> downstreamLinkId : downstreamLinkIds){
+			if (!linkEmpty(downstreamLinkId))
+				return false;
+		}
+		return true;			
+	}
+	
+	public boolean allDownstreamLinksEmpty(SignalData signal){
+		if (signal.getTurningMoveRestrictions() != null) {
+			return allLinksEmpty(signal.getTurningMoveRestrictions());
+		} else {
+			// if no turning move restrictions are set, turning is allowed to all outgoing links
+			Node systemNode = this.network.getLinks().get(signal.getLinkId()).getToNode();
+			return allLinksEmpty(systemNode.getOutLinks().keySet());
+		}
+	}
+	
+	public boolean allDownstreamLinksEmpty(Id<SignalSystem> signalSystemId, Id<SignalGroup> signalGroupId){
+		for (Id<Signal> signalId : signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(signalSystemId).get(signalGroupId).getSignalIds()){
+			SignalData signal = signalsData.getSignalSystemsData().getSignalSystemData().get(signalSystemId).getSignalData().get(signalId);
+			if (!allDownstreamLinksEmpty(signal))
+				return false;
 		}
 		return true;
 	}

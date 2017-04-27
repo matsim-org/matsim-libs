@@ -21,30 +21,18 @@
  */
 package signals.downstreamSensor;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 import com.google.inject.Provider;
-
-import signals.sensor.LinkSensorManager;
 
 /**
  * @author tthunig
@@ -57,40 +45,28 @@ public class DownstreamPlanbasedSignalController implements SignalController {
 	public final static String IDENTIFIER = "DownstreamSignalControl";
 
 	public final static class SignalControlProvider implements Provider<SignalController> {
-		private final LinkSensorManager sensorManager;
 		private final DownstreamSensor downstreamSensor;
-		private final Scenario scenario;
 
-		public SignalControlProvider(LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, Scenario scenario) {
-			this.sensorManager = sensorManager;
+		public SignalControlProvider(DownstreamSensor downstreamSensor) {
 			this.downstreamSensor = downstreamSensor;
-			this.scenario = scenario;
 		}
 
 		@Override
 		public DownstreamPlanbasedSignalController get() {
-			return new DownstreamPlanbasedSignalController(sensorManager, downstreamSensor, scenario);
+			return new DownstreamPlanbasedSignalController(downstreamSensor);
 		}
 	}
 
-	private final SignalsData signalsData;
-	private final Network network;
 	private final DownstreamSensor downstreamSensor;
-	private final LinkSensorManager sensorManager;
 
 	private SignalSystem system;
-	private Node systemNode;
-	private Map<Id<Signal>, Set<Id<Link>>> signal2DownstreamLinkMap = new HashMap<>();
 	private SignalPlan signalPlan;
 	private Set<Id<SignalGroup>> greenGroupsAccordingToPlan = new HashSet<>();
 	private Set<Id<SignalGroup>> greenGroupsInSimulation = new HashSet<>();
 	
 
-	private DownstreamPlanbasedSignalController(LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, Scenario scenario) {
-		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		this.network = scenario.getNetwork();
+	private DownstreamPlanbasedSignalController(DownstreamSensor downstreamSensor) {
 		this.downstreamSensor = downstreamSensor;
-		this.sensorManager = sensorManager;
 	}
 
 	@Override
@@ -134,7 +110,7 @@ public class DownstreamPlanbasedSignalController implements SignalController {
 		{
 			// check downstream links for all signal groups that show green/ has to show green (according to the plan)
 			for (Id<SignalGroup> groupId : greenGroupsAccordingToPlan) {
-				if (allDownstreamLinksEmpty(groupId)) {
+				if (downstreamSensor.allDownstreamLinksEmpty(system.getId(), groupId)) {
 					// all downstream links 'empty'
 					if (!greenGroupsInSimulation.contains(groupId)) {
 						// switch to green
@@ -157,22 +133,6 @@ public class DownstreamPlanbasedSignalController implements SignalController {
 		// TODO try alternatives: e.g. switch to next phase when downstream link occupied
 	}
 
-	/**
-	 * 
-	 * @param signalGroupId
-	 * @return true if all downstream links of all signals of the signal group are empty
-	 */
-	private boolean allDownstreamLinksEmpty(Id<SignalGroup> signalGroupId) {
-		for (Id<Signal> signalId : this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(this.system.getId()).get(signalGroupId).getSignalIds()) {
-			for (Id<Link> downstreamLinkId : signal2DownstreamLinkMap.get(signalId)) {
-				if (!downstreamSensor.linkEmpty(downstreamLinkId)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
 	@Override
 	public void reset(Integer iterationNumber) {
 		// nothing is to do. init() is only needed once
@@ -183,25 +143,7 @@ public class DownstreamPlanbasedSignalController implements SignalController {
 	 */
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
-		determineDownstreamLinks();
-		for (Id<Link> outgoingLinkId : systemNode.getOutLinks().keySet()) {
-			this.sensorManager.registerNumberOfCarsMonitoring(outgoingLinkId);
-		}
-	}
-
-	private void determineDownstreamLinks() {
-		SignalSystemData signalSystem = signalsData.getSignalSystemsData().getSignalSystemData().get(this.system.getId());
-		for (SignalData signal : signalSystem.getSignalData().values()) {
-			systemNode = this.network.getLinks().get(signal.getLinkId()).getToNode();
-
-			this.signal2DownstreamLinkMap.put(signal.getId(), new HashSet<>());
-			if (signal.getTurningMoveRestrictions() != null) {
-				this.signal2DownstreamLinkMap.get(signal.getId()).addAll(signal.getTurningMoveRestrictions());
-			} else {
-				// if no turning move restrictions are set, turning is allowed to all outgoing links
-				this.signal2DownstreamLinkMap.get(signal.getId()).addAll(systemNode.getOutLinks().keySet());
-			}
-		}
+		downstreamSensor.registerDownstreamSensors(system);
 	}
 
 	@Override
