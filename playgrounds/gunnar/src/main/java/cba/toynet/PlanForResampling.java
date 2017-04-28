@@ -111,7 +111,7 @@ class PlanForResampling implements Alternative {
 	}
 
 	@Override
-	public void setMATSimTimeScore(double score) {
+	public void updateMATSimTimeScore(double score, double dummy) {
 		this.congestedTravelTimeUtility = score;
 	}
 
