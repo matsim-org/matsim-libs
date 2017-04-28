@@ -45,6 +45,7 @@ public final class LaneSensor {
 	private boolean doAverageVehiclesPerSecondMonitoring = false;
 
 	private double totalVehicles = 0;
+	private double monitoringStartTime;
 
 	private Map<Double, Map<Id<Vehicle>, CarLocator>> distanceMeterCarLocatorMap = null;
 
@@ -84,6 +85,12 @@ public final class LaneSensor {
 
 	public void handleEvent(LaneEnterEvent event) {
 		this.agentsOnLane++;
+		if(this.doAverageVehiclesPerSecondMonitoring) {
+			totalVehicles ++;
+			if(totalVehicles == 1) {
+				monitoringStartTime = event.getTime();
+			}
+		}
 		if (this.doDistanceMonitoring){
 			for (Double distance : this.distanceMeterCarLocatorMap.keySet()){
 				Map<Id<Vehicle>, CarLocator> carLocatorPerVehicleId = this.distanceMeterCarLocatorMap.get(distance);
@@ -107,4 +114,15 @@ public final class LaneSensor {
 		return count;
 	}
 
+	public double getAvgVehiclesPerSecond(double now) {
+		if(now > monitoringStartTime) {
+			return totalVehicles / (now - monitoringStartTime);
+		} else {
+			return 0;
+		}
+	}
+
+    public void registerAverageVehiclesPerSecondToMonitor() {
+		this.doAverageVehiclesPerSecondMonitoring = true;
+    }
 }

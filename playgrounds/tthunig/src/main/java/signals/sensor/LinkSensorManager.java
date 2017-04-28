@@ -140,7 +140,26 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 			Lane lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
 			this.linkIdLaneIdSensorMap.get(linkId).put(laneId, new LaneSensor(link, lane));
 		}
-	
+	}
+
+	public void registerAverageNumberOfCarsPerSecondMonitoringOnLane(Id<Link> linkId, Id<Lane> laneId) {
+		Link link = this.network.getLinks().get(linkId);
+		if (link == null){
+			throw new IllegalStateException("Link with Id " + linkId + " is not in the network, can't register sensor");
+		}
+		if (this.laneDefinitions == null || this.laneDefinitions.getLanesToLinkAssignments().get(linkId) == null ||
+				this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId) == null) {
+			throw new IllegalStateException("No data found for lane  " + laneId + " on link  " + linkId + " is not in the network, can't register sensor");
+		}
+		if (! this.linkIdLaneIdSensorMap.containsKey(linkId)){
+			this.linkIdLaneIdSensorMap.put(linkId, new HashMap<>());
+		}
+		if (! this.linkIdLaneIdSensorMap.get(linkId).containsKey(laneId)){
+			Lane lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
+			this.linkIdLaneIdSensorMap.get(linkId).put(laneId, new LaneSensor(link, lane));
+		}
+		linkIdLaneIdSensorMap.get(linkId).get(laneId).registerAverageVehiclesPerSecondToMonitor();
+
 	}
 
 	public void registerAverageNumberOfCarsPerSecondMonitoring(Id<Link> linkId) {
@@ -218,8 +237,12 @@ public final class LinkSensorManager implements LinkEnterEventHandler, LinkLeave
 		return map.get(laneId).getNumberOfCarsInDistance(distanceMeter, timeSeconds);
 	}
 
-	public double getAverageArrivalRate(Id<Link> linkId, double now) {
+	public double getAverageArrivalRateOnLink(Id<Link> linkId, double now) {
 		return this.linkIdSensorMap.get(linkId).getAvgVehiclesPerSecond(now);
+	}
+
+	public double getAverageArrivalRateOnLane(Id<Link> linkId, Id<Lane> laneId, double now) {
+		return this.linkIdLaneIdSensorMap.get(linkId).get(laneId).getAvgVehiclesPerSecond(now);
 	}
 	
 	@Override
