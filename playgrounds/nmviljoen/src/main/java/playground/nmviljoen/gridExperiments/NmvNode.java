@@ -22,6 +22,19 @@ public class NmvNode implements Comparable<NmvNode>{
 		this.Y = Y;
 	}
 	
+<<<<<<< HEAD
+=======
+	public NmvNode(String id) {
+		this.id = id;
+	}
+	
+	public NmvNode(String id, double x, double y){
+		this.id = id;
+		this.X = x;
+		this.Y = y;
+	}
+	
+>>>>>>> 5edca91500... Completed the tests for reading and writing multulayer networks
 	public String toString() {
 		return "id: " + id + " ("+ X + ";"+ Y + ")";
 	}  
@@ -35,11 +48,19 @@ public class NmvNode implements Comparable<NmvNode>{
 	}
 	
 	public String getXAsString(){
-		return Double.toString(X);
+		String s = null;
+		if(X != null){
+			s = Double.toString(X);
+		}
+		return s;
 	}
 	
 	public String getYAsString(){
-		return Double.toString(Y);
+		String s = null;
+		if(Y != null){
+			s = Double.toString(Y); 
+		}
+		return s;
 	}
 
 	@Override
