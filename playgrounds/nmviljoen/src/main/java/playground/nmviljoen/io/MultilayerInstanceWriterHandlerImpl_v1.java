@@ -22,6 +22,7 @@ package playground.nmviljoen.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.List;
 
 import playground.nmviljoen.gridExperiments.GridExperiment;
 import playground.nmviljoen.gridExperiments.NmvLink;
@@ -37,15 +38,15 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 
 	@Override
 	public void startInstance(BufferedWriter out) throws IOException {
-		out.write("\n<instance");
-		out.write(" archetype=\"" + experiment.getArchetype().getShortName() + "\"");
+		out.write("\n<multilayerNetwork");
+		out.write(" archetype=\"" + experiment.getArchetype().getDescription() + "\"");
 		out.write(" number=\"" + experiment.getInstanceNumber() + "\"");
 		out.write(">\n");
 	}
 
 	@Override
 	public void endInstance(BufferedWriter out) throws IOException {
-		out.write("</instance>");
+		out.write("</multilayerNetwork>");
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	
 	@Override
 	public void startPhysicalNode(BufferedWriter out, NmvNode node) throws IOException {
-		out.write("\t\t\t<node id=\"" 
+		out.write("\t\t\t<physicalNode id=\"" 
 				+ node.getId() 
 				+ "\" x=\"" + node.getXAsString()
 				+ "\" y=\"" + node.getYAsString() + "\"");
@@ -94,7 +95,7 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	@Override
 	public void startPhysicalEdge(BufferedWriter out, NmvLink link) throws IOException {
 		String[] sa = link.getId().split("_");
-		out.write("\t\t\t<edge fromId=\"" + sa[0] + "\" toId=\"" + sa[1] + " weight=\"" + link.getWeight() + "\"");
+		out.write("\t\t\t<physicalEdge fromId=\"" + sa[0] + "\" toId=\"" + sa[1] + "\" weight=\"" + link.getWeight() + "\"");
 	}
 
 	@Override
@@ -104,27 +105,33 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 
 	@Override
 	public void startLogicalNetwork(BufferedWriter out) throws IOException {
-		out.write("\n\t</logicalNetwork>\n");
+		out.write("\n\t<logicalNetwork>\n");
 	}
 
 	@Override
 	public void endLogicalNetwork(BufferedWriter out) throws IOException {
-		out.write("\t<logicalNetwork>\n");
+		out.write("\t</logicalNetwork>\n");
 	}
 
 	@Override
 	public void startLogicalNodes(BufferedWriter out) throws IOException {
-		out.write("\t\t</logicalNodes>\n");
-	}
-
-	@Override
-	public void endLogicalNodes(BufferedWriter out) throws IOException {
 		out.write("\t\t<logicalNodes>\n");
 	}
 
 	@Override
-	public void startLogicalNode(BufferedWriter out) throws IOException {
-		out.write("\t\t\t<node id=\"" + "\"");
+	public void endLogicalNodes(BufferedWriter out) throws IOException {
+		out.write("\t\t</logicalNodes>\n");
+	}
+
+	@Override
+	public void startLogicalNode(BufferedWriter out, NmvNode node) throws IOException {
+		out.write("\t\t\t<logicalNode id=\"" + node.getId() + "\"");
+		if(node.getXAsString() != null){
+			out.write(" x=\"" + node.getXAsString() + "\"");
+		}
+		if(node.getYAsString() != null){
+			out.write(" y=\"" + node.getYAsString() + "\"");
+		}
 		//TODO Add optional name and capacity
 	}
 
@@ -144,8 +151,9 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-	public void startLogicalEdge(BufferedWriter out) throws IOException {
-		out.write("\t\t\t<edge fromId=\"" + "\" toId=\"" + "\"");
+	public void startLogicalEdge(BufferedWriter out, NmvLink link) throws IOException {
+		String[] sa = link.getId().split("_");
+		out.write("\t\t\t<logicalEdge fromId=\"" + sa[0] + "\" toId=\"" + sa[1] + "\" weight=\"" + link.getWeight() + "\"");
 	}
 
 	@Override
@@ -153,9 +161,6 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 		out.write("/>\n");
 	}
 
-	
-	
-	
 	
 	@Override
 	public void startAssociations(BufferedWriter out) throws IOException {
@@ -168,10 +173,10 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-	public void startAssociation(BufferedWriter out) throws IOException {
+	public void startAssociation(BufferedWriter out, String logicalId, String physicalId) throws IOException {
 		out.write("\t\t<association " 
-				+ "logicalId=\"" 
-				+ "\" physicalId=\"" 
+				+ "logicalId=\"" + logicalId
+				+ "\" physicalId=\"" + physicalId
 				+ "\"");
 	}
 
@@ -191,9 +196,9 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-	public void startSet(BufferedWriter out) throws IOException {
-		out.write("\t\t<set fromId=\""
-				+ "\" toId=\""
+	public void startSet(BufferedWriter out, String fromId, String toId) throws IOException {
+		out.write("\t\t<set fromId=\"" + fromId
+				+ "\" toId=\"" + toId
 				+ "\">\n");
 	}
 
@@ -203,13 +208,16 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-	public void startPath(BufferedWriter out) throws IOException {
-		out.write("\t\t\t<path 2 4 6 11 12 14 16");
+	public void startPath(BufferedWriter out, List<String> path) throws IOException {
+		out.write("\t\t\t<path>");
+		for(String s : path){
+			out.write(" " + s);
+		}
 	}
 
 	@Override
 	public void endPath(BufferedWriter out) throws IOException {
-		out.write("/>\n");
+		out.write("</path>\n");
 	}
 
 	@Override
