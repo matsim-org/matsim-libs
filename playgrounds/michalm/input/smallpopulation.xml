@@ -107,39 +107,39 @@
 		<plan selected="yes">
 			<activity type="Home" x="367930.39451335266" y="3906912.8671092307" end_time="08:38:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="368582.8509665737" y="3907870.250423474" end_time="08:54:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="368301.4181722809" y="3907934.3762660427" end_time="08:56:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="368379.1213139473" y="3907924.698777237" end_time="12:17:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="368346.441784848" y="3907928.726167308" end_time="13:44:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="369947.1357699534" y="3906099.216588857" end_time="15:50:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Home" x="367930.39451335266" y="3906912.8671092307" end_time="18:53:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="356652.7115081493" y="3938273.7623548214" end_time="20:00:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="357468.88415327354" y="3939405.565910611" end_time="20:26:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Home" x="367930.39451335266" y="3906912.8671092307" end_time="28:00:00" >
 			</activity>
@@ -233,23 +233,23 @@
 		<plan selected="yes">
 			<activity type="Home" x="368033.76175105583" y="3916229.269968474" end_time="11:12:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="369591.8500933956" y="3912366.403689191" end_time="11:46:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="364753.37704597204" y="3915605.622377034" end_time="13:42:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="360870.8893755446" y="3923711.283402795" end_time="15:59:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Other" x="364619.3097829954" y="3909628.629969368" end_time="16:55:00" >
 			</activity>
-			<leg mode="car">
+			<leg mode="taxi">
 			</leg>
 			<activity type="Home" x="368033.76175105583" y="3916229.269968474" end_time="28:00:00" >
 			</activity>
