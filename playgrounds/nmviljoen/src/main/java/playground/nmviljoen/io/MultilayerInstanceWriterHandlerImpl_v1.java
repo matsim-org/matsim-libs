@@ -22,10 +22,7 @@ package playground.nmviljoen.io;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-<<<<<<< HEAD
 import java.util.List;
-=======
->>>>>>> 905d616477... Interim commit to deal with xml writing
 
 import playground.nmviljoen.gridExperiments.GridExperiment;
 import playground.nmviljoen.gridExperiments.NmvLink;
@@ -41,24 +38,15 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 
 	@Override
 	public void startInstance(BufferedWriter out) throws IOException {
-<<<<<<< HEAD
 		out.write("\n<multilayerNetwork");
 		out.write(" archetype=\"" + experiment.getArchetype().getDescription() + "\"");
-=======
-		out.write("\n<instance");
-		out.write(" archetype=\"" + experiment.getArchetype().getShortName() + "\"");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 		out.write(" number=\"" + experiment.getInstanceNumber() + "\"");
 		out.write(">\n");
 	}
 
 	@Override
 	public void endInstance(BufferedWriter out) throws IOException {
-<<<<<<< HEAD
 		out.write("</multilayerNetwork>");
-=======
-		out.write("</instance>");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 	@Override
@@ -83,11 +71,7 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	
 	@Override
 	public void startPhysicalNode(BufferedWriter out, NmvNode node) throws IOException {
-<<<<<<< HEAD
 		out.write("\t\t\t<physicalNode id=\"" 
-=======
-		out.write("\t\t\t<node id=\"" 
->>>>>>> 905d616477... Interim commit to deal with xml writing
 				+ node.getId() 
 				+ "\" x=\"" + node.getXAsString()
 				+ "\" y=\"" + node.getYAsString() + "\"");
@@ -111,11 +95,7 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	@Override
 	public void startPhysicalEdge(BufferedWriter out, NmvLink link) throws IOException {
 		String[] sa = link.getId().split("_");
-<<<<<<< HEAD
 		out.write("\t\t\t<physicalEdge fromId=\"" + sa[0] + "\" toId=\"" + sa[1] + "\" weight=\"" + link.getWeight() + "\"");
-=======
-		out.write("\t\t\t<edge fromId=\"" + sa[0] + "\" toId=\"" + sa[1] + " weight=\"" + link.getWeight() + "\"");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 	@Override
@@ -125,34 +105,21 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 
 	@Override
 	public void startLogicalNetwork(BufferedWriter out) throws IOException {
-<<<<<<< HEAD
 		out.write("\n\t<logicalNetwork>\n");
-=======
-		out.write("\n\t</logicalNetwork>\n");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 	@Override
 	public void endLogicalNetwork(BufferedWriter out) throws IOException {
-<<<<<<< HEAD
 		out.write("\t</logicalNetwork>\n");
-=======
-		out.write("\t<logicalNetwork>\n");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 	@Override
 	public void startLogicalNodes(BufferedWriter out) throws IOException {
-<<<<<<< HEAD
 		out.write("\t\t<logicalNodes>\n");
-=======
-		out.write("\t\t</logicalNodes>\n");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 	@Override
 	public void endLogicalNodes(BufferedWriter out) throws IOException {
-<<<<<<< HEAD
 		out.write("\t\t</logicalNodes>\n");
 	}
 
@@ -165,14 +132,6 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 		if(node.getYAsString() != null){
 			out.write(" y=\"" + node.getYAsString() + "\"");
 		}
-=======
-		out.write("\t\t<logicalNodes>\n");
-	}
-
-	@Override
-	public void startLogicalNode(BufferedWriter out) throws IOException {
-		out.write("\t\t\t<node id=\"" + "\"");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 		//TODO Add optional name and capacity
 	}
 
@@ -192,14 +151,9 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-<<<<<<< HEAD
 	public void startLogicalEdge(BufferedWriter out, NmvLink link) throws IOException {
 		String[] sa = link.getId().split("_");
 		out.write("\t\t\t<logicalEdge fromId=\"" + sa[0] + "\" toId=\"" + sa[1] + "\" weight=\"" + link.getWeight() + "\"");
-=======
-	public void startLogicalEdge(BufferedWriter out) throws IOException {
-		out.write("\t\t\t<edge fromId=\"" + "\" toId=\"" + "\"");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 	@Override
@@ -208,12 +162,6 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	
-<<<<<<< HEAD
-=======
-	
-	
-	
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	@Override
 	public void startAssociations(BufferedWriter out) throws IOException {
 		out.write("\n\t<associations>\n");
@@ -225,17 +173,10 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-<<<<<<< HEAD
 	public void startAssociation(BufferedWriter out, String logicalId, String physicalId) throws IOException {
 		out.write("\t\t<association " 
 				+ "logicalId=\"" + logicalId
 				+ "\" physicalId=\"" + physicalId
-=======
-	public void startAssociation(BufferedWriter out) throws IOException {
-		out.write("\t\t<association " 
-				+ "logicalId=\"" 
-				+ "\" physicalId=\"" 
->>>>>>> 905d616477... Interim commit to deal with xml writing
 				+ "\"");
 	}
 
@@ -255,15 +196,9 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-<<<<<<< HEAD
 	public void startSet(BufferedWriter out, String fromId, String toId) throws IOException {
 		out.write("\t\t<set fromId=\"" + fromId
 				+ "\" toId=\"" + toId
-=======
-	public void startSet(BufferedWriter out) throws IOException {
-		out.write("\t\t<set fromId=\""
-				+ "\" toId=\""
->>>>>>> 905d616477... Interim commit to deal with xml writing
 				+ "\">\n");
 	}
 
@@ -273,25 +208,16 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-<<<<<<< HEAD
 	public void startPath(BufferedWriter out, List<String> path) throws IOException {
 		out.write("\t\t\t<path>");
 		for(String s : path){
 			out.write(" " + s);
 		}
-=======
-	public void startPath(BufferedWriter out) throws IOException {
-		out.write("\t\t\t<path 2 4 6 11 12 14 16");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 	@Override
 	public void endPath(BufferedWriter out) throws IOException {
-<<<<<<< HEAD
 		out.write("</path>\n");
-=======
-		out.write("/>\n");
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 	@Override
