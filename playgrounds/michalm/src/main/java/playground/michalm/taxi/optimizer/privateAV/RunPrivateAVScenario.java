@@ -1,6 +1,7 @@
 package playground.michalm.taxi.optimizer.privateAV;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -16,61 +17,51 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunPrivateAVScenario {
 
   public static void main(String[] args) {
-    RunPrivateAVScenario.run("config.xml", "someav_small", true);
-
+    RunPrivateAVScenario.run("config.xml", "someav_small");
   }
 
-  private static void run(String configFile, String runName, boolean runTaxis) {
+  private static void run(String configFile, String runName) {
     // TODO Auto-generated method stub
-	  Config config = ConfigUtils.loadConfig(configFile);
-	  config.controler().setRunId(runName);
-	  config.controler().setOutputDirectory("output/" + runName);
+    Config config = ConfigUtils.loadConfig(configFile,
+        new DvrpConfigGroup(),
+        new TaxiConfigGroup(),
+        new TaxiFareConfigGroup());
     
-	  config.network().setInputFile("input/network.xml.gz");
-	  config.facilities().setInputFile("input/facilities.xml.gz");
-	  config.plans().setInputFile("input/smallpopulation.xml");
-	  config.vehicles().setVehiclesFile("input/vehicles.xml");
-	  
-	  // set controler 
-	  Controler controler = createTaxiControler(config, runTaxis, "input/taxis.xml");
-	  
-		controler.run();
+    config.controler().setRunId(runName);
+    config.controler().setOutputDirectory("output/" + runName);
+
+    
+    config.network().setInputFile("input/network.xml.gz");
+    config.facilities().setInputFile("input/facilities.xml.gz");
+    config.plans().setInputFile("input/smallpopulation.xml");
+    config.vehicles().setVehiclesFile("input/vehicles.xml");
+    
+    // set controler 
+    createTaxiControler(config).run();
 
   }
   
   
-  public static Controler createTaxiControler(Config config, boolean runTaxis, String taxisFile){
+  public static Controler createTaxiControler(Config config){
+    
+    // added in response to error in run
+    config.qsim().addParam("simStarttimeInterpretation", "onlyUseStarttime");
+    config.qsim().setStartTime(0);
+
+    TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+    config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
+    config.checkConsistency();
 
 
+    Scenario scenario = ScenarioUtils.loadScenario(config);
+    FleetImpl fleet = new FleetImpl();
+    new VehicleReader(scenario.getNetwork(), fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+      
     Controler controler = new Controler(config);
     
-    if(runTaxis){
-      config.addModule(new TaxiConfigGroup());
-      config.addModule(new DvrpConfigGroup());
+    controler.addOverridingModule(
+        TaxiOptimizerModules.createModule(fleet, PrivateATOptimizerProvider.class));
 
-      DvrpConfigGroup.get(config).setMode(TaxiOptimizerModules.TAXI_MODE);
-      
-      // added in response to error in run
-      config.qsim().addParam("simStarttimeInterpretation", "onlyUseStarttime");
-      config.qsim().setStartTime(0);
-      //
-
-      TaxiConfigGroup taxi = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME); 
-      taxi.setTaxisFile(taxisFile);
-
-      config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-      config.checkConsistency();
-
-      Scenario scenario = ScenarioUtils.loadScenario(config);
-      FleetImpl fleet = new FleetImpl();
-      new VehicleReader(scenario.getNetwork(), fleet).readFile(taxisFile);
-      
-      controler.addOverridingModule(TaxiOptimizerModules.createModule(fleet, PrivateATOptimizerProvider.class));
-
-      
-    }
-    
-    
     return controler;
     
   }
