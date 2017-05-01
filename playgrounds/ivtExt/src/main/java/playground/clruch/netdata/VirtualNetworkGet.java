@@ -1,8 +1,6 @@
 package playground.clruch.netdata;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.zip.DataFormatException;
 
 import org.matsim.api.core.v01.network.Network;
 
@@ -14,9 +12,9 @@ public enum VirtualNetworkGet {
         System.out.println("" + virtualnetworkFile.getAbsoluteFile());
         try {
             return VirtualNetworkIO.fromByte(network, virtualnetworkFile);
-        } catch (ClassNotFoundException | DataFormatException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            // e.printStackTrace();
+            System.out.println("cannot load default " + virtualnetworkFile);
         }
         return null;
     }

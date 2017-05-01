@@ -3,6 +3,10 @@ package playground.clruch.gfx;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.geom.Path2D;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JCheckBox;
 
@@ -24,8 +28,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 128);
     private PointCloud pointCloud = null;
     private VirtualNetwork virtualNetwork = null;
-
-    private boolean drawCells = false;
+    Map<VirtualNode, Tensor> convexHull = new HashMap<>();
+    private boolean drawCells = true;
 
     public VirtualNetworkLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
@@ -40,7 +44,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
         boolean containsRebalance = ref.vehicles.stream() //
                 .filter(vc -> vc.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
                 .findAny().isPresent();
-        if (pointCloud != null && drawCells && containsRebalance) {
+        if (drawCells && pointCloud != null && containsRebalance) {
             graphics.setColor(COLOR);
             int zoom = matsimMapComponent.getZoom();
             int width = zoom <= 12 ? 0 : 1;
@@ -51,11 +55,31 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
             }
         }
+        if (drawCells) {
+            graphics.setColor(new Color(128, 128, 128, 128));
+            for (Entry<VirtualNode, Tensor> entry : convexHull.entrySet()) {
+                Tensor hull = entry.getValue();
+                Path2D path2d = new Path2D.Double();
+                boolean init = false;
+                for (Tensor vector : hull) {
+                    Coord coord = new Coord( //
+                            vector.Get(0).number().doubleValue(), //
+                            vector.Get(1).number().doubleValue());
+                    Point point = matsimMapComponent.getMapPositionAlways(coord);
+                    if (!init) {
+                        init = true;
+                        path2d.moveTo(point.getX(), point.getY());
+                    } else
+                        path2d.lineTo(point.getX(), point.getY());
+                }
+                path2d.closePath();
+                graphics.draw(path2d);
+            }
+        }
     }
 
     public void setPointCloud(PointCloud pointCloud) {
         this.pointCloud = pointCloud;
-        drawCells = pointCloud != null;
     }
 
     void setDrawCells(boolean selected) {
@@ -76,18 +100,18 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     public void setVirtualNetwork(VirtualNetwork virtualNetwork) {
         this.virtualNetwork = virtualNetwork;
-        final MatsimStaticDatabase db = matsimMapComponent.db;
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-            Tensor coords = Tensors.empty();
-            for (Link link : virtualNode.getLinks()) {
-                int index = db.getLinkIndex(link);
-                OsmLink osmLink = db.getOsmLink(index);
-                Coord coord = osmLink.getAt(.5);
-                coords.append(Tensors.vector(coord.getX(), coord.getY()));
-            }
-            if (coords.length() != 0) {
-                Tensor hull = ConvexHull.of(coords);
-                // System.out.println(Pretty.of(hull));
+        if (virtualNetwork != null) {
+            final MatsimStaticDatabase db = matsimMapComponent.db;
+            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+                Tensor coords = Tensors.empty();
+                for (Link link : virtualNode.getLinks()) {
+                    int index = db.getLinkIndex(link);
+                    OsmLink osmLink = db.getOsmLink(index);
+                    Coord coord = osmLink.getAt(.5);
+                    coords.append(Tensors.vector(coord.getX(), coord.getY()));
+                }
+                if (coords.length() != 0)
+                    convexHull.put(virtualNode, ConvexHull.of(coords));
             }
         }
     }

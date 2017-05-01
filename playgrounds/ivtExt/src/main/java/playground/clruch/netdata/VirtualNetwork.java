@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -28,13 +27,8 @@ public class VirtualNetwork implements Serializable {
     private final List<VirtualLink> virtualLinks = new ArrayList<>();
     // the map is for checking that all links in the network are assigned to one vNode
     protected transient Map<Link, VirtualNode> linkVNodeMap = new HashMap<>();
-    private final Map<String, VirtualNode> linkVNodeMapRAWVERYPRIVATE = new HashMap<>(); // is
-                                                                                         // stored
-                                                                                         // but only
-                                                                                         // used to
-                                                                                         // create
-                                                                                         // references
-                                                                                         // LINK
+    // is stored but only used to create references LINK
+    private final Map<String, VirtualNode> linkVNodeMapRAWVERYPRIVATE = new HashMap<>();
     private final Map<Point, VirtualLink> virtualLinkPairs = new HashMap<>();
 
     /* package */ VirtualNetwork() {
@@ -72,12 +66,11 @@ public class VirtualNetwork implements Serializable {
      * @return virtual node belonging to link
      */
     public final VirtualNode getVirtualNode(Link link) {
-        GlobalAssert.that(link!=null);
-        if(!linkVNodeMap.containsKey(link)){
+        GlobalAssert.that(link != null);
+        if (!linkVNodeMap.containsKey(link)) {
             System.out.println("link: " + link.getId().toString());
             System.out.println("virtualNode not found ");
         }
-
 
         return linkVNodeMap.get(link);
     }
@@ -156,34 +149,32 @@ public class VirtualNetwork implements Serializable {
     }
 
     private void fillLinkVNodeMap(Network network) {
-        
+
         linkVNodeMap = new HashMap<>();
-        
+
         for (String linkIDString : linkVNodeMapRAWVERYPRIVATE.keySet()) {
             Id<Link> linkID = Id.createLinkId(linkIDString);
-            GlobalAssert.that(network.getLinks().get(linkID)!=null);
+            GlobalAssert.that(network.getLinks().get(linkID) != null);
             Link link = network.getLinks().get(linkID);
             VirtualNode vNode = linkVNodeMapRAWVERYPRIVATE.get(linkIDString);
             linkVNodeMap.put(link, vNode);
         }
         checkConsistency();
     }
-    
-    
-    
-    protected void fillVNodeMapRAWVERYPRIVATE(){
+
+    protected void fillVNodeMapRAWVERYPRIVATE() {
         GlobalAssert.that(!linkVNodeMap.isEmpty());
-        for(Link link : linkVNodeMap.keySet()){
+        for (Link link : linkVNodeMap.keySet()) {
             linkVNodeMapRAWVERYPRIVATE.put(link.getId().toString(), linkVNodeMap.get(link));
         }
-        
+
         GlobalAssert.that(linkVNodeMap.size() == linkVNodeMapRAWVERYPRIVATE.size());
-        GlobalAssert.that(!linkVNodeMapRAWVERYPRIVATE.isEmpty());        
-    }
-    
-    public void checkConsistency(){
         GlobalAssert.that(!linkVNodeMapRAWVERYPRIVATE.isEmpty());
-        GlobalAssert.that(linkVNodeMap!=null);
+    }
+
+    public void checkConsistency() {
+        GlobalAssert.that(!linkVNodeMapRAWVERYPRIVATE.isEmpty());
+        GlobalAssert.that(linkVNodeMap != null);
     }
 
     // TODO don't delete this function but move outside into class e.g. VirtualNetworkHelper
