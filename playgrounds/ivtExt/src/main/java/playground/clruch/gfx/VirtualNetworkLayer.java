@@ -7,14 +7,23 @@ import java.awt.Point;
 import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.opt.ConvexHull;
 import playground.clruch.export.AVStatus;
+import playground.clruch.net.MatsimStaticDatabase;
+import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.gui.RowPanel;
 
 public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 128);
     private PointCloud pointCloud = null;
+    private VirtualNetwork virtualNetwork = null;
 
     private boolean drawCells = false;
 
@@ -62,6 +71,24 @@ public class VirtualNetworkLayer extends ViewerLayer {
             jCheckBox.setSelected(drawCells);
             jCheckBox.addActionListener(e -> setDrawCells(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);
+        }
+    }
+
+    public void setVirtualNetwork(VirtualNetwork virtualNetwork) {
+        this.virtualNetwork = virtualNetwork;
+        final MatsimStaticDatabase db = matsimMapComponent.db;
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+            Tensor coords = Tensors.empty();
+            for (Link link : virtualNode.getLinks()) {
+                int index = db.getLinkIndex(link);
+                OsmLink osmLink = db.getOsmLink(index);
+                Coord coord = osmLink.getAt(.5);
+                coords.append(Tensors.vector(coord.getX(), coord.getY()));
+            }
+            if (coords.length() != 0) {
+                Tensor hull = ConvexHull.of(coords);
+                // System.out.println(Pretty.of(hull));
+            }
         }
     }
 }
