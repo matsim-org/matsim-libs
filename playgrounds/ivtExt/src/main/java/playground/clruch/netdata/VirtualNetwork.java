@@ -160,14 +160,10 @@ public class VirtualNetwork implements Serializable {
         linkVNodeMap = new HashMap<>();
         
         for (String linkIDString : linkVNodeMapRAWVERYPRIVATE.keySet()) {
-            Optional<Id<Link>> optLinkFound = network.getLinks().keySet().stream().filter(v -> v.toString().equals(linkIDString)).findAny();
-            GlobalAssert.that(optLinkFound.isPresent());
-
-            Link link = network.getLinks().get(optLinkFound.get());
+            Id<Link> linkID = Id.createLinkId(linkIDString);
+            GlobalAssert.that(network.getLinks().get(linkID)!=null);
+            Link link = network.getLinks().get(linkID);
             VirtualNode vNode = linkVNodeMapRAWVERYPRIVATE.get(linkIDString);
-            GlobalAssert.that(linkVNodeMap!=null);
-            GlobalAssert.that(link!=null);
-            GlobalAssert.that(vNode!=null);
             linkVNodeMap.put(link, vNode);
         }
         checkConsistency();

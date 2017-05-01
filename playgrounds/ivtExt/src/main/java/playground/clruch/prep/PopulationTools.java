@@ -185,6 +185,37 @@ public class PopulationTools {
         }
 
     }
+    
+    
+    /** removes all persons with activity Type "freight" from population
+     * @param population
+     */
+    public static void eliminateWalking(Population population) {
+        log.info("All population elements with activity freight are removed.");
+
+        Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
+
+        while (itPerson.hasNext()) {
+            Person person = itPerson.next();
+            boolean removePerson = false;
+            for (Plan plan : person.getPlans()) {
+                for (PlanElement planElement : plan.getPlanElements()) {
+                    if (planElement instanceof Leg) {
+                        Leg leg = (Leg) planElement;
+                        if (leg.getMode() == "walk" ) {
+                            removePerson = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (removePerson)
+                itPerson.remove();
+        }
+
+    }
+
+    
 
 
 }

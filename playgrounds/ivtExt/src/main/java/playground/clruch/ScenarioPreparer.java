@@ -33,10 +33,18 @@ public class ScenarioPreparer {
         final int numVirtualNodes = 40;
 
         // cutting of scenario to circle
+        // increasing the first value goes right        
+        // increasing the second value goes north
+        // Zurich
         final Coord center = new Coord(2683600.0, 1251400.0);
-        final double radius = 9000; // (set to -1 for no cutting)
+        final double radius = 10000; // (set to -1 for no cutting)
+        // Basel
+        //final Coord center = new Coord(2612859.0,1266343.0);
+        //final double radius = 12000; // (set to -1 for no cutting)
         final boolean populationeliminateFreight = true;
         final boolean populationchangeModeToAV = true;
+        final boolean populationeliminateWalking = true;
+         
 
         // output file names
         final String VIRTUALNETWORKFILENAME = "virtualNetwork";
@@ -80,6 +88,8 @@ public class ScenarioPreparer {
             System.out.println("Population size after radius cut: " + population.getPersons().values().size());
             if(populationeliminateFreight) PopulationTools.eliminateFreight(population);
             System.out.println("Population size after removing freight: " + population.getPersons().values().size());
+            if(populationeliminateWalking) PopulationTools.eliminateWalking(population);
+            System.out.println("Population size after removing walking people: " + population.getPersons().values().size());
             if(populationchangeModeToAV) PopulationTools.changeModesOfTransportToAV(population);
             System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
             PopulationTools.changeModesOfTransportToAV(population);

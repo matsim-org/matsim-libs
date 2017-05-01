@@ -66,10 +66,11 @@ public class VirtualNode implements Serializable {
      */
     public void setLinksAfterSerialization(Network network) {
         this.links = new HashSet<>();
-        for (String linkIDString : linkIDsforSerialization) {
-            Optional<Id<Link>> optLinkFound = network.getLinks().keySet().stream().filter(v -> v.toString().equals(linkIDString)).findAny();
-            GlobalAssert.that(optLinkFound.isPresent());
-            links.add(network.getLinks().get(optLinkFound.get()));
+        for (String linkIDString : linkIDsforSerialization) {            
+            Id<Link> linkID = Id.createLinkId(linkIDString);
+            Link link = network.getLinks().get(linkID);
+            GlobalAssert.that(link!=null);
+            links.add(link);
         }
 
     }
