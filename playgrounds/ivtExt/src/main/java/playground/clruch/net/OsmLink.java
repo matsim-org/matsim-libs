@@ -27,12 +27,14 @@ public class OsmLink {
         this.link = link;
         coords[0] = from;
         coords[1] = to;
+        nx = coords[0].getX();
+        ny = coords[0].getY() ;
         dx = coords[1].getX() - coords[0].getX();
         dy = coords[1].getY() - coords[0].getY();
         length = Math.hypot(dx, dy);
         if (0 < length) {
-            nx = coords[0].getX() + dy / length * SCALE;
-            ny = coords[0].getY() - dx / length * SCALE;
+            nx += dy / length * SCALE;
+            ny -= dx / length * SCALE;
         }
     }
 
