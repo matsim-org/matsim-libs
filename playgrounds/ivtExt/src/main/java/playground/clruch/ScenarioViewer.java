@@ -2,11 +2,14 @@ package playground.clruch;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Network;
+
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.gfx.PointCloud;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;
 
 /**
@@ -31,13 +34,15 @@ public class ScenarioViewer {
 
         // END: CUSTOMIZE -------------------------------------------------
 
-        MatsimStaticDatabase.initializeSingletonInstance(NetworkLoader.loadNetwork(args), referenceFrame);
+        Network network = NetworkLoader.loadNetwork(args);
+        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
 
         // this is optional and should not cause problems if file does not exist.
         // temporary solution
         matsimJMapViewer.virtualNetworkLayer.setPointCloud(PointCloud.fromCsvFile( //
                 csvFile, MatsimStaticDatabase.INSTANCE.referenceFrame.coords_toWGS84));
+        matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
