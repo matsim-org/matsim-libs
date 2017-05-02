@@ -67,9 +67,9 @@ public class RunTaxiEvaluation {
 		List<String> normalWaitTimes = new ArrayList<>();
 		List<String> barrierfreeWaitTimes = new ArrayList<>();
 		
-		for (int i = 300; i <= 500; i = i + 50) {
-			String runId = "veh_" + i;
-			String dir = "D:/runs-svn/barrierFreeTaxi/v2/veh_"+ i + "/";
+		for (int i = 0; i <= 10; i ++) {
+			String runId = "veh250_" + i;
+			String dir = "D:/runs-svn/barrierFreeTaxi/v2/"+ runId + "/";
 			System.out.println("pop " + runId);
 			ZoneBasedBarrierFreeTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandlerBF = new ZoneBasedBarrierFreeTaxiCustomerWaitHandler(
 					network, geo, true);
