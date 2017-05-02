@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -306,7 +307,8 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 				seriesName = "empty ride";
 			seriesArray[s] = new XYSeries(seriesName, false, false);
 			for (int t = 0; t < occupancyOverTimeAverage.length; t++) {
-				seriesArray[s].add((startTime + t * smoothSeconds) * 1000, occupancyOverTimeAverage[t][s]);
+				seriesArray[s].add((startTime + t * smoothSeconds) * 1000 , occupancyOverTimeAverage[t][s]);
+				
 			}
 			dataset.addSeries(seriesArray[s]);
 		}
@@ -366,7 +368,8 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 		plot.setBackgroundPaint(Color.white);
 
 		DateAxis xAxis = new DateAxis();
-
+		xAxis.setTimeZone(TimeZone.getTimeZone("UTC"));
+//		xAxis.setLowerBound(startTime*1000);
 		plot.setDomainAxis(xAxis);
 
 		NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
