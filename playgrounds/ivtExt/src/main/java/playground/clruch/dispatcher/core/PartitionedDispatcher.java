@@ -25,9 +25,8 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 /**
  * a {@link PartitionedDispatcher} has a {@link VirtualNetwork}
  */
-public abstract class PartitionedDispatcher extends UniversalDispatcher {
+public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     protected final VirtualNetwork virtualNetwork; //
-    private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>();
 
     public PartitionedDispatcher( //
             AVDispatcherConfig config, //
@@ -38,28 +37,6 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
         GlobalAssert.that(virtualNetwork!=null);
-    }
-
-    @Override
-    final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
-        super.updateDatastructures(stayVehicles); // mandatory call
-        // TODO currently the vehicles are removed when arriving at final link,
-        // ... could be removed as soon as they reach rebalancing destination virtualNode instead
-        stayVehicles.forEach(rebalancingVehicles::remove);
-    }
-
-    @Override
-    protected Map<AVVehicle, Link> getRebalancingVehicles() {
-        return Collections.unmodifiableMap(rebalancingVehicles);
-    }
-
-    // This function has to be called only after getVirtualNodeRebalancingVehicles
-    protected synchronized final void setVehicleRebalance(final VehicleLinkPair vehicleLinkPair, final Link destination) {
-        // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
-        setVehicleDiversion(vehicleLinkPair, destination);
-        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), vehicleLinkPair.avVehicle, destination));
-        Link returnVal = rebalancingVehicles.put(vehicleLinkPair.avVehicle, destination);
-        GlobalAssert.that(returnVal == null);
     }
 
     /**
@@ -87,6 +64,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
             returnMap.put(virtualNode, new HashSet<>());
         }
+        final Map<AVVehicle, Link> rebalancingVehicles = getRebalancingVehicles();
         for (AVVehicle avVehicle : rebalancingVehicles.keySet()) {
             boolean successAdd = returnMap.get(virtualNetwork.getVirtualNode(rebalancingVehicles.get(avVehicle))).add(avVehicle);
             GlobalAssert.that(successAdd);
@@ -130,6 +108,7 @@ public abstract class PartitionedDispatcher extends UniversalDispatcher {
         Map<VirtualNode, List<VehicleLinkPair>> rebalanceMap = new HashMap<>();
 
         // remove vehicles which are rebalancing
+        final Map<AVVehicle, Link> rebalancingVehicles = getRebalancingVehicles();
         for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
             rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)).collect(Collectors.toList()));
         }

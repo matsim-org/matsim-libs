@@ -18,7 +18,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import playground.clruch.dispatcher.core.UniversalDispatcher;
+import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
@@ -33,7 +33,7 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public class SelfishDispatcher extends UniversalDispatcher {
+public class SelfishDispatcher extends RebalancingDispatcher {
 
     private final int dispatchPeriod;
 
@@ -87,7 +87,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
         networkLinksTree = buildNetworkTree();
-
+        nonStrict = true; // TODO improve API design here
     }
 
     @Override
@@ -148,7 +148,8 @@ public class SelfishDispatcher extends UniversalDispatcher {
                     GlobalAssert.that(refPositions.containsKey(vehicleLinkPair.avVehicle));
                     Link link = refPositions.get(vehicleLinkPair.avVehicle);
                     GlobalAssert.that(link != null);
-                    setVehicleDiversion(vehicleLinkPair, link);
+                    // setVehicleDiversion(vehicleLinkPair, link);
+                    setVehicleRebalance(vehicleLinkPair, link);
                 }
             }
         }
