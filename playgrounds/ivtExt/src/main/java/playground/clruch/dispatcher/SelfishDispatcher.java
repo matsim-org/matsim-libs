@@ -135,10 +135,14 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                         }   
                     } else if (subStrategy.equals("selfishLoiter")) { //
                         for (AVRequest pendingRequest : getAVRequests()) {
+                            if (getDivertableVehicles().size() == 0) {
+                                continue;
+                            } else {
                             VehicleLinkPair closestDivertableVehicle = findClosestDivertableVehicle(pendingRequest);
                             // TODO instead of just diverting, MATCH the closest vehicle with the pending request
                             setVehicleDiversion(closestDivertableVehicle, pendingRequest.getFromLink());
-                            // setAcceptRequest(closestDivertableVehicle.avVehicle, pendingRequest); // TODO throws error                          
+                            // setAcceptRequest(closestDivertableVehicle.avVehicle, pendingRequest); // TODO throws error 
+                            }
                         }
                     }                    
                 }
