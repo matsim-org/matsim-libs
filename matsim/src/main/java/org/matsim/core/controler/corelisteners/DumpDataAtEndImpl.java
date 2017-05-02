@@ -40,7 +40,7 @@ import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.facilities.ActivityFacilities;
@@ -59,6 +59,8 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 
@@ -136,7 +138,11 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		try {
 			File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));
 			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "events.xml.gz"));
-			IOUtils.copyFile(fromFile, toFile);
+			try {
+                Files.copy(fromFile.toPath(), toFile.toPath());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
 		} catch ( Exception ee ) {
 			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
 					+ "generated in the final iteration") ;

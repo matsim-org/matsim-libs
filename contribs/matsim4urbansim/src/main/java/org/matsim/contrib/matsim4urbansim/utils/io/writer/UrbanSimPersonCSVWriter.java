@@ -3,11 +3,13 @@ package org.matsim.contrib.matsim4urbansim.utils.io.writer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 
 public class UrbanSimPersonCSVWriter {
@@ -79,9 +81,13 @@ public class UrbanSimPersonCSVWriter {
 			
 			// copy the zones file to the outputfolder...
 			log.info("Copying " + module.getMATSim4OpusTemp() + FILE_NAME + " to " + module.getMATSim4OpusOutput() + FILE_NAME);
-			IOUtils.copyFile(new File( module.getMATSim4OpusTemp() + FILE_NAME),	new File( module.getMATSim4OpusOutput() + FILE_NAME));
-			
-			log.info("... done!");
+            try {
+                Files.copy(new File( module.getMATSim4OpusTemp() + FILE_NAME).toPath(), new File( module.getMATSim4OpusOutput() + FILE_NAME).toPath());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+
+            log.info("... done!");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	

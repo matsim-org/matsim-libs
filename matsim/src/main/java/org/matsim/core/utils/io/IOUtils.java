@@ -266,127 +266,6 @@ public class IOUtils {
 		}
 	}
 
-
-	/**
-	 * Attempts to rename a file. The built-in method File.renameTo() often fails
-	 * for different reasons (e.g. if the file should be moved across different
-	 * file systems). This method first tries the method File.renameTo(),
-	 * but tries other possibilities if the first one fails.
-	 *
-	 * @param fromFilename The file name of an existing file
-	 * @param toFilename The new file name
-	 * @return <code>true</code> if the file was successfully renamed, <code>false</code> otherwise
-	 *
-	 * @author mrieser
-	 */
-	public static boolean renameFile(final String fromFilename, final String toFilename) {
-		return renameFile(new File(fromFilename), new File(toFilename));
-	}
-
-	/**
-	 * Attempts to rename a file. The built-in method File.renameTo() often fails
-	 * for different reasons (e.g. if the file should be moved across different
-	 * file systems). This method first tries the method File.renameTo(),
-	 * but tries other possibilities if the first one fails.
-	 *
-	 * @param fromFile The existing file.
-	 * @param toFile A file object pointing to the new location of the file.
-	 * @return <code>true</code> if the file was successfully renamed, <code>false</code> otherwise
-	 *
-	 * @author mrieser
-	 */
-	public static boolean renameFile(final File fromFile, final File toFile) {
-		File toFile2 = toFile;
-
-		// the first, obvious approach
-		if (fromFile.renameTo(toFile)) {
-			return true;
-		}
-
-		// if it failed, make some tests to decide if we should try any other approach
-		if (!fromFile.exists()) {
-			// there's no use renaming an inexistant file
-			return false;
-		}
-
-		if (!fromFile.canRead()) {
-			// there's no use to proceed further if we cannot read the file
-			return false;
-		}
-
-		if (toFile.isDirectory()) {
-			toFile2 = new File(toFile, fromFile.getName());
-		}
-
-		if (toFile2.exists()) {
-			// we do not overwrite existing files
-			return false;
-		}
-
-		String parent = toFile2.getParent();
-		if (parent == null)
-			parent = System.getProperty("user.dir");
-		File dir = new File(parent);
-
-		if (!dir.exists()) {
-			// we cannot move a file to an inexistent directory
-			return false;
-		}
-
-		if (!dir.canWrite()) {
-			// we cannot write into the directory
-			return false;
-		}
-
-		try {
-			copyFile(fromFile, toFile2);
-		} catch (UncheckedIOException e) {
-			if (toFile2.exists()) toFile2.delete();
-			return false;
-		}
-
-		// okay, at this place we can assume that we successfully copied the data, so remove the old file
-		fromFile.delete();
-
-		return true;
-	}
-
-	/**
-	 * Copies the file content from one file to the other file.
-	 *
-	 * @param fromFile The file containing the data to be copied
-	 * @param toFile The file the data should be written to
-	 * @throws UncheckedIOException
-	 *
-	 * @author mrieser
-	 */
-	public static void copyFile(final File fromFile, final File toFile) throws UncheckedIOException {
-		InputStream from = null;
-		OutputStream to = null;
-		try {
-			from = new FileInputStream(fromFile);
-			to = new FileOutputStream(toFile);
-			copyStream(from, to);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			if (from != null) {
-				try {
-					from.close();
-				} catch (IOException ignored) {
-					ignored.printStackTrace();
-				}
-			}
-			if (to != null) {
-				try {
-					to.close();
-				} catch (IOException ignored) {
-					ignored.printStackTrace();
-				}
-			}
-		}
-	}
-
 	/**
 	 * Copies the content from one stream to another stream.
 	 *
@@ -405,28 +284,13 @@ public class IOUtils {
 	}
 
 	/**
-	 * Method to create a directory.  Taken from OutputDirectoryHierarchy.  I am no expert on this so this may be wrong or incomplete.
-	 * 
-	 * @param dirName
-	 * 
-	 * @author kai nagel
-	 */
-	public static File createDirectory(final String dirName) {
-		try {
-			return Files.createDirectories(Paths.get(dirName)).toFile();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	/**
 	 *
 	 * Deletes a directory tree recursively. Should behave like rm -rf, i.e. there should not be
 	 * any accidents like following symbolic links.
 	 *
 	 * @param path The directoy to be deleted
 	 */
-	public static void deleteDirectoryRecursively(Path path) {
+	public static void deleteDirectoryRecursively(Path path) throws UncheckedIOException {
 		try {
 			Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
@@ -523,7 +387,7 @@ public class IOUtils {
 	 * 
 	 * @author mrieser
 	 */
-	public static OutputStream getOutputStream(final String filename)  {
+	public static OutputStream getOutputStream(final String filename) throws UncheckedIOException {
 		if (filename == null) {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}

@@ -30,11 +30,10 @@ import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWrite
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimPersonCSVWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 
 /**
@@ -88,13 +87,13 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 	private void compareFilesByLinesInMemory(String fileName) {
 		String originalFileName = utils.getClassInputDirectory() + fileName ;
 		log.info( "old: " + originalFileName ) ;
-		Set<String> expected = fileToLines(originalFileName);
+		List<String> expected = readAllLines(originalFileName);
 		for ( String str : expected ) {
 			System.err.println(str);
 		}
 		String revisedFileName = utils.getOutputDirectory() + fileName ;
 		log.info( "new: " + revisedFileName ) ;
-		Set<String> actual = fileToLines(revisedFileName);
+		List<String> actual = readAllLines(revisedFileName);
 		for ( String str : actual ) {
 			System.err.println(str);
 		}
@@ -102,22 +101,11 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 	}
 	
 	
-	/**
-	 * Helper method for get the file content
-	 * taken from ConfigReadWriteOverwriteTest.java
-	 */	
-	private static Set<String> fileToLines(String filename) {
-		Set<String> lines = new HashSet<>();
-		String line;
+	private static List<String> readAllLines(String filename) {
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(filename));
-			while ((line = in.readLine()) != null) {
-				lines.add(line);
-			}
-			in.close() ;
+			return Files.readAllLines(Paths.get(filename), java.nio.charset.Charset.defaultCharset());
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return lines;
 	}
 }

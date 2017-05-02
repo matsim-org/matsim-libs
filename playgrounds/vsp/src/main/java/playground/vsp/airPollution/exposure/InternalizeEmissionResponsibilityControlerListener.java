@@ -21,6 +21,9 @@
 package playground.vsp.airPollution.exposure;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -35,7 +38,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author benjamin
@@ -136,8 +139,12 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		try {
 			File toFile = new File(	controler.getControlerIO().getOutputFilename("output_emission.events.xml.gz"));
 			File fromFile = new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controler().getLastIteration(), "emission.events.xml.gz"));
-			IOUtils.copyFile(fromFile, toFile);
-		} catch ( Exception ee ) {
+            try {
+                Files.copy(fromFile.toPath(), toFile.toPath());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        } catch ( Exception ee ) {
 			Logger.getLogger(this.getClass()).error("writing output emissions events did not work; probably parameters were such that no events were "
 					+ "generated in the final iteration") ;
 		}

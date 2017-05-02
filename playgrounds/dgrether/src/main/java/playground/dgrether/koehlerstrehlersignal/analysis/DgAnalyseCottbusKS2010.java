@@ -20,6 +20,9 @@
 package playground.dgrether.koehlerstrehlersignal.analysis;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -52,7 +55,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
@@ -271,12 +273,24 @@ public class DgAnalyseCottbusKS2010 {
 		Population pop = baseResult.runLoader.getPopulation();
 		String outDir = svnBaseDir + "runs-svn/cottbus/createGridLock/analysis/";
 //				svnBaseDir + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/diffs/"; // old path
-		File out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/");
+        File result1;
+        try {
+            result1 = Files.createDirectories(Paths.get(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/")).toFile();
+        } catch (IOException e1) {
+            throw new RuntimeException(e1);
+        }
+        File out = result1;
 		Population newPop = this.getFilteredPopulation(pop, disattractedPersonIds);
 		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_disattracted_acts");
 
-		out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_attracted/");
+        File result;
+        try {
+            result = Files.createDirectories(Paths.get(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_attracted/")).toFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        out = result;
 		newPop = this.getFilteredPopulation(pop, attractedPersonIds);
 		sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_attracted_acts");

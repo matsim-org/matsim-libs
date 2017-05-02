@@ -20,6 +20,9 @@
 package playground.dgrether.koehlerstrehlersignal.run;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -59,8 +61,13 @@ public class SignalsMorningEveningMergeTool {
 
 	
 	private void writeSignalControl(String outputDirectory, SignalControlData merged) {
-		IOUtils.createDirectory(outputDirectory);
-		SignalsScenarioWriter writer = new SignalsScenarioWriter();
+        File result;
+        try {
+            result = Files.createDirectories(Paths.get(outputDirectory)).toFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        SignalsScenarioWriter writer = new SignalsScenarioWriter();
 		writer.setSignalControlOutputFilename(outputDirectory + "merged_signal_control_" + basefilename + ".xml");
 		writer.writeSignalControlData(merged);
 	}

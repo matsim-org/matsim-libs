@@ -23,12 +23,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.ExeRunner;
 
 /**
@@ -88,8 +89,12 @@ public class DynusTExe {
 			if (f.isFile()) {
 				log.info("  Copying " + f.getName());
 				exeFiles.add(f.getName());
-				IOUtils.copyFile(f, new File(this.tmpDir + "/" + f.getName()));
-				String lcName = f.getName().toLowerCase(Locale.ROOT);
+                try {
+                    Files.copy(f.toPath(), new File(this.tmpDir + "/" + f.getName()).toPath());
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+                String lcName = f.getName().toLowerCase(Locale.ROOT);
 				if (lcName.endsWith(".exe") && lcName.contains("dynust")) {
 					log.info("    Found DynusT executable");
 					exeName = f.getName();
@@ -99,13 +104,21 @@ public class DynusTExe {
 		log.info("Copying model files to iteration-directory...");
 		for (String filename : modelFiles) {
 			log.info("  Copying " + filename);
-			IOUtils.copyFile(new File(this.modelDir + "/" + filename), new File(this.tmpDir + "/" + filename));
-		}
+            try {
+                Files.copy(new File(this.modelDir + "/" + filename).toPath(), new File(this.tmpDir + "/" + filename).toPath());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
 		for (File f : new File(this.modelDir).listFiles()) {
 			if (f.getName().toLowerCase(Locale.ROOT).endsWith(".dws")) {
 				log.info("  Copying " + f.getName());
-				IOUtils.copyFile(f, new File(this.tmpDir + "/" + f.getName()));
-			}
+                try {
+                    Files.copy(f.toPath(), new File(this.tmpDir + "/" + f.getName()).toPath());
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
 		}
 
 		// adapt workingdir.ini
