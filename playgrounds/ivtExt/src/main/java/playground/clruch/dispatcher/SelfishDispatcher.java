@@ -97,6 +97,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
             initializeVehicles();
         } else {
             if (round_now % dispatchPeriod == 0) {
+                
                 // add new open requests to list
                 addOpenRequests(getAVRequests());
                 GlobalAssert.that(openRequests.size() == pendingRequestsTree.size());
@@ -109,7 +110,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
                 GlobalAssert.that(requestsServed.values().stream().mapToInt(List::size).sum() == getTotalMatchedRequests());
 
                 // update reference positions periodically
-                if (round_now % updateRefPeriod == 0) {
+                if ((round_now % updateRefPeriod == 0) && (requestsServed.size() > 10)) {
                     updateRefPositions();
                 }
                                
@@ -135,7 +136,9 @@ public class SelfishDispatcher extends UniversalDispatcher {
                     } else if (subStrategy.equals("selfishLoiter")) { //
                         for (AVRequest pendingRequest : getAVRequests()) {
                             VehicleLinkPair closestDivertableVehicle = findClosestDivertableVehicle(pendingRequest);
+                            // TODO instead of just diverting, MATCH the closest vehicle with the pending request
                             setVehicleDiversion(closestDivertableVehicle, pendingRequest.getFromLink());
+                            // setAcceptRequest(closestDivertableVehicle.avVehicle, pendingRequest); // TODO throws error                          
                         }
                     }                    
                 }
@@ -152,7 +155,7 @@ public class SelfishDispatcher extends UniversalDispatcher {
     }
 
     /**
-     * 
+     * build a quadtree for all links in the network (with respect to their from-nodes)
      */
     private QuadTree<Link> buildNetworkTree() {
         QuadTree<Link> networkQuadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
