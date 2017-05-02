@@ -38,7 +38,7 @@ public class EquilDistanceDistribution implements DistanceDistribution {
     private final double [] distClasses = new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};
     private final OpdytsScenario opdytsScenario;
 
-    EquilDistanceDistribution(final OpdytsScenario opdytsScenario){
+    public EquilDistanceDistribution(final OpdytsScenario opdytsScenario){
         this.opdytsScenario = opdytsScenario;
         double totalLegs = 4000;
         double carVals = 1000.;
