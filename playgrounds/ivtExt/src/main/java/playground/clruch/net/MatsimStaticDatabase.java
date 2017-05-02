@@ -79,7 +79,7 @@ public class MatsimStaticDatabase {
         return linkInteger.get(link);
     }
 
-    public Map<Link, Integer> getLinkInteger() {
+    public Map<Link, Integer> getLinkInteger() { // TODO rename function
         return Collections.unmodifiableMap(linkInteger);
     }
 

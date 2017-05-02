@@ -468,7 +468,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
             {
                 final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
                 GlobalAssert.that(virtualnetworkFile.isFile());
-                virtualNetwork = VirtualNetworkLoader.fromXML(network, virtualnetworkFile);
+                virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
             }
             // ---
             {

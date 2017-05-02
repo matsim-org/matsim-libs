@@ -149,7 +149,7 @@ public class Tile {
         // If we have already created the empty tile then return it
         if (Cache.hasEmptyTile(colorScheme))
             return Cache.getEmptyTile(colorScheme);
-        System.out.println("create empty tile: " + colorScheme);
+        // System.out.println("create empty tile: " + colorScheme);
         // Create a blank tile that is 32 bit and has an alpha
         BufferedImage tile = new BufferedImage(HeatMap.SIZE, HeatMap.SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphic = tile.createGraphics();

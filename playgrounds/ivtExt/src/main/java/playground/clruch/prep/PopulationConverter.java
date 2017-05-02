@@ -17,6 +17,7 @@ import playground.clruch.utils.GZHandler;
 /**
  * Created by Claudio on 1/4/2017.
  */
+@Deprecated // integrated into ScenarioPreparer
 public class PopulationConverter {
     public static void main(String[] args) throws MalformedURLException {
         final File dir = new File(args[0]);
@@ -25,8 +26,8 @@ public class PopulationConverter {
             System.exit(-1);
         }
         final File fileImport = new File(dir, "population.xml");
-        final File fileExportGz = new File(dir, "populationZurichOnlyAV.xml.gz");
-        final File fileExport = new File(dir, "populationZurichOnlyAV.xml");
+        final File fileExportGz = new File(dir, "populationZurichOnlyTest.xml.gz");
+        final File fileExport = new File(dir, "populationZurichOnlyTest.xml");
 
         // load the existing population file
         Config config = ConfigUtils.createConfig();
@@ -34,15 +35,18 @@ public class PopulationConverter {
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         final Population population = scenario.getPopulation();
-        //TheApocalypse.decimatesThe(population).toNoMoreThan(5000).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(235594).people();
         //System.out.println("Population size:" + population.getPersons().values().size());
 
         // edit the configuration file - change all modes of transport to "av"
-        //Coord center = new Coord(2704366.0,1236061.0);
-        Coord center = new Coord(2684648.0,1251492.0);
-        double radius = 25000;
+        // increasing the second value goes north
+        // increasing the first value goes right
+        Coord center = new Coord(2682000.0,1247492.0);
+        double radius = 12000;
         PopulationTools.elminateOutsideRadius(population, center, radius);
         System.out.println("Population size after radius cut: " + population.getPersons().values().size());
+        PopulationTools.eliminateFreight(population);
+        System.out.println("Population size after removing freight: " + population.getPersons().values().size());
         PopulationTools.changeModesOfTransportToAV(population);
         System.out.println("Population size after conversion:" + population.getPersons().values().size());
 

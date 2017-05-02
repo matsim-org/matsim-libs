@@ -38,6 +38,7 @@ public class LinkLayer extends ViewerLayer {
 
     private volatile boolean drawLoad = false;
     private volatile boolean drawLinks = false;
+    // TODO the drawMaxCars option is not properly supported!
     private volatile boolean drawMaxCars = false;
     private static final Color LINKCOLOR = new Color(153, 153, 102, 64);
     private static final int MAXHISTORY = 10;
@@ -173,6 +174,7 @@ public class LinkLayer extends ViewerLayer {
             {
                 SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
                 spinnerLabel.setArray(1, 2, 3, 4, 5);
+                spinnerLabel.setMenuHover(true);
                 spinnerLabel.setValueSafe(historyLength);
                 spinnerLabel.addSpinnerListener(i -> {
                     historyLength = i;
@@ -185,7 +187,8 @@ public class LinkLayer extends ViewerLayer {
             }
             {
                 SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
-                spinnerLabel.setArray(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+                spinnerLabel.setArray(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+                spinnerLabel.setMenuHover(true);
                 spinnerLabel.setValueSafe(loadScale);
                 spinnerLabel.addSpinnerListener(i -> {
                     loadScale = i;
@@ -205,12 +208,12 @@ public class LinkLayer extends ViewerLayer {
             jCheckBox.addActionListener(event -> setDraw(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);
         }
-        {
-            final JCheckBox jCheckBox = new JCheckBox("maxCars");
-            jCheckBox.setSelected(drawMaxCars);
-            jCheckBox.addActionListener(event -> setDrawMaxCars(jCheckBox.isSelected()));
-            rowPanel.add(jCheckBox);
-        }
+        // {
+        // final JCheckBox jCheckBox = new JCheckBox("maxCars");
+        // jCheckBox.setSelected(drawMaxCars);
+        // jCheckBox.addActionListener(event -> setDrawMaxCars(jCheckBox.isSelected()));
+        // rowPanel.add(jCheckBox);
+        // }
 
     }
 

@@ -13,13 +13,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.joel.analysis.AnalyzeAll;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.prep.TheApocalypse;
-import playground.maalbert.analysis.AnalyzeMarc;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
+import playground.joel.analysis.AnalyzeAll;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -55,17 +56,50 @@ public class ScenarioServer {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         File configFile = new File(args[0]);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+        //Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
         MatsimStaticDatabase.initializeSingletonInstance( //
                 scenario.getNetwork(), ReferenceFrame.IDENTITY);
+        
+        
+//        // admissible Nodes sebhoerl
+//        final Network network = scenario.getNetwork();
+//        
+//        FileInputStream stream = new FileInputStream(ConfigGroup.getInputFileURL(config.getContext(), "nodes.list").getPath());
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+//
+//        final Set<Node> permissibleNodes = new HashSet<>();
+//        final Set<Link> permissibleLinks = new HashSet<>();
+//
+//        reader.lines().forEach((String nodeId) -> permissibleNodes.add(network.getNodes().get(Id.createNodeId(nodeId))) );
+//        permissibleNodes.forEach((Node node) -> permissibleLinks.addAll(node.getOutLinks().values()));
+//        permissibleNodes.forEach((Node node) -> permissibleLinks.addAll(node.getInLinks().values()));
+//        final Set<Link> filteredPermissibleLinks = permissibleLinks.stream().filter((l) -> l.getAllowedModes().contains("car")).collect(Collectors.toSet());
+        
+        
         TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
+        controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
+        
+        
+//        controler.addOverridingModule(new AbstractModule() {
+//            @Override
+//            public void install() {
+//                bind(new TypeLiteral<Collection<Link>>() {}).annotatedWith(Names.named("zurich")).toInstance(filteredPermissibleLinks);
+//                //AVUtils.registerDispatcherFactory(binder(), "ZurichDispatcher", ZurichDispatcher.ZurichDispatcherFactory.class);
+//                AVUtils.registerGeneratorFactory(binder(), "ZurichGenerator", ZurichGenerator.ZurichGeneratorFactory.class);
+//
+//                addPlanStrategyBinding("ZurichModeChoice").toProvider(ZurichPlanStrategyProvider.class);
+//            }
+//        });
+        
+        
         controler.run();
         
         SimulationServer.INSTANCE.stopAccepting(); // close port

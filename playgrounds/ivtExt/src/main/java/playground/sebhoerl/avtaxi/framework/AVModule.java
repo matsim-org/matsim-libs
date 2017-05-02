@@ -69,6 +69,7 @@ public class AVModule extends AbstractModule {
         addPlanStrategyBinding("AVOperatorChoice").to(AVOperatorChoiceStrategy.class);
 
         // Bind the AV travel time to the DVRP estimated travel time
+        // TODO add different travel time to avoid congestions
         bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE))
                 .to(Key.get(TravelTime.class, Names.named(VrpTravelTimeModules.DVRP_ESTIMATED)));
 
@@ -100,7 +101,7 @@ public class AVModule extends AbstractModule {
         AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
         
-        // ---
+        // ---BIND
         /** dispatchers for UniversalDispatcher */
         bind(PulseDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);

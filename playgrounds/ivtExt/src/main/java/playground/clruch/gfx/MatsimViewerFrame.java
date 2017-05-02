@@ -56,10 +56,6 @@ public class MatsimViewerFrame implements Runnable {
     SpinnerLabel<Integer> spinnerLabelSpeed = new SpinnerLabel<>();
     private final JSlider jSlider = new JSlider(0, 1, 0);
 
-    // private static FlowLayout createFlowLayout() {
-    // return new FlowLayout(FlowLayout.LEFT, 2, 2);
-    // }
-
     /** Constructs the {@code Demo}. */
     public MatsimViewerFrame(MatsimMapComponent matsimMapComponent) {
         this.matsimMapComponent = matsimMapComponent;
@@ -132,7 +128,7 @@ public class MatsimViewerFrame implements Runnable {
             panelControls.add(jButtonIncr);
         }
         {
-            
+
             spinnerLabelSpeed.setArray( //
                     800, 500, 400, 300, 200, 150, 125, 100, //
                     75, 50, 25, 10, 5, 2, 1);
@@ -143,7 +139,17 @@ public class MatsimViewerFrame implements Runnable {
         {
             panelControls.add(jToggleButtonAuto);
         }
-
+        // {
+        // JToggleButton jToggleButton = new JToggleButton("full");
+        // jToggleButton.setSelected(false);
+        // jToggleButton.addActionListener(event -> {
+        // boolean full = jToggleButton.isSelected();
+        // if (full)
+        // jFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        // jFrame.validate();
+        // });
+        // panelConfig.add(jToggleButton);
+        // }
         {
             JToggleButton jToggleButton = new JToggleButton("config");
             jToggleButton.setSelected(true);
@@ -188,7 +194,7 @@ public class MatsimViewerFrame implements Runnable {
     }
 
     void reindex() {
-        System.out.println("reindex");
+        // System.out.println("reindex");
         List<IterationFolder> list = StorageUtils.getAvailableIterations();
         boolean nonEmpty = !list.isEmpty();
         spinnerLabelIter.setEnabled(nonEmpty);
