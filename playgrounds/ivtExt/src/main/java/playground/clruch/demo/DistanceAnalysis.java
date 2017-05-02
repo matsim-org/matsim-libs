@@ -67,7 +67,7 @@ class DistanceAnalysis {
         // System.out.println(Dimensions.of(table1));
         // System.out.println(Dimensions.of(table2));
 
-        Tensor matrix = Transpose.of(Tensors.of(Range.of(table1.length()), table1, table2));
+        Tensor matrix = Transpose.of(Tensors.of(Range.of(0, table1.length()), table1, table2));
         System.out.println(Pretty.of(matrix.extract(2000, 4000)));
     }
 

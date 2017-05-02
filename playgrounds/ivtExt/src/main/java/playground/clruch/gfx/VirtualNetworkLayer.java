@@ -110,8 +110,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
                     Coord coord = osmLink.getAt(.5);
                     coords.append(Tensors.vector(coord.getX(), coord.getY()));
                 }
-                if (coords.length() != 0)
-                    convexHull.put(virtualNode, ConvexHull.of(coords));
+                convexHull.put(virtualNode, ConvexHull.of(coords));
             }
         }
     }
