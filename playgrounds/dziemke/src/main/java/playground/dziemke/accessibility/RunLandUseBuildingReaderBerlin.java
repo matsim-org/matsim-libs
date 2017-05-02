@@ -60,17 +60,23 @@ public class RunLandUseBuildingReaderBerlin {
 //		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/2015-06-24_schlesische_str.osm";
 //		String facilityFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilities_landuse6.xml";
 //		String attributeFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilitiy_attributes_landuse6.xml";
-		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/2015-05-26_berlin.osm";
-		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/09/";
-		String facilityFile = outputBase + "facilities_buildings.xml";
-		String attributeFile = outputBase + "facilitiy_attributes_buildings.xml";
+//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/2015-05-26_berlin.osm";
+//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/09/";
+//		String facilityFile = outputBase + "facilities_buildings.xml";
+//		String attributeFile = outputBase + "facilitiy_attributes_buildings.xml";
+		
+		String osmFile = "../../../shared-svn/projects/maxess/data/nairobi/osm/2017-04-25_nairobi_central_and_kibera";
+		String outputBase = "../../../shared-svn/projects/maxess/data/nairobi/facilities/2017-04-25_nairobi_central_and_kibera/";
+		String facilityFile = outputBase + "2017-04-25_facilities_landuse_buildings.xml";
+		String attributeFile = outputBase + "2017-04-25_facilitiy_landuse_buildings_attributes.xml";
 		
 		// Logging
 		LOG.info("Parsing land use from OpenStreetMap.");
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
 		// Parameters
-		String outputCRS = "EPSG:31468"; // DHDN GK4
+//		String outputCRS = "EPSG:31468"; // DHDN GK4
+		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
 		// building types are either taken from the building itself and, if building does not have a type, taken from
 		// the type of land use of the area which the build belongs to.
