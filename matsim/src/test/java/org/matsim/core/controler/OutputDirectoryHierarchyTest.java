@@ -39,7 +39,7 @@ public class OutputDirectoryHierarchyTest {
 	@Test
 	public void testFailureIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
-		IOUtils.deleteDirectory( new File( outputDirectory ) );
+		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 
 		// directory creation is a side effect of instanciation...
 		new OutputDirectoryHierarchy(
@@ -73,7 +73,7 @@ public class OutputDirectoryHierarchyTest {
 	@Test
 	public void testOverrideIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
-		IOUtils.deleteDirectory( new File( outputDirectory ) );
+		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 
 		// directory creation is a side effect of instanciation...
 		new OutputDirectoryHierarchy(
@@ -106,7 +106,7 @@ public class OutputDirectoryHierarchyTest {
 	@Test
 	public void testDeleteIfDirectoryExists() {
 		final String outputDirectory = utils.getOutputDirectory();
-		IOUtils.deleteDirectory( new File( outputDirectory ) );
+		IOUtils.deleteDirectoryRecursively(new File( outputDirectory ).toPath());
 
 		// directory creation is a side effect of instanciation...
 		new OutputDirectoryHierarchy(

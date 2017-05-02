@@ -62,7 +62,7 @@ public class RunRoadClassification {
 		final Config config = ConfigUtils.loadConfig(configFileName);
 		final File out = new File(config.controler().getOutputDirectory());
 		if (out.exists()) {
-			IOUtils.deleteDirectory(out);
+			IOUtils.deleteDirectoryRecursively(out.toPath());
 		}
 
 		final Controler controler = new Controler(config);

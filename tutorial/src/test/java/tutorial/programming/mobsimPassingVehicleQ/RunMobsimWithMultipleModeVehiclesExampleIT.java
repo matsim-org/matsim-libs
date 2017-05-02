@@ -18,14 +18,14 @@ public class RunMobsimWithMultipleModeVehiclesExampleIT {
 		String pathname = config.getParam("controler", "outputDirectory");
 
 		try {
-			IOUtils.deleteDirectory(new File(pathname), false);
+			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
 		} catch (IllegalArgumentException ee) {
 			// (maybe the directory is left over from somewhere else; do nothing)
 		}
 
 		tutorial.programming.mobsimPassingVehicleQ.RunMobsimWithMultipleModeVehiclesExample.main(args);
 
-		IOUtils.deleteDirectory(new File(pathname), false);
+		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
 	}
 
 }

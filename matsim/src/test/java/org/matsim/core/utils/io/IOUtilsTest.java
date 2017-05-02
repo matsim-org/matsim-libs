@@ -177,7 +177,7 @@ public class IOUtilsTest {
 		File someFile = new File(someFilename);
 		Assert.assertTrue(someFile.createNewFile());
 
-		IOUtils.deleteDirectory(dir);
+		IOUtils.deleteDirectoryRecursively(dir.toPath());
 
 		Assert.assertFalse(someFile.exists());
 		Assert.assertFalse(dir.exists());
@@ -186,19 +186,12 @@ public class IOUtilsTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test
+	@Test(expected = UncheckedIOException.class)
 	public void testDeleteDir_InexistentDir() {
 		String outputDir = utils.getOutputDirectory();
 		String testDir = outputDir + "a";
 		File dir = new File(testDir);
-
-		try {
-			IOUtils.deleteDirectory(dir);
-			Assert.fail("expected Exception.");
-		}
-		catch (IllegalArgumentException e) {
-			log.info("catched expected exception: " + e.getMessage());
-		}
+		IOUtils.deleteDirectoryRecursively(dir.toPath());
 		Assert.assertFalse(dir.exists());
 	}
 

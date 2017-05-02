@@ -203,7 +203,7 @@ public class PatnaUrbanOpdytsCalibrator {
 		// remove the unused iterations
 		for (int index =0; index < maxIterations; index++) {
 			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
-			IOUtils.deleteDirectory(new File(dir2remove));
+			IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
 		}
 	}
 }

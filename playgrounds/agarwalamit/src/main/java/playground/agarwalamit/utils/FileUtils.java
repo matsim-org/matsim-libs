@@ -48,7 +48,7 @@ public final class FileUtils {
         for (int index =firstIteration+1; index <lastIteration; index ++){
             String dirToDel = outputDir+"/ITERS/it."+index;
             Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
-            IOUtils.deleteDirectory(new File(dirToDel),false);
+            IOUtils.deleteDirectoryRecursively(new File(dirToDel).toPath());
         }
     }
 }
