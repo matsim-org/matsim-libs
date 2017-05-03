@@ -80,7 +80,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
         }
         if (drawVLinks && virtualNetwork != null) {
             final MatsimStaticDatabase db = matsimMapComponent.db;
-            graphics.setColor(Color.RED);
+            graphics.setColor(new Color(255, 0, 0, 128));
             for (VirtualLink vl : virtualNetwork.getVirtualLinks()) {
                 VirtualNode n1 = vl.getFrom();
                 VirtualNode n2 = vl.getTo();
