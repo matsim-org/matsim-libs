@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.oneagent;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -26,8 +28,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
@@ -35,9 +35,6 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -48,12 +45,15 @@ import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.util.Types;
 
 /**
  * Simple test case for the Controler and or QSim and the default signal system implementation.
@@ -81,25 +81,16 @@ public class QSimSignalTest implements
 		// configure and load standard scenario
 		Scenario scenario = new Fixture().createAndLoadTestScenario(true);
 		
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(this);
 		this.link2EnterTime = 38.0;
-		
-		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
-		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
-		SignalEngine engine = new QSimSignalEngine(manager);
-
-		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-		qsim.addQueueSimulationListeners(engine);
-		qsim.run();
+		runQSimWithSignals(scenario, false);
 	}
-	
+
 
 	/**
 	 * Tests the setup with a traffic light that shows red up to second 99 then in sec 100 green. 
 	 */
 	@Test
-	public void testSignalSystems1AgentGreenAtSec100() {
+	public void testSignalSystems1AgentGreenAtSec100() {		
 		// configure and load standard scenario
 		Scenario scenario = new Fixture().createAndLoadTestScenario(false);
 		// modify scenario
@@ -112,56 +103,9 @@ public class QSimSignalTest implements
 		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
 		groupData.setDropping(0);
 		groupData.setOnset(100);
-		
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(this);
-		this.link2EnterTime = 100.0;
-		
-		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
-		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
-		SignalEngine engine = new QSimSignalEngine(manager);
 
-		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-		qsim.addQueueSimulationListeners(engine);
-		qsim.run();
-		
-//		// configure and load standard scenario
-//		Scenario scenario = new Fixture().createAndLoadTestScenario(false);
-//
-//		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-//		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.signalSystemId2);
-//		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.signalPlanId2);
-//		planData.setStartTime(0.0);
-//		planData.setEndTime(0.0);
-//		planData.setCycleTime(5 * 3600);
-//		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
-//		groupData.setDropping(1);
-//		groupData.setOnset(100);
-//
-//		com.google.inject.Injector injector = createInjector(scenario);
-//
-//		EventsManager events = injector.getInstance(EventsManager.class);
-//		events.addHandler(this);
-//		this.link2EnterTime = 100.0;
-//		events.initProcessing();
-//		
-//		injector.getInstance(Mobsim.class).run();
-//		// TODO why are there no signal events?
-	}
-	
-	private com.google.inject.Injector createInjector(final Scenario scenario) {
-		return Injector.createInjector(scenario.getConfig(), new AbstractModule() {
-			@Override
-			public void install() {
-				// defaults
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				install(new ControlerDefaultsModule());
-				install(new ScenarioByInstanceModule(scenario));
-				// signal specific module
-				install(new SignalsModule());
-			}
-		});
+		this.link2EnterTime = 100.0;
+		runQSimWithSignals(scenario, false);
 	}
 	
 	/**
@@ -182,22 +126,7 @@ public class QSimSignalTest implements
 		groupData.setOnset(0);
 		groupData.setDropping(59);	
 		
-		EventsManager events = EventsUtils.createEventsManager();
-
-		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
-		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
-		SignalEngine engine = new QSimSignalEngine(manager);
-
-		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-		qsim.addQueueSimulationListeners(engine);
-		Exception ex = null;
-		try{
-			qsim.run();
-		} catch (Exception e){
-			log.info(e.getMessage());
-			ex = e;
-		}
-		Assert.assertNotNull(ex);
+		runQSimWithSignals(scenario, true);
 	}
 	
 	/**
@@ -218,21 +147,52 @@ public class QSimSignalTest implements
 		groupData.setOnset(30);
 		groupData.setDropping(25);	
 		
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(this);
 		this.link2EnterTime = 38.0;
-		
-		FromDataBuilder builder = new FromDataBuilder(scenario, new DefaultSignalModelFactory(), events);
-		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
-		SignalEngine engine = new QSimSignalEngine(manager);
-
-		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-		qsim.addQueueSimulationListeners(engine);
-		qsim.run();
+		runQSimWithSignals(scenario, false);
 	}
 
 	
 	
+	private void runQSimWithSignals(final Scenario scenario, boolean abort){
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				// defaults
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
+				// signal specific module
+				install(new SignalsModule());
+			}
+		});
+	
+		EventsManager events = injector.getInstance(EventsManager.class);
+		events.initProcessing();
+		events.addHandler(this);
+		
+		Mobsim mobsim = injector.getInstance(Mobsim.class);
+		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) 
+				injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
+		for (Provider<MobsimListener> provider : mobsimListeners){
+			((ObservableMobsim) mobsim).addQueueSimulationListeners(provider.get());
+		}
+		
+		Exception ex = null;
+		try{
+			mobsim.run();
+		} catch (Exception e){
+			log.info(e.getMessage());
+			ex = e;
+		}
+		if (abort) {
+			Assert.assertNotNull(ex);
+		} else {
+			Assert.assertNull(ex);
+		}
+	}
+
+
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		log.info("Link id: " + e.getLinkId().toString() + " enter time: " + e.getTime());
