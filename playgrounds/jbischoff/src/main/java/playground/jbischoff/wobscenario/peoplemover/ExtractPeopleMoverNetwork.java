@@ -51,7 +51,9 @@ public class ExtractPeopleMoverNetwork {
 
 	private final static double northernLimit =  52.5585399;
 //	private final static double southernLimit =  52.3110258;
-	private final static double southernLimit =  52.30;
+	
+	//as per may 3
+	private final static double southernLimit =  52.2345;
 	private final static double easternLimit =  10.9617273;
 	private final static double westernLimit =  10.606989;
 	private final static double minFreeSpeed =  8.0;
