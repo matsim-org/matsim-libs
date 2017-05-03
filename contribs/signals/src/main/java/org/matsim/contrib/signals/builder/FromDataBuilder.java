@@ -61,7 +61,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	private Scenario scenario;
 
 	@Inject
-	public FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
+	private FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
 		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.scenario = scenario;
 		this.factory = factory;
