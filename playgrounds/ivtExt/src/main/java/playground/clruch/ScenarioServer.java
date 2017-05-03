@@ -21,6 +21,7 @@ import playground.clruch.prep.TheApocalypse;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
+import playground.maalbert.analysis.AnalyzeMarc;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -104,7 +105,7 @@ public class ScenarioServer {
         
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        AnalyzeAll.analyze(args);
-        //AnalyzeMarc.analyze(args);
+        //AnalyzeAll.analyze(args);
+        AnalyzeMarc.analyze(args);
     }
 }

@@ -17,6 +17,8 @@ public class VehicleStatistic {
 
     public final Tensor distanceTotal;
     public final Tensor distanceWithCustomer;
+    public final Tensor distanceDriveToCustomer;
+    public final Tensor distanceRebalanceDrive;
 
     private int lastIndex = -1;
     private int offset = -1;
@@ -26,6 +28,8 @@ public class VehicleStatistic {
     public VehicleStatistic(int tics_max) {
         distanceTotal = Array.zeros(tics_max);
         distanceWithCustomer = Array.zeros(tics_max);
+        distanceRebalanceDrive = Array.zeros(tics_max);
+        distanceDriveToCustomer = Array.zeros(tics_max);
     }
 
     public void register(int tics, VehicleContainer vehicleContainer) {
@@ -62,12 +66,24 @@ public class VehicleStatistic {
                 switch (vehicleContainer.avStatus) {
                 case DRIVEWITHCUSTOMER:
                     distanceWithCustomer.set(contrib, index);
+                    break;
                 case DRIVETOCUSTMER:
+                    distanceDriveToCustomer.set(contrib,index);
+                    break;
                 case REBALANCEDRIVE:
-                    distanceTotal.set(contrib, index); // applies to all three
+                    distanceRebalanceDrive.set(contrib, index); // applies to all three
                     break;
                 default:
                     break;
+                }
+                switch (vehicleContainer.avStatus) {
+                    case DRIVEWITHCUSTOMER:
+                    case DRIVETOCUSTMER:
+                    case REBALANCEDRIVE:
+                        distanceTotal.set(contrib, index); // applies to all three
+                        break;
+                    default:
+                        break;
                 }
                 ++count;
             }

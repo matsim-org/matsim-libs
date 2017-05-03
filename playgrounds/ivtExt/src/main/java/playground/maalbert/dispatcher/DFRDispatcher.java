@@ -17,6 +17,7 @@ import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Ceiling;
 import ch.ethz.idsc.tensor.sca.Floor;
+import ch.ethz.idsc.tensor.sca.Round;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Link;
@@ -170,7 +171,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 System.out.println("Open Requests     : " + openRequests.toString());
                 System.out.println("Rebalancing to vS : " + rebalancingTovStation.toString());
                 System.out.println("System Imbalance  : " + systemImbalance.toString());
-                System.out.println("Mean Wait Times   : " + waitTimes.toString());
+                Tensor dispWaitTimes = Round.of(waitTimes);
+                System.out.println("Mean Wait Times   : " + dispWaitTimes.toString());
                 //DEBUG END
                 //======================================================================================================
                 // DFR Iterations: Compute Rebalancing
@@ -350,9 +352,9 @@ public class DFRDispatcher extends PartitionedDispatcher {
 
 
                 // consistency check: rebalancing destination links must not exceed available vehicles in virtual node
-                if (virtualNetwork.getVirtualNodes().stream().filter(v -> available_Vehicles.get(v).size() < destinationLinks.get(v).size()).findAny().isPresent()) {
-                    System.out.print("too many verhilces sent;");
-                }
+            //    if (virtualNetwork.getVirtualNodes().stream().filter(v -> available_Vehicles.get(v).size() < destinationLinks.get(v).size()).findAny().isPresent()) {
+            //        System.out.print("too many verhilces sent;");
+            //    }
 
                 // send rebalancing vehicles using the setVehicleRebalance command
                 // TODO Count Rebalanced cars correctly!
@@ -371,6 +373,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
             {
                 // collect destinations per vNode
                 Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
+
+                long tStart = System.currentTimeMillis();
 
                 for (VirtualNode vNode : virtualNetwork.getVirtualNodes()) {
                     destinationLinks.get(vNode).addAll( // stores from links
@@ -391,8 +395,14 @@ public class DFRDispatcher extends PartitionedDispatcher {
                                 .match(available_Vehicles.get(virtualNode), destinationLinks.get(virtualNode)) //
                                 .entrySet().stream().forEach(this::setVehicleDiversion);
                 }
-            }
 
+                //TIME DISPLAY
+                long tEnd = System.currentTimeMillis();
+                long tDelta = tEnd - tStart;
+                double elapsedSeconds = tDelta / 1000.0;
+
+                System.out.print("Time to do all the mathcings: "+ Double.toString(elapsedSeconds)+"\n");
+            }
         }
     }
 
@@ -458,6 +468,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
+            //AbstractVehicleDestMatcher abstractVehicleDestMatcher = new InOrderOfArrivalMatcher();
             // ---
             GlobalAssert.that(config.getParams().containsKey(KEY_VIRTUALNETWORKDIRECTORY));
             GlobalAssert.that(config.getParams().containsKey(KEY_DTEXTENSION));

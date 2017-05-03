@@ -31,7 +31,7 @@ public class AnalyzeMarc {
 
     static void saveFile(Tensor table, String name) throws Exception {
         //DEBUG START
-        String folderName = "data4Matlab/";
+        String folderName = "output/data4Matlab/";
         File directory = new File(folderName);
         if (! directory.exists()){
             directory.mkdir();
