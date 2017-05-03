@@ -20,6 +20,7 @@ import playground.clruch.export.AVStatus;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.gui.RowPanel;
@@ -29,7 +30,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
     private PointCloud pointCloud = null;
     private VirtualNetwork virtualNetwork = null;
     Map<VirtualNode, Tensor> convexHull = new HashMap<>();
-    private boolean drawCells = true;
+    private boolean drawVNodes = true;
+    private boolean drawVLinks = true;
 
     public VirtualNetworkLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
@@ -44,7 +46,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
         boolean containsRebalance = ref.vehicles.stream() //
                 .filter(vc -> vc.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
                 .findAny().isPresent();
-        if (drawCells && pointCloud != null && containsRebalance) {
+        if (drawVNodes && pointCloud != null && containsRebalance) {
             graphics.setColor(COLOR);
             int zoom = matsimMapComponent.getZoom();
             int width = zoom <= 12 ? 0 : 1;
@@ -55,7 +57,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
             }
         }
-        if (drawCells) {
+        if (drawVNodes) {
             graphics.setColor(new Color(128, 128, 128, 128));
             for (Entry<VirtualNode, Tensor> entry : convexHull.entrySet()) {
                 Tensor hull = entry.getValue();
@@ -76,24 +78,49 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 graphics.draw(path2d);
             }
         }
+        if (drawVLinks && virtualNetwork != null) {
+            final MatsimStaticDatabase db = matsimMapComponent.db;
+            graphics.setColor(Color.RED);
+            for (VirtualLink vl : virtualNetwork.getVirtualLinks()) {
+                VirtualNode n1 = vl.getFrom();
+                VirtualNode n2 = vl.getTo();
+                Coord c1 = db.referenceFrame.coords_toWGS84.transform(n1.getCoord());
+                Coord c2 = db.referenceFrame.coords_toWGS84.transform(n2.getCoord());
+                Point p1 = matsimMapComponent.getMapPositionAlways(c1);
+                Point p2 = matsimMapComponent.getMapPositionAlways(c2);
+                graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
+            }
+        }
     }
 
     public void setPointCloud(PointCloud pointCloud) {
         this.pointCloud = pointCloud;
     }
 
-    void setDrawCells(boolean selected) {
-        drawCells = selected;
+    void setDrawVNodes(boolean selected) {
+        drawVNodes = selected;
+        matsimMapComponent.repaint();
+    }
+
+    void setDrawVLinks(boolean selected) {
+        drawVLinks = selected;
         matsimMapComponent.repaint();
     }
 
     @Override
     protected void createPanel(RowPanel rowPanel) {
         {
-            final JCheckBox jCheckBox = new JCheckBox("cells");
+            final JCheckBox jCheckBox = new JCheckBox("nodes");
             jCheckBox.setToolTipText("voronoi boundaries of virtual nodes");
-            jCheckBox.setSelected(drawCells);
-            jCheckBox.addActionListener(e -> setDrawCells(jCheckBox.isSelected()));
+            jCheckBox.setSelected(drawVNodes);
+            jCheckBox.addActionListener(e -> setDrawVNodes(jCheckBox.isSelected()));
+            rowPanel.add(jCheckBox);
+        }
+        {
+            final JCheckBox jCheckBox = new JCheckBox("links");
+            jCheckBox.setToolTipText("virtual links between nodes");
+            jCheckBox.setSelected(drawVLinks);
+            jCheckBox.addActionListener(e -> setDrawVLinks(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);
         }
     }
