@@ -169,7 +169,9 @@ public class QSimSignalTest implements
 	
 		EventsManager events = injector.getInstance(EventsManager.class);
 		events.initProcessing();
-		events.addHandler(this);
+		if (!abort){
+			events.addHandler(this);
+		}
 		
 		Mobsim mobsim = injector.getInstance(Mobsim.class);
 		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) 
