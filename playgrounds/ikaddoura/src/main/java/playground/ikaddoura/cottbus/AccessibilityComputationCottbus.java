@@ -49,18 +49,17 @@ public class AccessibilityComputationCottbus {
 	
 	public static void main(String[] args) {
 		// Input and output
-		String runOutputFolder = "../../../public-svn/matsim/scenarios/countries/de/cottbus/commuter-population-only-car-traffic-only-100pct-2016-03-18/";
-		String networkFile = runOutputFolder + "network_wgs84_utm33n.xml.gz";
-		String facilitiesFile = "/Users/ihab/Documents/workspace/public-svn/matsim/scenarios/countries/de/cottbus/facilities_final_WGS84_UTM33N.xml";
-		String plansFile = runOutputFolder + "commuter_population_wgs84_utm33n_car_only.xml";
-		String configFile = runOutputFolder + "config.xml";
-		String accessibilityOutputDirectory = runOutputFolder + "accessibilities_final/";	
+		String runOutputFolder = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/be_117j_baseCaseCtd_detailedNetwork/";
+		String networkFile = runOutputFolder + "output_network.xml.gz";
+		String facilitiesFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-03_facilities/berlin-2017-05-03_facilities_DHDN_GK4.xml";
+		String plansFile = runOutputFolder + "output_plans.xml.gz";
+		String configFile = runOutputFolder + "output_config.xml.gz";
+		String accessibilityOutputDirectory = runOutputFolder + "accessibilities/";	
 		
 		// Parameters
 		final Double cellSize = 100.;
-		String crs = TransformationFactory.WGS84_UTM33N; // EPSG:32633 -- UTM33N
-		Envelope envelope = new Envelope(447000,5729000,461000,5740000);
-		final String runId = "de_cottbus_ihab" + "_" + cellSize.toString().split("\\.")[0];
+		String crs = TransformationFactory.DHDN_GK4;
+		Envelope envelope = new Envelope(4571637,461898,5806002,5835967);
 		final boolean push2Geoserver = false;
 		
 		// QGis parameters
