@@ -29,7 +29,10 @@ import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
+import ch.ethz.idsc.tensor.io.Pretty;
+import ch.ethz.idsc.tensor.red.KroneckerDelta;
 import ch.ethz.idsc.tensor.sca.Plus;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
@@ -40,9 +43,8 @@ import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNetworkIO;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.netdata.vLinkDataReader;
 import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -90,59 +92,78 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         // redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
 
         try {
-            final int m = virtualNetwork.getvLinksCount();
             final int n = virtualNetwork.getvNodesCount();
+            final int m = virtualNetwork.getvLinksCount();
             // TODO
             javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
             // ---
             {
                 Container container = new Container("init");
                 {
-                    double[] array = new double[n * m]; // TODO
+                    Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().index, i), n, m);
+                    System.out.println("E_in=");
+                    System.out.println(Pretty.of(matrix));
+                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
+                    // new double[n * m]; // TODO
                     DoubleArray doubleArray = new DoubleArray("E_in", new int[] { n, m }, array);
                     container.add(doubleArray);
                 }
                 {
-                    double[] array = new double[n * m]; // TODO
+                    Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getFrom().index, i), n, m);
+                    System.out.println("E_out=");
+                    System.out.println(Pretty.of(matrix));
+                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
                     DoubleArray doubleArray = new DoubleArray("E_out", new int[] { n, m }, array);
                     container.add(doubleArray);
                 }
                 {
-                    double[] array = new double[m]; // TODO
-                    DoubleArray doubleArray = new DoubleArray("P", new int[] { m }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    double[] array = new double[m]; // TODO
-                    DoubleArray doubleArray = new DoubleArray("Q", new int[] { m }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    double[] array = new double[m]; // TODO
-                    DoubleArray doubleArray = new DoubleArray("T", new int[] { m }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    double[] array = new double[m];
-                    DoubleArray doubleArray = new DoubleArray("C", new int[] { m }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    double[] array = new double[] { numberOfAVs };
-                    GlobalAssert.that(0 < numberOfAVs);
-                    DoubleArray doubleArray = new DoubleArray("N_cars", new int[] { 1 }, array);
-                    container.add(doubleArray);
-                }
-                { // normalized per seconds
-                    double[] array = new double[m]; // TODO
-                    DoubleArray doubleArray = new DoubleArray("lambda", new int[] { m }, array);
-                    container.add(doubleArray);
-                }
-                { // normalized per seconds
-                    double[] array = new double[] { 10.0 };
+                    double[] array = new double[] { samplingPeriod };
                     DoubleArray doubleArray = new DoubleArray("samplingPeriod", new int[] { 1 }, array);
                     container.add(doubleArray);
                 }
+                {
+
+                    Tensor matrix = Tensors.vector(i -> Tensors.vector( //
+                            virtualNetwork.getVirtualNode(i).getCoord().getX(), //
+                            virtualNetwork.getVirtualNode(i).getCoord().getY() //
+                    ), n);
+                    System.out.println(Pretty.of(matrix));
+                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
+                    DoubleArray doubleArray = new DoubleArray("voronoiCenter", new int[] { n, 2 }, array);
+                    container.add(doubleArray);
+                }
+
+                // {
+                // double[] array = new double[m]; // TODO
+                // DoubleArray doubleArray = new DoubleArray("P", new int[] { m }, array);
+                // container.add(doubleArray);
+                // }
+                // {
+                // double[] array = new double[m]; // TODO
+                // DoubleArray doubleArray = new DoubleArray("Q", new int[] { m }, array);
+                // container.add(doubleArray);
+                // }
+                // {
+                // double[] array = new double[m]; // TODO
+                // DoubleArray doubleArray = new DoubleArray("T", new int[] { m }, array);
+                // container.add(doubleArray);
+                // }
+                // {
+                // double[] array = new double[m];
+                // DoubleArray doubleArray = new DoubleArray("C", new int[] { m }, array);
+                // container.add(doubleArray);
+                // }
+                // {
+                // double[] array = new double[] { numberOfAVs };
+                // GlobalAssert.that(0 < numberOfAVs);
+                // DoubleArray doubleArray = new DoubleArray("N_cars", new int[] { 1 }, array);
+                // container.add(doubleArray);
+                // }
+                // { // normalized per seconds
+                // double[] array = new double[m]; // TODO
+                // DoubleArray doubleArray = new DoubleArray("lambda", new int[] { m }, array);
+                // container.add(doubleArray);
+                // }
                 javaContainerSocket.writeContainer(container);
             }
         } catch (UnknownHostException e) {
@@ -371,10 +392,12 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
             final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
             GlobalAssert.that(virtualnetworkDir.isDirectory());
             {
-                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
-                System.out.println("" + virtualnetworkFile.getAbsoluteFile());
-                virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
-                travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkFile, virtualNetwork, "Ttime");
+                // TODO
+                // final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
+                // System.out.println("" + virtualnetworkFile.getAbsoluteFile());
+                // virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+                // travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkFile, virtualNetwork, "Ttime");
             }
 
             return new MPCDispatcher_1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher,
