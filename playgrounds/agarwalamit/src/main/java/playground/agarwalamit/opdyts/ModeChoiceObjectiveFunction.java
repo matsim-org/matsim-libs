@@ -127,9 +127,13 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
         resetContainers();
 
+        MATSimState matSimState = (MATSimState) state;
+        Set<Id<Person>> persons = matSimState.getPersonIdView();
+
         StatType statType = StatType.tripBeelineDistances;
 
-        for (Plan plan : service.getExperiencedPlans().values()) {
+        for (Id<Person> personId : persons) {
+            Plan plan = matSimState.getSelectedPlan(personId);
             List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
             for (TripStructureUtils.Trip trip : trips) {
                 List<String> tripTypes = new ArrayList<>();
