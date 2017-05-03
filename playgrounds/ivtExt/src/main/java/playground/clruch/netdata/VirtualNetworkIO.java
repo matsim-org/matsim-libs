@@ -223,7 +223,12 @@ public class VirtualNetworkIO {
                 }
             }
             
+            virtualNetwork.fillVNodeMapRAWVERYPRIVATE();
+            
             virtualNetwork.fillSerializationInfo(network);
+            
+            
+            
             return virtualNetwork;
         } catch (IOException | JDOMException io) {
             System.out.println(io.getMessage());

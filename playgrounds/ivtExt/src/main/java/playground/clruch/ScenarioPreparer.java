@@ -41,9 +41,9 @@ public class ScenarioPreparer {
         // Basel
         //final Coord center = new Coord(2612859.0,1266343.0);
         //final double radius = 12000; // (set to -1 for no cutting)
-        final boolean populationeliminateFreight = true;
+        final boolean populationeliminateFreight = false;
         final boolean populationchangeModeToAV = true;
-        final boolean populationeliminateWalking = true;
+        final boolean populationeliminateWalking = false;
          
 
         // output file names
@@ -64,7 +64,7 @@ public class ScenarioPreparer {
 
         // 1) cut network (and reduce population to new network)
         {
-            NetworkCutClean.elminateOutsideRadius(network, center, radius);
+//            NetworkCutClean.elminateOutsideRadius(network, center, radius);
             final File fileExportGz = new File(dir, NETWORKUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(dir, NETWORKUPDATEDNAME + ".xml");
             {
@@ -84,17 +84,17 @@ public class ScenarioPreparer {
         // 2) adapt the population to new network
         {
             System.out.println("Original population size: " + population.getPersons().values().size());
-            PopulationTools.elminateOutsideNetwork(population, network);
+  //          PopulationTools.elminateOutsideNetwork(population, network);
             System.out.println("Population size after radius cut: " + population.getPersons().values().size());
-            if(populationeliminateFreight) PopulationTools.eliminateFreight(population);
+ //           if(populationeliminateFreight) PopulationTools.eliminateFreight(population);
             System.out.println("Population size after removing freight: " + population.getPersons().values().size());
-            if(populationeliminateWalking) PopulationTools.eliminateWalking(population);
+//            if(populationeliminateWalking) PopulationTools.eliminateWalking(population);
             System.out.println("Population size after removing walking people: " + population.getPersons().values().size());
             if(populationchangeModeToAV) PopulationTools.changeModesOfTransportToAV(population);
             System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
-            PopulationTools.changeModesOfTransportToAV(population);
+///            PopulationTools.changeModesOfTransportToAV(population);
             System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
-            TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
+   //         TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
             System.out.println("Population after decimation:" + population.getPersons().values().size());
             
             final File fileExportGz = new File(dir, POPULATIONUPDATEDNAME + ".xml.gz");
@@ -115,10 +115,10 @@ public class ScenarioPreparer {
         }
 
         // 2) create virtual Network
-        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes);
-        VirtualNetworkIO.toByte(new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME), virtualNetwork);
-        VirtualNetworkIO.toXML(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME+".xml", virtualNetwork);
-        System.out.println("saved virtual network byte format to : "+ new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME));
+//        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
+//        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes);
+//        VirtualNetworkIO.toByte(new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME), virtualNetwork);
+//        VirtualNetworkIO.toXML(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME+".xml", virtualNetwork);
+//        System.out.println("saved virtual network byte format to : "+ new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME));
     }
 }

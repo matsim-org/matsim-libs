@@ -173,6 +173,8 @@ public class VirtualNetwork implements Serializable {
     }
 
     public void checkConsistency() {
+        System.out.println("privatematp size: ");
+        System.out.println(linkVNodeMapRAWVERYPRIVATE.size());
         GlobalAssert.that(!linkVNodeMapRAWVERYPRIVATE.isEmpty());
         GlobalAssert.that(linkVNodeMap != null);
     }
