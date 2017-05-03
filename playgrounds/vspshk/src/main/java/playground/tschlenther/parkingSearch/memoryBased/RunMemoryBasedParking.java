@@ -33,7 +33,8 @@ import playground.tschlenther.parkingSearch.utils.ZoneParkingManager;
 
 public class RunMemoryBasedParking {
 	private static final String inputDir = "C:/Users/Work/Bachelor Arbeit/input/GridNet/";
-	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Memory/Neues_GridNet/";
+//	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Memory/Neues_GridNet/";
+	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/maleBild/GridNet/";
 	private final static String ZONE1 = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Links.txt";
 	private final static String ZONE2 = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Rechts.txt";
 	
