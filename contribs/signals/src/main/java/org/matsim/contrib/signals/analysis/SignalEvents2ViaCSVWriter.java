@@ -65,6 +65,8 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 	private static final String Y_COORD = "y";
 	private static final String TIME = "time";
 	private static final String SIGNAL_STATE = "signal state";
+	
+	private int countWarnings = 0;
 
 	/**
 	 * distance between signal (the coordinate that will be drawn) and node in direction of the link
@@ -131,6 +133,13 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 
 	@Override
 	public void handleEvent(SignalGroupStateChangedEvent event) {
+		if (signalsData == null){
+			if (countWarnings > 9){
+				log.warn("You are using the SignalsModule without Controler. No output is written out. (This warning is only given 10 times.)");
+				countWarnings++;
+			}
+			return;
+		}
 		SignalGroupData signalGroupData = signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(event.getSignalSystemId()).get(event.getSignalGroupId());
 		// write a line for each signal of the group
 		for (Id<Signal> signalId : signalGroupData.getSignalIds()) {
