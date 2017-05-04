@@ -47,6 +47,9 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 
 	public IntervalHandler(Double timeBinSize, Double simulationEndTime, GridTools gridTools){
 		this.timeBinSize=timeBinSize;
+
+		if ( simulationEndTime.isInfinite() ) throw new RuntimeException("Please set the simulation end time to a real value. Aborting...");
+
 		this.simulationEndTime = simulationEndTime;
 		this.noOfxCells = gridTools.getNoOfXCells();
 		this.noOfyCells = gridTools.getNoOfYCells();
