@@ -88,7 +88,7 @@ public class IOUtils {
 	 * @return BufferedReader for the specified file.
 	 * @throws UncheckedIOException
 	 *
-	 * @author mrieser
+	 * <br> author mrieser
 	 */
 	public static BufferedReader getBufferedReader(final String filename) throws UncheckedIOException {
 		return getBufferedReader(filename, Charset.forName("UTF8"));
@@ -105,7 +105,7 @@ public class IOUtils {
 	 * @return BufferedReader for the specified file.
 	 * @throws UncheckedIOException
 	 *
-	 * @author mrieser
+	 * <br> author mrieser
 	 */
 	public static BufferedReader getBufferedReader(final String filename, final Charset charset) throws UncheckedIOException {
 		BufferedReader infile = null;
@@ -273,7 +273,7 @@ public class IOUtils {
 	 * @param toStream The stream the data should be written to
 	 * @throws IOException
 	 *
-	 * @author mrieser
+	 * <br> author mrieser
 	 */
 	public static void copyStream(final InputStream fromStream, final OutputStream toStream) throws IOException {
 		byte[] buffer = new byte[4096];
@@ -320,7 +320,7 @@ public class IOUtils {
    * @return InputStream for the specified file.
    * @throws UncheckedIOException
    *
-   * @author dgrether
+   * <br> author dgrether
    */
 	public static InputStream getInputStream(final String filename) throws UncheckedIOException {
 		InputStream inputStream = null;
@@ -385,7 +385,7 @@ public class IOUtils {
 	 * 
 	 * @throws UncheckedIOException if the file cannot be created.
 	 * 
-	 * @author mrieser
+	 * <br> author mrieser
 	 */
 	public static OutputStream getOutputStream(final String filename) throws UncheckedIOException {
 		if (filename == null) {
