@@ -5,6 +5,9 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 public class AnalysisFileWriter {
@@ -110,6 +113,9 @@ public class AnalysisFileWriter {
 				bufferedWriter.newLine();
 			}
 
+            bufferedWriter.write(createVersionControlIdentifier());
+			bufferedWriter.newLine();
+
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -125,7 +131,15 @@ public class AnalysisFileWriter {
 		log.info("Analysis file " + outputFile + " written.");
 	}
 	
-	
+	private static String createVersionControlIdentifier() {
+	    String identifier = "Created with: ";
+	    identifier += AnalysisFileWriter.class.getName();
+	    identifier += " on ";
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        identifier += dateFormat.format(new Date());
+        return identifier;
+    }
+
 	// file writer for data that has a string (e.g. an activity name) as key
 	public static void writeToFileStringKey(Map<String, Double> map, String outputFile, double aggregateWeight) {
 		BufferedWriter bufferedWriter = null;
