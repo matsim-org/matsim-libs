@@ -140,6 +140,8 @@ public class CNEMunich {
 //			if (modeChoice) configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
 //			else configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
 			configFile = "../../../shared-svn/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
+			congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
+			airPollutionPricing = true;
 
 		}
 

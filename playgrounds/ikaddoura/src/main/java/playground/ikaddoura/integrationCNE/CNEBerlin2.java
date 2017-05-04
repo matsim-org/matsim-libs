@@ -123,8 +123,8 @@ public class CNEBerlin2 {
 			
 		} else {
 			
-			outputDirectory = null;
-			configFile = "../../../runs-svn/berlin-an/input/config.xml";
+			outputDirectory = "../../../runs-svn/cne/berlin-dz-1pct/output/test/";
+			configFile = "../../../runs-svn/cne/berlin-dz-1pct/input/config_m_r.xml";
 			
 			congestionPricing = true;
 			noisePricing = true;
@@ -183,7 +183,7 @@ public class CNEBerlin2 {
 		noiseParameters.setScaleFactor(100.);
 		noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(false);
 		
-		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>(); // TODO
+		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("42341", Link.class));
 		tunnelLinkIDs.add(Id.create("42340", Link.class));
 		
