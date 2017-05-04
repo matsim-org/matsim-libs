@@ -41,6 +41,7 @@ import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionC
 import playground.agarwalamit.utils.PersonFilter;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
@@ -97,7 +98,7 @@ public class CNEIntegration {
 	
 	public CNEIntegration(String configFile, String outputDirectory) {
 		
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup(), new DecongestionConfigGroup());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		this.controler = new Controler(scenario);

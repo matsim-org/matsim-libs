@@ -309,7 +309,6 @@ public class CNEMunich {
 		cne.setAirPollutionPricing(airPollutionPricing);
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
-		cne.setkP(kP);
 		cne.setPersonFilter(new MunichPersonFilter());
 
 		cne.setAgentFilter(new AgentFilter() {
