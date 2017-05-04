@@ -60,6 +60,8 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.DecongestionApproach;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -141,7 +143,7 @@ public class CNEMunich {
 
 		}
 
-		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup(), new DecongestionConfigGroup());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -265,6 +267,39 @@ public class CNEMunich {
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 		
 		noiseParameters.setWriteOutputIteration(config.controler().getLastIteration() - config.controler().getFirstIteration());
+		
+		// decongestion pricing Munich settings
+	
+		final DecongestionConfigGroup decongestionSettings = (DecongestionConfigGroup) controler.getConfig().getModules().get(DecongestionConfigGroup.GROUP_NAME);
+		
+		if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
+			
+			decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
+			decongestionSettings.setKp(kP);
+			decongestionSettings.setKi(0.);
+			decongestionSettings.setKd(0.);
+			
+			decongestionSettings.setMsa(true);
+			
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+
+		} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
+
+			decongestionSettings.setDecongestionApproach(DecongestionApproach.BangBang);
+			decongestionSettings.setINITIAL_TOLL(0.01);
+			decongestionSettings.setTOLL_ADJUSTMENT(1.0);
+			
+			decongestionSettings.setMsa(false);
+			
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+			
+		} else {
+			// for V3, V9 and V10: no additional settings
+		}
 		
 		// CNE Integration
 		

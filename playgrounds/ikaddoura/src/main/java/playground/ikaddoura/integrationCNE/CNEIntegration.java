@@ -41,7 +41,6 @@ import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionC
 import playground.agarwalamit.utils.PersonFilter;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
-import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
@@ -85,7 +84,6 @@ public class CNEIntegration {
 	private boolean useTripAndAgentSpecificVTTSForRouting = false;
 	
 	private CongestionTollingApproach congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
-	private double kP = 0.;
 
 	private PersonFilter personFilter = null; // TODO : i think, we can somehow merge the personFilter or agentFilter. amit
 	private AgentFilter agentFilter  = null;
@@ -94,7 +92,7 @@ public class CNEIntegration {
 	private final ResponsibilityGridTools responsibilityGridTools ;
 
 	public enum CongestionTollingApproach {
-        DecongestionPID, QBPV3, QBPV9
+        DecongestionPID, DecongestionBangBang, QBPV3, QBPV9
 	}
 	
 	public CNEIntegration(String configFile, String outputDirectory) {
@@ -212,17 +210,9 @@ public class CNEIntegration {
 				final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
 				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV9(controler.getEvents(), controler.getScenario())));
 				
-			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
-							
-				final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-				decongestionSettings.setKp(kP);
-				decongestionSettings.setKi(0.);
-				decongestionSettings.setKd(0.);
-				decongestionSettings.setMsa(true);
-				decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-				decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-				controler.getConfig().addModule(decongestionSettings);
-				
+			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString()) ||
+					congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
+											
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
@@ -375,10 +365,6 @@ public class CNEIntegration {
 
 	public void setCongestionTollingApproach(CongestionTollingApproach congestionTollingApproach) {
 		this.congestionTollingApproach = congestionTollingApproach;
-	}
-
-	public void setkP(double kP) {
-		this.kP = kP;
 	}
 
 	public void setPersonFilter(PersonFilter personFilter) {
