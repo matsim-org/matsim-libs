@@ -11,6 +11,11 @@ import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
 
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.ZeroScalar;
+import ch.ethz.idsc.tensor.red.Max;
 import playground.clruch.export.AVStatus;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
@@ -27,7 +32,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
     private boolean drawVNodes = true;
     private boolean drawVLinks = true;
     VirtualNodeGeometry virtualNodeGeometry = null;
-    private VirtualNodeShader vNodeShader = VirtualNodeShader.CarCount;
+    private VirtualNodeShader virtualNodeShader = VirtualNodeShader.CarCount;
 
     public VirtualNetworkLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
@@ -54,9 +59,28 @@ public class VirtualNetworkLayer extends ViewerLayer {
             }
         }
         if (drawVNodes) {
-            graphics.setColor(new Color(128, 128, 128, 128));
-            for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
-                graphics.draw(entry.getValue());
+            switch (virtualNodeShader) {
+            case None:
+                graphics.setColor(new Color(128, 128, 128, 64));
+                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet())
+                    graphics.fill(entry.getValue());
+                break;
+            case CarCount: {
+                Tensor count = new CarCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
+                Tensor prob = count; // SoftmaxLayer.of(count);
+                Scalar max = prob.flatten(0).reduce(Max::of).get().Get();
+                if (!max.equals(ZeroScalar.get()))
+                    prob = prob.multiply(RealScalar.of(224).divide(max));
+                // System.out.println(prob);
+                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                    int index = entry.getKey().index;
+                    graphics.setColor(new Color(128, 128, 128, prob.Get(index).number().intValue()));
+                    graphics.fill(entry.getValue());
+                }
+                break;
+            }
+            default:
+                break;
             }
         }
         if (drawVLinks && virtualNetwork != null) {
@@ -98,23 +122,23 @@ public class VirtualNetworkLayer extends ViewerLayer {
             rowPanel.add(jCheckBox);
         }
         {
+            SpinnerLabel<VirtualNodeShader> spinner = new SpinnerLabel<>();
+            spinner.setToolTipText("virtual node shader");
+            spinner.setArray(VirtualNodeShader.values());
+            spinner.setValue(virtualNodeShader);
+            spinner.addSpinnerListener(cs -> {
+                virtualNodeShader = cs;
+                matsimMapComponent.repaint();
+            });
+            spinner.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));
+            rowPanel.add(spinner.getLabelComponent());
+        }
+        {
             final JCheckBox jCheckBox = new JCheckBox("links");
             jCheckBox.setToolTipText("virtual links between nodes");
             jCheckBox.setSelected(drawVLinks);
             jCheckBox.addActionListener(e -> setDrawVLinks(jCheckBox.isSelected()));
             rowPanel.add(jCheckBox);
-        }
-        {
-            SpinnerLabel<VirtualNodeShader> spinner = new SpinnerLabel<>();
-            spinner.setToolTipText("virtual node shader");
-            spinner.setArray(VirtualNodeShader.values());
-            spinner.setValue(vNodeShader);
-            spinner.addSpinnerListener(cs -> {
-                vNodeShader = cs;
-                matsimMapComponent.repaint();
-            });
-            spinner.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));
-            rowPanel.add(spinner.getLabelComponent());
         }
     }
 

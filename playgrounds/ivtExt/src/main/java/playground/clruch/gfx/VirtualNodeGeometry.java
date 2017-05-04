@@ -3,7 +3,7 @@ package playground.clruch.gfx;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Path2D;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -19,7 +19,7 @@ import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 
 class VirtualNodeGeometry {
-    Map<VirtualNode, Tensor> convexHulls = new HashMap<>();
+    Map<VirtualNode, Tensor> convexHulls = new LinkedHashMap<>(); // ordering matters
 
     VirtualNodeGeometry(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
         if (virtualNetwork == null)
@@ -37,7 +37,7 @@ class VirtualNodeGeometry {
     }
 
     Map<VirtualNode, Shape> getShapes(MatsimMapComponent matsimMapComponent) {
-        Map<VirtualNode, Shape> map = new HashMap<>();
+        Map<VirtualNode, Shape> map = new LinkedHashMap<>(); // ordering matters
         for (Entry<VirtualNode, Tensor> entry : convexHulls.entrySet()) {
             Tensor hull = entry.getValue();
             Path2D path2d = new Path2D.Double();
