@@ -12,6 +12,9 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Node;
 
+/**
+ * class helps to detect adjacency between VirtualNodes based on shared Nodes in the network
+ */
 class ButterfliesAndRainbows {
     private Map<Node, Set<VirtualNode>> map = new HashMap<>();
 
@@ -27,7 +30,7 @@ class ButterfliesAndRainbows {
             Set<VirtualNode> set = entry.getValue();
             if (1 < set.size()) {
                 if (set.size() != 2)
-                    System.out.println("strange size =" + set.size());
+                    System.out.println("Node shared by " + set.size() + " VirtualNodes");
                 List<VirtualNode> some = new ArrayList<>(set);
                 for (int i = 0; i < some.size() - 1; ++i)
                     for (int j = i + 1; j < some.size(); ++j) {
