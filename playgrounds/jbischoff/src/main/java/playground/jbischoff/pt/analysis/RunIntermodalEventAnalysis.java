@@ -39,7 +39,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 public class RunIntermodalEventAnalysis {
 public static void main(String[] args) {
 	
-	String runId = "25pct.r04";
+	String runId = "25pct.r05";
 	String networkFile = "D:/runs-svn/bvg_intermodal/"+runId+"/"+runId+".output_network.xml.gz";
 	String eventsFile = "D:/runs-svn/bvg_intermodal/"+runId+"/"+runId+".output_events.xml.gz";
 	String outFile = "D:/runs-svn/bvg_intermodal/"+runId+"/"+runId+"interModalChains.csv";

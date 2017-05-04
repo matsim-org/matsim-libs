@@ -92,12 +92,14 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		List<PlanElement> legList = new ArrayList<>();
 		TransitStopFacility accessFacility = findAccessFacility(fromFacility, toFacility);
 		if (accessFacility == null) {
-			Logger.getLogger(getClass()).error("No access stop found, agent will walk. Agent Id:" + person.getId());
+			if (drtconfig.isPrintDetailedWarnings()){
+			Logger.getLogger(getClass()).error("No access stop found, agent will walk. Agent Id:\t" + person.getId());}
 			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
 		}
 		TransitStopFacility egressFacility = findEgressFacility(accessFacility, toFacility);
 		if (egressFacility == null) {
-			Logger.getLogger(getClass()).error("No egress stop found, agent will walk. Agent Id:" + person.getId());
+			if (drtconfig.isPrintDetailedWarnings()){
+			Logger.getLogger(getClass()).error("No egress stop found, agent will walk. Agent Id:\t" + person.getId());}
 			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
 		}
 		legList.addAll(walkRouter.calcRoute(fromFacility, accessFacility, departureTime, person));
@@ -114,8 +116,9 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		drtRoute.setTravelTime(drtRoute.getDistance() / drtconfig.getEstimatedDrtSpeed());
 
 		if (drtRoute.getStartLinkId() == drtRoute.getEndLinkId()) {
-			Logger.getLogger(getClass()).error("Start and end stop are the same, agent will walk. Agent Id:" + person.getId());
-
+			if (drtconfig.isPrintDetailedWarnings()){
+			Logger.getLogger(getClass()).error("Start and end stop are the same, agent will walk. Agent Id:\t" + person.getId());
+			}
 			return (walkRouter.calcRoute(fromFacility, toFacility, departureTime, person));
 
 		}

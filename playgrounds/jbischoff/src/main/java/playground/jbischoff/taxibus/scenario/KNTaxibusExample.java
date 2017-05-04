@@ -64,7 +64,7 @@ public class KNTaxibusExample {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		new org.matsim.contrib.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
+		new org.matsim.contrib.taxibus.run.configuration.TaxibusControlerCreator(controler).initiateTaxibusses();
 		controler.addOverridingModule( new OTFVisLiveModule() );
 		
 		controler.run();

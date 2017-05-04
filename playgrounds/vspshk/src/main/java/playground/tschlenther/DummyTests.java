@@ -4,9 +4,14 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.tschlenther.parkingSearch.utils.ParkingTuple;
 import playground.tschlenther.processing.testapplet;
@@ -16,7 +21,8 @@ public class DummyTests {
 	public static void main(String[] argS){
 //		testListIndex();
 //		testDecimalFormat();
-		testDateFormat();
+//		testDateFormat();
+		testCollectionModification();
 	}
 	
 	private static void testDateFormat(){
@@ -125,6 +131,44 @@ public class DummyTests {
 			str += "" + i + ":" + arr[i] + "\n";
 		}
 		return str;
+	}
+	
+	private static void testCollectionModification(){
+		List<Tuple<Coord,Double>> freeSlots = new ArrayList<Tuple<Coord,Double>>();
+
+		freeSlots.add(new Tuple<Coord, Double>(new Coord(0, 0), 1.0));
+		freeSlots.add(new Tuple<Coord, Double>(new Coord(1, 0), 2.0));
+		freeSlots.add(new Tuple<Coord, Double>(new Coord(0, 1), 3.0));
+		
+		System.out.println(freeSlots.toString());
+		List<Tuple<Coord,Double>> nList = new ArrayList<Tuple<Coord,Double>>();
+		for (Tuple<Coord, Double> t : freeSlots){ 
+			Coord c = t.getFirst();
+			nList.add(new Tuple<Coord, Double>(c,0.0));
+		}
+		System.out.println(freeSlots.toString());
+		System.out.println(nList.toString());
+		
+		Map<String,Double> map = new HashMap<String,Double>();
+		map.put("eins", 1.0);
+		map.put("zwei", 2.0);
+		map.put("drei", 3.0);
+		map.put("vier", 4.0);
+		
+		
+		for(String key: map.keySet()){
+			System.out.println("Vorher");
+			Double d = map.get(key);
+			System.out.println(key + ":" + d);
+			map.put(key, d-1);
+		}
+		
+		for(String key: map.keySet()){
+			System.out.println("Nachher");
+			Double d = map.get(key);
+			System.out.println(key + ":" + d);
+		}
+		
 	}
 
 }

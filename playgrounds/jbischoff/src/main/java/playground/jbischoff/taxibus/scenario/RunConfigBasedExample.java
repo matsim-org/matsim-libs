@@ -41,7 +41,7 @@ public class RunConfigBasedExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
+		new TaxibusControlerCreator(controler).initiateTaxibusses();
 		controler.run();
 	}
 }

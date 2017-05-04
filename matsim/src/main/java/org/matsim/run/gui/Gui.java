@@ -184,7 +184,7 @@ public class Gui extends JFrame {
 					int i = JOptionPane.showOptionDialog(Gui.this, "Do you really want to delete the output directory? This action cannot be undone.", "Delete Output Directory", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[] {"Cancel", "Delete"}, "Cancel");
 					if (i == 1) {
 						try {
-							IOUtils.deleteDirectory(new File(Gui.this.txtOutput.getText()));
+							IOUtils.deleteDirectoryRecursively(new File(Gui.this.txtOutput.getText()).toPath());
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}

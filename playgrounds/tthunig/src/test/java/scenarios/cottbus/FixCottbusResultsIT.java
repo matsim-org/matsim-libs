@@ -23,7 +23,6 @@ package scenarios.cottbus;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -40,12 +39,12 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import analysis.TtTotalTravelTime;
-import scenarios.cottbus.run.TtRunCottbusSimulation.ScenarioType;
+import scenarios.cottbus.run.TtRunCottbusSimulation.NetworkType;
+import scenarios.cottbus.run.TtRunCottbusSimulation.PopulationType;
 import scenarios.cottbus.run.TtRunCottbusSimulation.SignalType;
 
 /**
@@ -60,30 +59,26 @@ public class FixCottbusResultsIT {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
-	@Ignore //takes to long
 	public void testBC(){		
-		fixResults(ScenarioType.BaseCase, SignalType.MS, 125289192.0);
+		fixResults(NetworkType.V1, PopulationType.WoMines, SignalType.MS, 65208962.0);
 	}
 
 	@Test
-	@Ignore // TODO debug. UncheckedIOException while reading lanes: "SAXParseException; lineNumber 1; columnNumber 1; Content is not allowed in prolog"
 	public void testBCContinuedFreeRouteChoice(){
-		fixResults(ScenarioType.BaseCaseContinued_MatsimRoutes, SignalType.BTU_OPT, 1133616.0);
+		fixResults(NetworkType.BTU_NET, PopulationType.BTU_POP_MATSIM_ROUTES, SignalType.BTU_OPT, 1096817.0);
 	}
 	
 	@Test
-	@Ignore // TODO debug. UncheckedIOException while reading lanes: "SAXParseException; lineNumber 1; columnNumber 1; Content is not allowed in prolog"
 	public void testBCContinuedFixedRouteSet(){
-		fixResults(ScenarioType.BaseCaseContinued_BtuRoutes, SignalType.BTU_OPT, 1091221.0);
+		fixResults(NetworkType.BTU_NET, PopulationType.BTU_POP_BTU_ROUTES, SignalType.BTU_OPT, 1073110.0);
 	}	
 	
-	private void fixResults(ScenarioType scenarioType, SignalType signalType, double expectedTotalTt) {
-		Config config = defineConfig(scenarioType, signalType);
+	private void fixResults(NetworkType netType, PopulationType popType, SignalType signalType, double expectedTotalTt) {
+		Config config = defineConfig(netType, popType, signalType);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);	
 		// add missing scenario elements
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsDataLoader(config).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		
 		Controler controler = new Controler(scenario);
 		// add missing modules
@@ -100,50 +95,57 @@ public class FixCottbusResultsIT {
 		controler.run();
 		
 		// check travel time
-		log.info("scenarioType: " + scenarioType + ", signalType: " + signalType + ", expectedTotalTt: " + expectedTotalTt + ", experiencedTotalTt: " + handler.getTotalTt());
+		log.info("networkType: " + netType + ", populationType" + popType + ", signalType: " + signalType + ", expectedTotalTt: " + expectedTotalTt + ", experiencedTotalTt: " + handler.getTotalTt());
 		Assert.assertEquals(expectedTotalTt, handler.getTotalTt(), MatsimTestUtils.EPSILON);	
 	}
 
-	private Config defineConfig(ScenarioType scenarioType, SignalType signalType) {
+	private Config defineConfig(NetworkType netType, PopulationType popType, SignalType signalType) {
 		Config config = ConfigUtils.createConfig();
 		
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 
-		if (scenarioType.equals(ScenarioType.BaseCase)){
-			config.network().setInputFile(testUtils.getClassInputDirectory() + "matsimData/network_wgs84_utm33n.xml.gz");
-			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "matsimData/lanes.xml");
-			config.plans().setInputFile(testUtils.getClassInputDirectory() + "matsimData/commuter_population_wgs84_utm33n_car_only.xml.gz");
-		} else { // BaseCaseContinued
+		if (netType.equals(NetworkType.BTU_NET)){
 			config.network().setInputFile(testUtils.getClassInputDirectory() + "btuOpt/network_small_simplified.xml.gz");
 			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "btuOpt/lanes_network_small.xml.gz");
-			if (scenarioType.equals(ScenarioType.BaseCaseContinued_MatsimRoutes))
+			if (popType.equals(PopulationType.BTU_POP_MATSIM_ROUTES))
 				config.plans().setInputFile(testUtils.getClassInputDirectory() + "btuOpt/trip_plans_from_morning_peak_ks_commodities_minFlow50.0.xml");
-			else // BtuRoutes	
+			else if (popType.equals(PopulationType.BTU_POP_BTU_ROUTES))
 				config.plans().setInputFile(testUtils.getClassInputDirectory() + "btuOpt/2015-03-10_sameEndTimes_ksOptRouteChoice_paths.xml");
+			else
+				throw new UnsupportedOperationException("Combination of population " + popType + " and network " + netType + " not supported");
+		} else if (netType.equals(NetworkType.V1)){
+			config.network().setInputFile(testUtils.getClassInputDirectory() + "matsimData/network_wgs84_utm33n.xml.gz");
+			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "matsimData/lanes.xml");
+			if (popType.equals(PopulationType.WoMines)){
+				// use routes from a 100th iteration as initial plans
+				config.plans().setInputFile(testUtils.getClassInputDirectory() + "matsimData/commuter_population_wgs84_utm33n_car_only_100it_MS_cap0.7.xml.gz");
+			}
 		}
 		
 		// set number of iterations
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(0);
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( true );
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalConfigGroup.setUseSignalSystems( true );
 		// set signal files
-		if (scenarioType.equals(ScenarioType.BaseCase)){
+		if (netType.equals(NetworkType.V1)){
 			signalConfigGroup.setSignalSystemFile(testUtils.getClassInputDirectory() + "matsimData/signal_systems_no_13.xml");
-		} else { // BaseCaseContinued
-			signalConfigGroup.setSignalSystemFile(testUtils.getClassInputDirectory() + "btuOpt/output_signal_systems_v2.0.xml.gz");
+		} else if (netType.equals(NetworkType.BTU_NET)){ 
+			signalConfigGroup.setSignalSystemFile(testUtils.getClassInputDirectory() + "btuOpt/signal_systems_no_13_btuNet.xml");
 		}
 		signalConfigGroup.setSignalGroupsFile(testUtils.getClassInputDirectory() + "matsimData/signal_groups_no_13.xml");
 		if (signalType.equals(SignalType.MS)){
 			signalConfigGroup.setSignalControlFile(testUtils.getClassInputDirectory() + "matsimData/signal_control_no_13.xml");
-		} else { // SignalType.BTU_OPT
+		} else if (signalType.equals(SignalType.BTU_OPT)){ 
 			signalConfigGroup.setSignalControlFile(testUtils.getClassInputDirectory() + "btuOpt/signal_control_opt.xml");
 		}
+
+		config.qsim().setUsingFastCapacityUpdate(false);
 		
 		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta( 2 );
+//		config.planCalcScore().setBrainExpBeta( 2 );
 
 		// choose between link to link and node to node routing
 		// (only has effect if lanes are used)
@@ -153,45 +155,32 @@ public class FixCottbusResultsIT {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+//		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
 		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		// hash map and array produce same results. only difference: memory and time.
 		// for small time bins and sparse values hash map is better. theresa, may'15
 
-		// define strategies:
+		// define strategies
 		{
 			StrategySettings strat = new StrategySettings();
-			strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-			if (scenarioType.equals(ScenarioType.BaseCaseContinued_BtuRoutes))
-				strat.setWeight(0.0); // no ReRoute, fix route choice set
-			else // MatsimRoutes or BaseCase
-				strat.setWeight(0.1);
-			strat.setDisableAfter(config.controler().getLastIteration() - 50);
-			config.strategy().addStrategySettings(strat);
-		}
-		{
-			StrategySettings strat = new StrategySettings();
-			strat.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
-			strat.setWeight(0.9);
+			strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
+			strat.setWeight(1);
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		if (scenarioType.equals(ScenarioType.BaseCaseContinued_BtuRoutes))
-			config.strategy().setMaxAgentPlanMemorySize(0); //unlimited because ReRoute is switched off anyway
-		else 
-			config.strategy().setMaxAgentPlanMemorySize( 5 );
-
+		config.strategy().setMaxAgentPlanMemorySize(0); //unlimited because ReRoute is switched off anyway
+		
 		config.qsim().setStuckTime( 3600 );
 		config.qsim().setRemoveStuckVehicles(false);
 		
-		if (scenarioType.equals(ScenarioType.BaseCase)){
+		if (netType.equals(NetworkType.V1)){
 			config.qsim().setStorageCapFactor( 0.7 );
 			config.qsim().setFlowCapFactor( 0.7 );
-		} else { // BaseCaseContinued
-			// use default: 1.0 (i.e. as it is in the BTU network)
+		} else { // BTU network
+			// use default: 1.0 (BTU network is already scaled down)
 		}
 		
 		// set start and end time to shorten simulation run time

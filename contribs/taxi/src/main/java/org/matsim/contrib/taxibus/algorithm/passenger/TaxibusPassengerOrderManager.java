@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.QSim;
  * @author jbischoff
  *
  */
-public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, MobsimInitializedListener {
+public class TaxibusPassengerOrderManager implements OrderManager, ActivityStartEventHandler, MobsimInitializedListener {
 	private QSim qSim;
 	private TaxibusPassengerEngine passengerEngine;
 
@@ -45,6 +45,7 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 
 	}
 
+	@Override
 	public void setPassengerEngine(TaxibusPassengerEngine passengerEngine) {
 		this.passengerEngine = passengerEngine;
 	}

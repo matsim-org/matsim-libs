@@ -45,6 +45,8 @@ public class SignalGroupImpl implements SignalGroup {
 		return this.id;
 	}
 
+	/* do not call this directly. Use scheduleDropping/Onset in the SignalSystem implementation instead.
+	 * visibility can't be restricted in the interface. theresa, apr'17 */
 	@Override
 	public void setState(SignalGroupState state) {
 		this.state = state;

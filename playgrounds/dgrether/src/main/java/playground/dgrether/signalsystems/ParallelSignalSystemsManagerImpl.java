@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.contrib.signals.model.SignalSystemsManagerImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.model.AmberLogic;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
@@ -42,13 +44,13 @@ public class ParallelSignalSystemsManagerImpl extends SignalSystemsManagerImpl i
 	
 	private List<Worker> workers = new Vector<Worker>();
 	
-	public ParallelSignalSystemsManagerImpl(){
+	public ParallelSignalSystemsManagerImpl(SignalsData signalData, EventsManager eventsManager){
+		super(signalData, eventsManager);
 		for (int i = 0; i < numberOfThreads; i++) {
 			Worker w = new Worker();
 			w.start();
 			this.workers.add(w);
 		}
-		
 	}
 	
 

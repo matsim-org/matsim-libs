@@ -19,6 +19,7 @@
 
 package playground.jbischoff.wobscenario.peoplemover;
 
+import org.matsim.contrib.drt.routing.ClosestStopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -27,15 +28,17 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 
+
 public class RunDrtWithStops {
 
 	public static void main(String[] args) {
-		String configFile = "../../../shared-svn/projects/vw_rufbus/projekt2/input/configPM122.10c.xml";
+		String configFile = "../../../shared-svn/projects/vw_rufbus/projekt2/input/configPM122.10.xml";
 		RunDrtWithStops.run(configFile, false);
 	}
 
@@ -63,7 +66,7 @@ public class RunDrtWithStops {
 		
 		config.qsim().setStartTime(0);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
-		
+		config.controler().setWriteEventsInterval(1);
 		createControler(config, otfvis).run();
 	}
 
@@ -72,7 +75,6 @@ public class RunDrtWithStops {
 
 		
 		Controler controler = DrtControlerCreator.createControler(config, otfvis);
-
 	
 
 		if (otfvis) {

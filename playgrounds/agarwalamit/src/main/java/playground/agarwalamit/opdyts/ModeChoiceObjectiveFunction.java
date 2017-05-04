@@ -23,14 +23,13 @@ import java.util.*;
 import javax.inject.Inject;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
+import opdytsintegration.MATSimState;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.TransportPlanningMainModeIdentifier;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.kai.DataMap;
 import org.matsim.contrib.analysis.kai.Databins;
 import org.matsim.core.gbl.Gbl;
@@ -127,9 +126,13 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
 
         resetContainers();
 
+        MATSimState matSimState = (MATSimState) state;
+        Set<Id<Person>> persons = matSimState.getPersonIdView();
+
         StatType statType = StatType.tripBeelineDistances;
 
-        for (Plan plan : service.getExperiencedPlans().values()) {
+        for (Id<Person> personId : persons) {
+            Plan plan = matSimState.getSelectedPlan(personId);
             List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
             for (TripStructureUtils.Trip trip : trips) {
                 List<String> tripTypes = new ArrayList<>();

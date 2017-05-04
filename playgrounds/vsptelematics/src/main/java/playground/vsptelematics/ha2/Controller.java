@@ -20,11 +20,17 @@
 package playground.vsptelematics.ha2;
 
 import com.google.inject.Singleton;
+
+import playground.vsptelematics.common.TelematicsConfigGroup;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 
 
 /**
@@ -32,9 +38,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
  *
  */
 public class Controller {
-	
 	public static void run(Config config){
-		Controler c = new Controler(config);
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		TelematicsConfigGroup telematicsConfigGroup = ConfigUtils.addOrGetModule(config,
+				TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
+		Controler c = new Controler(scenario);
 		c.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

@@ -199,7 +199,7 @@ public final class OutputDirectoryHierarchy {
 						log.warn("### " + outputPath);
 						log.warn("###########################################################");
 						System.err.flush();
-						IOUtils.deleteDirectory(outputDir, false);
+						IOUtils.deleteDirectoryRecursively(outputDir.toPath());
 						break;
 					default:
 						throw new RuntimeException( "unknown setting "+overwriteFiles );

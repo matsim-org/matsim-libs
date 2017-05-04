@@ -232,8 +232,8 @@ public class NetworkAnalysis {
 		LOG.info("   tolerance: " + ec.getTolerance());
 		LOG.info("   max iterations: " + ec.getMaxIterations());
 		LOG.info("Setting new tolerance and interations...");
-		ec.setMaxIterations(10000);
-		ec.setTolerance(1e-8);
+		ec.setMaxIterations(1000);
+		ec.setTolerance(1e-5);
 		LOG.info("   tolerance: " + ec.getTolerance());
 		LOG.info("   max iterations: " + ec.getMaxIterations());		
 		ec.acceptDisconnectedGraph(true);
@@ -269,7 +269,7 @@ public class NetworkAnalysis {
 					Coord cH = network.getPathDependentNode(id).getCoord();
 					Coord cWGS = ct.transform(cH);
 					double ecDouble =ec.getVertexScore(id);
-					bw.write(String.format("%s,%.0f,%.0f,%.6f,%.6f,%f,%s\n", 
+					bw.write(String.format("%s,%.0f,%.0f,%.6f,%.6f,%s,%f\n", 
 							id, cH.getX(), cH.getY(), cWGS.getX(), cWGS.getY(), "NA", ecDouble));
 				}
 			} catch (IOException e) {

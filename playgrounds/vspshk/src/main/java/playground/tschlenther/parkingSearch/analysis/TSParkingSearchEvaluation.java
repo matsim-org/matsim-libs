@@ -90,14 +90,35 @@ public class TSParkingSearchEvaluation {
 	}
 	
 	public static void main(String[] args){
-		String[] zones = new String[2];
-		zones[0] = "C:/Users/Work/Bachelor Arbeit/input/Berlin/Klausener.txt";
-		zones[1] = "C:/Users/Work/Bachelor Arbeit/input/Berlin/Mierendorff.txt";
+//		String[] zones = new String[2];
+//		zones[0] = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Links.txt";
+//		zones[1] = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Rechts.txt";
+//		TSParkingSearchEvaluation eval = new TSParkingSearchEvaluation(zones);
+//		
+//		String runDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Memory/Neues_GridNet/RUN_180417_15.21_MEMORY_X.S.1/ITERS";
+//		eval.analyseRun(runDir, 10);
+		
+		
+		//------------------------------------------------------------------------------------------------
+		String[] zones = new String[1];
+		zones[0] = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/AlleLinks.txt";
 		TSParkingSearchEvaluation eval = new TSParkingSearchEvaluation(zones);
 		
-		String runDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Benenson/Berlin/changeEvents/RUN_130417_22.14_1_3_1000_350_750_P.B.4.BUGFIX/ITERS";
-		eval.analyseRun(runDir, 7);
 		
+		String runDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Memory/Neues_GridNet/RUN_180417_15.21_MEMORY_X.S.1/ITERS";
+//		String runDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Benenson/Neues_GridNet/RUN_180417_19.09_2_4_1000_500_100_100_600_PS5/ITERS";
+		String runID = "X.S.1_";
+		eval.analyseRun(runDir, 10);
+		String scriptPath = 	"C:/Users/Work/Bachelor Arbeit/Analysis_ohne_Java_GridNet.vbs";
+		String[] arguments = new String[] {
+				"wscript.exe", scriptPath , runDir, runID
+		};
+		try {
+	        Runtime.getRuntime().exec(arguments);        
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        throw new RuntimeException("konnte Skript nicht durchlaufen lassen");
+	    }
 	}
 	
 }

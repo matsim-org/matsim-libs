@@ -90,7 +90,7 @@ public class RunParallelisationExample {
 		Gbl.printElapsedTime();
 		
 		/* Running multi-threaded. First delete the output directory. */
-		IOUtils.deleteDirectory(new File(config.controler().getOutputDirectory()));
+		IOUtils.deleteDirectoryRecursively(new File(config.controler().getOutputDirectory()).toPath());
 		Gbl.startMeasurement();
 		config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, configFilename);

@@ -38,9 +38,9 @@ public class SignalSystemImpl implements SignalSystem {
 
 	/*package*/ static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
 	
-	private SignalController controller;
+	private SignalController signalController;
 	private Map<Id<SignalGroup>, SignalGroup> signalGroups = new HashMap<>();
-	private SignalSystemsManager manager;
+	private SignalSystemsManager signalManager;
 	
 	private Set<SignalGroupStateChangeRequest> requests = new HashSet<SignalGroupStateChangeRequest>();
 	
@@ -54,37 +54,32 @@ public class SignalSystemImpl implements SignalSystem {
 	}
 
 	@Override
-	public SignalSystemsManager getSignalSystemsManager() {
-		return this.manager;
-	}
-
-	@Override
 	public void setSignalSystemsManager(SignalSystemsManager signalManager) {
-		this.manager = signalManager;
+		this.signalManager = signalManager;
 	}
 
 	@Override
 	public void setSignalSystemController(SignalController controller) {
-		this.controller = controller;
+		this.signalController = controller;
 	}
 	
 	@Override
 	public void scheduleDropping(double timeSeconds, Id<SignalGroup> signalGroupId) {
 //		log.debug("dropping  at time " + timeSeconds + " of  group " + signalGroupId);
-		Set<SignalGroupStateChangeRequest> rqs = this.manager.getAmberLogic().processDropping(timeSeconds, this.getId(), signalGroupId);
+		Set<SignalGroupStateChangeRequest> rqs = this.signalManager.getAmberLogic().processDropping(timeSeconds, this.getId(), signalGroupId);
 		requests.addAll(rqs);
 	}
 	
 	@Override
 	public void scheduleOnset(double timeSeconds, Id<SignalGroup> signalGroupId) {
 //		log.debug("onset at time " + timeSeconds + " of  group " + signalGroupId);
-		Set<SignalGroupStateChangeRequest> rqs = this.manager.getAmberLogic().processOnsets(timeSeconds, this.getId(), signalGroupId);
+		Set<SignalGroupStateChangeRequest> rqs = this.signalManager.getAmberLogic().processOnsets(timeSeconds, this.getId(), signalGroupId);
 		requests.addAll(rqs);
 	}
 	
 	@Override
 	public void updateState(double timeSeconds) {
-		this.controller.updateState(timeSeconds);
+		this.signalController.updateState(timeSeconds);
 		SignalGroupStateChangedEvent stateEvent;
 		this.sortedRequests.addAll(this.requests);
 		this.requests.clear();
@@ -93,7 +88,7 @@ public class SignalSystemImpl implements SignalSystem {
 //			log.debug("system id " + this.id + " group " + request.getSignalGroupId() + " state " + request.getRequestedState() + " at time " + timeSeconds);
 			this.signalGroups.get(request.getSignalGroupId()).setState(request.getRequestedState());
 			stateEvent = new SignalGroupStateChangedEvent(timeSeconds, this.getId(), request.getSignalGroupId(), request.getRequestedState());
-			this.getSignalSystemsManager().getEventsManager().processEvent(stateEvent);
+			this.signalManager.getEventsManager().processEvent(stateEvent);
 			this.sortedRequests.poll();
 			request = this.sortedRequests.peek();
 		}
@@ -102,7 +97,7 @@ public class SignalSystemImpl implements SignalSystem {
 	@Override
 	public void switchOff(double timeSeconds) {
 		Set<SignalGroupStateChangeRequest> req = new HashSet<SignalGroupStateChangeRequest>();
-		for (Id<SignalGroup> sgId : this.getSignalGroups().keySet()){
+		for (Id<SignalGroup> sgId : this.signalGroups.keySet()){
 			req.add(new SignalGroupStateChangeRequestImpl(sgId, SignalGroupState.YELLOW, timeSeconds));
 			req.add(new SignalGroupStateChangeRequestImpl(sgId, SignalGroupState.OFF, timeSeconds + SWITCH_OFF_SEQUENCE_LENGTH));
 		}
@@ -112,7 +107,7 @@ public class SignalSystemImpl implements SignalSystem {
 
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
-		this.controller.simulationInitialized(simStartTimeSeconds);
+		this.signalController.simulationInitialized(simStartTimeSeconds);
 	}
 
 	
@@ -143,13 +138,13 @@ public class SignalSystemImpl implements SignalSystem {
 
 	@Override
 	public SignalController getSignalController() {
-		return this.controller;
+		return this.signalController;
 	}
 
 	@Override
 	public void startPlan(double now) {
 		Set<SignalGroupStateChangeRequest> req = new HashSet<SignalGroupStateChangeRequest>();
-		for (Id<SignalGroup> sgId : this.getSignalGroups().keySet()){
+		for (Id<SignalGroup> sgId : this.signalGroups.keySet()){
 			req.add(new SignalGroupStateChangeRequestImpl(sgId, SignalGroupState.START_PLAN, now));
 		}
 		this.sortedRequests.addAll(req);

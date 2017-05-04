@@ -33,12 +33,8 @@ import org.matsim.contrib.signals.data.SignalsData;
 public interface SignalSystemsManager {
 
 	public SignalsData getSignalsData();
-	
-	public void setSignalsData(SignalsData signalsData);
 
 	public EventsManager getEventsManager();
-	
-	public void setEventsManager(EventsManager events);
 	
 	public void addSignalSystem(SignalSystem system);
 
