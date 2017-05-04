@@ -19,6 +19,7 @@ import playground.clruch.utils.GlobalAssert;
 /**
  * Created by Claudio on 2/8/2017.
  */
+// TODO VirtualNode implements Comparable<VirtualNode> based on index
 public class VirtualNode implements Serializable {
     /**
      * index is counting from 0,1,... index is used to assign entries in vectors and matrices

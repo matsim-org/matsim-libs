@@ -1,37 +1,38 @@
 package playground.clruch.gfx;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.geom.Path2D;
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.Shape;
 import java.util.Map.Entry;
 
 import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.opt.ConvexHull;
+import ch.ethz.idsc.tensor.ZeroScalar;
+import ch.ethz.idsc.tensor.red.Max;
 import playground.clruch.export.AVStatus;
 import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.gui.RowPanel;
+import playground.clruch.utils.gui.SpinnerLabel;
 
 public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 128);
     private PointCloud pointCloud = null;
     private VirtualNetwork virtualNetwork = null;
-    Map<VirtualNode, Tensor> convexHull = new HashMap<>();
     private boolean drawVNodes = true;
     private boolean drawVLinks = true;
+    VirtualNodeGeometry virtualNodeGeometry = null;
+    private VirtualNodeShader virtualNodeShader = VirtualNodeShader.CarCount;
 
     public VirtualNetworkLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
@@ -58,24 +59,28 @@ public class VirtualNetworkLayer extends ViewerLayer {
             }
         }
         if (drawVNodes) {
-            graphics.setColor(new Color(128, 128, 128, 128));
-            for (Entry<VirtualNode, Tensor> entry : convexHull.entrySet()) {
-                Tensor hull = entry.getValue();
-                Path2D path2d = new Path2D.Double();
-                boolean init = false;
-                for (Tensor vector : hull) {
-                    Coord coord = new Coord( //
-                            vector.Get(0).number().doubleValue(), //
-                            vector.Get(1).number().doubleValue());
-                    Point point = matsimMapComponent.getMapPositionAlways(coord);
-                    if (!init) {
-                        init = true;
-                        path2d.moveTo(point.getX(), point.getY());
-                    } else
-                        path2d.lineTo(point.getX(), point.getY());
+            switch (virtualNodeShader) {
+            case None:
+                graphics.setColor(new Color(128, 128, 128, 64));
+                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet())
+                    graphics.fill(entry.getValue());
+                break;
+            case CarCount: {
+                Tensor count = new CarCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
+                Tensor prob = count; // SoftmaxLayer.of(count);
+                Scalar max = prob.flatten(0).reduce(Max::of).get().Get();
+                if (!max.equals(ZeroScalar.get()))
+                    prob = prob.multiply(RealScalar.of(224).divide(max));
+                // System.out.println(prob);
+                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                    int index = entry.getKey().index;
+                    graphics.setColor(new Color(128, 128, 128, prob.Get(index).number().intValue()));
+                    graphics.fill(entry.getValue());
                 }
-                path2d.closePath();
-                graphics.draw(path2d);
+                break;
+            }
+            default:
+                break;
             }
         }
         if (drawVLinks && virtualNetwork != null) {
@@ -117,6 +122,18 @@ public class VirtualNetworkLayer extends ViewerLayer {
             rowPanel.add(jCheckBox);
         }
         {
+            SpinnerLabel<VirtualNodeShader> spinner = new SpinnerLabel<>();
+            spinner.setToolTipText("virtual node shader");
+            spinner.setArray(VirtualNodeShader.values());
+            spinner.setValue(virtualNodeShader);
+            spinner.addSpinnerListener(cs -> {
+                virtualNodeShader = cs;
+                matsimMapComponent.repaint();
+            });
+            spinner.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));
+            rowPanel.add(spinner.getLabelComponent());
+        }
+        {
             final JCheckBox jCheckBox = new JCheckBox("links");
             jCheckBox.setToolTipText("virtual links between nodes");
             jCheckBox.setSelected(drawVLinks);
@@ -127,18 +144,6 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     public void setVirtualNetwork(VirtualNetwork virtualNetwork) {
         this.virtualNetwork = virtualNetwork;
-        if (virtualNetwork != null) {
-            final MatsimStaticDatabase db = matsimMapComponent.db;
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-                Tensor coords = Tensors.empty();
-                for (Link link : virtualNode.getLinks()) {
-                    int index = db.getLinkIndex(link);
-                    OsmLink osmLink = db.getOsmLink(index);
-                    Coord coord = osmLink.getAt(.5);
-                    coords.append(Tensors.vector(coord.getX(), coord.getY()));
-                }
-                convexHull.put(virtualNode, ConvexHull.of(coords));
-            }
-        }
+        virtualNodeGeometry = new VirtualNodeGeometry(matsimMapComponent.db, virtualNetwork);
     }
 }

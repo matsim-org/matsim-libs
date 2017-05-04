@@ -71,7 +71,6 @@ public class VirtualNetwork implements Serializable {
             System.out.println("link: " + link.getId().toString());
             System.out.println("virtualNode not found ");
         }
-
         return linkVNodeMap.get(link);
     }
 
