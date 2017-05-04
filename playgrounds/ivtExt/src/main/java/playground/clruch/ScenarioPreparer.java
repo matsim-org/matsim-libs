@@ -21,6 +21,7 @@ import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.utils.GZHandler;
+import playground.clruch.utils.GlobalAssert;
 
 
 public class ScenarioPreparer {
@@ -96,6 +97,7 @@ public class ScenarioPreparer {
             System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
             TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
             System.out.println("Population after decimation:" + population.getPersons().values().size());
+            GlobalAssert.that(population.getPersons().size()>0);
             
             final File fileExportGz = new File(dir, POPULATIONUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(dir, POPULATIONUPDATEDNAME + ".xml");
