@@ -19,6 +19,10 @@
 
 package org.matsim.core.replanning.strategies;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
@@ -26,23 +30,20 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-public class TimeAllocationMutator implements
-		Provider<PlanStrategy> {
+public class TimeAllocationMutator implements Provider<PlanStrategy> {
 
 	@Inject private GlobalConfigGroup globalConfigGroup;
 	@Inject private TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
 	@Inject private PlansConfigGroup plansConfigGroup;
 	@Inject private Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
-
-    @Override
+	@Inject private Population population;
+	
+	@Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		org.matsim.core.replanning.modules.TimeAllocationMutator tam = new org.matsim.core.replanning.modules.TimeAllocationMutator(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup);
+		org.matsim.core.replanning.modules.TimeAllocationMutator tam = new org.matsim.core.replanning.modules.TimeAllocationMutator(this.tripRouterProvider, 
+				this.plansConfigGroup, this.timeAllocationMutatorConfigGroup, this.globalConfigGroup, population);
 		strategy.addStrategyModule(tam);
 		return strategy;
 	}
-
 }

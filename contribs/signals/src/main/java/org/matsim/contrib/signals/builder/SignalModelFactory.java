@@ -24,7 +24,6 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 
 /**
@@ -33,11 +32,9 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
  */
 public interface SignalModelFactory {
 	
-	public SignalSystemsManager createSignalSystemsManager();
-	
 	public SignalSystem createSignalSystem(Id<SignalSystem> id);
 	
-	public SignalController createSignalSystemController(String controllerIdentifier);
+	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem);
 
 	public SignalPlan createSignalPlan(SignalPlanData planData);
 	

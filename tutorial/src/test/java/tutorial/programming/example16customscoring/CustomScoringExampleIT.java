@@ -24,14 +24,14 @@ public class CustomScoringExampleIT {
     public void testCustomScoring() {
         final String pathname = "./output/example";
         try {
-            IOUtils.deleteDirectory(new File(pathname),false);
+            IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
         } catch ( IllegalArgumentException ee ) {
             // (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
             // and did not remove the directory afterwards.)
         }
         RunCustomScoringExample.main(null);
 
-        IOUtils.deleteDirectory(new File(pathname),false);
+        IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
         // (here, the directory should have been there)
     }
 

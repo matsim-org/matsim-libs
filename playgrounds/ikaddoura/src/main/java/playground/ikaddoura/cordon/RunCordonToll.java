@@ -134,7 +134,7 @@ public class RunCordonToll {
 		String OUTPUT_DIR = controler.getConfig().controler().getOutputDirectory();
 		for (int index = firstIt+1; index < lastIt; index ++){
 			String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
-			IOUtils.deleteDirectory(new File(dirToDel),false);
+			IOUtils.deleteDirectoryRecursively(new File(dirToDel).toPath());
 		}
 		
 		// some processing of the output data

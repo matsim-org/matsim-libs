@@ -166,7 +166,7 @@ public class OuterCordonCadytsControler {
 		for (int index =firstIt+1; index <lastIt; index ++){
 			String dirToDel = outputDir+"/ITERS/it."+index;
 			Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
-			IOUtils.deleteDirectory(new File(dirToDel),false);
+			IOUtils.deleteDirectoryRecursively(new File(dirToDel).toPath());
 		}
 		
 		new File(outputDir+"/analysis/").mkdir();

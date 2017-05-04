@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
@@ -31,13 +32,15 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author michalm
  */
 public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements MobsimBeforeCleanupListener {
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
-
+	private final boolean printWarnings;
+	
 	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg) {
 		super(optimContext, new TreeSet<DrtRequest>(Requests.ABSOLUTE_COMPARATOR));
 
@@ -46,7 +49,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 		// preProcessDijkstra.run(optimContext.network);
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-
+		printWarnings = drtCfg.isPrintDetailedWarnings();
 		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
 				.createRoutingNetwork(optimContext.network);
 		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(preProcessDijkstra)
@@ -85,7 +88,9 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 			DrtRequest req = reqIter.next();
 			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
 			if (best == null) {
-				// throw new RuntimeException("No feasible solution");
+				if (printWarnings){
+					Logger.getLogger(getClass()).warn("No vehicle found for drt request from passenger \t"+req.getPassenger().getId()+"\tat\t"+Time.writeTime(req.getSubmissionTime() ));
+				}
 			} else {
 				getOptimContext().scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
 				vData.updateEntry(best.vehicleEntry);

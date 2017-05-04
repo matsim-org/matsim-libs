@@ -85,7 +85,6 @@ public class CNEIntegration {
 	private boolean useTripAndAgentSpecificVTTSForRouting = false;
 	
 	private CongestionTollingApproach congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
-	private double kP = 0.;
 
 	private PersonFilter personFilter = null; // TODO : i think, we can somehow merge the personFilter or agentFilter. amit
 	private AgentFilter agentFilter  = null;
@@ -94,12 +93,12 @@ public class CNEIntegration {
 	private final ResponsibilityGridTools responsibilityGridTools ;
 
 	public enum CongestionTollingApproach {
-        DecongestionPID, QBPV3, QBPV9
+        DecongestionPID, DecongestionBangBang, QBPV3, QBPV9
 	}
 	
 	public CNEIntegration(String configFile, String outputDirectory) {
 		
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup(), new EmissionsConfigGroup(), new DecongestionConfigGroup());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		this.controler = new Controler(scenario);
@@ -212,17 +211,9 @@ public class CNEIntegration {
 				final TollHandler congestionTollHandlerQBP = new TollHandler(controler.getScenario());
 				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV9(controler.getEvents(), controler.getScenario())));
 				
-			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
-							
-				final DecongestionConfigGroup decongestionSettings = new DecongestionConfigGroup();
-				decongestionSettings.setKp(kP);
-				decongestionSettings.setKi(0.);
-				decongestionSettings.setKd(0.);
-				decongestionSettings.setMsa(true);
-				decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-				decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-				controler.getConfig().addModule(decongestionSettings);
-				
+			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString()) ||
+					congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
+											
 				controler.addOverridingModule(new AbstractModule() {
 					@Override
 					public void install() {
@@ -253,20 +244,7 @@ public class CNEIntegration {
 
 		// ########################## Air pollution ##########################
 
-		EmissionResponsibilityCostModule emissionCostModule = null;
-
 		if (analyzeAirPollution) {
-
-			final double emissionEfficiencyFactor = 1.0;
-			final boolean considerCO2Costs = true;
-			final double emissionCostFactor = 1.0;
-
-			/* TODO : since these params are in config now, plz check if the settings are same in the  output config.
-			 If these values are overridden by config file, we need to add them to config. Amit Mar'17 */
-			EmissionsConfigGroup emissionsConfigGroup = ((EmissionsConfigGroup) this.controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME));
-			emissionsConfigGroup.setConsideringCO2Costs(considerCO2Costs);
-			emissionsConfigGroup.setEmissionCostMultiplicationFactor(emissionCostFactor);
-			emissionsConfigGroup.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
 
 			if (airPollutionPricing) {
 				controler.addOverridingModule(new AbstractModule() {
@@ -287,10 +265,6 @@ public class CNEIntegration {
 						bind(GridTools.class).toInstance(gridTools);
 						bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
 						bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
-
-						// if EmissionModule is binded (necessary step), EmissionControlerListener is not required.
-						// It's sole purpose was to write the emission events if emission costs are not internalized. Amit Apr'17
-//						addControlerListenerBinding().to(EmissionControlerListener.class); // just to write the emission events
 
 						if(personFilter!=null) bind(PersonFilter.class).toInstance(personFilter);
 						bind(ExperiencedEmissionCostHandler.class);
@@ -375,10 +349,6 @@ public class CNEIntegration {
 
 	public void setCongestionTollingApproach(CongestionTollingApproach congestionTollingApproach) {
 		this.congestionTollingApproach = congestionTollingApproach;
-	}
-
-	public void setkP(double kP) {
-		this.kP = kP;
 	}
 
 	public void setPersonFilter(PersonFilter personFilter) {

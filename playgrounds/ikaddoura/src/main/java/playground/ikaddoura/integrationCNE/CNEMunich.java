@@ -60,6 +60,8 @@ import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.munich.utils.MunichPersonFilter.MunichUserGroup;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.DecongestionApproach;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -138,10 +140,12 @@ public class CNEMunich {
 //			if (modeChoice) configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2.xml";
 //			else configFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
 			configFile = "../../../shared-svn/projects/detailedEval/matsim-input-files/config_1pct_v2_WOModeChoice.xml";
+			congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
+			airPollutionPricing = true;
 
 		}
 
-		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup(), new DecongestionConfigGroup());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -266,6 +270,39 @@ public class CNEMunich {
 		
 		noiseParameters.setWriteOutputIteration(config.controler().getLastIteration() - config.controler().getFirstIteration());
 		
+		// decongestion pricing Munich settings
+	
+		final DecongestionConfigGroup decongestionSettings = (DecongestionConfigGroup) controler.getConfig().getModules().get(DecongestionConfigGroup.GROUP_NAME);
+		
+		if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
+			
+			decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
+			decongestionSettings.setKp(kP);
+			decongestionSettings.setKi(0.);
+			decongestionSettings.setKd(0.);
+			
+			decongestionSettings.setMsa(true);
+			
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+
+		} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
+
+			decongestionSettings.setDecongestionApproach(DecongestionApproach.BangBang);
+			decongestionSettings.setINITIAL_TOLL(0.01);
+			decongestionSettings.setTOLL_ADJUSTMENT(1.0);
+			
+			decongestionSettings.setMsa(false);
+			
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+			
+		} else {
+			// for V3, V9 and V10: no additional settings
+		}
+		
 		// CNE Integration
 		
 		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
@@ -274,7 +311,6 @@ public class CNEMunich {
 		cne.setAirPollutionPricing(airPollutionPricing);
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
-		cne.setkP(kP);
 		cne.setPersonFilter(new MunichPersonFilter());
 
 		cne.setAgentFilter(new AgentFilter() {
@@ -320,7 +356,7 @@ public class CNEMunich {
 		for (int index =firstIt+1; index <lastIt; index ++){
 			String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
 			log.info("Deleting the directory "+dirToDel);
-			IOUtils.deleteDirectory(new File(dirToDel),false);
+			IOUtils.deleteDirectoryRecursively(new File(dirToDel).toPath());
 		}
 
 

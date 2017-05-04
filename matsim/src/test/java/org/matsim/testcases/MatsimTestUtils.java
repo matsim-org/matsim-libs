@@ -184,7 +184,7 @@ public final class MatsimTestUtils extends TestWatchman {
 		if ((!this.outputDirCreated) && (this.outputDirectory != null)) {
 			File directory = new File(this.outputDirectory);
 			if (directory.exists()) {
-				IOUtils.deleteDirectory(directory);
+				IOUtils.deleteDirectoryRecursively(directory.toPath());
 			}
 			this.outputDirCreated = directory.mkdirs();
 			Assert.assertTrue("Could not create the output directory " + this.outputDirectory, this.outputDirCreated);

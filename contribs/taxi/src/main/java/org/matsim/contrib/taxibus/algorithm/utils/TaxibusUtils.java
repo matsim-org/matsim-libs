@@ -31,6 +31,8 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
  */
 public class TaxibusUtils {
 	public static final String TAXIBUS_MODE = "taxibus";
+	public static final String TAXIBUS_EGRESS_WALK_MODE = "taxibus_egress_walk";
+	public static final String TAXIBUS_ACCESS_WALK_MODE = "taxibus_access_walk";
 
 	public static double calcPathCost(ArrayList<VrpPathWithTravelData> newPath) {
 		double cost = 0.0;

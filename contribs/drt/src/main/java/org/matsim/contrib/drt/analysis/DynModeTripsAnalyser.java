@@ -118,7 +118,8 @@ public class DynModeTripsAnalyser {
 			traveltimes.addValue(trip.getInVehicleTravelTime() + trip.getWaitTime());
 		}
 		String value = format.format(waitStats.getValues().length) + delimiter + format.format(waitStats.getMean())
-				+ delimiter + format.format(waitStats.getMax()) + delimiter + format.format(waitStats.getPercentile(95))
+				+ delimiter + format.format(waitStats.getMax()) + delimiter + format.format(waitStats.getPercentile(95)) 
+				+ delimiter+ format.format(waitStats.getPercentile(75))+ delimiter+ format.format(waitStats.getPercentile(50))
 				+ delimiter + format.format(rideStats.getMean()) + delimiter + format.format(distanceStats.getMean())
 				+ delimiter + format.format(traveltimes.getMean());
 		return value;

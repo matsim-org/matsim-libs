@@ -22,10 +22,8 @@ package org.matsim.contrib.signals.model;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,18 +35,17 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether, tthunig
  *
  */
-public class DefaultPlanbasedSignalSystemController implements SignalController {
+public class DefaultPlanbasedSignalSystemController extends AbstractSignalController implements SignalController {
 	
 	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
 	
+	/* an identifier 'PlanbasedSignalControl' would be better analogously to all other identifiers of signal controller
+	 * but renaming would cause to much problems with old signal control input files. theresa jan'17
+	 */
 	public static final String IDENTIFIER = "DefaultPlanbasedSignalSystemController";
 	private LinkedList<SignalPlan> planQueue = null;
-	private Map<Id<SignalPlan>, SignalPlan> plans = null;
-	private SignalSystem signalSystem = null;
 	private SignalPlan activePlan = null;
 	private double nextActivePlanCheckTime;
-	
-	public DefaultPlanbasedSignalSystemController(){}
 	
 	@Override
 	public void updateState(double timeSeconds) {
@@ -68,7 +65,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	private void processOnsetGroupIds(double timeSeconds, List<Id<SignalGroup>> onsetGroupIds) {
 		if (onsetGroupIds != null){
 			for (Id<SignalGroup> id : onsetGroupIds){
-				this.signalSystem.scheduleOnset(timeSeconds, id);
+				this.system.scheduleOnset(timeSeconds, id);
 			}
 		}		
 	}
@@ -76,7 +73,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	private void processDroppingGroupIds(double timeSeconds, List<Id<SignalGroup>> droppingGroupIds){
 		if (droppingGroupIds != null){
 			for (Id<SignalGroup> id : droppingGroupIds){
-				this.signalSystem.scheduleDropping(timeSeconds, id);
+				this.system.scheduleDropping(timeSeconds, id);
 			}
 		}
 	}
@@ -111,7 +108,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 			double mod = diff % (24*3600);
 			if (mod > SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH){
 				// switch off the signals if next plan is starting in more than 5 seconds
-				this.signalSystem.switchOff(now);
+				this.system.switchOff(now);
 			}
 			waitForNextPlanInQueue(now);
 		}
@@ -139,7 +136,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	@Override
 	public void simulationInitialized(double simStartTime) {		
 		// store all plans in a queue, sort them according to their end times and validate them
-		this.planQueue = new LinkedList<SignalPlan>(this.plans.values());
+		this.planQueue = new LinkedList<SignalPlan>(this.signalPlans.values());
 		Collections.sort(planQueue, new SignalPlanEndTimeComparator(simStartTime));
 		validateSignalPlans();
 		
@@ -242,7 +239,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	 */
 	private void checkOverlapping(SignalPlan plan1, SignalPlan plan2) {
 		if (plan1.getStartTime() % (24*3600) == plan1.getEndTime() % (24*3600) || plan2.getStartTime() % (24*3600) == plan2.getEndTime() % (24*3600)){
-			throw new UnsupportedOperationException("Signal system " + signalSystem.getId() + " has multiple plans but at least one of them covers the hole day. "
+			throw new UnsupportedOperationException("Signal system " + system.getId() + " has multiple plans but at least one of them covers the hole day. "
 					+ "If multiple signal plans are used, they are not allowed to overlap.");
 		}
 		
@@ -256,23 +253,8 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		if (plan2.getEndTime() <= plan1.getStartTime())
 			counter++;
 		if (counter < 3) {
-			throw new UnsupportedOperationException("Signal plans " + plan1.getId() + " and " + plan2.getId() + " of signal system " + signalSystem.getId() + " overlap.");
+			throw new UnsupportedOperationException("Signal plans " + plan1.getId() + " and " + plan2.getId() + " of signal system " + system.getId() + " overlap.");
 		}
-	}
-
-	@Override
-	public void addPlan(SignalPlan plan) {
-//		log.error("addPlan to system : " + this.signalSystem.getId());
-		if (this.plans == null){
-			this.plans = new HashMap<>();
-//			this.activePlan = plan;
-		}
-		this.plans.put(plan.getId(), plan);
-	}
-
-	@Override
-	public void setSignalSystem(SignalSystem system) {
-		this.signalSystem = system;
 	}
 
 	@Override

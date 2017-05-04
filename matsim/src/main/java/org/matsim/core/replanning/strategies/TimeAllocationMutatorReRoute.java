@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.strategies;
 
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
@@ -42,13 +43,13 @@ public class TimeAllocationMutatorReRoute implements Provider<PlanStrategy> {
 	@Inject private TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
 	@Inject private PlansConfigGroup plansConfigGroup;
 	@Inject private ActivityFacilities activityFacilities;
-
+	@Inject private Population population;
+	
     @Override
 	public PlanStrategy get() {
 		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule( new TimeAllocationMutator(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup) );
-		strategy.addStrategyModule( new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
+		strategy.addStrategyModule(new TimeAllocationMutator(this.tripRouterProvider, this.plansConfigGroup, this.timeAllocationMutatorConfigGroup, this.globalConfigGroup, this.population));
+		strategy.addStrategyModule(new ReRoute(this.activityFacilities, this.tripRouterProvider, this.globalConfigGroup));
 		return strategy;
 	}
 }
-

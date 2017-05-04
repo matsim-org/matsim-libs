@@ -8,8 +8,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
-import playground.dgrether.DgPaths;
-
 /**
  * @author tthunig
  * @deprecated
@@ -28,16 +26,11 @@ public class TtAnalyseComTravelTimesAndRoutes {
 		 // 2023 = bb 5000, no time choice, opt50 signals with person ids of newer cplex opt
 		runNumber = 2023;
 	    int iteration = 1400;
-		String eventFile = DgPaths.RUNSSVN + 
-				"run"+runNumber+"/ITERS/it."+iteration+"/"+runNumber+"."+iteration+".events.xml.gz";
-		String networkFile = DgPaths.RUNSSVN + 
-				"run"+runNumber+"/"+runNumber+".output_network.xml.gz";
-		String plansFile = DgPaths.RUNSSVN + 
-				"run"+runNumber+"/"+runNumber+".output_plans.xml.gz";
-		String xmlOutputFile = DgPaths.RUNSSVN + 
-	    		"run"+runNumber+"/"+runNumber+"."+iteration+".comodityTravelTimes.xml";
-		String shpOutputFile = DgPaths.RUNSSVN + 
-	    		"run"+runNumber+"/"+runNumber+"."+iteration+".comodityRoutes.shp";
+		String eventFile = "../../../runs-svn/run"+runNumber+"/ITERS/it."+iteration+"/"+runNumber+"."+iteration+".events.xml.gz";
+		String networkFile = "../../../runs-svn/run"+runNumber+"/"+runNumber+".output_network.xml.gz";
+		String plansFile = "../../../runs-svn/run"+runNumber+"/"+runNumber+".output_plans.xml.gz";
+		String xmlOutputFile = "../../../runs-svn/run"+runNumber+"/"+runNumber+"."+iteration+".comodityTravelTimes.xml";
+		String shpOutputFile = "../../../runs-svn/run"+runNumber+"/"+runNumber+"."+iteration+".comodityRoutes.shp";
 				
 	    		
 	    EventsManager eventsManager = EventsUtils.createEventsManager();

@@ -38,13 +38,13 @@ public class IT {
 	public void test() {
 		final String pathname = "./output/example";
 		try{
-		IOUtils.deleteDirectory(new File(pathname),false);
+			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
 		}
 		catch (IllegalArgumentException e){
 			
 		}
 		RunLeastCostPathCalculatorExample.main(null);
-		IOUtils.deleteDirectory(new File(pathname),false);
+		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
 
 	}
 

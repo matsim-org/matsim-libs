@@ -177,10 +177,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	public double[] getVolumesPerHourForLink(final Id<Link> linkId) {
 		if (3600.0 % this.timeBinSize != 0) log.error("Volumes per hour and per link probably not correct!");
 		
-		double [] volumes = new double[24];
-		for (int hour = 0; hour < 24; hour++) {
-			volumes[hour] = 0.0;
-		}
+		double[] volumes = new double[24];
 		
 		int[] volumesForLink = this.getVolumesForLink(linkId);
 		if (volumesForLink == null) return volumes;

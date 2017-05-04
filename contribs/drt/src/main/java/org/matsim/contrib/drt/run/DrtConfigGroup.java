@@ -50,7 +50,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private static final String TRANSIT_STOP_FILE = "transitStopFile";
 	private static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
 	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
-
+	private static final String PRINT_WARNINGS = "plotDetailedWarnings";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 
 	private double stopDuration = Double.NaN;// seconds
@@ -77,7 +77,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
-
+	private boolean printDetailedWarnings = false;
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	public enum OperationalScheme {
@@ -87,6 +87,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
 	}
+
 
 	@Override
 	public Map<String, String> getComments() {
@@ -113,7 +114,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS,
 				"Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()");
 		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased. door2door by default");
-		map.put(MAX_WALK_DISTANCE, "Maximum walk distance to next stop location in stationbased system.");
+		map.put(MAX_WALK_DISTANCE, "Maximum walk distance (in meters) to next stop location in stationbased system.");
 		map.put(TRANSIT_STOP_FILE, "Stop locations file (transit schedule format, but without lines) for DRT stops. "
 				+ "Used only for the stationbased mode");
 		map.put(ESTIMATED_DRT_SPEED, "Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
@@ -123,6 +124,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(NUMBER_OF_THREADS,
 				"Number of threads used for parallel evaluation of request insertion into existing schedules. "
 						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
+		map.put(PRINT_WARNINGS, "Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
 		return map;
 	}
 
@@ -283,5 +285,15 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(NUMBER_OF_THREADS)
 	public void setNumberOfThreads(final int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
+	}
+
+	@StringGetter(PRINT_WARNINGS)
+	public boolean isPrintDetailedWarnings() {
+		return printDetailedWarnings;
+	}
+
+	@StringSetter(PRINT_WARNINGS)
+	public void setPrintDetailedWarnings(boolean printDetailedWarnings) {
+		this.printDetailedWarnings = printDetailedWarnings;
 	}
 }

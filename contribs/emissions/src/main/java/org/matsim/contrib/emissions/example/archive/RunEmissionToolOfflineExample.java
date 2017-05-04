@@ -36,7 +36,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * 
  * Use the config file as created by the 
  * {@link org.matsim.contrib.emissions.example.CreateEmissionConfig CreateEmissionConfig} to calculate 
- * emissions based on the link leave events of an events file. Results are written into an emission event file. 
+ * emissions based on the link leave events of an events file. Results are written into an emission event file.
+ * Archived: Nov'16
  *
  * @author benjamin, julia
  */

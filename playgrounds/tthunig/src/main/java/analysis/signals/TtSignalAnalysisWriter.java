@@ -98,7 +98,7 @@ public class TtSignalAnalysisWriter {
 		
 		// collect results of this iteration
 		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = handler.getTotalSignalGreenTime();
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimes = handler.calculateAvgSignalGreenTimePerCycle();
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimes = handler.calculateAvgSignalGreenTimePerFlexibleCycle();
 		
 		// add line with results to overallItWritingStreams
 		StringBuffer lineTotalTime = new StringBuffer();

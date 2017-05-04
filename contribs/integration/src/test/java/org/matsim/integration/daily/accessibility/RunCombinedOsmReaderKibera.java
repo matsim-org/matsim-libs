@@ -56,10 +56,10 @@ public class RunCombinedOsmReaderKibera {
 	 * works in metres.
 	 */
 	public static void main(String[] args) {
-		String osmFile = "../../../shared-svn/projects/maxess/data/kibera/osm/2016-12-18_kibera.osm";
-		String outputBase = "../../../shared-svn/projects/maxess/data/kibera/facilities/2016-12-18/";
-		String facilityFile = outputBase + "2016-12-18_facilities.xml";
-		String attributeFile = outputBase + "2016-12-18_facilitiy_attributes.xml";
+		String osmFile = "../../../shared-svn/projects/maxess/data/nairobi/osm/2017-04-25_nairobi_central_and_kibera";
+		String outputBase = "../../../shared-svn/projects/maxess/data/nairobi/facilities/2017-04-25_nairobi_central_and_kibera/";
+		String facilityFile = outputBase + "2017-04-25_facilities.xml";
+		String attributeFile = outputBase + "2017-04-25_facilitiy_attributes.xml";
 		
 //		String outputCRS = "EPSG:31468"; // = DHDN GK4, for Berlin
 		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya

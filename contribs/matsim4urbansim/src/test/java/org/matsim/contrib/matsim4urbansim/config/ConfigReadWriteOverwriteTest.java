@@ -23,8 +23,10 @@
 package org.matsim.contrib.matsim4urbansim.config;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +51,6 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -193,9 +194,14 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		M4UConfigurationConverterV4 converter = null;
 
 		String path = utils.getOutputDirectory() + "/tmp" ;
-		IOUtils.createDirectory(path) ;
+        File result;
+        try {
+            result = Files.createDirectories(java.nio.file.Paths.get(path)).toFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-		log.info("Creating a matsim4urbansim config file and writing it on hard disk");
+        log.info("Creating a matsim4urbansim config file and writing it on hard disk");
 
 		// this creates an external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
 		CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestM4UConfig.COLD_START, path);

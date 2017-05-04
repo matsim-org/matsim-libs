@@ -3,14 +3,15 @@ package org.matsim.contrib.matsim4urbansim.run;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 
 
@@ -96,9 +97,13 @@ import org.matsim.facilities.ActivityFacility;
 
 			// copy the zones file to the outputfolder...
 			log.info("Copying " + matsim4opusTempDirectory + FILE_NAME + " to " + matsimOutputDirectory + FILE_NAME);
-			IOUtils.copyFile(new File( matsim4opusTempDirectory + FILE_NAME),	new File( matsimOutputDirectory + FILE_NAME));
+            try {
+                Files.copy(new File( matsim4opusTempDirectory + FILE_NAME).toPath(), new File( matsimOutputDirectory + FILE_NAME).toPath());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
 
-			log.info("... done!");
+            log.info("... done!");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("io did not work") ;

@@ -87,10 +87,7 @@ public class RunResultsLoader {
 	}
 
 	private Network loadNetwork(String path) {
-		//Why we have to do all this, we simply want to read a file
-		Config c = ConfigUtils.createConfig(); 
-		c.network().setInputFile(path);
-		Scenario sc = ScenarioUtils.createScenario(c);
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
 		nr.readFile(path);
 		return sc.getNetwork();
@@ -105,10 +102,7 @@ public class RunResultsLoader {
 	}
 
 	private Population loadPopulation(String path) {
-		//Why we have to do all this, we simply want to read a file
-		Config c = ConfigUtils.createConfig(); 
-		c.plans().setInputFile(path);
-		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(c) ;
+		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(ConfigUtils.createConfig()) ;
 		builder.setNetwork(this.network) ;
 		Scenario sc = builder.build() ;
 		PopulationReader pr= new PopulationReader(sc);

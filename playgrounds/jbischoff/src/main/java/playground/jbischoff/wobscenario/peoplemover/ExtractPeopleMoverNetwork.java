@@ -50,7 +50,10 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class ExtractPeopleMoverNetwork {
 
 	private final static double northernLimit =  52.5585399;
-	private final static double southernLimit =  52.3110258;
+//	private final static double southernLimit =  52.3110258;
+	
+	//as per may 3
+	private final static double southernLimit =  52.2345;
 	private final static double easternLimit =  10.9617273;
 	private final static double westernLimit =  10.606989;
 	private final static double minFreeSpeed =  8.0;
@@ -73,9 +76,9 @@ public class ExtractPeopleMoverNetwork {
 	 * 
 	 */
 	public void run() {
-		String inputNetworkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-feb.xml";
-		String outputNetworkFileAV = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av-only.xml";
-		String outputNetworkFile  = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av.xml";
+		String inputNetworkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av-mar17.xml";
+		String outputNetworkFileAV = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-avonly-may17.xml";
+		String outputNetworkFile  = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av-may17.xml";
 		topLeft = ct.transform(new Coord(westernLimit,northernLimit));
 		bottomRight = ct.transform(new Coord(easternLimit,southernLimit));
 		preparePositiveList();

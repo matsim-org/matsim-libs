@@ -14,8 +14,8 @@ public class IT {
     @Test
 	public final void testMain() {
 	    try {
-		    IOUtils.deleteDirectory( new File( RunEventsHandlingWithControlerExample.outputDirectory ) );
-	    } catch ( Exception ee ) {
+			IOUtils.deleteDirectoryRecursively(new File( RunEventsHandlingWithControlerExample.outputDirectory ).toPath());
+		} catch ( Exception ee ) {
 		    // deletion may fail; is ok.
 	    }
 		try {
@@ -24,7 +24,7 @@ public class IT {
 			ee.printStackTrace();
 			fail( "Got an exception while running eventHandler example: "+ee ) ;
 		}
-		IOUtils.deleteDirectory( new File( RunEventsHandlingWithControlerExample.outputDirectory ) );
+		IOUtils.deleteDirectoryRecursively(new File( RunEventsHandlingWithControlerExample.outputDirectory ).toPath());
 		// if this fails, then it is a test failure (since the directory should have been constructed)
 	}
 

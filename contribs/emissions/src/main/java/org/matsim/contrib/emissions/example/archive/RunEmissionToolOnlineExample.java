@@ -36,7 +36,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * Results are written into distinct xml-files including emission event files for some iterations (as specified by the config). 
  * <p></p>
  * See <a href="{@docRoot}/src-html/org/matsim/contrib/emissions/example/RunEmissionToolOnlineExample.html#line.39">here</a> for the listing.
-
+ *
+ * Archived: Nov'16
  *
  * @author benjamin, julia
  */

@@ -96,6 +96,9 @@ class ResultsWriter {
 		header.append(separator);
 		header.append("average travel time");
 		header.append(separator);
+		
+		header.append("number of stucked/aborted agents");
+		header.append(separator);
 
 		return header.toString();
 	}
@@ -154,6 +157,9 @@ class ResultsWriter {
 		out.append(formatDouble(r.personsDelta));
 		out.append(separator);
 		out.append(formatDouble(r.averageTravelTime));
+		out.append(separator);
+		
+		out.append(formatDouble(r.noStuckedVeh));
 		out.append(separator);
 
 		return out.toString();

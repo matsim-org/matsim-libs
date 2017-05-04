@@ -22,14 +22,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.core.utils.io.IOUtils;
-
-import tutorial.config.RunFromConfigfileExample;
 
 /**
  * @author nagel
@@ -74,13 +71,13 @@ public class ExamplesByConfigfileIT {
 	@Test
 	public final void testMain() {
 		try {
-			IOUtils.deleteDirectory(new File("./output/example"),false);
+			IOUtils.deleteDirectoryRecursively(new File("./output/example").toPath());
 		} catch ( IllegalArgumentException ee ) {
 			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
 			// and did not remove the directory afterwards.)
 		}
 		RunFromConfigfileExample.main(new String[]{configFile});
-		IOUtils.deleteDirectory(new File("./output/example"),false);
+		IOUtils.deleteDirectoryRecursively(new File("./output/example").toPath());
 		// (here, the directory should be there)
 	}
 

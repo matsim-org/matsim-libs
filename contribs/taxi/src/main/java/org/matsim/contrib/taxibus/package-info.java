@@ -2,6 +2,6 @@
  * 
  */
 /**
- * Generalisable DRT Tasks for taxi-like services with more than one passenger.
+ * The taxibus package provides pre-booked shuttle services
  */
 package org.matsim.contrib.taxibus;

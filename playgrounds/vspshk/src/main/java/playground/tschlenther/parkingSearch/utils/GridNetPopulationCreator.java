@@ -23,11 +23,11 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 public class GridNetPopulationCreator {
 
-//	private final static String pathToZoneOne = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Links_Activities.txt";
-//	private final static String pathToZoneTwo = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Rechts_Activities.txt";
+	private final static String pathToZoneOne = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Links_Activities.txt";
+	private final static String pathToZoneTwo = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Rechts_Activities.txt";
 	
-	private final static String pathToZoneOne = "C:/Users/Work/Bachelor Arbeit/input/Berlin/Klausener.txt";
-	private final static String pathToZoneTwo = "C:/Users/Work/Bachelor Arbeit/input/Berlin/Mierendorff.txt";
+//	private final static String pathToZoneOne = "C:/Users/Work/Bachelor Arbeit/input/Berlin/Klausener.txt";
+//	private final static String pathToZoneTwo = "C:/Users/Work/Bachelor Arbeit/input/Berlin/Mierendorff.txt";
 	
 	public static void main(String[] args){
 		int nrOfAgentsPerZone = 60;
@@ -51,7 +51,7 @@ public class GridNetPopulationCreator {
 			linkerPlan.addLeg(fac.createLeg("car"));
 			
 			Activity workAct = fac.createActivityFromLinkId("work", linksOfZoneTwo.get(rand.nextInt(linksOfZoneTwo.size())));
-			workAct.setEndTime(11*3600 + (i * 3600 / nrOfAgentsPerZone));
+			workAct.setEndTime(9.30*3600 + (i * 3600 / nrOfAgentsPerZone));
 			linkerPlan.addActivity(workAct);
 			
 			linkerPlan.addLeg(fac.createLeg("car"));
@@ -72,7 +72,7 @@ public class GridNetPopulationCreator {
 			rechterPlan.addLeg(fac.createLeg("car"));
 			
 			Activity workActRechts = fac.createActivityFromLinkId("work", linksOfZoneOne.get(rand.nextInt(linksOfZoneOne.size()))); 
-			workActRechts.setEndTime(11*3600 + (i * 3600 / nrOfAgentsPerZone));
+			workActRechts.setEndTime(9.30*3600 + (i * 3600 / nrOfAgentsPerZone));
 			rechterPlan.addActivity(workActRechts);
 			
 			rechterPlan.addLeg(fac.createLeg("car"));
@@ -84,7 +84,7 @@ public class GridNetPopulationCreator {
 			population.addPerson(linkerAgent);			
 		}
 		
-		new PopulationWriter(population).write("C:/Users/Work/Bachelor Arbeit/input/Berlin/population_Test_60.xml");
+		new PopulationWriter(population).write("C:/Users/Work/Bachelor Arbeit/input/GridNet/population_60_8h_9.30h.xml");
 	}
 
 	private static List<Id<Link>> getLinkIDsOfZone (String pathToZoneFile){

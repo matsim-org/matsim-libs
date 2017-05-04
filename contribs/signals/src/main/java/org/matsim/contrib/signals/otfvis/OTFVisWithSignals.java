@@ -22,38 +22,64 @@
 
 package org.matsim.contrib.signals.otfvis;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.lanes.data.Lanes;
-import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vis.otfvis.*;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.util.Types;
+
 public class OTFVisWithSignals {
 
-	public static void playScenario(Scenario scenario){
-		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
-		if ((boolean) ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
-			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
-			qSim.addQueueSimulationListeners(engine);
+	public static void playScenario(final Scenario scenario){
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				// defaults
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
+				// signal specific module
+				install(new SignalsModule());
+			}
+		});
+	
+		EventsManager events = injector.getInstance(EventsManager.class);
+		events.initProcessing();
+		
+		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
+		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
+		for (Provider<MobsimListener> provider : mobsimListeners) {
+			qSim.addQueueSimulationListeners(provider.get());
 		}
 
 		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);

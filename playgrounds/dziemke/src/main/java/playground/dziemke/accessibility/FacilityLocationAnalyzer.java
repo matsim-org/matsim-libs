@@ -25,10 +25,11 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public class FacilityLocationAnalyzer {
 	// Input file and output directory
-	private static String inputOutputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/";
+//	private static String inputOutputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/secondary/";
+	private static String inputOutputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/facilities/2017-04-25_nairobi_central_and_kibera/";
 	
-	private static String facilitiesFile = inputOutputDirectory + "facilities.xml";
-	private static String outputFileName = inputOutputDirectory + "facilities.shp";
+	private static String facilitiesFile = inputOutputDirectory + "2017-04-25_facilities.xml";
+	private static String outputFileName = inputOutputDirectory + "2017-04-25_facilities.shp";
 	
 	// Parameters
 //	private static String[] attributeLabel = {"FacilityId", "Type", "Name"};

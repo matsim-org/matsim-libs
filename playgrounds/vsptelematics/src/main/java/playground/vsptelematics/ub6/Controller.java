@@ -24,10 +24,18 @@
 package playground.vsptelematics.ub6;
 
 
+import java.io.File;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
+
 import playground.vsptelematics.common.IncidentGenerator;
+import playground.vsptelematics.common.TelematicsConfigGroup;
 
 /**
  * @author illenberger
@@ -40,7 +48,14 @@ public class Controller {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Controler c = new Controler(args);
+		Config config = ConfigUtils.loadConfig( args[0]) ;
+		TelematicsConfigGroup telematicsConfigGroup = ConfigUtils.addOrGetModule(config,
+				TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		Controler c = new Controler(scenario);
+		
+		System.out.println((new File("blub.txt")).getAbsolutePath()); // /Users/gleich/git/matsim/playgrounds/vsptelematics/blub.txt
+
 		c.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		c.getConfig().controler().setCreateGraphs(false);
@@ -58,7 +73,7 @@ public class Controller {
 					addControlerListenerBinding().to(Scorer.class);
 				}
 				if (getConfig().network().isTimeVariantNetwork()) {
-					addControlerListenerBinding().to(IncidentGenerator.class);
+					addControlerListenerBinding().to(IncidentGenerator.class); // incidents.xml is not found probably because no absolute path is set and the relative path points into the wrong directory
 				}
 
 			}

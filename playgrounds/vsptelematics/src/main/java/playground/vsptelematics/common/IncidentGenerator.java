@@ -21,6 +21,8 @@ package playground.vsptelematics.common;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -38,7 +40,9 @@ public class IncidentGenerator implements BeforeMobsimListener {
 	@Inject
 	IncidentGenerator(Config config, Network network) {
 		IncidentsReader reader = new IncidentsReader(network);
-		changeEvents = reader.read(config.getParam("telematics", "incidentsFile"));
+		TelematicsConfigGroup telematicsConfigGroup = ConfigUtils.addOrGetModule(config,
+				TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
+		changeEvents = reader.read(ConfigGroup.getInputFileURL(config.getContext(), telematicsConfigGroup.getIncidentsFile()).getFile());
 	}
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
