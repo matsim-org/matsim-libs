@@ -60,7 +60,7 @@ public class RunCombinedOsmReaderCottbus {
 				
 
 		String osmFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-03.osm";
-		String outputBase = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-03_facilities/";
+		String outputBase = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-03_facilities_2/";
 		
 		String facilityFile = "berlin-2017-05-03_facilities_DHDN_GK4.xml";
 		String attributeFile = "berlin-2017-05-03_facilities_amenities_DHDN_GK4.xml";
