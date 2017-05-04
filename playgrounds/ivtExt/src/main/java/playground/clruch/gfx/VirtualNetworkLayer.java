@@ -32,7 +32,16 @@ public class VirtualNetworkLayer extends ViewerLayer {
     private boolean drawVNodes = true;
     private boolean drawVLinks = true;
     VirtualNodeGeometry virtualNodeGeometry = null;
-    private VirtualNodeShader virtualNodeShader = VirtualNodeShader.CarCount;
+    private VirtualNodeShader virtualNodeShader = VirtualNodeShader.VehicleCount;
+
+    // TODO make this functionality part of tensor library
+    public static Tensor normalize1Norm(Tensor count) {
+        Tensor prob = count; // SoftmaxLayer.of(count);
+        Scalar max = prob.flatten(0).reduce(Max::of).get().Get();
+        if (!max.equals(ZeroScalar.get()))
+            prob = prob.multiply(RealScalar.of(224).divide(max));
+        return prob;
+    }
 
     public VirtualNetworkLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
@@ -65,16 +74,20 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet())
                     graphics.fill(entry.getValue());
                 break;
-            case CarCount: {
-                Tensor count = new CarCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
-                Tensor prob = count; // SoftmaxLayer.of(count);
-                Scalar max = prob.flatten(0).reduce(Max::of).get().Get();
-                if (!max.equals(ZeroScalar.get()))
-                    prob = prob.multiply(RealScalar.of(224).divide(max));
-                // System.out.println(prob);
+            case VehicleCount: {
+                Tensor count = new VehicleCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
+                Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
-                    int index = entry.getKey().index;
-                    graphics.setColor(new Color(128, 128, 128, prob.Get(index).number().intValue()));
+                    graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
+                    graphics.fill(entry.getValue());
+                }
+                break;
+            }
+            case RequestCount: {
+                Tensor count = new RequestCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
+                Tensor prob = normalize1Norm(count);
+                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                    graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
                     graphics.fill(entry.getValue());
                 }
                 break;

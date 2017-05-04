@@ -14,11 +14,11 @@ import playground.clruch.netdata.VirtualNode;
 /**
  * count vehicles
  */
-class CarCountVirtualNodeFunction {
+class VehicleCountVirtualNodeFunction {
     final MatsimStaticDatabase db;
     final VirtualNetwork virtualNetwork;
 
-    public CarCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
+    public VehicleCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
         this.db = db;
         this.virtualNetwork = virtualNetwork;
     }
