@@ -244,20 +244,7 @@ public class CNEIntegration {
 
 		// ########################## Air pollution ##########################
 
-		EmissionResponsibilityCostModule emissionCostModule = null;
-
 		if (analyzeAirPollution) {
-
-			final double emissionEfficiencyFactor = 1.0;
-			final boolean considerCO2Costs = true;
-			final double emissionCostFactor = 1.0;
-
-			/* TODO : since these params are in config now, plz check if the settings are same in the  output config.
-			 If these values are overridden by config file, we need to add them to config. Amit Mar'17 */
-			EmissionsConfigGroup emissionsConfigGroup = ((EmissionsConfigGroup) this.controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME));
-			emissionsConfigGroup.setConsideringCO2Costs(considerCO2Costs);
-			emissionsConfigGroup.setEmissionCostMultiplicationFactor(emissionCostFactor);
-			emissionsConfigGroup.setEmissionEfficiencyFactor(emissionEfficiencyFactor);
 
 			if (airPollutionPricing) {
 				controler.addOverridingModule(new AbstractModule() {
@@ -278,10 +265,6 @@ public class CNEIntegration {
 						bind(GridTools.class).toInstance(gridTools);
 						bind(ResponsibilityGridTools.class).toInstance(responsibilityGridTools);
 						bind(EmissionResponsibilityCostModule.class).asEagerSingleton();
-
-						// if EmissionModule is binded (necessary step), EmissionControlerListener is not required.
-						// It's sole purpose was to write the emission events if emission costs are not internalized. Amit Apr'17
-//						addControlerListenerBinding().to(EmissionControlerListener.class); // just to write the emission events
 
 						if(personFilter!=null) bind(PersonFilter.class).toInstance(personFilter);
 						bind(ExperiencedEmissionCostHandler.class);
