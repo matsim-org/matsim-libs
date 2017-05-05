@@ -154,9 +154,6 @@ public class CNEMunich {
 			controler.getScenario().getConfig().controler().setOutputDirectory(outputDirectory);
 		}
 		
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
-		
 		// scenario-specific settings
 		
 		controler.addOverridingModule(new OTFVisFileWriterModule());
@@ -302,6 +299,14 @@ public class CNEMunich {
 		} else {
 			// for V3, V9 and V10: no additional settings
 		}
+
+		// air pollution Munich settings
+		
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		
+		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+		emissionsConfigGroup.setConsideringCO2Costs(true);
 		
 		// CNE Integration
 		
