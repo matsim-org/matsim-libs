@@ -36,7 +36,7 @@ public class DecongestionConfigGroup extends ReflectiveConfigGroup {
 
 	// BangBang approach
 	private double INITIAL_TOLL = 10.0;
-	private double TOLL_ADJUSTMENT = 1.0; // default: 0.1
+	private double TOLL_ADJUSTMENT = 1.0;
 
 	// PID approach
 	private double Kp = 1.0;
