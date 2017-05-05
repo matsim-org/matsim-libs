@@ -63,6 +63,10 @@ class PrepareForSimImpl implements PrepareForSim {
 			net = network;
 		}
 
+		// vehicles should be created before a route is created. Amit May'17
+
+
+
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(population, globalConfigGroup.getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
