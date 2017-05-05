@@ -10,9 +10,11 @@
 package playground.clruch.dispatcher;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -262,9 +264,13 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             final File virtualnetworkDir = new File(config.getParams().get(KEY_VIRTUALNETWORKDIRECTORY));
             GlobalAssert.that(virtualnetworkDir.isDirectory());
             {
-                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
+                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork");
                 GlobalAssert.that(virtualnetworkFile.isFile());
-                virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
+                try {
+                    virtualNetwork = VirtualNetworkIO.fromByte(network, virtualnetworkFile);
+                } catch (ClassNotFoundException | DataFormatException | IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             ArrivalInformation arrivalInformationIn = null;

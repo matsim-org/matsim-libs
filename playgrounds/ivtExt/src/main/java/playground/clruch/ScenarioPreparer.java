@@ -27,21 +27,31 @@ import playground.clruch.utils.GlobalAssert;
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
+        
+        // INPUT ARGUMENT: path to a config.xml file which contains references to the original xml files (population.xml)
+        // if the xml file with the converted files is supplied, no changes are implemented by the ScenarioPreparer. 
+        System.out.println("converting simulation data files from " + args[0]);
+
 
         // BEGIN: CUSTOMIZE ----------------------------------------------- 
         // set manually depending on the scenario:
         final int maxPopulationSize = 142381;
         final int numVirtualNodes = 40;
 
+        
         // cutting of scenario to circle
         // increasing the first value goes right        
         // increasing the second value goes north
         // Zurich
-        final Coord center = new Coord(2683600.0, 1251400.0);
-        final double radius = 10000; // (set to -1 for no cutting)
+        // final Coord center = new Coord(2683600.0, 1251400.0);
+        // final double radius = 10000; // (set to -1 for no cutting)
         // Basel
-        //final Coord center = new Coord(2612859.0,1266343.0);
-        //final double radius = 12000; // (set to -1 for no cutting)
+        // final Coord center = new Coord(2612859.0,1266343.0);
+        // final double radius = 12000; // (set to -1 for no cutting)
+        // Sioux
+        final Coord center = new Coord(678365.311581,4827050.237694);
+        final double radius = 4000;
+
         final boolean populationeliminateFreight = true;
         final boolean populationchangeModeToAV = true;
         final boolean populationeliminateWalking = true;
@@ -122,5 +132,8 @@ public class ScenarioPreparer {
         VirtualNetworkIO.toByte(new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME), virtualNetwork);
         VirtualNetworkIO.toXML(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME+".xml", virtualNetwork);
         System.out.println("saved virtual network byte format to : "+ new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME));
+        
+        System.out.println("successfully converted simulation data files from " + args[0]);
     }
 }
+
