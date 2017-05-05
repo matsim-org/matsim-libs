@@ -92,6 +92,15 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 }
                 break;
             }
+            case MeanRequestDistance: {
+                Tensor count = new MeanRequestDistanceVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
+                Tensor prob = normalize1Norm(count);
+                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                    graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
+                    graphics.fill(entry.getValue());
+                }
+                break;
+            }
             default:
                 break;
             }

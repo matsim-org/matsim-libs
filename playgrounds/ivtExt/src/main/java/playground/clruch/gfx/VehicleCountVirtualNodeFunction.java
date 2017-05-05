@@ -14,16 +14,13 @@ import playground.clruch.netdata.VirtualNode;
 /**
  * count vehicles
  */
-class VehicleCountVirtualNodeFunction {
-    final MatsimStaticDatabase db;
-    final VirtualNetwork virtualNetwork;
-
+class VehicleCountVirtualNodeFunction extends AbstractVirtualNodeFunction {
     public VehicleCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
-        this.db = db;
-        this.virtualNetwork = virtualNetwork;
+        super(db, virtualNetwork);
     }
 
-    Tensor evaluate(SimulationObject ref) {
+    @Override
+    public Tensor evaluate(SimulationObject ref) {
         Tensor count = Array.zeros(virtualNetwork.getvNodesCount());
         for (VehicleContainer vc : ref.vehicles) {
             int linkIndex = vc.linkIndex;

@@ -12,18 +12,15 @@ import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 
 /**
- * count vehicles
+ * count requests
  */
-class RequestCountVirtualNodeFunction {
-    final MatsimStaticDatabase db;
-    final VirtualNetwork virtualNetwork;
-
+class RequestCountVirtualNodeFunction extends AbstractVirtualNodeFunction {
     public RequestCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
-        this.db = db;
-        this.virtualNetwork = virtualNetwork;
+        super(db, virtualNetwork);
     }
 
-    Tensor evaluate(SimulationObject ref) {
+    @Override
+    public Tensor evaluate(SimulationObject ref) {
         Tensor count = Array.zeros(virtualNetwork.getvNodesCount());
         for (RequestContainer rc : ref.requests) {
             int linkIndex = rc.fromLinkIndex;
