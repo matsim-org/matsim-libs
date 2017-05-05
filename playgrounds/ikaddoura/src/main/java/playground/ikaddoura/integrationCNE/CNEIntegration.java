@@ -43,6 +43,7 @@ import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
+import playground.ikaddoura.decongestion.DecongestionModule;
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
 import playground.ikaddoura.decongestion.handler.DelayAnalysis;
 import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
@@ -212,29 +213,8 @@ public class CNEIntegration {
 				controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandlerQBP, new CongestionHandlerImplV9(controler.getEvents(), controler.getScenario())));
 				
 			} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString()) ||
-					congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
-											
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						
-						this.bind(DecongestionInfo.class).asEagerSingleton();
-						
-						this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);
-						this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAll.class);
-
-						this.bind(IntervalBasedTollingAll.class).asEagerSingleton();
-						this.bind(DelayAnalysis.class).asEagerSingleton();
-						this.bind(PersonVehicleTracker.class).asEagerSingleton();
-										
-						this.addEventHandlerBinding().to(IntervalBasedTollingAll.class);
-						this.addEventHandlerBinding().to(DelayAnalysis.class);
-						this.addEventHandlerBinding().to(PersonVehicleTracker.class);
-						
-						this.addControlerListenerBinding().to(DecongestionControlerListener.class);
-
-					}
-				});
+					congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {					
+				controler.addOverridingModule(new DecongestionModule(controler.getScenario()));
 				
 			} else {
 				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
