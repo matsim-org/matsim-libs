@@ -42,10 +42,10 @@ public class MatsimMapComponent extends JMapViewer {
         virtualNetworkLayer = new VirtualNetworkLayer(this);
 
         addLayer(new TilesLayer(this));
+        addLayer(virtualNetworkLayer);
         addLayer(new VehiclesLayer(this));
         addLayer(new RequestsLayer(this));
         addLayer(new LinkLayer(this));
-        addLayer(virtualNetworkLayer);
         addLayer(new HudLayer(this));
 
     }

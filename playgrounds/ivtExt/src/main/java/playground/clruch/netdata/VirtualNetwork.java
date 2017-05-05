@@ -71,7 +71,6 @@ public class VirtualNetwork implements Serializable {
             System.out.println("link: " + link.getId().toString());
             System.out.println("virtualNode not found ");
         }
-
         return linkVNodeMap.get(link);
     }
 
@@ -80,29 +79,24 @@ public class VirtualNetwork implements Serializable {
      * @return the virtualLink belonging to a certain index.
      */
     public final VirtualLink getVirtualLink(int index) {
-        // return this.getVirtualLinks().stream().filter(v -> v.getIndex() ==
-        // index).findAny().get();
         return virtualLinks.get(index);
     }
 
     public final VirtualNode getVirtualNode(int index) {
-        // return this.getVirtualNodes().stream().filter(v->v.getIndex() == index).findAny().get();
         return virtualNodes.get(index);
     }
 
     /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn, int neighCount, Coord coord) {
         VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount, coord);
+        return addVirtualNode(virtualNode);
+    }
+
+    /* package */ VirtualNode addVirtualNode(VirtualNode virtualNode) {
+        GlobalAssert.that(virtualNodes.size() == virtualNode.index); // <- NEVER remove this check
         virtualNodes.add(virtualNode);
         for (Link link : virtualNode.getLinks())
             linkVNodeMap.put(link, virtualNode);
         return virtualNode;
-    }
-
-    /* package */ VirtualNode addVirtualNode(VirtualNode virtualNodeIn) {
-        virtualNodes.add(virtualNodeIn);
-        for (Link link : virtualNodeIn.getLinks())
-            linkVNodeMap.put(link, virtualNodeIn);
-        return virtualNodeIn;
     }
 
     /* package */ void addVirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn, double travelTime) {
