@@ -79,22 +79,15 @@ public class VirtualNetwork implements Serializable {
      * @return the virtualLink belonging to a certain index.
      */
     public final VirtualLink getVirtualLink(int index) {
-        // return this.getVirtualLinks().stream().filter(v -> v.getIndex() ==
-        // index).findAny().get();
         return virtualLinks.get(index);
     }
 
     public final VirtualNode getVirtualNode(int index) {
-        // return this.getVirtualNodes().stream().filter(v->v.getIndex() == index).findAny().get();
         return virtualNodes.get(index);
     }
 
     /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn, int neighCount, Coord coord) {
         VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount, coord);
-        // virtualNodes.add(virtualNode);
-        // for (Link link : virtualNode.getLinks())
-        // linkVNodeMap.put(link, virtualNode);
-        // return virtualNode;
         return addVirtualNode(virtualNode);
     }
 

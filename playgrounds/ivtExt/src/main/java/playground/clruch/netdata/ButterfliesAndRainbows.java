@@ -14,6 +14,11 @@ import org.matsim.api.core.v01.network.Node;
 
 /**
  * class helps to detect adjacency between VirtualNodes based on shared Nodes in the network
+ * 
+ * two VirtualNodes form a VirtualLink if there is a matsim::Node that is contained by both VirtualNodes
+ * 
+ * a matsim::Node is contained in a VirtualNode in case there is a Link in the linkSet of the VirtualNode
+ * that has given node as fromLink or as toLink.
  */
 class ButterfliesAndRainbows {
     private Map<Node, Set<VirtualNode>> map = new HashMap<>();
