@@ -30,17 +30,17 @@ public class ScenarioPreparer {
         // BEGIN: CUSTOMIZE ----------------------------------------------- 
         // set manually depending on the scenario:
         final int maxPopulationSize = 142381;
-        final int numVirtualNodes = 20;
+        final int numVirtualNodes = 30;
 
         // cutting of scenario to circle
         // increasing the first value goes right        
         // increasing the second value goes north
         // Zurich
-        final Coord center = new Coord(2683600.0, 1251400.0);
-        final double radius = 10000; // (set to -1 for no cutting)
+//        final Coord center = new Coord(2683600.0, 1251400.0);
+//        final double radius = 10000; // (set to -1 for no cutting)
         // Basel
-        //final Coord center = new Coord(2612859.0,1266343.0);
-        //final double radius = 12000; // (set to -1 for no cutting)
+        final Coord center = new Coord(2612859.0,1266343.0);
+        final double radius = 12000; // (set to -1 for no cutting)
         final boolean populationeliminateFreight = true;
         final boolean populationchangeModeToAV = true;
         final boolean populationeliminateWalking = true;

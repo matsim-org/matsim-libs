@@ -65,7 +65,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
-    final int numberOfAVs;
+//    final int numberOfAVs;
+    final int numberOfVehicles;
     private int total_rebalanceCount = 0;
     Tensor printVals = Tensors.empty();
     final InstantPathFactory instantPathFactory;
@@ -87,7 +88,9 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
-        numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
+        numberOfVehicles = (int) generatorConfig.getNumberOfVehicles();
+//        numberOfVehicles = Integer.parseInt(config.getParams().get("numberOfVehicles"));
+//        System.out.println(numberOfAVs + " " + numberOfVehicles);
         samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
         // redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
 
@@ -99,7 +102,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
             // ---
             {
                 Container container = new Container("init");
-                {
+                { // directed graph incidence matrix
                     Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().index, i), n, m);
                     System.out.println("E_in=");
                     System.out.println(Pretty.of(matrix));
@@ -122,7 +125,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     container.add(doubleArray);
                 }
                 {
-
                     Tensor matrix = Tensors.vector(i -> Tensors.vector( //
                             virtualNetwork.getVirtualNode(i).getCoord().getX(), //
                             virtualNetwork.getVirtualNode(i).getCoord().getY() //
@@ -130,6 +132,31 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     System.out.println(Pretty.of(matrix));
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
                     DoubleArray doubleArray = new DoubleArray("voronoiCenter", new int[] { n, 2 }, array);
+                    container.add(doubleArray);
+                }
+                {
+                    Tensor matrix = Tensors.empty(); // REQ x 3, <- 3 == [time, vn_fromIndex, vn_toIndex]
+                    final int REQCOUNT = 1000;
+                    { // generate random schedule TODO temporary
+                        final int FIRST = 100;
+                        Random random = new Random();
+                        for (int c = 0; c < REQCOUNT; ++c) {
+                            // requests happen only during the first 24 hrs
+                            int time = FIRST + random.nextInt(86400 - FIRST);
+                            int i = random.nextInt(n);
+                            int j = random.nextInt(n);
+                            // requests starting and ending in the same virtual node are allowed
+                            matrix.append(Tensors.vector(time, i + 1, j + 1));
+                        }
+                    }
+                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
+                    DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { REQCOUNT, 3 }, array);
+                    container.add(doubleArray);
+                }
+                {
+                    double[] array = new double[] { numberOfVehicles };
+                    GlobalAssert.that(0 < numberOfVehicles);
+                    DoubleArray doubleArray = new DoubleArray("N_cars", new int[] { 1 }, array);
                     container.add(doubleArray);
                 }
 
@@ -151,12 +178,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                 // {
                 // double[] array = new double[m];
                 // DoubleArray doubleArray = new DoubleArray("C", new int[] { m }, array);
-                // container.add(doubleArray);
-                // }
-                // {
-                // double[] array = new double[] { numberOfAVs };
-                // GlobalAssert.that(0 < numberOfAVs);
-                // DoubleArray doubleArray = new DoubleArray("N_cars", new int[] { 1 }, array);
                 // container.add(doubleArray);
                 // }
                 // { // normalized per seconds

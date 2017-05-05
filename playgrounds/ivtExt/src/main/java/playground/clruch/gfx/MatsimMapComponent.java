@@ -90,6 +90,8 @@ public class MatsimMapComponent extends JMapViewer {
 
         final Graphics2D graphics = (Graphics2D) g;
         final Dimension dimension = getSize();
+        
+        virtualNetworkLayer.paint(graphics, ref); // FIXME
 
         if (ref != null) {
 
