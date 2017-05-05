@@ -1,7 +1,8 @@
 package playground.clruch.netdata;
 
+import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -90,9 +91,10 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
         // Relation containing the number vectors:
         rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
-
         // CREATE MAP with all VirtualNodes
-        Map<VirtualNode, Set<Link>> vNMap = new HashMap<>();
+        // the datastructure HAS TO BE a linked hash map ! do not change to hash map
+        // the map has to be ordered to preserve the indexing of the vnodes 0,1,2,...
+        Map<VirtualNode, Set<Link>> vNMap = new LinkedHashMap<>();
 
         {
             int index = 0;
@@ -115,6 +117,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             GlobalAssert.that(successAdd);
         }
 
+        // associate link to virtual node based on proximity to voronoi center
         for (Link link : network.getLinks().values()) {
             VirtualNode closestVNode = vnQuadtree.getClosest(link.getCoord().getX(), link.getCoord().getY());
             vNMap.get(closestVNode).add(link);
@@ -122,21 +125,43 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
 
         for (VirtualNode virtualNode : vNMap.keySet()) {
             virtualNode.setLinks(vNMap.get(virtualNode));
-            virtualNetwork.addVirtualNode(virtualNode);
-        }
-
-        // CREATE VirtualLinks
-        int index = 0;
-        for (VirtualNode vNfrom : virtualNetwork.getVirtualNodes()) {
-            for (VirtualNode vNto : virtualNetwork.getVirtualNodes()) {
-                if (!vNfrom.equals(vNto)) {
-                    String indexStr = "vLink_" + Integer.toString(index + 1);
-                    virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, CoordUtils.calcEuclideanDistance(vNfrom.getCoord(), vNto.getCoord()));
-                    index++;
-                }
-            }
+            virtualNetwork.addVirtualNode(virtualNode); // <- function requires the final set of links belonging to virtual node
         }
         
+        { // build proximity
+            ButterfliesAndRainbows butterflyAndRainbows = new ButterfliesAndRainbows();
+            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+                virtualNode.getLinks().stream() //
+                        .map(link -> link.getFromNode()) //
+                        .forEach(node -> butterflyAndRainbows.add(node, virtualNode));
+                virtualNode.getLinks().stream() //
+                        .map(link -> link.getToNode()) //
+                        .forEach(node -> butterflyAndRainbows.add(node, virtualNode));
+            }
+            int index = 0;
+            for (Point point : butterflyAndRainbows.allPairs()) {
+                VirtualNode vNfrom = virtualNetwork.getVirtualNode(point.x);
+                VirtualNode vNto = virtualNetwork.getVirtualNode(point.y);
+                String indexStr = "vLink_" + Integer.toString(index + 1);
+                virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, CoordUtils.calcEuclideanDistance(vNfrom.getCoord(), vNto.getCoord()));
+                index++;
+
+            }
+        }
+
+        // this code builds a complete graph
+        // CREATE VirtualLinks
+        // int index = 0;
+        // for (VirtualNode vNfrom : virtualNetwork.getVirtualNodes()) {
+        // for (VirtualNode vNto : virtualNetwork.getVirtualNodes()) {
+        // if (!vNfrom.equals(vNto)) {
+        // String indexStr = "vLink_" + Integer.toString(index + 1);
+        // virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, CoordUtils.calcEuclideanDistance(vNfrom.getCoord(), vNto.getCoord()));
+        // index++;
+        // }
+        // }
+        // }
+
         // FILL information for serialization
         virtualNetwork.fillVNodeMapRAWVERYPRIVATE();
 
