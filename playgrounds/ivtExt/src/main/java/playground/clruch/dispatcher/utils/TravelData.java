@@ -25,7 +25,7 @@ import playground.clruch.utils.GlobalAssert;
 /**
  * Created by Claudio on 3/19/2017.
  */
-public class ArrivalInformation {
+public class TravelData {
     Tensor lambda;
     Tensor pij;
     Tensor alpha_ij;
@@ -34,8 +34,14 @@ public class ArrivalInformation {
     public final long populationSize;
     // private final Scalar factor;
     VirtualNetwork virtualNetwork;
+    
+    
+    
+    
+    
+    
 
-    public ArrivalInformation(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize,
+    public TravelData(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize,
             int rebalancingPeriod) throws JDOMException, IOException {
         virtualNetwork = virtualNetworkIn;
         this.populationSize = populationSize;
@@ -86,6 +92,13 @@ public class ArrivalInformation {
             System.out.println("Do we get here?");
         }
     }
+    
+    
+    
+    
+    
+    
+    
 
     /**
      * @param timeString

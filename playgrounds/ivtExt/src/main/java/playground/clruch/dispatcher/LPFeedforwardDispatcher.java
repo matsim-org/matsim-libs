@@ -37,7 +37,7 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
-import playground.clruch.dispatcher.utils.ArrivalInformation;
+import playground.clruch.dispatcher.utils.TravelData;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
@@ -74,7 +74,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
     private final int nVNodes;
     private final int nVLinks;
     Tensor printVals = Tensors.empty();
-    ArrivalInformation arrivalInformation;
+    TravelData arrivalInformation;
     Tensor rebalancingRate;
     Tensor rebalanceCount;
     Tensor rebalanceCountInteger;
@@ -90,7 +90,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRequestSelector abstractRequestSelector, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            ArrivalInformation arrivalInformationIn) {
+            TravelData arrivalInformationIn) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         this.virtualNodeDest = abstractVirtualNodeDest;
         this.requestSelector = abstractRequestSelector;
@@ -273,7 +273,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 }
             }
 
-            ArrivalInformation arrivalInformationIn = null;
+            TravelData arrivalInformationIn = null;
             {
                 final String ext = config.getParams().get(KEY_DTEXTENSION);
                 final File lambdaXML = new File(virtualnetworkDir, "poissonParameters_" + ext + ".xml");
@@ -286,7 +286,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 try {
                     long populationSize = population.getPersons().size();
                     int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-                    arrivalInformationIn = new ArrivalInformation(virtualNetwork, lambdaXML, pijFile, alphaijFile, //
+                    arrivalInformationIn = new TravelData(virtualNetwork, lambdaXML, pijFile, alphaijFile, //
                             populationSize, //
                             rebalancingPeriod //
                     );

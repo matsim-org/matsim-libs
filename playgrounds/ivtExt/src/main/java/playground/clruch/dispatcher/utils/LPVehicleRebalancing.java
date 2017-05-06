@@ -192,6 +192,8 @@ public class LPVehicleRebalancing {
         GLPK.glp_write_lp(lp, null, "networklinearprogram_updated.lp");
         GLPK.glp_init_smcp(parm);
         int ret = GLPK.glp_simplex(lp,parm);
+        int stat = GLPK.glp_get_status(lp);
+        if(stat == GLPK.GLP_INFEAS);
 
         // Retrieve solution
         // TODO check if ret == 0 functions properly or not
