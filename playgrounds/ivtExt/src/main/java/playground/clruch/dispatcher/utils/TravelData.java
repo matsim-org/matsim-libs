@@ -27,24 +27,27 @@ import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
+import ch.ethz.idsc.tensor.io.Pretty;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
 
 /**
- * Created by Claudio on 3/19/2017.
+ * Created by Claudio on 5/6/2017.
  */
 public class TravelData {
     Tensor lambda; // tensor of dimension (numberofTimeSteps, numberVirtualNodes) that contains mean arrival rates per virtual Node in timestep
     Tensor pij; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) pij(t,i,j) probability of moving from i to j in
                 // timestep t
-    Tensor alpha_ij;
+    Tensor alphaij; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) alpha(t,i,j) static rebalancing rates from i
+                    // to j at timestep t
     private int numberTimeSteps;
     private final int dt; // used as lookup
     public final long populationSize;
     public final int dayduration = 30 * 60 * 60;
     // private final Scalar factor;
     VirtualNetwork virtualNetwork;
+    LPVehicleRebalancing lpVehicleRebalancing;
 
     /**
      * Constructor for TravelData object creating historic travel information based on virtualNetwork and population
@@ -58,8 +61,8 @@ public class TravelData {
         System.out.println("reading travel data for population of size" + population.getPersons().size());
         populationSize = population.getPersons().size();
         virtualNetwork = virtualNetworkIn;
-        
-        
+        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
+
         // ensure that dayduration / timeInterval is integer value
         dt = greatestNonRestDt(dtIn, dayduration);
         numberTimeSteps = dayduration / dt;
@@ -67,14 +70,20 @@ public class TravelData {
         System.out.println("dt = " + dt);
         GlobalAssert.that(dayduration % dt == 0);
 
-        // create lambdas and pij
+        // create lambda, pij and alphaij Tensors
         lambda = Tensors.matrix((i, j) -> RealScalar.of(0.0), numberTimeSteps, virtualNetwork.getvNodesCount());
         pij = Tensors.empty();
         for (int k = 0; k < numberTimeSteps; ++k) {
             final int timestep = k;
             pij.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
         }
+        alphaij = Tensors.empty();
+        for (int k = 0; k < numberTimeSteps; ++k) {
+            final int timestep = k;
+            alphaij.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
+        }
 
+        // fill based on population file
         for (Person person : population.getPersons().values()) {
             for (Plan plan : person.getPlans()) {
 
@@ -112,6 +121,7 @@ public class TravelData {
                 }
             }
         }
+
         // norm pij such that it is row stochastic, i.e. sum(p_ij)_j = 1 for all i and all time indexes
         for (int t = 0; t < numberTimeSteps; ++t) {
             for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
@@ -129,10 +139,42 @@ public class TravelData {
                 }
             }
         }
+
+        // compute alphaij rates according to Pavone, Marco, Stephen L. Smith, and Emilio Frazzoli Daniela Rus. "Load balancing for mobility-on-demand
+        // systems." (2011).
+        System.out.println(Pretty.of(lambda));
+        for (int t = 0; t < numberTimeSteps; ++t) {
+            System.out.println("time step: " + t);
+            // lambdas = [lbd_1, ... , lbd] row vector, where n nmbr. of vNodes
+            Tensor lambdaT = lambda.get(t);
+            System.out.println("lambda = " + lambdaT);
+
+            // p_ij row-stochastic matrix (nxn) with transition probabilities from i to j
+            Tensor pijT = pij.get(t);
+            System.out.println(Pretty.of(pijT));
+
+            // fill right-hand-side, i.e. rhs(i) = -lambda_i + sum_j * lambda_j p_ji
+            Tensor rhs = lambdaT.multiply(RealScalar.of(-1)).add(lambdaT.dot(pijT));
+            System.out.println(Pretty.of(lambdaT.multiply(RealScalar.of(-1))));
+            System.out.println(Pretty.of(lambdaT.dot(pijT)));
+            System.out.println(Pretty.of(lambdaT.dot(pijT)));
+            System.out.println(Pretty.of(lambdaT.multiply(RealScalar.of(-1)).add(lambdaT.dot(pijT))));
+            System.out.println("rhs = " + Pretty.of(rhs));
+
+            // solve the linear program with updated right-hand side
+            Tensor rebalancingRate = lpVehicleRebalancing.solveUpdatedLP(rhs);
+
+            // ensure positivity of solution (small negative values possible due to solver
+            // accuracy)
+            rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
+            System.out.println(Pretty.of(rebalancingRate));
+           
+        }
+
         checkConsistency();
         // TODO how to get dimensions of Tensor?
         System.out.println("successfully created lambda matrix of size " + lambda.length() + " x " + Transpose.of(lambda).length());
-        System.out.println("successfully created pij matrix of size " + "?" + " x " + "?"+ " x "+ "?");
+        System.out.println("successfully created pij matrix of size " + "?" + " x " + "?" + " x " + "?");
     }
 
     @Deprecated
@@ -177,10 +219,10 @@ public class TravelData {
             Element rootNode = document.getRootElement();
             // List<Element> children = rootNode.getChildren();
 
-            alpha_ij = Tensors.empty();
+            alphaij = Tensors.empty();
             for (int k = 0; k < numberTimeSteps; ++k) {
                 final int timestep = k;
-                alpha_ij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
+                alphaij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
                         virtualNetwork.getvNodesCount()));
             }
             System.out.println("Do we get here?");
@@ -299,7 +341,7 @@ public class TravelData {
 
     public Tensor getAlphaijforTime(int time) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
-        return alpha_ij.get(timestep).copy();
+        return alphaij.get(timestep).copy();
     }
 
     /**
@@ -313,9 +355,8 @@ public class TravelData {
         return greatestNonRestDt(dt - 1, length);
     }
 
-    
     /**
-     * Perform consistency checks after completion of constructor operations. 
+     * Perform consistency checks after completion of constructor operations.
      */
     private void checkConsistency() {
         for (int t = 0; t < numberTimeSteps; ++t) {
