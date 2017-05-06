@@ -36,7 +36,7 @@ public class ScenarioPreparer {
         // BEGIN: CUSTOMIZE ----------------------------------------------- 
         // set manually depending on the scenario:
         final int maxPopulationSize = 142381;
-        final int numVirtualNodes = 20;
+        final int numVirtualNodes = 4;
 
         
         // cutting of scenario to circle
