@@ -175,13 +175,16 @@ public class TravelData implements Serializable {
 
             // p_ij row-stochastic matrix (nxn) with transition probabilities from i to j
             Tensor pijT = pijPSF.get(t);
-
+            
             // fill right-hand-side, i.e. rhs(i) = -lambda_i + sum_j * lambda_j p_ji
-            Tensor rhs = lambdaT.multiply(RealScalar.of(-1)).add(lambdaT.dot(pijT));
-
+            Tensor dotprod = lambdaT.dot(pijT);
+            
+            //Tensor rhs = lambdaT.multiply(RealScalar.of(-1)).add(lambdaT.dot(pijT));
+            Tensor rhs = lambdaT.subtract(dotprod);
+            
             // solve the linear program with updated right-hand side
             Tensor rebalancingRate = lpVehicleRebalancing.solveUpdatedLP(rhs,GLPKConstants.GLP_FX);
-
+            
             // ensure positivity of solution (small negative values possible due to solver
             // accuracy)
             rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
