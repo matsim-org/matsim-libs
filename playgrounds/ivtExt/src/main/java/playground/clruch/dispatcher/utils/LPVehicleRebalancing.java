@@ -1,19 +1,24 @@
 package playground.clruch.dispatcher.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import org.gnu.glpk.GLPK;
+import org.gnu.glpk.GLPKConstants;
+import org.gnu.glpk.GlpkException;
+import org.gnu.glpk.SWIGTYPE_p_double;
+import org.gnu.glpk.SWIGTYPE_p_int;
+import org.gnu.glpk.glp_prob;
+import org.gnu.glpk.glp_smcp;
+
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.alg.Array;
-import org.gnu.glpk.*;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Created by Claudio on 3/17/2017. Updated by Claudio on 5/7/2017.
@@ -57,26 +62,23 @@ public class LPVehicleRebalancing {
                 int variableId = 0;
                 for (int i = 0; i < n; ++i) {
                     for (int j = 0; j < n; ++j) {
+                        // variable name and initialization
                         variableId = variableId + 1;
                         String varname = ("reb_" + i + j);
-                        if (i == j) {
-                            // For self-links, make num_ii fixed variable (no self-rebalancing)
-                            GLPK.glp_set_col_name(lp, variableId, varname);
-                            GLPK.glp_set_col_kind(lp, variableId, GLPKConstants.GLP_CV);
+                        GLPK.glp_set_col_name(lp, variableId, varname);
+                        GLPK.glp_set_col_kind(lp, variableId, GLPKConstants.GLP_CV);
+
+                        // for every variable find virtualLink
+                        VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(i);
+                        VirtualNode vNodeTo = virtualNetwork.getVirtualNode(j);
+                        Optional<VirtualLink> optVLink = virtualNetwork.getVirtualLinks().stream()
+                                .filter(v -> (v.getFrom().equals(vNodeFrom) && v.getTo().equals(vNodeTo))).findFirst();
+                        if(optVLink.isPresent()){ // if virtualLink is present it is a lower bounded optimization variable
+                            GLPK.glp_set_col_bnds(lp, variableId, GLPKConstants.GLP_LO, 0.0, 0.0); // Lower bound: second number irrelevant
+                            varIDLinkID.put(variableId, optVLink.get().getIndex());
+                        }else{ // fixed variable to 0.0
                             GLPK.glp_set_col_bnds(lp, variableId, GLPKConstants.GLP_FX, 0, 0);
                             varIDLinkID.put(variableId, -1);
-                        } else {
-                            GLPK.glp_set_col_name(lp, variableId, varname);
-                            GLPK.glp_set_col_kind(lp, variableId, GLPKConstants.GLP_CV);
-                            GLPK.glp_set_col_bnds(lp, variableId, GLPKConstants.GLP_LO, 0.0, 0.0); // Lower bound: second number irrelevant
-
-                            VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(i);
-                            VirtualNode vNodeTo = virtualNetwork.getVirtualNode(j);
-                            Optional<VirtualLink> optVLink = virtualNetwork.getVirtualLinks().stream()
-                                    .filter(v -> (v.getFrom().equals(vNodeFrom) && v.getTo().equals(vNodeTo))).findFirst();
-                            GlobalAssert.that(optVLink.isPresent());
-                            varIDLinkID.put(variableId, optVLink.get().getIndex());
-                            System.out.println("variableID = " + variableId);
                         }
                     }
                 }
@@ -143,13 +145,10 @@ public class LPVehicleRebalancing {
             }
 
             // Write model to file
-            GLPK.glp_write_lp(lp, null, "networklinearprogram_initial.lp");
-        } catch (GlpkException ex)
-
-        {
+            GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_initial.lp");
+        } catch (GlpkException ex){
             ex.printStackTrace();
         }
-
     }
 
     /**
@@ -159,50 +158,37 @@ public class LPVehicleRebalancing {
         // release storage allocated for LP
         parm.delete();
         GLPK.glp_delete_prob(lp);
-        System.out.println("Book instance is getting destroyed");
+        System.out.println("LP instance is getting destroyed");
     }
 
     /**
-     * solving the LP with updated right-hand-sides
-     * 
-     * @param rhs
-     *            rhs for problem, i.e. rhs = vi_desiredT - vi_excessT;
+     * solving the LP with updated right-hand-sides 
+     * @param rhs for problem, i.e. b-vector, e.g. rhs = vi_desiredT - vi_excessT;
      * @return
      */
     public Tensor solveUpdatedLP(Tensor rhs) {
 
         // use rhs to set constraints
-        for (int i = 0; i < rhs.length(); ++i) {
+        GlobalAssert.that(rhs.length() == n);
+        for (int i = 0; i < n; ++i) {
             GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((rhs.Get(i))).number().doubleValue(), 0.0);
         }
 
         // Solve model
-        GLPK.glp_write_lp(lp, null, "networklinearprogram_updated.lp");
+        GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_updated.lp");
         GLPK.glp_init_smcp(parm);
-        int ret = GLPK.glp_simplex(lp, parm);
+        int ret = GLPK.glp_simplex(lp, parm); // ret==0 indicates of the algorithm ran correctly
+        GlobalAssert.that(ret==0);
         int stat = GLPK.glp_get_status(lp);
-        if (stat == GLPK.GLP_INFEAS)
-            ;
-
-        // Retrieve solution
-        // TODO check if ret == 0 functions properly or not
-        if (ret == 0) {
-            System.out.println("successfully solved LP");
-            // write_lp_solution(lp);
-        } else {
-            System.out.println("The problem could not be solved");
+        if (stat == GLPK.GLP_INFEAS){
+            System.out.println("infeasible problem, no solution found.");
+            GlobalAssert.that(false);
         }
+
 
         // fill result vector
         Tensor rebalanceOrder = Tensors.matrix((j, i) -> RealScalar.of(GLPK.glp_get_col_prim(lp, (j + 1) + (i) * n)), n, n);
-
-        // if exists primal feasible solution, return it, otherwise return empty set.
-        // TODO check if ret == 0 functions properly or not
-        if (ret == 0) {
-            return rebalanceOrder;
-        } else {
-            return Array.zeros(virtualNetwork.getvLinksCount());
-        }
+        return rebalanceOrder;
 
     }
 
