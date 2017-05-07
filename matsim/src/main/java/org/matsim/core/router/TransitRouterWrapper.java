@@ -116,6 +116,7 @@ public class TransitRouterWrapper implements RoutingModule {
 			    } else {
 				    firstToFacility = toFacility;
 			    }
+			    // (*)
 			    Route route = new GenericRouteImpl(fromFacility.getLinkId(), firstToFacility.getLinkId());
 			    final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(fromFacility, firstToFacility, departureTime, person);
 			    route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
@@ -127,23 +128,29 @@ public class TransitRouterWrapper implements RoutingModule {
 				    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
 				    tRoute.setTravelTime(leg.getTravelTime());
 				    tRoute.setDistance(RouteUtils.calcDistance(tRoute, transitSchedule, network));
-				    Activity act =
-						    PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId());
+				    Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId());
 				    act.setMaximumDuration(0.0);
 				    trip.add(act);
 				    nextCoord = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
-			    } else { // walk legs don't have a coord, use the coord from the last egress point
+			    } else { 
+				    // it is not an instance of an ExperimentalTransitRoute so it must be a (transit) walk leg.
+				    
+				    // walk legs don't have a coord, use the coord from the last egress point.  yyyy But I don't understand why in one case we take "nextCoord", while in the
+				    // other case we retrieve the facility from the previous route.
+
 				    if (i == baseTrip.size() - 1) {
+					    // if this is the last leg, we don't believe the leg from the TransitRouter.  Why?
+					    
 					    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
 					    Facility lastFromFacility = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId());
+					    // The following is roughly the same as (*) above.   Looks like we are just getting the distance from the walk router ?!?!
 					    Route route = new GenericRouteImpl(lastFromFacility.getLinkId(), toFacility.getLinkId());
 					    final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(lastFromFacility, toFacility, departureTime, person);
 					    route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
 					    route.setTravelTime(leg.getTravelTime());
 					    leg.setRoute(route);
 				    }
-				    Activity act =
-						    PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, leg.getRoute().getStartLinkId());
+				    Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, nextCoord, leg.getRoute().getStartLinkId());
 				    act.setMaximumDuration(0.0);
 				    trip.add(act);
 			    }
