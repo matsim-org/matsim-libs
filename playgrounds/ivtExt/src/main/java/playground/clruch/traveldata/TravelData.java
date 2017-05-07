@@ -42,11 +42,15 @@ public class TravelData implements Serializable {
     /**
      * 
      */
+    // general
     Tensor lambda; // tensor of dimension (numberofTimeSteps, numberVirtualNodes) that contains mean arrival rates per virtual Node in timestep
     Tensor pij; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) pij(t,i,j) probability of moving from i to j in
                 // timestep t
-    Tensor alphaij; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) alpha(t,i,j) static rebalancing rates from i
-                    // to j at timestep t
+    // framework from Pavone, Marco, Stephen L. Smith, and Emilio Frazzoli Daniela Rus. "Load balancing for mobility-on-demand systems." (2011).
+    Tensor lambdaPSF;
+    Tensor pijPSF;
+    Tensor alphaijPSF; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) alpha(t,i,j) static rebalancing rates from i
+                       // to j at timestep t
     private int numberTimeSteps;
     private final int dt; // used as lookup
     public final long populationSize;
@@ -84,10 +88,10 @@ public class TravelData implements Serializable {
             final int timestep = k;
             pij.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
         }
-        alphaij = Tensors.empty();
+        alphaijPSF = Tensors.empty();
         for (int k = 0; k < numberTimeSteps; ++k) {
             final int timestep = k;
-            alphaij.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
+            alphaijPSF.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
         }
 
         // fill based on population file
@@ -130,22 +134,35 @@ public class TravelData implements Serializable {
         }
 
         // norm pij such that it is row stochastic, i.e. sum(p_ij)_j = 1 for all i and all time indexes
+        // count the total of the rows
+        for (int t = 0; t < numberTimeSteps; ++t) {
+            pij.set(normToRowStochastic(pij.get(t)), t);
+        }
+
+        // compute lambdaPSF, pijPSF
+        // lambda PSF = lambda - pii*lambda
+        // pijPSF = row-stochastic normalized matrix derived from pij with pii = 0
+        lambdaPSF = Tensors.matrix((i, j) -> RealScalar.of(0.0), numberTimeSteps, virtualNetwork.getvNodesCount());
         for (int t = 0; t < numberTimeSteps; ++t) {
             for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
-                Scalar sum = RealScalar.of(0.0);
-                for (int j = 0; j < virtualNetwork.getvNodesCount(); ++j) {
-                    Scalar val = (Scalar) pij.get(t, i, j);
-                    sum = sum.add(val);
-                }
-                for (int j = 0; j < virtualNetwork.getvNodesCount(); ++j) {
-                    Scalar val = (Scalar) pij.get(t, i, j);
-                    Scalar valScaled = RealScalar.of(0.0);
-                    if (sum.number().doubleValue() > 0)
-                        valScaled = val.divide(sum);
-                    pij.set(valScaled, t, i, j);
-                }
+                Tensor labmdaold = lambda.get(t, i);
+                Tensor pii = pij.get(t, i, i);
+                Tensor upd = labmdaold.subtract(labmdaold.multiply((Scalar) pii));
+                lambdaPSF.set(upd, t, i);
             }
         }
+
+
+        pijPSF = pij.copy();
+        for (int t = 0; t < numberTimeSteps; ++t) {
+            for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
+                pijPSF.set(RealScalar.of(0.0), t, i, i);
+            }
+        }
+        for (int t = 0; t < numberTimeSteps; ++t) {
+            pijPSF.set(normToRowStochastic(pijPSF.get(t)), t);
+        }
+
 
         // compute alphaij rates according to Pavone, Marco, Stephen L. Smith, and Emilio Frazzoli Daniela Rus. "Load balancing for mobility-on-demand
         // systems." (2011).
@@ -153,10 +170,10 @@ public class TravelData implements Serializable {
         for (int t = 0; t < numberTimeSteps; ++t) {
 
             // lambdas = [lbd_1, ... , lbd] row vector, where n nmbr. of vNodes
-            Tensor lambdaT = lambda.get(t);
+            Tensor lambdaT = lambdaPSF.get(t);
 
             // p_ij row-stochastic matrix (nxn) with transition probabilities from i to j
-            Tensor pijT = pij.get(t);
+            Tensor pijT = pijPSF.get(t);
 
             // fill right-hand-side, i.e. rhs(i) = -lambda_i + sum_j * lambda_j p_ji
             Tensor rhs = lambdaT.multiply(RealScalar.of(-1)).add(lambdaT.dot(pijT));
@@ -168,18 +185,17 @@ public class TravelData implements Serializable {
             // accuracy)
             rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
 
-            alphaij.set(rebalancingRate, t);
+            alphaijPSF.set(rebalancingRate, t);
 
         }
-
 
         checkConsistency();
         // TODO how to get dimensions of Tensor?
         System.out.println("successfully created lambda matrix of size " + lambda.length() + " x " + Transpose.of(lambda).length());
         System.out.println("successfully created pij matrix of size " + "?" + " x " + "?" + " x " + "?");
         System.out.println("successfully created alphaij matrix of size" + "?" + " x " + "?" + " x " + "?");
-    }
 
+    }
 
     /**
      * @param timeString
@@ -193,7 +209,6 @@ public class TravelData implements Serializable {
         int seconds = Integer.parseInt(parts[2]);
         return hours * 60 * 60 + minutes * 60 + seconds;
     }
-
 
     public Tensor getLambdaforTime(int time) {
         int row = (int) Math.min(time / dt, numberTimeSteps - 1);
@@ -237,7 +252,7 @@ public class TravelData implements Serializable {
 
     public Tensor getAlphaijforTime(int time) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
-        return alphaij.get(timestep).copy();
+        return alphaijPSF.get(timestep).copy();
     }
 
     /**
@@ -251,19 +266,47 @@ public class TravelData implements Serializable {
         return greatestNonRestDt(dt - 1, length);
     }
 
-
     protected void fillSerializationInfo(VirtualNetwork virtalNetworkIn) {
         // check if TravelData object was created with the supplied virtualNetwork
         GlobalAssert.that(virtalNetworkIn.getvNetworkID() == virtualNetworkID);
         this.virtualNetwork = virtalNetworkIn;
     }
-    
-    public long getVirtualNetworkID(){
+
+    public long getVirtualNetworkID() {
         return virtualNetworkID;
     }
 
-    
-    
+    /**
+     * 
+     * @param T
+     *            tensor which will be normed for row-stochasticity
+     */
+    // TODO can the dimensions be retrieved more elegantly?
+    private Tensor normToRowStochastic(Tensor Tin) {
+        Tensor T = Tin.copy();
+        int cols = T.get(0).length();
+        int rows = Transpose.of(T).get(0).length();
+
+        // for every row
+        for (int i = 0; i < rows; ++i) {
+            // count the total of the rows
+            Scalar sum = RealScalar.of(0.0);
+            for (int j = 0; j < cols; ++j) {
+                Scalar val = (Scalar) T.get(i, j);
+                sum = sum.add(val);
+            }
+            // divide by the total
+            for (int j = 0; j < cols; ++j) {
+                Scalar val = (Scalar) T.get(i, j);
+                Scalar valScaled = RealScalar.of(0.0);
+                if (sum.number().doubleValue() > 0)
+                    valScaled = val.divide(sum);
+                T.set(valScaled, i, j);
+            }
+        }
+        return T;
+    }
+
     /**
      * Perform consistency checks after completion of constructor operations.
      */
@@ -280,16 +323,14 @@ public class TravelData implements Serializable {
                 GlobalAssert.that(sumInt == 1 || sumInt == 0);
             }
         }
-        
-        
+
     }
-    
-    
+
     @Deprecated
     public TravelData(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize, int rebalancingPeriod)
             throws JDOMException, IOException {
         virtualNetwork = virtualNetworkIn;
-        virtualNetworkID = -1; // Must be wrong since unkknown with what virtualNetwork the XML was created. 
+        virtualNetworkID = -1; // Must be wrong since unkknown with what virtualNetwork the XML was created.
         this.populationSize = populationSize;
         System.out.println("reading historic travel data");
         {// arrival rates lambda
@@ -327,16 +368,15 @@ public class TravelData implements Serializable {
             Element rootNode = document.getRootElement();
             // List<Element> children = rootNode.getChildren();
 
-            alphaij = Tensors.empty();
+            alphaijPSF = Tensors.empty();
             for (int k = 0; k < numberTimeSteps; ++k) {
                 final int timestep = k;
-                alphaij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
+                alphaijPSF.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
                         virtualNetwork.getvNodesCount()));
             }
         }
     }
-    
-    
+
     @Deprecated
     private Scalar getLambdafromFile(int row, int col, Element rootNode) {
         List<Element> children = rootNode.getChildren();
@@ -391,7 +431,5 @@ public class TravelData implements Serializable {
         GlobalAssert.that(false);
         return ZeroScalar.get();
     }
-
-
 
 }
