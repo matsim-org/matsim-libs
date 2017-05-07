@@ -20,6 +20,8 @@ import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
+import playground.clruch.traveldata.TravelData;
+import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
@@ -37,6 +39,7 @@ public class ScenarioPreparer {
         // set manually depending on the scenario:
         final int maxPopulationSize = 142381;
         final int numVirtualNodes = 4;
+        final int dtTravelData = 500;
 
         
         // cutting of scenario to circle
@@ -59,8 +62,10 @@ public class ScenarioPreparer {
 
         // output file names
         final String VIRTUALNETWORKFILENAME = "virtualNetwork";
+        final String TRAVELDATAFILENAME = "travelData";
         final String NETWORKUPDATEDNAME = "networkConverted";
         final String POPULATIONUPDATEDNAME = "populationConverted";
+        
 
         // END: CUSTOMIZE -------------------------------------------------
 
@@ -132,6 +137,14 @@ public class ScenarioPreparer {
         VirtualNetworkIO.toByte(new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME), virtualNetwork);
         VirtualNetworkIO.toXML(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME+".xml", virtualNetwork);
         System.out.println("saved virtual network byte format to : "+ new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME));
+        
+        
+        
+        // 3) generate travelData
+        TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
+        TravelDataIO.toByte(new File(dir+"/virtualNetwork/"+TRAVELDATAFILENAME), travelData);
+        System.out.println("saved travelData byte format to : "+ new File(dir+"/virtualNetwork/"+TRAVELDATAFILENAME));
+
         
         System.out.println("successfully converted simulation data files from " + args[0]);
     }
