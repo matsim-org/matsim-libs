@@ -1,8 +1,10 @@
-package playground.clruch.dispatcher.utils;
+package playground.clruch.traveldata;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jdom2.Attribute;
@@ -28,6 +30,7 @@ import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.Pretty;
+import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
@@ -35,7 +38,10 @@ import playground.clruch.utils.GlobalAssert;
 /**
  * Created by Claudio on 5/6/2017.
  */
-public class TravelData {
+public class TravelData implements Serializable {
+    /**
+     * 
+     */
     Tensor lambda; // tensor of dimension (numberofTimeSteps, numberVirtualNodes) that contains mean arrival rates per virtual Node in timestep
     Tensor pij; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) pij(t,i,j) probability of moving from i to j in
                 // timestep t
@@ -46,8 +52,8 @@ public class TravelData {
     public final long populationSize;
     public final int dayduration = 30 * 60 * 60;
     // private final Scalar factor;
-    VirtualNetwork virtualNetwork;
-    LPVehicleRebalancing lpVehicleRebalancing;
+    protected transient VirtualNetwork virtualNetwork;
+    private final long virtualNetworkID;
 
     /**
      * Constructor for TravelData object creating historic travel information based on virtualNetwork and population
@@ -58,10 +64,11 @@ public class TravelData {
      *            time step for calculation
      */
     public TravelData(VirtualNetwork virtualNetworkIn, Network network, Population population, int dtIn) {
-        System.out.println("reading travel data for population of size" + population.getPersons().size());
+        System.out.println("reading travel data for population of size " + population.getPersons().size());
         populationSize = population.getPersons().size();
         virtualNetwork = virtualNetworkIn;
-        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
+        virtualNetworkID = virtualNetworkIn.getvNetworkID();
+        System.out.println("the ID of the virtualNetwork used for travel data construction is: " + virtualNetworkID);
 
         // ensure that dayduration / timeInterval is integer value
         dt = greatestNonRestDt(dtIn, dayduration);
@@ -142,24 +149,17 @@ public class TravelData {
 
         // compute alphaij rates according to Pavone, Marco, Stephen L. Smith, and Emilio Frazzoli Daniela Rus. "Load balancing for mobility-on-demand
         // systems." (2011).
-        System.out.println(Pretty.of(lambda));
+        LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         for (int t = 0; t < numberTimeSteps; ++t) {
-            System.out.println("time step: " + t);
+
             // lambdas = [lbd_1, ... , lbd] row vector, where n nmbr. of vNodes
             Tensor lambdaT = lambda.get(t);
-            System.out.println("lambda = " + lambdaT);
 
             // p_ij row-stochastic matrix (nxn) with transition probabilities from i to j
             Tensor pijT = pij.get(t);
-            System.out.println(Pretty.of(pijT));
 
             // fill right-hand-side, i.e. rhs(i) = -lambda_i + sum_j * lambda_j p_ji
             Tensor rhs = lambdaT.multiply(RealScalar.of(-1)).add(lambdaT.dot(pijT));
-            System.out.println(Pretty.of(lambdaT.multiply(RealScalar.of(-1))));
-            System.out.println(Pretty.of(lambdaT.dot(pijT)));
-            System.out.println(Pretty.of(lambdaT.dot(pijT)));
-            System.out.println(Pretty.of(lambdaT.multiply(RealScalar.of(-1)).add(lambdaT.dot(pijT))));
-            System.out.println("rhs = " + Pretty.of(rhs));
 
             // solve the linear program with updated right-hand side
             Tensor rebalancingRate = lpVehicleRebalancing.solveUpdatedLP(rhs);
@@ -167,20 +167,24 @@ public class TravelData {
             // ensure positivity of solution (small negative values possible due to solver
             // accuracy)
             rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
-            System.out.println(Pretty.of(rebalancingRate));
-           
+
+            alphaij.set(rebalancingRate, t);
+
         }
+
 
         checkConsistency();
         // TODO how to get dimensions of Tensor?
         System.out.println("successfully created lambda matrix of size " + lambda.length() + " x " + Transpose.of(lambda).length());
         System.out.println("successfully created pij matrix of size " + "?" + " x " + "?" + " x " + "?");
+        System.out.println("successfully created alphaij matrix of size" + "?" + " x " + "?" + " x " + "?");
     }
 
     @Deprecated
     public TravelData(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize, int rebalancingPeriod)
             throws JDOMException, IOException {
         virtualNetwork = virtualNetworkIn;
+        virtualNetworkID = -1; // Must be wrong since unkknown with what virtualNetwork the XML was created. 
         this.populationSize = populationSize;
         System.out.println("reading historic travel data");
         {// arrival rates lambda
@@ -211,7 +215,6 @@ public class TravelData {
                 pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
                         virtualNetwork.getvNodesCount()));
             }
-            System.out.println("Do we get here?");
         }
         {// rebalancing rates alpha_ij
             SAXBuilder builder = new SAXBuilder();
@@ -225,7 +228,6 @@ public class TravelData {
                 alphaij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
                         virtualNetwork.getvNodesCount()));
             }
-            System.out.println("Do we get here?");
         }
     }
 
@@ -273,7 +275,6 @@ public class TravelData {
             Element timeatvLink = vLinkElem.getChildren().get(timestep);
             return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("P_ij").getValue()));
         }
-        System.out.println("Whats happening?");
         GlobalAssert.that(false);
         return ZeroScalar.get();
     }
@@ -294,7 +295,6 @@ public class TravelData {
             Element timeatvLink = vLinkElem.getChildren().get(timestep);
             return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("alpha_ij").getValue()));
         }
-        System.out.println("Whats happening?");
         GlobalAssert.that(false);
         return ZeroScalar.get();
     }
@@ -355,10 +355,24 @@ public class TravelData {
         return greatestNonRestDt(dt - 1, length);
     }
 
+
+    protected void fillSerializationInfo(VirtualNetwork virtalNetworkIn) {
+        // check if TravelData object was created with the supplied virtualNetwork
+        GlobalAssert.that(virtalNetworkIn.getvNetworkID() == virtualNetworkID);
+        this.virtualNetwork = virtalNetworkIn;
+    }
+    
+    public long getVirtualNetworkID(){
+        return virtualNetworkID;
+    }
+
+    
+    
     /**
      * Perform consistency checks after completion of constructor operations.
      */
-    private void checkConsistency() {
+    public void checkConsistency() {
+        // row-stochasticity of pij matrix
         for (int t = 0; t < numberTimeSteps; ++t) {
             for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                 Scalar sum = RealScalar.of(0.0);
@@ -370,6 +384,8 @@ public class TravelData {
                 GlobalAssert.that(sumInt == 1 || sumInt == 0);
             }
         }
+        
+        
     }
 
 }
