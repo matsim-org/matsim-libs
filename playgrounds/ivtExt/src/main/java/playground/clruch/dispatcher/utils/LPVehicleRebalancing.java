@@ -166,12 +166,13 @@ public class LPVehicleRebalancing {
      * @param rhs for problem, i.e. b-vector, e.g. rhs = vi_desiredT - vi_excessT;
      * @return
      */
-    public Tensor solveUpdatedLP(Tensor rhs) {
+    public Tensor solveUpdatedLP(Tensor rhs, int GLPrhs) {
 
         // use rhs to set constraints
         GlobalAssert.that(rhs.length() == n);
         for (int i = 0; i < n; ++i) {
-            GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((rhs.Get(i))).number().doubleValue(), 0.0);
+            //GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((rhs.Get(i))).number().doubleValue(), 0.0);
+            GLPK.glp_set_row_bnds(lp, i + 1, GLPrhs, ((rhs.Get(i))).number().doubleValue(), 0.0);
         }
 
         // Solve model

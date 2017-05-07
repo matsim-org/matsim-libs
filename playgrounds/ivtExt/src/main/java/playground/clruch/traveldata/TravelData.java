@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.gnu.glpk.GLPKConstants;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -179,7 +180,7 @@ public class TravelData implements Serializable {
             Tensor rhs = lambdaT.multiply(RealScalar.of(-1)).add(lambdaT.dot(pijT));
 
             // solve the linear program with updated right-hand side
-            Tensor rebalancingRate = lpVehicleRebalancing.solveUpdatedLP(rhs);
+            Tensor rebalancingRate = lpVehicleRebalancing.solveUpdatedLP(rhs,GLPKConstants.GLP_FX);
 
             // ensure positivity of solution (small negative values possible due to solver
             // accuracy)

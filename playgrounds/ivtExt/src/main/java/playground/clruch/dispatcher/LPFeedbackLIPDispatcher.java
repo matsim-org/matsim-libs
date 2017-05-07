@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
+import org.gnu.glpk.GLPKConstants;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -120,7 +121,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 // solve the linear program with updated right-hand side
                 // fill right-hand-side
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
-                Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);
+                Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs,GLPKConstants.GLP_LO);
                 Tensor rebalanceCount = Round.of(rebalanceCount2);
                 // TODO this should never become active, can be possibly removed later
                 // assert that solution is integer and does not contain negative values
