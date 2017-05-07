@@ -180,56 +180,6 @@ public class TravelData implements Serializable {
         System.out.println("successfully created alphaij matrix of size" + "?" + " x " + "?" + " x " + "?");
     }
 
-    @Deprecated
-    public TravelData(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize, int rebalancingPeriod)
-            throws JDOMException, IOException {
-        virtualNetwork = virtualNetworkIn;
-        virtualNetworkID = -1; // Must be wrong since unkknown with what virtualNetwork the XML was created. 
-        this.populationSize = populationSize;
-        System.out.println("reading historic travel data");
-        {// arrival rates lambda
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(lambdaFile);
-            Element rootNode = document.getRootElement();
-            List<Element> children = rootNode.getChildren();
-
-            // get number of time steps and time step size
-            numberTimeSteps = children.get(0).getChildren().size();
-            Attribute attribute = rootNode.getAttribute("dt");
-            dt = secfromStringTime(attribute.getValue());
-
-            // construct matrices based on xml
-            // the lambdas are normalized of their population size and time bin width
-            Scalar factor = RealScalar.of(populationSize * rebalancingPeriod);
-            lambda = Tensors.matrix((i, j) -> getLambdafromFile(i, j, rootNode).multiply(factor), numberTimeSteps, virtualNetwork.getvNodesCount());
-        }
-        {// transition probabilities pij
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(pijFile);
-            Element rootNode = document.getRootElement();
-            // List<Element> children = rootNode.getChildren();
-
-            pij = Tensors.empty();
-            for (int k = 0; k < numberTimeSteps; ++k) {
-                final int timestep = k;
-                pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
-                        virtualNetwork.getvNodesCount()));
-            }
-        }
-        {// rebalancing rates alpha_ij
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(alphaijFile);
-            Element rootNode = document.getRootElement();
-            // List<Element> children = rootNode.getChildren();
-
-            alphaij = Tensors.empty();
-            for (int k = 0; k < numberTimeSteps; ++k) {
-                final int timestep = k;
-                alphaij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
-                        virtualNetwork.getvNodesCount()));
-            }
-        }
-    }
 
     /**
      * @param timeString
@@ -244,60 +194,6 @@ public class TravelData implements Serializable {
         return hours * 60 * 60 + minutes * 60 + seconds;
     }
 
-    @Deprecated
-    private Scalar getLambdafromFile(int row, int col, Element rootNode) {
-        List<Element> children = rootNode.getChildren();
-
-        // get element with virtualNode col
-        VirtualNode correctNode = virtualNetwork.getVirtualNode(col);
-        Element vNodeelem = children.stream().filter(v -> v.getAttribute("id").getValue().toString().equals(correctNode.getId())).findFirst().get();
-
-        // get element with number row
-        Element timeatvNode = vNodeelem.getChildren().get(row);
-
-        // return entry
-        return RealScalar.of(Double.parseDouble(timeatvNode.getAttribute("lambda").getValue()));
-    }
-
-    @Deprecated
-    private Scalar getpijfromFile(int from, int to, int timestep, Element rootNode) {
-        List<Element> children = rootNode.getChildren();
-
-        // get element with virtualLink col
-        VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
-        VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
-
-        Optional<Element> optional = children.stream().filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId())
-                && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId())).findFirst();
-
-        if (optional.isPresent()) {
-            Element vLinkElem = optional.get();
-            Element timeatvLink = vLinkElem.getChildren().get(timestep);
-            return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("P_ij").getValue()));
-        }
-        GlobalAssert.that(false);
-        return ZeroScalar.get();
-    }
-
-    @Deprecated
-    private Scalar getalphaijfromFile(int from, int to, int timestep, Element rootNode) {
-        List<Element> children = rootNode.getChildren();
-
-        // get element with virtualLink col
-        VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
-        VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
-
-        Optional<Element> optional = children.stream().filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId())
-                && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId())).findFirst();
-
-        if (optional.isPresent()) {
-            Element vLinkElem = optional.get();
-            Element timeatvLink = vLinkElem.getChildren().get(timestep);
-            return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("alpha_ij").getValue()));
-        }
-        GlobalAssert.that(false);
-        return ZeroScalar.get();
-    }
 
     public Tensor getLambdaforTime(int time) {
         int row = (int) Math.min(time / dt, numberTimeSteps - 1);
@@ -387,5 +283,115 @@ public class TravelData implements Serializable {
         
         
     }
+    
+    
+    @Deprecated
+    public TravelData(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize, int rebalancingPeriod)
+            throws JDOMException, IOException {
+        virtualNetwork = virtualNetworkIn;
+        virtualNetworkID = -1; // Must be wrong since unkknown with what virtualNetwork the XML was created. 
+        this.populationSize = populationSize;
+        System.out.println("reading historic travel data");
+        {// arrival rates lambda
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(lambdaFile);
+            Element rootNode = document.getRootElement();
+            List<Element> children = rootNode.getChildren();
+
+            // get number of time steps and time step size
+            numberTimeSteps = children.get(0).getChildren().size();
+            Attribute attribute = rootNode.getAttribute("dt");
+            dt = secfromStringTime(attribute.getValue());
+
+            // construct matrices based on xml
+            // the lambdas are normalized of their population size and time bin width
+            Scalar factor = RealScalar.of(populationSize * rebalancingPeriod);
+            lambda = Tensors.matrix((i, j) -> getLambdafromFile(i, j, rootNode).multiply(factor), numberTimeSteps, virtualNetwork.getvNodesCount());
+        }
+        {// transition probabilities pij
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(pijFile);
+            Element rootNode = document.getRootElement();
+            // List<Element> children = rootNode.getChildren();
+
+            pij = Tensors.empty();
+            for (int k = 0; k < numberTimeSteps; ++k) {
+                final int timestep = k;
+                pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
+                        virtualNetwork.getvNodesCount()));
+            }
+        }
+        {// rebalancing rates alpha_ij
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(alphaijFile);
+            Element rootNode = document.getRootElement();
+            // List<Element> children = rootNode.getChildren();
+
+            alphaij = Tensors.empty();
+            for (int k = 0; k < numberTimeSteps; ++k) {
+                final int timestep = k;
+                alphaij.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
+                        virtualNetwork.getvNodesCount()));
+            }
+        }
+    }
+    
+    
+    @Deprecated
+    private Scalar getLambdafromFile(int row, int col, Element rootNode) {
+        List<Element> children = rootNode.getChildren();
+
+        // get element with virtualNode col
+        VirtualNode correctNode = virtualNetwork.getVirtualNode(col);
+        Element vNodeelem = children.stream().filter(v -> v.getAttribute("id").getValue().toString().equals(correctNode.getId())).findFirst().get();
+
+        // get element with number row
+        Element timeatvNode = vNodeelem.getChildren().get(row);
+
+        // return entry
+        return RealScalar.of(Double.parseDouble(timeatvNode.getAttribute("lambda").getValue()));
+    }
+
+    @Deprecated
+    private Scalar getpijfromFile(int from, int to, int timestep, Element rootNode) {
+        List<Element> children = rootNode.getChildren();
+
+        // get element with virtualLink col
+        VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
+        VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
+
+        Optional<Element> optional = children.stream().filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId())
+                && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId())).findFirst();
+
+        if (optional.isPresent()) {
+            Element vLinkElem = optional.get();
+            Element timeatvLink = vLinkElem.getChildren().get(timestep);
+            return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("P_ij").getValue()));
+        }
+        GlobalAssert.that(false);
+        return ZeroScalar.get();
+    }
+
+    @Deprecated
+    private Scalar getalphaijfromFile(int from, int to, int timestep, Element rootNode) {
+        List<Element> children = rootNode.getChildren();
+
+        // get element with virtualLink col
+        VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
+        VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
+
+        Optional<Element> optional = children.stream().filter(v -> v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId())
+                && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId())).findFirst();
+
+        if (optional.isPresent()) {
+            Element vLinkElem = optional.get();
+            Element timeatvLink = vLinkElem.getChildren().get(timestep);
+            return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("alpha_ij").getValue()));
+        }
+        GlobalAssert.that(false);
+        return ZeroScalar.get();
+    }
+
+
 
 }

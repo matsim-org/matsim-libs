@@ -18,7 +18,6 @@ import java.util.zip.DataFormatException;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -48,23 +47,15 @@ import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.traveldata.TravelData;
+import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LPFeedforwardDispatcher extends PartitionedDispatcher {
-    // DEBUG Start
-    public static final String KEY_REBALANCINGPERIOD = "rebalancingPeriod";
-    public static final String KEY_VIRTUALNETWORKDIRECTORY = "virtualNetworkDirectory";
-    public static final String KEY_DTEXTENSION = "dtExtension";
-    // public static final String KEY_WEIGHTSEXTENSION = "weightsExtension";
-    public static final String KEX_REDISPATCHPERIOD = "redispatchPeriod";
-    // DEBUG End
-    public final int rebalancingPeriod;
     public final int redispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
@@ -74,7 +65,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
     private final int nVNodes;
     private final int nVLinks;
     Tensor printVals = Tensors.empty();
-    TravelData arrivalInformation;
+    TravelData travelData;
     Tensor rebalancingRate;
     Tensor rebalanceCount;
     Tensor rebalanceCountInteger;
@@ -96,10 +87,8 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         this.requestSelector = abstractRequestSelector;
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
-        rebalancingPeriod = Integer.parseInt(config.getParams().get(KEY_REBALANCINGPERIOD));
-        System.out.println(config.getParams().get(KEX_REDISPATCHPERIOD));
-        redispatchPeriod = Integer.parseInt(config.getParams().get(KEX_REDISPATCHPERIOD));
-        arrivalInformation = arrivalInformationIn;
+        redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
+        travelData = arrivalInformationIn;
         nVNodes = virtualNetwork.getvNodesCount();
         nVLinks = virtualNetwork.getvLinksCount();
         rebalanceCount = Array.zeros(nVNodes, nVNodes);
@@ -114,34 +103,11 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 .match(getStayVehicles(), getAVRequestsAtLinks());
         final long round_now = Math.round(now);
 
-        // Recalculate new rebalancing rates periodically
-        if (round_now % rebalancingPeriod == 0) {
-
-            Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
-            // II.i compute rebalancing vehicles and send to virtualNodes
-            {
-                // lambdas = [lbd_1, ... , lbd] row vector, where n nmbr. of vNodes
-                System.out.println("number of virtual Nodes: " + nVNodes);
-                Tensor lambdas = Tensors.matrix((i, j) -> getLambdai(now, j), 1, nVNodes);
-
-                // p_ij_bar row-stochastic matrix (nxn) with transition probabilities from i to j
-                // p_ij = p_ij_bar with the diagonal elements set to zero
-                Tensor p_ij = Tensors.matrix((i, j) -> getPij(now, i, j), nVNodes, nVNodes);
-
-                // fill right-hand-side, i.e. rhs(i) = -lambda_i + sum_j * lambda_j p_ji
-                Tensor rhs = (lambdas.multiply(RealScalar.of(-1)).add(lambdas.dot(p_ij))).get(0);
-
-                // solve the linear program with updated right-hand side
-                rebalancingRate = lpVehicleRebalancing.solveUpdatedLP(rhs);
-
-                // ensure positivity of solution (small negative values possible due to solver
-                // accuracy)
-                rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
-            }
-        }
 
         // permanently rebalance vehicles according to the rates output by the LP
         if (round_now % redispatchPeriod == 0) {
+            rebalancingRate = travelData.getAlphaijforTime((int)round_now);
+            
             // update rebalance count using current rate
             rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(redispatchPeriod)));
 
@@ -158,8 +124,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
             // ensure that not more vehicles are sent away than available
             Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
-            Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCountInteger.unmodifiable(),
-                    availableVehicles);
+            Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCountInteger.unmodifiable(), availableVehicles);
             total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
             // generate routing instructions for rebalancing vehicles
@@ -193,36 +158,8 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         }
 
         // assign destinations to vehicles using bipartite matching
-        printVals = HungarianUtils.globalBipartiteMatching(this, () -> getVirtualNodeDivertableNotRebalancingVehicles().values()
-                .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));
-    }
-
-    /**
-     * @param time,
-     *            time step
-     * @param index,
-     *            vNode index
-     * @return lambda at this node and index
-     */
-    Scalar getLambdai(double time, int index) {
-        return arrivalInformation.getLambdaforTime((int) time, index);
-    }
-
-    /**
-     * @param time,
-     *            time step
-     * @param row,
-     *            fromNode
-     * @param col,
-     *            toNode
-     * @return
-     */
-    Scalar getPij(double time, int row, int col) {
-        if (row == col) { // diagonal elements have to be zero
-            return RealScalar.of(0.0);
-        } else { // off-diagonal elements according to data input
-            return arrivalInformation.getpijforTime((int) time, row, col);
-        }
+        printVals = HungarianUtils.globalBipartiteMatching(this,
+                () -> getVirtualNodeDivertableNotRebalancingVehicles().values().stream().flatMap(v -> v.stream()).collect(Collectors.toList()));
     }
 
     @Override
@@ -249,9 +186,6 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         @Inject
         private Network network;
 
-        @Inject
-        private Population population;
-
         public static VirtualNetwork virtualNetwork;
 
         @Override
@@ -261,7 +195,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
-            final File virtualnetworkDir = new File(config.getParams().get(KEY_VIRTUALNETWORKDIRECTORY));
+            final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
             GlobalAssert.that(virtualnetworkDir.isDirectory());
             {
                 final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork");
@@ -273,31 +207,16 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 }
             }
 
-            TravelData arrivalInformationIn = null;
-            {
-                final String ext = config.getParams().get(KEY_DTEXTENSION);
-                final File lambdaXML = new File(virtualnetworkDir, "poissonParameters_" + ext + ".xml");
-                GlobalAssert.that(lambdaXML.isFile());
-                final File pijFile = new File(virtualnetworkDir, "transitionProbabilities_" + ext + ".xml");
-                GlobalAssert.that(pijFile.isFile());
-                final File alphaijFile = new File(virtualnetworkDir, "rebalancingRates_" + ext + ".xml");
-                GlobalAssert.that(alphaijFile.isFile());
-
-                try {
-                    long populationSize = population.getPersons().size();
-                    int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-                    arrivalInformationIn = new TravelData(virtualNetwork, lambdaXML, pijFile, alphaijFile, //
-                            populationSize, //
-                            rebalancingPeriod //
-                    );
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    GlobalAssert.that(false);
-                }
+            TravelData travelData = null;
+            try {
+                travelData = TravelDataIO.fromByte(network, virtualNetwork, new File(virtualnetworkDir, "travelData"));
+            } catch (ClassNotFoundException | DataFormatException | IOException e) {
+                System.out.println("problem reading travelData");
+                e.printStackTrace();
             }
 
-            return new LPFeedforwardDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork,
-                    abstractVirtualNodeDest, abstractRequestSelector, abstractVehicleDestMatcher, arrivalInformationIn);
+            return new LPFeedforwardDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
+                    abstractRequestSelector, abstractVehicleDestMatcher, travelData);
         }
     }
 }

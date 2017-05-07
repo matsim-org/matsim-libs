@@ -37,9 +37,9 @@ public class ScenarioPreparer {
 
         // BEGIN: CUSTOMIZE ----------------------------------------------- 
         // set manually depending on the scenario:
-        final int maxPopulationSize = 142381;
+        final int maxPopulationSize = 1000;
         final int numVirtualNodes = 10;
-        final int dtTravelData = 40000;
+        final int dtTravelData = 1000;
         final boolean completeGraph = true;
 
         
@@ -54,7 +54,7 @@ public class ScenarioPreparer {
         // final double radius = 12000; // (set to -1 for no cutting)
         // Sioux
         final Coord center = new Coord(678365.311581,4827050.237694);
-        final double radius = 4000;
+        final double radius = 50000;
 
         final boolean populationeliminateFreight = true;
         final boolean populationchangeModeToAV = true;
