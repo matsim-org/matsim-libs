@@ -187,7 +187,11 @@ public class LPVehicleRebalancing {
 
 
         // fill result vector
-        Tensor rebalanceOrder = Tensors.matrix((j, i) -> RealScalar.of(GLPK.glp_get_col_prim(lp, (j + 1) + (i) * n)), n, n);
+        //rebalance from i to j is equal to variable  i*( n-1) + j +1
+
+        
+        Tensor rebalanceOrder = Tensors.matrix((i, j) -> RealScalar.of( GLPK.glp_get_col_prim(lp, (i*n)+ j +1)), n, n);
+        //Tensor rebalanceOrder = Tensors.matrix((j, i) -> RealScalar.of(   GLPK.glp_get_col_prim(lp, (j + 1) + (i) * n))   , n, n);
         return rebalanceOrder;
 
     }

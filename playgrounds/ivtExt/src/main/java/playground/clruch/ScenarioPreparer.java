@@ -38,7 +38,7 @@ public class ScenarioPreparer {
         // BEGIN: CUSTOMIZE ----------------------------------------------- 
         // set manually depending on the scenario:
         final int maxPopulationSize = 142381;
-        final int numVirtualNodes = 3;
+        final int numVirtualNodes = 10;
         final int dtTravelData = 40000;
         final boolean completeGraph = true;
 
