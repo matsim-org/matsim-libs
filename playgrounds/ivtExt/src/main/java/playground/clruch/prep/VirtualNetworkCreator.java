@@ -21,6 +21,7 @@ public class VirtualNetworkCreator {
         
         // parameters
         int numberOfNodes = 40;
+        boolean completeGraph = true;
                 
         // load Network file
         Config config = ConfigUtils.loadConfig(configFile.toString());
@@ -30,7 +31,7 @@ public class VirtualNetworkCreator {
         
         // create KMEANS-Computed VirtualNetwork
         KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population,network,numberOfNodes);
+        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population,network,numberOfNodes,completeGraph);
         
         
         // save in virtualNetwork Folder        

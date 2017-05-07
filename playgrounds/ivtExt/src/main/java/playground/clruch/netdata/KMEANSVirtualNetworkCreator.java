@@ -49,7 +49,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
     Relation<NumberVector> rel;
 
     @Override
-    public VirtualNetwork createVirtualNetwork(Population population, Network network, int numVNodes) {
+    public VirtualNetwork createVirtualNetwork(Population population, Network network, int numVNodes, boolean completeGraph) {
         // initialize new virtual network
         VirtualNetwork virtualNetwork = new VirtualNetwork();
 
@@ -127,8 +127,23 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             virtualNode.setLinks(vNMap.get(virtualNode));
             virtualNetwork.addVirtualNode(virtualNode); // <- function requires the final set of links belonging to virtual node
         }
-        
-        { // build proximity
+
+        // CREATE virtualLinks if completeGraph is set to true a complete graph without self-loops is built otherwise a graph where only neighboring
+        // vNodes are connected.
+        if (completeGraph) {// build complete graph
+            int index = 0;
+            for (VirtualNode vNfrom : virtualNetwork.getVirtualNodes()) {
+                for (VirtualNode vNto : virtualNetwork.getVirtualNodes()) {
+                    if (!vNfrom.equals(vNto)) {
+                        String indexStr = "vLink_" + Integer.toString(index + 1);
+                        virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, CoordUtils.calcEuclideanDistance(vNfrom.getCoord(), vNto.getCoord()));
+                        index++;
+                    }
+                }
+            }
+
+        } else { // build proximity
+
             ButterfliesAndRainbows butterflyAndRainbows = new ButterfliesAndRainbows();
             for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
                 virtualNode.getLinks().stream() //
@@ -147,20 +162,8 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
                 index++;
 
             }
-        }
 
-        // this code builds a complete graph
-        // CREATE VirtualLinks
-        // int index = 0;
-        // for (VirtualNode vNfrom : virtualNetwork.getVirtualNodes()) {
-        // for (VirtualNode vNto : virtualNetwork.getVirtualNodes()) {
-        // if (!vNfrom.equals(vNto)) {
-        // String indexStr = "vLink_" + Integer.toString(index + 1);
-        // virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, CoordUtils.calcEuclideanDistance(vNfrom.getCoord(), vNto.getCoord()));
-        // index++;
-        // }
-        // }
-        // }
+        }
 
         // FILL information for serialization
         virtualNetwork.fillVNodeMapRAWVERYPRIVATE();

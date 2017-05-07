@@ -8,6 +8,7 @@ import org.gnu.glpk.*;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
+import playground.clruch.utils.GlobalAssert;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,10 +20,10 @@ import java.util.Optional;
  */
 public class LPVehicleRebalancing {
     VirtualNetwork virtualNetwork;
-    // TODO generalize this to "objective weights"
     glp_prob lp;
     glp_smcp parm = new glp_smcp();
     final int n;
+    final int m;
 
 
     /**
@@ -31,6 +32,9 @@ public class LPVehicleRebalancing {
     public LPVehicleRebalancing(VirtualNetwork virtualNetworkIn) {
         virtualNetwork = virtualNetworkIn;
         n = virtualNetwork.getvNodesCount();
+        m = virtualNetwork.getvLinksCount();
+        System.out.println("creating rebalancing LP for system with "+n+" virtualNodes and "+m+" virtualLinks");
+        GlobalAssert.that(m==n*n-n);
         initiateLP();
     }
 
