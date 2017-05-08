@@ -31,6 +31,8 @@ import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.Pretty;
+import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
@@ -83,17 +85,20 @@ public class TravelData implements Serializable {
         GlobalAssert.that(dayduration % dt == 0);
 
         // create lambda, pij and alphaij Tensors
-        lambda = Tensors.matrix((i, j) -> RealScalar.of(0.0), numberTimeSteps, virtualNetwork.getvNodesCount());
-        pij = Tensors.empty();
-        for (int k = 0; k < numberTimeSteps; ++k) {
-            final int timestep = k;
-            pij.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
-        }
-        alphaijPSF = Tensors.empty();
-        for (int k = 0; k < numberTimeSteps; ++k) {
-            final int timestep = k;
-            alphaijPSF.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
-        }
+//        lambda = Tensors.matrix((i, j) -> RealScalar.of(0.0), numberTimeSteps, virtualNetwork.getvNodesCount());
+        lambda = Array.zeros(numberTimeSteps, virtualNetwork.getvNodesCount());
+//        pij = Tensors.empty();
+//        for (int k = 0; k < numberTimeSteps; ++k) {
+//            final int timestep = k;
+//            pij.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
+//        }
+        pij = Array.zeros(numberTimeSteps, virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+//        alphaijPSF = Tensors.empty();
+//        for (int k = 0; k < numberTimeSteps; ++k) {
+//            final int timestep = k;
+//            alphaijPSF.append(Tensors.matrix((i, j) -> RealScalar.of(0.0), virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount()));
+//        }
+        alphaijPSF = Array.zeros(numberTimeSteps, virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
 
         // fill based on population file
         for (Person person : population.getPersons().values()) {
@@ -117,16 +122,17 @@ public class TravelData implements Serializable {
 
                             // add customer/dt to arrival rate
                             {
-                                Scalar val = (Scalar) lambda.get(timeIndex, vNodeIndexFrom);
+                                Scalar val = lambda.Get(timeIndex, vNodeIndexFrom);
                                 Scalar valAdded = val.add(RealScalar.of(1.0 / (double) dt));
                                 lambda.set(valAdded, timeIndex, vNodeIndexFrom);
                             }
 
                             // add trips to pij (has to be normed later)
                             {
-                                Scalar val = (Scalar) pij.get(timeIndex, vNodeIndexFrom, vNodeIndexTo);
-                                Scalar valAddded = val.add(RealScalar.of(1.0));
-                                pij.set(valAddded, timeIndex, vNodeIndexFrom, vNodeIndexTo);
+//                                Scalar val = (Scalar) pij.get(timeIndex, vNodeIndexFrom, vNodeIndexTo);
+//                                Scalar valAddded = val.add(RealScalar.of(1.0));
+//                                pij.set(valAddded, timeIndex, vNodeIndexFrom, vNodeIndexTo);
+                                pij.set(s->s.add(RealScalar.ONE), timeIndex, vNodeIndexFrom, vNodeIndexTo);
                             }
                         }
                     }
@@ -143,7 +149,8 @@ public class TravelData implements Serializable {
         // compute lambdaPSF, pijPSF
         // lambda PSF = lambda - pii*lambda
         // pijPSF = row-stochastic normalized matrix derived from pij with pii = 0
-        lambdaPSF = Tensors.matrix((i, j) -> RealScalar.of(0.0), numberTimeSteps, virtualNetwork.getvNodesCount());
+//        lambdaPSF = Tensors.matrix((i, j) -> RealScalar.of(0.0), numberTimeSteps, virtualNetwork.getvNodesCount());
+        lambdaPSF = Array.zeros(numberTimeSteps, virtualNetwork.getvNodesCount());
         for (int t = 0; t < numberTimeSteps; ++t) {
             for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                 Tensor labmdaold = lambda.get(t, i);
@@ -287,26 +294,29 @@ public class TravelData implements Serializable {
      */
     // TODO can the dimensions be retrieved more elegantly?
     private Tensor normToRowStochastic(Tensor Tin) {
+        List<Integer> dims = Dimensions.of(Tin);
         Tensor T = Tin.copy();
-        int cols = T.get(0).length();
-        int rows = Transpose.of(T).get(0).length();
+//        int cols = dims.get(1); // T.get(0).length();
+        int rows = dims.get(0); //Transpose.of(T).get(0).length();
 
         // for every row
         for (int i = 0; i < rows; ++i) {
             // count the total of the rows
-            Scalar sum = RealScalar.of(0.0);
-            for (int j = 0; j < cols; ++j) {
-                Scalar val = (Scalar) T.get(i, j);
-                sum = sum.add(val);
-            }
+//            Scalar sum = RealScalar.of(0.0);
+//            for (int j = 0; j < cols; ++j) {
+//                Scalar val = (Scalar) T.get(i, j);
+//                sum = sum.add(val);
+//            }
+            Scalar sum = Total.of(T.get(i)).Get();
             // divide by the total
-            for (int j = 0; j < cols; ++j) {
-                Scalar val = (Scalar) T.get(i, j);
-                Scalar valScaled = RealScalar.of(0.0);
-                if (sum.number().doubleValue() > 0)
-                    valScaled = val.divide(sum);
-                T.set(valScaled, i, j);
-            }
+//            for (int j = 0; j < cols; ++j) {
+//                Scalar val = (Scalar) T.get(i, j);
+//                Scalar valScaled = RealScalar.of(0.0);
+//                if (sum.number().doubleValue() > 0)
+//                    valScaled = val.divide(sum);
+//                T.set(valScaled, i, j);
+//            }
+            T.set(v->v.multiply(InvertUnlessZero.function.apply(sum)), i);
         }
         return T;
     }
@@ -318,11 +328,12 @@ public class TravelData implements Serializable {
         // row-stochasticity of pij matrix
         for (int t = 0; t < numberTimeSteps; ++t) {
             for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
-                Scalar sum = RealScalar.of(0.0);
-                for (int j = 0; j < virtualNetwork.getvNodesCount(); ++j) {
-                    Scalar val = (Scalar) pij.get(t, i, j);
-                    sum = sum.add(val);
-                }
+//                Scalar sum = RealScalar.of(0.0);
+//                for (int j = 0; j < virtualNetwork.getvNodesCount(); ++j) {
+//                    Scalar val = (Scalar) pij.get(t, i, j);
+//                    sum = sum.add(val);
+//                }
+                Scalar sum = Total.of(pij.get(t, i)).Get();
                 int sumInt = sum.number().intValue();
                 GlobalAssert.that(sumInt == 1 || sumInt == 0);
             }

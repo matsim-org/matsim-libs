@@ -14,6 +14,7 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.clruch.gfx.LocationSpec;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
@@ -25,7 +26,7 @@ import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
-
+// TODO make this a class, so that people can invoke new ScenPrep(file, LocationSpec) from other packages 
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
@@ -42,7 +43,8 @@ public class ScenarioPreparer {
         final int dtTravelData = 500;
         final boolean completeGraph = true;
 
-        
+        // TODO use LocationSpec
+        LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
         // cutting of scenario to circle
         // increasing the first value goes right        
         // increasing the second value goes north
@@ -132,20 +134,23 @@ public class ScenarioPreparer {
             }
         }
 
-        // 2) create virtual Network
+        {
+        // 3) create virtual Network
         KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
         VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes,completeGraph);
-        VirtualNetworkIO.toByte(new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME), virtualNetwork);
-        VirtualNetworkIO.toXML(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME+".xml", virtualNetwork);
-        System.out.println("saved virtual network byte format to : "+ new File(dir + "/virtualNetwork/" + VIRTUALNETWORKFILENAME));
+        final File vnDir = new File(dir, "virtualNetwork"); // <- magic const
+        vnDir.mkdir(); // create folder if necessary
+        VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
+        VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME+".xml").toString(), virtualNetwork);
+        System.out.println("saved virtual network byte format to : "+ new File(vnDir, VIRTUALNETWORKFILENAME));
         
         
         
         // 3) generate travelData
         TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
-        TravelDataIO.toByte(new File(dir+"/virtualNetwork/"+TRAVELDATAFILENAME), travelData);
-        System.out.println("saved travelData byte format to : "+ new File(dir+"/virtualNetwork/"+TRAVELDATAFILENAME));
-
+        TravelDataIO.toByte(new File(vnDir,TRAVELDATAFILENAME), travelData);
+        System.out.println("saved travelData byte format to : "+ new File(vnDir,TRAVELDATAFILENAME));
+        }
         
         System.out.println("successfully converted simulation data files from " + args[0]);
     }

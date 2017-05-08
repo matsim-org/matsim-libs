@@ -34,7 +34,8 @@ public class VirtualNetworkCreator {
         VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population,network,numberOfNodes,completeGraph);
         
         
-        // save in virtualNetwork Folder        
+        // save in virtualNetwork Folder    
+        // TODO /virtualNetwork/ is magic constant ... put to central location
         VirtualNetworkIO.toXML(configFile.getParent()+"/virtualNetwork/virtualNetwork.xml",virtualNetwork);        
         
 

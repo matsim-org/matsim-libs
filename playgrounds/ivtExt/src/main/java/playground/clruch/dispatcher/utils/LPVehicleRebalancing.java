@@ -172,7 +172,7 @@ public class LPVehicleRebalancing {
         GlobalAssert.that(rhs.length() == n);
         for (int i = 0; i < n; ++i) {
             //GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((rhs.Get(i))).number().doubleValue(), 0.0);
-            GLPK.glp_set_row_bnds(lp, i + 1, GLPrhs, ((rhs.Get(i))).number().doubleValue(), 0.0);
+            GLPK.glp_set_row_bnds(lp, i + 1, GLPrhs, rhs.Get(i).number().doubleValue(), 0.0);
         }
 
         // Solve model
