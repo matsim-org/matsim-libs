@@ -180,19 +180,20 @@ public class QSimSignalTest implements
 			((ObservableMobsim) mobsim).addQueueSimulationListeners(provider.get());
 		}
 		
-		Exception ex = null;
+		boolean catched = false;
 		try{
 			mobsim.run();
-		} catch (RuntimeException e){
+		} catch (Exception e){
 //			log.info(e.getMessage());
-			ex = e;
-		} finally {
+			catched = true;
+		} 
+		finally { // 'finally' to be executed when all threads of mobsim.run() are done.
 			if (abort) {
-				Assert.assertNotNull("The simulation should abort because of intergreens violation.", ex);
+				Assert.assertTrue("The simulation should abort because of intergreens violation.", catched);
 			} else {
-				Assert.assertNull("There was an unexpected exception.", ex);
+				Assert.assertFalse("There was an unexpected exception.", catched);
 			}
-		}		
+		}
 	}
 
 
