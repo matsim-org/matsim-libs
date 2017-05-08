@@ -23,6 +23,10 @@ import playground.clruch.utils.GlobalAssert;
  */
 public class VirtualNetwork implements Serializable {
 
+    /**
+     * 
+     */
+    private final long virtualNetworkID; // to ensure that other objects dependant on virtualNetwork are derived of that particular network
     private final List<VirtualNode> virtualNodes = new ArrayList<>();
     private final List<VirtualLink> virtualLinks = new ArrayList<>();
     // the map is for checking that all links in the network are assigned to one vNode
@@ -30,8 +34,10 @@ public class VirtualNetwork implements Serializable {
     // is stored but only used to create references LINK
     private final Map<String, VirtualNode> linkVNodeMapRAWVERYPRIVATE = new HashMap<>();
     private final Map<Point, VirtualLink> virtualLinkPairs = new HashMap<>();
+    
 
     /* package */ VirtualNetwork() {
+        virtualNetworkID = System.currentTimeMillis();
     }
 
     // get the collection of virtual nodes
@@ -170,6 +176,11 @@ public class VirtualNetwork implements Serializable {
         GlobalAssert.that(!linkVNodeMapRAWVERYPRIVATE.isEmpty());
         GlobalAssert.that(linkVNodeMap != null);
     }
+    
+    public long getvNetworkID(){
+        return virtualNetworkID;
+    }
+    
 
     // TODO don't delete this function but move outside into class e.g. VirtualNetworkHelper
     public void printForTesting(Network network) {
@@ -189,5 +200,7 @@ public class VirtualNetwork implements Serializable {
         }
         System.out.println("total: #vNodes=" + getVirtualNodes().size() + ", #vLinks=" + getVirtualLinks().size());
     }
+    
+    
 
 }
