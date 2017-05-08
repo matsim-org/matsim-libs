@@ -186,12 +186,13 @@ public class QSimSignalTest implements
 		} catch (RuntimeException e){
 //			log.info(e.getMessage());
 			ex = e;
-		}
-		if (abort) {
-			Assert.assertNotNull("The simulation should abort because of intergreens violation.", ex);
-		} else {
-			Assert.assertNull("There was an unexpected exception.", ex);
-		}
+		} finally {
+			if (abort) {
+				Assert.assertNotNull("The simulation should abort because of intergreens violation.", ex);
+			} else {
+				Assert.assertNull("There was an unexpected exception.", ex);
+			}
+		}		
 	}
 
 
