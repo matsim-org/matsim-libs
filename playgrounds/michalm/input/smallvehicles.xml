@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+	<vehicleType id="car">
+		<description>
+				car
+		</description>
+		<capacity>
+			<seats persons="7"/>
+			<standingRoom persons="0"/>
+		</capacity>
+		<length meter="4.0"/>
+		<width meter="1.0"/>
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+		<passengerCarEquivalents pce="1.0"/>
+	</vehicleType>
+	<vehicle id="H01947R08P01" type="car"/>
+	<vehicle id="H09310R01P02" type="car"/>
+	<vehicle id="H14758R03P01" type="car"/>
+	<vehicle id="H15210R02P01" type="car"/>
+	<vehicle id="H15656R05P02" type="car"/>
+	<vehicle id="H11961R10P02" type="car"/>
+</vehicleDefinitions>

@@ -1,0 +1,6 @@
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
+
+<vehicles>
+	<vehicle id="H13551R02T01" start_link="25399" t_0="1.0" t_1="86399.0"/>
+	<vehicle id="H06404R08T01" start_link="25138" t_0="1.0" t_1="86399.0"/>
+</vehicles>

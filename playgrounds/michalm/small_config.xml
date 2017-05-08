@@ -1,0 +1,200 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="controler">
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+		<param name="writeEventsInterval" value="10"/>
+    <param name="writePlansInterval" value="10"/>
+		<param name="outputDirectory" value="output/small_private/"/>
+		<param name="runId" value="small_private"/>
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="input/network.xml.gz" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="input/tinypopulation.xml" />
+	</module>
+	<module name= "vehicles">
+    <param name= "vehiclesFile" value= "input/smallvehicles.xml" />
+  </module>
+
+	<module name="taxifare">
+
+		<!-- Basefare per Trip (fare = positive value) -->
+		<param name="basefare" value="0.5" />
+
+		<!-- Daily subscription fee (fee = positive value) -->
+		<param name="dailySubscriptionFee" value="0.0" />
+
+		<!-- taxi fare per meter (fee = positive value) -->
+		<param name="distanceFare_m" value="0.0002" />
+
+		<!-- taxi fare per hour (fee = positive value) -->
+		<param name="timeFare_h" value="3.6" />
+	</module>
+
+	<module name="dvrp">
+		<param name="mode" value="taxi" />
+	</module>
+
+	<module name="taxi">
+
+		<!-- Used in AStarEuclidean for shortest path search for occupied drives.
+			Values above 1.0 (typically, 1.5 to 3.0) speed up the search, but at the
+			cost of obtaining longer paths -->
+		<param name="AStarEuclideanOverdoFactor" value="1.0" />
+
+		<param name="breakIfNotAllRequestsServed" value="false" />
+
+		<param name="changeStartLinkToLastLinkInSchedule" value="true" />
+
+		<!-- If false, the drop-off location remains unknown to the optimizer and
+			scheduler until the end of pickup -->
+		<param name="destinationKnown" value="false" />
+
+		<!-- If true, detailed hourly taxi stats are dumped after each iteration. -->
+		<param name="detailedStats" value="true" />
+
+		<!-- Typically, 60 seconds -->
+		<param name="dropoffDuration" value="60.0" />
+
+		<!-- If true, vehicles are (GPS-like) monitored while moving. This helps
+			in getting more accurate estimates on the time of arrival. Online tracking
+			is necessary for vehicle diversion. -->
+		<param name="onlineVehicleTracker" value="false" />
+
+		<!-- Typically, 120 seconds -->
+		<param name="pickupDuration" value="120.0" />
+
+		<!-- An XML file specifying the taxi fleet. The file format according to
+			dvrp_vehicles_v1.dtd -->
+		<!-- To create your own vehicles, see org.matsim.contrib.av.vehicles.CreateTaxiVehicles  -->
+		<param name="taxisFile" value="input/smalltaxis.xml" />
+		<!--  param name="taxisFile" value="taxis_2000.xml" /  -->
+
+		<!-- If true, time profiles of vehicle statuses (i.e. current task type)
+			and the number of unplanned requests -->
+		<param name="timeProfiles" value="true" />
+
+		<!-- If true, vehicles can be diverted during empty trips. Requires online
+			tracking. -->
+		<param name="vehicleDiversion" value="false" />
+
+		<parameterset type="optimizer">
+			<param name="cellSize" value="1000" />
+			<param name="goal" value="DEMAND_SUPPLY_EQUIL" />
+			<param name="id" value="example" />
+			<param name="nearestRequestsLimit" value="99999" />
+			<param name="nearestVehiclesLimit" value="99999" />
+			<param name="type" value="RULE_BASED" />
+		</parameterset>
+	</module>
+
+
+	<module name="qsim">
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
+		<param name="flowCapacityFactor" value="1.0" />
+    <param name="storageCapacityFactor" value="1.0" />
+		<param name="snapshotStyle" value="queue"/>
+		<param name="vehicleBehavior" value="wait" />
+	</module>
+
+	<module name="otfvis">
+		<param name="coloringScheme" value="taxicab" />
+		<param name="drawNonMovingItems" value="true" />
+	</module>
+
+	<module name="planscalcroute" >
+      <param name="networkModes" value="car"/>
+
+      <parameterset type="teleportedModeParameters" >
+          <param name="mode" value="pt" />
+          <!-- Speed for a teleported mode.
+            Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed.
+            Insert a line like this for every such mode. -->
+          <param name="beelineDistanceFactor" value="1.3" />
+          <param name="teleportedModeSpeed" value="6.944" />
+          <!-- 25 km/hr -->
+      </parameterset>
+  </module>
+
+	<module name="planCalcScore">
+		<!-- Activity Parameters -->
+		<parameterset type="activityParams">
+			<param name="activityType" value="Work" />
+			<param name="typicalDuration" value="08:00:00" />
+			<param name="openingTime" value="06:00:00" />
+			<param name="latestStartTime" value="09:00:00" />
+			<param name="closingTime" value="17:00:00" />
+		</parameterset>
+
+		<parameterset type="activityParams">
+				<param name="activityType" value="Home"/>
+				<param name="typicalDuration" value="12:00:00"/>
+		</parameterset>
+
+		<parameterset type="activityParams">
+				<param name="activityType" value="Other"/>
+				<param name="typicalDuration" value="02:00:00"/>
+		</parameterset>
+
+		<!-- Mode Parameters -->
+		<parameterset type="modeParams" >
+				<param name="mode" value="car" />
+				<param name="constant" value="-0.1" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
+		<parameterset type="modeParams" >
+				<param name="mode" value="taxi" />
+				<param name="constant" value="-2" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-10.0" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
+		<parameterset type="modeParams" >
+				<param name="mode" value="pt" />
+				<param name="constant" value="-6" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-12.0" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
+	</module>
+
+
+	<module name="strategy">
+		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.7" />
+		<param name="Module_1" value="BestScore" />
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="Module_2" value="ReRoute" />
+		<param name="ModuleProbability_3" value="0.1" />
+		<param name="Module_3" value="TimeAllocationMutator" />
+		<param name="ModuleProbability_4" value="0.1" />
+		<param name="Module_4" value="ChangeTripMode" />
+		<param name="ModuleProbability_5" value="0.1" />
+		<param name="Module_5" value="TimeAllocationMutator" />
+
+  </module>
+
+	<module name="changeMode" >
+			<param name="ignoreCarAvailability" value="false" />
+			<param name="modes" value="car,pt,taxi" />
+	</module>
+
+	<module name="TimeAllocationMutator">
+		<param name="mutationRange" value="900.0" />
+	</module>
+
+</config>
