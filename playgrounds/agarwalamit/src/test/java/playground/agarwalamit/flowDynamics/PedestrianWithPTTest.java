@@ -61,7 +61,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
  *
  * Simulating walk trip (named as="pedestrian" and has characteristics same as car) and public transit trips together.
  * Most likely, using name as "walk" will not work (if walk is a network mode too) because,
- * walk (or transit_walk) mode is used in {@link org.matsim.pt.config.TransitConfigGroup} for teleportation between
+ * walk (or transit_walk) mode is used in {@link org.matsim.pt.router.TransitRouterConfig} for teleportation between
  * first activity (home,work,...) and "pt interaction" activity.
  */
 
