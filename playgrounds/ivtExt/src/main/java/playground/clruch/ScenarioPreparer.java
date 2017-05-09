@@ -41,7 +41,6 @@ public class ScenarioPreparer {
         final int numVirtualNodes = 5;
         final int dtTravelData = 500;
         final boolean completeGraph = true;
-
         
         // cutting of scenario to circle
         // increasing the first value goes right        

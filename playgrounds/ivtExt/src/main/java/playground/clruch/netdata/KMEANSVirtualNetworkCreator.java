@@ -167,6 +167,8 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
 
         // FILL information for serialization
         virtualNetwork.fillVNodeMapRAWVERYPRIVATE();
+        
+        System.out.println("VNODES="+virtualNetwork.getvNodesCount());
 
         return virtualNetwork;
 
