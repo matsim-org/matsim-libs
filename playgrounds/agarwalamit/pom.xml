@@ -15,6 +15,37 @@
 			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.fortasoft</groupId>
+				<artifactId>gradle-maven-plugin</artifactId>
+				<version>1.0.8</version>
+				<configuration>
+					<tasks>
+						<task>
+							pom {
+							project {
+								groupId 'com.github.mobitopp'
+								artifactId 'connection-scan'
+								version '917f105'
+									}
+								}.writeTo("$buildDir/gradle_pom.xml")
+						</task>
+					</tasks>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>invoke</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>playground</groupId>
@@ -56,11 +87,11 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.54</version>
 		</dependency>
-		<dependency>
-			<groupId>com.github.mobitopp</groupId>
-			<artifactId>connection-scan</artifactId>
-			<version>master-SNAPSHOT</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.github.mobitopp</groupId>-->
+			<!--<artifactId>connection-scan</artifactId>-->
+			<!--<version>master-SNAPSHOT</version>-->
+		<!--</dependency>-->
 	</dependencies>
 
 </project>
