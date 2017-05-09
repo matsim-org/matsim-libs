@@ -26,6 +26,7 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
@@ -111,15 +112,19 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             // update rebalance count using current rate
             rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(redispatchPeriod)));
 
+            {
+                List<Integer> dims =Dimensions.of(rebalanceCount); 
             // redispatch values > 0 and remove from rebalanceCount
-            for (int i = 0; i < Dimensions.of(rebalanceCount).get(0); ++i) {
-                for (int j = 0; j < Dimensions.of(rebalanceCount).get(1); ++j) {
-                    double toSend = rebalanceCount.Get(i, j).number().doubleValue();
-                    if (toSend > 1.0) {
-                        rebalanceCountInteger.set(RealScalar.of(1), i, j);
-                        rebalanceCount.set(rebalanceCount.Get(i, j).subtract(RealScalar.of(1)), i, j);
+            for (int i = 0; i < dims.get(0); ++i) {
+                for (int j = 0; j < dims.get(1); ++j) {
+//                    double toSend = rebalanceCount.Get(i, j).number().doubleValue();
+                    if (Scalars.lessThan(RealScalar.ONE, rebalanceCount.Get(i, j))) {
+//                    if (toSend > 1.0) {
+                        rebalanceCountInteger.set(RealScalar.ONE, i, j);
+                        rebalanceCount.set(s->s.subtract(RealScalar.ONE), i, j);
                     }
                 }
+            }
             }
 
             // ensure that not more vehicles are sent away than available
@@ -154,7 +159,8 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             }
 
             // reset vector
-            rebalanceCountInteger = Tensors.matrix((i, j) -> RealScalar.of(0.0), nVNodes, nVNodes);
+            rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
+//                    Tensors.matrix((i, j) -> RealScalar.of(0.0), nVNodes, nVNodes);
         }
 
         // assign destinations to vehicles using bipartite matching
