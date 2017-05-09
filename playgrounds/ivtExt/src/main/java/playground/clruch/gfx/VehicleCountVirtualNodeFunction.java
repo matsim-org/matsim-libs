@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.sca.Plus;
+import ch.ethz.idsc.tensor.sca.Increment;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.VehicleContainer;
@@ -26,7 +26,7 @@ class VehicleCountVirtualNodeFunction extends AbstractVirtualNodeFunction {
             int linkIndex = vc.linkIndex;
             Link link = db.getOsmLink(linkIndex).link;
             VirtualNode vn = virtualNetwork.getVirtualNode(link);
-            count.set(Plus.ONE, vn.index);
+            count.set(Increment.ONE, vn.index);
         }
         return count;
     }

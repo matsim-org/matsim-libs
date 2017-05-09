@@ -34,7 +34,7 @@ import ch.ethz.idsc.tensor.io.ExtractPrimitives;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
 import ch.ethz.idsc.tensor.red.Total;
-import ch.ethz.idsc.tensor.sca.Plus;
+import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
@@ -208,7 +208,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         for (AVRequest avRequest : getAVRequests()) { // all current requests
                             if (mpcRequestsMap.containsKey(avRequest)) { // if request has been seen/computed before
                                 VirtualLink virtualLink = mpcRequestsMap.get(avRequest).virtualLink;
-                                vector.set(Plus.ONE, virtualLink.index);
+                                vector.set(Increment.ONE, virtualLink.index);
                             } else {
                                 // check if origin and dest are from same virtualNode
 
@@ -216,7 +216,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                 final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
                                 GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.index == vnTo.index));
                                 if (vnFrom.equals(vnTo)) {
-                                    vector.set(Plus.ONE, m + vnFrom.index); // index of self loop == m + vNode.id
+                                    vector.set(Increment.ONE, m + vnFrom.index); // index of self loop == m + vNode.id
                                 } else {
                                     VirtualNode fromIn = null;
                                     VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
@@ -230,7 +230,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                             VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
                                             mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, virtualLink));
                                             // I assume virtualLink != null
-                                            vector.set(Plus.ONE, virtualLink.index);
+                                            vector.set(Increment.ONE, virtualLink.index);
                                             break;
                                         }
                                     }
@@ -305,13 +305,13 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         /**
                          * find closest available cars to customers and pickup
                          */
-                        System.out.println("pickupPerVLink     : "+Pretty.of(requestVector));
+                        System.out.println("pickupPerVLink     : " + Pretty.of(requestVector));
                     }
                     {
                         DoubleArray doubleArray = container.get("rebalancingPerVLink");
                         rebalanceVector = Round.of(Tensors.vectorDouble(doubleArray.value));
                         GlobalAssert.that(rebalanceVector.length() == m + n);
-                        System.out.println("rebalancingPerVLink: "+Pretty.of(rebalanceVector));
+                        System.out.println("rebalancingPerVLink: " + Pretty.of(rebalanceVector));
                         /**
                          * find remaining available cars and do rebalance
                          */
