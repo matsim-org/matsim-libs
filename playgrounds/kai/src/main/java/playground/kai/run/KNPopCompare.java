@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -66,6 +67,7 @@ public class KNPopCompare {
 	// container that contains the statistics containers:
 	final Map<StatType,DataMap<String>> sumsContainer = new TreeMap<>() ;
 	final Map<StatType,DataMap<String>> cntsContainer = new TreeMap<>() ;
+	private Network network;
 
 	public static void main(String[] args) {
 		if ( args.length != 4 && args.length != 5 ) {
@@ -102,7 +104,7 @@ public class KNPopCompare {
 
 			Scenario scenario1 = ScenarioUtils.loadScenario( config ) ;
 			pop1 = scenario1.getPopulation() ;
-			//			network = scenario1.getNetwork() ;
+			network = scenario1.getNetwork() ;
 			ff = ((MutableScenario)scenario1).getActivityFacilities().getFactory() ;
 		}
 
@@ -216,8 +218,13 @@ public class KNPopCompare {
 				}
 //			}
 		}
-
-		final BoundingBox bbox = BoundingBox.createBoundingBox( 300000., -2.95e6, 500000., -2.7e6 );
+		BoundingBox bbox = null ;
+		if ( network != null ) {
+			bbox = BoundingBox.createBoundingBox( network );
+		} else {
+			bbox = BoundingBox.createBoundingBox( 300000., -2.95e6, 500000., -2.7e6 );
+		}
+		
 		{
 			SpatialGrid spatialGrid = new SpatialGrid( bbox, 2000., 0. ) ; 
 			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, 2000., 0. ) ; 
