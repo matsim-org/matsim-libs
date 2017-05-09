@@ -28,6 +28,7 @@ import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.*;
+import playground.clruch.traveldata.TravelData;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -73,7 +74,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
         final AbstractVirtualNodeDest virtualNodeDest;
         final AbstractRequestSelector requestSelector;
         final AbstractVehicleDestMatcher vehicleDestMatcher;
-        final ArrivalInformation arrivalInformation;
+        final TravelData arrivalInformation;
     //==================================================================================================================
     // Class Constructor
     //==================================================================================================================
@@ -88,7 +89,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                               AbstractRequestSelector abstractRequestSelector, //
                               AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
                               Map<VirtualLink, Double> linkWeightsIn, //
-                              ArrivalInformation arrivalInformation) {
+                              TravelData arrivalInformation) {
             super(config, travelTime, router, eventsManager, virtualNetwork);
 
             this.virtualNodeDest    = abstractVirtualNodeDest;
@@ -478,7 +479,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
             }
 
-            ArrivalInformation arrivalInformation = null;
+            TravelData arrivalInformation = null;
             {
                 final String ext = config.getParams().get(KEY_DTEXTENSION);
                 final File lambdaXML = new File(virtualnetworkDir, "poissonParameters_" + ext + ".xml");
@@ -491,7 +492,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 try {
                     long populationSize = population.getPersons().size();
                     int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-                    arrivalInformation = new ArrivalInformation(virtualNetwork, lambdaXML, pijFile, alphaijFile,//
+                    arrivalInformation = new TravelData(virtualNetwork, lambdaXML, pijFile, alphaijFile,//
                             populationSize, //
                             rebalancingPeriod //
                     );

@@ -3,6 +3,7 @@ package playground.clruch.test;
 import java.io.File;
 import java.util.Map;
 
+import org.gnu.glpk.GLPKConstants;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -53,7 +54,7 @@ public class VirtualNetworkTest {
         for (int i = 0; i < iter; ++i) {
             LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
             Tensor rhs = Array.zeros(virtualNetwork.getvNodesCount());
-            Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);
+            Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs,GLPKConstants.GLP_LO);
             lpVehicleRebalancing.closeLP();
         }
         long estimatedTimeNewSetup = System.currentTimeMillis() - startTime;
@@ -63,7 +64,7 @@ public class VirtualNetworkTest {
         LPVehicleRebalancing lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         for (int i = 0; i < iter * 10000; ++i) {
             Tensor rhs = Array.zeros(virtualNetwork.getvNodesCount());
-            Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs);
+            Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs,GLPKConstants.GLP_LO);
         }
         lpVehicleRebalancing.closeLP();
         long estimatedTimeRHS = System.currentTimeMillis() - startTime;
