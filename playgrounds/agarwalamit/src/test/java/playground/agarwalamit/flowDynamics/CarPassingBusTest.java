@@ -176,31 +176,31 @@ public class CarPassingBusTest {
 	}
 
 	private void createVehicles() {
-		Vehicles vehicles = this.scenario.getTransitVehicles();
-		VehiclesFactory vb = vehicles.getFactory();
+		{
+			Vehicles vehicles = this.scenario.getTransitVehicles();
+			VehiclesFactory vb = vehicles.getFactory();
 
-		// bus like
-		VehicleType busType = vb.createVehicleType(Id.create("bus", VehicleType.class));
-		busType.setMaximumVelocity(5.0);
-		busType.setPcuEquivalents(3.);
-		VehicleCapacity capacity = vb.createVehicleCapacity();
-		capacity.setSeats(Integer.valueOf(9999));
-		capacity.setStandingRoom(Integer.valueOf(0));
-		busType.setCapacity(capacity);
-		vehicles.addVehicleType(busType);
+			// bus like
+			VehicleType busType = vb.createVehicleType(Id.create("bus", VehicleType.class));
+			busType.setMaximumVelocity(5.0);
+			busType.setPcuEquivalents(3.);
+			VehicleCapacity capacity = vb.createVehicleCapacity();
+			capacity.setSeats(Integer.valueOf(9999));
+			capacity.setStandingRoom(Integer.valueOf(0));
+			busType.setCapacity(capacity);
+			vehicles.addVehicleType(busType);
+			vehicles.addVehicle( vb.createVehicle(Id.create("bus_1", Vehicle.class), busType));
+		}
 
-		vehicles.addVehicle( vb.createVehicle(Id.create("bus_1", Vehicle.class), busType));
+		{
+			Vehicles vehs = this.scenario.getVehicles();
+			VehicleType carType = vehs.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+			carType.setMaximumVelocity(10.);
+			carType.setPcuEquivalents(1.);
+			vehs.addVehicleType(carType);
 
-		Vehicles vehs = this.scenario.getVehicles();
-		vehs.addVehicleType(busType);
-
-		VehicleType carType = vehs.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-		carType.setMaximumVelocity(10.);
-		carType.setCapacity(capacity);
-		carType.setPcuEquivalents(1.);
-		vehs.addVehicleType(carType);
-
-		vehs.addVehicle(vehs.getFactory().createVehicle(Id.create("carUser", Vehicle.class), carType) );
+			vehs.addVehicle(vehs.getFactory().createVehicle(Id.create("carUser", Vehicle.class), carType) );
+		}
 	}
 
 	private void createPopulation() {
