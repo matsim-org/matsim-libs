@@ -121,7 +121,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                 }
                 {
                     double[] array = new double[] { samplingPeriod };
-                    DoubleArray doubleArray = new DoubleArray("samplingPeriod", new int[] { 1 }, array);
+                    DoubleArray doubleArray = new DoubleArray("Ts", new int[] { 1 }, array);
                     container.add(doubleArray);
                 }
                 {
