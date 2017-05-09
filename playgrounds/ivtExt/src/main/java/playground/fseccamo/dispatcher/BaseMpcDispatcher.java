@@ -36,8 +36,9 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     }
 
     protected Tensor countVehiclesPerVLink(Map<AVVehicle, Link> map) {
-        final Tensor vector = Array.zeros(virtualNetwork.getvLinksCount());
-        for (Entry<AVVehicle, Link> entry : map.entrySet()) {
+        final int m = virtualNetwork.getvLinksCount();
+        final Tensor vector = Array.zeros(m + virtualNetwork.getvNodesCount()); // self loops
+        for (Entry<AVVehicle, Link> entry : map.entrySet()) { // for each vehicle
             final AVVehicle avVehicle = entry.getKey();
             final Link current = entry.getValue();
             Task task = avVehicle.getSchedule().getCurrentTask();
@@ -45,15 +46,22 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             if (task instanceof AVPickupTask) {
                 List<? extends Task> list = avVehicle.getSchedule().getTasks();
                 int taskIndex = list.indexOf(task); //
-                task = list.get(taskIndex + 1);
-            }
-            if (task instanceof AVDriveTask)
+                task = list.get(taskIndex + 1); // immediately try next condition with task as AVDriveTask 
+            } // <- do not put "else" here
+            if (task instanceof AVDriveTask) {
                 vli = getVirtualLinkOfVehicle((AVDriveTask) task, current);
+                if (0 <= vli)
+                    vector.set(Plus.ONE, vli);
+                else {
+                    // if no transition between virtual nodes is detected, ... 
+                    // then the vehicle is considered to remain within current virtual node 
+                    VirtualNode vnode = virtualNetwork.getVirtualNode(current);
+                    vector.set(Plus.ONE, m + vnode.index); // self loop
+                }
+            }
             if (task instanceof AVDropoffTask) {
                 // don't do anything
             }
-            if (0 <= vli)
-                vector.set(Plus.ONE, vli);
         }
         return vector;
     }

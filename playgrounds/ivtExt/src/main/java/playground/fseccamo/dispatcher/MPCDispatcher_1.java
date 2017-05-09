@@ -65,7 +65,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
-//    final int numberOfAVs;
+    // final int numberOfAVs;
     final int numberOfVehicles;
     private int total_rebalanceCount = 0;
     Tensor printVals = Tensors.empty();
@@ -89,8 +89,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
         numberOfVehicles = (int) generatorConfig.getNumberOfVehicles();
-//        numberOfVehicles = Integer.parseInt(config.getParams().get("numberOfVehicles"));
-//        System.out.println(numberOfAVs + " " + numberOfVehicles);
+        // numberOfVehicles = Integer.parseInt(config.getParams().get("numberOfVehicles"));
+        // System.out.println(numberOfAVs + " " + numberOfVehicles);
         samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
         // redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
 
@@ -159,32 +159,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     DoubleArray doubleArray = new DoubleArray("N_cars", new int[] { 1 }, array);
                     container.add(doubleArray);
                 }
-
-                // {
-                // double[] array = new double[m]; // TODO
-                // DoubleArray doubleArray = new DoubleArray("P", new int[] { m }, array);
-                // container.add(doubleArray);
-                // }
-                // {
-                // double[] array = new double[m]; // TODO
-                // DoubleArray doubleArray = new DoubleArray("Q", new int[] { m }, array);
-                // container.add(doubleArray);
-                // }
-                // {
-                // double[] array = new double[m]; // TODO
-                // DoubleArray doubleArray = new DoubleArray("T", new int[] { m }, array);
-                // container.add(doubleArray);
-                // }
-                // {
-                // double[] array = new double[m];
-                // DoubleArray doubleArray = new DoubleArray("C", new int[] { m }, array);
-                // container.add(doubleArray);
-                // }
-                // { // normalized per seconds
-                // double[] array = new double[m]; // TODO
-                // DoubleArray doubleArray = new DoubleArray("lambda", new int[] { m }, array);
-                // container.add(doubleArray);
-                // }
                 javaContainerSocket.writeContainer(container);
             }
         } catch (UnknownHostException e) {
@@ -224,37 +198,46 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                   // 3) <VirtualLink, Integer> numberofCustomerCarryingVehicles --> new function needs to be implemented
                   // 4) <VirtualLink, Integer> numberofRebalancingVehicles --> new function needs to implemented
 
-                    Container container = new Container("problem");
+                    Container container = new Container(String.format("problem@%06d", Math.round(now))); //
                     { // done
                         /**
                          * number of waiting customers that begin their journey on link_k = (node_i, node_j)
                          */
-                        Tensor vector = Array.zeros(m);
+                        Tensor vector = Array.zeros(m + n); // +n accounts for self loop
                         for (AVRequest avRequest : getAVRequests()) { // all current requests
                             if (mpcRequestsMap.containsKey(avRequest)) { // if request has been seen/computed before
                                 VirtualLink virtualLink = mpcRequestsMap.get(avRequest).virtualLink;
                                 vector.set(Plus.ONE, virtualLink.index);
                             } else {
-                                VirtualNode fromIn = null;
-                                VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
-                                        avRequest.getFromLink(), avRequest.getToLink(), now); // TODO perhaps add expected waitTime
-                                for (Link link : vrpPath) {
-                                    final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
-                                    if (fromIn == null)
-                                        fromIn = toIn;
-                                    else //
-                                    if (fromIn != toIn) { // found adjacent node
-                                        VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
-                                        mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, virtualLink));
-                                        // I assume virtualLink != null
-                                        vector.set(Plus.ONE, virtualLink.index);
-                                        break;
+                                // check if origin and dest are from same virtualNode
+
+                                final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
+                                final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
+                                GlobalAssert.that(vnFrom.equals(vnTo) && vnFrom.index == vnTo.index);
+                                if (vnFrom.equals(vnTo)) {
+                                    vector.set(Plus.ONE, m + vnFrom.index); // index of self loop == m + vNode.id
+                                } else {
+                                    VirtualNode fromIn = null;
+                                    VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
+                                            avRequest.getFromLink(), avRequest.getToLink(), now); // TODO perhaps add expected waitTime
+                                    for (Link link : vrpPath) {
+                                        final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
+                                        if (fromIn == null)
+                                            fromIn = toIn;
+                                        else //
+                                        if (fromIn != toIn) { // found adjacent node
+                                            VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
+                                            mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, virtualLink));
+                                            // I assume virtualLink != null
+                                            vector.set(Plus.ONE, virtualLink.index);
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
-                        DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { m }, array);
+                        DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
                     }
                     { // done
@@ -265,9 +248,9 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
                         double[] array = new double[n];
                         for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet())
-                            array[entry.getKey().index] = entry.getValue().size(); // TODO use tensor notation
+                            array[entry.getKey().index] = entry.getValue().size(); // could use tensor notation
 
-                        DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { n }, array);
+                        DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { array.length }, array);
                         container.add(doubleArray);
                     }
                     { // done
@@ -276,7 +259,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                          */
                         final Tensor vector = countVehiclesPerVLink(getVehiclesWithCustomer());
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
-                        DoubleArray doubleArray = new DoubleArray("movingVehiclesWithCustomersPerVLink", new int[] { m }, array);
+                        DoubleArray doubleArray = new DoubleArray("movingVehiclesWithCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
                     }
                     { // done
@@ -285,7 +268,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                          */
                         final Tensor vector = countVehiclesPerVLink(getRebalancingVehicles());
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
-                        DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { m }, array);
+                        DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
                     }
                     javaContainerSocket.writeContainer(container);
