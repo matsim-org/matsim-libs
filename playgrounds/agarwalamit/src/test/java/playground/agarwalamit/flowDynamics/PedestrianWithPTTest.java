@@ -57,10 +57,15 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
- * @author amit after {@link playground.andreas.demo.AccessEgressDemoSimple}
+ * @author amit copy of {@link CarPassingBusTest}
+ *
+ * Simulating walk trip (named as="pedestrian" and has characteristics same as car) and public transit trips together.
+ * Most likely, using name as "walk" will not work (if walk is a network mode too) because,
+ * walk (or transit_walk) mode is used in {@link org.matsim.pt.config.TransitConfigGroup} for teleportation between
+ * first activity (home,work,...) and "pt interaction" activity.
  */
 
-public class CarPassingBusTest {
+public class PedestrianWithPTTest {
 
 	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private static final boolean isUsingOTFVis = false;
@@ -78,28 +83,28 @@ public class CarPassingBusTest {
 		runSim(lelteh);
 		
 		Id<Vehicle> busId = Id.createVehicleId("bus_1");
-		Id<Vehicle> carId = Id.createVehicleId("carUser");
+		Id<Vehicle> carId = Id.createVehicleId("pedestrianUser");
 		
 		Id<Link> linkId = Id.createLinkId("1011");
-		//	first make sure car enter after bus
+		//	first make sure pedestrian enter after bus
 		double busEnterTime = lelteh.vehicleEnterLeaveTimes.get(busId).get(linkId).getFirst();
 		double carEnterTime = lelteh.vehicleEnterLeaveTimes.get(carId).get(linkId).getFirst();
 		
-		Assert.assertEquals("Bus should enter before car.", busEnterTime < carEnterTime, true);
+		Assert.assertEquals("Bus should enter before pedestrian.", busEnterTime < carEnterTime, true);
 		
-		// now check car left before bus
+		// now check pedestrian left before bus
 		
 		double busLeaveTime = lelteh.vehicleEnterLeaveTimes.get(busId).get(linkId).getSecond();
 		double carLeaveTime = lelteh.vehicleEnterLeaveTimes.get(carId).get(linkId).getSecond();
 		
-		Assert.assertEquals("Car should leave before bus.", busLeaveTime > carLeaveTime, true);
+		Assert.assertEquals("Walk should leave before bus.", busLeaveTime > carLeaveTime, true);
 		
 		// now check for travel times
 		double busTravelTime = busLeaveTime - busEnterTime; // should be = 500/5+1 = 101
 		double carTravelTime = carLeaveTime - carEnterTime; // should be = 500/10+1 = 51
 		
 		Assert.assertEquals("Wrong bus travel time", busTravelTime, 101, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong car travel time", carTravelTime, 51, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong pedestrian travel time", carTravelTime, 51, MatsimTestUtils.EPSILON);
 	}
 
 	private void prepareConfig() {
@@ -107,9 +112,14 @@ public class CarPassingBusTest {
 		config.transit().setUseTransit(true);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue );
 		config.qsim().setEndTime(24.0*3600);
-		config.qsim().setMainModes(Arrays.asList(TransportMode.car));
+		config.qsim().setMainModes(Arrays.asList("car","pedestrian"));
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
+		config.travelTimeCalculator().setAnalyzedModes("car,pedestrian");
+		config.travelTimeCalculator().setFilterModes(true);
+
+		config.planCalcScore().getOrCreateModeParams("pedestrian").setConstant(0.);
+		config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.pt).setBeelineDistanceFactor(1.3);
 	}
 
 	private void createNetwork() {
@@ -182,17 +192,19 @@ public class CarPassingBusTest {
 			capacity.setStandingRoom(Integer.valueOf(0));
 			busType.setCapacity(capacity);
 			vehicles.addVehicleType(busType);
+
 			vehicles.addVehicle( vb.createVehicle(Id.create("bus_1", Vehicle.class), busType));
 		}
 
 		{
 			Vehicles vehs = this.scenario.getVehicles();
-			VehicleType carType = vehs.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+
+			VehicleType carType = vehs.getFactory().createVehicleType(Id.create("pedestrian", VehicleType.class));
 			carType.setMaximumVelocity(10.);
 			carType.setPcuEquivalents(1.);
 			vehs.addVehicleType(carType);
 
-			vehs.addVehicle(vehs.getFactory().createVehicle(Id.create("carUser", Vehicle.class), carType) );
+			vehs.addVehicle(vehs.getFactory().createVehicle(Id.create("pedestrianUser", Vehicle.class), carType) );
 		}
 	}
 
@@ -200,7 +212,7 @@ public class CarPassingBusTest {
 		Population population = this.scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 
-		Person person = pb.createPerson(Id.create("carUser", Person.class));
+		Person person = pb.createPerson(Id.create("pedestrianUser", Person.class));
 		Plan plan = pb.createPlan();
 
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
@@ -208,7 +220,7 @@ public class CarPassingBusTest {
 
 		Activity act1 = pb.createActivityFromLinkId("home", startLinkA.getId());
 		act1.setEndTime(7*3600. + 49.);
-		Leg leg = pb.createLeg(TransportMode.car);
+		Leg leg = pb.createLeg("pedestrian");
 
 		NetworkRoute networkRouteA = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 
@@ -235,7 +247,6 @@ public class CarPassingBusTest {
 		events.addHandler(eventHandler);
 
 		QSim qSim = QSimUtils.createDefaultQSim(this.scenario,events);
-
 		if (isUsingOTFVis) {
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 			OTFClientLive.run(scenario.getConfig(), server);
