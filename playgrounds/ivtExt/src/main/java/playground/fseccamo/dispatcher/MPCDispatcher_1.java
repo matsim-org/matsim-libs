@@ -33,6 +33,7 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
+import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Plus;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
@@ -198,7 +199,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                   // 3) <VirtualLink, Integer> numberofCustomerCarryingVehicles --> new function needs to be implemented
                   // 4) <VirtualLink, Integer> numberofRebalancingVehicles --> new function needs to implemented
 
-                    Container container = new Container(String.format("problem@%06d", Math.round(now))); //
+                    Container container = new Container(String.format("problem@%06d", Math.round(now)));
                     { // done
                         /**
                          * number of waiting customers that begin their journey on link_k = (node_i, node_j)
@@ -213,7 +214,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
                                 final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
                                 final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
-                                GlobalAssert.that(vnFrom.equals(vnTo) && vnFrom.index == vnTo.index);
+                                GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.index == vnTo.index));
                                 if (vnFrom.equals(vnTo)) {
                                     vector.set(Plus.ONE, m + vnFrom.index); // index of self loop == m + vNode.id
                                 } else {
@@ -239,6 +240,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
+                        System.out.println("waitCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                     }
                     { // done
                         /**
@@ -252,6 +254,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
                         DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { array.length }, array);
                         container.add(doubleArray);
+                        System.out.println("availableVehiclesPerVNode=" + Total.of(Tensors.vectorDouble(array)));
                     }
                     { // done
                         /**
@@ -261,6 +264,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingVehiclesWithCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
+                        System.out.println("movingVehiclesWithCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                     }
                     { // done
                         /**
@@ -270,6 +274,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
+                        System.out.println("movingRebalancingVehiclesPerVLink=" + Total.of(Tensors.vectorDouble(array)));
+
                     }
                     javaContainerSocket.writeContainer(container);
                 }
@@ -295,13 +301,17 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     {
                         DoubleArray doubleArray = container.get("pickupPerVLink");
                         requestVector = Round.of(Tensors.vectorDouble(doubleArray.value)); // integer values = # person
+                        GlobalAssert.that(requestVector.length() == m + n);
                         /**
                          * find closest available cars to customers and pickup
                          */
+                        System.out.println("pickupPerVLink     : "+Pretty.of(requestVector));
                     }
                     {
                         DoubleArray doubleArray = container.get("rebalancingPerVLink");
                         rebalanceVector = Round.of(Tensors.vectorDouble(doubleArray.value));
+                        GlobalAssert.that(rebalanceVector.length() == m + n);
+                        System.out.println("rebalancingPerVLink: "+Pretty.of(rebalanceVector));
                         /**
                          * find remaining available cars and do rebalance
                          */
