@@ -110,7 +110,9 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
         // remove vehicles which are rebalancing
         final Map<AVVehicle, Link> rebalancingVehicles = getRebalancingVehicles();
         for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
-            rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)).collect(Collectors.toList()));
+            rebalanceMap.put(entry.getKey(), entry.getValue().stream() //
+                    .filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //
+                    .collect(Collectors.toList()));
         }
 
         return rebalanceMap;

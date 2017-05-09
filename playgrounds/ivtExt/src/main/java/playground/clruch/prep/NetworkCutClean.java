@@ -16,8 +16,8 @@ public class NetworkCutClean {
 
     private static final Logger log = Logger.getLogger(NetworkCutClean.class);
 
-    public static void elminateOutsideRadius(Network network, Coord center, double radius) {
-        if (radius > 0) {
+    public static void elminateOutsideRadius(Network network, Coord center, Double radius) {
+        if (radius != null) {
             log.info("All network elements which are more than " + radius + " [m] away from Coord " + center.toString() + " removed.");
 
             System.out.println("network size before operation: " + network.getNodes().size());
