@@ -3,7 +3,7 @@ package playground.fseccamo.dispatcher;
 import java.io.File;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,8 +126,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     DoubleArray doubleArray = new DoubleArray("voronoiCenter", new int[] { n, 2 }, array);
                     container.add(doubleArray);
                 }
-                {   
-                    Tensor matrix = Import.of(getRequestScheduleFileGlobal()); // TODO check if global or next is needed!
+                {
+                    Tensor matrix = Import.of(getRequestScheduleFileGlobal());
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
                     DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { matrix.length(), 3 }, array);
                     container.add(doubleArray);
@@ -162,6 +162,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
             {
                 final int m = virtualNetwork.getvLinksCount();
                 final int n = virtualNetwork.getvNodesCount();
+
+                System.out.println("open requests: " + getAVRequests().size());
 
                 { // send
                   // INPUT TO MPC:
@@ -273,59 +275,32 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         DoubleArray doubleArray = container.get("pickupPerVLink");
                         requestVector = Round.of(Tensors.vectorDouble(doubleArray.value)); // integer values = # person
                         GlobalAssert.that(requestVector.length() == m + n);
-                        /**
-                         * find closest available cars to customers and pickup
-                         */
                     }
                     {
                         DoubleArray doubleArray = container.get("rebalancingPerVLink");
                         rebalanceVector = Round.of(Tensors.vectorDouble(doubleArray.value));
                         GlobalAssert.that(rebalanceVector.length() == m + n);
-                        /**
-                         * find remaining available cars and do rebalance
-                         */
                     }
-                    System.out.println("pickupPerVLink     : " + Pretty.of(requestVector));
-                    System.out.println("rebalancingPerVLink: " + Pretty.of(rebalanceVector));
+                    final int totalRebalanceDesired = Total.of(rebalanceVector).Get().number().intValue();
+                    final int totalPickupDesired = Total.of(requestVector).Get().number().intValue();
+                    System.out.println("pickupPerVLink     : TOTAL " + totalPickupDesired);
+                    System.out.println("rebalancingPerVLink: TOTAL " + totalRebalanceDesired);
+
                     {
-
+                        int totalRebalanceEffective = 0;
                         final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
-                        Tensor availVehCount = Tensor.of(availableVehicles.values().stream().map(List::size).map(RealScalar::of));
-
-                        final NavigableMap<Integer, List<MpcRequest>> virtualLinkRequestsMap = new TreeMap<>(mpcRequestsMap.values().stream() //
-                                .collect(Collectors.groupingBy(mpcRequest -> mpcRequest.vectorIndex)));
-
-                        System.out.println("availVehCount=" + availVehCount + "   " + virtualLinkRequestsMap.size());
-
-                        for (Entry<Integer, List<MpcRequest>> entry : virtualLinkRequestsMap.entrySet()) {
-                            int vectorIndex = entry.getKey();
-                            // ---
+                        for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
                             final VirtualNode vnFrom = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
                             final VirtualNode vnTo = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
                             // ---
                             if (availableVehicles.containsKey(vnFrom)) {
-                                // find cars!
-                                final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom);
-                                final List<MpcRequest> requests = entry.getValue();
-                                final int desiredPickup = requestVector.Get(vectorIndex).number().intValue();
+                                final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
                                 final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
-                                System.out.println("des " + desiredPickup + " " + desiredRebalance);
-                                {
-                                    // TODO perhaps ensure that requests are served according to waiting
-                                    // GlobalAssert.that(desiredPickup <= list.size()); // a bit strong
-                                    int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
-                                    for (int count = 0; count < min; ++count) {
-                                        VehicleLinkPair vehicleLinkPair = cars.get(0);
-                                        cars.remove(0);
-                                        MpcRequest mpcRequest = requests.get(count);
-                                        Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
-                                        System.out.println("set diversion for pickup");
-                                        setVehicleDiversion(vehicleLinkPair, pickupLocation); // send car to customer
-                                    }
-                                }
-                                {
+                                if (0 < desiredRebalance) {
+                                    String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";
+                                    System.out.println(String.format("vl=%2d  cars=%d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
                                     Random random = new Random();
                                     int min = Math.min(desiredRebalance, cars.size());
                                     for (int count = 0; count < min; ++count) {
@@ -334,23 +309,59 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                         // TODO choose better link
                                         Link rebalanceDest = new ArrayList<>( //
                                                 vnTo.getLinks()).get(random.nextInt(vnTo.getLinks().size()));
-                                        System.out.println("set rebalance");
                                         setVehicleRebalance(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
+                                        ++totalRebalanceEffective;
                                     }
                                 }
                             } else {
                                 System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
                             }
                         }
-
+                        if (totalRebalanceEffective != totalRebalanceDesired)
+                            System.out.println(" !!! rebalance delta: " + totalRebalanceEffective + " < " + totalRebalanceDesired);
                     }
 
+                    {
+                        int totalPickupEffective = 0;
+                        final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                        final NavigableMap<Integer, List<MpcRequest>> virtualLinkRequestsMap = new TreeMap<>(mpcRequestsMap.values().stream() //
+                                .collect(Collectors.groupingBy(mpcRequest -> mpcRequest.vectorIndex)));
+                        for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
+                            // ---
+                            final VirtualNode vnFrom = vectorIndex < m ? //
+                                    virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
+                            if (availableVehicles.containsKey(vnFrom)) {
+                                final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
+                                final int desiredPickup = requestVector.Get(vectorIndex).number().intValue();
+                                if (0 < desiredPickup) {
+                                    System.out.println(String.format("vl=%2d  cars=%d  pick=%3d  ", //
+                                            vectorIndex, cars.size(), desiredPickup));
+                                    { // handle requests
+                                        final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
+                                                virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
+
+                                        int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
+                                        for (int count = 0; count < min; ++count) {
+                                            VehicleLinkPair vehicleLinkPair = cars.get(0);
+                                            cars.remove(0);
+                                            MpcRequest mpcRequest = requests.get(count);
+                                            Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
+                                            System.out.println("set diversion for pickup");
+                                            setVehicleDiversion(vehicleLinkPair, pickupLocation); // send car to customer
+                                            ++totalPickupEffective;
+                                        }
+                                    }
+                                }
+                            } else {
+                                System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
+                            }
+                        }
+                        if (totalPickupEffective != totalPickupDesired)
+                            System.out.println(" !!! rebalance delta: " + totalPickupEffective + " < " + totalPickupDesired);
+
+                    }
                 }
             }
-            // all the open requests
-            Collection<AVRequest> avrequest = getAVRequests();
-
-            // TAKE CARE: Special case request from _ to same virtual Node.
         }
     }
 

@@ -100,7 +100,8 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         return -1;
     }
 
-    static File getRequestScheduleFileNext() {
+    @Deprecated
+    static File getRequestScheduleFileNext() { // not needed for MPC
         return new File(VIRTUALNETWORK_DIRECTORYNAME, "mpcRequestScheduleNext.tensor");
     }
 
