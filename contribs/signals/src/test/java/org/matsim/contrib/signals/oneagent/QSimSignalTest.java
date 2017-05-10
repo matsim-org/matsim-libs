@@ -126,6 +126,10 @@ public class QSimSignalTest implements
 		groupData.setOnset(0);
 		groupData.setDropping(59);	
 		
+//		scenario.getConfig().qsim().setUsingThreadpool(false);
+//		scenario.getConfig().qsim().setNumberOfThreads(0);
+		scenario.getConfig().parallelEventHandling().setNumberOfThreads(1);
+		
 		runQSimWithSignals(scenario, true);
 	}
 	
