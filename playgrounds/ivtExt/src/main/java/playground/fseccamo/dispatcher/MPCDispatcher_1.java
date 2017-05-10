@@ -312,6 +312,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         for (Entry<Integer, List<MpcRequest>> entry : virtualLinkRequestsMap.entrySet()) {
                             int vectorIndex = entry.getKey();
                             // ---
+                            // TODO simplify using mpcR struct
                             final VirtualNode vnFrom;
                             if (vectorIndex < m)
                                 vnFrom = virtualNetwork.getVirtualLink(vectorIndex).getFrom();
