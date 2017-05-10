@@ -11,7 +11,10 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
+
+import playground.clruch.utils.GlobalAssert;
 
 public class AVTravelTimeTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler {
     final private Map<Id<Vehicle>, Double> enterTimes = new HashMap<>();
@@ -33,7 +36,8 @@ public class AVTravelTimeTracker implements LinkEnterEventHandler, LinkLeaveEven
 
         if (enterTime != null) {
             LinkTravelTime travelTime = travelTimes.get(event.getLinkId());
-            if (travelTime == null) travelTime = new LinkTravelTime();
+            if (travelTime == null)
+                travelTime = new LinkTravelTime();
 
             travelTime.travelTime = event.getTime() - enterTime;
             travelTime.updateTime = event.getTime();
@@ -56,6 +60,11 @@ public class AVTravelTimeTracker implements LinkEnterEventHandler, LinkLeaveEven
 
     public LinkTravelTime getLinkTravelTime(Id<Link> linkId) {
         LinkTravelTime travelTime = travelTimes.get(linkId);
-        return (travelTime == null) ? new LinkTravelTime() : travelTime;
+        if (travelTime == null) {
+            return new LinkTravelTime();
+        } else {
+            GlobalAssert.that(travelTime.travelTime >= 0.0);
+            return travelTime;
+        }
     };
 }
