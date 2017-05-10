@@ -45,6 +45,8 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -61,13 +63,16 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 	private static double randomVariance = 1;
-	private static int iterationsToConvergence = 600;
+	private static int iterationsToConvergence = 1;
+	private static int averagingIterations = 10;
+	private static double selfTunerWeight = 0.95;
 
 	private static String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
 	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
 	private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
-	private static final boolean isPlansRelaxed = false;
+	private static final boolean isPlansRelaxed = true;
+
 
 	public static void main(String[] args) {
 
@@ -76,6 +81,8 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			iterationsToConvergence = Integer.valueOf(args[1]);
 			EQUIL_DIR = args[2];
 			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+			averagingIterations = Integer.valueOf(args[4]);
+			selfTunerWeight = Double.valueOf(args[5]);
 		}
 
 		Set<String> modes2consider = new HashSet<>();
@@ -157,14 +164,17 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			});
 			controler.run();
 
-			FileUtils.deleteIntermediateIterations(OUT_DIR,controler.getConfig().controler().getFirstIteration(), controler.getConfig().controler().getLastIteration());
+			FileUtils.deleteIntermediateIterations(config.controler().getOutputDirectory(),controler.getConfig().controler().getFirstIteration(), controler.getConfig().controler().getLastIteration());
 
 			// set back settings for opdyts
 			File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
 			config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
-			config.controler().setOutputDirectory(OUT_DIR);
-			config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
 		}
+
+		OUT_DIR = OUT_DIR+"/calibration_"+ averagingIterations +"Its_"+selfTunerWeight+"weight/";
+
+		config.controler().setOutputDirectory(OUT_DIR);
+		config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -194,6 +204,15 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 				addControlerListenerBinding().toInstance(stasControlerListner);
 
 				bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+
+				addControlerListenerBinding().toInstance(new ShutdownListener() {
+					@Override
+					public void notifyShutdown(ShutdownEvent event) {
+						// remove the unused iterations
+						String dir2remove = event.getServices().getControlerIO().getOutputPath()+"/ITERS/";
+						IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
+					}
+				});
 			}
 		});
 
@@ -218,8 +237,8 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// what would decide the convergence of the objective function
 //		final int iterationsToConvergence = 600; //
-		final int averagingIterations = 10;
-		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
+		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence,
+				averagingIterations);
 
 		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(
 				simulator,
@@ -236,17 +255,11 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 				);
 
 		// probably, an object which decide about the inertia
-		SelfTuner selfTuner = new SelfTuner(0.95);
+		SelfTuner selfTuner = new SelfTuner(selfTunerWeight);
 
 		randomSearch.setLogPath(OUT_DIR);
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
-
-		// remove the unused iterations
-		for (int index =0; index < maxIterations; index++) {
-			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
-			IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
-		}
 	}
 }
