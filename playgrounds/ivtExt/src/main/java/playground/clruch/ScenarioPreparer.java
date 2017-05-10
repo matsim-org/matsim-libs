@@ -38,26 +38,13 @@ public class ScenarioPreparer {
 
         // BEGIN: CUSTOMIZE ----------------------------------------------- 
         // set manually depending on the scenario:
-        final int maxPopulationSize = 2000;
-        final int numVirtualNodes = 5;
+        final int maxPopulationSize = 3000;
+        final int numVirtualNodes = 40;
         final int dtTravelData = 500;
-        final boolean completeGraph = true;
+        final boolean completeGraph = false;
 
-        // TODO use LocationSpec
-        LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
-        // cutting of scenario to circle
-        // increasing the first value goes right        
-        // increasing the second value goes north
-        // Zurich
-        // final Coord center = new Coord(2683600.0, 1251400.0);
-        // final double radius = 10000; // (set to -1 for no cutting)
-        // Basel
-        // final Coord center = new Coord(2612859.0,1266343.0);
-        // final double radius = 12000; // (set to -1 for no cutting)
-        // Sioux
-        final Coord center = new Coord(678365.311581,4827050.237694);
-        final double radius = 50000;
-
+        LocationSpec ls = LocationSpec.BASEL_CITY;
+        
         final boolean populationeliminateFreight = true;
         final boolean populationchangeModeToAV = true;
         final boolean populationeliminateWalking = true;
@@ -83,7 +70,7 @@ public class ScenarioPreparer {
 
         // 1) cut network (and reduce population to new network)
         {
-            NetworkCutClean.elminateOutsideRadius(network, center, radius);
+            NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
             final File fileExportGz = new File(dir, NETWORKUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(dir, NETWORKUPDATEDNAME + ".xml");
             {

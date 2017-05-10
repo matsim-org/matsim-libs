@@ -20,7 +20,7 @@ import playground.clruch.utils.GlobalAssert;
  * Created by Claudio on 2/8/2017.
  */
 // TODO VirtualNode implements Comparable<VirtualNode> based on index
-public class VirtualNode implements Serializable {
+public class VirtualNode implements Serializable, Comparable<VirtualNode> {
     /**
      * index is counting from 0,1,... index is used to assign entries in vectors and matrices
      */
@@ -94,5 +94,10 @@ public class VirtualNode implements Serializable {
 
     public int getNeighCount() {
         return neighCount;
+    }
+
+    @Override
+    public int compareTo(VirtualNode virtualNode) {
+        return Integer.compare(index, virtualNode.index);
     }
 }

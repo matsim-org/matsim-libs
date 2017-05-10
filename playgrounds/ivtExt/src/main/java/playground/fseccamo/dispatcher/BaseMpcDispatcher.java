@@ -1,5 +1,6 @@
 package playground.fseccamo.dispatcher;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,7 +13,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.sca.Plus;
+import ch.ethz.idsc.tensor.sca.Increment;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
@@ -25,6 +26,7 @@ import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 abstract class BaseMpcDispatcher extends PartitionedDispatcher {
+    static final String VIRTUALNETWORK_DIRECTORYNAME = "virtualNetwork";
 
     BaseMpcDispatcher( //
             AVDispatcherConfig config, //
@@ -46,17 +48,17 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             if (task instanceof AVPickupTask) {
                 List<? extends Task> list = avVehicle.getSchedule().getTasks();
                 int taskIndex = list.indexOf(task); //
-                task = list.get(taskIndex + 1); // immediately try next condition with task as AVDriveTask 
+                task = list.get(taskIndex + 1); // immediately try next condition with task as AVDriveTask
             } // <- do not put "else" here
             if (task instanceof AVDriveTask) {
                 vli = getVirtualLinkOfVehicle((AVDriveTask) task, current);
                 if (0 <= vli)
-                    vector.set(Plus.ONE, vli);
+                    vector.set(Increment.ONE, vli);
                 else {
-                    // if no transition between virtual nodes is detected, ... 
-                    // then the vehicle is considered to remain within current virtual node 
+                    // if no transition between virtual nodes is detected, ...
+                    // then the vehicle is considered to remain within current virtual node
                     VirtualNode vnode = virtualNetwork.getVirtualNode(current);
-                    vector.set(Plus.ONE, m + vnode.index); // self loop
+                    vector.set(Increment.ONE, m + vnode.index); // self loop
                 }
             }
             if (task instanceof AVDropoffTask) {
@@ -96,6 +98,14 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         // we can reach this point if vehicle is in last virtual node of path
         // System.out.println("failed to find virtual link of transition.");
         return -1;
+    }
+
+    static File getRequestScheduleFileNext() {
+        return new File(VIRTUALNETWORK_DIRECTORYNAME, "mpcRequestScheduleNext.tensor");
+    }
+
+    static File getRequestScheduleFileGlobal() {
+        return new File(VIRTUALNETWORK_DIRECTORYNAME, "mpcRequestScheduleGlobal.tensor");
     }
 
 }

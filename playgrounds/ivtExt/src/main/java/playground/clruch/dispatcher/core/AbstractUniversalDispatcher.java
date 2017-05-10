@@ -57,7 +57,7 @@ public abstract class AbstractUniversalDispatcher extends VehicleMaintainer {
 
     protected final double pickupDurationPerStop;
     protected final double dropoffDurationPerStop;
-    protected final int publishPeriod;
+    protected int publishPeriod; // not final, so that dispatchers can disable, or manipulate
 
     protected int total_matchedRequests = 0;
     protected Integer AVVEHILCECOUNT = null;
@@ -222,7 +222,7 @@ public abstract class AbstractUniversalDispatcher extends VehicleMaintainer {
 
     @Override
     final void notifySimulationSubscribers(long round_now) {
-        if (round_now % publishPeriod == 0) {
+        if (publishPeriod > 0 && round_now % publishPeriod == 0) {
             SimulationObjectCompiler simulationObjectCompiler = SimulationObjectCompiler.create( //
                     round_now, getInfoLine(), total_matchedRequests);
             simulationObjectCompiler.addRequests(getAVRequests());
