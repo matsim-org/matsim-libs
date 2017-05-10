@@ -1,9 +1,7 @@
 package playground.fseccamo.dispatcher;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +24,7 @@ import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.jmex.java.JavaContainerSocket;
 import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
@@ -33,7 +32,6 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
-import ch.ethz.idsc.tensor.red.Tally;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.Round;
@@ -63,11 +61,9 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  */
 public class MPCDispatcher_1 extends BaseMpcDispatcher {
     public final int samplingPeriod;
-    // public final int redispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
-    // final int numberOfAVs;
     final int numberOfVehicles;
     private int total_rebalanceCount = 0;
     Tensor printVals = Tensors.empty();
@@ -91,32 +87,23 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
         numberOfVehicles = (int) generatorConfig.getNumberOfVehicles();
-        // numberOfVehicles = Integer.parseInt(config.getParams().get("numberOfVehicles"));
-        // System.out.println(numberOfAVs + " " + numberOfVehicles);
-        samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
-        // redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
+        samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod")); // period between calls to MPC
 
         try {
             final int n = virtualNetwork.getvNodesCount();
             final int m = virtualNetwork.getvLinksCount();
-            // TODO
             javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
             // ---
             {
                 Container container = new Container("init");
                 { // directed graph incidence matrix
                     Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().index, i), n, m);
-                    System.out.println("E_in=");
-                    System.out.println(Pretty.of(matrix));
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
-                    // new double[n * m]; // TODO
                     DoubleArray doubleArray = new DoubleArray("E_in", new int[] { n, m }, array);
                     container.add(doubleArray);
                 }
                 {
                     Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getFrom().index, i), n, m);
-                    System.out.println("E_out=");
-                    System.out.println(Pretty.of(matrix));
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
                     DoubleArray doubleArray = new DoubleArray("E_out", new int[] { n, m }, array);
                     container.add(doubleArray);
@@ -131,7 +118,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             virtualNetwork.getVirtualNode(i).getCoord().getX(), //
                             virtualNetwork.getVirtualNode(i).getCoord().getY() //
                     ), n);
-                    System.out.println(Pretty.of(matrix));
+                    // System.out.println(Pretty.of(matrix));
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
                     DoubleArray doubleArray = new DoubleArray("voronoiCenter", new int[] { n, 2 }, array);
                     container.add(doubleArray);
@@ -163,14 +150,10 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                 }
                 javaContainerSocket.writeContainer(container);
             }
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw new RuntimeException(); // dispatcher will not work if constructor has issues
         }
-
     }
 
     // TODO remove served requests from map to save memory (but will not influence functionality)
@@ -319,13 +302,17 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     }
 
                     {
+
                         final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                        Tensor availVehCount = Tensor.of(availableVehicles.values().stream().map(List::size).map(RealScalar::of));
+                        System.out.println("availVehCount=" + availVehCount);
                         final Map<VirtualLink, List<MpcRequest>> virtualLinkRequestsMap = mpcRequestsMap.values().stream() //
                                 .collect(Collectors.groupingBy(mpcRequest -> mpcRequest.virtualLink));
 
                         for (Entry<VirtualLink, List<MpcRequest>> entry : virtualLinkRequestsMap.entrySet()) {
                             VirtualLink virtualLink = entry.getKey();
                             VirtualNode fromIn = virtualLink.getFrom();
+                            // FIXME treat case
                             if (availableVehicles.containsKey(fromIn)) {
                                 // find cars!
                                 List<VehicleLinkPair> cars = availableVehicles.get(fromIn);
