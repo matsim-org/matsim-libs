@@ -19,12 +19,14 @@
 
 package playground.agarwalamit.flowDynamics;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import com.google.inject.CreationException;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,13 +39,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -53,8 +57,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
  * @author amit copy of {@link CarPassingBusTest}
@@ -65,11 +67,33 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
  * first activity (home,work,...) and "pt interaction" activity.
  */
 
+@RunWith(Parameterized.class)
 public class PedestrianWithPTTest {
 
 	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	private static final boolean isUsingOTFVis = false;
-	
+	private final boolean isUsingControler ;
+
+	@Rule
+	public MatsimTestUtils helper = new MatsimTestUtils();
+
+	private final String walkModeName;
+
+	public PedestrianWithPTTest (boolean isUsingControler, String walkModeName) {
+		this.isUsingControler = isUsingControler;
+		this.walkModeName = walkModeName;
+	}
+
+	@Parameterized.Parameters(name = "{index}: isUsingControler == {0}")
+	public static Collection<Object[]> parameterObjects () {
+		Object [][] runMethod = new Object [][] {
+				{true, "walk"},
+				{false, "walk"},
+				{true, "ped"},
+				{false, "ped"}
+		};
+		return Arrays.asList(runMethod);
+	}
+
 	@Test
 	public void runTest() {
 		prepareConfig();
@@ -80,31 +104,40 @@ public class PedestrianWithPTTest {
 		
 		LinkEnterLeaveTimeEventHandler lelteh = new LinkEnterLeaveTimeEventHandler();
 		
-		runSim(lelteh);
-		
-		Id<Vehicle> busId = Id.createVehicleId("bus_1");
-		Id<Vehicle> carId = Id.createVehicleId("pedestrianUser");
-		
-		Id<Link> linkId = Id.createLinkId("1011");
-		//	first make sure pedestrian enter after bus
-		double busEnterTime = lelteh.vehicleEnterLeaveTimes.get(busId).get(linkId).getFirst();
-		double carEnterTime = lelteh.vehicleEnterLeaveTimes.get(carId).get(linkId).getFirst();
-		
-		Assert.assertEquals("Bus should enter before pedestrian.", busEnterTime < carEnterTime, true);
-		
-		// now check pedestrian left before bus
-		
-		double busLeaveTime = lelteh.vehicleEnterLeaveTimes.get(busId).get(linkId).getSecond();
-		double carLeaveTime = lelteh.vehicleEnterLeaveTimes.get(carId).get(linkId).getSecond();
-		
-		Assert.assertEquals("Walk should leave before bus.", busLeaveTime > carLeaveTime, true);
-		
-		// now check for travel times
-		double busTravelTime = busLeaveTime - busEnterTime; // should be = 500/5+1 = 101
-		double carTravelTime = carLeaveTime - carEnterTime; // should be = 500/10+1 = 51
-		
-		Assert.assertEquals("Wrong bus travel time", busTravelTime, 101, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong pedestrian travel time", carTravelTime, 51, MatsimTestUtils.EPSILON);
+		if (isUsingControler && this.walkModeName.equals(TransportMode.walk)) {
+			try {
+				runSim(lelteh);
+				Assert.assertTrue("Expected CreationException does not occur.", false);
+			} catch (CreationException e) {
+				Assert.assertTrue("Catched CreationException.", true);
+			}
+		} else {
+			runSim(lelteh);
+
+			Id<Vehicle> busId = Id.createVehicleId("bus_1");
+			Id<Vehicle> carId = Id.createVehicleId(walkModeName+"User");
+
+			Id<Link> linkId = Id.createLinkId("1011");
+			//	first make sure pedestrian enter after bus
+			double busEnterTime = lelteh.vehicleEnterLeaveTimes.get(busId).get(linkId).getFirst();
+			double carEnterTime = lelteh.vehicleEnterLeaveTimes.get(carId).get(linkId).getFirst();
+
+			Assert.assertEquals("Bus should enter before ."+walkModeName, busEnterTime < carEnterTime, true);
+
+			// now check pedestrian left before bus
+
+			double busLeaveTime = lelteh.vehicleEnterLeaveTimes.get(busId).get(linkId).getSecond();
+			double carLeaveTime = lelteh.vehicleEnterLeaveTimes.get(carId).get(linkId).getSecond();
+
+			Assert.assertEquals("Walk should leave before bus.", busLeaveTime > carLeaveTime, true);
+
+			// now check for travel times
+			double busTravelTime = busLeaveTime - busEnterTime; // should be = 500/5+1 = 101
+			double carTravelTime = carLeaveTime - carEnterTime; // should be = 500/10+1 = 51
+
+			Assert.assertEquals("Wrong bus travel time", busTravelTime, 101, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong "+walkModeName+" travel time", carTravelTime, 51, MatsimTestUtils.EPSILON);
+		}
 	}
 
 	private void prepareConfig() {
@@ -112,13 +145,14 @@ public class PedestrianWithPTTest {
 		config.transit().setUseTransit(true);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue );
 		config.qsim().setEndTime(24.0*3600);
-		config.qsim().setMainModes(Arrays.asList("car","pedestrian"));
+		config.qsim().setMainModes(Arrays.asList("car",walkModeName)); // car is still necessary for PT simulation
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
-		config.travelTimeCalculator().setAnalyzedModes("car,pedestrian");
+		config.travelTimeCalculator().setAnalyzedModes(StringUtils.join(new String[] { walkModeName}, ","));
 		config.travelTimeCalculator().setFilterModes(true);
+		config.plansCalcRoute().setNetworkModes(Arrays.asList(walkModeName));
 
-		config.planCalcScore().getOrCreateModeParams("pedestrian").setConstant(0.);
+		config.planCalcScore().getOrCreateModeParams(walkModeName).setConstant(0.);
 		config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.pt).setBeelineDistanceFactor(1.3);
 	}
 
@@ -199,12 +233,12 @@ public class PedestrianWithPTTest {
 		{
 			Vehicles vehs = this.scenario.getVehicles();
 
-			VehicleType carType = vehs.getFactory().createVehicleType(Id.create("pedestrian", VehicleType.class));
+			VehicleType carType = vehs.getFactory().createVehicleType(Id.create(walkModeName, VehicleType.class));
 			carType.setMaximumVelocity(10.);
 			carType.setPcuEquivalents(1.);
 			vehs.addVehicleType(carType);
 
-			vehs.addVehicle(vehs.getFactory().createVehicle(Id.create("pedestrianUser", Vehicle.class), carType) );
+			vehs.addVehicle(vehs.getFactory().createVehicle(Id.create(walkModeName+"User", Vehicle.class), carType) );
 		}
 	}
 
@@ -212,7 +246,7 @@ public class PedestrianWithPTTest {
 		Population population = this.scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 
-		Person person = pb.createPerson(Id.create("pedestrianUser", Person.class));
+		Person person = pb.createPerson(Id.create(walkModeName+"User", Person.class));
 		Plan plan = pb.createPlan();
 
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
@@ -220,7 +254,7 @@ public class PedestrianWithPTTest {
 
 		Activity act1 = pb.createActivityFromLinkId("home", startLinkA.getId());
 		act1.setEndTime(7*3600. + 49.);
-		Leg leg = pb.createLeg("pedestrian");
+		Leg leg = pb.createLeg(walkModeName);
 
 		NetworkRoute networkRouteA = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, startLinkA.getId(), endLinkA.getId());
 
@@ -243,16 +277,33 @@ public class PedestrianWithPTTest {
 	}
 
 	private void runSim(LinkEnterLeaveTimeEventHandler eventHandler) {
-		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(eventHandler);
+		if (isUsingControler) {
+			scenario.getConfig().controler().setOutputDirectory(helper.getOutputDirectory());
+			scenario.getConfig().controler().setLastIteration(0);
 
-		QSim qSim = QSimUtils.createDefaultQSim(this.scenario,events);
-		if (isUsingOTFVis) {
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
-			OTFClientLive.run(scenario.getConfig(), server);
+			PlanCalcScoreConfigGroup.ActivityParams homeAct = new PlanCalcScoreConfigGroup.ActivityParams("home");
+			PlanCalcScoreConfigGroup.ActivityParams workAct = new PlanCalcScoreConfigGroup.ActivityParams("work");
+			homeAct.setTypicalDuration(12. * 3600.);
+			workAct.setTypicalDuration(8. * 3600.);
+
+			scenario.getConfig().planCalcScore().addActivityParams(homeAct);
+			scenario.getConfig().planCalcScore().addActivityParams(workAct);
+
+			Controler controler = new Controler(scenario);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addEventHandlerBinding().toInstance(eventHandler);
+				}
+			});
+			controler.run();
+		} else {
+			EventsManager events = EventsUtils.createEventsManager();
+			events.addHandler(eventHandler);
+
+			QSim qSim = QSimUtils.createDefaultQSim(this.scenario,events);
+			qSim.run();
 		}
-
-		qSim.run();
 	}
 	
 	private static class LinkEnterLeaveTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
