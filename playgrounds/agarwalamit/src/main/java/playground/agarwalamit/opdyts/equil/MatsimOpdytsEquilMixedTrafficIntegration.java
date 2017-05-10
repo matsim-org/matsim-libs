@@ -71,7 +71,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
 	private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
-	private static final boolean isPlansRelaxed = true;
+	private static boolean isPlansRelaxed = true;
 
 
 	public static void main(String[] args) {
@@ -83,6 +83,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
 			averagingIterations = Integer.valueOf(args[4]);
 			selfTunerWeight = Double.valueOf(args[5]);
+			isPlansRelaxed = Boolean.valueOf(args[6]);
 		}
 
 		Set<String> modes2consider = new HashSet<>();
