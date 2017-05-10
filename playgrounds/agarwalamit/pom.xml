@@ -24,13 +24,24 @@
 				<configuration>
 					<tasks>
 						<task>
-							pom {
-							project {
-								groupId 'com.github.mobitopp'
-								artifactId 'connection-scan'
-								version '917f105'
-									}
-								}.writeTo("$buildDir/gradle_pom.xml")
+							writeNewPom {
+									doLast {
+									     pom {
+											project {
+												groupId 'com.github.mobitopp'
+												artifactId 'connection-scan'
+												version '917f105'
+													}
+											  }.writeTo("$buildDir/newpom.xml")
+											}
+										}
+							<!--pom {-->
+							<!--project {-->
+								<!--groupId 'com.github.mobitopp'-->
+								<!--artifactId 'connection-scan'-->
+								<!--version '917f105'-->
+									<!--}-->
+								<!--}.writeTo("$buildDir/gradle_pom.xml")-->
 						</task>
 					</tasks>
 				</configuration>
