@@ -60,12 +60,13 @@ public class MPCDispatcherPreparer extends BaseMpcDispatcher {
         this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
+        publishPeriod = 0;
     }
 
     @Override
     public void redispatch(double now) {
         final int m = virtualNetwork.getvLinksCount();
-
+        publishPeriod = 0;
         final long round_now = Math.round(now);
         if (round_now == 107000) {
 

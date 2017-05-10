@@ -126,21 +126,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     DoubleArray doubleArray = new DoubleArray("voronoiCenter", new int[] { n, 2 }, array);
                     container.add(doubleArray);
                 }
-                {
-//                    Tensor matrix = Tensors.empty(); // REQ x 3, <- 3 == [time, vn_fromIndex, vn_toIndex]
-//                    final int REQCOUNT = 1000;
-//                    { // generate random schedule TODO temporary
-//                        final int FIRST = 100;
-//                        Random random = new Random();
-//                        for (int c = 0; c < REQCOUNT; ++c) {
-//                            // requests happen only during the first 24 hrs
-//                            int time = FIRST + random.nextInt(86400 - FIRST);
-//                            int i = random.nextInt(n);
-//                            int j = random.nextInt(n);
-//                            // requests starting and ending in the same virtual node are allowed
-//                            matrix.append(Tensors.vector(time, i + 1, j + 1));
-//                        }
-//                    }
+                {   
                     Tensor matrix = Import.of(getRequestScheduleFileGlobal()); // TODO check if global or next is needed!
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
                     DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { matrix.length(), 3 }, array);
@@ -314,17 +300,10 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         for (Entry<Integer, List<MpcRequest>> entry : virtualLinkRequestsMap.entrySet()) {
                             int vectorIndex = entry.getKey();
                             // ---
-                            // TODO simplify using mpcR struct
-                            final VirtualNode vnFrom;
-                            if (vectorIndex < m)
-                                vnFrom = virtualNetwork.getVirtualLink(vectorIndex).getFrom();
-                            else
-                                vnFrom = virtualNetwork.getVirtualNode(vectorIndex - m);
-                            final VirtualNode vnTo;
-                            if (vectorIndex < m)
-                                vnTo = virtualNetwork.getVirtualLink(vectorIndex).getTo();
-                            else
-                                vnTo = virtualNetwork.getVirtualNode(vectorIndex - m);
+                            final VirtualNode vnFrom = vectorIndex < m ? //
+                                    virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
+                            final VirtualNode vnTo = vectorIndex < m ? //
+                                    virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
                             // ---
                             if (availableVehicles.containsKey(vnFrom)) {
                                 // find cars!
