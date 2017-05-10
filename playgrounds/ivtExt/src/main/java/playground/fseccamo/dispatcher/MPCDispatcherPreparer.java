@@ -17,6 +17,7 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.jmex.java.JavaContainerSocket;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Pretty;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
@@ -99,10 +100,12 @@ public class MPCDispatcherPreparer extends BaseMpcDispatcher {
                     MpcRequest mpcRequest = entry.getValue();
                     requestSchedule.append(Tensors.vector( //
                             Math.round(entry.getKey().getSubmissionTime()), //
-                            mpcRequest.nodeFrom.index, mpcRequest.nodeTo.index));
+                            mpcRequest.nodeFrom.index + 1, //
+                            mpcRequest.nodeTo.index + 1));
                 }
                 System.out.println("next node travel index");
-                System.out.println(Pretty.of(requestSchedule));
+                // System.out.println(Pretty.of(requestSchedule));
+                System.out.println(Dimensions.of(requestSchedule));
                 try {
                     Export.of(getRequestScheduleFileNext(), requestSchedule);
                 } catch (Exception exception) {
@@ -116,11 +119,14 @@ public class MPCDispatcherPreparer extends BaseMpcDispatcher {
                     final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
                     final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
                     requestSchedule.append(Tensors.vector( //
-                            Math.round(avRequest.getSubmissionTime()), vnFrom.index, vnTo.index));
+                            Math.round(avRequest.getSubmissionTime()), // 
+                            vnFrom.index + 1, // 
+                            vnTo.index + 1));
                 }
 
                 System.out.println("global travel index");
-                System.out.println(Pretty.of(requestSchedule));
+                // System.out.println(Pretty.of(requestSchedule));
+                System.out.println(Dimensions.of(requestSchedule));
                 try {
                     Export.of(getRequestScheduleFileGlobal(), requestSchedule);
                 } catch (Exception exception) {

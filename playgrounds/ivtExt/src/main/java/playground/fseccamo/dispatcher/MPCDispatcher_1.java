@@ -32,6 +32,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
+import ch.ethz.idsc.tensor.io.Import;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
 import ch.ethz.idsc.tensor.red.Total;
@@ -126,22 +127,23 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     container.add(doubleArray);
                 }
                 {
-                    Tensor matrix = Tensors.empty(); // REQ x 3, <- 3 == [time, vn_fromIndex, vn_toIndex]
-                    final int REQCOUNT = 1000;
-                    { // generate random schedule TODO temporary
-                        final int FIRST = 100;
-                        Random random = new Random();
-                        for (int c = 0; c < REQCOUNT; ++c) {
-                            // requests happen only during the first 24 hrs
-                            int time = FIRST + random.nextInt(86400 - FIRST);
-                            int i = random.nextInt(n);
-                            int j = random.nextInt(n);
-                            // requests starting and ending in the same virtual node are allowed
-                            matrix.append(Tensors.vector(time, i + 1, j + 1));
-                        }
-                    }
+//                    Tensor matrix = Tensors.empty(); // REQ x 3, <- 3 == [time, vn_fromIndex, vn_toIndex]
+//                    final int REQCOUNT = 1000;
+//                    { // generate random schedule TODO temporary
+//                        final int FIRST = 100;
+//                        Random random = new Random();
+//                        for (int c = 0; c < REQCOUNT; ++c) {
+//                            // requests happen only during the first 24 hrs
+//                            int time = FIRST + random.nextInt(86400 - FIRST);
+//                            int i = random.nextInt(n);
+//                            int j = random.nextInt(n);
+//                            // requests starting and ending in the same virtual node are allowed
+//                            matrix.append(Tensors.vector(time, i + 1, j + 1));
+//                        }
+//                    }
+                    Tensor matrix = Import.of(getRequestScheduleFileGlobal()); // TODO check if global or next is needed!
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
-                    DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { REQCOUNT, 3 }, array);
+                    DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { matrix.length(), 3 }, array);
                     container.add(doubleArray);
                 }
                 {
