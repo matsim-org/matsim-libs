@@ -164,6 +164,7 @@ public class LPVehicleRebalancing {
     /**
      * solving the LP with updated right-hand-sides 
      * @param rhs for problem, i.e. b-vector, e.g. rhs = vi_desiredT - vi_excessT;
+     * @parm GLPrhs, sign for right hand-side: GLP_LO -> Ax<=b, GLP_FX -> Ax==b
      * @return
      */
     public Tensor solveUpdatedLP(Tensor rhs, int GLPrhs) {
@@ -171,7 +172,6 @@ public class LPVehicleRebalancing {
         // use rhs to set constraints
         GlobalAssert.that(rhs.length() == n);
         for (int i = 0; i < n; ++i) {
-            //GLPK.glp_set_row_bnds(lp, i + 1, GLPKConstants.GLP_LO, ((rhs.Get(i))).number().doubleValue(), 0.0);
             GLPK.glp_set_row_bnds(lp, i + 1, GLPrhs, rhs.Get(i).number().doubleValue(), 0.0);
         }
 
@@ -187,12 +187,8 @@ public class LPVehicleRebalancing {
         }
 
 
-        // fill result vector
-        //rebalance from i to j is equal to variable  i*( n-1) + j +1
-
-        
+        // fill result vector, rebalance from i to j is equal to variable  (i*n)+ j +1
         Tensor rebalanceOrder = Tensors.matrix((i, j) -> RealScalar.of( GLPK.glp_get_col_prim(lp, (i*n)+ j +1)), n, n);
-        //Tensor rebalanceOrder = Tensors.matrix((j, i) -> RealScalar.of(   GLPK.glp_get_col_prim(lp, (j + 1) + (i) * n))   , n, n);
         return rebalanceOrder;
 
     }
