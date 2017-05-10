@@ -59,9 +59,10 @@ private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 		if (SignalGroupState.GREEN.equals(event.getNewState())){
 			this.checkAndHandleGreenAllowed(event);
 		}
-		else if (SignalGroupState.YELLOW.equals(event.getNewState())) {
-			this.handleRedOrSimilarStateChange(event);
-		}
+//		else if (SignalGroupState.YELLOW.equals(event.getNewState())) {
+//			this.handleRedOrSimilarStateChange(event);
+//		}
+		/* for intergreen validation only red, green (and off?) switches are necessary. theresa jan'17 */
 		else if (SignalGroupState.RED.equals(event.getNewState())){
 			this.handleRedOrSimilarStateChange(event);
 		}
@@ -92,7 +93,7 @@ private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 								Double lastDropTime =  droppingTimes4System.get(intergreens4BeginningGroup.getKey());
 								if (lastDropTime != null){
 									double realIntergreen = time - lastDropTime;
-									if (intergreens4BeginningGroup.getValue() < realIntergreen) {
+									if (intergreens4BeginningGroup.getValue() > realIntergreen) {
 										StringBuilder intergreenViolation = new StringBuilder();
 										intergreenViolation.append("SignalSystem Id ");
 										intergreenViolation.append(event.getSignalSystemId());
@@ -114,6 +115,7 @@ private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 											log.warn(intergreenViolation.toString());
 										}
 										else if (this.signalsConfig.getActionOnIntergreenViolation().equals(SignalSystemsConfigGroup.ActionOnIntergreenViolation.EXCEPTION)) {
+											log.warn(intergreenViolation.toString());
 											throw new RuntimeException(intergreenViolation.toString());
 										}
 									}

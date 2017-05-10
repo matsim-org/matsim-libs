@@ -20,7 +20,6 @@ package playground.agarwalamit.siouxFalls.simulationInputs;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
@@ -139,10 +138,12 @@ public class SiouxFallsControler {
 		controler.getConfig().controler().setCreateGraphs(true);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		
-		if(!internalizeEmission && !both){
-			controler.addControlerListener(new EmissionControlerListener());
-		}
+
+		// if EmissionModule is binded (necessary step), EmissionControlerListener is not required.
+		// It's sole purpose was to write the emission events if emission costs are not internalized. Amit Apr'17
+//		if(!internalizeEmission && !both){
+//			controler.addControlerListener(new EmissionControlerListener());
+//		}
 		controler.run();	
 	}
 }

@@ -52,7 +52,7 @@ public class MoreIOUtils {
 
 	public static void deleteDirectoryIfExists( final String dir ) {
 		final File file = new File( dir );
-		if ( file.exists() ) IOUtils.deleteDirectory( file );
+		if ( file.exists() ) IOUtils.deleteDirectoryRecursively(file.toPath());
 	}
 
 	public static File checkFile(final String file) {

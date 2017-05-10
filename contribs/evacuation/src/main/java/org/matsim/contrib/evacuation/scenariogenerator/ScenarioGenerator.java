@@ -102,23 +102,16 @@ public class ScenarioGenerator {
 		this.em.processEvent(e);
 		EvacuationConfigModule gcm = null; 
 
-		try {
-			this.matsimConfig = ConfigUtils.createConfig();
-			gcm = new EvacuationConfigModule("evacuation");//, this.configFile);
-			this.matsimConfig.addModule(gcm);
-			EvacuationConfigReader parser = new EvacuationConfigReader(gcm);
-			parser.readFile(this.configFile);
+		this.matsimConfig = ConfigUtils.createConfig();
+		gcm = new EvacuationConfigModule("evacuation");//, this.configFile);
+		this.matsimConfig.addModule(gcm);
+		EvacuationConfigReader parser = new EvacuationConfigReader(gcm);
+		parser.readFile(this.configFile);
 //			gcm.setFileNamesAbsolute();
-			String crs = getCRSFromEvacArea(gcm.getEvacuationAreaFileName());
-			this.matsimConfig.global().setCoordinateSystem(crs);
+		String crs = getCRSFromEvacArea(gcm.getEvacuationAreaFileName());
+		this.matsimConfig.global().setCoordinateSystem(crs);
 
 		
-		} catch (Exception ee) {
-			// TODO for backwards compatibility should be remove soon
-			log.warn("File is not a  evacuation config file. Guessing it is a common MATSim config file");
-			this.matsimConfig = ConfigUtils.loadConfig(this.configFile);
-
-		}
 
 		String outdir = gcm.getOutputDir();
 		this.matsimConfigFile = outdir + "/config.xml";

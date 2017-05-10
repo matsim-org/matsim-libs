@@ -21,7 +21,6 @@ package org.matsim.contrib.emissions.example.archive;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,7 +36,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * Results are written into distinct xml-files including emission event files for some iterations (as specified by the config). 
  * <p></p>
  * See <a href="{@docRoot}/src-html/org/matsim/contrib/emissions/example/RunEmissionToolOnlineExample.html#line.39">here</a> for the listing.
-
+ *
+ * Archived: Nov'16
  *
  * @author benjamin, julia
  */
@@ -68,7 +68,6 @@ public class RunEmissionToolOnlineExample {
 			@Override
 			public void install() {
 				bind(EmissionModule.class).asEagerSingleton();
-				addControlerListenerBinding().toInstance(new EmissionControlerListener());
 			}
 		});
 		controler.run();

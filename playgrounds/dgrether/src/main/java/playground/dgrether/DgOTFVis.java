@@ -1,27 +1,39 @@
 package playground.dgrether;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import playground.dgrether.utils.DgOTFVisUtils;
 
-import java.net.URL;
-import java.net.URLClassLoader;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.util.Types;
+
+import playground.dgrether.utils.DgOTFVisUtils;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -55,19 +67,35 @@ public class DgOTFVis {
 	
 	public void playScenario(Scenario scenario) {
 
-		EventsManager events = EventsUtils.createEventsManager();
-//		events.addHandler(new LogOutputEventHandler());
-		QSim qSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-
 		if (ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
-			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
-			qSim.addQueueSimulationListeners(engine);
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(scenario.getConfig()).loadSignalsData());
+		}
+		
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				// defaults
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
+				// signal specific module
+				install(new SignalsModule());
+			}
+		});
+	
+		EventsManager events = injector.getInstance(EventsManager.class);
+		events.initProcessing();
+		
+		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
+		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
+		for (Provider<MobsimListener> provider : mobsimListeners) {
+			qSim.addQueueSimulationListeners(provider.get());
 		}
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		qSim.run();
-
 	}
 	
 	public void playAndRouteConfig(String config){

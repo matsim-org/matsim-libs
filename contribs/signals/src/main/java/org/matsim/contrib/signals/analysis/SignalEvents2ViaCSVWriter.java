@@ -40,6 +40,8 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.contrib.signals.model.Signal;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -54,60 +56,59 @@ import org.matsim.lanes.data.Lanes;
  * @author tthunig
  *
  */
-public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHandler, IterationEndsListener, IterationStartsListener{
+public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHandler, IterationEndsListener, IterationStartsListener {
 
 	private static final Logger log = Logger.getLogger(SignalEvents2ViaCSVWriter.class);
-	
+
 	private static final String SIGNAL_ID = "signal id";
 	private static final String X_COORD = "x";
 	private static final String Y_COORD = "y";
 	private static final String TIME = "time";
 	private static final String SIGNAL_STATE = "signal state";
-		
+	
+	private int countWarnings = 0;
+
 	/**
-	 * distance between signal (the coordinate that will be drawn) 
-	 * and node in direction of the link
+	 * distance between signal (the coordinate that will be drawn) and node in direction of the link
 	 */
 	private static final double SIGNAL_COORD_NODE_OFFSET = 20.0;
 	/**
-	 * distance between signal (the coordinate that will be drawn) 
-	 * and link in orthogonal direction to the link
+	 * distance between signal (the coordinate that will be drawn) and link in orthogonal direction to the link
 	 */
 	private static final double SIGNAL_COORD_LINK_OFFSET = 5.0;
 
 	private BufferedWriter signalsCSVWriter;
 	private SignalsData signalsData;
-	@Inject Scenario scenario;
-	
-	/* this does not work here: one can bind the class via guice 
-	 * but it will never be instantiated because it is not used somewhere else */
-//	@Inject public SignalEvents2ViaCSVWriter(Scenario scenario, ControlerListenerManager clm, EventsManager em) {
-//		this.scenario = scenario;
-//		clm.addControlerListener(this);
-//		em.addHandler(this);
-//	}
-	
+	Scenario scenario;
+
+	@Inject
+	public SignalEvents2ViaCSVWriter(Scenario scenario, ControlerListenerManager clm, EventsManager em) {
+		this.scenario = scenario;
+		clm.addControlerListener(this);
+		em.addHandler(this);
+	}
+
 	private Map<Id<Signal>, Coord> signal2Coord = new HashMap<>();
 
 	@Override
-	public void reset(int iteration) {}
-	
+	public void reset(int iteration) {
+	}
+
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() == 0){
-			/* do all the stuff that is needed only once a simulation: 
-			 * - calculating coordinations for the via file
-			 * - getting the signals data out of the scenario */
+		if (event.getIteration() == scenario.getConfig().controler().getFirstIteration()) {
+			/*
+			 * do all the stuff that is needed only once a simulation: - calculating coordinations for the via file - getting the signals data out of the scenario
+			 */
 			init();
 		}
-		
-		String signalCSVFilename = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." 
-				+ event.getIteration() + "/signalEvents2Via.csv";
-		
-//		log.info("Initializing SignalsCSVWriter ...");
-		signalsCSVWriter = IOUtils.getBufferedWriter( signalCSVFilename );
+
+		String signalCSVFilename = scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/signalEvents2Via.csv";
+
+		// log.info("Initializing SignalsCSVWriter ...");
+		signalsCSVWriter = IOUtils.getBufferedWriter(signalCSVFilename);
 		log.info("Writing signal events of iteration " + event.getIteration() + " as csv file for via to " + signalCSVFilename + " ...");
-		
+
 		// create header
 		try {
 			signalsCSVWriter.write(SIGNAL_ID + ";" + X_COORD + ";" + Y_COORD + ";" + TIME + ";" + SIGNAL_STATE);
@@ -118,12 +119,12 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 		}
 	}
 
-	private void init(){
+	private void init() {
 		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		
+
 		// calculate coordinates of all signals and remember them
-		for (SignalSystemData signalSystem : signalsData.getSignalSystemsData().getSignalSystemData().values()){
-			for (SignalData signalData : signalSystem.getSignalData().values()){
+		for (SignalSystemData signalSystem : signalsData.getSignalSystemsData().getSignalSystemData().values()) {
+			for (SignalData signalData : signalSystem.getSignalData().values()) {
 				Coord signalCoord = calculateSignalCoordinate(signalData);
 				signal2Coord.put(signalData.getId(), signalCoord);
 			}
@@ -132,14 +133,19 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 
 	@Override
 	public void handleEvent(SignalGroupStateChangedEvent event) {
-		SignalGroupData signalGroupData = signalsData.getSignalGroupsData().
-				getSignalGroupDataBySystemId(event.getSignalSystemId()).get(event.getSignalGroupId());
+		if (signalsData == null){
+			if (countWarnings > 9){
+				log.warn("You are using the SignalsModule without Controler. No output is written out. (This warning is only given 10 times.)");
+				countWarnings++;
+			}
+			return;
+		}
+		SignalGroupData signalGroupData = signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(event.getSignalSystemId()).get(event.getSignalGroupId());
 		// write a line for each signal of the group
-		for (Id<Signal> signalId : signalGroupData.getSignalIds()){
+		for (Id<Signal> signalId : signalGroupData.getSignalIds()) {
 			Coord signalCoord = signal2Coord.get(signalId);
 			try {
-				signalsCSVWriter.write(signalId + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" 
-						+ event.getTime() + ";" + event.getNewState());
+				signalsCSVWriter.write(signalId + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + event.getTime() + ";" + event.getNewState());
 				signalsCSVWriter.newLine();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -147,53 +153,53 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 			}
 		}
 	}
-	
-	private Coord calculateSignalCoordinate(SignalData signalData){
-//		log.info("Calculating coordinate for signal " + signalId + " of signal system " + signalSystemId + " ...");
-		
+
+	private Coord calculateSignalCoordinate(SignalData signalData) {
+		// log.info("Calculating coordinate for signal " + signalId + " of signal system " + signalSystemId + " ...");
+
 		Id<Link> signalLinkId = signalData.getLinkId();
 		Link signalLink = scenario.getNetwork().getLinks().get(signalLinkId);
 		Coord toNodeCoord = signalLink.getToNode().getCoord();
 		Coord fromNodeCoord = signalLink.getFromNode().getCoord();
-		
+
 		int stepNumber = 0;
-		if (signalData.getLaneIds() != null){
+		if (signalData.getLaneIds() != null) {
 			// if the signal belongs to lanes, different signals may exist for one link -> determine step number for visualization
 			Lanes lanes = scenario.getLanes();
 			Id<Lane> firstSignalLaneId = (Id<Lane>) signalData.getLaneIds().toArray()[0];
 			Lane firstSignalLane = lanes.getLanesToLinkAssignments().get(signalLinkId).getLanes().get(firstSignalLaneId);
 			stepNumber = firstSignalLane.getAlignment();
 		}
-		
-		//calculate delta X and Y depending on the node offset
+
+		// calculate delta X and Y depending on the node offset
 		double deltaX = 0;
 		double deltaY = 0;
 		// handle different cases of links
-		if (toNodeCoord.getX() == fromNodeCoord.getX()){
-			// vertical link 
+		if (toNodeCoord.getX() == fromNodeCoord.getX()) {
+			// vertical link
 			deltaX = 0;
-			if (toNodeCoord.getY() < fromNodeCoord.getY()){
+			if (toNodeCoord.getY() < fromNodeCoord.getY()) {
 				deltaY = -1;
 			} else {
 				deltaY = 1;
 			}
-			
+
 		} else {
 			// this case includes the case when the link is horizontal
 			double m = (toNodeCoord.getY() - fromNodeCoord.getY()) / (toNodeCoord.getX() - fromNodeCoord.getX());
 			deltaX = 1 / (Math.sqrt(1 + m * m));
-			if (toNodeCoord.getX() > fromNodeCoord.getX()){
+			if (toNodeCoord.getX() > fromNodeCoord.getX()) {
 				// link is oriented to the right -> coordinates has to be shifted to the left
 				deltaX *= -1;
 			}
 			deltaY = m * deltaX;
 		}
-		
+
 		// calculate x and y coord where the signal should be drawn
 		double x = toNodeCoord.getX() + SIGNAL_COORD_NODE_OFFSET * deltaX + stepNumber * SIGNAL_COORD_LINK_OFFSET * deltaY;
 		double y = toNodeCoord.getY() + SIGNAL_COORD_NODE_OFFSET * deltaY - stepNumber * SIGNAL_COORD_LINK_OFFSET * deltaX;
-		
-//		log.info("... done!");
+
+		// log.info("... done!");
 		return new Coord(x, y);
 	}
 
@@ -209,5 +215,5 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 		}
 		log.info("... done for this iteration");
 	}
-	
+
 }

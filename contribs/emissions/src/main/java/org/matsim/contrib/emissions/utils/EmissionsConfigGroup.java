@@ -50,13 +50,13 @@ extends ReflectiveConfigGroup
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	private boolean isUsingVehicleIdAsVehicleDescription = false;
 
-	private static final String IGNORING_EMISSIONS_FROM_EVENTS_FILE = "isIgnoringEmissionsFromEventsFile";
-	private boolean isIgnoringEmissionsFromEventsFile = false;
+	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
+	private boolean isWritingEmissionsEvents = true;
 
 	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
 	private double emissionEfficiencyFactor = 1.0;
 
-	private static final String EMISSION_COST_MULTIPLICATION_FACTOR = "EMISSION_COST_MULTIPLICATION_FACTOR";
+	private static final String EMISSION_COST_MULTIPLICATION_FACTOR = "emissionCostMultiplicationFactor";
 	private double emissionCostMultiplicationFactor = 1.0;
 
 	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
@@ -73,13 +73,13 @@ extends ReflectiveConfigGroup
 			" - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
 			" - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
 			" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"."+
-			"\n" +
-			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n"+
+			"\n\t\t" +
+			"TRUE: for backward compatibility; vehicle type id is used for the emission specifications. " + "\n\t\t"+
 			"FALSE: vehicle description is used for the emission specifications." +
 			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
 			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
 
-	static final String IGNORING_EMISSIONS_FROM_EVENTS_FILE_CMT = "if true, emission events will not appear in the events file.";
+	static final String WRITING_EMISSIONS_EVENTS_CMT = "if false, emission events will not appear in the events file.";
 
 	static final String EMISSION_EFFICIENCY_FACTOR_CMT = "A factor to include efficiency of the vehicles; the factor is applied to the whole fleet. ";
 
@@ -106,7 +106,7 @@ extends ReflectiveConfigGroup
 
 		map.put(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION, USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT);
 
-		map.put(IGNORING_EMISSIONS_FROM_EVENTS_FILE, IGNORING_EMISSIONS_FROM_EVENTS_FILE_CMT);
+		map.put(WRITING_EMISSIONS_EVENTS, WRITING_EMISSIONS_EVENTS_CMT);
 
 		map.put(EMISSION_EFFICIENCY_FACTOR, EMISSION_EFFICIENCY_FACTOR_CMT);
 
@@ -226,17 +226,17 @@ extends ReflectiveConfigGroup
 		isUsingVehicleIdAsVehicleDescription = usingVehicleIdAsVehicleDescription;
 	}
 
-	@StringGetter(IGNORING_EMISSIONS_FROM_EVENTS_FILE)
-	public boolean isIgnoringEmissionsFromEventsFile() {
-		return isIgnoringEmissionsFromEventsFile;
+	@StringGetter(WRITING_EMISSIONS_EVENTS)
+	public boolean isWritingEmissionsEvents() {
+		return isWritingEmissionsEvents;
 	}
 
 	/**
-	 * @param ignoringEmissionsFromEventsFile -- {@value #IGNORING_EMISSIONS_FROM_EVENTS_FILE_CMT}
+	 * @param ignoringEmissionsFromEventsFile -- {@value #WRITING_EMISSIONS_EVENTS_CMT}
 	 */
-	@StringSetter(IGNORING_EMISSIONS_FROM_EVENTS_FILE)
+	@StringSetter(WRITING_EMISSIONS_EVENTS)
 	public void setIgnoringEmissionsFromEventsFile(boolean ignoringEmissionsFromEventsFile) {
-		isIgnoringEmissionsFromEventsFile = ignoringEmissionsFromEventsFile;
+		isWritingEmissionsEvents = ignoringEmissionsFromEventsFile;
 	}
 
 	@StringGetter(EMISSION_EFFICIENCY_FACTOR)

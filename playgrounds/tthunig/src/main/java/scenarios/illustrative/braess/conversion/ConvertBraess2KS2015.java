@@ -35,8 +35,7 @@ import playground.dgrether.koehlerstrehlersignal.conversion.TtMatsim2KS2015;
 public class ConvertBraess2KS2015 {
 
 	public static void main(String[] args) throws Exception {
-		String inputDir = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/cap3600_4Signals/";
+		String inputDir = "../../../shared-svn/projects/cottbus/data/scenarios/braess_scenario/cap3600_4Signals/";
 		// input files
 		String signalSystemsFilename = inputDir + "signalSystems.xml";
 		String signalGroupsFilename = inputDir + "signalGroups.xml";
@@ -46,8 +45,7 @@ public class ConvertBraess2KS2015 {
 		String populationFilename = inputDir + "plans3600_initRoutes.xml";
 
 		// output files
-		String outputDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/optimization/braess2ks/";
+		String outputDirectory = "../../../shared-svn/projects/cottbus/data/optimization/braess2ks/";
 		
 		// get the current date in format "yyyy-mm-dd"
 		Calendar cal = Calendar.getInstance();

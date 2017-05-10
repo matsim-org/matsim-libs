@@ -54,7 +54,7 @@ import playground.jbischoff.utils.JbUtils;
  */
 public class IntermodalTripDistanceAnalyser {
 	public static void main(String[] args) {
-		String runId = "25pct.r04";
+		String runId = "25pct.r05";
 		String plansFile = "D:/runs-svn/bvg_intermodal/"+runId+"/"+runId+".output_plans.xml.gz";
 		String networkFile = "D:/runs-svn/bvg_intermodal/"+runId+"/"+runId+".output_network.xml.gz";
 		String outFilePrefix = "D:/runs-svn/bvg_intermodal/"+runId+"/"+runId+".";

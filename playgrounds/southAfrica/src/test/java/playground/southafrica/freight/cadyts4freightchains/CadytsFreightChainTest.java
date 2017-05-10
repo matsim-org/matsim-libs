@@ -57,10 +57,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,9 +82,14 @@ public class CadytsFreightChainTest {
 		final int lastIteration = 100 ;
 
 		String outputDir = this.utils.getOutputDirectory();
-		IOUtils.createDirectory(outputDir) ;
+        File result;
+        try {
+            result = Files.createDirectories(Paths.get(outputDir)).toFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-		final Config config = createTestConfig(outputDir);
+        final Config config = createTestConfig(outputDir);
 
 		config.controler().setLastIteration(lastIteration);
 

@@ -33,8 +33,10 @@ import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnaly
 import org.matsim.contrib.emissions.types.*;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 
@@ -63,7 +65,7 @@ public class EmissionModule {
 	
 	//===
     private Map<Integer, String> roadTypeMapping;
-	private Vehicles emissionVehicles;
+	private Vehicles vehicles;
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
@@ -77,7 +79,7 @@ public class EmissionModule {
 
 		this.ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
 
-		if ( ecg.isIgnoringEmissionsFromEventsFile() ) {
+		if ( !ecg.isWritingEmissionsEvents() ) {
 			logger.warn("Emission events are excluded from events file. A new events manager is created.");
 			this.eventsManager = EventsUtils.createEventsManager();
 		} else {
@@ -86,6 +88,10 @@ public class EmissionModule {
 
 		createLookupTables();
 		createEmissionHandler();
+
+		// add event handlers here and restrict the access outside the emission Module.  Amit Apr'17.
+		this.eventsManager.addHandler(warmEmissionHandler);
+		this.eventsManager.addHandler(coldEmissionHandler);
 	}
 	
 	private void createLookupTables() {
@@ -94,8 +100,27 @@ public class EmissionModule {
 		getInputFiles();
 		
 		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
-		if(this.emissionVehicles == null){
-			emissionVehicles = scenario.getVehicles();
+
+		vehicles = scenario.getVehicles();
+
+		if( vehicles == null || vehicles.getVehicleTypes().isEmpty()) {
+			throw new RuntimeException("For emissions calculations, at least vehicle type information is necessary." +
+					"However, no information is provided. Aborting...");
+		} else {
+			for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
+				if (vehicleType.getMaximumVelocity() < 4.0/3.6 ) {
+					// Historically, many emission vehicles file have maximum speed set to 1 m/s which was not used by mobsim before.
+					// However, this should be removed if not set intentionally. Amit May'17
+					logger.warn("The maximum speed of vehicle type "+ vehicleType+ " is less than 4 km/h. " +
+							"\n Please make sure, this is really what you want because this will affect the mobility simulation.");
+				}
+			}
+		}
+
+		if(scenario.getConfig().qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.defaultVehicle)) {
+			logger.warn("Vehicle source in the QSim is "+ QSimConfigGroup.VehiclesSource.defaultVehicle.name()+", however a vehicle file or vehicle information is provided. \n" +
+					"Therefore, switching to "+ QSimConfigGroup.VehiclesSource.fromVehiclesData.name()+".");
+			scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
@@ -133,8 +158,8 @@ public class EmissionModule {
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
 		
-		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
+		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
+		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -382,21 +407,14 @@ public class EmissionModule {
 		return hbefaTrafficSituation;
 	}
 
-	public WarmEmissionHandler getWarmEmissionHandler() {
-		return warmEmissionHandler;	
+	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
+		return this. warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
-	public ColdEmissionHandler getColdEmissionHandler() {
-		return coldEmissionHandler;
-	}
-
+	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
+	// for the analysis purpose. Need a test. Amit Apr'17
 	public EventsManager getEmissionEventsManager() {
 		return eventsManager;
-	}
-
-	@Deprecated // use scenario.getVehicles() instead.
-	public Vehicles getEmissionVehicles() {
-		return emissionVehicles;
 	}
 
 	public void writeEmissionInformation() {

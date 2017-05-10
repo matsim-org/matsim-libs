@@ -45,7 +45,7 @@ public class TaxiModule extends DvrpModule {
 	}
 
 	public TaxiModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		super(createModuleForQSimPlugin(DefaultTaxiOptimizerProvider.class), TaxiOptimizer.class);
+		super(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
 	}
 
 	@Provides

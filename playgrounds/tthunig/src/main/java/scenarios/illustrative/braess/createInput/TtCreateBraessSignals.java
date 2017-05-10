@@ -52,34 +52,39 @@ import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.LanesToLinkAssignment;
 
-import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
+import signals.downstreamSensor.DownstreamPlanbasedSignalController;
+import signals.sylvia.data.DgSylviaPreprocessData;
 
 /**
- * Class to create signals (signal systems, signal groups and signal control)
- * for the Braess scenario.
+ * Class to create signals (signal systems, signal groups and signal control) for the Braess scenario.
  * 
  * @author tthunig
  * 
  */
 public final class TtCreateBraessSignals {
 
-	private static final Logger log = Logger
-			.getLogger(TtCreateBraessSignals.class);
-	
-	public enum SignalControlType{
-		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_X_SECOND_Z, SIGNAL4_SYLVIA_V2Z, SIGNAL4_SYLVIA_Z2V, SIGNAL4_RESPONSIVE
+	private static final Logger log = Logger.getLogger(TtCreateBraessSignals.class);
+
+	public enum SignalBasePlan {
+		NONE, ALL_NODES_ALL_GREEN, ALL_NODES_ONE_SECOND_Z, ALL_NODES_ONE_SECOND_SO, ALL_NODES_GREEN_WAVE_Z, ALL_NODES_GREEN_WAVE_SO, SIGNAL4_X_SECOND_Z_V2Z, SIGNAL4_X_SECOND_Z_Z2V
 	}
-	
+
+	public enum SignalControlLogic {
+		NONE, PLANBASED, SYLVIA, SIMPLE_RESPONSIVE, DOWNSTREAM_RESPONSIVE
+	}
+
 	private static final int CYCLE_TIME = 60;
 	private static final int INTERGREEN_TIME = 0;
-	
+
 	private Scenario scenario;
-	
+
 	private boolean middleLinkExists = true;
 	private LaneType laneType;
-	private SignalControlType signalType;
+	// private SignalControlType signalType;
+	private SignalBasePlan basePlan = SignalBasePlan.NONE;
 	private int secondsZGreen;
+	private SignalControlLogic signalLogic = SignalControlLogic.NONE;
 
 	// travel time for the middle link
 	private int linkTTMid;
@@ -102,14 +107,14 @@ public final class TtCreateBraessSignals {
 		// check whether the network contains the middle link
 		if (!this.scenario.getNetwork().getLinks().containsKey(Id.createLinkId("3_4")))
 			this.middleLinkExists = false;
-		
+
 		// calculate link travel times (necessary for green wave settings)
 		Link currentLink;
 		// get link travel time of the middle link
 		currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("3_4"));
 		linkTTMid = (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
 		// get link travel time of the middle route links besides the middle link (add inflow link travel time if inflow link exists)
-		if (scenario.getNetwork().getLinks().containsKey(Id.createLinkId("2_3"))){
+		if (scenario.getNetwork().getLinks().containsKey(Id.createLinkId("2_3"))) {
 			currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("2_3"));
 			linkTTSmall = (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
 		} else { // inflow link exists
@@ -117,21 +122,24 @@ public final class TtCreateBraessSignals {
 			linkTTSmall = (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
 			currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("23_3"));
 			linkTTSmall += (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
-		}		
+		}
 		// get link travel time of the two remaining outer route links
 		currentLink = scenario.getNetwork().getLinks().get(Id.createLinkId("3_5"));
 		linkTTBig = (int) Math.ceil(currentLink.getLength() / currentLink.getFreespeed());
 	}
 
 	public void createSignals() {
-		
-		if (signalType.equals(SignalControlType.NONE)){
-			log.error("This method should not be called if the signal type NONE is used.");
+
+		if (signalLogic.equals(SignalControlLogic.NONE)) {
+			log.error("This method should not be called if the signal control type NONE is used.");
 		}
-		if (!this.middleLinkExists && !this.signalType.equals(SignalControlType.ALL_GREEN)){
+		if (!this.middleLinkExists && !this.basePlan.equals(SignalBasePlan.ALL_NODES_ALL_GREEN)) {
 			log.error("No provided signal control besides ALL_GREEN makes sense in a scenario without the middle link.");
 		}
-		
+		if (!this.signalLogic.equals(SignalControlLogic.NONE) && this.basePlan.equals(SignalBasePlan.NONE)) {
+			log.error("A signal base plan is needed for signal control " + this.signalLogic);
+		}
+
 		createSignalSystems();
 		createSignalGroups();
 		createSignalControl();
@@ -140,17 +148,14 @@ public final class TtCreateBraessSignals {
 	/**
 	 * Creates signal systems depending on the network situation.
 	 * 
-	 * If realistic lanes are used they already give the turning move restrictions such that no
-	 * further turning move restrictions are necessary for the signal definitions. If only trivial
-	 * or no lanes are used this method adds the turning move restrictions to the signals.
+	 * If realistic lanes are used they already give the turning move restrictions such that no further turning move restrictions are necessary for the signal definitions. If only trivial or no lanes
+	 * are used this method adds the turning move restrictions to the signals.
 	 */
 	private void createSignalSystems() {
 
-		switch (signalType){
-		case SIGNAL4_X_SECOND_Z:
-		case SIGNAL4_SYLVIA_V2Z:
-		case SIGNAL4_SYLVIA_Z2V:
-		case SIGNAL4_RESPONSIVE:
+		switch (basePlan) {
+		case SIGNAL4_X_SECOND_Z_V2Z:
+		case SIGNAL4_X_SECOND_Z_Z2V:
 			// create only one signal system at node 4
 			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(4)));
 			break;
@@ -175,20 +180,20 @@ public final class TtCreateBraessSignals {
 		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
-		
+
 		// create signal system
 		SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem" + node.getId(), SignalSystem.class));
 		signalSystems.addSignalSystemData(signalSystem);
-		
+
 		// create a signal for every inLink outLink pair
-		for (Id<Link> inLinkId : node.getInLinks().keySet()){
+		for (Id<Link> inLinkId : node.getInLinks().keySet()) {
 			int outLinkCounter = 0;
-			for (Id<Link> outLinkId : node.getOutLinks().keySet()){
+			for (Id<Link> outLinkId : node.getOutLinks().keySet()) {
 				outLinkCounter++;
 				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId + "." + outLinkCounter, Signal.class));
 				signalSystem.addSignalData(signal);
 				signal.setLinkId(inLinkId);
-				
+
 				// add turning move restrictions and lanes if necessary
 				switch (this.laneType) {
 				case TRIVIAL:
@@ -234,10 +239,10 @@ public final class TtCreateBraessSignals {
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
 		SignalControlDataFactory fac = signalControl.getFactory();
-		
+
 		// create a temporary, empty signal control object needed in case sylvia is used
-		SignalControlData tmpSignalControl = new SignalControlDataImpl();		
-		
+		SignalControlData tmpSignalControl = new SignalControlDataImpl();
+
 		// create a signal control for all signal systems
 		for (SignalSystemData signalSystem : signalSystems.getSignalSystemData().values()) {
 
@@ -245,78 +250,78 @@ public final class TtCreateBraessSignals {
 
 			// create a default plan for the signal system (with defined cycle time and offset 0)
 			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
-			
+
 			signalSystemControl.addSignalPlanData(signalPlan);
-			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			// add the signalSystemControl to the final or temporary, respectively, signalControl 
-			if (this.signalType.equals(SignalControlType.SIGNAL4_SYLVIA_Z2V) || this.signalType.equals(SignalControlType.SIGNAL4_SYLVIA_V2Z)){
+			// choose controller identifier
+			switch (this.signalLogic){
+			case DOWNSTREAM_RESPONSIVE:
+				signalSystemControl.setControllerIdentifier(DownstreamPlanbasedSignalController.IDENTIFIER);
+				break;
+			default:
+				// planbased controller identifier needed for planbased signal control, sylvia and the simple responsive signals used here
+				signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+				break;
+			}
+			// add the signalSystemControl to the final or temporary, respectively, signalControl
+			if (this.signalLogic.equals(SignalControlLogic.SYLVIA)) {
 				tmpSignalControl.addSignalSystemControllerData(signalSystemControl);
 			} else {
 				signalControl.addSignalSystemControllerData(signalSystemControl);
 			}
-			
+
 			// specify signal group settings for all signal groups of this signal system
 			for (SignalGroupData signalGroup : signalGroups.getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
-				
-				switch (this.signalType){
-				case GREEN_WAVE_Z:
+
+				switch (this.basePlan) {
+				case ALL_NODES_GREEN_WAVE_Z:
 					// create signal control such that the middle route is preferred
 					createGreenWaveZSignalControl(fac, signalPlan, signalGroup.getId());
 					break;
-				case GREEN_WAVE_SO:
+				case ALL_NODES_GREEN_WAVE_SO:
 					// create signal control such that the outer routes are preferred
 					createGreenWaveSOSignalControl(fac, signalPlan, signalGroup.getId());
 					break;
-				case ALL_GREEN:
-				case ONE_SECOND_Z:
-				case ONE_SECOND_SO:
+				case ALL_NODES_ALL_GREEN:
+				case ALL_NODES_ONE_SECOND_Z:
+				case ALL_NODES_ONE_SECOND_SO:
 					// create all day green onset and dropping
 					// and change it afterwards in case of ONE_SECOND_* control
-					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
-							fac, signalGroup.getId(), 0, CYCLE_TIME));
+					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroup.getId(), 0, CYCLE_TIME));
 					break;
-				case SIGNAL4_X_SECOND_Z:
-				case SIGNAL4_RESPONSIVE:
+				case SIGNAL4_X_SECOND_Z_Z2V:
 					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), secondsZGreen);
 					break;
-				case SIGNAL4_SYLVIA_V2Z:
+				case SIGNAL4_X_SECOND_Z_V2Z:
 					// create a basis signal plan
-					createSignal4SettingFirstV(fac, signalPlan, signalGroup.getId(), 55);
-					break;
-				case SIGNAL4_SYLVIA_Z2V:
-					// create a basis signal plan
-					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), 55);
+					createSignal4SettingFirstV(fac, signalPlan, signalGroup.getId(), CYCLE_TIME - secondsZGreen - 2 * INTERGREEN_TIME);
 					break;
 				default:
 					break;
 				}
 			}
 		}
-		
+
 		// overall adoptions
-		switch (this.signalType){
-		
+		switch (this.basePlan) {
 		// change the overall signal control to ONE_SECOND_Z or ONE_SECOND_SO respectively if necessary
-		case ONE_SECOND_Z:
+		case ALL_NODES_ONE_SECOND_Z:
 			// change all day green signal control such that
 			// the middle route gets only green for one second a cycle
 			changeAllGreenSignalControlTo1Z();
 			break;
-		case ONE_SECOND_SO:
+		case ALL_NODES_ONE_SECOND_SO:
 			// change all day green signal control such that
 			// the outer routes get only green for one second a cycle
 			changeAllGreenSignalControlTo1SO();
 			break;
-		
-		// convert basis fixed time plan to sylvia plan
-		case SIGNAL4_SYLVIA_V2Z:
-		case SIGNAL4_SYLVIA_Z2V:
-			// create the final sylvia signal control with information of the temporary signal control
-			DgSylviaPreprocessData.convertSignalControlData(tmpSignalControl, signalControl);
-			break;
-		
 		default:
 			break;
+		}
+
+		// convert basis fixed time plan to sylvia plan
+		if (this.signalLogic.equals(SignalControlLogic.SYLVIA)){
+			// create the final sylvia signal control with information of the temporary signal control
+			DgSylviaPreprocessData.convertSignalControlData(tmpSignalControl, signalControl);
 		}
 	}
 
@@ -325,7 +330,7 @@ public final class TtCreateBraessSignals {
 		int dropping = 0;
 		int signalSystemOffset = 0;
 		// set onset and dropping for each signal group and offset for each signal system
-		switch (signalGroupId.toString()){
+		switch (signalGroupId.toString()) {
 		case "signal1_2.1": // signal for turning left (upper or middle route) at node 2
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
@@ -383,7 +388,7 @@ public final class TtCreateBraessSignals {
 		int dropping = 0;
 		int signalSystemOffset = 0;
 		// set onset and dropping for each signal group and offset for each signal system
-		switch (signalGroupId.toString()){
+		switch (signalGroupId.toString()) {
 		case "signal1_2.1": // signal for turning left (upper or middle route) at node 2
 			onset = 0;
 			dropping = 30 - INTERGREEN_TIME;
@@ -436,63 +441,60 @@ public final class TtCreateBraessSignals {
 		signalPlan.setOffset(signalSystemOffset);
 	}
 
-	private void createSignal4SettingFirstZ(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, int second2SwitchFromZtoV) {
+	private void createSignal4SettingFirstZ(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, int second2SwitchOffZ) {
 		int onset = 0;
 		int dropping = 0;
 		// set onset and dropping depending on the signal group and signal control type
-		switch (signalGroupId.toString()){
+		switch (signalGroupId.toString()) {
 		case "signal3_4.1": // signal at node 4 for the middle route
 			// set second2SwitchFromZtoV1 seconds green for the middle route
 			onset = 0;
-			dropping = second2SwitchFromZtoV;
+			dropping = second2SwitchOffZ;
 			break;
 		case "signal24_4.1":
 		case "signal2_4.1": // signal at node 4 for the lower route
 			// set 60 - second2SwitchFromZtoV seconds green for the lower route
-			onset = second2SwitchFromZtoV;
-			dropping = 60;
+			onset = second2SwitchOffZ + INTERGREEN_TIME;
+			dropping = 60 - INTERGREEN_TIME;
 			break;
 		default:
-			log.error("This method was called for signal group ID " + signalGroupId 
-					+ " but should not be called for other signal groups than the ones of signal system 4.");
+			log.error("This method was called for signal group ID " + signalGroupId + " but should not be called for other signal groups than the ones of signal system 4.");
 			break;
 		}
 		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
 	}
-	
-	private void createSignal4SettingFirstV(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, int second2SwitchFromVtoZ) {
+
+	private void createSignal4SettingFirstV(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, int second2SwitchOffV) {
 		int onset = 0;
 		int dropping = 0;
 		// set onset and dropping depending on the signal group and signal control type
-		switch (signalGroupId.toString()){
+		switch (signalGroupId.toString()) {
 		case "signal3_4.1": // signal at node 4 for the middle route
 			// set 60 - second2SwitchFromVtoZ seconds green for the middle route
-			onset = second2SwitchFromVtoZ;
-			dropping = 60;
+			onset = second2SwitchOffV + INTERGREEN_TIME;
+			dropping = 60 - INTERGREEN_TIME;
 			break;
 		case "signal24_4.1":
 		case "signal2_4.1": // signal at node 4 for the lower route
 			// set second2SwitchFromVtoZ seconds green for the lower route
 			onset = 0;
-			dropping = second2SwitchFromVtoZ;
+			dropping = second2SwitchOffV;
 			break;
 		default:
-			log.error("This method was called for signal group ID " + signalGroupId 
-					+ " but should not be called for other signal groups than the ones of signal system 4.");
+			log.error("This method was called for signal group ID " + signalGroupId + " but should not be called for other signal groups than the ones of signal system 4.");
 			break;
 		}
 		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
 	}
 
 	/**
-	 * Sets the signal at link 3_4 (i.e. the middle route) green for only one
-	 * second a cycle. (Green for no seconds is not possible.)
+	 * Sets the signal at link 3_4 (i.e. the middle route) green for only one second a cycle. (Green for no seconds is not possible.)
 	 * 
 	 * Assumes that the middle link (3_4) exists.
 	 */
 	private void changeAllGreenSignalControlTo1Z() {
 
-		SignalsData signalsData = (SignalsData) this.scenario	.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData signalControl = signalsData.getSignalControlData();
 
 		SignalSystemControllerData signalSystem4Control = signalControl.getSignalSystemControllerDataBySystemId().get(Id.create("signalSystem4", SignalSystem.class));
@@ -500,14 +502,14 @@ public final class TtCreateBraessSignals {
 			// note: every signal system has only one signal plan here
 
 			// pick the signal at link 3_4 (which is the middle link) from the signal plan
-			SignalGroupSettingsData signalGroupZSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(			Id.create("signal3_4.1", SignalGroup.class));
+			SignalGroupSettingsData signalGroupZSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal3_4.1", SignalGroup.class));
 
 			// set the signal green for only one second
 			signalGroupZSetting.setOnset(0);
 			signalGroupZSetting.setDropping(1);
-			
+
 			// pick the signal at link 2_4 (or 24_4 respectively) from the signal plan
-			// (which is the lower link in front of crossing 4) 
+			// (which is the lower link in front of crossing 4)
 			SignalGroupSettingsData signalGroupVSetting;
 			if (signalPlan.getSignalGroupSettingsDataByGroupId().containsKey(Id.create("signal2_4.1", SignalGroup.class)))
 				signalGroupVSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal2_4.1", SignalGroup.class));
@@ -521,12 +523,10 @@ public final class TtCreateBraessSignals {
 	}
 
 	/**
-	 * Sets the signal for turning right at link 1_2 and the signal for going
-	 * straight on at link 2_3 green for only one second a cylce. (Green for no
-	 * seconds is not possible.)
+	 * Sets the signal for turning right at link 1_2 and the signal for going straight on at link 2_3 green for only one second a cylce. (Green for no seconds is not possible.)
 	 */
 	private void changeAllGreenSignalControlTo1SO() {
-		
+
 		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData signalControl = signalsData.getSignalControlData();
 
@@ -543,15 +543,15 @@ public final class TtCreateBraessSignals {
 			signalGroupSOSetting.setOnset(0);
 			signalGroupSOSetting.setDropping(1);
 		}
-		
+
 		// adapt signal system 3
-		SignalSystemControllerData signalSystem3Control = signalControl.getSignalSystemControllerDataBySystemId().get(	Id.create("signalSystem3", SignalSystem.class));
+		SignalSystemControllerData signalSystem3Control = signalControl.getSignalSystemControllerDataBySystemId().get(Id.create("signalSystem3", SignalSystem.class));
 		for (SignalPlanData signalPlan : signalSystem3Control.getSignalPlanData().values()) {
 			// note: every signal system has only one signal plan here
 
 			// pick the second signal at link 2_3 (or 23_3 respectively) (going straight on) from the signal plan
 			SignalGroupSettingsData signalGroupSOSetting;
-			if (signalPlan.getSignalGroupSettingsDataByGroupId().containsKey(Id.create("signal2_3.2", SignalGroup.class))){
+			if (signalPlan.getSignalGroupSettingsDataByGroupId().containsKey(Id.create("signal2_3.2", SignalGroup.class))) {
 				signalGroupSOSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal2_3.2", SignalGroup.class));
 			} else {
 				signalGroupSOSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal23_3.2", SignalGroup.class));
@@ -567,11 +567,15 @@ public final class TtCreateBraessSignals {
 		this.laneType = laneType;
 	}
 
-	public void setSignalType(SignalControlType signalType) {
-		this.signalType = signalType;
+	public void setBasePlanType(SignalBasePlan basePlan) {
+		this.basePlan = basePlan;
 	}
-	
-	public void setSecondsZGreen(int secondsZGreen){
+
+	public void setSignalControlLogic(SignalControlLogic signalLogic) {
+		this.signalLogic = signalLogic;
+	}
+
+	public void setSecondsZGreen(int secondsZGreen) {
 		this.secondsZGreen = secondsZGreen;
 	}
 

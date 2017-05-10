@@ -22,7 +22,7 @@ public class OSM2MATSimNetwork {
 		/*
 		 * The input file name.
 		 */
-		String osm = "Z:/Berlin-Netz/merged.osm";
+		String osm = "C:/Users/Felix/Documents/VSP/Berlin-Netz/merged-filtered.osm";
 		
 		
 		/*
@@ -56,11 +56,11 @@ public class OSM2MATSimNetwork {
 		 * to every other link. This may not be the case in the initial network converted from OpenStreetMap.
 		 */
 		new NetworkCleaner().run(network);
-		reduceSpeedKN(network);
+//		reduceSpeedKN(network);
 		/*
 		 * Write the Network to a MATSim network file.
 		 */
-		new NetworkWriter(network).write("Z:/Berlin-Netz/mergedReducedSpeedKNWay.xml");
+		new NetworkWriter(network).write("C:/Users/Felix/Documents/VSP/Berlin-Netz/merged-filtered.xml");
 		
 	}
 	

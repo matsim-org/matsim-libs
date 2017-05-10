@@ -21,15 +21,13 @@ package org.matsim.contrib.signals.builder;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
-import org.matsim.contrib.signals.model.SignalSystemImpl;
-import org.matsim.contrib.signals.model.SignalSystemsManagerImpl;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.model.SignalController;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.model.SignalSystemImpl;
 
 
 /**
@@ -39,11 +37,6 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
 public final class DefaultSignalModelFactory implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(DefaultSignalModelFactory.class);
-	
-	@Override
-	public SignalSystemsManager createSignalSystemsManager() {
-		return new SignalSystemsManagerImpl();
-	}
 
 	@Override
 	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
@@ -51,10 +44,12 @@ public final class DefaultSignalModelFactory implements SignalModelFactory {
 	}
 
 	@Override
-	public SignalController createSignalSystemController(String controllerIdentifier) {
+	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (DefaultPlanbasedSignalSystemController.IDENTIFIER.equals(controllerIdentifier)){
 			log.info("Created SignalController: " + DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			return new DefaultPlanbasedSignalSystemController();
+			DefaultPlanbasedSignalSystemController signalControl = new DefaultPlanbasedSignalSystemController();
+			signalControl.setSignalSystem(signalSystem);
+			return signalControl;
 		}
 		//TODO improve error message and consider creation by class name
 		throw new IllegalArgumentException("Controller " + controllerIdentifier + " not known.");

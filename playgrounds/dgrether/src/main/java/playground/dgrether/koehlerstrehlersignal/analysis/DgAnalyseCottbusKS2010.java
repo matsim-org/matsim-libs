@@ -20,7 +20,11 @@
 package playground.dgrether.koehlerstrehlersignal.analysis;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,19 +45,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
@@ -64,25 +65,26 @@ import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.RunResultsLoader;
 import playground.dgrether.analysis.categoryhistogram.CategoryHistogramWriter;
+import playground.dgrether.analysis.eventsfilter.FeatureNetworkLinkCenterCoordFilter;
 import playground.dgrether.analysis.flightlhi.LegModeHistogramImproved;
 import playground.dgrether.analysis.simsimanalyser.SimSimAnalysis;
 import playground.dgrether.analysis.simsimanalyser.SimSimShapefileWriter;
 import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
 import playground.dgrether.events.InMemoryEventsManager;
-import playground.dgrether.events.filters.TimeEventFilter;
+import playground.dgrether.events.filters.FirstTripPerPersonEventFilter;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 
 public class DgAnalyseCottbusKS2010 {
 
-	private static final Logger log = Logger.getLogger(DgAnalyseCottbusKS2010.class);
+	private static final Logger LOG = Logger.getLogger(DgAnalyseCottbusKS2010.class);
 
-	private static final CoordinateReferenceSystem crs = MGC
-			.getCRS(TransformationFactory.WGS84_UTM33N);
+	private static final CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+	
+	private static String svnBaseDir;
 	
 	static class TimeConfig {
 		String name;
@@ -125,6 +127,7 @@ public class DgAnalyseCottbusKS2010 {
 		LegModeHistogramImproved legHistogram;
 		Double distanceMeter;
 		Double noTrips;
+		Double noTripsPercent;
 		Double deltaDistance;
 		Double deltaNoTrips;
 		Double speedKmH;
@@ -132,6 +135,7 @@ public class DgAnalyseCottbusKS2010 {
 		Double delayPercent;
 		Double distancePercent;
 		public Set<Id<Person>> seenPersonIds;
+		int noStuckedVeh;
 	}
 
 	static class Results {
@@ -222,6 +226,7 @@ public class DgAnalyseCottbusKS2010 {
 		
 		r.deltaSpeedKmH = r.speedKmH - baseResult.speedKmH;
 		r.deltaNoTrips = r.noTrips - baseResult.noTrips;
+		r.noTripsPercent = r.noTrips / baseResult.noTrips * 100.0;
 		r.personsDelta = r.numberOfPersons - baseResult.numberOfPersons;
 	}
 	
@@ -241,7 +246,7 @@ public class DgAnalyseCottbusKS2010 {
 			if (! r.runInfo.baseCase && r.extent.createPersonDiff) {
 				this.createAndWritePersonDiff(baseResult, r);
 //				this.createAndWriteSimSimComparison(baseResult, r);
-				log.warn("sim sim compare currently disabled");
+				LOG.warn("sim sim compare currently disabled");
 			}
 
 			this.writeMfd(r);
@@ -266,13 +271,26 @@ public class DgAnalyseCottbusKS2010 {
 		
 		Network n = baseResult.runLoader.getNetwork();
 		Population pop = baseResult.runLoader.getPopulation();
-		String outDir = DgPaths.REPOS + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/diffs/";
-		File out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/");
+		String outDir = svnBaseDir + "runs-svn/cottbus/createGridLock/analysis/";
+//				svnBaseDir + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/diffs/"; // old path
+        File result1;
+        try {
+            result1 = Files.createDirectories(Paths.get(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/")).toFile();
+        } catch (IOException e1) {
+            throw new RuntimeException(e1);
+        }
+        File out = result1;
 		Population newPop = this.getFilteredPopulation(pop, disattractedPersonIds);
 		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_disattracted_acts");
 
-		out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_attracted/");
+        File result;
+        try {
+            result = Files.createDirectories(Paths.get(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_attracted/")).toFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        out = result;
 		newPop = this.getFilteredPopulation(pop, attractedPersonIds);
 		sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_attracted_acts");
@@ -321,9 +339,10 @@ public class DgAnalyseCottbusKS2010 {
 	private void calculateResults(List<RunInfo> runInfos, List<TimeConfig> times, List<Extent> extents) {
 		for (RunInfo runInfo: runInfos) {
 			String runId = runInfo.runId;
-			String runDirectory = DgPaths.REPOS + "runs-svn/cottbus/run"+runId+"/";
+			String runDirectory = svnBaseDir + "runs-svn/cottbus/createGridLock/run"+runId+"/";
 			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
-			String eventsFilename = runDir.getEventsFilename(runInfo.iteration);
+			String eventsFilename = //runDirectory + runId + ".output_events.xml";
+					runDir.getEventsFilename(runInfo.iteration);
 			
 			InMemoryEventsManager inMemoryEvents = null;
 			if (useInMemoryEvents) {
@@ -341,6 +360,7 @@ public class DgAnalyseCottbusKS2010 {
 					net = runDir.getNetwork();
 				}
 				
+				// TODO skip this if you use inMemoryEvents=false
 				EventsManager eventsManagerUnfiltered = new EventsManagerImpl();
 				LegModeHistogramImproved lhi = new LegModeHistogramImproved();
 				eventsManagerUnfiltered.addHandler(lhi);
@@ -357,12 +377,17 @@ public class DgAnalyseCottbusKS2010 {
 					results.addResult(result);
 
 					EventsFilterManager eventsManager = new EventsFilterManagerImpl();
-					TimeEventFilter tef = new TimeEventFilter();
-					tef.setStartTime(time.startTime);
-					tef.setEndTime(time.endTime);
-					eventsManager.addFilter(tef);
+//					TimeEventFilter tef = new TimeEventFilter();
+//					tef.setStartTime(time.startTime);
+//					tef.setEndTime(time.endTime);
+//					eventsManager.addFilter(tef);
+					/* use trip filter instead of time filter to consider also trips that are delayed. theresa, mar'17 */
+					if (time.name.equals("morning")){
+						eventsManager.addFilter(new FirstTripPerPersonEventFilter());
+					}
 
 					DgAverageTravelTimeSpeed avgTtSpeed = new DgAverageTravelTimeSpeed(net);
+					avgTtSpeed.considerStuckAndAbortTravelTimesAndSpeeds();
 					eventsManager.addHandler(avgTtSpeed);
 
 					VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600, net);
@@ -371,8 +396,8 @@ public class DgAnalyseCottbusKS2010 {
 					DgMfd mfd = new DgMfd(net, runInfo.storagecap);
 					eventsManager.addHandler(mfd);
 
-					TtTotalDelay totalDelay = new TtTotalDelay(net);
-					eventsManager.addHandler(totalDelay);
+					TtTotalDelay totalDelay = new TtTotalDelay(net, eventsManager);
+					totalDelay.considerDelayOfStuckedOrAbortedVehicles();
 
 					this.processEvents(eventsManager, inMemoryEvents, eventsFilename);
 
@@ -384,12 +409,13 @@ public class DgAnalyseCottbusKS2010 {
 					result.totalDelay = totalDelay.getTotalDelay();
 					result.distanceMeter = avgTtSpeed.getDistanceMeter();
 					result.noTrips = avgTtSpeed.getNumberOfTrips();
+					result.noStuckedVeh = avgTtSpeed.getNumberOfStuckedVeh();
 					result.seenPersonIds = avgTtSpeed.getSeenPersonIds();
-					log.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfVehicles());
+					LOG.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfVehicles());
 				}
 			}
 		}
-		log.info("Calculated results.");
+		LOG.info("Calculated results.");
 	}
 	
 	private void processEvents(EventsManager eventsManager, InMemoryEventsManager inMemoryEvents, String eventsFilename){
@@ -416,7 +442,8 @@ public class DgAnalyseCottbusKS2010 {
 		evening.name = "afternoon";
 		TimeConfig all = new TimeConfig();
 		all.startTime = 0.0;
-		all.endTime = 24.0 * 3600.0;
+//		all.endTime = 24.0 * 3600.0;
+		all.endTime = Double.MAX_VALUE;
 		all.name = "all_day";
 		List<TimeConfig> list = new ArrayList<TimeConfig>();
 		list.add(morning);
@@ -424,11 +451,6 @@ public class DgAnalyseCottbusKS2010 {
 //		list.add(all);
 		return list;
 	}
-
-
-	
-
-
 	
 	private static Envelope transform(Envelope env, CoordinateReferenceSystem from, CoordinateReferenceSystem to) {
 		RuntimeException ex; 
@@ -458,59 +480,73 @@ public class DgAnalyseCottbusKS2010 {
 	 * In this method one can compose spatial extends that are used for analysis.
 	 */
 	public static List<Extent> createExtentList(){
+		String inputBaseDir = svnBaseDir + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
+		
 		List<Extent> l = new ArrayList<Extent>();
-		String filterFeatureFilename = "../../../shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
-		Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple = CottbusUtils.loadCottbusFeature(filterFeatureFilename);
-		Envelope env = getTransformedEnvelope(featureTuple);
+//		String filterFeatureFilename = "../../../shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
+//		Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple = CottbusUtils.loadCottbusFeature(filterFeatureFilename);
+//		Envelope env = getTransformedEnvelope(featureTuple);
 		Extent e = null;
 		
 		//		e.name = "Cottbus Kreis BB";
 		//		e.envelope = env;
 		//		l.add(e);
-
-		filterFeatureFilename = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
-//		featureTuple = CottbusUtils.loadFeature(filterFeatureFilename);
-//		env = getTransformedEnvelope(featureTuple);
-
-		String signalsBBNet = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/network_small.xml.gz";
-		Scenario scSignalsBoundingBox = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scSignalsBoundingBox.getNetwork());
-		netReader.readFile(signalsBBNet);
-
-		String signalSystemsFile = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/signal_systems_no_13.xml";
-		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
-		SignalSystemsReader20 signalsReader = new SignalSystemsReader20(signalSystems);
-		signalsReader.readFile(signalSystemsFile);
-//		signalSystems.getSignalSystemData().remove(new IdImpl("13")); //just to make sure we have consistent data
 		
-		e = new Extent();
-		e.name = "signalized_links";
-		e.network = new DgSignalizedLinksNetwork().createSmallNetwork(scSignalsBoundingBox.getNetwork(), signalSystems);
-//		l.add(e);	
+		// full network
+		String fullNetFile = inputBaseDir + "network_wgs84_utm33n.xml.gz";
+		Scenario scFullNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scFullNetwork.getNetwork());
+		netReader.readFile(fullNetFile);
+		
+		String filterFeatureFilename = inputBaseDir + "shape_files/signal_systems/bounding_box.shp";
+//				"../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
+		Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple = CottbusUtils.loadFeature(filterFeatureFilename);
+//		Envelope env = getTransformedEnvelope(featureTuple);
+		
+		NetworkFilterManager netFilter = new NetworkFilterManager(scFullNetwork.getNetwork());
+		FeatureNetworkLinkCenterCoordFilter filter = new FeatureNetworkLinkCenterCoordFilter(MGC.getCRS(TransformationFactory.WGS84_UTM33N), featureTuple.getSecond(), featureTuple.getFirst());
+		netFilter.addLinkFilter(filter);
+		Network signalsBBNet = netFilter.applyFilters();
+
+//		String signalsBBNet = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/network_small.xml.gz";
+//		Scenario scSignalsBoundingBox = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		MatsimNetworkReader netReader = new MatsimNetworkReader(scSignalsBoundingBox.getNetwork());
+//		netReader.readFile(signalsBBNet);
+//
+//		String signalSystemsFile = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/signal_systems_no_13.xml";
+//		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
+//		SignalSystemsReader20 signalsReader = new SignalSystemsReader20(signalSystems);
+//		signalsReader.readFile(signalSystemsFile);
+////		signalSystems.getSignalSystemData().remove(new IdImpl("13")); //just to make sure we have consistent data
+//		
+//		e = new Extent();
+//		e.name = "signalized_links";
+//		e.network = new DgSignalizedLinksNetwork().createSmallNetwork(scSignalsBoundingBox.getNetwork(), signalSystems);
+////		l.add(e);	
 
 		e = new Extent();
 		e.name = "signals_bb";
 //		e.envelope = env;
-		e.network = scSignalsBoundingBox.getNetwork();
-//		l.add(e);
+		e.network = signalsBBNet;
+		l.add(e);
 		
 		
-		String cityNetwork = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
-		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader2= new MatsimNetworkReader(sc2.getNetwork());
-		netReader2.readFile(cityNetwork);
-		e = new Extent();
-		e.name = "city";
-		e.network = sc2.getNetwork();
-//		l.add(e);
-
-		e = new Extent();
-		e.name = "city_w_hole";
-		for (Link link : scSignalsBoundingBox.getNetwork().getLinks().values()) {
-			sc2.getNetwork().removeLink(link.getId()); 
-		}
-		e.network = sc2.getNetwork();
-//		l.add(e);
+//		String cityNetwork = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
+//		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		MatsimNetworkReader netReader2= new MatsimNetworkReader(sc2.getNetwork());
+//		netReader2.readFile(cityNetwork);
+//		e = new Extent();
+//		e.name = "city";
+//		e.network = sc2.getNetwork();
+////		l.add(e);
+//
+//		e = new Extent();
+//		e.name = "city_w_hole";
+//		for (Link link : scSignalsBoundingBox.getNetwork().getLinks().values()) {
+//			sc2.getNetwork().removeLink(link.getId()); 
+//		}
+//		e.network = sc2.getNetwork();
+////		l.add(e);
 		
 		e = new Extent();
 		e.name = "all";
@@ -554,7 +590,7 @@ public class DgAnalyseCottbusKS2010 {
 	}
 
 	
-	public static List<RunInfo> createRunsIdList(){
+	public static List<RunInfo> createRunsIdList(String[] args){
 		List<RunInfo> l = new ArrayList<RunInfo>();
 		
 //		CottbusRuns.addReduceFlowCapacityRunsNoIterations(l);
@@ -604,25 +640,150 @@ public class DgAnalyseCottbusKS2010 {
 		// with time choice
 //		CottbusRuns.addBaseCaseOptAndRouteChoice1400(l, 2046, 2045, 2048);
 		// parameter test
-		CottbusRuns.addOptAndRouteChoice1400(l, 2054, 2055);
+//		CottbusRuns.addOptAndRouteChoice1400(l, 2054, 2055);
 		
+		if (args != null && args.length != 0){
+			for (int i = 0; i < args.length; i++){
+				RunInfo ri = new RunInfo();
+				ri.runId = args[i];
+				ri.iteration = 200;
+				ri.baseCase = args[i].endsWith("1")? true : false;
+				switch (args[i].substring(3)){
+//				switch (args[i].charAt(3)){
+				case "1":
+					ri.remark = "all green";
+					break;
+				case "2":
+					ri.remark = "fixed MS";
+					break;
+				case "3":
+					ri.remark = "sylvia MS";
+					break;
+				case "4":
+					ri.remark = "bp MS";
+					break;
+				case "5":
+					ri.remark = "bp MS+green";
+					break;
+				case "6":
+					ri.remark = "bp green";
+					break;
+				case "7":
+					ri.remark = "toll ring";
+					break;
+				case "8":
+					ri.remark = "toll w/oRing";
+					break;
+				default:
+					throw new IllegalArgumentException("Unknown run type.");
+				}
+				l.add(ri);
+			}
+		} else { // args is empty
+			String cap = "10";
+			
+			RunInfo ri = null;
+			ri = new RunInfo();
+			ri.runId = "3"+cap+"1";
+			ri.iteration = 200;
+			ri.baseCase = true;
+			ri.remark = "all green";
+			l.add(ri);
+			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"2";
+//			ri.iteration = 200;
+//			ri.remark = "fixed MS";
+//			l.add(ri);
+//			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"3";
+//			ri.iteration = 200;
+//			ri.remark = "sylvia MS";
+//			l.add(ri);
+			
+			ri = new RunInfo();
+			ri.runId = "3"+cap+"3c";
+			ri.iteration = 200;
+			ri.remark = "sylvia MS stab";
+			l.add(ri);
+			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"4";
+//			ri.iteration = 200;
+//			ri.remark = "bp MS";
+//			l.add(ri);
+//			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"5";
+//			ri.iteration = 200;
+//			ri.remark = "bp MS+green";
+//			l.add(ri);
+//			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"6";
+//			ri.iteration = 200;
+//			ri.remark = "bp green";
+//			l.add(ri);
+			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"6M";
+//			ri.iteration = 200;
+//			ri.remark = "bp green an MS";
+//			l.add(ri);
+			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"7";
+//			ri.iteration = 200;
+//			ri.remark = "toll ring";
+//			l.add(ri);
+//			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"8";
+//			ri.iteration = 200;
+//			ri.remark = "toll w/oRing";
+//			l.add(ri);
+			
+//			ri = new RunInfo();
+//			ri.runId = "3"+cap+"9";
+//			ri.iteration = 200;
+//			ri.remark = "cp V9";
+//			l.add(ri);
+		}
 		return l;
 	}
 	
 
+	/**
+	 * if args is not empty it should contain the runIds of runs that should be analyzed
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		List<RunInfo> runIds = createRunsIdList();
+		// get the current date in format "yyyy-mm-dd"
+		Calendar cal = Calendar.getInstance();
+		// this class counts months from 0, but days from 1
+		int month = cal.get(Calendar.MONTH) + 1;
+		String monthStr = month + "";
+		if (month < 10)
+			monthStr = "0" + month;
+		String date = cal.get(Calendar.YEAR) + "-" + monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
+
+		// TODO choose correct version
+//		svnBaseDir = "/net/ils3/thunig/"; // cluster
+		svnBaseDir = "../../../"; // local
+		
+		List<RunInfo> runIds = createRunsIdList(args);
 		String runIdsString = createRunIdIterationString(runIds);
-		String outputDirectory = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/" 
-				+ "2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/results/";
+		String outputDirectory = svnBaseDir + "runs-svn/cottbus/createGridLock/analysis/";
+//				svnBaseDir + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/results/"; // old
 		List<TimeConfig> times = createTimeConfig();
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2015-03-12_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + date + "_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
-		ana.setUseInMemoryEvents(false);
+		ana.setUseInMemoryEvents(true);
 		ana.calculateResults(runIds, times, extents);
 		ana.analyseResults();
 		new ResultsWriter().writeResultsTable(ana.results, outputFilename + extentString +".txt");
@@ -630,7 +791,7 @@ public class DgAnalyseCottbusKS2010 {
 		for (Entry<Extent, List<Result>> extent : resultsByExtent.entrySet()) {
 			new LatexResultsWriter().writeResultsTable(extent.getValue(), outputFilename + extent.getKey().name + ".tex");
 		}
-		log.info("Output written to " + outputFilename);
+		LOG.info("Output written to " + outputFilename);
 
 	}
 

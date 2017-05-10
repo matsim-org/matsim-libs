@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
@@ -40,7 +42,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  * @author tthunig
  *
  */
-public class TtSignalAnalysisTool implements SignalGroupStateChangedEventHandler, AfterMobsimListener, ActivityStartEventHandler{
+public class TtSignalAnalysisTool implements SignalGroupStateChangedEventHandler, AfterMobsimListener, ActivityStartEventHandler, ActivityEndEventHandler{
 
 	private Map<Id<SignalGroup>, Double> totalSignalGreenTime;
 	private Map<Id<SignalSystem>, Integer> numberOfCyclesPerSystem;
@@ -54,6 +56,7 @@ public class TtSignalAnalysisTool implements SignalGroupStateChangedEventHandler
 	private Map<Id<SignalGroup>, Id<SignalSystem>> signalGroup2signalSystemId;
 	private Map<Id<SignalSystem>, Id<SignalGroup>> firstSignalGroupOfSignalSystem;
 	private double lastActStartTime;
+	private Double firstActEndTime;
 	
 	@Override
 	public void reset(int iteration) {
@@ -71,6 +74,12 @@ public class TtSignalAnalysisTool implements SignalGroupStateChangedEventHandler
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		lastActStartTime = event.getTime();
+	}
+	
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (firstActEndTime == null) 
+			firstActEndTime = event.getTime();
 	}
 
 	@Override
@@ -184,7 +193,7 @@ public class TtSignalAnalysisTool implements SignalGroupStateChangedEventHandler
 		return totalSignalGreenTime;
 	}
 
-	public Map<Id<SignalGroup>, Double> calculateAvgSignalGreenTimePerCycle(){
+	public Map<Id<SignalGroup>, Double> calculateAvgSignalGreenTimePerFlexibleCycle(){
 		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = new HashMap<>();
 		for (Id<SignalGroup> signalGroupId : totalSignalGreenTime.keySet()){
 			Id<SignalSystem> signalSystemId = signalGroup2signalSystemId.get(signalGroupId);
@@ -194,7 +203,7 @@ public class TtSignalAnalysisTool implements SignalGroupStateChangedEventHandler
 		return avgSignalGreenTimePerCycle;
 	}
 
-	public Map<Id<SignalSystem>, Double> calculateAvgCycleTimePerSignalSystem(){
+	public Map<Id<SignalSystem>, Double> calculateAvgFlexibleCycleTimePerSignalSystem(){
 		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = new HashMap<>();
 		for (Id<SignalSystem> signalSystemId : sumOfSystemCycleTimes.keySet()){
 			double avgSystemCylceTime = sumOfSystemCycleTimes.get(signalSystemId) / numberOfCyclesPerSystem.get(signalSystemId);
@@ -205,6 +214,19 @@ public class TtSignalAnalysisTool implements SignalGroupStateChangedEventHandler
 	
 	public Map<Double, Map<Id<SignalGroup>, Double>> getSumOfBygoneSignalGreenTime(){
 		return summedBygoneSignalGreenTimesPerSecond;
+	}
+	
+	/**
+	 * can be used for fixed cycle times with repeating signal groups per cycle too (e.g. for downstream signal)
+	 * @return
+	 */
+	public Map<Id<SignalGroup>, Double> calculateSignalGreenTimeRatios(){
+		Map<Id<SignalGroup>, Double> signalGreenTimeRatios = new HashMap<>();
+		for (Id<SignalGroup> signalGroupId : totalSignalGreenTime.keySet()){
+			double avgSignalGreenTime = totalSignalGreenTime.get(signalGroupId) / (this.lastActStartTime - this.firstActEndTime);
+			signalGreenTimeRatios.put(signalGroupId, avgSignalGreenTime);
+		}
+		return signalGreenTimeRatios;
 	}
 
 }

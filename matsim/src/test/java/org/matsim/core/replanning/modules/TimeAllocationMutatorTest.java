@@ -20,16 +20,21 @@
 
 package org.matsim.core.replanning.modules;
 
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup.TimeAllocationMutatorSubpopulationSettings;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
@@ -39,6 +44,8 @@ import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestCase;
@@ -70,6 +77,43 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
+	public void testSubpopulations() {
+		
+		String cbSubpopulation = "cb";
+		String freightSubpopulation = "freight";
+		
+		Config config  = ConfigUtils.createConfig();
+		config.plans().setSubpopulationAttributeName("subpopulation");
+		config.timeAllocationMutator().setUseIndividualSettingsForSubpopulations(true);
+		config.timeAllocationMutator().setMutationRange(1800.0);
+		
+		TimeAllocationMutatorSubpopulationSettings cbSettings = (TimeAllocationMutatorSubpopulationSettings) config.timeAllocationMutator().createParameterSet(TimeAllocationMutatorSubpopulationSettings.SET_NAME);
+		cbSettings.setSubpopulation(cbSubpopulation);
+		cbSettings.setAffectingDuration(false);
+		cbSettings.setMutationRange(100.0);
+		config.timeAllocationMutator().addParameterSet(cbSettings);
+		
+		TimeAllocationMutatorSubpopulationSettings freightSettings = (TimeAllocationMutatorSubpopulationSettings) config.timeAllocationMutator().createParameterSet(TimeAllocationMutatorSubpopulationSettings.SET_NAME);
+		freightSettings.setSubpopulation(freightSubpopulation);
+		freightSettings.setAffectingDuration(true);
+		freightSettings.setMutationRange(7200.0);
+		config.timeAllocationMutator().addParameterSet(freightSettings);
+		
+		Provider<TripRouter> tripRouterProvider = null;
+		
+		TimeAllocationMutator mutator = new TimeAllocationMutator(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global());
+		
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		TimeAllocationMutator cbMutator = new TimeAllocationMutator(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global(), scenario.getPopulation());
+//		assertEquals(false, cbMutator.affectingDuration);
+//		assertEquals(100.0, cbMutator.mutationRange);
+//		
+//		TimeAllocationMutator freightMutator = new TimeAllocationMutator(tripRouterProvider, config.plans(), config.timeAllocationMutator(), config.global(), scenario.getPopulation());
+//		assertEquals(true, freightMutator.affectingDuration);
+//		assertEquals(7200.0, freightMutator.mutationRange);
+	}
+	
 	/**
 	 * Internal helper method to run the real test, but with different setups.
 	 * Basically, it creates one plan and calls the given TimeAllocationMutator

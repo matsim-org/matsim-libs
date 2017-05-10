@@ -3,81 +3,75 @@
 <!-- $Id$ -->
 
 <!-- ============================================================ -->
-<!-- Date: 2017-03-22 -->
-<!-- A concise format to capture the combination of a logical     -->
-<!-- supply chain network, and a physical transport network       -->
+<!-- Date: 2017-03-22
+     A concise format to capture the combination of a logical     
+     supply chain network, and a physical transport network, and  
+     the associations between the two networks. The container    
+     also stores optional shortest path sets between logical     
+     nodes.                                                        
 	 
-<!-- References:
+     References:
 	 T.B.C. Working paper for Viljoen, N.M., Joubert, J.W. in
-	 Data in Brief journal										  -->
+	 Data in Brief journal										  
 
-<!-- For further information or questions, please contact
+     For further information or questions, please contact
      Johan Joubert, johan dot joubert at up dot ac dot za         -->
 
 <!-- ============================================================ -->
 
-<!ELEMENT instance					(logic,physical,associations,sets*)>
-<!ATTLIST instance
+<!ELEMENT multilayerNetwork			(physicalNetwork,logicalNetwork,associations,shortestPathSets*)>
+<!ATTLIST multilayerNetwork
 		  archetype		CDATA		#REQUIRED
 		  number		CDATA		#REQUIRED>
 		  
-<!ELEMENT logic						(nodes, edges)>
+<!ELEMENT physicalNetwork			(physicalNodes, physicalEdges)>
 
-<!ELEMENT physical					(nodes, edges)>
+<!ELEMENT physicalNodes				(physicalNode)*>
 
-<!ELEMENT nodes						(node)*>
-
-<!ELEMENT node						EMPTY>
-<!ATTLIST node
+<!ELEMENT physicalNode				EMPTY>
+<!ATTLIST physicalNode
 		  id			CDATA		#REQUIRED
-		  x				CDATA		#IMPLIED
-		  y				CDATA		#IMPLIED>
+		  x				CDATA		#REQUIRED
+		  y				CDATA		#REQUIRED>
 
-<!ELEMENT edges						(edge)*>
+<!ELEMENT physicalEdges				(physicalEdge)*>
 
-<!ELEMENT edge						EMPTY>
-<!ATTLIST edge
-		  originId		CDATA		#REQUIRED
-		  destId		CDATA		#REQUIRED>
+<!ELEMENT physicalEdge				EMPTY>
+<!ATTLIST physicalEdge
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED
+		  weight		CDATA		#IMPLIED>
 
-<!ELEMENT associations				(association)>
+<!ELEMENT logicalNetwork			(logicalNodes, logicalEdges)>
+
+<!ELEMENT logicalNodes				(logicalNode)*>
+
+<!ELEMENT logicalNode				EMPTY>
+<!ATTLIST logicalNode
+		  id			CDATA		#REQUIRED
+		  name			CDATA		#IMPLIED
+		  capacity		CDATA		#IMPLIED>
+
+<!ELEMENT logicalEdges				(logicalEdge)*>
+
+<!ELEMENT logicalEdge				EMPTY>
+<!ATTLIST logicalEdge
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED
+	  	  weight		CDATA		#IMPLIED>
+
+<!ELEMENT associations				(association)*>
 
 <!ELEMENT association				EMPTY>
 <!ATTLIST association
 		  logicalId		CDATA		#REQUIRED
 		  physicalId	CDATA		#REQUIRED>
 
-<!ELEMENT sets						(set)+>
-<!ATTLIST sets
-		  archetype		CDATA		#REQUIRED
-		  instance		CDATA		#REQUIRED>
+<!ELEMENT shortestPathSets			(set)+>
 
 <!ELEMENT set						(path)+>
 <!ATTLIST set
-		  originId		CDATA		#REQUIRED
-		  destId		CDATA		#REQUIRED>
+		  fromId		CDATA		#REQUIRED
+		  toId			CDATA		#REQUIRED>
 
-<!ELEMENT path						(node)*>
-
-<!ELEMENT node					    EMPTY>
-<!ATTLIST node
-		  physicalId	CDATA		#REQUIRED>
-
-<!-- ============================================================ -->
-
-<!-- ROOT ELEMENT digicoreVehicles:
-     In here all individual vehicles are stored including their 
-     observed activity chains. -->
-
-<!-- ATTRIBUTE crs:
-	 The coordinate reference system used for the activity 
-	 locations. -->
-
-<!-- ATTRIBUTE desc:
-     It is always a good idea to give a container file a description
-     for better identification.
-     Normally it should describe the year/period of the input data, 
-     and what specific modifications were made, for example the 
-     clustering parameters used to identify the facilities. -->
-
-<!-- ============================================================ -->
+<!ELEMENT path			(#PCDATA)>

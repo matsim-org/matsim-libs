@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * 
  * Use the config file as created by the 
  * {@link CreateEmissionConfig CreateEmissionConfig} to calculate
- * emissions based on the link leave events of an events file. Results are written into an emission event file.
+ * emissions based on the link leave events of an events file. Resulting emission events are written into an event file.
  *
  * @author benjamin, julia
  */
@@ -60,9 +60,6 @@ public class RunEmissionToolOfflineExampleV2 {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionModule emissionModule = new EmissionModule(scenario, eventsManager);
 
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
-		
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 

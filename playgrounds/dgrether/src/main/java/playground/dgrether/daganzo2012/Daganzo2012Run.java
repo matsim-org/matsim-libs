@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.controler.Controler;
@@ -44,8 +45,6 @@ import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
 import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 
 
 /**
@@ -72,12 +71,14 @@ public class Daganzo2012Run {
 	private void run(String config) {
 		Controler controler = new Controler(config);
 		//add the signals module
-		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
-		sylviaConfig.setSignalGroupMaxGreenScale(2.0);
-		sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(true);
-		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
-		sylviaSignalsModule.setSylviaConfig(sylviaConfig);
-		controler.addOverridingModule(sylviaSignalsModule);
+//		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+//		sylviaConfig.setSignalGroupMaxGreenScale(2.0);
+//		sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(true);
+//		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
+//		sylviaSignalsModule.setSylviaConfig(sylviaConfig);
+//		controler.addOverridingModule(sylviaSignalsModule);
+		/* sylvia moved to playground tthunig. If you want to use sylvia use e.g. TtBasicController in playground tthunig. theresa, apr'17 */
+		controler.addOverridingModule(new SignalsModule());
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.getConfig().controler().setCreateGraphs(false);

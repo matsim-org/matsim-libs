@@ -19,95 +19,93 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.util.Types;
 
 public class FourWaysVis {
 
-	public static final String TESTINPUTDIR = "../../../matsim/trunk/src/test/resources/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
-	
-	/**
-	 * @param args
-	 */
+	public static final String TESTINPUTDIR = "../../contribs/signals/src/test/resources/test/input/org/matsim/contrib/signals/TravelTimeFourWaysTest/";
+
 	public static void main(String[] args) {
 
-		String netFile = TESTINPUTDIR + "network.xml.gz";
-		String lanesFile  = TESTINPUTDIR + "testLaneDefinitions_v1.1.xml";
-		String lanesFile20  = TESTINPUTDIR + "testLaneDefinitions_v2.0.xml";
-		String popFile = TESTINPUTDIR + "plans.xml.gz";
-		String signalFile = TESTINPUTDIR + "testSignalSystems_v2.0.xml";
-		String signalGroupsFile = TESTINPUTDIR + "testSignalGroups_v2.0.xml";
-		String signalControlFile = TESTINPUTDIR + "testSignalControl_v2.0.xml";
-		
-		
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		config.plans().setInputFile(popFile);
-		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
+		config.controler().setOutputDirectory("./output/fourWaysVis/");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.network().setInputFile(TESTINPUTDIR + "network.xml.gz");
+		config.plans().setInputFile(TESTINPUTDIR + "plans.xml.gz");
+		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setStuckTime(100.0);
+		config.qsim().setUsingFastCapacityUpdate(false);
 
-
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalFile);
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+		signalsConfig.setSignalSystemFile(TESTINPUTDIR + "testSignalSystems_v2.0.xml");
+		signalsConfig.setSignalGroupsFile(TESTINPUTDIR + "testSignalGroups_v2.0.xml");
+		signalsConfig.setSignalControlFile(TESTINPUTDIR + "testSignalControl_v2.0.xml");
+		signalsConfig.setUseSignalSystems(true);
 
 		OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 		otfconfig.setAgentSize(130.0f);
 
-		
-//		LaneDefinitions laneDefinitions = new LaneDefinitionsImpl();
-//		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(laneDefinitions, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
-//		reader.readFile(lanesFile);
-		if (true)
-			throw new RuntimeException("The following lines are commented");
-//		LaneDefinitonsV11ToV20Converter converter = new LaneDefinitonsV11ToV20Converter();
-//		converter.convert(lanesFile, lanesFile20, netFile);
-
-		config.network().setLaneDefinitionsFile(lanesFile20);
+		config.network().setLaneDefinitionsFile(TESTINPUTDIR + "testLaneDefinitions_v2.0.xml");
 		config.qsim().setUseLanes(true);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		EventsManager events = EventsUtils.createEventsManager();
-		
-//		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(config.signalSystems());
-//		SignalsData signalsData = signalsLoader.loadSignalsData();
-//		scenario.addScenarioElement(SignalsData.ELEMENT_NAME , signalsData);
-		FromDataBuilder builder = new FromDataBuilder(scenario, events);
-		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
-		SignalEngine engine = new QSimSignalEngine(manager);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				// defaults
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
+				install(new ScenarioByInstanceModule(scenario));
+				// signal specific module
+				install(new SignalsModule());
+			}
+		});
 
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-		otfVisQSim.addQueueSimulationListeners(engine);
-		
-		//		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());
-//		client.setLaneDefinitions(scenario.getLaneDefinitions());
-//		client.setSignalSystems(scenario.getSignalSystems(), scenario.getSignalSystemConfigurations());
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, otfVisQSim);
+		EventsManager events = injector.getInstance(EventsManager.class);
+		events.initProcessing();
+
+		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
+		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
+		for (Provider<MobsimListener> provider : mobsimListeners) {
+			qSim.addQueueSimulationListeners(provider.get());
+		}
+
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, qSim);
 		OTFClientLive.run(config, server);
-		
-		otfVisQSim.run();
-		
-		
+
+		qSim.run();
 	}
 
 }

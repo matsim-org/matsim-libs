@@ -44,6 +44,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisRun;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup.DecongestionApproach;
 import playground.ikaddoura.integrationCNE.CNEIntegration.CongestionTollingApproach;
 import playground.ikaddoura.moneyTravelDisutility.data.BerlinAgentFilter;
 import playground.vsp.airPollution.exposure.GridTools;
@@ -137,7 +139,7 @@ public class CNEBerlin {
 
 	public void run() {
 						
-		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup(), new NoiseConfigGroup(), new DecongestionConfigGroup());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -152,6 +154,9 @@ public class CNEBerlin {
 		int noOfYCells = 446;
 		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+	
+		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+		emissionsConfigGroup.setConsideringCO2Costs(true);
 	
 		// noise Berlin settings
 		
@@ -223,6 +228,39 @@ public class CNEBerlin {
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 		
+		// decongestion pricing Berlin settings
+		
+		final DecongestionConfigGroup decongestionSettings = (DecongestionConfigGroup) controler.getConfig().getModules().get(DecongestionConfigGroup.GROUP_NAME);
+		
+		if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionPID.toString())) {
+			
+			decongestionSettings.setDecongestionApproach(DecongestionApproach.PID);
+			decongestionSettings.setKp(kP);
+			decongestionSettings.setKi(0.);
+			decongestionSettings.setKd(0.);
+			
+			decongestionSettings.setMsa(true);
+			
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+
+		} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
+
+			decongestionSettings.setDecongestionApproach(DecongestionApproach.BangBang);
+			decongestionSettings.setINITIAL_TOLL(0.01);
+			decongestionSettings.setTOLL_ADJUSTMENT(1.0);
+			
+			decongestionSettings.setMsa(false);
+			
+			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+			
+		} else {
+			// for V3, V9 and V10: no additional settings
+		}
+		
 		// CNE Integration
 		
 		CNEIntegration cne = new CNEIntegration(controler, gt, rgt);
@@ -231,7 +269,6 @@ public class CNEBerlin {
 		cne.setAirPollutionPricing(airPollutionPricing);
 		cne.setSigma(sigma);
 		cne.setCongestionTollingApproach(congestionTollingApproach);
-		cne.setkP(kP);
 		cne.setAgentFilter(new BerlinAgentFilter());
 
 		controler = cne.prepareControler();
@@ -268,7 +305,7 @@ public class CNEBerlin {
 		for (int index =firstIt+1; index <lastIt; index ++){
 			String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
 			log.info("Deleting the directory "+dirToDel);
-			IOUtils.deleteDirectory(new File(dirToDel),false);
+			IOUtils.deleteDirectoryRecursively(new File(dirToDel).toPath());
 		}
 	}
 	

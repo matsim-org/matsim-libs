@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.drt.run;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
@@ -37,6 +38,7 @@ import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,6 +57,17 @@ public class DrtControlerCreator {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
 		config.checkConsistency();
+		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)){
+			ActivityParams params = config.planCalcScore().getActivityParams(DrtStageActivityType.DRTSTAGEACTIVITY);
+			if (params == null)
+			{
+				params = new ActivityParams(DrtStageActivityType.DRTSTAGEACTIVITY);
+				params.setTypicalDuration(1);
+				params.setScoringThisActivityAtAll(false);
+				config.planCalcScore().addActivityParams(params);
+				Logger.getLogger(DrtControlerCreator.class).info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
+			}
+		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);

@@ -102,7 +102,7 @@ public class MunichJointCalibrationControler {
         String OUTPUT_DIR = controler.getConfig().controler().getOutputDirectory();
         for (int index =firstIt+1; index <lastIt; index ++){
             String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
-            IOUtils.deleteDirectory(new File(dirToDel),false);
+            IOUtils.deleteDirectoryRecursively(new File(dirToDel).toPath());
         }
 
         String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";

@@ -153,7 +153,7 @@ public class JointCalibrationControler {
 		for (int index =firstIt+1; index <lastIt; index ++){
 			String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
 			Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
-			IOUtils.deleteDirectory(new File(dirToDel),false);
+			IOUtils.deleteDirectoryRecursively(new File(dirToDel).toPath());
 		}
 
 		new File(OUTPUT_DIR+"/analysis/").mkdir();

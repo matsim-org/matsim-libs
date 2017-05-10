@@ -22,9 +22,7 @@
  */
 package playground.jbischoff.wobscenario.peoplemover;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -54,10 +52,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class CreatePeoplemoverStops {
 	public static void main(String[] args) {
 
-		String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av.xml";
+		String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/networkpt-av-may17.xml";
 		String networkModeDesignator = "av";
 		double averageStopDistance_meters = 300;
-		String transitStopsOutputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/stopsWRS_"+Math.round(averageStopDistance_meters)+"m.xml";
+		String transitStopsOutputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/stopsWRS_may17_"+Math.round(averageStopDistance_meters)+"m.xml";
 		
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(networkFile);

@@ -25,9 +25,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicles;
 import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
 
 
@@ -37,14 +39,23 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
  */
 public class EmissionModalTravelDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
-	@Inject  private EmissionModule emissionModule;
-	@Inject  private EmissionCostModule emissionCostModule;
-	private Set<Id<Link>> hotspotLinks;
+	@Inject private EmissionModule emissionModule;
+	@Inject private EmissionCostModule emissionCostModule;
 	@Inject private PlanCalcScoreConfigGroup cnScoringGroup;
+	@Inject private QSimConfigGroup qsimConfigGroup;
+	@Inject private Vehicles vehicles;
+
+	private final TravelDisutilityFactory travelDisutilityFactory;
+
+	private Set<Id<Link>> hotspotLinks;
+
+	public EmissionModalTravelDisutilityCalculatorFactory (TravelDisutilityFactory travelDisutilityFactory){
+		this.travelDisutilityFactory = travelDisutilityFactory;
+	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
-		return new EmissionModalTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule, hotspotLinks);
+		return new EmissionModalTravelDisutilityCalculator(travelDisutilityFactory.createTravelDisutility(timeCalculator), timeCalculator, cnScoringGroup, emissionModule, emissionCostModule, hotspotLinks, vehicles, qsimConfigGroup);
 	}
 
 	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {

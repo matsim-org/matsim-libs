@@ -42,7 +42,11 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.model.SignalSystemsManagerImpl;
 import org.matsim.core.config.ConfigUtils;
+
+import com.google.inject.Inject;
+
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 /**
@@ -52,22 +56,19 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 public class FromDataBuilder implements SignalSystemsModelBuilder{
 
 	private SignalsData signalsData;
-	private SignalModelFactory factory = new DefaultSignalModelFactory();
+	private SignalModelFactory factory;
 	private EventsManager events;
 	private Scenario scenario;
 
-	public FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
+	@Inject
+	private FromDataBuilder(Scenario scenario, SignalModelFactory factory, EventsManager events){
 		this.signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.scenario = scenario;
 		this.factory = factory;
 		this.events = events;
 	}
 	
-	public FromDataBuilder(Scenario scenario, EventsManager events){
-		this(scenario, new DefaultSignalModelFactory(), events);
-	}
-	
-	public void createAndAddSignals(SignalSystem system){
+	private void createAndAddSignals(SignalSystem system){
 		SignalSystemData ssData = signalsData.getSignalSystemsData().getSignalSystemData().get(system.getId());
 		for (SignalData signalData : ssData.getSignalData().values()){
 			Signal signal = new DatabasedSignal(signalData);
@@ -75,7 +76,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public void createAndAddSignalSystemsFromData(SignalSystemsManager manager){
+	private void createAndAddSignalSystemsFromData(SignalSystemsManager manager){
 		//process information of SignalSystemsData object
 		for (SignalSystemData ssData : this.signalsData.getSignalSystemsData().getSignalSystemData().values()){
 			SignalSystem system = this.factory.createSignalSystem(ssData.getId());
@@ -84,8 +85,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-
-	public void createAndAddSignalGroupsFromData(SignalSystem system){
+	private void createAndAddSignalGroupsFromData(SignalSystem system){
 		//process information of  SignalGroupsData object and create the signal groups
 		Map<Id<SignalGroup>, SignalGroupData> signalGroupDataMap = this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(system.getId());
 		for (SignalGroupData signalGroupData : signalGroupDataMap.values()){
@@ -98,11 +98,11 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public void createAndAddSignalSystemControllerFromData(SignalSystem system){
+	private void createAndAddSignalSystemControllerFromData(SignalSystem system){
 		//process information of SignalControlData
 		SignalSystemControllerData systemControlData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(system.getId());
-		SignalController controller = this.factory.createSignalSystemController(systemControlData.getControllerIdentifier());
-		controller.setSignalSystem(system);
+		SignalController controller = this.factory.createSignalSystemController(systemControlData.getControllerIdentifier(), system);
+//		controller.setSignalSystem(system);
 		system.setSignalSystemController(controller);
 		if (systemControlData.getSignalPlanData() != null) { 
 			for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
@@ -112,7 +112,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public void createAndAddAmberLogic(SignalSystemsManager manager){
+	private void createAndAddAmberLogic(SignalSystemsManager manager){
 		//process information of AmberTimesData object
 		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseAmbertimes()){
 			AmberLogic amberLogic = new AmberLogicImpl(this.signalsData.getAmberTimesData());
@@ -120,14 +120,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		}
 	}
 	
-	public SignalSystemsManager createSignalSystemManager(){
-		SignalSystemsManager manager = this.factory.createSignalSystemsManager();
-		manager.setSignalsData(this.signalsData);
-		manager.setEventsManager(events);
-		return manager;
-	}
-	
-	public void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
+	private void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
 		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
 			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 			this.events.addHandler(intergreensLogic);
@@ -137,7 +130,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	@Override
 	public SignalSystemsManager createAndInitializeSignalSystemsManager() {
 		//1.) SignalSystemsManager
-		SignalSystemsManager manager = this.createSignalSystemManager();
+		SignalSystemsManager manager = new SignalSystemsManagerImpl(signalsData, events);
 		//2.) SignalSystems
 		this.createAndAddSignalSystemsFromData(manager);
 		//3.) Signals then SignalGroups then SignalController
@@ -152,17 +145,4 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		this.createAndAddIntergreenTimesLogic(manager);
 		return manager;
 	}
-
-	@Override
-	public SignalModelFactory getSignalModelFactory() {
-		return this.factory;
-	}
-
-	@Override
-	public void setSignalModelFactory(SignalModelFactory factory) {
-		this.factory = factory;
-	}
-	
-	
-	
 }

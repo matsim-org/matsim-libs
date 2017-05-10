@@ -30,6 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.model.SignalGroup;
@@ -59,6 +60,7 @@ public class Fixture {
 			e.printStackTrace();
 		}
 		Config conf = ConfigUtils.createConfig(testUtils.classInputResourcePath());
+		conf.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		ActivityParams params = new ActivityParams("h");
 		params.setTypicalDuration(24.0 * 3600.0);
 		conf.planCalcScore().addActivityParams(params);
@@ -85,9 +87,7 @@ public class Fixture {
 
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
 		Scenario scenario = ScenarioUtils.loadScenario(conf);
-		SignalsDataLoader signalsLoader = new SignalsDataLoader(conf);
-		SignalsData signalsData = signalsLoader.loadSignalsData();
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(conf).loadSignalsData());
 		
 		return scenario;
 	}

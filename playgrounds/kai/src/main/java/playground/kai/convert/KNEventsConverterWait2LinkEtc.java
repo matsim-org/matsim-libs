@@ -19,10 +19,9 @@
 package playground.kai.convert;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsConverterXML;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-
-import tutorial.converter.completeEventFilesRegardingVehicleInformation.EventsConverterXML;
 
 /**
  * @author nagel

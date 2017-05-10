@@ -60,7 +60,7 @@ public class RunSharedTaxiExample {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
+		new TaxibusControlerCreator(controler).initiateTaxibusses();
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

@@ -27,16 +27,12 @@ package playground.vsp.analysis.modules.emissionsWriter;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.matsim.contrib.emissions.ColdEmissionHandler;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.WarmEmissionHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.MutableScenario;
-
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -50,8 +46,6 @@ public class EmissionEventsWriter extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(EmissionEventsWriter.class);
 	private MutableScenario scenario;
 	private EmissionModule emissionModule;
-	private WarmEmissionHandler wEmiHandler;
-	private ColdEmissionHandler cEmiHandler;
 	private EventWriterXML emissionEventWriter;
 	private String outputPath;
 	private String filename;
@@ -64,17 +58,12 @@ public class EmissionEventsWriter extends AbstractAnalysisModule{
 	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		this.emissionModule = new EmissionModule(scenario, EventsUtils.createEventsManager());
-		this.wEmiHandler = emissionModule.getWarmEmissionHandler();
-		this.cEmiHandler = emissionModule.getColdEmissionHandler();
 		this.filename = "emission.events.xml.gz";
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> handler = new LinkedList<EventHandler>();
-		
-		handler.add(this.wEmiHandler);
-		handler.add(this.cEmiHandler);
 		
 		new File(this.outputPath).mkdirs();
 		this.emissionEventWriter = new EventWriterXML(this.outputPath + this.filename);

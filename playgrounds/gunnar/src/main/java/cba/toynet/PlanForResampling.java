@@ -110,14 +110,19 @@ class PlanForResampling implements Alternative {
 		this.epsilonRealization = eps;
 	}
 
-	@Override
-	public void updateMATSimTimeScore(double score, double dummy) {
-		this.congestedTravelTimeUtility = score;
-	}
-
 	// TODO NEW
 	public double getFrozenEpsilon() {
 		return this.frozenEpsilon;
+	}
+
+	@Override
+	public Plan getMATSimPlan() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void updateMATSimTimeScore(double score, double innovationWeight) {
+		throw new UnsupportedOperationException();
 	}
 
 	// -------------------- OVERRIDING OF Object --------------------
@@ -133,12 +138,6 @@ class PlanForResampling implements Alternative {
 		result.append("P_sampers(this)   = " + this.sampersChoiceProba + "\n");
 		result.append("P_MATSim(this)    = " + this.matsimChoiceProba);
 		return result.toString();
-	}
-
-	@Override
-	public Plan getMATSimPlan() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

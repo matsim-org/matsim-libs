@@ -31,6 +31,7 @@ import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.utils.TimeDiscretization;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -75,7 +76,7 @@ public class EquilOpdytsTest {
 
     private static final boolean isPlansRelaxed = false;
 
-    @Test
+    @Test@Ignore
     public void runTest(){
         Set<String> modes2consider = new HashSet<>();
         modes2consider.add("car");

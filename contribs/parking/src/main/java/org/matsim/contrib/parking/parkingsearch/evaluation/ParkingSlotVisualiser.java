@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) ${year} by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.contrib.parking.parkingsearch.evaluation;
 
 import java.io.BufferedWriter;
@@ -219,11 +237,12 @@ class ParkingSlotManager{
 	}
 	
 	public void setAllParkingTimesToZero(){
+		List<Tuple<Coord,Double>> newFreeSlots = new ArrayList<Tuple<Coord,Double>>();
 		for (Tuple<Coord,Double> t : this.freeSlots){
 			Coord c = t.getFirst();
-			this.freeSlots.remove(t);
-			this.freeSlots.add(new Tuple<Coord, Double>(c,0.0));
+			newFreeSlots.add(new Tuple<Coord, Double>(c,0.0));
 		}
+		this.freeSlots = newFreeSlots;
 		for (Id<Vehicle> id : this.occupiedSlots.keySet()){
 			Coord c = this.occupiedSlots.get(id).getFirst();
 			this.occupiedSlots.put(id, new Tuple<Coord,Double>(c,0.0));

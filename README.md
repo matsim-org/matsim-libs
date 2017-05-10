@@ -21,6 +21,12 @@ and see if it has already been answered. If not, post a new question.
 
 The issue tracker is at http://matsim.atlassian.net/.
 
+Build by running (from this directory, not any sub-directory):
+
+```
+mvn package -DskipTests
+```
+
 ## Binaries
 
 Releases and release candidates, including information how to use them by Maven, Gradle, or similar, also for contribs, can be found at https://bintray.com/matsim/matsim/.
