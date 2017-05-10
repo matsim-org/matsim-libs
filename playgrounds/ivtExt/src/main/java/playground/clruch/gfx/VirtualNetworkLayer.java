@@ -30,9 +30,9 @@ public class VirtualNetworkLayer extends ViewerLayer {
     private PointCloud pointCloud = null;
     private VirtualNetwork virtualNetwork = null;
     private boolean drawVNodes = true;
-    private boolean drawVLinks = true;
+    private boolean drawVLinks = false;
     VirtualNodeGeometry virtualNodeGeometry = null;
-    private VirtualNodeShader virtualNodeShader = VirtualNodeShader.VehicleCount;
+    private VirtualNodeShader virtualNodeShader = VirtualNodeShader.None;
 
     // TODO make this functionality part of tensor library
     public static Tensor normalize1Norm(Tensor count) {
