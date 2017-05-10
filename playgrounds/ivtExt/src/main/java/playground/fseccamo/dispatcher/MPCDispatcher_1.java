@@ -127,7 +127,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     container.add(doubleArray);
                 }
                 {   
-                    Tensor matrix = Import.of(getRequestScheduleFileGlobal()); // TODO check if global or next is needed!
+                    Tensor matrix = Import.of(getRequestScheduleFileGlobal());
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
                     DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { matrix.length(), 3 }, array);
                     container.add(doubleArray);
@@ -162,6 +162,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
             {
                 final int m = virtualNetwork.getvLinksCount();
                 final int n = virtualNetwork.getvNodesCount();
+                
+                System.out.println("open requests: " + getAVRequests().size());
 
                 { // send
                   // INPUT TO MPC:
@@ -285,8 +287,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                          * find remaining available cars and do rebalance
                          */
                     }
-                    System.out.println("pickupPerVLink     : " + Pretty.of(requestVector));
-                    System.out.println("rebalancingPerVLink: " + Pretty.of(rebalanceVector));
+                    System.out.println("pickupPerVLink     : TOTAL " + Pretty.of(Total.of(requestVector)));
+                    System.out.println("rebalancingPerVLink: TOTAL " + Pretty.of(Total.of(rebalanceVector)));
                     {
 
                         final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
