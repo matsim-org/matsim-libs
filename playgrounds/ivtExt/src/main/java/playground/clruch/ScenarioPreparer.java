@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -26,49 +25,44 @@ import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
-// TODO make this a class, so that people can invoke new ScenPrep(file, LocationSpec) from other packages 
+/**
+ * Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
+ * and travelData objects. 
+ * @author clruch
+ *
+ */
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
-        
+        run(args);
+    }
+
+    public static void run(String[] args) throws MalformedURLException, Exception {
+
         // INPUT ARGUMENT: path to a config.xml file which contains references to the original xml files (population.xml)
-        // if the xml file with the converted files is supplied, no changes are implemented by the ScenarioPreparer. 
+        // if the xml file with the converted files is supplied, no changes are implemented by the ScenarioPreparer.
         System.out.println("converting simulation data files from " + args[0]);
 
-
-        // BEGIN: CUSTOMIZE ----------------------------------------------- 
+        // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
         final int maxPopulationSize = 2000;
-        final int numVirtualNodes = 5;
-        final int dtTravelData = 500;
+        final int numVirtualNodes = 2;
+        final int dtTravelData = 2000;
         final boolean completeGraph = true;
 
-        // TODO use LocationSpec
+        // LocationSpec object to specify city location and center, radius for cutting
         LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
-        // cutting of scenario to circle
-        // increasing the first value goes right        
-        // increasing the second value goes north
-        // Zurich
-        // final Coord center = new Coord(2683600.0, 1251400.0);
-        // final double radius = 10000; // (set to -1 for no cutting)
-        // Basel
-        // final Coord center = new Coord(2612859.0,1266343.0);
-        // final double radius = 12000; // (set to -1 for no cutting)
-        // Sioux
-        final Coord center = new Coord(678365.311581,4827050.237694);
-        final double radius = 50000;
 
         final boolean populationeliminateFreight = true;
-        final boolean populationchangeModeToAV = true;
         final boolean populationeliminateWalking = true;
-         
+        final boolean populationchangeModeToAV = true;
 
         // output file names
+        final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
         final String VIRTUALNETWORKFILENAME = "virtualNetwork";
         final String TRAVELDATAFILENAME = "travelData";
         final String NETWORKUPDATEDNAME = "networkConverted";
         final String POPULATIONUPDATEDNAME = "populationConverted";
-        
 
         // END: CUSTOMIZE -------------------------------------------------
 
@@ -81,9 +75,9 @@ public class ScenarioPreparer {
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
 
-        // 1) cut network (and reduce population to new network)
-        {
-            NetworkCutClean.elminateOutsideRadius(network, center, radius);
+        
+        {// 1) cut network (and reduce population to new network)
+            NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
             final File fileExportGz = new File(dir, NETWORKUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(dir, NETWORKUPDATEDNAME + ".xml");
             {
@@ -100,23 +94,24 @@ public class ScenarioPreparer {
             System.out.println("saved converted network to: " + dir + NETWORKUPDATEDNAME + ".xml");
         }
 
-        // 2) adapt the population to new network
-        {
+        
+        {// 2) adapt the population to new network
             System.out.println("Original population size: " + population.getPersons().values().size());
             PopulationTools.elminateOutsideNetwork(population, network);
             System.out.println("Population size after radius cut: " + population.getPersons().values().size());
-            if(populationeliminateFreight) PopulationTools.eliminateFreight(population);
+            if (populationeliminateFreight)
+                PopulationTools.eliminateFreight(population);
             System.out.println("Population size after removing freight: " + population.getPersons().values().size());
-            if(populationeliminateWalking) PopulationTools.eliminateWalking(population);
+            if (populationeliminateWalking)
+                PopulationTools.eliminateWalking(population);
             System.out.println("Population size after removing walking people: " + population.getPersons().values().size());
-            if(populationchangeModeToAV) PopulationTools.changeModesOfTransportToAV(population);
-            System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
-            PopulationTools.changeModesOfTransportToAV(population);
+            if (populationchangeModeToAV)
+                PopulationTools.changeModesOfTransportToAV(population);
             System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
             TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
             System.out.println("Population after decimation:" + population.getPersons().values().size());
-            GlobalAssert.that(population.getPersons().size()>0);
-            
+            GlobalAssert.that(population.getPersons().size() > 0);
+
             final File fileExportGz = new File(dir, POPULATIONUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(dir, POPULATIONUPDATEDNAME + ".xml");
 
@@ -134,25 +129,21 @@ public class ScenarioPreparer {
             }
         }
 
-        {
-        // 3) create virtual Network
-        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes,completeGraph);
-        final File vnDir = new File(dir, "virtualNetwork"); // <- magic const
-        vnDir.mkdir(); // create folder if necessary
-        VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
-        VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME+".xml").toString(), virtualNetwork);
-        System.out.println("saved virtual network byte format to : "+ new File(vnDir, VIRTUALNETWORKFILENAME));
-        
-        
-        
-        // 3) generate travelData
-        TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
-        TravelDataIO.toByte(new File(vnDir,TRAVELDATAFILENAME), travelData);
-        System.out.println("saved travelData byte format to : "+ new File(vnDir,TRAVELDATAFILENAME));
+        {// 3) create virtual Network            
+            KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
+            VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
+            final File vnDir = new File(dir, VIRTUALNETWORKFOLDERNAME);
+            vnDir.mkdir(); // create folder if necessary
+            VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
+            VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
+            System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
+
+            // 3) generate travelData
+            TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
+            TravelDataIO.toByte(new File(vnDir, TRAVELDATAFILENAME), travelData);
+            System.out.println("saved travelData byte format to : " + new File(vnDir, TRAVELDATAFILENAME));
         }
-        
+
         System.out.println("successfully converted simulation data files from " + args[0]);
     }
 }
-
