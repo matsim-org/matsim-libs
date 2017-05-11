@@ -19,6 +19,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
+import playground.clruch.traveltimetracker.AVTravelTimeRecorder;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -48,6 +49,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
         bind(AVActionCreator.class);
         bind(AVRequestCreator.class);
         bind(AVDispatchmentListener.class);
+        bind(AVTravelTimeRecorder.class);
     }
 
     @Provides @Singleton

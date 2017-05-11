@@ -15,6 +15,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 
 import com.google.inject.Inject;
 
+import playground.clruch.traveltimetracker.AVTravelTimeRecorder;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatchmentListener;
 import playground.sebhoerl.avtaxi.schedule.AVOptimizer;
@@ -34,6 +35,7 @@ public class AVQSimProvider implements Provider<Mobsim> {
 
         qSim.addQueueSimulationListeners(childInjector.getInstance(AVOptimizer.class));
         qSim.addQueueSimulationListeners(childInjector.getInstance(AVDispatchmentListener.class));
+        qSim.addQueueSimulationListeners(childInjector.getInstance(AVTravelTimeRecorder.class));
 
         qSim.addMobsimEngine(childInjector.getInstance(PassengerEngine.class));
         qSim.addDepartureHandler(childInjector.getInstance(PassengerEngine.class));
