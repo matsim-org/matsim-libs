@@ -3,8 +3,10 @@ package playground.fseccamo.dispatcher;
 import java.io.File;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -58,9 +60,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
- * Dispatcher implementing the linear program from Pavone, Marco, Stephen Smith, Emilio Frazzoli, and Daniela Rus. 2011.
- * “Load Balancing for Mobility-on-Demand Systems.” In Robotics: Science and Systems VII. doi:10.15607/rss.2011.vii.034.
- * Implemented by Claudio Ruch on 2017, 02, 25
+ * MPC dispatcher requires yalmip running in matlab
  */
 public class MPCDispatcher_1 extends BaseMpcDispatcher {
     public final int samplingPeriod;
@@ -148,6 +148,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
     // TODO remove served requests from map to save memory (but will not influence functionality)
     final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
+    final Collection<AVRequest> considerItDone = new HashSet<>();
 
     @Override
     public void redispatch(double now) {
@@ -181,7 +182,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                          * number of waiting customers that begin their journey on link_k = (node_i, node_j)
                          */
                         for (AVRequest avRequest : getAVRequests()) // all current requests
-                            if (!mpcRequestsMap.containsKey(avRequest)) { // if request has been seen/computed before
+                            if (!considerItDone.contains(avRequest) && !mpcRequestsMap.containsKey(avRequest)) { // if request has been seen/computed before
                                 // check if origin and dest are from same virtualNode
                                 final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
                                 final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
@@ -349,6 +350,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                             System.out.println("set diversion for pickup");
                                             setVehicleDiversion(vehicleLinkPair, pickupLocation); // send car to customer
                                             ++totalPickupEffective;
+                                            considerItDone.add(mpcRequest.avRequest);
+                                            mpcRequestsMap.remove(mpcRequest.avRequest);
                                         }
                                     }
                                 }
@@ -357,7 +360,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             }
                         }
                         if (totalPickupEffective != totalPickupDesired)
-                            System.out.println(" !!! rebalance delta: " + totalPickupEffective + " < " + totalPickupDesired);
+                            System.out.println(" !!! pickup delta: " + totalPickupEffective + " < " + totalPickupDesired);
 
                     }
                 }
