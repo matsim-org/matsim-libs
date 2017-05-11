@@ -4,9 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 
 public class AVVehicle extends VehicleImpl {
@@ -25,10 +23,16 @@ public class AVVehicle extends VehicleImpl {
     public AVOperator getOperator() {
         return operator;
     }
-    public AVDispatcher getDispatcher() { return dispatcher; }
+
+    public AVDispatcher getDispatcher() {
+        return dispatcher;
+    }
 
     public void setOpeartor(AVOperator operator) {
         this.operator = operator;
     }
-    public void setDispatcher(AVDispatcher dispatcher) { this.dispatcher = dispatcher; }
+
+    public void setDispatcher(AVDispatcher dispatcher) {
+        this.dispatcher = dispatcher;
+    }
 }

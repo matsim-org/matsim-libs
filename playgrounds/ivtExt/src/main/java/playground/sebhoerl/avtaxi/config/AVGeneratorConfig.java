@@ -1,7 +1,6 @@
 package playground.sebhoerl.avtaxi.config;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-import playground.sebhoerl.avtaxi.data.AVOperator;
 
 public class AVGeneratorConfig extends ReflectiveConfigGroup {
     final static String GENERATOR = "generator";

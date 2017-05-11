@@ -12,6 +12,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -19,7 +20,7 @@ import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregatedRequest;
 import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregationEvent;
 import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.ModeChangeEvent;
-import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
+import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SimpleDispatcherHeuristicMode;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
@@ -28,8 +29,6 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 import java.util.*;
 
 public class MultiODHeuristic implements AVDispatcher {
-    private boolean reoptimize = true;
-
     final private Id<AVOperator> operatorId;
     final private EventsManager eventsManager;
 
@@ -45,7 +44,7 @@ public class MultiODHeuristic implements AVDispatcher {
 
     final private Map<AVVehicle, AggregatedRequest> vehicle2Request = new HashMap<>();
 
-    private SingleHeuristicDispatcher.HeuristicMode mode = SingleHeuristicDispatcher.HeuristicMode.OVERSUPPLY;
+    private SimpleDispatcherHeuristicMode mode = SimpleDispatcherHeuristicMode.OVERSUPPLY;
 
     final private AggregateRideAppender appender;
     final private TravelTimeEstimator estimator;
@@ -84,41 +83,45 @@ public class MultiODHeuristic implements AVDispatcher {
         }
 
         if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
+<<<<<<< HEAD
             addVehicle(vehicle, ((AVStayTask) task).getLink());
+=======
+            private_addVehicle((AVVehicle) task.getSchedule().getVehicle(), ((AVStayTask) task).getLink());
+>>>>>>> master
         }
     }
 
     private void reoptimize(double now) {
         while (pendingRequests.size() > 0 && availableVehicles.size() > 0) {
+            System.out.println(
+                    "Multi-OD heuristic is now reoptimizing. Pending requests.size(): " + pendingRequests.size() + "  availableVehicles.size()" + availableVehicles.size());
+
             AggregatedRequest request = null;
             AVVehicle vehicle = null;
 
             switch (mode) {
-                case OVERSUPPLY:
-                    request = findRequest();
-                    vehicle = findClosestVehicle(request.getMasterRequest().getFromLink());
-                    break;
-                case UNDERSUPPLY:
-                    vehicle = findVehicle();
-                    request = findClosestRequest(vehicleLinks.get(vehicle));
-                    break;
+            case OVERSUPPLY:
+                request = findRequest();
+                vehicle = findClosestVehicle(request.getMasterRequest().getFromLink());
+                break;
+            case UNDERSUPPLY:
+                vehicle = findVehicle();
+                request = findClosestRequest(vehicleLinks.get(vehicle));
+                break;
             }
 
             removeRequest(request);
             removeVehicle(vehicle);
             vehicle2Request.put(vehicle, request);
 
-            assignableRequests.remove(request); // TODO: IMPORTANT; otherwise REscheduling is necessary!!!
+            assignableRequests.remove(request); // TODO: IMPORTANT; otherwise Rescheduling is necessary!!!
             appender.schedule(request, vehicle, now);
 
             long count = request.getSlaveRequests().size() + 1;
             shareHistogram.put(count, shareHistogram.get(count) + 1);
         }
 
-        SingleHeuristicDispatcher.HeuristicMode updatedMode =
-                availableVehicles.size() > 0 ?
-                        SingleHeuristicDispatcher.HeuristicMode.OVERSUPPLY :
-                        SingleHeuristicDispatcher.HeuristicMode.UNDERSUPPLY;
+        SimpleDispatcherHeuristicMode updatedMode = availableVehicles.size() > 0 ? SimpleDispatcherHeuristicMode.OVERSUPPLY : SimpleDispatcherHeuristicMode.UNDERSUPPLY;
 
         if (!updatedMode.equals(mode)) {
             mode = updatedMode;
@@ -129,7 +132,7 @@ public class MultiODHeuristic implements AVDispatcher {
     @Override
     public void onNextTimestep(double now) {
         this.now = now;
-        if (reoptimize) reoptimize(now);
+        reoptimize(now);
     }
 
     private void addRequest(AVRequest request, Link link) {
@@ -153,7 +156,8 @@ public class MultiODHeuristic implements AVDispatcher {
         double bestCost = Double.POSITIVE_INFINITY;
 
         for (AggregatedRequest candidate : assignableRequests) {
-            if (candidate == null) throw new IllegalStateException();
+            if (candidate == null)
+                throw new IllegalStateException();
             Double cost = candidate.accept(request);
 
             if (cost != null && cost < bestCost) {
@@ -184,16 +188,15 @@ public class MultiODHeuristic implements AVDispatcher {
     }
 
     @Override
-    public void addVehicle(AVVehicle vehicle) {
-        addVehicle(vehicle, vehicle.getStartLink());
+    public void registerVehicle(AVVehicle vehicle) {
+        private_addVehicle(vehicle, vehicle.getStartLink());
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
-    private void addVehicle(AVVehicle vehicle, Link link) {
+    private void private_addVehicle(AVVehicle vehicle, Link link) {
         availableVehicles.add(vehicle);
         availableVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), vehicle);
         vehicleLinks.put(vehicle, link);
-        reoptimize = true;
     }
 
     private void removeVehicle(AVVehicle vehicle) {
@@ -211,26 +214,23 @@ public class MultiODHeuristic implements AVDispatcher {
     static public class Factory implements AVDispatcherFactory {
         @Inject
         private Network network;
-        @Inject private EventsManager eventsManager;
+        @Inject
+        private EventsManager eventsManager;
 
-        @Inject @Named(AVModule.AV_MODE)
+        @Inject
+        @Named(AVModule.AV_MODE)
         private LeastCostPathCalculator router;
 
-        @Inject @Named(AVModule.AV_MODE)
+        @Inject
+        @Named(AVModule.AV_MODE)
         private TravelTime travelTime;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             double threshold = Double.parseDouble(config.getParams().getOrDefault("aggregationThreshold", "600.0"));
             TravelTimeEstimator estimator = new TravelTimeEstimator(router, threshold);
 
-            return new MultiODHeuristic(
-                    config.getParent().getId(),
-                    eventsManager,
-                    network,
-                    new AggregateRideAppender(config, router, travelTime, estimator),
-                    estimator
-            );
+            return new MultiODHeuristic(config.getParent().getId(), eventsManager, network, new AggregateRideAppender(config, router, travelTime, estimator), estimator);
         }
     }
 }

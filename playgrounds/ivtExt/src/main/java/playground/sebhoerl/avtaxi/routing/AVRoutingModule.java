@@ -1,26 +1,24 @@
 package playground.sebhoerl.avtaxi.routing;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.Collections;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
-import playground.sebhoerl.avtaxi.data.AVData;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.replanning.AVOperatorChoiceStrategy;
-
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class AVRoutingModule implements RoutingModule {

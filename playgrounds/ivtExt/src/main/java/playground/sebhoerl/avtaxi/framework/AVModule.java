@@ -1,8 +1,13 @@
 package playground.sebhoerl.avtaxi.framework;
 
-import com.google.inject.*;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
+import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Named;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -15,13 +20,28 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-import org.opengis.filter.capability.Operator;
-import playground.sebhoerl.avtaxi.config.*;
-import playground.sebhoerl.avtaxi.data.*;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
+
+import com.google.inject.Key;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
+
+import org.opengis.filter.Not;
+import playground.clruch.dispatcher.*;
+import playground.fseccamo.dispatcher.MPCDispatcher_1;
+import playground.joel.dispatcher.single_heuristic.NewSingleHeuristicDispatcher; // TODO: delete this or the other
+import playground.maalbert.dispatcher.DFRDispatcher;
+import playground.sebhoerl.avtaxi.config.AVConfig;
+import playground.sebhoerl.avtaxi.config.AVConfigReader;
+import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
+import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
+import playground.sebhoerl.avtaxi.data.AVData;
+import playground.sebhoerl.avtaxi.data.AVLoader;
+import playground.sebhoerl.avtaxi.data.AVOperator;
+import playground.sebhoerl.avtaxi.data.AVOperatorFactory;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.MultiODHeuristic;
 import playground.sebhoerl.avtaxi.dispatcher.single_fifo.SingleFIFODispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
@@ -34,14 +54,6 @@ import playground.sebhoerl.avtaxi.routing.AVRouteFactory;
 import playground.sebhoerl.avtaxi.routing.AVRoutingModule;
 import playground.sebhoerl.avtaxi.scoring.AVScoringFunctionFactory;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculatorFactory;
-
-import javax.inject.Named;
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 public class AVModule extends AbstractModule {
     final static public String AV_MODE = "av";
@@ -79,13 +91,51 @@ public class AVModule extends AbstractModule {
     }
 
 	private void configureDispatchmentStrategies() {
+        /** dispatchers by sebhoerl */
         bind(SingleFIFODispatcher.Factory.class);
         bind(SingleHeuristicDispatcher.Factory.class);
         bind(MultiODHeuristic.Factory.class);
-
+        
         AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
+        
+        // ---
+        /** dispatchers for UniversalDispatcher */
+        bind(PulseDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
+        
+        bind(EdgyDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
+
+        bind(NotAsDumbDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(),NotAsDumbDispatcher.class.getSimpleName()).to(NotAsDumbDispatcher.Factory.class);
+
+        bind(HungarianDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), HungarianDispatcher.class.getSimpleName()).to(HungarianDispatcher.Factory.class);
+        
+        bind(SelfishDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
+
+        bind(NewSingleHeuristicDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
+
+
+
+        /** dispatchers for PartitionedDispatcher */
+        //bind(ConsensusDispatcherDFR.Factory.class);
+        bind(LPFeedbackLIPDispatcher.Factory.class);
+        bind(LPFeedforwardDispatcher.Factory.class);
+        bind(DFRDispatcher.Factory.class);
+        //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
+        
+        // MPC dispatcher
+        bind(MPCDispatcher_1.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher_1.class.getSimpleName()).to(MPCDispatcher_1.Factory.class);
+        
     }
 
     private void configureGeneratorStrategies() {
