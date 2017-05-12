@@ -27,4 +27,5 @@ public class AVTravelTimeModule extends AbstractModule {
     private AVTravelTime provideAVTravelTime(AVTravelTimeTracker travelTimeTracker, @Named("car") TravelTime delegate) {
         return new AVTravelTime(travelTimeTracker, delegate);
     }
+    
 }
