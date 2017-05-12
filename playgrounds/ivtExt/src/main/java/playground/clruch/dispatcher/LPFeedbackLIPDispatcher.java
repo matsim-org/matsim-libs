@@ -67,7 +67,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     public LPFeedbackLIPDispatcher( //
             AVDispatcherConfig config, //
             AVGeneratorConfig generatorConfig, //
-            TravelTime travelTime, // 
+            TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             VirtualNetwork virtualNetwork, //
@@ -99,38 +99,45 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
                 Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                int totalAvailable = 0;
+                for(List<VehicleLinkPair> vlpl : availableVehicles.values()){
+                    totalAvailable += vlpl.size();                    
+                }
 
                 // calculate desired vehicles per vNode
                 int num_requests = requests.values().stream().mapToInt(List::size).sum();
-                int vi_desired_num = (int) ((numberOfAVs - num_requests) / (double) virtualNetwork.getvNodesCount());
-                GlobalAssert.that(vi_desired_num * virtualNetwork.getvNodesCount() <= numberOfAVs);
-                Tensor vi_desiredT = Tensors.vector(i -> RationalScalar.of(vi_desired_num, 1), virtualNetwork.getvNodesCount());
-                
+                double vi_desired_num = ((numberOfAVs - num_requests) / (double) virtualNetwork.getvNodesCount());
+                int vi_desired_numint = (int) Math.floor(vi_desired_num);
+                Tensor vi_desiredT = Tensors.vector(i -> RationalScalar.of(vi_desired_numint, 1), virtualNetwork.getvNodesCount());
+
                 // calculate excess vehicles per virtual Node i, where v_i excess = vi_own - c_i =
                 // v_i + sum_j (v_ji) - c_i
                 Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
                 Map<VirtualNode, Set<AVVehicle>> v_ij_cust = getVirtualNodeArrivingWCustomerVehicles();
                 Tensor vi_excessT = Array.zeros(virtualNetwork.getvNodesCount());
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
-                    int viExcessVal = availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size()
-                            + v_ij_cust.get(virtualNode).size() - requests.get(virtualNode).size();
+                    int viExcessVal = availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size() + v_ij_cust.get(virtualNode).size()
+                            - requests.get(virtualNode).size();
                     vi_excessT.set(RealScalar.of(viExcessVal), virtualNode.index);
                 }
-                
-                
+
                 // solve the linear program with updated right-hand side
-                // fill right-hand-side
+                // fill right-hand-side    // TODO if MATSim would never produce zero available vehicles, we could save these lines
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
-                Tensor rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs,GLPKConstants.GLP_LO);
+                Tensor rebalanceCount2 = Tensors.empty();
+                if (totalAvailable > 0) {
+                    rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs, GLPKConstants.GLP_LO);
+                } else {
+                    rebalanceCount2 = Array.zeros(virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+                }
                 Tensor rebalanceCount = Round.of(rebalanceCount2);
                 // TODO this should never become active, can be possibly removed later
                 // assert that solution is integer and does not contain negative values
-                GlobalAssert.that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s -> s.number().doubleValue()).filter(e -> e < 0)
-                        .findAny().isPresent());
+                GlobalAssert.that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s -> s.number().doubleValue()).filter(e -> e < 0).findAny()
+                        .isPresent());
 
                 // ensure that not more vehicles are sent away than available
-                Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCount.unmodifiable(),
-                        availableVehicles);
+                Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCount.unmodifiable(), availableVehicles);
                 total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
                 // generate routing instructions for rebalancing vehicles
@@ -164,9 +171,9 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using bipartite matching
         if (round_now % redispatchPeriod == 0) {
-            printVals = HungarianUtils.globalBipartiteMatching(this, // 
+            printVals = HungarianUtils.globalBipartiteMatching(this, //
                     () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
-                    .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));
+                            .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));
         }
     }
 
@@ -198,7 +205,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         public static Map<VirtualLink, Double> travelTimes;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig){
+        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
@@ -216,8 +223,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
             }
 
-            return new LPFeedbackLIPDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork,
-                    abstractVirtualNodeDest, abstractVehicleDestMatcher);
+            return new LPFeedbackLIPDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
+                    abstractVehicleDestMatcher);
         }
     }
 }
