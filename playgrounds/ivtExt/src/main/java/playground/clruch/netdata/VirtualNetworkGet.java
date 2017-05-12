@@ -15,6 +15,7 @@ public enum VirtualNetworkGet {
         } catch (Exception e) {
             // e.printStackTrace();
             System.out.println("cannot load default " + virtualnetworkFile);
+            // throw new RuntimeException();
         }
         return null;
     }

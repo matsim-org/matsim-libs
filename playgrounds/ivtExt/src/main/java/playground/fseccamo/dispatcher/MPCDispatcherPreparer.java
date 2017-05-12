@@ -160,8 +160,6 @@ public class MPCDispatcherPreparer extends BaseMpcDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
-            final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
-            GlobalAssert.that(virtualnetworkDir.isDirectory());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
             return new MPCDispatcherPreparer( //
                     config, generatorConfig, travelTime, router, eventsManager, //

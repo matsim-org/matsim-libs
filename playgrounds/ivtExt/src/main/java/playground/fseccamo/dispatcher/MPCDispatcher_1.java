@@ -413,9 +413,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
-
-            final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
-            GlobalAssert.that(virtualnetworkDir.isDirectory());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
             return new MPCDispatcher_1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher,
