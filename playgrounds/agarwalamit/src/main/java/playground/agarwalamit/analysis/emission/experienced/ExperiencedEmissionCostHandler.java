@@ -106,7 +106,7 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 //		String outFile = "/Users/amit/Documents/cluster/ils4/agarwal/munich/airPolluationExposureCosts_cne.txt";
 
 		// berlin
-		String dir = "/Users/ihab/Desktop/ils4i/kaddoura/cne/berlin/output/";
+		String dir = "/Users/ihab/Desktop/ils4i/kaddoura/cne/berlin-dz-1pct/output/";
 		String outFile = dir +"airPolluationExposureCosts_cne.txt";
 		
 		// munich
@@ -125,13 +125,29 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 
 		// berlin
 		String [] cases = {
-				"output_run0_bln_bc_r"
-				,"output_run1_bln_c_QBPV3_r"
-				,"output_run2_bln_c_QBPV9_r"
-				,"output_run3_bln_c_DecongestionPID_r"
-				,"output_run4_bln_cne_DecongestionPID_r_new"
-				,"output_run7_bln_n_r"
-				,"output_run8_bln_e_r"
+				"m_r_output_run0_bln_bc"
+				,"m_r_output_run1_bln_c_QBPV3"
+				,"m_r_output_run2_bln_c_QBPV9"
+				,"m_r_output_run3_bln_c_DecongestionPID"
+				,"m_r_output_run3b_bln_c_DecongestionBangBang"
+				,"m_r_output_run4_bln_cne_DecongestionPID"
+				,"m_r_output_run4b_bln_cne_DecongestionBangBang",
+				"m_r_output_run5_bln_cne_QBPV3",
+				"m_r_output_run6_bln_cne_QBPV9",
+				"m_r_output_run7_bln_n",
+				"m_r_output_run8_bln_e",
+//
+				"r_output_run0_bln_bc"
+				,"r_output_run1_bln_c_QBPV3"
+				,"r_output_run2_bln_c_QBPV9"
+				,"r_output_run3_bln_c_DecongestionPID"
+				,"r_output_run3b_bln_c_DecongestionBangBang"
+				,"r_output_run4_bln_cne_DecongestionPID"
+				,"r_output_run4b_bln_cne_DecongestionBangBang",
+				"r_output_run5_bln_cne_QBPV3",
+				"r_output_run6_bln_cne_QBPV9",
+				"r_output_run7_bln_n",
+				"r_output_run8_bln_e"
 		};
 		int [] its = {100};
 		
@@ -140,7 +156,8 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 
 		for(String str : cases) {
 				for(int itr : its) {
-					String emissionEventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".emission.events.xml.gz";
+					String emissionEventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".events.xml.gz";
+//					String emissionEventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".emission.events.xml.gz";
 					String networkFile = dir+str+"/output_network.xml.gz";
 					String configFile = dir+str+"/output_config.xml.gz";
 					String eventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".events.xml.gz";
