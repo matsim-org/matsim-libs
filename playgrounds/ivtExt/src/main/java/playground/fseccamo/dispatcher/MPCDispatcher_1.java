@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Queue;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -140,8 +142,24 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         }
     }
 
+    // requests that haven't received a pickup order yet
     final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
+    // requests that have received a pickup order
     final Collection<AVRequest> considerItDone = new HashSet<>();
+    // vehicles that have been dispatched to customers, and haven't reached stay task yet
+    final Collection<AVVehicle> pickupAndCustomerVehicle = new HashSet<>();
+
+    Map<VirtualNode, List<VehicleLinkPair>> getDivertableNotRebalancingNotPickupVehicles() {
+        Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+        Map<VirtualNode, List<VehicleLinkPair>> map = new HashMap<>();
+        for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet()) {
+            List<VehicleLinkPair> list = entry.getValue().stream() //
+                    .filter(vlp -> !pickupAndCustomerVehicle.contains(vlp.avVehicle)) //
+                    .collect(Collectors.toList());
+            map.put(entry.getKey(), list);
+        }
+        return map;
+    }
 
     @Override
     public void redispatch(double now) {
@@ -150,6 +168,9 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         new InOrderOfArrivalMatcher(this::setAcceptRequest) //
                 .match(getStayVehicles(), getAVRequestsAtLinks());
 
+        getStayVehicles().values().stream() //
+                .flatMap(Queue::stream).forEach(pickupAndCustomerVehicle::remove);
+
         final long round_now = Math.round(now);
         if (round_now % samplingPeriod == 0) {
 
@@ -157,7 +178,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                 final int m = virtualNetwork.getvLinksCount();
                 final int n = virtualNetwork.getvNodesCount();
 
-                System.out.println("open requests: " + getAVRequests().size());
+                System.out.println("open requests: " + getAVRequests().size() + "  not served yet: " + mpcRequestsMap.size());
 
                 { // send
                   // INPUT TO MPC:
@@ -201,9 +222,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             }
 
                         Tensor waitCustomersPerVLink = Array.zeros(m + n); // +n accounts for self loop
-                        for (AVRequest avRequest : getAVRequests()) // all current requests
-                            waitCustomersPerVLink.set(Increment.ONE, mpcRequestsMap.get(avRequest).vectorIndex);
-
+                        for (MpcRequest mpcRequest : mpcRequestsMap.values()) // requests that haven't received a dispatch yet
+                            waitCustomersPerVLink.set(Increment.ONE, mpcRequest.vectorIndex);
                         double[] array = ExtractPrimitives.toArrayDouble(waitCustomersPerVLink);
                         DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
@@ -214,7 +234,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                          * STAY vehicles + vehicles without task inside VirtualNode
                          */
                         // all vehicles except the ones with a customer on board and the ones which are rebalancing
-                        Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                        Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
                         double[] array = new double[n];
                         for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet())
                             array[entry.getKey().index] = entry.getValue().size(); // could use tensor notation
@@ -228,6 +248,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                          * Vehicles with customers still within node_i traveling on link_k = (node_i, node_j)
                          */
                         final Tensor vector = countVehiclesPerVLink(getVehiclesWithCustomer());
+                        // TODO vehicles on pickup drive should appear here...
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingVehiclesWithCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
@@ -242,7 +263,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
                         System.out.println("movingRebalancingVehiclesPerVLink=" + Total.of(Tensors.vectorDouble(array)));
-
                     }
                     javaContainerSocket.writeContainer(container);
                 }
@@ -282,7 +302,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
                     {
                         int totalRebalanceEffective = 0;
-                        final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                        final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
                         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
                             final VirtualNode vnFrom = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
@@ -317,7 +337,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
                     {
                         int totalPickupEffective = 0;
-                        final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                        final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
                         final NavigableMap<Integer, List<MpcRequest>> virtualLinkRequestsMap = new TreeMap<>(mpcRequestsMap.values().stream() //
                                 .collect(Collectors.groupingBy(mpcRequest -> mpcRequest.vectorIndex)));
                         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
@@ -344,6 +364,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                             setVehicleDiversion(vehicleLinkPair, pickupLocation); // send car to customer
                                             ++totalPickupEffective;
                                             considerItDone.add(mpcRequest.avRequest);
+                                            GlobalAssert.that(!pickupAndCustomerVehicle.contains(vehicleLinkPair.avVehicle));
+                                            pickupAndCustomerVehicle.add(vehicleLinkPair.avVehicle);
                                             mpcRequestsMap.remove(mpcRequest.avRequest);
                                         }
                                     }
