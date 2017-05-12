@@ -37,9 +37,9 @@ public class BuildingsByArea {
 	private void Run(){
 		
 
-		ArrayList<String> oldKeys = new ArrayList<>();
+		ArrayList<String> oldKeys = new ArrayList<>(); //CMN-MZ list
 
-		ArrayList<String> newKeys = new ArrayList<>();
+		ArrayList<String> newKeys = new ArrayList<>(); //CMN-MZ-AR list
 		
 		Map <String , Integer> C = new LinkedHashMap <String , Integer> ();
 		Map <String , Integer> D = new LinkedHashMap <String , Integer> ();
@@ -171,6 +171,7 @@ public class BuildingsByArea {
 			    	
 					int start = oldKeys.indexOf(s);
 					int finish = oldKeys.lastIndexOf(s);
+					
 					int totalC = C.get(newKeys.get(start));	int totalD = D.get(newKeys.get(start));	int totalE = E.get(newKeys.get(start));
 					int totalG = G.get(newKeys.get(start));	int totalH = H.get(newKeys.get(start));	int totalI = I.get(newKeys.get(start));
 					int totalL = L.get(newKeys.get(start));	int totalM = M.get(newKeys.get(start));	int totalO = O.get(newKeys.get(start));
