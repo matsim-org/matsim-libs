@@ -12,7 +12,8 @@ import org.matsim.core.utils.io.IOUtils;
 public class CouplingScoreStatistics {
 	
 	private HashMap <String,String> simSteps = new HashMap<>();
-	private String outputFolder = "../../../baseCaseAnalysis/1pct/2_testingSteps/";
+	private String pct = "10pct";
+	private String outputFolder = "../../../baseCaseAnalysis/" + pct + "/2_testingSteps/";
 	private final Logger log = Logger.getLogger(CouplingScoreStatistics.class);
 	
 	
@@ -37,7 +38,19 @@ public class CouplingScoreStatistics {
 //		simSteps.put("0_24C0", "300-600");
 //		simSteps.put("0_24T0", "300-600");
 //		simSteps.put("0_24T2", "600-800");
-		simSteps.put("0_24T1", "600-800");
+//		simSteps.put("0_24T1", "600-800");
+//		simSteps.put("0_1", "0-300");
+//		simSteps.put("0_P", "0-100");
+//		simSteps.put("0.A", "0-500");
+//		simSteps.put("1", "100-600");		
+//		simSteps.put("1.A", "600-800");		
+//		simSteps.put("1.B", "600-800");
+//		simSteps.put("0x", "0-100");
+//		simSteps.put("1", "100-400");		
+//		simSteps.put("1x", "300-600");
+//		simSteps.put("1xA", "600-800");
+		simSteps.put("1xB", "600-800");
+		
 		
 		try{
 		PrintWriter pw = new PrintWriter (new FileWriter ( outputFolder + "stepsScoreStatistics.txt" ));
@@ -46,14 +59,9 @@ public class CouplingScoreStatistics {
 		for(HashMap.Entry<String, String> entry :simSteps.entrySet()){
 			
 			String stepOutputFolder;
-			
-			if(entry.getKey().equals("0")){
-				stepOutputFolder = "../../../runs-svn/santiago/baseCase1pct/outputPRECalibration/output_sim30/";
-			} else {	
-
-				stepOutputFolder = "../../../runs-svn/santiago/baseCase1pct/outputOfStep" + entry.getKey() + "/";
+			stepOutputFolder = "../../../runs-svn/santiago/baseCase" + pct + "/outputOfStep" + entry.getKey() + "/";
 				
-			}
+
 			
 				try{
 					
