@@ -30,6 +30,8 @@ import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -42,6 +44,7 @@ import org.matsim.facilities.ActivityFacilities;
 import com.vividsolutions.jts.geom.Envelope;
 
 import playground.dziemke.utils.LogToOutputSaver;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 
 /**
  * @author dziemke, ikaddoura
@@ -51,12 +54,11 @@ public class AccessibilityComputationCottbus {
 	
 	public static void main(String[] args) {
 		// Input and output
-		String runOutputFolder = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/be_117j_baseCaseCtd/";
+		String runOutputFolder = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/";
 		String networkFile = runOutputFolder + "output_network.xml.gz";
-		String facilitiesFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-03_facilities/berlin-2017-05-03_facilities_DHDN_GK4.xml";
-		String plansFile = runOutputFolder + "output_plans.xml.gz";
+		String facilitiesFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-10_facilities/berlin-2017-05-10_facilities_DHDN_GK4.xml";
 		String configFile = runOutputFolder + "output_config.xml.gz";
-		String accessibilityOutputDirectory = runOutputFolder + "accessibilities2/";	
+		String accessibilityOutputDirectory = runOutputFolder + "accessibilities/";	
 		
 		// Parameters
 		final Double cellSize = 500.;
@@ -76,20 +78,15 @@ public class AccessibilityComputationCottbus {
 		final List<String> modes = new ArrayList<>();
 		
 		// Config and scenario
-		Config config = ConfigUtils.loadConfig(configFile);
-	
-//		config.global().setCoordinateSystem(TransformationFactory.DHDN_GK4);
-		
+		Config config = ConfigUtils.loadConfig(configFile, new DecongestionConfigGroup(), new NoiseConfigGroup(), new EmissionsConfigGroup());
+			
 		config.network().setInputFile(networkFile);
-//		config.network().setInputCRS(TransformationFactory.WGS84_UTM33N);
 	
 		config.facilities().setInputFile(facilitiesFile);
-//		config.facilities().setInputCRS(TransformationFactory.DHDN_GK4);
 		
-//		config.plans().setInputFile(plansFile);
 		config.plans().setInputFile(null);
-		
 		config.counts().setInputFile(null);
+		config.vehicles().setVehiclesFile(null);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(accessibilityOutputDirectory);
@@ -122,7 +119,7 @@ public class AccessibilityComputationCottbus {
 		activityTypes.add("fire_station");
 
 		// Collect homes for density layer
-		final ActivityFacilities densityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, FacilityTypes.HOME);
+//		final ActivityFacilities densityFacilities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, FacilityTypes.HOME);
 		
 		// Controller
 		final Controler controler = new Controler(scenario);
@@ -130,7 +127,7 @@ public class AccessibilityComputationCottbus {
 		for (String activityType : activityTypes) {
 			AccessibilityModule module = new AccessibilityModule();
 			module.setConsideredActivityType(activityType);
-			module.addAdditionalFacilityData(densityFacilities);
+//			module.addAdditionalFacilityData(densityFacilities);
 			module.setPushing2Geoserver(push2Geoserver);
 			controler.addOverridingModule(module);
 		}
