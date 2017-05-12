@@ -46,11 +46,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
                 .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            if (round_now == 11890) {
-                System.out.println("arrived at problem");
-            }
             printVals = HungarianUtils.globalBipartiteMatching(this, () -> getDivertableVehicles());
-
         }
     }
 
