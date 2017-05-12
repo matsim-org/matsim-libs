@@ -59,11 +59,11 @@ public class RunCombinedOsmReaderCottbus {
 	public static void main(String[] args) {
 				
 
-		String osmFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-03.osm";
-		String outputBase = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-03_facilities_2/";
+		String osmFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-10.osm";
+		String outputBase = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-10_facilities/";
 		
-		String facilityFile = "berlin-2017-05-03_facilities_DHDN_GK4.xml";
-		String attributeFile = "berlin-2017-05-03_facilities_amenities_DHDN_GK4.xml";
+		String facilityFile = "berlin-2017-05-10_facilities_DHDN_GK4.xml";
+		String attributeFile = "berlin-2017-05-10_facilities_amenities_DHDN_GK4.xml";
 		
 		log.info("Parsing land use from OpenStreetMap.");
 		LogToOutputSaver.setOutputDirectory(outputBase);
