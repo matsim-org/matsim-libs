@@ -1,7 +1,6 @@
 package playground.clruch.gfx;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -89,9 +88,7 @@ public class MatsimMapComponent extends JMapViewer {
         super.paintComponent(g);
 
         final Graphics2D graphics = (Graphics2D) g;
-        final Dimension dimension = getSize();
-        
-        virtualNetworkLayer.paint(graphics, ref); // FIXME
+        // final Dimension dimension = getSize();
 
         if (ref != null) {
 

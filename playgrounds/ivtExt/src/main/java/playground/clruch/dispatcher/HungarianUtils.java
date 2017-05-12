@@ -22,7 +22,7 @@ import playground.clruch.simonton.MyTree;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-enum HungarianUtils {
+public enum HungarianUtils {
     ;
     // ---
     public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier) {

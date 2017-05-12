@@ -28,7 +28,7 @@ public class RequestsLayer extends ViewerLayer {
     private volatile boolean drawNumber = true;
     private volatile boolean drawRequestDestinations = false;
 
-    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.Orange);
+    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.OrangeContour);
     MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GreenContour);
     double maxWaitTime;
 

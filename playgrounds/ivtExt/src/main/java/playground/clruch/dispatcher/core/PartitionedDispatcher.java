@@ -1,13 +1,14 @@
 package playground.clruch.dispatcher.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -47,11 +48,11 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
                 .parallel() //
                 .collect(Collectors.groupingBy(vlp -> virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
 
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-            if (!returnMap.containsKey(virtualNode)) {
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) 
+            if (!returnMap.containsKey(virtualNode)) 
                 returnMap.put(virtualNode, Collections.emptyList());
-            }
-        }
+        
+        GlobalAssert.that(returnMap.size() == virtualNetwork.getvNodesCount());
         return returnMap;
     }
 
@@ -102,18 +103,20 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
      *
      * @return
      */
-    protected synchronized Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeDivertableNotRebalancingVehicles() {
+    protected synchronized NavigableMap<VirtualNode, List<VehicleLinkPair>> getVirtualNodeDivertableNotRebalancingVehicles() {
         // return list of vehicles
-        Map<VirtualNode, List<VehicleLinkPair>> returnMap = getVirtualNodeAvailableVehicles();
-        Map<VirtualNode, List<VehicleLinkPair>> rebalanceMap = new HashMap<>();
+        NavigableMap<VirtualNode, List<VehicleLinkPair>> nonRebalanceMap = new TreeMap<>();
 
         // remove vehicles which are rebalancing
         final Map<AVVehicle, Link> rebalancingVehicles = getRebalancingVehicles();
+        Map<VirtualNode, List<VehicleLinkPair>> returnMap = getVirtualNodeAvailableVehicles();
         for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
-            rebalanceMap.put(entry.getKey(), entry.getValue().stream().filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)).collect(Collectors.toList()));
+            nonRebalanceMap.put(entry.getKey(), entry.getValue().stream() //
+                    .filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //
+                    .collect(Collectors.toList()));
         }
 
-        return rebalanceMap;
+        return nonRebalanceMap;
     }
 
     protected Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {

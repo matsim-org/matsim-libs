@@ -30,9 +30,9 @@ public class VirtualNetworkLayer extends ViewerLayer {
     private PointCloud pointCloud = null;
     private VirtualNetwork virtualNetwork = null;
     private boolean drawVNodes = true;
-    private boolean drawVLinks = true;
+    private boolean drawVLinks = false;
     VirtualNodeGeometry virtualNodeGeometry = null;
-    private VirtualNodeShader virtualNodeShader = VirtualNodeShader.VehicleCount;
+    private VirtualNodeShader virtualNodeShader = VirtualNodeShader.None;
 
     // TODO make this functionality part of tensor library
     public static Tensor normalize1Norm(Tensor count) {
@@ -53,7 +53,6 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        if (ref != null) { // FIXME
         boolean containsRebalance = ref.vehicles.stream() //
                 .filter(vc -> vc.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
                 .findAny().isPresent();
@@ -106,15 +105,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 break;
             }
         }
-        }
         if (drawVLinks && virtualNetwork != null) {
             final MatsimStaticDatabase db = matsimMapComponent.db;
-            
-            graphics.setColor(new Color(128, 128, 128, 64));
-            for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet())
-                graphics.fill(entry.getValue());
-
-            
             
             graphics.setColor(new Color(255, 0, 0, 64));
             for (VirtualLink vl : virtualNetwork.getVirtualLinks()) {

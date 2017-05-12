@@ -39,7 +39,9 @@ public class LPVehicleRebalancing {
         n = virtualNetwork.getvNodesCount();
         m = virtualNetwork.getvLinksCount();
         System.out.println("creating rebalancing LP for system with " + n + " virtualNodes and " + m + " virtualLinks");
-        GlobalAssert.that(m == n * n - n);
+        // TODO this criterion is only valid for complete graph....
+        // how to deal with it from ScenarioPrep
+        // GlobalAssert.that(m == n * n - n);
         initiateLP();
     }
 

@@ -52,7 +52,7 @@ public class ScenarioPreparer {
 
         // LocationSpec object to specify city location and center, radius for cutting
         LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
-
+        
         final boolean populationeliminateFreight = true;
         final boolean populationeliminateWalking = true;
         final boolean populationchangeModeToAV = true;
@@ -74,6 +74,7 @@ public class ScenarioPreparer {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
+
 
         
         {// 1) cut network (and reduce population to new network)
