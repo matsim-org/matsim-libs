@@ -28,14 +28,12 @@ import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.jmex.java.JavaContainerSocket;
 import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
-import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
 import ch.ethz.idsc.tensor.io.Import;
-import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Increment;
@@ -63,13 +61,10 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * MPC dispatcher requires yalmip running in matlab
  */
 public class MPCDispatcher_1 extends BaseMpcDispatcher {
-    public final int samplingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
     final int numberOfVehicles;
-    private int total_rebalanceCount = 0;
-    Tensor printVals = Tensors.empty();
     final InstantPathFactory instantPathFactory;
 
     JavaContainerSocket javaContainerSocket;
@@ -90,7 +85,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
         numberOfVehicles = (int) generatorConfig.getNumberOfVehicles();
-        samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod")); // period between calls to MPC
 
         try {
             final int n = virtualNetwork.getvNodesCount();
@@ -146,7 +140,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         }
     }
 
-    // TODO remove served requests from map to save memory (but will not influence functionality)
     final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
     final Collection<AVRequest> considerItDone = new HashSet<>();
 
@@ -370,10 +363,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
     @Override
     public String getInfoLine() {
-        return String.format("%s RV=%s H=%s", //
-                super.getInfoLine(), //
-                total_rebalanceCount, //
-                printVals.toString() //
+        return String.format("%s", //
+                super.getInfoLine() //
         );
     }
 
@@ -403,14 +394,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
             final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
             GlobalAssert.that(virtualnetworkDir.isDirectory());
-            {
-                // TODO
-                // final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
-                // System.out.println("" + virtualnetworkFile.getAbsoluteFile());
-                // virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
-                virtualNetwork = VirtualNetworkGet.readDefault(network);
-                // travelTimes = vLinkDataReader.fillvLinkData(virtualnetworkFile, virtualNetwork, "Ttime");
-            }
+            virtualNetwork = VirtualNetworkGet.readDefault(network);
 
             return new MPCDispatcher_1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest, abstractVehicleDestMatcher,
                     travelTimes);

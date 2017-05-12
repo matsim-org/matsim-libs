@@ -27,6 +27,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     static final String VIRTUALNETWORK_DIRECTORYNAME = "virtualNetwork";
+    protected final int samplingPeriod;
 
     BaseMpcDispatcher( //
             AVDispatcherConfig config, //
@@ -35,6 +36,8 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             EventsManager eventsManager, //
             VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
+        
+        samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod")); // period between calls to MPC
     }
 
     protected Tensor countVehiclesPerVLink(Map<AVVehicle, Link> map) {
