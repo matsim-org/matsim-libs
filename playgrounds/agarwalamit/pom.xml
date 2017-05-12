@@ -15,48 +15,6 @@
 			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
-	<!--<build>-->
-			<!--<plugins>-->
-				<!--<plugin>-->
-					<!--<groupId>org.fortasoft</groupId>-->
-					<!--<artifactId>gradle-maven-plugin</artifactId>-->
-					<!--<version>1.0.8</version>-->
-					<!--<configuration>-->
-						<!--<tasks>-->
-							<!--<task>-->
-								<!--writeNewPom {-->
-								<!--doLast {-->
-								<!--pom {-->
-								<!--project {-->
-								<!--groupId 'com.github.mobitopp'-->
-								<!--artifactId 'connection-scan'-->
-								<!--version '917f105'-->
-								<!--}-->
-								<!--}.writeTo("$buildDir/newpom.xml")-->
-								<!--}-->
-								<!--}-->
-								<!--&lt;!&ndash;pom {&ndash;&gt;-->
-								<!--&lt;!&ndash;project {&ndash;&gt;-->
-								<!--&lt;!&ndash;groupId 'com.github.mobitopp'&ndash;&gt;-->
-								<!--&lt;!&ndash;artifactId 'connection-scan'&ndash;&gt;-->
-								<!--&lt;!&ndash;version '917f105'&ndash;&gt;-->
-								<!--&lt;!&ndash;}&ndash;&gt;-->
-								<!--&lt;!&ndash;}.writeTo("$buildDir/gradle_pom.xml")&ndash;&gt;-->
-							<!--</task>-->
-						<!--</tasks>-->
-					<!--</configuration>-->
-					<!--<executions>-->
-						<!--<execution>-->
-							<!--<phase>compile</phase>-->
-							<!--<goals>-->
-								<!--<goal>invoke</goal>-->
-							<!--</goals>-->
-						<!--</execution>-->
-					<!--</executions>-->
-				<!--</plugin>-->
-			<!--</plugins>-->
-		<!--</build>-->
-
 	<dependencies>
 		<dependency>
 			<groupId>playground</groupId>
