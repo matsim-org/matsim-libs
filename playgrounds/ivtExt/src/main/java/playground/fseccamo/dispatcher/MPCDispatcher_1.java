@@ -314,7 +314,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                 final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
                                 if (0 < desiredRebalance) {
                                     String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";
-                                    System.out.println(String.format("vl=%2d  cars=%d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
+                                    System.out.println(String.format("vl=%3d  cars=%3d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
                                     Random random = new Random();
                                     int min = Math.min(desiredRebalance, cars.size());
                                     for (int count = 0; count < min; ++count) {
@@ -348,7 +348,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                 final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
                                 final int desiredPickup = requestVector.Get(vectorIndex).number().intValue();
                                 if (0 < desiredPickup) {
-                                    System.out.println(String.format("vl=%2d  cars=%d  pick=%3d  ", //
+                                    System.out.println(String.format("vl=%3d  cars=%3d  pick=%3d  ", //
                                             vectorIndex, cars.size(), desiredPickup));
                                     { // handle requests
                                         final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
