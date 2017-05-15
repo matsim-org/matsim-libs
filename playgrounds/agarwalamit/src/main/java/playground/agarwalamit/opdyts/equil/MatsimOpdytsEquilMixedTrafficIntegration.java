@@ -73,6 +73,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 	private static boolean isPlansRelaxed = true;
 
+	private static int randomSeedForDecisionVariableRandomizer;
 
 	public static void main(String[] args) {
 
@@ -84,6 +85,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			averagingIterations = Integer.valueOf(args[4]);
 			selfTunerWeight = Double.valueOf(args[5]);
 			isPlansRelaxed = Boolean.valueOf(args[6]);
+			randomSeedForDecisionVariableRandomizer = Integer.valueOf(args[7]);
 		}
 
 		Set<String> modes2consider = new HashSet<>();
@@ -231,7 +233,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC,  Double.valueOf(randomVariance),  EQUIL_MIXEDTRAFFIC, null);
+				RandomizedUtilityParametersChoser.ONLY_ASC,  Double.valueOf(randomVariance),  EQUIL_MIXEDTRAFFIC, null, randomSeedForDecisionVariableRandomizer);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL_MIXEDTRAFFIC);
