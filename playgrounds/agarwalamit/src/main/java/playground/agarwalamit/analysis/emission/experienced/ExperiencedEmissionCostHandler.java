@@ -75,12 +75,12 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 
 		// munich CNE specific data
 		
-//		final Integer noOfXCells = 270;
-//		final Integer noOfYCells = 208;
-//		final double xMin = 4452550.;
-//		final double xMax = 4479550.;
-//		final double yMin = 5324955.;
-//		final double yMax = 5345755.;
+		final Integer noOfXCells = 270;
+		final Integer noOfYCells = 208;
+		final double xMin = 4452550.;
+		final double xMax = 4479550.;
+		final double yMin = 5324955.;
+		final double yMax = 5345755.;
 		
 //		final Integer noOfXCells = 160;
 //		final Integer noOfYCells = 120;
@@ -91,65 +91,66 @@ public class ExperiencedEmissionCostHandler implements WarmEmissionEventHandler,
 		
 		// berlin CNE specific data
 		
-		final Integer noOfXCells = 677;
-		final Integer noOfYCells = 446;
-		final double xMin = 4565039.;
-		final double xMax = 4632739.;
-		final double yMin = 5801108.;
-		final double yMax = 5845708.;
+//		final Integer noOfXCells = 677;
+//		final Integer noOfYCells = 446;
+//		final double xMin = 4565039.;
+//		final double xMax = 4632739.;
+//		final double yMin = 5801108.;
+//		final double yMax = 5845708.;
 
 		final Double timeBinSize = 3600.;
 		final int noOfTimeBins = 30;
 
 		// munich
-//		String dir = "/Users/amit/Documents/cluster/ils4/kaddoura/cne/munich/output/";
-//		String outFile = "/Users/amit/Documents/cluster/ils4/agarwal/munich/airPolluationExposureCosts_cne.txt";
+		String dir = "/Users/ihab/Desktop/ils4/kaddoura/cne/munich/output/";
+		String outFile = "/Users/ihab/Desktop/ils4/kaddoura/cne/munich/output/airPolluationExposureCosts_cne.txt";
 
 		// berlin
-		String dir = "/Users/ihab/Desktop/ils4i/kaddoura/cne/berlin-dz-1pct/output/";
-		String outFile = dir +"airPolluationExposureCosts_cne.txt";
+//		String dir = "/Users/ihab/Desktop/ils4/kaddoura/cne/berlin-dz-1pct/output/";
+//		String outFile = dir +"airPolluationExposureCosts_cne.txt";
 		
 		// munich
-//		String [] cases = {
-//				"output_run0_muc_bc","output_run0b_muc_bc"
-//				,"output_run1_muc_c_QBPV3","output_run1b_muc_c_QBPV3"
-//				,"output_run2_muc_c_QBPV9","output_run2b_muc_c_QBPV9"
-//				,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
-//				,"output_run4_muc_cne_DecongestionPID","output_run4b_muc_cne_DecongestionPID"
-//				,"output_run5_muc_cne_QBPV3","output_run5b_muc_cne_QBPV3"
-//				,"output_run6_muc_cne_QBPV9","output_run6b_muc_cne_QBPV9"
-//				,"output_run7_muc_n","output_run7b_muc_n"
-//				,"output_run8_muc_e","output_run8b_muc_e"
-//		};
-//		int [] its = {1000, 1500};
+		String [] cases = {
+				"output_run0_muc_bc","output_run0b_muc_bc"
+				,"output_run1_muc_c_QBPV3","output_run1b_muc_c_QBPV3"
+				,"output_run2_muc_c_QBPV9","output_run2b_muc_c_QBPV9"
+				,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
+				,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
+				,"output_run4_muc_cne_DecongestionPID","output_run4b_muc_cne_DecongestionPID"
+				,"output_run5_muc_cne_QBPV3","output_run5b_muc_cne_QBPV3"
+				,"output_run6_muc_cne_QBPV9","output_run6b_muc_cne_QBPV9"
+				,"output_run7_muc_n","output_run7b_muc_n"
+				,"output_run8_muc_e","output_run8b_muc_e"
+		};
+		int [] its = {1500};
 
 		// berlin
-		String [] cases = {
-				"m_r_output_run0_bln_bc"
-				,"m_r_output_run1_bln_c_QBPV3"
-				,"m_r_output_run2_bln_c_QBPV9"
-				,"m_r_output_run3_bln_c_DecongestionPID"
-				,"m_r_output_run3b_bln_c_DecongestionBangBang"
-				,"m_r_output_run4_bln_cne_DecongestionPID"
-				,"m_r_output_run4b_bln_cne_DecongestionBangBang",
-				"m_r_output_run5_bln_cne_QBPV3",
-				"m_r_output_run6_bln_cne_QBPV9",
-				"m_r_output_run7_bln_n",
-				"m_r_output_run8_bln_e",
-//
-				"r_output_run0_bln_bc"
-				,"r_output_run1_bln_c_QBPV3"
-				,"r_output_run2_bln_c_QBPV9"
-				,"r_output_run3_bln_c_DecongestionPID"
-				,"r_output_run3b_bln_c_DecongestionBangBang"
-				,"r_output_run4_bln_cne_DecongestionPID"
-				,"r_output_run4b_bln_cne_DecongestionBangBang",
-				"r_output_run5_bln_cne_QBPV3",
-				"r_output_run6_bln_cne_QBPV9",
-				"r_output_run7_bln_n",
-				"r_output_run8_bln_e"
-		};
-		int [] its = {100};
+//		String [] cases = {
+//				"m_r_output_run0_bln_bc"
+//				,"m_r_output_run1_bln_c_QBPV3"
+//				,"m_r_output_run2_bln_c_QBPV9"
+//				,"m_r_output_run3_bln_c_DecongestionPID"
+//				,"m_r_output_run3b_bln_c_DecongestionBangBang"
+//				,"m_r_output_run4_bln_cne_DecongestionPID"
+//				,"m_r_output_run4b_bln_cne_DecongestionBangBang",
+//				"m_r_output_run5_bln_cne_QBPV3",
+//				"m_r_output_run6_bln_cne_QBPV9",
+//				"m_r_output_run7_bln_n",
+//				"m_r_output_run8_bln_e",
+////
+//				"r_output_run0_bln_bc"
+//				,"r_output_run1_bln_c_QBPV3"
+//				,"r_output_run2_bln_c_QBPV9"
+//				,"r_output_run3_bln_c_DecongestionPID"
+//				,"r_output_run3b_bln_c_DecongestionBangBang"
+//				,"r_output_run4_bln_cne_DecongestionPID"
+//				,"r_output_run4b_bln_cne_DecongestionBangBang",
+//				"r_output_run5_bln_cne_QBPV3",
+//				"r_output_run6_bln_cne_QBPV9",
+//				"r_output_run7_bln_n",
+//				"r_output_run8_bln_e"
+//		};
+//		int [] its = {300};
 		
 		try(BufferedWriter writer = IOUtils.getBufferedWriter(outFile)) {
 			writer.write("case \t itNr \t costsInEur \t tollValuesEUR \n");
