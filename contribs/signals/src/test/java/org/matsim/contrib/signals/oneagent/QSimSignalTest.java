@@ -113,7 +113,6 @@ public class QSimSignalTest implements
 	 * Tests the setup with a traffic light that shows red less than the specified intergreen time of five seconds.
 	 */
 	@Test(expected = RuntimeException.class)
-	@Ignore // see MATSim-670
 	public void testIntergreensAbortOneAgentDriving() { // throws RuntimeException {
 		//configure and load standard scenario
 		Scenario scenario = new Fixture().createAndLoadTestScenario(true);
@@ -127,9 +126,7 @@ public class QSimSignalTest implements
 		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
 		groupData.setOnset(0);
 		groupData.setDropping(59);	
-		
-//		scenario.getConfig().parallelEventHandling().setNumberOfThreads(1);
-		
+
 		runQSimWithSignals(scenario, false);
 		
 		// if this code is reached, no exception has been thrown
