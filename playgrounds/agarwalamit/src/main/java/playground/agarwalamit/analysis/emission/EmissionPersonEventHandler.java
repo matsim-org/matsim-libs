@@ -35,7 +35,6 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -47,7 +46,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class EmissionPersonEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
-    private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+    private final Map<Id<Vehicle>, Id<Person>> vehicle2DriverIdCollector = new HashMap<>();
 
     private final Map<Id<Person>, Map<ColdPollutant, Double>> personId2ColdEmissions = new HashMap<>();
     private final Map<Id<Vehicle>, Map<ColdPollutant, Double>> vehicleId2ColdEmissions = new HashMap<>();
@@ -56,24 +55,7 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
 
     @Override
     public void handleEvent(WarmEmissionEvent event) {
-//        Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-        //TODO : following would be gone as soon as I will be able to fix the reading of two events file.
-        Id<Person> driverId ;
-        String vehicleIdString = event.getVehicleId().toString();
-
-        if( vehicleIdString.endsWith("motorbike") ){
-            int lastIndex = vehicleIdString.indexOf("_motorbike");
-            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-        } else if ( vehicleIdString.endsWith("bike") ){
-            int lastIndex = vehicleIdString.indexOf("_bike");
-            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-        } else if ( vehicleIdString.endsWith("truck") ){
-            int lastIndex = vehicleIdString.indexOf("_truck");
-            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-        } else {
-            driverId = Id.createPersonId(vehicleIdString);
-        }
-
+        Id<Person> driverId = getDriverOfVehicle(event.getVehicleId());
         {
             Map<WarmPollutant, Double> warmEmissions = this.personId2WarmEmissions.get(driverId);
 
@@ -105,23 +87,7 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
 
     @Override
     public void handleEvent(ColdEmissionEvent event) {
-//        Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-        //TODO : following would be gone as soon as I will be able to fix the reading of two events file.
-        Id<Person> driverId ;
-        String vehicleIdString = event.getVehicleId().toString();
-
-        if( vehicleIdString.endsWith("motorbike") ){
-            int lastIndex = vehicleIdString.indexOf("_motorbike");
-            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-        } else if ( vehicleIdString.endsWith("bike") ){
-            int lastIndex = vehicleIdString.indexOf("_bike");
-            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-        } else if ( vehicleIdString.endsWith("truck") ){
-            int lastIndex = vehicleIdString.indexOf("_truck");
-            driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-        } else {
-            driverId = Id.createPersonId(vehicleIdString);
-        }
+        Id<Person> driverId = getDriverOfVehicle(event.getVehicleId());
 
         {
             Map<ColdPollutant, Double> coldEmissions = this.personId2ColdEmissions.get(driverId);
@@ -159,21 +125,21 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
         this.personId2ColdEmissions.clear();
         this.vehicleId2ColdEmissions.clear();
         this.vehicleId2WarmEmissions.clear();
-        this.delegate.reset(iteration);
+        this.vehicle2DriverIdCollector.clear();
     }
 
     @Override
     public void handleEvent(VehicleEntersTrafficEvent event) {
-        delegate.handleEvent(event);
+        this.vehicle2DriverIdCollector.put(event.getVehicleId(), event.getPersonId());
     }
 
     @Override
     public void handleEvent(VehicleLeavesTrafficEvent event) {
-        delegate.handleEvent(event);
+        this.vehicle2DriverIdCollector.remove(event.getVehicleId());
     }
 
     public Id<Person> getDriverOfVehicle(Id<Vehicle> vehicleId) {
-        return delegate.getDriverOfVehicle(vehicleId);
+        return this.vehicle2DriverIdCollector.get(vehicleId);
     }
 
     public Map<Id<Person>, Map<ColdPollutant, Double>> getPersonId2ColdEmissions() {
