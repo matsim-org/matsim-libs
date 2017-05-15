@@ -18,20 +18,19 @@ import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
+import playground.clruch.utils.gui.GraphicsUtil;
 
 public class MatsimMapComponent extends JMapViewer {
 
     final MatsimStaticDatabase db;
     private int repaint_count = 0;
-    public boolean displayHud = true;
-
     SimulationObject simulationObject = null;
 
     public final VirtualNetworkLayer virtualNetworkLayer;
 
     public final List<ViewerLayer> viewerLayers = new ArrayList<>();
     private final List<InfoString> infoStrings = new LinkedList<>();
-    private static Font infoStringFont = new Font(Font.MONOSPACED, Font.BOLD, 13);
+    private int infoFontSize = 13;
     private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
 
     public JLabel jLabel = new JLabel(" ");
@@ -105,21 +104,18 @@ public class MatsimMapComponent extends JMapViewer {
 
             jLabel.setText(ref.infoLine);
 
-            if (displayHud)
+            if (0 < infoFontSize)
                 drawInfoStrings(graphics);
-        }
-        {
-            // graphics.setFont(debugStringFont);
-            // graphics.setColor(Color.LIGHT_GRAY);
-            // graphics.drawString("" + repaint_count, 0, dimension.height - 40);
         }
     }
 
     private void drawInfoStrings(Graphics2D graphics) {
         int piy = 10;
         final int pix = 5;
-        final int height = 15;
-        graphics.setFont(infoStringFont);
+        final int height = infoFontSize + 2;
+        GraphicsUtil.setQualityHigh(graphics);
+
+        graphics.setFont(new Font(Font.MONOSPACED, Font.BOLD, infoFontSize));
         FontMetrics fontMetrics = graphics.getFontMetrics();
         for (InfoString infoString : infoStrings) {
             if (infoString.message.isEmpty()) {
@@ -134,6 +130,7 @@ public class MatsimMapComponent extends JMapViewer {
                 piy += height;
             }
         }
+        GraphicsUtil.setQualityDefault(graphics);
     }
 
     void appendSeparator() {
@@ -158,9 +155,12 @@ public class MatsimMapComponent extends JMapViewer {
         repaint();
     }
 
-    public void setHudShow(boolean selected) {
-        displayHud = selected;
-        repaint();
+    public void setFontSize(int i) {
+        infoFontSize = i;
+    }
+
+    public int getFontSize() {
+        return infoFontSize;
     }
 
 }

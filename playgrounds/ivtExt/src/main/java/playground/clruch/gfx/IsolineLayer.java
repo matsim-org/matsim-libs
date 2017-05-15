@@ -16,7 +16,8 @@ import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.RowPanel;
 
-class IsolineLayer extends ViewerLayer {
+@Deprecated
+class IsolineLayer extends ViewerLayer { // TODO not used yet
 
     public IsolineLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);

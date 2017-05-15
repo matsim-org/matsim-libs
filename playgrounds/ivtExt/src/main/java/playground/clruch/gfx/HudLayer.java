@@ -9,6 +9,7 @@ import javax.swing.JCheckBox;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.GraphicsUtil;
 import playground.clruch.utils.gui.RowPanel;
+import playground.clruch.utils.gui.SpinnerLabel;
 
 /**
  * Head Up Display
@@ -38,11 +39,18 @@ public class HudLayer extends ViewerLayer {
     @Override
     protected void createPanel(RowPanel rowPanel) {
         {
-            JCheckBox jCheckBox = new JCheckBox("details");
-            jCheckBox.setToolTipText("head up display");
-            jCheckBox.setSelected(show);
-            jCheckBox.addActionListener(e -> matsimMapComponent.setHudShow(jCheckBox.isSelected()));
-            rowPanel.add(jCheckBox);
+            SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
+            spinnerLabel.setArray(0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 22, 24);
+            spinnerLabel.setMenuHover(true);
+            spinnerLabel.setValueSafe(matsimMapComponent.getFontSize());
+            spinnerLabel.addSpinnerListener(i -> {
+                matsimMapComponent.setFontSize(i);
+                matsimMapComponent.repaint();
+            });
+            spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(55, DEFAULT_HEIGHT));
+            spinnerLabel.getLabelComponent().setToolTipText("font size of info");
+            rowPanel.add(spinnerLabel.getLabelComponent());
+
         }
         {
             JCheckBox jCheckBox = new JCheckBox("clock");
