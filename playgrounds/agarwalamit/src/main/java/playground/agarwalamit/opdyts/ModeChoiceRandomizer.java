@@ -41,7 +41,10 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
     public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,
                                 final double randomVariance, final OpdytsScenario opdytsScenario, final String subPopName) {
         this.scenario = scenario;
-        this.rnd = new Random(4711);
+        this.rnd = new Random();
+//        this.rnd = new Random(4711);
+// this will create an identical sequence of candidate decision variables for each experiment where a new ModeChoiceRandomizer instance is created.
+// That's not good; the parametrized runs are then all conditional on the 4711 random seed.
         // (careful with using matsim-random since it is always the same sequence in one run)
         this.randomizedUtilityParametersChoser = randomizedUtilityParametersChoser;
         this.randomVariance = randomVariance;

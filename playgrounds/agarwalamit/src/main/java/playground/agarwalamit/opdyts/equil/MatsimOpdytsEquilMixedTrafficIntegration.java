@@ -139,9 +139,10 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		//==
 
-		if(! isPlansRelaxed) {
+		//
+		config.controler().setOutputDirectory(OUT_DIR+"/relaxingPlans/");
 
-			config.controler().setOutputDirectory(OUT_DIR+"/relaxingPlans/");
+		if(! isPlansRelaxed) {
 			config.controler().setLastIteration(50);
 			config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
@@ -166,12 +167,11 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			controler.run();
 
 			FileUtils.deleteIntermediateIterations(config.controler().getOutputDirectory(),controler.getConfig().controler().getFirstIteration(), controler.getConfig().controler().getLastIteration());
-
-			// set back settings for opdyts
-			File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
-			config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
 		}
 
+		// set back settings for opdyts
+		File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
+		config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
 		OUT_DIR = OUT_DIR+"/calibration_"+ averagingIterations +"Its_"+selfTunerWeight+"weight/";
 
 		config.controler().setOutputDirectory(OUT_DIR);
@@ -256,7 +256,8 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 				);
 
 		// probably, an object which decide about the inertia
-		SelfTuner selfTuner = new SelfTuner(selfTunerWeight);
+		SelfTuner selfTuner = new SelfTuner(0.95);
+		selfTuner.setWeightScale(selfTunerWeight);
 
 		randomSearch.setLogPath(OUT_DIR);
 
