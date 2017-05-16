@@ -34,30 +34,20 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 public class PrepareForSimUtils {
 
     public static PrepareForSim createDefaultPrepareForSim(final Scenario scenario, final EventsManager eventsManager){
-        com.google.inject.Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), new StandalonePrepareForSim(scenario,eventsManager));
+        com.google.inject.Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(),
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        install(new ScenarioByInstanceModule(scenario));
+                        bind(EventsManager.class).toInstance(eventsManager);
+
+                        install(new TripRouterModule());
+                        install(new TravelDisutilityModule());
+                        install(new TravelTimeCalculatorModule());
+
+                        bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+                    }
+                });
         return (PrepareForSim) injector.getInstance(PrepareForSim.class);
     }
-
-    private static class StandalonePrepareForSim extends org.matsim.core.controler.AbstractModule {
-        private final Scenario scenario;
-        private final EventsManager eventsManager;
-
-        public StandalonePrepareForSim(final Scenario scenario, final EventsManager eventsManager) {
-            this.scenario = scenario;
-            this.eventsManager = eventsManager;
-        }
-
-        @Override
-        public void install() {
-            install(new ScenarioByInstanceModule(scenario));
-            bind(EventsManager.class).toInstance(eventsManager);
-
-            install(new TripRouterModule());
-            install(new TravelDisutilityModule());
-            install(new TravelTimeCalculatorModule());
-
-            bind(PrepareForSim.class).to(PrepareForSimImpl.class);
-        }
-    }
-
 }
